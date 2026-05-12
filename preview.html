@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>歲悅長照｜響應式預覽</title>
+    <style>
+      :root {
+        --orange: #f08a24;
+        --rice: #f6e9d9;
+        --cream: #fff8ee;
+        --brown: #4b2609;
+        --line: #efd7bc;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #24150d;
+        color: var(--brown);
+        font-family: "Noto Sans TC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .preview-shell {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        min-height: 100vh;
+      }
+
+      .preview-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 14px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 248, 238, 0.96);
+        backdrop-filter: blur(16px);
+      }
+
+      .preview-title strong,
+      .preview-title small {
+        display: block;
+      }
+
+      .preview-title strong {
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .preview-title small {
+        margin-top: 3px;
+        color: #80614b;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .device-tabs {
+        display: inline-flex;
+        gap: 8px;
+        padding: 6px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+      }
+
+      .device-tab {
+        min-height: 42px;
+        padding: 9px 16px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--brown);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+
+      .device-tab.active {
+        background: var(--orange);
+        color: #fff;
+      }
+
+      .preview-meta {
+        color: #80614b;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .device-stage {
+        display: grid;
+        place-items: start center;
+        min-height: 0;
+        padding: 28px;
+        overflow: auto;
+      }
+
+      .device-frame {
+        width: min(var(--device-width), 100%);
+        min-width: min(var(--device-width), 100%);
+        height: var(--device-height);
+        border: 10px solid #130b07;
+        border-radius: var(--device-radius);
+        background: #fff;
+        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+        overflow: hidden;
+        transition: width 0.24s ease, min-width 0.24s ease, height 0.24s ease, border-radius 0.24s ease;
+      }
+
+      .device-frame iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: #fff;
+      }
+
+      body[data-device="desktop"] {
+        --device-width: 1440px;
+        --device-height: 900px;
+        --device-radius: 22px;
+      }
+
+      body[data-device="tablet"] {
+        --device-width: 820px;
+        --device-height: 1080px;
+        --device-radius: 30px;
+      }
+
+      body[data-device="mobile"] {
+        --device-width: 390px;
+        --device-height: 844px;
+        --device-radius: 36px;
+      }
+
+      @media (max-width: 760px) {
+        .preview-toolbar {
+          display: grid;
+        }
+
+        .device-tabs {
+          width: 100%;
+          justify-content: stretch;
+        }
+
+        .device-tab {
+          flex: 1;
+          padding-inline: 10px;
+        }
+
+        .device-stage {
+          padding: 16px 10px 28px;
+        }
+
+        .device-frame {
+          border-width: 7px;
+        }
+      }
+    </style>
+  </head>
+  <body data-device="desktop">
+    <div class="preview-shell">
+      <header class="preview-toolbar">
+        <div class="preview-title">
+          <strong>歲悅長照響應式預覽</strong>
+          <small>切換裝置寬度，即時檢查首頁與選單排版</small>
+        </div>
+        <div class="device-tabs" role="tablist" aria-label="裝置預覽">
+          <button class="device-tab active" type="button" role="tab" aria-selected="true" data-device="desktop">電腦</button>
+          <button class="device-tab" type="button" role="tab" aria-selected="false" data-device="tablet">平板</button>
+          <button class="device-tab" type="button" role="tab" aria-selected="false" data-device="mobile">手機</button>
+        </div>
+        <div class="preview-meta" id="previewMeta">Desktop · 1440 × 900</div>
+      </header>
+
+      <main class="device-stage">
+        <div class="device-frame">
+          <iframe src="index.html" title="歲悅長照網站預覽"></iframe>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const labels = {
+        desktop: "Desktop · 1440 × 900",
+        tablet: "Tablet · 820 × 1080",
+        mobile: "Mobile · 390 × 844"
+      };
+
+      const meta = document.querySelector("#previewMeta");
+      const tabs = document.querySelectorAll(".device-tab");
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const device = tab.dataset.device;
+          document.body.dataset.device = device;
+          meta.textContent = labels[device];
+
+          tabs.forEach((item) => {
+            const active = item === tab;
+            item.classList.toggle("active", active);
+            item.setAttribute("aria-selected", String(active));
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
