@@ -201,8 +201,13 @@ button, input, select, textarea { font: inherit; }
 
 .page { display: none; }
 .page.active { display: block; }
-.reveal { opacity: 0; transform: translateY(34px); transition: opacity .75s ease, transform .75s ease; }
-.reveal.in-view { opacity: 1; transform: translateY(0); }
+.reveal {
+  opacity: 1;
+  transform: translateY(0);
+  transition: transform .75s ease;
+}
+.reveal:not(.in-view) { transform: translateY(10px); }
+.reveal.in-view { transform: translateY(0); }
 
 .hero {
   position: relative;
