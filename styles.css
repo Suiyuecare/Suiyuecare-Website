@@ -563,10 +563,11 @@ h2 {
   align-content: start;
   gap: 0;
   min-width: 0;
-  padding: 26px;
+  height: 100%;
+  padding: clamp(24px, 2.6vw, 38px);
   border: 1px solid var(--line);
   border-radius: 36px;
-  background: rgba(255,255,255,.82);
+  background: rgba(255,253,248,.96);
   box-shadow: 0 18px 46px rgba(83,43,11,.08);
 }
 .care-values .scene-side-title {
@@ -680,9 +681,9 @@ h2 {
 
 .content-wall {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr);
-  gap: 20px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1.16fr) minmax(420px, .84fr);
+  gap: clamp(34px, 4vw, 62px);
+  align-items: stretch;
   background: var(--cream);
 }
 .content-wall > * {
@@ -691,7 +692,7 @@ h2 {
 .wall-main,
 .scene-carousel {
   position: relative;
-  min-height: clamp(430px, 38vw, 560px);
+  min-height: clamp(500px, 40vw, 640px);
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 36px;
@@ -731,7 +732,7 @@ h2 {
 .scene-carousel h2, .scene-carousel .eyebrow { color: #fff; }
 .wall-side, .scene-side { display: grid; gap: 20px; }
 .scene-side {
-  align-self: start;
+  align-self: stretch;
 }
 .scene-side-title h2 {
   margin: 8px 0 0;
@@ -741,9 +742,9 @@ h2 {
 .wall-side article, .scene-side article { padding: 20px 22px; border: 1px solid var(--line); border-radius: 24px; background: #fff; box-shadow: 0 18px 46px rgba(83,43,11,.08); }
 .care-values article {
   display: grid;
-  grid-template-columns: 48px 1fr;
-  gap: 4px 14px;
-  padding: 18px 0;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 4px 18px;
+  padding: 24px 0;
   border: 0;
   border-bottom: 1px solid rgba(234,210,182,.8);
   border-radius: 0;
@@ -763,8 +764,8 @@ h2 {
 .care-values article span {
   display: grid;
   grid-row: 1 / span 2;
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   place-items: center;
   border-radius: 999px;
   background: var(--orange);
@@ -1611,6 +1612,7 @@ h2 {
   .north-map { aspect-ratio: 1448 / 1086; height: auto; }
   .location-detail { height: auto; }
   .hero-copy, .hero-dashboard { grid-column: auto; grid-row: auto; }
+  .care-values { height: auto; }
   .health-grid { grid-template-columns: 1fr 1fr; }
   .health-preview.feature img { height: 260px; }
 }
