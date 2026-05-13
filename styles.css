@@ -584,7 +584,8 @@ h2 {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  max-width: calc(100% - 82px);
+  grid-area: meta;
+  min-width: 0;
   color: var(--orange-dark);
   font-size: 13px;
   font-weight: 900;
@@ -621,6 +622,15 @@ h2 {
 }
 .story-slider article {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 70px;
+  grid-template-areas:
+    "meta face"
+    "title title"
+    "points points"
+    "read read";
+  align-content: start;
+  column-gap: 18px;
   flex: 0 0 clamp(320px, 31vw, 430px);
   min-height: 330px;
   padding: 28px 28px 26px;
@@ -631,11 +641,13 @@ h2 {
   scroll-snap-align: start;
 }
 .story-face {
-  position: absolute;
-  top: 24px;
-  right: 24px;
+  position: static;
+  grid-area: face;
+  justify-self: end;
+  align-self: start;
   width: 62px;
   height: 62px;
+  min-width: 62px;
   border: 3px solid #fff;
   border-radius: 50%;
   object-fit: cover;
@@ -645,12 +657,14 @@ h2 {
 .story-slider::-webkit-scrollbar-track { border-radius: 999px; background: rgba(246,233,217,.72); }
 .story-slider::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(240,138,36,.72); }
 .story-slider h3 {
+  grid-area: title;
   margin: 16px 0 14px;
   color: var(--brown);
   font-size: 25px;
   line-height: 1.35;
 }
 .story-points {
+  grid-area: points;
   display: grid;
   gap: 10px;
   margin-top: 18px;
@@ -672,6 +686,10 @@ h2 {
   margin-top: 18px;
   color: var(--orange-dark);
   font-weight: 900;
+}
+.story-readmore {
+  grid-area: read;
+  justify-self: start;
 }
 .story-readmore::after,
 .celebrity-slider a::after {
