@@ -318,12 +318,16 @@
             <h2>先留下需求，讓我們協助判斷適合的照顧方向。</h2>
             <p>服務諮詢、課程報名、人才招募、土地合作與投資洽談，都可以從這裡開始。</p>
           </div>
-          <form class="contact-form">
-            <label>姓名<input type="text" placeholder="請輸入姓名" /></label>
-            <label>電話<input type="tel" placeholder="請輸入聯絡電話" /></label>
-            <label>需求<select><option>長照服務諮詢</option><option>課程報名</option><option>人才招募</option><option>土地合作</option><option>投資洽談</option></select></label>
-            <label>說明<textarea rows="4" placeholder="請簡單描述目前遇到的照顧情境"></textarea></label>
-            <button type="button">送出諮詢</button>
+          <form class="contact-form" action="https://formsubmit.co/generalaffairs@suiyuecare.com" method="POST">
+            <input type="hidden" name="_subject" value="歲悅長照官網聯絡表單" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <label>姓名<input type="text" name="姓名" placeholder="請輸入姓名" required /></label>
+            <label>電話<input type="tel" name="電話" placeholder="請輸入聯絡電話" required /></label>
+            <label>需求<select name="需求" required><option>長照服務諮詢</option><option>課程報名</option><option>人才招募</option><option>土地合作</option><option>投資洽談</option></select></label>
+            <label>說明<textarea name="說明" rows="4" placeholder="請簡單描述目前遇到的照顧情境" required></textarea></label>
+            <button type="submit">送出諮詢</button>
           </form>
         </section>
 

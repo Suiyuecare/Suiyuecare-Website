@@ -1498,7 +1498,8 @@ h2 {
   box-shadow: var(--shadow);
 }
 .contact-form label { display: grid; gap: 9px; color: var(--brown); font-weight: 900; }
-.contact-form label:nth-child(4), .contact-form button { grid-column: 1 / -1; }
+.contact-form input[name="_honey"] { display: none; }
+.contact-form label:last-of-type, .contact-form button { grid-column: 1 / -1; }
 .contact-form input, .contact-form select, .contact-form textarea {
   width: 100%;
   min-height: 52px;
