@@ -698,6 +698,7 @@ h2 {
 }
 
 .content-wall {
+  --care-wall-height: clamp(520px, 42vw, 640px);
   display: grid;
   grid-template-columns: minmax(0, 1.16fr) minmax(420px, .84fr);
   gap: clamp(34px, 4vw, 62px);
@@ -710,8 +711,9 @@ h2 {
 .wall-main,
 .scene-carousel {
   position: relative;
-  min-height: clamp(500px, 40vw, 640px);
-  aspect-ratio: 16 / 9;
+  height: var(--care-wall-height);
+  min-height: 0;
+  aspect-ratio: auto;
   overflow: hidden;
   border-radius: 36px;
   box-shadow: var(--shadow);
@@ -1630,16 +1632,16 @@ h2 {
   .north-map { aspect-ratio: 1448 / 1086; height: auto; }
   .location-detail { height: auto; }
   .hero-copy, .hero-dashboard { grid-column: auto; grid-row: auto; }
+  .content-wall { --care-wall-height: auto; }
+  .scene-carousel { height: auto; min-height: clamp(420px, 62vw, 560px); }
   .care-values { height: auto; }
   .health-grid { grid-template-columns: 1fr 1fr; }
   .health-preview.feature img { height: 260px; }
 }
 @media (max-width: 1320px) and (min-width: 1181px) {
   .content-wall {
+    --care-wall-height: clamp(500px, 44vw, 590px);
     grid-template-columns: minmax(0, 1.3fr) minmax(260px, .7fr);
-  }
-  .scene-carousel {
-    min-height: 420px;
   }
   .scene-side-title h2 {
     font-size: 30px;
