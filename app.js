@@ -112,6 +112,7 @@ const groups = document.querySelectorAll(".nav-group");
 const home = document.querySelector("#home");
 const pageView = document.querySelector("#pageView");
 const revealItems = document.querySelectorAll(".reveal");
+const introLoader = document.querySelector(".intro-loader");
 const WP_API_BASE = "https://www.suiyuecare.com/wp-json/wp/v2";
 const WP_CATEGORIES = {
   latestNews: "latest-news",
@@ -490,6 +491,8 @@ function renderCoursesPage() {
 }
 
 function renderPage(slug) {
+  if (!home || !pageView) return;
+
   const normalized = slug || "home";
   const anchorTarget = normalized === "home" ? null : document.getElementById(normalized);
   const page = anchorTarget ? null : pages[normalized];
@@ -544,8 +547,8 @@ function renderPage(slug) {
     link.classList.toggle("active", link.getAttribute("href") === `#${normalized}`);
   });
 
-  nav.classList.remove("open");
-  menuToggle.setAttribute("aria-expanded", "false");
+  nav?.classList.remove("open");
+  menuToggle?.setAttribute("aria-expanded", "false");
   groups.forEach((group) => group.classList.remove("open"));
 
   if (anchorTarget && normalized !== "home") {
@@ -555,22 +558,30 @@ function renderPage(slug) {
   }
 }
 
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("in-view");
-      }
-    });
-  },
-  { threshold: 0.16 }
-);
+if ("IntersectionObserver" in window) {
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+        }
+      });
+    },
+    { threshold: 0.16 }
+  );
 
-revealItems.forEach((item) => revealObserver.observe(item));
+  revealItems.forEach((item) => revealObserver.observe(item));
+} else {
+  revealItems.forEach((item) => item.classList.add("in-view"));
+}
 
-menuToggle.addEventListener("click", () => {
-  const open = nav.classList.toggle("open");
-  menuToggle.setAttribute("aria-expanded", String(open));
+window.setTimeout(() => {
+  revealItems.forEach((item) => item.classList.add("in-view"));
+}, 900);
+
+menuToggle?.addEventListener("click", () => {
+  const open = nav?.classList.toggle("open");
+  menuToggle.setAttribute("aria-expanded", String(Boolean(open)));
 });
 
 groups.forEach((group) => {
@@ -616,6 +627,10 @@ window.addEventListener("hashchange", () => renderPage(location.hash.slice(1)));
 renderPage(location.hash.slice(1));
 loadWordPressContent();
 
+window.setTimeout(() => {
+  introLoader?.remove();
+}, 6200);
+
 window.addEventListener("load", () => {
   window.setTimeout(() => {
     if (location.hash !== "#home") {
@@ -623,5 +638,6 @@ window.addEventListener("load", () => {
       renderPage("home");
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
+    introLoader?.remove();
   }, 4850);
 });
