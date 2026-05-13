@@ -227,7 +227,7 @@ button, input, select, textarea { font: inherit; }
   background:
     linear-gradient(90deg, rgba(28, 12, 4, 0.78) 0%, rgba(28, 12, 4, 0.56) 34%, rgba(28, 12, 4, 0.18) 72%),
     linear-gradient(180deg, rgba(28, 12, 4, 0.08), rgba(28, 12, 4, 0.64)),
-    url("assets/hero-care.png") center / cover;
+    url("assets/homepage-batch/01-care-home-greeting.png") center / cover;
   transform: scale(1.03);
 }
 .hero-copy {
@@ -1265,7 +1265,7 @@ h2 {
   place-items: center;
   overflow: hidden;
   border-radius: 36px;
-  background: linear-gradient(135deg, rgba(63,33,13,.62), rgba(240,138,36,.22)), url("assets/hero-care.png") center / cover;
+  background: linear-gradient(135deg, rgba(63,33,13,.62), rgba(240,138,36,.22)), url("assets/homepage-batch/01-care-home-greeting.png") center / cover;
   box-shadow: var(--shadow);
 }
 .video-panel button {
@@ -1618,7 +1618,7 @@ h2 {
 }
 
 @media (max-width: 1180px) {
-  .site-header { display: flex; min-height: 82px; padding-inline: 22px; }
+  .site-header { display: flex; justify-content: space-between; min-height: 82px; padding-inline: 22px; }
   .brand-mark { width: 58px; height: 58px; }
   .brand small { display: none; }
   .brand strong { font-size: 22px; }
@@ -1661,6 +1661,9 @@ h2 {
   }
 }
 @media (max-width: 900px) {
+  .site-header { gap: 12px; }
+  .brand { min-width: 0; }
+  .menu-toggle { flex: 0 0 auto; margin-left: auto; }
   .menu-toggle { display: grid; width: 48px; height: 48px; padding: 10px; border: 1px solid var(--line); border-radius: 999px; background: #fff; }
   .menu-toggle span { display: block; height: 2px; margin: 4px 0; border-radius: 999px; background: var(--brown); }
   .primary-nav { position: fixed; top: 80px; right: 0; left: 0; display: none; max-height: calc(100vh - 80px); padding: 16px 22px 26px; overflow-y: auto; border-bottom: 1px solid var(--line); background: var(--cream); white-space: normal; }

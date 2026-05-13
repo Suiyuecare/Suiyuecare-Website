@@ -142,7 +142,7 @@ function formatPostDate(dateValue, yearOnly = false) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function getPostImage(post, fallback = "assets/service-overview.png") {
+function getPostImage(post, fallback = "assets/homepage-batch/02-daycare-group-exercise.png") {
   const embedded = post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
   const acfImage = post?.acf?.image?.url || post?.acf?.avatar?.url || post?.acf?.speaker_photo?.url || post?.acf?.cover?.url;
   return acfImage || embedded || fallback;
@@ -185,7 +185,7 @@ function renderWordPressStories(posts) {
     const service = acf.service_type || "居家照顧";
     const quote = acf.quote || stripHTML(post.title?.rendered || "");
     const feedback = acf.short_feedback || stripHTML(post.excerpt?.rendered || post.content?.rendered || "");
-    const image = getPostImage(post, "assets/recruit-home-care-worker.png");
+    const image = getPostImage(post, "assets/homepage-batch/05-orange-polo-caregiver.png");
     return `
       <article>
         <img class="story-face" src="${escapeHTML(image)}" alt="${escapeHTML(name)}頭像" />
@@ -228,7 +228,7 @@ function renderWordPressMasterTalk(posts) {
     return `
       <article>
         <figure>
-          <img src="${escapeHTML(getPostImage(post, "assets/location-taipei.png"))}" alt="${escapeHTML(speaker)}" />
+          <img src="${escapeHTML(getPostImage(post, "assets/homepage-batch/10-family-consultation.png"))}" alt="${escapeHTML(speaker)}" />
           <figcaption>${escapeHTML(speaker)}</figcaption>
         </figure>
         <div>
@@ -263,7 +263,7 @@ async function loadWordPressContent() {
 
 const locationData = {
   shilin: {
-    image: "assets/location-taipei.png",
+    image: "assets/homepage-batch/16-taipei-service-office.png",
     alt: "士林服務據點照片",
     type: "臺北市｜居家照顧站",
     name: "Suiyuecare Corps. 士林照顧站",
@@ -276,7 +276,7 @@ const locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   datong: {
-    image: "assets/location-taipei.png",
+    image: "assets/homepage-batch/10-family-consultation.png",
     alt: "大同服務據點照片",
     type: "臺北市｜家屬諮詢站",
     name: "Suiyuecare Corps. 大同諮詢站",
@@ -289,7 +289,7 @@ const locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   "wanhua-a": {
-    image: "assets/scene-home-care.png",
+    image: "assets/homepage-batch/07-orange-apron-meal-prep.png",
     alt: "萬華居家服務據點照片",
     type: "臺北市｜居家服務點",
     name: "Suiyuecare Corps. 萬華居家服務點 A",
@@ -302,7 +302,7 @@ const locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   "wanhua-b": {
-    image: "assets/scene-care-note.png",
+    image: "assets/homepage-batch/14-care-notes.png",
     alt: "萬華照顧支援據點照片",
     type: "臺北市｜照顧支援點",
     name: "Suiyuecare Corps. 萬華照顧服務點 B",
@@ -315,7 +315,7 @@ const locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   xinyi: {
-    image: "assets/location-taipei.png",
+    image: "assets/homepage-batch/10-family-consultation.png",
     alt: "信義服務據點照片",
     type: "臺北市｜健康促進站",
     name: "Suiyuecare Corps. 信義健康促進站",
@@ -328,7 +328,7 @@ const locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   xindian: {
-    image: "assets/location-newtaipei.png",
+    image: "assets/homepage-batch/12-community-health-class.png",
     alt: "新店日間照顧據點照片",
     type: "新北市｜日間照顧點",
     name: "Suiyuecare Corps. 新店日照據點",
@@ -341,7 +341,7 @@ const locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   xinzhuang: {
-    image: "assets/location-newtaipei.png",
+    image: "assets/homepage-batch/12-community-health-class.png",
     alt: "新莊社區據點照片",
     type: "新北市｜社區照顧點",
     name: "Suiyuecare Corps. 新莊社區據點",
@@ -354,7 +354,7 @@ const locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   luzhu: {
-    image: "assets/location-taoyuan.png",
+    image: "assets/homepage-batch/13-rehab-walking-practice.png",
     alt: "蘆竹護理復能據點照片",
     type: "桃園市｜護理復能點",
     name: "Suiyuecare Corps. 蘆竹復能中心",
@@ -422,7 +422,7 @@ function renderHealthPage() {
       </section>
       <section class="health-grid">
         <article class="health-feature">
-          <img src="assets/service-overview.png" alt="長照健康3.0精選文章" />
+          <img src="assets/homepage-batch/02-daycare-group-exercise.png" alt="長照健康3.0精選文章" />
           <div>
             <span class="health-tag">早安精選</span>
             <h2>第一次申請長照服務，家人需要先準備什麼？</h2>
