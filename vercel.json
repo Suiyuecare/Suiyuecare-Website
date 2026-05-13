@@ -1,4 +1,6 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "buildCommand": "mkdir -p dist && cp index.html styles.css app.js dist/ && cp -R assets dist/assets",
+  "outputDirectory": "dist"
 }
