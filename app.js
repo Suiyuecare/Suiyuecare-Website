@@ -122,6 +122,60 @@ const WP_CATEGORIES = {
   masterTalk: "master-talk"
 };
 
+const articlePages = {
+  "longterm-care-apply": {
+    category: "Health 3.0",
+    title: "第一次申請長照服務，家人需要先準備什麼？",
+    dek: "從需求盤點、照顧計畫、政府補助到服務媒合，用一篇文章把流程講清楚。",
+    image: "assets/homepage-batch/10-family-consultation.png",
+    author: "歲悅照顧編輯部",
+    date: "2026.05.13",
+    readTime: "6 min read",
+    tags: ["長照申請", "家庭照顧", "服務媒合"],
+    summary: ["先整理長輩目前生活需要協助的地方。", "把醫療、用藥、行動能力與家庭照顧時間寫下來。", "諮詢時直接描述一週中最困難的照顧時段。"],
+    content: [
+      ["先從一天的生活節奏開始", "很多家庭第一次接觸長照時，會先問可以申請什麼服務。但更有效的方式，是先把長輩一天的生活節奏整理出來：起床、用餐、洗澡、服藥、外出、睡眠與夜間照顧，哪些地方最容易卡住。這些細節會影響服務安排，也能幫助專業人員更快判斷適合的照顧方向。"],
+      ["把照顧困難說具體", "與其說「需要有人照顧」，不如說「早上起床移位不穩」、「洗澡時家人很擔心跌倒」、「下午容易忘記吃藥」。具體描述能讓督導判斷需要居家照顧、日間照顧、護理復能或家屬支持課程，也能避免服務進場後才重新調整。"],
+      ["保留家屬喘息的空間", "長照不是只照顧長輩，也是在支持整個家庭。當家屬已經長期睡不好、無法上班或情緒緊繃，就應該把喘息需求一起放進討論。好的照顧安排，會讓長輩安全，也讓家人能走得長久。"]
+    ],
+    cta: "不確定該從哪一項服務開始？留下需求，讓歲悅協助判斷。"
+  },
+  "family-care-story": {
+    category: "Care Stories",
+    title: "爸爸出院後，我終於知道每天該注意什麼。",
+    dek: "家屬最需要的不是更多壓力，而是有人把照顧重點說清楚、每天回報、一起調整。",
+    image: "assets/homepage-batch/01-care-home-greeting.png",
+    author: "林小姐｜居家照顧",
+    date: "2026.05.13",
+    readTime: "4 min read",
+    tags: ["居家照顧", "家屬回饋", "出院返家"],
+    summary: ["每日回報讓家人不用猜。", "照服員會提醒移位、用餐與精神狀況。", "督導會依照狀態調整照顧方式。"],
+    content: [
+      ["剛出院時，家人最怕做錯", "林小姐的爸爸出院返家後，家裡最焦慮的是每天都不知道哪些狀況正常、哪些需要留意。歲悅團隊進場後，先協助家屬整理照顧重點，把移位、用餐、服藥與精神狀況變成每天可以追蹤的項目。"],
+      ["照顧紀錄是一封安心回信", "每次服務後，家屬都能知道今天長輩吃得如何、活動狀況如何、是否有特別需要注意的地方。這些紀錄看起來簡單，卻讓下班後的家人可以快速掌握狀況，不用靠猜測累積不安。"],
+      ["照顧不是單點服務，而是一個團隊", "當現場出現新的狀況，照服員不需要一個人承擔。督導會一起討論、調整服務方式，必要時也會建議家屬串接復能或護理資源。這讓照顧更穩定，也讓家庭感覺背後真的有人一起走。"]
+    ],
+    cta: "如果家中也正面臨出院返家或照顧轉換期，可以先和歲悅聊聊。"
+  },
+  "master-talk-care-psychology": {
+    category: "Master Talk",
+    title: "好的照顧，是讓長輩和家屬都保有生活感。",
+    dek: "照顧心理講師周小姐談家庭照顧中的焦慮、溝通與支持系統。",
+    image: "assets/homepage-batch/10-family-consultation.png",
+    author: "照顧心理講師 周小姐",
+    date: "2026.05.13",
+    readTime: "5 min read",
+    tags: ["名人講堂", "照顧心理", "家屬支持"],
+    summary: ["照顧焦慮常來自資訊不清楚。", "家人需要可理解、可求助的系統。", "真正的支持是讓家庭恢復生活感。"],
+    content: [
+      ["照顧中的焦慮，常常不是不愛", "很多家屬在照顧中感到煩躁或疲憊，會因此責備自己。但周小姐提醒，這些情緒往往來自資訊不足與長期壓力。當照顧沒有明確分工，也沒有可以求助的窗口，家人很容易把所有責任都扛在自己身上。"],
+      ["讓資訊變得可以使用", "照顧建議不是越多越好，而是要讓家庭知道今天先做哪一件事。像是跌倒風險、飲食狀況、服藥提醒與情緒變化，都可以轉化成簡單可追蹤的提醒，讓家屬有方向，而不是被資訊淹沒。"],
+      ["保有生活感，是長期照顧的關鍵", "好的照顧不是把家庭變成病房，而是在安全之中保留原本的生活節奏。當長輩仍能做選擇，家屬也能保有休息與工作，照顧才有機會走得長久。"]
+    ],
+    cta: "想把家庭照顧壓力變得更可整理，歡迎預約歲悅照顧諮詢。"
+  }
+};
+
 function stripHTML(value = "") {
   return value.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
@@ -427,11 +481,12 @@ function renderHealthPage() {
             <span class="health-tag">早安精選</span>
             <h2>第一次申請長照服務，家人需要先準備什麼？</h2>
             <p>從需求盤點、照顧計畫、政府補助到服務媒合，用一篇文章把流程講清楚。</p>
+            <a class="health-readmore" href="#article-longterm-care-apply">Read More</a>
           </div>
         </article>
-        <article class="health-card"><span class="health-tag">疾病症狀</span><h3>長輩跌倒後的黃金觀察期</h3><p>整理家人可以在家先觀察的身體訊號與就醫時機。</p></article>
-        <article class="health-card"><span class="health-tag">飲食營養</span><h3>吃得少不是正常老化</h3><p>從體重、食慾與肌力看出營養風險。</p></article>
-        <article class="health-card"><span class="health-tag">失智照顧</span><h3>重複提問怎麼回應？</h3><p>降低衝突，讓照顧者與長輩都保有安全感。</p></article>
+        <article class="health-card"><span class="health-tag">疾病症狀</span><h3>長輩跌倒後的黃金觀察期</h3><p>整理家人可以在家先觀察的身體訊號與就醫時機。</p><a href="#article-longterm-care-apply">Read More</a></article>
+        <article class="health-card"><span class="health-tag">飲食營養</span><h3>吃得少不是正常老化</h3><p>從體重、食慾與肌力看出營養風險。</p><a href="#article-longterm-care-apply">Read More</a></article>
+        <article class="health-card"><span class="health-tag">失智照顧</span><h3>重複提問怎麼回應？</h3><p>降低衝突，讓照顧者與長輩都保有安全感。</p><a href="#article-master-talk-care-psychology">Read More</a></article>
         <aside class="ranking-panel">
           <h3>熱門文章</h3>
           <ol>
@@ -490,19 +545,88 @@ function renderCoursesPage() {
   `;
 }
 
+function renderArticlePage(slug) {
+  const article = articlePages[slug] || articlePages["longterm-care-apply"];
+  const related = Object.entries(articlePages)
+    .filter(([key]) => key !== slug)
+    .slice(0, 3);
+
+  return `
+    <article class="article-page">
+      <header class="article-hero">
+        <div class="article-hero-copy">
+          <a class="article-back" href="#health">Health 3.0</a>
+          <p class="eyebrow">${article.category}</p>
+          <h1>${article.title}</h1>
+          <p>${article.dek}</p>
+          <div class="article-meta">
+            <span>${article.author}</span>
+            <span>${article.date}</span>
+            <span>${article.readTime}</span>
+          </div>
+        </div>
+        <figure>
+          <img src="${article.image}" alt="${article.title}" />
+        </figure>
+      </header>
+
+      <section class="article-shell">
+        <aside class="article-aside">
+          <div class="article-summary">
+            <strong>本文重點</strong>
+            <ul>${article.summary.map((item) => `<li>${item}</li>`).join("")}</ul>
+          </div>
+          <div class="article-tags">
+            ${article.tags.map((tag) => `<span>${tag}</span>`).join("")}
+          </div>
+        </aside>
+
+        <div class="article-body">
+          ${article.content.map(([heading, body]) => `
+            <section>
+              <h2>${heading}</h2>
+              <p>${body}</p>
+            </section>
+          `).join("")}
+          <div class="article-cta">
+            <p>${article.cta}</p>
+            <a href="#contact">預約照顧諮詢</a>
+          </div>
+        </div>
+
+        <aside class="article-related">
+          <strong>延伸閱讀</strong>
+          ${related.map(([key, item]) => `
+            <a href="#article-${key}">
+              <img src="${item.image}" alt="" />
+              <span>${item.category}</span>
+              <b>${item.title}</b>
+            </a>
+          `).join("")}
+        </aside>
+      </section>
+    </article>
+  `;
+}
+
 function renderPage(slug) {
   if (!home || !pageView) return;
 
   const normalized = slug || "home";
+  const articleSlug = normalized.startsWith("article-") ? normalized.replace("article-", "") : null;
   const anchorTarget = normalized === "home" ? null : document.getElementById(normalized);
   const page = anchorTarget ? null : pages[normalized];
-  const isHome = normalized === "home" || Boolean(anchorTarget) || !page;
+  const isHome = !articleSlug && (normalized === "home" || Boolean(anchorTarget) || !page);
 
   home.classList.toggle("active", isHome);
   pageView.classList.toggle("active", !isHome);
   pageView.innerHTML = "";
 
-  if (normalized === "health") {
+  if (articleSlug) {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderArticlePage(articleSlug);
+  } else if (normalized === "health") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderHealthPage();
@@ -633,11 +757,11 @@ window.setTimeout(() => {
 
 window.addEventListener("load", () => {
   window.setTimeout(() => {
-    if (location.hash !== "#home") {
+    if (!location.hash || location.hash === "#home") {
       history.replaceState(null, "", "#home");
       renderPage("home");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
     introLoader?.remove();
   }, 4850);
 });
