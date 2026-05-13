@@ -270,10 +270,10 @@ const locationData = {
     desc: "服務士林、北投生活圈，提供長照需求初談、居家照顧媒合與家屬諮詢。",
     services: "居家照顧、喘息服務、家屬諮詢",
     hours: "週一至週五 09:00-18:00",
-    phone: "02-2755-0824",
-    phoneHref: "tel:0227550824",
+    phone: "02-6604-5432",
+    phoneHref: "tel:0266045432",
     address: "臺北市士林區照顧服務據點",
-    email: "care@suiyuecare.tw"
+    email: "generalaffairs@suiyuecare.com"
   },
   datong: {
     image: "assets/location-taipei.png",
@@ -283,10 +283,10 @@ const locationData = {
     desc: "協助大同、南港與周邊家庭釐清照顧需求，安排到宅照顧與照顧計畫。",
     services: "照顧評估、服務媒合、課程報名",
     hours: "週一至週五 09:00-18:00",
-    phone: "02-2558-0824",
-    phoneHref: "tel:0225580824",
+    phone: "02-6604-5432",
+    phoneHref: "tel:0266045432",
     address: "臺北市大同區照顧服務據點",
-    email: "care@suiyuecare.tw"
+    email: "generalaffairs@suiyuecare.com"
   },
   "wanhua-a": {
     image: "assets/scene-home-care.png",
@@ -296,10 +296,10 @@ const locationData = {
     desc: "支援萬華北側社區與高齡家庭，提供日常生活協助、陪伴與照顧紀錄回報。",
     services: "生活照顧、陪伴服務、家屬回報",
     hours: "週一至週六 08:30-18:00",
-    phone: "02-2308-0824",
-    phoneHref: "tel:0223080824",
+    phone: "02-6604-5432",
+    phoneHref: "tel:0266045432",
     address: "臺北市萬華區北側服務據點",
-    email: "homecare@suiyuecare.tw"
+    email: "generalaffairs@suiyuecare.com"
   },
   "wanhua-b": {
     image: "assets/scene-care-note.png",
@@ -309,10 +309,10 @@ const locationData = {
     desc: "服務萬華南側生活圈，串接居家照顧、喘息安排與健康3.0照顧衛教。",
     services: "喘息服務、健康衛教、照顧諮詢",
     hours: "週一至週五 09:00-17:30",
-    phone: "02-2336-0824",
-    phoneHref: "tel:0223360824",
+    phone: "02-6604-5432",
+    phoneHref: "tel:0266045432",
     address: "臺北市萬華區南側服務據點",
-    email: "homecare@suiyuecare.tw"
+    email: "generalaffairs@suiyuecare.com"
   },
   xinyi: {
     image: "assets/location-taipei.png",
@@ -322,10 +322,10 @@ const locationData = {
     desc: "提供信義、南港周邊家屬照顧諮詢、預防延緩失能活動與課程報名。",
     services: "健康促進、家屬課程、照顧諮詢",
     hours: "週一至週五 09:00-18:00",
-    phone: "02-2722-0824",
-    phoneHref: "tel:0227220824",
+    phone: "02-6604-5432",
+    phoneHref: "tel:0266045432",
     address: "臺北市信義區健康促進據點",
-    email: "health@suiyuecare.tw"
+    email: "generalaffairs@suiyuecare.com"
   },
   xindian: {
     image: "assets/location-newtaipei.png",
@@ -335,10 +335,10 @@ const locationData = {
     desc: "以白天托顧、團體活動、共餐與復能安排，支持新店、中和、永和家庭喘息。",
     services: "日間照顧、社區共餐、延緩失能活動",
     hours: "週一至週六 08:30-17:30",
-    phone: "02-8955-3018",
-    phoneHref: "tel:0289553018",
+    phone: "02-6604-5432",
+    phoneHref: "tel:0266045432",
     address: "新北市新店區日間照顧服務據點",
-    email: "daycare@suiyuecare.tw"
+    email: "generalaffairs@suiyuecare.com"
   },
   xinzhuang: {
     image: "assets/location-newtaipei.png",
@@ -348,10 +348,10 @@ const locationData = {
     desc: "串接新莊周邊社區照顧、預防延緩失能與家庭支持服務。",
     services: "社區據點、健康促進、家屬支持",
     hours: "週一至週五 09:00-17:30",
-    phone: "02-2998-3018",
-    phoneHref: "tel:0229983018",
+    phone: "02-6604-5432",
+    phoneHref: "tel:0266045432",
     address: "新北市新莊區社區照顧服務據點",
-    email: "community@suiyuecare.tw"
+    email: "generalaffairs@suiyuecare.com"
   },
   luzhu: {
     image: "assets/location-taoyuan.png",
@@ -361,10 +361,10 @@ const locationData = {
     desc: "支援蘆竹、大園生活圈，由護理與復能團隊協助建立個案目標並追蹤照顧風險。",
     services: "護理評估、復能訓練、照顧風險追蹤",
     hours: "週一至週五 09:00-17:30",
-    phone: "03-336-5806",
-    phoneHref: "tel:033365806",
+    phone: "02-6604-5432",
+    phoneHref: "tel:0266045432",
     address: "桃園市蘆竹區護理復能服務中心",
-    email: "rehab@suiyuecare.tw"
+    email: "generalaffairs@suiyuecare.com"
   }
 };
 

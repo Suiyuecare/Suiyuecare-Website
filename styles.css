@@ -1555,10 +1555,10 @@ h2 {
   box-shadow: 0 12px 30px rgba(83,43,11,.06);
 }
 .partner-item img {
-  width: 42px;
+  width: 76px;
   height: 42px;
-  padding: 4px;
-  border-radius: 50%;
+  padding: 3px;
+  border-radius: 12px;
   background: #fff;
   object-fit: contain;
   flex: 0 0 auto;
