@@ -623,9 +623,9 @@ h2 {
 .story-slider article {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 70px;
+  grid-template-columns: 62px minmax(0, 1fr);
   grid-template-areas:
-    "meta face"
+    "face meta"
     "title title"
     "points points"
     "read read";
@@ -643,7 +643,7 @@ h2 {
 .story-face {
   position: static;
   grid-area: face;
-  justify-self: end;
+  justify-self: start;
   align-self: start;
   width: 62px;
   height: 62px;
