@@ -952,20 +952,68 @@ function renderCoursesPage() {
       </section>
       <section class="course-list">
         ${[
-          ["照服員核心訓練班", "實體", "5/20", "剩餘 12 名"],
-          ["家庭照顧者實用課", "線上", "5/24", "免費"],
-          ["失智照顧溝通工作坊", "實體", "6/02", "熱賣中"],
-          ["移工照顧技能培訓", "實體", "6/08", "開放報名"],
-          ["督導品質管理研習", "線上", "6/15", "專業課"],
-          ["護理復能基礎課", "實體", "6/22", "早鳥中"]
+          {
+            title: "照服員核心訓練班",
+            intro: "從生活支持、移位安全、沐浴照顧到服務紀錄，建立照服員上線前的基本能力。",
+            date: "2026.05.20",
+            time: "09:00-17:00",
+            price: "NT$ 3,600",
+            place: "實體課｜臺北教室"
+          },
+          {
+            title: "家庭照顧者實用課",
+            intro: "給正在照顧家人的你，快速學會起身、用餐、跌倒預防與照顧溝通。",
+            date: "2026.05.24",
+            time: "19:30-21:00",
+            price: "免費",
+            place: "線上同步課｜Google Meet"
+          },
+          {
+            title: "失智照顧溝通工作坊",
+            intro: "用情境演練理解重複提問、拒絕洗澡、情緒不安等常見照顧場景。",
+            date: "2026.06.02",
+            time: "13:30-16:30",
+            price: "NT$ 1,200",
+            place: "實體課｜新北據點"
+          },
+          {
+            title: "移工照顧技能培訓",
+            intro: "協助家庭與移工建立一致的照顧流程，包含安全移位、用藥提醒與紀錄回報。",
+            date: "2026.06.08",
+            time: "10:00-15:00",
+            price: "NT$ 2,000",
+            place: "實體課｜臺北教室"
+          },
+          {
+            title: "督導品質管理研習",
+            intro: "聚焦服務媒合、異常事件追蹤、照顧紀錄檢核與團隊支持制度。",
+            date: "2026.06.15",
+            time: "20:00-22:00",
+            price: "NT$ 980",
+            place: "線上同步課｜Zoom"
+          },
+          {
+            title: "護理復能基礎課",
+            intro: "從生活目標設定、步態觀察到家屬陪伴，理解復能如何回到日常。",
+            date: "2026.06.22",
+            time: "可隨時觀看",
+            price: "NT$ 680",
+            place: "預錄課｜線上學習"
+          }
         ].map((course, index) => `
-          <article class="course-card">
+          <article class="course-card click-card" data-href="#contact" tabindex="0" role="link">
             <div class="course-thumb">${String(index + 1).padStart(2, "0")}</div>
             <div class="course-body">
-              <div class="course-meta"><span>${course[1]}</span><span>${course[2]}</span><span>${course[3]}</span></div>
-              <h3>${course[0]}</h3>
-              <p>課程包含案例說明、現場演練與可帶回使用的照顧檢核表。</p>
-              <a href="#contact">立即報名</a>
+              <span class="course-type">${course.place}</span>
+              <h3>${course.title}</h3>
+              <p>${course.intro}</p>
+              <dl class="course-details">
+                <div><dt>日期</dt><dd>${course.date}</dd></div>
+                <div><dt>時間</dt><dd>${course.time}</dd></div>
+                <div><dt>價格</dt><dd>${course.price}</dd></div>
+                <div><dt>地點</dt><dd>${course.place}</dd></div>
+              </dl>
+              <a class="course-register" href="#contact">立即報名</a>
             </div>
           </article>
         `).join("")}
