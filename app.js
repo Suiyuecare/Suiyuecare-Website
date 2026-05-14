@@ -176,6 +176,162 @@ const articlePages = {
   }
 };
 
+Object.assign(articlePages, {
+  "safe-transfer-tips": {
+    category: "照顧技巧",
+    title: "協助長輩安全起身的三個提醒",
+    dek: "從床邊高度、手部支撐到起身節奏，降低跌倒與拉傷風險。",
+    image: "assets/homepage-batch/18-health-fall-prevention-cover.png",
+    author: "歲悅復能團隊",
+    date: "2026.05.10",
+    readTime: "4 min read",
+    tags: ["移位安全", "跌倒預防", "復能照顧"],
+    summary: ["先確認腳能踩穩、手能扶穩。", "起身前讓長輩坐在床緣停留幾秒。", "不要拉手臂硬起身，改用口令與重心引導。"],
+    content: [
+      ["先讓身體找到穩定點", "長輩起身前，先確認雙腳可以踩到地面，床邊或椅旁有穩定扶手。若剛睡醒或剛坐下，建議先停留幾秒，觀察是否頭暈、無力或站不穩。"],
+      ["用口令協助，不用蠻力拉起", "照顧者可以用「腳往後收、身體向前、手扶穩、再站起來」的口令協助長輩自己參與動作。直接拉手臂容易造成肩膀受傷，也會讓長輩失去重心。"],
+      ["把安全變成每天固定流程", "起身、移位與如廁是日常中最容易跌倒的時刻。把環境、口令與步驟固定下來，長輩會更有安全感，家屬也比較能掌握風險。"]
+    ],
+    cta: "需要到宅檢視移位與跌倒風險，歡迎預約歲悅照顧諮詢。"
+  },
+  "nutrition-warning": {
+    category: "飲食營養",
+    title: "吃得少不是正常老化，家人該先看哪些訊號？",
+    dek: "從體重、食慾、肌力與精神狀態，快速判斷是否需要營養或醫療協助。",
+    image: "assets/homepage-batch/17-health-nutrition-cover.png",
+    author: "歲悅營養照顧小組",
+    date: "2026.05.08",
+    readTime: "5 min read",
+    tags: ["飲食營養", "體重觀察", "家屬支持"],
+    summary: ["觀察體重是否快速下降。", "留意吃飯時間變長或常常剩餐。", "若合併嗆咳、無力或精神變差，應及早諮詢。"],
+    content: [
+      ["先看變化，不只看份量", "長輩吃得少不一定只是胃口差，也可能和牙口、吞嚥、藥物、情緒或疾病變化有關。家人可以先記錄一週的飲食量、體重與精神狀態。"],
+      ["肌力和精神也是營養訊號", "營養不足常會反映在走路變慢、起身變吃力、白天嗜睡或活動意願下降。若這些變化同時出現，就不建議只用正常老化解釋。"],
+      ["把餐食調整變成照顧計畫", "照顧團隊可以協助觀察用餐節奏、食物質地與水分補充，再視情況串接醫療或營養專業，讓家屬不用單獨猜測。"]
+    ],
+    cta: "想評估長輩飲食與照顧風險，可以先留下需求。"
+  },
+  "dementia-response": {
+    category: "失智照顧",
+    title: "重複提問怎麼回應，才不會讓彼此更焦慮？",
+    dek: "理解長輩不安背後的需求，用更穩定的語句降低照顧衝突。",
+    image: "assets/homepage-batch/19-health-dementia-cover.png",
+    author: "歲悅照顧編輯部",
+    date: "2026.05.06",
+    readTime: "5 min read",
+    tags: ["失智照顧", "溝通技巧", "情緒安撫"],
+    summary: ["重複提問常常來自不安。", "先回應情緒，再補充事實。", "用固定提示物降低反覆確認。"],
+    content: [
+      ["先聽見不安", "長輩一直問同一件事，常常不是故意找麻煩，而是記憶與安全感正在鬆動。照顧者可以先用穩定語氣回應情緒，例如「你有點擔心，我在這裡」。"],
+      ["答案越短越好", "長篇解釋容易讓長輩更混亂。建議用短句、固定說法與視覺提示，例如白板、日曆、照片或固定物品，讓長輩有可以反覆確認的依據。"],
+      ["照顧者也需要喘息", "當重複提問頻率很高，照顧者會累是正常的。這時候需要的是服務分工與喘息安排，而不是要求家屬永遠保持耐心。"]
+    ],
+    cta: "失智照顧需要一起設計日常節奏，歡迎和歲悅討論。"
+  },
+  "caregiver-support": {
+    category: "家屬支持",
+    title: "照顧者快撐不住時，可以先做的三件事",
+    dek: "先盤點照顧時段、找到喘息入口，讓家庭照顧可以走得更久。",
+    image: "assets/homepage-batch/20-health-caregiver-stress-cover.png",
+    author: "歲悅家庭支持團隊",
+    date: "2026.05.02",
+    readTime: "4 min read",
+    tags: ["喘息服務", "家屬支持", "照顧壓力"],
+    summary: ["先寫下最累的三個時段。", "把可替手的服務列入安排。", "不要等到崩潰才求助。"],
+    content: [
+      ["找出最耗能的照顧時段", "很多家庭不是整天都撐不住，而是卡在洗澡、夜間、如廁、用餐或回診。先找出最困難的三個時段，才容易安排服務介入。"],
+      ["不要把喘息視為偷懶", "喘息是長期照顧的一部分。當家屬有休息、工作與情緒恢復的空間，照顧關係反而比較能走得長久。"],
+      ["讓照顧變成團隊工作", "居家照顧、日間照顧、課程與諮詢可以一起使用。重點不是把責任丟出去，而是讓家庭不再只有一個人硬撐。"]
+    ],
+    cta: "如果你已經快撐不住，先讓歲悅幫你整理可用資源。"
+  },
+  "family-care-course": {
+    category: "課程活動",
+    title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
+    dek: "把移位、用餐、跌倒預防與照顧溝通整理成家人也能操作的課程。",
+    image: "assets/homepage-batch/12-community-health-class.png",
+    author: "歲悅教育品管",
+    date: "2026.04.28",
+    readTime: "3 min read",
+    tags: ["課程報名", "家屬照顧", "照顧技巧"],
+    summary: ["課程以家中真實場景設計。", "重點放在可以每天使用的方法。", "適合初次照顧與照顧壓力升高的家庭。"],
+    content: [
+      ["把技巧變成家人聽得懂的語言", "課程會把專業照顧動作拆成家屬也能理解的步驟，包含移位、起身、用餐、安全觀察與溝通方式。"],
+      ["從家中的問題開始練習", "每個家庭遇到的困難不一樣，因此課程會以常見情境作為練習入口，讓家屬能帶著問題找到可執行的方法。"],
+      ["課後也能接續服務", "若家庭需要進一步協助，也可以串接居家照顧、日照、護理復能或督導諮詢，讓課程不是一次性的資訊。"]
+    ],
+    cta: "想參加家屬照顧課，歡迎查看課程報名。"
+  },
+  "day-care-respite": {
+    category: "活動專區",
+    title: "日照體驗參觀日：認識家庭喘息與白天照顧",
+    dek: "帶家屬理解日間照顧的一天，包含活動、共餐、休息與回報流程。",
+    image: "assets/homepage-batch/02-daycare-group-exercise.png",
+    author: "歲悅日照團隊",
+    date: "2026.04.22",
+    readTime: "3 min read",
+    tags: ["日間照顧", "家庭喘息", "活動專區"],
+    summary: ["認識日照中心的一日流程。", "理解哪些長輩適合日間照顧。", "現場可諮詢家庭照顧安排。"],
+    content: [
+      ["白天有人陪，晚上仍能回家", "日間照顧讓長輩白天有規律活動、餐食與陪伴，晚上仍回到熟悉的家中，也讓家屬有工作與休息的空間。"],
+      ["活動不是消磨時間", "好的日照活動會考量認知、肢體、社交與情緒需求，讓長輩維持節奏，也保留被邀請、被看見的感覺。"],
+      ["家屬也能看見照顧品質", "透過參觀與諮詢，家屬可以了解回報機制、照顧紀錄與服務調整方式，判斷是否適合自己的家庭。"]
+    ],
+    cta: "想了解日間照顧是否適合家中長輩，歡迎預約參觀。"
+  },
+  "reablement-workshop": {
+    category: "活動專區",
+    title: "復能照顧工作坊：陪長輩一步一步重新有把握",
+    dek: "用小目標、日常動作與安全陪伴，支持長輩找回生活能力。",
+    image: "assets/homepage-batch/13-rehab-walking-practice.png",
+    author: "歲悅護理復能團隊",
+    date: "2026.04.18",
+    readTime: "4 min read",
+    tags: ["護理復能", "復能訓練", "活動專區"],
+    summary: ["復能不是催促，而是陪伴練習。", "目標要能放回日常生活。", "家屬需要知道如何安全協助。"],
+    content: [
+      ["從生活目標開始", "復能不是只做訓練動作，而是回到長輩想完成的生活任務，例如走到餐桌、自己起身、安心如廁或短距離外出。"],
+      ["把目標拆小才走得久", "太大的目標會讓長輩挫折。團隊會把練習拆成可完成的小步驟，讓每一次進步都能被看見。"],
+      ["家屬知道方法，長輩更安全", "工作坊會協助家屬理解安全陪伴、口令、環境調整與觀察重點，讓練習不只發生在課堂。"]
+    ],
+    cta: "想為家中長輩安排復能目標，歡迎預約諮詢。"
+  },
+  "fall-observation": {
+    category: "短影片",
+    title: "跌倒後 24 小時觀察重點",
+    dek: "跌倒後不只看有沒有外傷，也要留意疼痛、意識、走路與精神變化。",
+    image: "assets/homepage-batch/14-care-notes.png",
+    author: "歲悅照顧編輯部",
+    date: "2026.04.16",
+    readTime: "3 min read",
+    tags: ["跌倒觀察", "短影片", "居家安全"],
+    summary: ["先確認意識與疼痛位置。", "觀察 24 小時內是否精神變差。", "若持續疼痛或走路異常，應盡快就醫。"],
+    content: [
+      ["跌倒後先不要急著扶起", "先確認長輩是否清醒、哪裡疼痛、是否有明顯變形或出血。若懷疑骨折或頭部撞擊，不建議硬拉起身。"],
+      ["24 小時內持續觀察", "有些狀況不是當下立刻出現。家屬可以留意嗜睡、頭痛、嘔吐、走路不穩、情緒改變或食慾明顯下降。"],
+      ["把跌倒原因找出來", "跌倒後除了處理傷勢，也要回頭檢查燈光、地墊、浴室、床邊高度、鞋子與用藥狀況，避免同樣事件再次發生。"]
+    ],
+    cta: "需要居家安全檢視，可以與歲悅照顧團隊討論。"
+  },
+  "bathroom-safety": {
+    category: "短影片",
+    title: "浴室安全的快速檢查",
+    dek: "用五分鐘檢查止滑、扶手、動線與照明，降低家中高風險跌倒。",
+    image: "assets/homepage-batch/08-orange-apron-walking.png",
+    author: "歲悅居家安全團隊",
+    date: "2026.04.12",
+    readTime: "3 min read",
+    tags: ["浴室安全", "跌倒預防", "居家照顧"],
+    summary: ["地面止滑與排水是第一步。", "扶手位置要符合長輩動作。", "夜間照明與動線也要一起檢查。"],
+    content: [
+      ["先看地面和排水", "浴室濕滑是跌倒高風險來源。止滑墊、排水速度與門口高低差都需要檢查，避免長輩跨出浴室時踩到積水。"],
+      ["扶手不是有裝就好", "扶手要裝在長輩真正會用力的位置，例如馬桶旁、淋浴區或進出浴室的轉身處。位置不對，反而可能讓動作更不穩。"],
+      ["夜間動線也很重要", "很多跌倒發生在半夜如廁。床邊到浴室的燈光、走道雜物與鞋子止滑，都應納入照顧檢查。"]
+    ],
+    cta: "想做居家安全檢視，歡迎預約歲悅到宅評估。"
+  }
+});
+
 const relatedArticleCards = [
   {
     href: "#article-longterm-care-apply",
@@ -196,31 +352,31 @@ const relatedArticleCards = [
     image: "assets/homepage-batch/10-family-consultation.png"
   },
   {
-    href: "#health",
+    href: "#article-safe-transfer-tips",
     category: "照顧技巧",
     title: "協助長輩安全起身的三個提醒",
     image: "assets/homepage-batch/18-health-fall-prevention-cover.png"
   },
   {
-    href: "#health",
+    href: "#article-nutrition-warning",
     category: "飲食營養",
     title: "吃得少不是正常老化，家人該先看哪些訊號？",
     image: "assets/homepage-batch/17-health-nutrition-cover.png"
   },
   {
-    href: "#health",
+    href: "#article-dementia-response",
     category: "失智照顧",
     title: "重複提問怎麼回應，才不會讓彼此更焦慮？",
     image: "assets/homepage-batch/19-health-dementia-cover.png"
   },
   {
-    href: "#health",
+    href: "#article-caregiver-support",
     category: "家屬支持",
     title: "照顧者快撐不住時，可以先做的三件事",
     image: "assets/homepage-batch/20-health-caregiver-stress-cover.png"
   },
   {
-    href: "#courses",
+    href: "#article-family-care-course",
     category: "課程報名",
     title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
     image: "assets/homepage-batch/12-community-health-class.png"
@@ -259,7 +415,7 @@ const healthArticles = [
     keywords: "名人講堂 照顧心理 家屬支持"
   },
   {
-    href: "#health",
+    href: "#article-safe-transfer-tips",
     category: "照顧技巧",
     title: "協助長輩安全起身的三個提醒",
     excerpt: "從床邊高度、手部支撐到起身節奏，降低跌倒與拉傷風險。",
@@ -269,7 +425,7 @@ const healthArticles = [
     keywords: "跌倒 起身 移位 復能"
   },
   {
-    href: "#health",
+    href: "#article-nutrition-warning",
     category: "飲食營養",
     title: "吃得少不是正常老化，家人該先看哪些訊號？",
     excerpt: "從體重、食慾、肌力與精神狀態，快速判斷是否需要營養或醫療協助。",
@@ -279,7 +435,7 @@ const healthArticles = [
     keywords: "營養 飲食 肌力 食慾 體重"
   },
   {
-    href: "#health",
+    href: "#article-dementia-response",
     category: "失智照顧",
     title: "重複提問怎麼回應，才不會讓彼此更焦慮？",
     excerpt: "理解長輩不安背後的需求，用更穩定的語句降低照顧衝突。",
@@ -289,7 +445,7 @@ const healthArticles = [
     keywords: "失智 重複提問 溝通 情緒"
   },
   {
-    href: "#health",
+    href: "#article-caregiver-support",
     category: "家屬支持",
     title: "照顧者快撐不住時，可以先做的三件事",
     excerpt: "先盤點照顧時段、找到喘息入口，讓家庭照顧可以走得更久。",
@@ -299,7 +455,7 @@ const healthArticles = [
     keywords: "照顧者 壓力 喘息 家屬支持"
   },
   {
-    href: "#courses",
+    href: "#article-family-care-course",
     category: "課程",
     title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
     excerpt: "把移位、用餐、跌倒預防與照顧溝通整理成家人也能操作的課程。",
@@ -596,18 +752,18 @@ function renderHealthPage() {
   const lazyPacks = [
     ["長照申請懶人包", "從評估、補助、服務媒合到第一次到宅，照著順序看就懂。", "assets/homepage-batch/10-family-consultation.png", "#article-longterm-care-apply"],
     ["出院返家照顧包", "把返家前準備、移位、用餐與每日觀察整理成家屬清單。", "assets/homepage-batch/01-care-home-greeting.png", "#article-family-care-story"],
-    ["失智陪伴懶人包", "重複提問、情緒不安與日常安全，用簡單方法降低摩擦。", "assets/homepage-batch/19-health-dementia-cover.png", "#health"]
+    ["失智陪伴懶人包", "重複提問、情緒不安與日常安全，用簡單方法降低摩擦。", "assets/homepage-batch/19-health-dementia-cover.png", "#article-dementia-response"]
   ];
   const eventCards = [
-    ["家屬照顧技巧課", "移位、用餐、跌倒預防與照顧溝通", "5/28", "assets/homepage-batch/12-community-health-class.png", "#courses"],
-    ["日照體驗參觀日", "認識日間照顧流程與家庭喘息安排", "6/05", "assets/homepage-batch/02-daycare-group-exercise.png", "#courses"],
-    ["復能照顧工作坊", "讓長輩一步一步恢復生活能力", "6/12", "assets/homepage-batch/13-rehab-walking-practice.png", "#courses"]
+    ["家屬照顧技巧課", "移位、用餐、跌倒預防與照顧溝通", "5/28", "assets/homepage-batch/12-community-health-class.png", "#article-family-care-course"],
+    ["日照體驗參觀日", "認識日間照顧流程與家庭喘息安排", "6/05", "assets/homepage-batch/02-daycare-group-exercise.png", "#article-day-care-respite"],
+    ["復能照顧工作坊", "讓長輩一步一步恢復生活能力", "6/12", "assets/homepage-batch/13-rehab-walking-practice.png", "#article-reablement-workshop"]
   ];
   const videoCards = [
     ["影片", "三分鐘理解居家照顧安排流程", "assets/homepage-batch/15-phone-consultation.png", "#article-master-talk-care-psychology"],
     ["影片", "日間照顧如何讓家庭喘息", "assets/homepage-batch/12-community-health-class.png", "#article-master-talk-care-psychology"],
-    ["短影片", "跌倒後 24 小時觀察重點", "assets/homepage-batch/14-care-notes.png", "#health"],
-    ["短影片", "浴室安全的快速檢查", "assets/homepage-batch/08-orange-apron-walking.png", "#health"]
+    ["短影片", "跌倒後 24 小時觀察重點", "assets/homepage-batch/14-care-notes.png", "#article-fall-observation"],
+    ["短影片", "浴室安全的快速檢查", "assets/homepage-batch/08-orange-apron-walking.png", "#article-bathroom-safety"]
   ];
 
   return `
