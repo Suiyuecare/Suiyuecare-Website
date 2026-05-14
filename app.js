@@ -113,6 +113,8 @@ const home = document.querySelector("#home");
 const pageView = document.querySelector("#pageView");
 const revealItems = document.querySelectorAll(".reveal");
 const introLoader = document.querySelector(".intro-loader");
+const COURSE_NOTIFY_EMAIL = "edu.control@suiyuecare.com";
+const COURSE_LINE_URL = "https://lin.ee/oaPkGiq";
 const WP_API_BASE = "https://www.suiyuecare.com/wp-json/wp/v2";
 const WP_CATEGORIES = {
   latestNews: "latest-news",
@@ -1027,13 +1029,13 @@ function renderCoursesPage() {
         </div>
         <div class="featured-course-track" aria-label="重要課程輪播">
           ${importantCourses.map((course) => `
-            <article class="featured-course-card click-card" data-href="#contact" tabindex="0" role="link">
+            <article class="featured-course-card click-card" data-course-title="${course.title}" tabindex="0" role="button">
               <img src="${course.image}" alt="${course.title}" />
               <div>
                 <span>${course.type}</span>
                 <h3>${course.title}</h3>
                 <p>${course.intro}</p>
-                <a href="#contact">立即報名</a>
+                <button class="course-register" type="button" data-course-title="${course.title}">立即報名</button>
               </div>
             </article>
           `).join("")}
@@ -1041,7 +1043,7 @@ function renderCoursesPage() {
       </section>
       <section class="course-list">
         ${courses.map((course, index) => `
-          <article class="course-card click-card" data-href="#contact" tabindex="0" role="link">
+          <article class="course-card click-card" data-course-title="${course.title}" tabindex="0" role="button">
             <div class="course-thumb"><img src="${course.image}" alt="${course.title}" /><span>${String(index + 1).padStart(2, "0")}</span></div>
             <div class="course-body">
               <div class="course-topline"><span class="course-type">${course.type}</span><span class="course-seats">${course.seats}</span></div>
@@ -1049,11 +1051,29 @@ function renderCoursesPage() {
               <p>${course.intro}</p>
               <div class="course-info-line"><span><em>地點</em>${course.type}｜${course.location}</span><b><em>費用</em>${course.price}</b></div>
               <div class="course-info-line"><span><em>日期</em>${course.date}</span><b><em>時間</em>${course.time}</b></div>
-              <a class="course-register" href="#contact">立即報名</a>
+              <button class="course-register" type="button" data-course-title="${course.title}">立即報名</button>
             </div>
           </article>
         `).join("")}
       </section>
+      <div class="course-modal" id="courseSignupModal" hidden>
+        <form class="course-modal-card" id="courseSignupForm">
+          <button class="course-modal-close" type="button" data-course-close aria-label="關閉報名視窗">×</button>
+          <p class="eyebrow">Course Signup</p>
+          <h2>課程報名確認</h2>
+          <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
+          <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
+          <label>您本次報名的課程<input name="課程" id="courseSignupTitle" type="text" readonly /></label>
+          <input name="_subject" type="hidden" value="歲悅長照課程報名通知" />
+          <input name="_captcha" type="hidden" value="false" />
+          <p class="course-confirm-text">是否要報名？</p>
+          <div class="course-modal-actions">
+            <button type="button" data-course-close>否</button>
+            <button type="submit">是，送出報名</button>
+          </div>
+          <p class="course-modal-status" id="courseSignupStatus" aria-live="polite"></p>
+        </form>
+      </div>
     </div>
   `;
 }
@@ -1276,6 +1296,86 @@ document.querySelectorAll("[data-news-tab]").forEach((tab) => {
       panel.classList.toggle("active", panel.dataset.newsPanel === key);
     });
   });
+});
+
+function openCourseSignup(courseTitle = "") {
+  const modal = document.querySelector("#courseSignupModal");
+  const form = document.querySelector("#courseSignupForm");
+  const titleInput = document.querySelector("#courseSignupTitle");
+  const status = document.querySelector("#courseSignupStatus");
+  if (!modal || !form || !titleInput || !status) return;
+
+  form.reset();
+  titleInput.value = courseTitle;
+  status.textContent = "";
+  modal.hidden = false;
+  document.body.classList.add("modal-open");
+  form.querySelector("input[name='姓名']")?.focus();
+}
+
+function closeCourseSignup() {
+  const modal = document.querySelector("#courseSignupModal");
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.classList.remove("modal-open");
+}
+
+document.addEventListener("click", (event) => {
+  const registerButton = event.target.closest(".course-register");
+  if (registerButton) {
+    event.preventDefault();
+    event.stopPropagation();
+    openCourseSignup(registerButton.dataset.courseTitle || registerButton.closest("[data-course-title]")?.dataset.courseTitle || "");
+    return;
+  }
+
+  const courseCard = event.target.closest(".course-card, .featured-course-card");
+  if (courseCard && !event.target.closest("a, button, input, select, textarea")) {
+    event.preventDefault();
+    openCourseSignup(courseCard.dataset.courseTitle || courseCard.querySelector("h3")?.textContent || "");
+    return;
+  }
+
+  if (event.target.closest("[data-course-close]") || event.target.id === "courseSignupModal") {
+    closeCourseSignup();
+  }
+});
+
+document.addEventListener("submit", async (event) => {
+  const form = event.target.closest("#courseSignupForm");
+  if (!form) return;
+
+  event.preventDefault();
+  const status = document.querySelector("#courseSignupStatus");
+  const submitButton = form.querySelector("button[type='submit']");
+  if (!status || !submitButton) return;
+
+  submitButton.disabled = true;
+  status.textContent = "正在送出報名資訊...";
+
+  try {
+    const response = await fetch(`https://formsubmit.co/ajax/${COURSE_NOTIFY_EMAIL}`, {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: new FormData(form)
+    });
+    if (!response.ok) throw new Error("signup failed");
+
+    let seconds = 2;
+    status.textContent = `報名資訊已送出，${seconds} 秒後前往 LINE@。`;
+    const countdown = window.setInterval(() => {
+      seconds -= 1;
+      if (seconds <= 0) {
+        window.clearInterval(countdown);
+        window.location.href = COURSE_LINE_URL;
+      } else {
+        status.textContent = `報名資訊已送出，${seconds} 秒後前往 LINE@。`;
+      }
+    }, 1000);
+  } catch (error) {
+    status.textContent = "送出時發生問題，請稍後再試或直接加入 LINE@。";
+    submitButton.disabled = false;
+  }
 });
 
 document.addEventListener("click", (event) => {

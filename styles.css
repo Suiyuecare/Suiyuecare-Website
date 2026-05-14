@@ -22,6 +22,7 @@ body {
   font-family: "Noto Sans TC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0;
 }
+body.modal-open { overflow: hidden; }
 a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; }
 
@@ -1837,16 +1838,18 @@ h2 {
   font-weight: 800;
   line-height: 1.7;
 }
-.featured-course-card a {
+.featured-course-card .course-register {
   display: inline-flex;
   min-height: 46px;
   align-items: center;
   margin-top: 12px;
   padding: 0 18px;
+  border: 0;
   border-radius: 999px;
   background: #fff;
   color: var(--orange-dark);
   font-weight: 900;
+  cursor: pointer;
 }
 .course-list {
   display: grid;
@@ -1962,9 +1965,98 @@ h2 {
   min-height: 46px;
   margin-top: 4px;
   padding: 0 18px;
+  border: 0;
   border-radius: 999px;
   background: var(--orange);
   color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+}
+.course-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(61,31,12,.42);
+  backdrop-filter: blur(8px);
+}
+.course-modal[hidden] {
+  display: none;
+}
+.course-modal-card {
+  position: relative;
+  display: grid;
+  width: min(560px, 100%);
+  gap: 15px;
+  padding: 34px;
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  background: #fffdf8;
+  box-shadow: 0 28px 78px rgba(47,24,10,.28);
+}
+.course-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--brown);
+  font-size: 24px;
+  cursor: pointer;
+}
+.course-modal-card h2 {
+  margin: 0;
+  color: var(--brown);
+  font-size: 36px;
+}
+.course-modal-card label {
+  display: grid;
+  gap: 8px;
+  color: var(--brown);
+  font-weight: 900;
+}
+.course-modal-card input {
+  min-height: 52px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0 16px;
+  background: #fff;
+  color: var(--brown);
+}
+.course-confirm-text {
+  margin: 4px 0 0;
+  color: var(--brown);
+  font-size: 18px;
+  font-weight: 900;
+}
+.course-modal-actions {
+  display: flex;
+  gap: 12px;
+}
+.course-modal-actions button {
+  flex: 1;
+  min-height: 50px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brown);
+  font-weight: 900;
+  cursor: pointer;
+}
+.course-modal-actions button[type="submit"] {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: #fff;
+}
+.course-modal-status {
+  min-height: 24px;
+  margin: 0;
+  color: var(--orange-dark);
   font-weight: 900;
 }
 
