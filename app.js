@@ -227,6 +227,89 @@ const relatedArticleCards = [
   }
 ];
 
+const healthArticles = [
+  {
+    href: "#article-longterm-care-apply",
+    category: "長照申請",
+    title: "第一次申請長照服務，家人需要先準備什麼？",
+    excerpt: "從需求盤點、照顧計畫、政府補助到服務媒合，用一篇文章把流程講清楚。",
+    image: "assets/homepage-batch/10-family-consultation.png",
+    author: "歲悅照顧編輯部",
+    date: "2026.05.13",
+    keywords: "長照申請 家庭照顧 服務媒合 居家照顧"
+  },
+  {
+    href: "#article-family-care-story",
+    category: "家屬故事",
+    title: "爸爸出院後，我終於知道每天該注意什麼。",
+    excerpt: "每日回報、照顧紀錄與督導追蹤，讓出院返家的照顧不再只能靠家人猜。",
+    image: "assets/homepage-batch/01-care-home-greeting.png",
+    author: "林小姐｜居家照顧",
+    date: "2026.05.13",
+    keywords: "出院返家 居家照顧 家屬回饋 照顧紀錄"
+  },
+  {
+    href: "#article-master-talk-care-psychology",
+    category: "專家專欄",
+    title: "好的照顧，是讓長輩和家屬都保有生活感。",
+    excerpt: "照顧心理講師談家庭照顧中的焦慮、溝通與支持系統。",
+    image: "assets/homepage-batch/10-family-consultation.png",
+    author: "照顧心理講師 周小姐",
+    date: "2026.05.13",
+    keywords: "名人講堂 照顧心理 家屬支持"
+  },
+  {
+    href: "#health",
+    category: "照顧技巧",
+    title: "協助長輩安全起身的三個提醒",
+    excerpt: "從床邊高度、手部支撐到起身節奏，降低跌倒與拉傷風險。",
+    image: "assets/homepage-batch/18-health-fall-prevention-cover.png",
+    author: "歲悅復能團隊",
+    date: "2026.05.10",
+    keywords: "跌倒 起身 移位 復能"
+  },
+  {
+    href: "#health",
+    category: "飲食營養",
+    title: "吃得少不是正常老化，家人該先看哪些訊號？",
+    excerpt: "從體重、食慾、肌力與精神狀態，快速判斷是否需要營養或醫療協助。",
+    image: "assets/homepage-batch/17-health-nutrition-cover.png",
+    author: "歲悅營養照顧小組",
+    date: "2026.05.08",
+    keywords: "營養 飲食 肌力 食慾 體重"
+  },
+  {
+    href: "#health",
+    category: "失智照顧",
+    title: "重複提問怎麼回應，才不會讓彼此更焦慮？",
+    excerpt: "理解長輩不安背後的需求，用更穩定的語句降低照顧衝突。",
+    image: "assets/homepage-batch/19-health-dementia-cover.png",
+    author: "歲悅照顧編輯部",
+    date: "2026.05.06",
+    keywords: "失智 重複提問 溝通 情緒"
+  },
+  {
+    href: "#health",
+    category: "家屬支持",
+    title: "照顧者快撐不住時，可以先做的三件事",
+    excerpt: "先盤點照顧時段、找到喘息入口，讓家庭照顧可以走得更久。",
+    image: "assets/homepage-batch/20-health-caregiver-stress-cover.png",
+    author: "歲悅家庭支持團隊",
+    date: "2026.05.02",
+    keywords: "照顧者 壓力 喘息 家屬支持"
+  },
+  {
+    href: "#courses",
+    category: "課程",
+    title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
+    excerpt: "把移位、用餐、跌倒預防與照顧溝通整理成家人也能操作的課程。",
+    image: "assets/homepage-batch/12-community-health-class.png",
+    author: "歲悅教育品管",
+    date: "2026.04.28",
+    keywords: "課程 家屬照顧 移位 跌倒預防"
+  }
+];
+
 function stripHTML(value = "") {
   return value.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
@@ -507,6 +590,16 @@ function updateLocation(locationKey) {
 }
 
 function renderHealthPage() {
+  const feature = healthArticles[0];
+  const quickCards = healthArticles.slice(1, 5);
+  const latestCards = healthArticles.slice(0, 6);
+  const videoCards = [
+    ["影片", "三分鐘理解居家照顧安排流程", "assets/homepage-batch/15-phone-consultation.png", "#article-master-talk-care-psychology"],
+    ["影片", "日間照顧如何讓家庭喘息", "assets/homepage-batch/12-community-health-class.png", "#article-master-talk-care-psychology"],
+    ["短影片", "跌倒後 24 小時觀察重點", "assets/homepage-batch/14-care-notes.png", "#health"],
+    ["短影片", "浴室安全的快速檢查", "assets/homepage-batch/08-orange-apron-walking.png", "#health"]
+  ];
+
   return `
     <div class="health-page">
       <section class="health-hero">
@@ -517,37 +610,123 @@ function renderHealthPage() {
             <p>長照內容農場，整理疾病症狀、飲食營養、復能運動、失智照顧與家屬照顧技巧。</p>
           </div>
           <form class="health-search">
-            <input type="search" placeholder="搜尋跌倒、失智、營養、復能" />
-            <button type="button">搜尋</button>
+            <input name="q" type="search" placeholder="搜尋跌倒、失智、營養、復能" />
+            <button type="submit">搜尋</button>
           </form>
         </div>
         <div class="health-cats">
-          <span>疾病症狀</span><span>健康生活</span><span>飲食營養</span><span>復能運動</span><span>失智照顧</span><span>影音專區</span><span>專家專欄</span><span>圖解文章</span>
+          ${["疾病症狀", "健康生活", "飲食營養", "復能運動", "失智照顧", "影音專區", "專家專欄", "圖解文章", "家屬支持", "課程活動"].map((cat) => `<button class="click-card" type="button" data-href="#search?q=${encodeURIComponent(cat)}">${cat}</button>`).join("")}
         </div>
       </section>
-      <section class="health-grid">
-        <article class="health-feature">
-          <img src="assets/homepage-batch/02-daycare-group-exercise.png" alt="長照健康3.0精選文章" />
+
+      <section class="health-board">
+        <article class="health-feature click-card" data-href="${feature.href}" tabindex="0" role="link">
+          <img src="${feature.image}" alt="${feature.title}" />
           <div>
-            <span class="health-tag">早安精選</span>
-            <h2>第一次申請長照服務，家人需要先準備什麼？</h2>
-            <p>從需求盤點、照顧計畫、政府補助到服務媒合，用一篇文章把流程講清楚。</p>
-            <a class="health-readmore" href="#article-longterm-care-apply">Read More</a>
+            <span class="health-tag">本週精選</span>
+            <h2>${feature.title}</h2>
+            <p>${feature.excerpt}</p>
+            <a class="health-readmore" href="${feature.href}">Read More</a>
           </div>
         </article>
-        <article class="health-card"><span class="health-tag">疾病症狀</span><h3>長輩跌倒後的黃金觀察期</h3><p>整理家人可以在家先觀察的身體訊號與就醫時機。</p><a href="#article-longterm-care-apply">Read More</a></article>
-        <article class="health-card"><span class="health-tag">飲食營養</span><h3>吃得少不是正常老化</h3><p>從體重、食慾與肌力看出營養風險。</p><a href="#article-longterm-care-apply">Read More</a></article>
-        <article class="health-card"><span class="health-tag">失智照顧</span><h3>重複提問怎麼回應？</h3><p>降低衝突，讓照顧者與長輩都保有安全感。</p><a href="#article-master-talk-care-psychology">Read More</a></article>
+
+        <div class="health-quick-grid">
+          ${quickCards.map((post) => `
+            <article class="health-card click-card" data-href="${post.href}" tabindex="0" role="link">
+              <span class="health-tag">${post.category}</span>
+              <h3>${post.title}</h3>
+              <p>${post.excerpt}</p>
+              <a href="${post.href}">Read More</a>
+            </article>
+          `).join("")}
+        </div>
+
         <aside class="ranking-panel">
-          <h3>熱門文章</h3>
+          <div class="ranking-title"><span>Ranking</span><h3>熱門文章</h3></div>
           <ol>
-            <li>一分鐘看懂長照2.0申請流程</li>
-            <li>日照中心適合哪些長輩？</li>
-            <li>失智初期家屬常忽略的5個訊號</li>
-            <li>復能不是復健，差異在哪裡？</li>
-            <li>照顧者壓力過高時的求助清單</li>
+            ${healthArticles.slice(0, 6).map((post) => `<li><a href="${post.href}">${post.title}</a></li>`).join("")}
           </ol>
         </aside>
+      </section>
+
+      <section class="health-topic-strip">
+        ${["長照2.0", "出院返家", "跌倒預防", "營養補充", "失智陪伴", "日間照顧", "復能訓練", "喘息服務"].map((keyword) => `<a href="#search?q=${encodeURIComponent(keyword)}"># ${keyword}</a>`).join("")}
+      </section>
+
+      <section class="health-latest">
+        <div class="health-section-head">
+          <div><p class="eyebrow">Latest</p><h2>最新照顧文章</h2></div>
+          <a href="#search?q=${encodeURIComponent("照顧")}">查看全部</a>
+        </div>
+        <div class="health-latest-grid">
+          ${latestCards.map((post) => `
+            <article class="health-list-card click-card" data-href="${post.href}" tabindex="0" role="link">
+              <img src="${post.image}" alt="${post.title}" />
+              <div>
+                <span>${post.category}</span>
+                <h3>${post.title}</h3>
+                <p>${post.excerpt}</p>
+                <small>${post.author} · ${post.date}</small>
+              </div>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="health-media-hub">
+        <div class="health-section-head">
+          <div><p class="eyebrow">Video</p><h2>影音與短影片</h2></div>
+          <a href="#search?q=${encodeURIComponent("影片")}">更多影音</a>
+        </div>
+        <div class="health-media-grid">
+          ${videoCards.map(([type, title, image, href]) => `
+            <article class="health-video-card click-card" data-href="${href}" tabindex="0" role="link">
+              <img src="${image}" alt="${title}" />
+              <div><span>${type}</span><h3>${title}</h3></div>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function renderSearchPage(query = "") {
+  const keyword = decodeURIComponent(query || "").trim();
+  const normalizedKeyword = keyword.toLowerCase();
+  const results = normalizedKeyword
+    ? healthArticles.filter((post) => `${post.title} ${post.excerpt} ${post.category} ${post.keywords}`.toLowerCase().includes(normalizedKeyword))
+    : healthArticles;
+
+  return `
+    <div class="search-page">
+      <section class="search-hero">
+        <p class="eyebrow">Search</p>
+        <h1>搜尋照顧知識</h1>
+        <form class="health-search search-page-form">
+          <input name="q" type="search" value="${escapeHTML(keyword)}" placeholder="搜尋跌倒、失智、營養、復能" />
+          <button type="submit">搜尋</button>
+        </form>
+        <p>${keyword ? `「${escapeHTML(keyword)}」共有 ${results.length} 筆相關內容` : "輸入關鍵字，快速找到文章、影音與照顧資源。"}</p>
+      </section>
+      <section class="search-results">
+        ${results.length ? results.map((post) => `
+          <article class="search-result-card click-card" data-href="${post.href}" tabindex="0" role="link">
+            <img src="${post.image}" alt="${post.title}" />
+            <div>
+              <span>${post.category}</span>
+              <h2>${post.title}</h2>
+              <p>${post.excerpt}</p>
+              <small>${post.author} · ${post.date}</small>
+            </div>
+          </article>
+        `).join("") : `
+          <div class="search-empty">
+            <h2>目前沒有找到相關內容</h2>
+            <p>可以試試「長照申請」、「跌倒」、「失智」、「營養」或「喘息」。</p>
+            <a href="#health">回健康3.0</a>
+          </div>
+        `}
       </section>
     </div>
   `;
@@ -688,7 +867,9 @@ function renderArticlePage(slug) {
 function renderPage(slug) {
   if (!home || !pageView) return;
 
-  const normalized = slug || "home";
+  const rawSlug = slug || "home";
+  const [normalized, queryString = ""] = rawSlug.split("?");
+  const searchParams = new URLSearchParams(queryString);
   const articleSlug = normalized.startsWith("article-") ? normalized.replace("article-", "") : null;
   const anchorTarget = normalized === "home" ? null : document.getElementById(normalized);
   const page = anchorTarget ? null : pages[normalized];
@@ -706,6 +887,10 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderHealthPage();
+  } else if (normalized === "search") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderSearchPage(searchParams.get("q") || "");
   } else if (normalized === "courses") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -808,6 +993,31 @@ document.querySelectorAll("[data-news-tab]").forEach((tab) => {
       panel.classList.toggle("active", panel.dataset.newsPanel === key);
     });
   });
+});
+
+document.addEventListener("click", (event) => {
+  const card = event.target.closest(".click-card, .health-preview, .story-slider article, .celebrity-slider article");
+  if (!card || event.target.closest("a, button, input, select, textarea")) return;
+  const href = card.dataset.href || card.querySelector("a[href]")?.getAttribute("href");
+  if (href) location.hash = href.replace(/^#/, "");
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const card = event.target.closest(".click-card");
+  if (!card || event.target.closest("a, button, input, select, textarea")) return;
+  event.preventDefault();
+  const href = card.dataset.href;
+  if (href) location.hash = href.replace(/^#/, "");
+});
+
+document.addEventListener("submit", (event) => {
+  const form = event.target.closest(".health-search");
+  if (!form) return;
+  event.preventDefault();
+  const formData = new FormData(form);
+  const query = String(formData.get("q") || "").trim();
+  location.hash = `search?q=${encodeURIComponent(query)}`;
 });
 
 const sceneImages = document.querySelectorAll(".scene-carousel img");
