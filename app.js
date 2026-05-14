@@ -647,7 +647,6 @@ function renderHealthPage() {
               <div>
                 <span class="health-tag">${post.category}</span>
                 <h3>${post.title}</h3>
-                <p>${post.excerpt}</p>
                 <a href="${post.href}">Read More</a>
               </div>
             </article>

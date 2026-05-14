@@ -564,6 +564,7 @@ h2 {
   gap: 0;
   min-width: 0;
   height: 100%;
+  min-height: var(--care-wall-height);
   padding: clamp(24px, 2.6vw, 38px);
   border: 1px solid var(--line);
   border-radius: 36px;
@@ -698,7 +699,7 @@ h2 {
 }
 
 .content-wall {
-  --care-wall-height: clamp(520px, 42vw, 640px);
+  --care-wall-height: clamp(560px, 46vw, 660px);
   display: grid;
   grid-template-columns: minmax(0, 1.16fr) minmax(420px, .84fr);
   gap: clamp(34px, 4vw, 62px);
@@ -712,7 +713,7 @@ h2 {
 .scene-carousel {
   position: relative;
   height: var(--care-wall-height);
-  min-height: 0;
+  min-height: var(--care-wall-height);
   aspect-ratio: auto;
   overflow: hidden;
   border-radius: 36px;
@@ -1392,22 +1393,24 @@ h2 {
 .health-quick-grid,
 .ranking-panel {
   height: 100%;
-  min-height: 610px;
+  min-height: 560px;
 }
 .health-card {
   display: grid;
   grid-template-columns: 128px 1fr;
-  min-height: 140px;
+  min-height: 126px;
   overflow: hidden;
 }
 .health-card img {
   width: 100%;
   height: 100%;
-  min-height: 140px;
+  min-height: 126px;
   object-fit: cover;
 }
 .health-card div {
-  padding: 18px;
+  display: grid;
+  align-content: center;
+  padding: 16px 18px;
 }
 .health-tag {
   color: var(--orange-dark);
@@ -1426,13 +1429,7 @@ h2 {
 }
 .health-card h3 {
   margin: 8px 0;
-  font-size: 21px;
-}
-.health-card p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.65;
+  font-size: 20px;
 }
 .health-card a,
 .health-readmore {
