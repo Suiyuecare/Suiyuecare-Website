@@ -1637,7 +1637,7 @@ h2 {
 }
 .article-hero figure {
   position: relative;
-  min-height: 620px;
+  min-height: clamp(360px, 38vw, 500px);
   margin: 0 clamp(32px,5vw,86px);
   overflow: hidden;
   border-radius: 36px;
@@ -1655,7 +1655,7 @@ h2 {
 .article-hero img {
   width: 100%;
   height: 100%;
-  min-height: 620px;
+  min-height: clamp(360px, 38vw, 500px);
   display: block;
   object-fit: cover;
 }
@@ -1669,7 +1669,7 @@ h2 {
 }
 .article-hero h1 {
   margin: 0 0 18px;
-  font-size: clamp(44px, 5.3vw, 84px);
+  font-size: clamp(40px, 4.6vw, 68px);
   line-height: 1.08;
   letter-spacing: 0;
   color: #fff;
@@ -1792,14 +1792,19 @@ h2 {
   font-size: 30px;
 }
 .article-related-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
   gap: 16px;
+  margin-inline: -4px;
+  padding: 4px 4px 18px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
 }
 .article-related a {
   display: grid;
   grid-template-rows: 180px auto auto;
   align-content: start;
+  flex: 0 0 min(310px, 78vw);
   gap: 10px;
   min-height: 320px;
   padding: 14px;
@@ -1807,6 +1812,7 @@ h2 {
   border-radius: 24px;
   background: #fff;
   box-shadow: 0 16px 38px rgba(83,43,11,.07);
+  scroll-snap-align: start;
 }
 .article-related img {
   width: 100%;
@@ -1945,7 +1951,7 @@ h2 {
   .health-preview.feature img { height: 260px; }
   .article-hero figure,
   .article-hero img {
-    min-height: 520px;
+    min-height: 420px;
   }
   .article-ads {
     position: static;
@@ -2044,7 +2050,7 @@ h2 {
   }
   .article-hero figure,
   .article-hero img {
-    min-height: 430px;
+    min-height: 340px;
     border-radius: 24px;
   }
   .article-hero figcaption {

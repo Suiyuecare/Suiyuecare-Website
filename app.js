@@ -176,6 +176,57 @@ const articlePages = {
   }
 };
 
+const relatedArticleCards = [
+  {
+    href: "#article-longterm-care-apply",
+    category: "Health 3.0",
+    title: "第一次申請長照服務，家人需要先準備什麼？",
+    image: "assets/homepage-batch/10-family-consultation.png"
+  },
+  {
+    href: "#article-family-care-story",
+    category: "Care Stories",
+    title: "爸爸出院後，我終於知道每天該注意什麼。",
+    image: "assets/homepage-batch/01-care-home-greeting.png"
+  },
+  {
+    href: "#article-master-talk-care-psychology",
+    category: "Master Talk",
+    title: "好的照顧，是讓長輩和家屬都保有生活感。",
+    image: "assets/homepage-batch/10-family-consultation.png"
+  },
+  {
+    href: "#health",
+    category: "照顧技巧",
+    title: "協助長輩安全起身的三個提醒",
+    image: "assets/homepage-batch/18-health-fall-prevention-cover.png"
+  },
+  {
+    href: "#health",
+    category: "飲食營養",
+    title: "吃得少不是正常老化，家人該先看哪些訊號？",
+    image: "assets/homepage-batch/17-health-nutrition-cover.png"
+  },
+  {
+    href: "#health",
+    category: "失智照顧",
+    title: "重複提問怎麼回應，才不會讓彼此更焦慮？",
+    image: "assets/homepage-batch/19-health-dementia-cover.png"
+  },
+  {
+    href: "#health",
+    category: "家屬支持",
+    title: "照顧者快撐不住時，可以先做的三件事",
+    image: "assets/homepage-batch/20-health-caregiver-stress-cover.png"
+  },
+  {
+    href: "#courses",
+    category: "課程報名",
+    title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
+    image: "assets/homepage-batch/12-community-health-class.png"
+  }
+];
+
 function stripHTML(value = "") {
   return value.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
@@ -547,9 +598,9 @@ function renderCoursesPage() {
 
 function renderArticlePage(slug) {
   const article = articlePages[slug] || articlePages["longterm-care-apply"];
-  const related = Object.entries(articlePages)
-    .filter(([key]) => key !== slug)
-    .slice(0, 3);
+  const related = relatedArticleCards
+    .filter((item) => item.href !== `#article-${slug}`)
+    .slice(0, 7);
 
   return `
     <article class="article-page">
@@ -600,8 +651,8 @@ function renderArticlePage(slug) {
               <strong>延伸閱讀</strong>
             </div>
             <div class="article-related-grid">
-              ${related.map(([key, item]) => `
-                <a href="#article-${key}">
+              ${related.map((item) => `
+                <a href="${item.href}">
                   <img src="${item.image}" alt="" />
                   <span>${item.category}</span>
                   <b>${item.title}</b>
