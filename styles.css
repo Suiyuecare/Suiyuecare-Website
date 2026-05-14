@@ -1948,6 +1948,13 @@ h2 {
   flex: 0 0 auto;
   color: var(--brown);
 }
+.course-info-line em {
+  display: inline-block;
+  margin-right: 7px;
+  color: var(--orange-dark);
+  font-style: normal;
+  font-weight: 1000;
+}
 .course-register {
   display: inline-flex;
   align-items: center;

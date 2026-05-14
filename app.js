@@ -1047,8 +1047,8 @@ function renderCoursesPage() {
               <div class="course-topline"><span class="course-type">${course.type}</span><span class="course-seats">${course.seats}</span></div>
               <h3>${course.title}</h3>
               <p>${course.intro}</p>
-              <div class="course-info-line"><span>地點 ${course.type}｜${course.location}</span><b>${course.price}</b></div>
-              <div class="course-info-line"><span>日期 ${course.date}</span><b>${course.time}</b></div>
+              <div class="course-info-line"><span><em>地點</em>${course.type}｜${course.location}</span><b><em>費用</em>${course.price}</b></div>
+              <div class="course-info-line"><span><em>日期</em>${course.date}</span><b><em>時間</em>${course.time}</b></div>
               <a class="course-register" href="#contact">立即報名</a>
             </div>
           </article>
