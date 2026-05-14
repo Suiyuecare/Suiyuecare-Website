@@ -553,56 +553,81 @@ function renderArticlePage(slug) {
 
   return `
     <article class="article-page">
-      <header class="article-hero">
-        <div class="article-hero-copy">
-          <a class="article-back" href="#health">Health 3.0</a>
-          <p class="eyebrow">${article.category}</p>
-          <h1>${article.title}</h1>
-          <p>${article.dek}</p>
-          <div class="article-meta">
-            <span>${article.author}</span>
-            <span>${article.date}</span>
-            <span>${article.readTime}</span>
-          </div>
-        </div>
-        <figure>
-          <img src="${article.image}" alt="${article.title}" />
-        </figure>
-      </header>
+      <div class="article-topbar">
+        <a class="article-back" href="#health">返回上一頁</a>
+        <span class="article-category">${article.category}</span>
+      </div>
 
-      <section class="article-shell">
-        <aside class="article-aside">
+      <section class="article-layout">
+        <div class="article-main">
+          <header class="article-hero">
+            <figure>
+              <img src="${article.image}" alt="${article.title}" />
+              <figcaption>
+                <h1>${article.title}</h1>
+                <p>${article.dek}</p>
+              </figcaption>
+            </figure>
+          </header>
+
+          <div class="article-meta">
+            <span class="meta-editor">編輯人｜${article.author}</span>
+            <span class="meta-date">${article.date}</span>
+            ${article.tags.map((tag) => `<span class="meta-tag"># ${tag}</span>`).join("")}
+          </div>
+
           <div class="article-summary">
             <strong>本文重點</strong>
             <ul>${article.summary.map((item) => `<li>${item}</li>`).join("")}</ul>
           </div>
-          <div class="article-tags">
-            ${article.tags.map((tag) => `<span>${tag}</span>`).join("")}
-          </div>
-        </aside>
 
-        <div class="article-body">
-          ${article.content.map(([heading, body]) => `
-            <section>
-              <h2>${heading}</h2>
-              <p>${body}</p>
-            </section>
-          `).join("")}
-          <div class="article-cta">
-            <p>${article.cta}</p>
-            <a href="#contact">預約照顧諮詢</a>
+          <div class="article-body">
+            ${article.content.map(([heading, body]) => `
+              <section>
+                <h2>${heading}</h2>
+                <p>${body}</p>
+              </section>
+            `).join("")}
+            <div class="article-cta">
+              <p>${article.cta}</p>
+              <a href="#contact">預約照顧諮詢</a>
+            </div>
           </div>
+
+          <section class="article-related">
+            <div class="article-related-head">
+              <span>Related Articles</span>
+              <strong>延伸閱讀</strong>
+            </div>
+            <div class="article-related-grid">
+              ${related.map(([key, item]) => `
+                <a href="#article-${key}">
+                  <img src="${item.image}" alt="" />
+                  <span>${item.category}</span>
+                  <b>${item.title}</b>
+                </a>
+              `).join("")}
+            </div>
+          </section>
         </div>
 
-        <aside class="article-related">
-          <strong>延伸閱讀</strong>
-          ${related.map(([key, item]) => `
-            <a href="#article-${key}">
-              <img src="${item.image}" alt="" />
-              <span>${item.category}</span>
-              <b>${item.title}</b>
-            </a>
-          `).join("")}
+        <aside class="article-ads" aria-label="側邊推薦">
+          <a class="article-ad featured" href="#contact">
+            <span>Suiyuecare Corps.</span>
+            <strong>第一次照顧諮詢</strong>
+            <p>不知道該選居家、日照還是復能？讓專人協助判斷。</p>
+            <em>預約諮詢</em>
+          </a>
+          <a class="article-ad" href="#courses">
+            <span>Care Course</span>
+            <strong>家屬照顧課</strong>
+            <p>把移位、用餐、跌倒預防變成看得懂的日常技巧。</p>
+          </a>
+          <a class="article-ad" href="#talent">
+            <span>We want you</span>
+            <strong>加入歲悅團隊</strong>
+            <p>居服員、督導、日照照服員招募中。</p>
+          </a>
         </aside>
       </section>
     </article>
