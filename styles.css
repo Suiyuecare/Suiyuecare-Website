@@ -1630,7 +1630,7 @@ h2 {
   grid-template-columns: minmax(0, 1fr) minmax(300px, .32fr);
   gap: 32px;
   align-items: start;
-  padding: 0 clamp(32px,5vw,86px) 96px;
+  padding: 24px clamp(32px,5vw,86px) 96px;
 }
 .article-main {
   min-width: 0;
@@ -1638,7 +1638,7 @@ h2 {
 .article-hero figure {
   position: relative;
   min-height: 620px;
-  margin: 0;
+  margin: 0 clamp(32px,5vw,86px);
   overflow: hidden;
   border-radius: 36px;
   background: var(--brown);
@@ -1829,9 +1829,10 @@ h2 {
 }
 .article-ads {
   position: sticky;
-  top: 112px;
+  top: 104px;
   display: grid;
   gap: 16px;
+  margin-top: 58px;
 }
 .article-ad {
   display: block;

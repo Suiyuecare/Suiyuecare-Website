@@ -558,18 +558,18 @@ function renderArticlePage(slug) {
         <span class="article-category">${article.category}</span>
       </div>
 
+      <header class="article-hero">
+        <figure>
+          <img src="${article.image}" alt="${article.title}" />
+          <figcaption>
+            <h1>${article.title}</h1>
+            <p>${article.dek}</p>
+          </figcaption>
+        </figure>
+      </header>
+
       <section class="article-layout">
         <div class="article-main">
-          <header class="article-hero">
-            <figure>
-              <img src="${article.image}" alt="${article.title}" />
-              <figcaption>
-                <h1>${article.title}</h1>
-                <p>${article.dek}</p>
-              </figcaption>
-            </figure>
-          </header>
-
           <div class="article-meta">
             <span class="meta-editor">編輯人｜${article.author}</span>
             <span class="meta-date">${article.date}</span>
