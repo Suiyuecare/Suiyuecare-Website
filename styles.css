@@ -1376,19 +1376,38 @@ h2 {
   box-shadow: 0 18px 46px rgba(83,43,11,.08);
 }
 .health-feature {
-  grid-row: span 2;
   overflow: hidden;
 }
 .health-feature img {
   width: 100%;
-  height: 330px;
+  height: 290px;
   object-fit: cover;
   display: block;
 }
 .health-feature div,
-.health-card,
 .ranking-panel {
   padding: 26px;
+}
+.health-feature,
+.health-quick-grid,
+.ranking-panel {
+  height: 100%;
+  min-height: 610px;
+}
+.health-card {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  min-height: 140px;
+  overflow: hidden;
+}
+.health-card img {
+  width: 100%;
+  height: 100%;
+  min-height: 140px;
+  object-fit: cover;
+}
+.health-card div {
+  padding: 18px;
 }
 .health-tag {
   color: var(--orange-dark);
@@ -1404,6 +1423,16 @@ h2 {
   color: var(--brown);
   font-size: 25px;
   line-height: 1.35;
+}
+.health-card h3 {
+  margin: 8px 0;
+  font-size: 21px;
+}
+.health-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
 }
 .health-card a,
 .health-readmore {
@@ -1422,6 +1451,12 @@ h2 {
 .ranking-panel a {
   color: var(--muted);
 }
+.ranking-title span {
+  font-size: 15px;
+  font-weight: 1000;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
 .health-board {
   display: grid;
   grid-template-columns: minmax(420px, 1fr) minmax(360px, .78fr) minmax(260px, .52fr);
@@ -1430,8 +1465,9 @@ h2 {
 }
 .health-quick-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(4, 1fr);
+  gap: 12px;
 }
 .ranking-title span,
 .health-section-head .eyebrow {
@@ -1452,7 +1488,9 @@ h2 {
   font-weight: 900;
   box-shadow: 0 12px 26px rgba(83,43,11,.06);
 }
+.health-pack-section,
 .health-latest,
+.health-event-section,
 .health-media-hub {
   padding: 26px clamp(32px,5vw,86px) 54px;
 }
@@ -1476,6 +1514,47 @@ h2 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+}
+.health-pack-grid,
+.health-event-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.health-pack-card,
+.health-event-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.health-pack-card img,
+.health-event-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+.health-pack-card div,
+.health-event-card div {
+  padding: 22px;
+}
+.health-pack-card span,
+.health-event-card time {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 900;
+}
+.health-pack-card h3,
+.health-event-card h3 {
+  color: var(--brown);
+  font-size: 27px;
+  line-height: 1.32;
+}
+.health-pack-card p,
+.health-event-card p {
+  color: var(--muted);
+  line-height: 1.8;
 }
 .health-list-card {
   display: grid;
@@ -2177,7 +2256,9 @@ h2 {
   .health-grid { grid-template-columns: 1fr 1fr; }
   .health-board,
   .health-latest-grid,
-  .health-media-grid {
+  .health-media-grid,
+  .health-pack-grid,
+  .health-event-grid {
     grid-template-columns: 1fr 1fr;
   }
   .ranking-panel {
@@ -2241,8 +2322,18 @@ h2 {
   .health-quick-grid,
   .health-latest-grid,
   .health-media-grid,
+  .health-pack-grid,
+  .health-event-grid,
   .search-result-card {
     grid-template-columns: 1fr;
+  }
+  .health-feature,
+  .health-quick-grid,
+  .ranking-panel {
+    min-height: auto;
+  }
+  .health-card {
+    grid-template-columns: 140px 1fr;
   }
   .search-result-card img {
     height: 220px;
@@ -2259,7 +2350,7 @@ h2 {
   .hero { min-height: auto; padding-top: 74px; }
   .wall-main, .video-panel { min-height: 360px; border-radius: 24px; }
   .north-map { min-height: 0; border-radius: 24px; }
-  .care-flow, .service-grid, .contact-form, .detail-content, .footer-sitemap, .health-grid, .course-list, .course-search, .footer-main, .mini-article-grid, .media-row, .health-board, .health-quick-grid, .health-latest-grid, .health-media-grid { grid-template-columns: 1fr; }
+  .care-flow, .service-grid, .contact-form, .detail-content, .footer-sitemap, .health-grid, .course-list, .course-search, .footer-main, .mini-article-grid, .media-row, .health-board, .health-quick-grid, .health-latest-grid, .health-media-grid, .health-pack-grid, .health-event-grid { grid-template-columns: 1fr; }
   .story-slider article { flex-basis: 86vw; }
   .celebrity-slider article { flex-basis: 86vw; }
   .news-list article { grid-template-columns: 1fr; }
@@ -2284,6 +2375,12 @@ h2 {
   }
   .health-list-card {
     grid-template-rows: 190px 1fr;
+  }
+  .health-card {
+    grid-template-columns: 1fr;
+  }
+  .health-card img {
+    height: 180px;
   }
   .health-list-card img,
   .health-video-card img,

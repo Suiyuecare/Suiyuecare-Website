@@ -593,6 +593,16 @@ function renderHealthPage() {
   const feature = healthArticles[0];
   const quickCards = healthArticles.slice(1, 5);
   const latestCards = healthArticles.slice(0, 6);
+  const lazyPacks = [
+    ["長照申請懶人包", "從評估、補助、服務媒合到第一次到宅，照著順序看就懂。", "assets/homepage-batch/10-family-consultation.png", "#article-longterm-care-apply"],
+    ["出院返家照顧包", "把返家前準備、移位、用餐與每日觀察整理成家屬清單。", "assets/homepage-batch/01-care-home-greeting.png", "#article-family-care-story"],
+    ["失智陪伴懶人包", "重複提問、情緒不安與日常安全，用簡單方法降低摩擦。", "assets/homepage-batch/19-health-dementia-cover.png", "#health"]
+  ];
+  const eventCards = [
+    ["家屬照顧技巧課", "移位、用餐、跌倒預防與照顧溝通", "5/28", "assets/homepage-batch/12-community-health-class.png", "#courses"],
+    ["日照體驗參觀日", "認識日間照顧流程與家庭喘息安排", "6/05", "assets/homepage-batch/02-daycare-group-exercise.png", "#courses"],
+    ["復能照顧工作坊", "讓長輩一步一步恢復生活能力", "6/12", "assets/homepage-batch/13-rehab-walking-practice.png", "#courses"]
+  ];
   const videoCards = [
     ["影片", "三分鐘理解居家照顧安排流程", "assets/homepage-batch/15-phone-consultation.png", "#article-master-talk-care-psychology"],
     ["影片", "日間照顧如何讓家庭喘息", "assets/homepage-batch/12-community-health-class.png", "#article-master-talk-care-psychology"],
@@ -633,10 +643,13 @@ function renderHealthPage() {
         <div class="health-quick-grid">
           ${quickCards.map((post) => `
             <article class="health-card click-card" data-href="${post.href}" tabindex="0" role="link">
-              <span class="health-tag">${post.category}</span>
-              <h3>${post.title}</h3>
-              <p>${post.excerpt}</p>
-              <a href="${post.href}">Read More</a>
+              <img src="${post.image}" alt="${post.title}" />
+              <div>
+                <span class="health-tag">${post.category}</span>
+                <h3>${post.title}</h3>
+                <p>${post.excerpt}</p>
+                <a href="${post.href}">Read More</a>
+              </div>
             </article>
           `).join("")}
         </div>
@@ -651,6 +664,21 @@ function renderHealthPage() {
 
       <section class="health-topic-strip">
         ${["長照2.0", "出院返家", "跌倒預防", "營養補充", "失智陪伴", "日間照顧", "復能訓練", "喘息服務"].map((keyword) => `<a href="#search?q=${encodeURIComponent(keyword)}"># ${keyword}</a>`).join("")}
+      </section>
+
+      <section class="health-pack-section">
+        <div class="health-section-head">
+          <div><p class="eyebrow">Guides</p><h2>懶人包</h2></div>
+          <a href="#search?q=${encodeURIComponent("懶人包")}">更多懶人包</a>
+        </div>
+        <div class="health-pack-grid">
+          ${lazyPacks.map(([title, desc, image, href]) => `
+            <article class="health-pack-card click-card" data-href="${href}" tabindex="0" role="link">
+              <img src="${image}" alt="${title}" />
+              <div><span>懶人包</span><h3>${title}</h3><p>${desc}</p></div>
+            </article>
+          `).join("")}
+        </div>
       </section>
 
       <section class="health-latest">
@@ -668,6 +696,21 @@ function renderHealthPage() {
                 <p>${post.excerpt}</p>
                 <small>${post.author} · ${post.date}</small>
               </div>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="health-event-section">
+        <div class="health-section-head">
+          <div><p class="eyebrow">Events</p><h2>活動專區</h2></div>
+          <a href="#courses">課程報名</a>
+        </div>
+        <div class="health-event-grid">
+          ${eventCards.map(([title, desc, date, image, href]) => `
+            <article class="health-event-card click-card" data-href="${href}" tabindex="0" role="link">
+              <img src="${image}" alt="${title}" />
+              <div><time>${date}</time><h3>${title}</h3><p>${desc}</p></div>
             </article>
           `).join("")}
         </div>
