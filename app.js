@@ -701,6 +701,7 @@ function renderSearchPage(query = "") {
   return `
     <div class="search-page">
       <section class="search-hero">
+        <a class="search-back" href="#health">返回健康3.0</a>
         <p class="eyebrow">Search</p>
         <h1>搜尋照顧知識</h1>
         <form class="health-search search-page-form">
