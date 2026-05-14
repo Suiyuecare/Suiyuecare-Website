@@ -932,6 +932,76 @@ function renderSearchPage(query = "") {
 }
 
 function renderCoursesPage() {
+  const courses = [
+    {
+      title: "照服員核心訓練班",
+      intro: "建立照服員上線前的基本能力。",
+      date: "2026.05.20",
+      time: "09:00-17:00",
+      price: "NT$ 3,600",
+      type: "實體課",
+      location: "臺北教室",
+      seats: "剩餘 12 名",
+      image: "assets/homepage-batch/05-orange-polo-caregiver.png"
+    },
+    {
+      title: "家庭照顧者實用課",
+      intro: "快速學會起身、用餐、跌倒預防與照顧溝通。",
+      date: "2026.05.24",
+      time: "19:30-21:00",
+      price: "免費",
+      type: "線上同步課",
+      location: "Google Meet",
+      seats: "80 人",
+      image: "assets/homepage-batch/12-community-health-class.png"
+    },
+    {
+      title: "失智照顧溝通工作坊",
+      intro: "用情境演練理解重複提問、拒絕洗澡與情緒不安。",
+      date: "2026.06.02",
+      time: "13:30-16:30",
+      price: "NT$ 1,200",
+      type: "實體課",
+      location: "新北據點",
+      seats: "24 人",
+      image: "assets/homepage-batch/19-health-dementia-cover.png"
+    },
+    {
+      title: "移工照顧技能培訓",
+      intro: "建立一致的安全移位、用藥提醒與紀錄回報流程。",
+      date: "2026.06.08",
+      time: "10:00-15:00",
+      price: "NT$ 2,000",
+      type: "實體課",
+      location: "臺北教室",
+      seats: "30 人",
+      image: "assets/homepage-batch/03-supervisor-care-plan.png"
+    },
+    {
+      title: "督導品質管理研習",
+      intro: "聚焦服務媒合、異常追蹤、紀錄檢核與團隊支持。",
+      date: "2026.06.15",
+      time: "20:00-22:00",
+      price: "NT$ 980",
+      type: "線上同步課",
+      location: "Zoom",
+      seats: "120 人",
+      image: "assets/homepage-batch/04-admin-team-office.png"
+    },
+    {
+      title: "護理復能基礎課",
+      intro: "理解復能目標、步態觀察與家屬陪伴方法。",
+      date: "2026.06.22",
+      time: "可隨時觀看",
+      price: "NT$ 680",
+      type: "預錄課",
+      location: "線上學習",
+      seats: "不限人數",
+      image: "assets/homepage-batch/13-rehab-walking-practice.png"
+    }
+  ];
+  const importantCourses = courses.slice(0, 3);
+
   return `
     <div class="courses-page">
       <section class="courses-hero">
@@ -950,69 +1020,35 @@ function renderCoursesPage() {
           </form>
         </div>
       </section>
+      <section class="featured-courses">
+        <div class="health-section-head">
+          <div><p class="eyebrow">Featured</p><h2>重要課程</h2></div>
+          <span>左右滑動查看本月主打課程</span>
+        </div>
+        <div class="featured-course-track" aria-label="重要課程輪播">
+          ${importantCourses.map((course) => `
+            <article class="featured-course-card click-card" data-href="#contact" tabindex="0" role="link">
+              <img src="${course.image}" alt="${course.title}" />
+              <div>
+                <span>${course.type}</span>
+                <h3>${course.title}</h3>
+                <p>${course.intro}</p>
+                <a href="#contact">立即報名</a>
+              </div>
+            </article>
+          `).join("")}
+        </div>
+      </section>
       <section class="course-list">
-        ${[
-          {
-            title: "照服員核心訓練班",
-            intro: "從生活支持、移位安全、沐浴照顧到服務紀錄，建立照服員上線前的基本能力。",
-            date: "2026.05.20",
-            time: "09:00-17:00",
-            price: "NT$ 3,600",
-            place: "實體課｜臺北教室"
-          },
-          {
-            title: "家庭照顧者實用課",
-            intro: "給正在照顧家人的你，快速學會起身、用餐、跌倒預防與照顧溝通。",
-            date: "2026.05.24",
-            time: "19:30-21:00",
-            price: "免費",
-            place: "線上同步課｜Google Meet"
-          },
-          {
-            title: "失智照顧溝通工作坊",
-            intro: "用情境演練理解重複提問、拒絕洗澡、情緒不安等常見照顧場景。",
-            date: "2026.06.02",
-            time: "13:30-16:30",
-            price: "NT$ 1,200",
-            place: "實體課｜新北據點"
-          },
-          {
-            title: "移工照顧技能培訓",
-            intro: "協助家庭與移工建立一致的照顧流程，包含安全移位、用藥提醒與紀錄回報。",
-            date: "2026.06.08",
-            time: "10:00-15:00",
-            price: "NT$ 2,000",
-            place: "實體課｜臺北教室"
-          },
-          {
-            title: "督導品質管理研習",
-            intro: "聚焦服務媒合、異常事件追蹤、照顧紀錄檢核與團隊支持制度。",
-            date: "2026.06.15",
-            time: "20:00-22:00",
-            price: "NT$ 980",
-            place: "線上同步課｜Zoom"
-          },
-          {
-            title: "護理復能基礎課",
-            intro: "從生活目標設定、步態觀察到家屬陪伴，理解復能如何回到日常。",
-            date: "2026.06.22",
-            time: "可隨時觀看",
-            price: "NT$ 680",
-            place: "預錄課｜線上學習"
-          }
-        ].map((course, index) => `
+        ${courses.map((course, index) => `
           <article class="course-card click-card" data-href="#contact" tabindex="0" role="link">
-            <div class="course-thumb">${String(index + 1).padStart(2, "0")}</div>
+            <div class="course-thumb"><img src="${course.image}" alt="${course.title}" /><span>${String(index + 1).padStart(2, "0")}</span></div>
             <div class="course-body">
-              <span class="course-type">${course.place}</span>
+              <div class="course-topline"><span class="course-type">${course.type}</span><span class="course-seats">${course.seats}</span></div>
               <h3>${course.title}</h3>
               <p>${course.intro}</p>
-              <dl class="course-details">
-                <div><dt>日期</dt><dd>${course.date}</dd></div>
-                <div><dt>時間</dt><dd>${course.time}</dd></div>
-                <div><dt>價格</dt><dd>${course.price}</dd></div>
-                <div><dt>地點</dt><dd>${course.place}</dd></div>
-              </dl>
+              <div class="course-info-line"><span>地點 ${course.type}｜${course.location}</span><b>${course.price}</b></div>
+              <div class="course-info-line"><span>日期 ${course.date}</span><b>${course.time}</b></div>
               <a class="course-register" href="#contact">立即報名</a>
             </div>
           </article>
