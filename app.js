@@ -1353,29 +1353,44 @@ document.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
   status.textContent = "正在送出報名資訊...";
 
-  try {
-    const response = await fetch(`https://formsubmit.co/ajax/${COURSE_NOTIFY_EMAIL}`, {
-      method: "POST",
-      headers: { Accept: "application/json" },
-      body: new FormData(form)
-    });
-    if (!response.ok) throw new Error("signup failed");
-
-    let seconds = 2;
-    status.textContent = `報名資訊已送出，${seconds} 秒後前往 LINE@。`;
-    const countdown = window.setInterval(() => {
-      seconds -= 1;
-      if (seconds <= 0) {
-        window.clearInterval(countdown);
-        window.location.href = COURSE_LINE_URL;
-      } else {
-        status.textContent = `報名資訊已送出，${seconds} 秒後前往 LINE@。`;
-      }
-    }, 1000);
-  } catch (error) {
-    status.textContent = "送出時發生問題，請稍後再試或直接加入 LINE@。";
-    submitButton.disabled = false;
+  const iframeName = "courseSignupSubmitFrame";
+  let iframe = document.querySelector(`iframe[name="${iframeName}"]`);
+  if (!iframe) {
+    iframe = document.createElement("iframe");
+    iframe.name = iframeName;
+    iframe.hidden = true;
+    document.body.appendChild(iframe);
   }
+
+  const submitForm = document.createElement("form");
+  submitForm.method = "POST";
+  submitForm.action = `https://formsubmit.co/${COURSE_NOTIFY_EMAIL}`;
+  submitForm.target = iframeName;
+  submitForm.hidden = true;
+
+  new FormData(form).forEach((value, key) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = key;
+    input.value = value;
+    submitForm.appendChild(input);
+  });
+
+  document.body.appendChild(submitForm);
+  submitForm.submit();
+  window.setTimeout(() => submitForm.remove(), 500);
+
+  let seconds = 2;
+  status.textContent = `報名資訊已送出，${seconds} 秒後前往 LINE@。`;
+  const countdown = window.setInterval(() => {
+    seconds -= 1;
+    if (seconds <= 0) {
+      window.clearInterval(countdown);
+      window.location.assign(COURSE_LINE_URL);
+    } else {
+      status.textContent = `報名資訊已送出，${seconds} 秒後前往 LINE@。`;
+    }
+  }, 1000);
 });
 
 document.addEventListener("click", (event) => {
