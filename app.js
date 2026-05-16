@@ -1078,6 +1078,594 @@ function renderCoursesPage() {
   `;
 }
 
+function renderInvestorsPage() {
+  const irNews = [
+    ["2026.05", "歲悅長照新增北北桃服務調度窗口", "整合居家照顧、日間照顧與護理復能諮詢，協助家庭更快找到適合服務。"],
+    ["2026.04", "健康3.0照顧知識專欄上線", "提供家屬可快速理解的照顧技巧、營養衛教與安全提醒。"],
+    ["2026.03", "移工照顧訓練課程開放報名", "以實作情境、家庭溝通與照顧安全為核心，提升家庭照顧穩定度。"]
+  ];
+  const irAwards = [
+    ["2026", "臺北市居家照顧服務合作案", "承接區域照顧支持與家屬諮詢服務，建立可追蹤的照顧流程。"],
+    ["2025", "新北市社區照顧據點服務案", "協助社區健康促進、共餐活動與預防延緩失能課程執行。"],
+    ["2025", "桃園市護理復能支持服務案", "串接護理評估、復能訓練與服務品質追蹤。"]
+  ];
+
+  return `
+    <div class="investor-page">
+      <section class="investor-hero">
+        <div>
+          <p class="eyebrow">Investor Relations</p>
+          <h1>投資人專區</h1>
+          <p>以清楚、穩定、可信任的資訊揭露，讓投資人理解歲悅長照集團的服務網絡、治理節奏與成長策略。</p>
+          <div class="investor-hero-actions">
+            <a class="primary-button" href="#contact">聯絡投資人窗口</a>
+            <a class="secondary-button" href="#investor-downloads">下載資料</a>
+          </div>
+        </div>
+        <aside class="investor-snapshot">
+          <span>Suiyuecare Corps.</span>
+          <strong>照顧服務網絡持續擴張</strong>
+          <div>
+            <p><b>3</b>核心縣市</p>
+            <p><b>6</b>服務事業</p>
+            <p><b>95%</b>服務滿意度</p>
+          </div>
+        </aside>
+      </section>
+
+      <nav class="investor-directory" aria-label="投資人專區主要分類">
+        <a href="#ir-finance"><span>Financials</span><strong>財務資訊</strong><em>每月營收、財務分析、季報與年報</em></a>
+        <a href="#ir-governance"><span>Governance</span><strong>公司治理</strong><em>治理運作、稽核、風險與誠信經營</em></a>
+        <a href="#ir-shareholders"><span>Shareholders</span><strong>股東專區</strong><em>股務資訊、股東會、法說會與 FAQ</em></a>
+      </nav>
+
+      <section class="investor-panel active">
+        <div class="investor-section-head">
+          <p class="eyebrow">Latest Updates</p>
+          <h2>投資人最新動態</h2>
+          <span>把首頁的最新消息與得標紀錄同步整理到投資人專區，讓投資人快速掌握營運進度。</span>
+        </div>
+        <div class="ir-updates-grid">
+          <article class="ir-update-card">
+            <div><p class="eyebrow">News</p><h3>最新消息</h3></div>
+            ${irNews.map(([date, title, copy]) => `<a href="#ir-finance"><time>${date}</time><strong>${title}</strong><p>${copy}</p></a>`).join("")}
+          </article>
+          <article class="ir-update-card">
+            <div><p class="eyebrow">Awards</p><h3>得標紀錄</h3></div>
+            ${irAwards.map(([date, title, copy]) => `<a href="#ir-governance"><time>${date}</time><strong>${title}</strong><p>${copy}</p></a>`).join("")}
+          </article>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function renderFinancePage() {
+  const revenueRows = [
+    ["2026.05", "8.6M", "+12.4%", "居家照顧與教育品管需求提升"],
+    ["2026.04", "7.7M", "+8.1%", "北北桃服務量穩定增加"],
+    ["2026.03", "7.1M", "+6.8%", "課程與移工培訓開課帶動"],
+    ["2026.02", "6.8M", "+5.5%", "日照與社區據點服務穩定"]
+  ];
+  const reports = [
+    ["2026 Q1 財務報告", "PDF", "2026.05.15", "已上架"],
+    ["2025 Q4 財務報告", "PDF", "2026.03.31", "已上架"],
+    ["2025 Q3 財務報告", "PDF", "2025.11.14", "已上架"],
+    ["2025 Q2 財務報告", "PDF", "2025.08.14", "已上架"]
+  ];
+  const annualReports = [
+    ["2025 年度股東會年報", "PDF", "2026.05", "申請下載"],
+    ["2025 股東會議事手冊", "PDF", "2026.05", "申請下載"],
+    ["2024 年度營運摘要", "PDF", "2025.05", "申請下載"]
+  ];
+
+  return `
+    <div class="investor-page finance-page">
+      <section class="ir-sub-hero finance-visual">
+        <div>
+          <a class="search-back" href="#investors">返回投資人專區</a>
+          <p class="eyebrow">Financial Information</p>
+          <h1>財務資訊</h1>
+          <p>以月營收、季度財報、財務分析與股東會年報為核心，建立投資人能快速閱讀、下載與追蹤的財務資訊中心。</p>
+        </div>
+        <aside class="finance-hero-chart" aria-label="年度營運趨勢示意圖">
+          <span>Revenue Trend</span>
+          <div class="mini-line-chart">
+            <i style="--x:8%;--y:70%"></i><i style="--x:25%;--y:56%"></i><i style="--x:42%;--y:62%"></i><i style="--x:59%;--y:42%"></i><i style="--x:76%;--y:36%"></i><i style="--x:92%;--y:22%"></i>
+          </div>
+          <strong>+12.4%</strong>
+          <p>最近月營收成長率示意</p>
+        </aside>
+      </section>
+
+      <nav class="investor-tabs ir-finance-tabs" aria-label="財務資訊分頁">
+        <button class="active" type="button" data-ir-tab="monthly-revenue">每月營收</button>
+        <button type="button" data-ir-tab="finance-analysis">財務資訊分析</button>
+        <button type="button" data-ir-tab="quarterly-reports">季度財報</button>
+        <button type="button" data-ir-tab="annual-reports">股東會年報</button>
+      </nav>
+
+      <section class="ir-tab-panel active" data-ir-panel="monthly-revenue">
+        <div class="investor-section-head">
+          <p class="eyebrow">Monthly Revenue</p>
+          <h2>每月營收</h2>
+          <span>用表格與折線/柱狀圖呈現月營收變化，後續可串接 WordPress 或財務 CSV 自動更新。</span>
+        </div>
+        <div class="finance-dashboard">
+          <article class="chart-card wide">
+            <div class="chart-card-head"><span>月營收趨勢</span><strong>NT$ 8.6M</strong></div>
+            <div class="bar-line-chart">
+              ${[42, 48, 46, 55, 61, 70, 68, 74, 78, 82, 88, 96].map((value, index) => `<i style="--h:${value}%"><b>${index + 1}</b></i>`).join("")}
+            </div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-card-head"><span>服務收入組成</span><strong>100%</strong></div>
+            <div class="donut-chart" style="--a:42%;--b:26%;--c:18%;--d:14%"><em>Revenue</em></div>
+            <ul class="chart-legend"><li>居家照顧 42%</li><li>日間照顧 26%</li><li>教育培訓 18%</li><li>其他服務 14%</li></ul>
+          </article>
+        </div>
+        <div class="investor-table-card">
+          <div class="table-title"><h3>月營收公告</h3><a href="#contact">訂閱財務通知</a></div>
+          <table>
+            <thead><tr><th>月份</th><th>營收</th><th>年增率</th><th>說明</th><th>下載</th></tr></thead>
+            <tbody>${revenueRows.map(([month, revenue, growth, note]) => `<tr><td>${month}</td><td>${revenue}</td><td>${growth}</td><td>${note}</td><td><a href="#contact">PDF</a></td></tr>`).join("")}</tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="finance-analysis">
+        <div class="investor-section-head">
+          <p class="eyebrow">Analysis</p>
+          <h2>財務資訊分析</h2>
+          <span>以服務收入、成本結構、現金流與展店投資四個角度，讓投資人快速讀懂營運品質。</span>
+        </div>
+        <div class="analysis-grid">
+          <article class="finance-highlight">
+            <span>Management Discussion</span>
+            <h3>照顧服務收入穩定，培訓與品管形成可複製的營運護城河。</h3>
+            <p>此區可放管理層對營收、成本、人力、展店與現金流的說明，讓財務數字不只是結果，而能對應到服務品質與區域策略。</p>
+          </article>
+          <article class="chart-card"><div class="chart-card-head"><span>成本結構</span><strong>Q1</strong></div><div class="donut-chart cost" style="--a:54%;--b:22%;--c:15%;--d:9%"><em>Cost</em></div><ul class="chart-legend"><li>人事 54%</li><li>場域 22%</li><li>教材品管 15%</li><li>行政 9%</li></ul></article>
+          <article class="chart-card"><div class="chart-card-head"><span>現金流穩定度</span><strong>88</strong></div><div class="score-ring"><b>88</b><span>Cash Index</span></div></article>
+        </div>
+        <div class="download-grid">
+          <a href="#contact"><span>PDF</span><strong>財務分析月報</strong><em>申請下載</em></a>
+          <a href="#contact"><span>XLS</span><strong>營運指標資料表</strong><em>申請下載</em></a>
+          <a href="#contact"><span>PDF</span><strong>管理層討論與分析</strong><em>申請下載</em></a>
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="quarterly-reports">
+        <div class="investor-section-head">
+          <p class="eyebrow">Quarterly Reports</p>
+          <h2>季度財報</h2>
+          <span>以季度報告、簡報與主要財務比率呈現，方便投資人按年度與季度查找。</span>
+        </div>
+        <div class="report-layout">
+          <article class="chart-card wide">
+            <div class="chart-card-head"><span>季度營收與毛利率</span><strong>2025-2026</strong></div>
+            <div class="combo-chart">
+              ${[58, 64, 62, 71, 76, 84].map((value, index) => `<i style="--h:${value}%"><b>Q${(index % 4) + 1}</b></i>`).join("")}
+            </div>
+          </article>
+          <div class="investor-table-card compact-table">
+            <div class="table-title"><h3>季度財報下載</h3><a href="#contact">索取完整檔案</a></div>
+            <table><thead><tr><th>文件</th><th>格式</th><th>日期</th><th>下載</th></tr></thead><tbody>${reports.map(([name, type, date, status]) => `<tr><td>${name}</td><td>${type}</td><td>${date}</td><td><a href="#contact">${status}</a></td></tr>`).join("")}</tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="annual-reports">
+        <div class="investor-section-head">
+          <p class="eyebrow">Annual Reports</p>
+          <h2>股東會年報</h2>
+          <span>集中放置年度營運摘要、股東會年報、議事手冊與相關附件。</span>
+        </div>
+        <div class="annual-grid">
+          <article class="annual-cover">
+            <img src="assets/homepage-batch/04-admin-team-office.png" alt="歲悅行政團隊整理年度報告" />
+            <div><span>2025 Annual Report</span><h3>讓投資人看見照顧網絡如何被制度化。</h3></div>
+          </article>
+          <div class="download-grid vertical">
+            ${annualReports.map(([name, type, date, status]) => `<a href="#contact"><span>${type}</span><strong>${name}</strong><small>${date}</small><em>${status}</em></a>`).join("")}
+          </div>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function renderGovernancePage() {
+  const majorMessages = [
+    ["2026.05.15", "董事會通過北區服務品質治理計畫", "強化督導訪視、異常事件追蹤與家屬回報流程。"],
+    ["2026.04.22", "個資與照顧紀錄權限控管制度更新", "建立分級權限、紀錄稽核與教育訓練節點。"],
+    ["2026.03.18", "誠信經營與吹哨者保護辦法公告", "建立內外部通報管道與案件追蹤原則。"]
+  ];
+  const executives = [
+    ["執行長", "營運策略與服務網絡拓展", "assets/homepage-batch/04-admin-team-office.png"],
+    ["照顧品質長", "服務品管、督導制度與異常事件改善", "assets/homepage-batch/03-supervisor-care-plan.png"],
+    ["教育訓練長", "照服員、督導與移工培訓制度", "assets/homepage-batch/11-elder-art-activity.png"],
+    ["財務行政長", "財務控管、人資行政與投資人關係", "assets/homepage-batch/10-family-consultation.png"]
+  ];
+  const auditItems = [
+    ["服務紀錄稽核", "92%", "完成率"],
+    ["個資權限檢核", "88%", "完成率"],
+    ["教育訓練覆蓋", "96%", "完成率"],
+    ["異常追蹤結案", "84%", "完成率"]
+  ];
+  const downloads = [
+    ["公司治理實務守則", "PDF", "2026.05"],
+    ["誠信經營守則", "PDF", "2026.05"],
+    ["內部稽核年度計畫", "PDF", "2026.04"],
+    ["風險管理政策", "PDF", "2026.04"],
+    ["吹哨者通報與保護辦法", "PDF", "2026.03"]
+  ];
+
+  return `
+    <div class="investor-page governance-page">
+      <section class="ir-sub-hero governance-visual">
+        <div>
+          <a class="search-back" href="#investors">返回投資人專區</a>
+          <p class="eyebrow">Corporate Governance</p>
+          <h1>公司治理</h1>
+          <p>以服務品質、內控稽核、風險管理與誠信經營為核心，讓歲悅長照集團的照顧系統能被追蹤、被改善，也能被投資人信任。</p>
+        </div>
+        <aside class="governance-hero-card">
+          <span>Governance Score</span>
+          <div class="score-ring governance-score"><b>91</b><span>Index</span></div>
+          <p>治理成熟度示意</p>
+        </aside>
+      </section>
+
+      <nav class="investor-tabs governance-tabs" aria-label="公司治理分頁">
+        <button class="active" type="button" data-ir-tab="governance-news">重要訊息</button>
+        <button type="button" data-ir-tab="governance-operation">公司治理運作</button>
+        <button type="button" data-ir-tab="executives">重要管理階層</button>
+        <button type="button" data-ir-tab="whistleblower">吹哨者專區</button>
+        <button type="button" data-ir-tab="evaluation">治理評鑑專區</button>
+        <button type="button" data-ir-tab="internal-audit">內部稽核</button>
+        <button type="button" data-ir-tab="risk-management">風險管理</button>
+        <button type="button" data-ir-tab="integrity">誠信經營</button>
+      </nav>
+
+      <section class="ir-tab-panel active" data-ir-panel="governance-news">
+        <div class="investor-section-head">
+          <p class="eyebrow">Material Information</p>
+          <h2>重要訊息</h2>
+          <span>用投資人看得懂的方式呈現重大決議、制度更新與治理公告。</span>
+        </div>
+        <div class="governance-news-grid">
+          <article class="governance-image-card">
+            <img src="assets/homepage-batch/04-admin-team-office.png" alt="歲悅行政團隊治理會議" />
+            <div><span>Board Updates</span><h3>治理訊息不只是公告，而是讓投資人看見公司如何運作。</h3></div>
+          </article>
+          <div class="ir-update-card">
+            <div><p class="eyebrow">Announcements</p><h3>治理公告</h3></div>
+            ${majorMessages.map(([date, title, copy]) => `<a href="#contact"><time>${date}</time><strong>${title}</strong><p>${copy}</p></a>`).join("")}
+          </div>
+        </div>
+        <div class="download-grid">
+          ${downloads.slice(0, 3).map(([name, type, date]) => `<a href="#contact"><span>${type}</span><strong>${name}</strong><small>${date}</small><em>下載文件</em></a>`).join("")}
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="governance-operation">
+        <div class="investor-section-head">
+          <p class="eyebrow">Governance Operation</p>
+          <h2>公司治理運作</h2>
+          <span>呈現董事會、功能委員會、內控與利害關係人溝通的治理運作節奏。</span>
+        </div>
+        <div class="finance-dashboard">
+          <article class="chart-card wide">
+            <div class="chart-card-head"><span>治理會議與追蹤事項</span><strong>2026</strong></div>
+            <div class="bar-line-chart governance-bars">
+              ${[80, 66, 72, 88, 76, 91, 84, 93].map((value, index) => `<i style="--h:${value}%"><b>${["董事會","品管","稽核","風險","個資","訓練","服務","利害"][index]}</b></i>`).join("")}
+            </div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-card-head"><span>治理資源配置</span><strong>100%</strong></div>
+            <div class="donut-chart governance-donut" style="--a:34%;--b:28%;--c:22%;--d:16%"><em>Gov</em></div>
+            <ul class="chart-legend"><li>服務品質 34%</li><li>內控稽核 28%</li><li>風險管理 22%</li><li>利害關係人 16%</li></ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="executives">
+        <div class="investor-section-head">
+          <p class="eyebrow">Leadership</p>
+          <h2>重要管理階層</h2>
+          <span>讓投資人理解管理團隊如何分工，並把照顧現場、品管、教育與財務治理串起來。</span>
+        </div>
+        <div class="executive-grid">
+          ${executives.map(([role, duty, image]) => `
+            <article>
+              <img src="${image}" alt="${role}形象圖" />
+              <div><span>${role}</span><h3>${duty}</h3><a href="#contact">Read More</a></div>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="whistleblower">
+        <div class="investor-section-head">
+          <p class="eyebrow">Whistleblower</p>
+          <h2>吹哨者專區</h2>
+          <span>建立保密、可追蹤、有回覆機制的通報入口，保障員工、服務對象與合作夥伴。</span>
+        </div>
+        <div class="whistle-layout">
+          <article class="finance-highlight">
+            <span>Protected Reporting</span>
+            <h3>每一個通報都需要被承接，而不是被消音。</h3>
+            <p>此區建議放通報適用範圍、保密原則、處理流程、回覆時程與禁止報復聲明。正式上線時可串接表單，寄送至指定治理信箱。</p>
+          </article>
+          <article class="process-card">
+            <h3>處理流程</h3>
+            <ol><li>收到通報</li><li>初步分級</li><li>成立處理小組</li><li>回覆與改善追蹤</li></ol>
+          </article>
+        </div>
+        <div class="download-grid">
+          <a href="#contact"><span>Form</span><strong>吹哨者通報表</strong><em>開啟表單</em></a>
+          <a href="#contact"><span>PDF</span><strong>通報人保護辦法</strong><em>下載文件</em></a>
+          <a href="#contact"><span>PDF</span><strong>案件處理流程</strong><em>下載文件</em></a>
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="evaluation">
+        <div class="investor-section-head">
+          <p class="eyebrow">Evaluation</p>
+          <h2>治理評鑑專區</h2>
+          <span>把治理目標拆成可追蹤指標，呈現年度進度、改善項目與評鑑資料。</span>
+        </div>
+        <div class="evaluation-grid">
+          <article class="chart-card"><div class="chart-card-head"><span>年度治理指標</span><strong>91/100</strong></div><div class="score-ring governance-score"><b>91</b><span>Score</span></div></article>
+          <article class="chart-card wide"><div class="chart-card-head"><span>治理評鑑趨勢</span><strong>2023-2026</strong></div><div class="combo-chart">${[58, 66, 73, 82, 91].map((value, index) => `<i style="--h:${value}%"><b>${2022 + index}</b></i>`).join("")}</div></article>
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="internal-audit">
+        <div class="investor-section-head">
+          <p class="eyebrow">Internal Audit</p>
+          <h2>內部稽核</h2>
+          <span>以服務、財務、個資與訓練四個面向呈現稽核計畫與執行進度。</span>
+        </div>
+        <div class="audit-grid">
+          ${auditItems.map(([title, value, label]) => `<article><span>${title}</span><strong>${value}</strong><em>${label}</em><div><i style="width:${value}"></i></div></article>`).join("")}
+        </div>
+        <div class="investor-table-card">
+          <div class="table-title"><h3>稽核文件下載</h3><a href="#contact">申請完整報告</a></div>
+          <table><thead><tr><th>文件</th><th>格式</th><th>更新日期</th><th>操作</th></tr></thead><tbody>${downloads.filter(([name]) => name.includes("稽核") || name.includes("治理")).map(([name, type, date]) => `<tr><td>${name}</td><td>${type}</td><td>${date}</td><td><a href="#contact">下載</a></td></tr>`).join("")}</tbody></table>
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="risk-management">
+        <div class="investor-section-head">
+          <p class="eyebrow">Risk Management</p>
+          <h2>風險管理</h2>
+          <span>把長照營運的服務品質、人力、個資、法遵與財務風險放進同一張治理地圖。</span>
+        </div>
+        <div class="risk-layout">
+          <article class="risk-matrix">
+            <h3>風險矩陣</h3>
+            <div class="matrix-grid">
+              <span style="grid-column:3;grid-row:1">個資</span><span style="grid-column:2;grid-row:2">人力</span><span style="grid-column:3;grid-row:2">服務</span><span style="grid-column:1;grid-row:3">法遵</span><span style="grid-column:2;grid-row:3">財務</span>
+            </div>
+          </article>
+          <article class="chart-card"><div class="chart-card-head"><span>風險類型占比</span><strong>Q1</strong></div><div class="donut-chart cost" style="--a:30%;--b:25%;--c:25%;--d:20%"><em>Risk</em></div><ul class="chart-legend"><li>服務 30%</li><li>人力 25%</li><li>個資 25%</li><li>財務 20%</li></ul></article>
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="integrity">
+        <div class="investor-section-head">
+          <p class="eyebrow">Integrity</p>
+          <h2>誠信經營</h2>
+          <span>以制度、教育、申報與追蹤為基礎，讓誠信經營成為日常管理的一部分。</span>
+        </div>
+        <div class="integrity-layout">
+          <article class="governance-image-card">
+            <img src="assets/homepage-batch/14-care-notes.png" alt="歲悅照顧紀錄與誠信經營" />
+            <div><span>Integrity System</span><h3>照顧產業的信任，來自每一筆紀錄、每一次回報與每一個承諾。</h3></div>
+          </article>
+          <div class="finance-metrics">
+            <article><b>誠信訓練覆蓋率</b><strong>96%</strong><span>年度教育訓練</span></article>
+            <article><b>利益衝突申報</b><strong>100%</strong><span>管理階層完成</span></article>
+            <article><b>案件追蹤</b><strong>0</strong><span>重大未結案件</span></article>
+          </div>
+        </div>
+        <div class="download-grid">
+          <a href="#contact"><span>PDF</span><strong>誠信經營守則</strong><em>下載文件</em></a>
+          <a href="#contact"><span>PDF</span><strong>利益衝突申報辦法</strong><em>下載文件</em></a>
+          <a href="#contact"><span>PDF</span><strong>員工行為準則</strong><em>下載文件</em></a>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function renderShareholdersPage() {
+  const meetingFiles = [
+    ["2026 股東常會開會通知", "PDF", "2026.05.20"],
+    ["2026 股東常會議事手冊", "PDF", "2026.05.20"],
+    ["2026 股東常會年報", "PDF", "2026.05.20"],
+    ["2025 股東常會議事錄", "PDF", "2025.06.18"]
+  ];
+  const briefingFiles = [
+    ["2026 Q1 法說會簡報", "PDF", "2026.05.15"],
+    ["2025 年度營運說明會", "PDF", "2026.03.31"],
+    ["北北桃服務網絡說明", "PDF", "2026.01.20"]
+  ];
+  const faq = [
+    ["如何更新股東通訊資料？", "請透過股務服務窗口提出申請，並備妥身分證明與股東資料，窗口確認後協助更新。"],
+    ["如何索取股東會相關文件？", "可在本頁股東會 tab 申請下載，或來信 generalaffairs@suiyuecare.com 由專人協助。"],
+    ["歲悅目前是否有定期法說會？", "目前以季度營運說明與投資人簡報為主，正式法說會時程將依公司階段公告。"],
+    ["投資人如何提出問題？", "可使用聯絡我們表單，選擇投資洽談或股東服務，由投資人關係窗口回覆。"]
+  ];
+
+  return `
+    <div class="investor-page shareholders-page">
+      <section class="ir-sub-hero shareholders-visual">
+        <div>
+          <a class="search-back" href="#investors">返回投資人專區</a>
+          <p class="eyebrow">Shareholder Services</p>
+          <h1>股東專區</h1>
+          <p>集中整理股務資訊、股東會、法說會與常見問答，讓股東能快速找到文件、窗口與重要時程。</p>
+        </div>
+        <aside class="shareholder-hero-card">
+          <span>Shareholder Service</span>
+          <strong>02-6604-5432</strong>
+          <p>週一至週五 09:00-18:00</p>
+          <a href="#contact">聯絡股務窗口</a>
+        </aside>
+      </section>
+
+      <nav class="investor-tabs shareholder-tabs" aria-label="股東專區分頁">
+        <button class="active" type="button" data-ir-tab="stock-affairs">股務資訊</button>
+        <button type="button" data-ir-tab="shareholder-meeting">股東會</button>
+        <button type="button" data-ir-tab="investor-conference">法說會</button>
+        <button type="button" data-ir-tab="shareholder-faq">常見問答</button>
+      </nav>
+
+      <section class="ir-tab-panel active" data-ir-panel="stock-affairs">
+        <div class="investor-section-head">
+          <p class="eyebrow">Stock Affairs</p>
+          <h2>股務資訊</h2>
+          <span>提供股東服務窗口、股務流程、股東結構與常用文件下載。</span>
+        </div>
+        <div class="shareholder-info-grid">
+          <article class="shareholder-contact">
+            <span>Service Window</span>
+            <h3>股務服務窗口</h3>
+            <p>歲悅長照集團 投資人關係 / 股東服務</p>
+            <dl>
+              <div><dt>電話</dt><dd>02-6604-5432</dd></div>
+              <div><dt>信箱</dt><dd>generalaffairs@suiyuecare.com</dd></div>
+              <div><dt>服務時間</dt><dd>週一至週五 09:00-18:00</dd></div>
+            </dl>
+          </article>
+          <article class="chart-card">
+            <div class="chart-card-head"><span>股東結構示意</span><strong>100%</strong></div>
+            <div class="donut-chart shareholder-donut" style="--a:46%;--b:28%;--c:16%;--d:10%"><em>Holders</em></div>
+            <ul class="chart-legend"><li>創辦團隊 46%</li><li>策略投資人 28%</li><li>員工持股 16%</li><li>其他股東 10%</li></ul>
+          </article>
+        </div>
+        <div class="download-grid">
+          <a href="#contact"><span>PDF</span><strong>股務作業說明</strong><em>下載文件</em></a>
+          <a href="#contact"><span>Form</span><strong>股東資料變更申請</strong><em>下載表單</em></a>
+          <a href="#contact"><span>PDF</span><strong>投資人聯絡窗口</strong><em>下載文件</em></a>
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="shareholder-meeting">
+        <div class="investor-section-head">
+          <p class="eyebrow">Shareholder Meeting</p>
+          <h2>股東會</h2>
+          <span>整理股東會時程、議案、年報、議事手冊、議事錄與出席統計。</span>
+        </div>
+        <div class="meeting-layout">
+          <article class="governance-image-card">
+            <img src="assets/homepage-batch/10-family-consultation.png" alt="歲悅股東會與投資人溝通情境" />
+            <div><span>Annual Meeting</span><h3>把年度營運、治理進度與照顧網絡成長，清楚交代給每一位股東。</h3></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-card-head"><span>股東會出席率</span><strong>2026</strong></div>
+            <div class="combo-chart attendance-chart">
+              ${[72, 76, 81, 85, 88].map((value, index) => `<i style="--h:${value}%"><b>${2022 + index}</b></i>`).join("")}
+            </div>
+          </article>
+        </div>
+        <div class="investor-table-card">
+          <div class="table-title"><h3>股東會文件下載</h3><a href="#contact">索取完整資料</a></div>
+          <table><thead><tr><th>文件</th><th>格式</th><th>公告日期</th><th>操作</th></tr></thead><tbody>${meetingFiles.map(([name, type, date]) => `<tr><td>${name}</td><td>${type}</td><td>${date}</td><td><a href="#contact">下載</a></td></tr>`).join("")}</tbody></table>
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="investor-conference">
+        <div class="investor-section-head">
+          <p class="eyebrow">Investor Conference</p>
+          <h2>法說會</h2>
+          <span>呈現季度營運說明、法說會簡報、投資人問答與未來時程。</span>
+        </div>
+        <div class="conference-layout">
+          <article class="chart-card wide">
+            <div class="chart-card-head"><span>投資人溝通頻率</span><strong>2025-2026</strong></div>
+            <div class="bar-line-chart conference-chart">
+              ${[36, 42, 48, 55, 64, 72, 78, 86].map((value, index) => `<i style="--h:${value}%"><b>Q${(index % 4) + 1}</b></i>`).join("")}
+            </div>
+          </article>
+          <div class="finance-metrics">
+            <article><b>本年度簡報</b><strong>3</strong><span>已上架</span></article>
+            <article><b>投資人提問</b><strong>24</strong><span>累積回覆</span></article>
+            <article><b>下一場說明</b><strong>Q2</strong><span>時程規劃中</span></article>
+          </div>
+        </div>
+        <div class="download-grid">
+          ${briefingFiles.map(([name, type, date]) => `<a href="#contact"><span>${type}</span><strong>${name}</strong><small>${date}</small><em>下載簡報</em></a>`).join("")}
+        </div>
+      </section>
+
+      <section class="ir-tab-panel" data-ir-panel="shareholder-faq">
+        <div class="investor-section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>常見問答</h2>
+          <span>把股東最常詢問的資料更新、文件索取、法說會與投資人聯絡流程集中整理。</span>
+        </div>
+        <div class="faq-layout">
+          <article class="governance-image-card">
+            <img src="assets/homepage-batch/15-phone-consultation.png" alt="歲悅投資人窗口電話諮詢" />
+            <div><span>Investor Q&A</span><h3>投資人關係的核心，是讓問題被清楚承接、被準確回覆。</h3></div>
+          </article>
+          <div class="shareholder-faq">
+            ${faq.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join("")}
+          </div>
+        </div>
+        <div class="download-grid">
+          <a href="#contact"><span>PDF</span><strong>股東常見問答手冊</strong><em>下載文件</em></a>
+          <a href="#contact"><span>Form</span><strong>投資人提問表</strong><em>開啟表單</em></a>
+          <a href="#contact"><span>PDF</span><strong>股東服務流程</strong><em>下載文件</em></a>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function renderIrPlaceholderPage(kind) {
+  const config = {
+    governance: {
+      eyebrow: "Corporate Governance",
+      title: "公司治理",
+      intro: "此頁將整理重要訊息、公司治理運作、重要管理階層、吹哨者專區、治理評鑑、內部稽核、風險管理與誠信經營。",
+      tabs: ["重要訊息", "公司治理運作", "重要管理階層", "吹哨者專區", "治理評鑑專區", "內部稽核", "風險管理", "誠信經營"]
+    },
+    shareholders: {
+      eyebrow: "Shareholder Services",
+      title: "股東專區",
+      intro: "此頁將整理股務資訊、股東會、法說會與常見問答，未來可接公告文件、會議資料與投資人提問流程。",
+      tabs: ["股務資訊", "股東會", "法說會", "常見問答"]
+    }
+  }[kind];
+
+  return `
+    <div class="investor-page">
+      <section class="ir-sub-hero">
+        <div>
+          <a class="search-back" href="#investors">返回投資人專區</a>
+          <p class="eyebrow">${config.eyebrow}</p>
+          <h1>${config.title}</h1>
+          <p>${config.intro}</p>
+        </div>
+      </section>
+      <nav class="investor-tabs">
+        ${config.tabs.map((tab, index) => `<button class="${index === 0 ? "active" : ""}" type="button">${tab}</button>`).join("")}
+      </nav>
+      <section class="investor-panel active">
+        <div class="investor-section-head"><p class="eyebrow">Coming Next</p><h2>${config.tabs[0]}</h2><span>這個大項已接上 Header，下一步可依你的順序逐頁設計完整內容。</span></div>
+        <div class="download-grid">
+          ${config.tabs.slice(0, 4).map((tab) => `<a href="#contact"><span>Template</span><strong>${tab}</strong><em>規劃中</em></a>`).join("")}
+        </div>
+      </section>
+    </div>
+  `;
+}
+
 function renderArticlePage(slug) {
   const article = articlePages[slug] || articlePages["longterm-care-apply"];
   const related = relatedArticleCards
@@ -1198,6 +1786,22 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderCoursesPage();
+  } else if (normalized === "investors") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderInvestorsPage();
+  } else if (normalized === "ir-finance") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderFinancePage();
+  } else if (normalized === "ir-governance") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderGovernancePage();
+  } else if (normalized === "ir-shareholders") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderShareholdersPage();
   } else if (!isHome) {
     pageView.innerHTML = `
       <div class="detail-hero">
@@ -1394,6 +1998,30 @@ document.addEventListener("submit", async (event) => {
 });
 
 document.addEventListener("click", (event) => {
+  const irTab = event.target.closest("[data-ir-tab]");
+  if (irTab) {
+    const tabName = irTab.dataset.irTab;
+    document.querySelectorAll("[data-ir-tab]").forEach((button) => {
+      button.classList.toggle("active", button === irTab);
+    });
+    document.querySelectorAll("[data-ir-panel]").forEach((panel) => {
+      panel.classList.toggle("active", panel.dataset.irPanel === tabName);
+    });
+    return;
+  }
+
+  const investorTab = event.target.closest("[data-investor-tab]");
+  if (investorTab) {
+    const tabName = investorTab.dataset.investorTab;
+    document.querySelectorAll("[data-investor-tab]").forEach((button) => {
+      button.classList.toggle("active", button === investorTab);
+    });
+    document.querySelectorAll("[data-investor-panel]").forEach((panel) => {
+      panel.classList.toggle("active", panel.dataset.investorPanel === tabName);
+    });
+    return;
+  }
+
   const card = event.target.closest(".click-card, .health-preview, .story-slider article, .celebrity-slider article");
   if (!card || event.target.closest("a, button, input, select, textarea")) return;
   const href = card.dataset.href || card.querySelector("a[href]")?.getAttribute("href");
