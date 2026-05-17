@@ -1893,6 +1893,608 @@ h2 {
 .investor-panel.active {
   display: block;
 }
+.ir-progress-section {
+  padding-top: 18px;
+}
+.ir-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.ir-progress-card {
+  display: grid;
+  gap: 16px;
+  min-height: 440px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.ir-progress-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.ir-progress-top span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+}
+.ir-progress-top strong {
+  color: var(--brown);
+  font-size: 36px;
+  line-height: 1;
+}
+.ir-progress-card h3 {
+  margin: 0;
+  color: var(--brown);
+  font-size: 25px;
+  line-height: 1.35;
+}
+.ir-progress-card p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 900;
+  line-height: 1.7;
+}
+.ir-main-progress,
+.ir-step-list span {
+  display: block;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f2e8dd;
+}
+.ir-main-progress {
+  height: 13px;
+}
+.ir-main-progress i,
+.ir-step-list i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--orange), #ffbd67);
+}
+.ir-step-list {
+  display: grid;
+  gap: 12px;
+  align-self: end;
+}
+.ir-step-list div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 10px;
+}
+.ir-step-list b,
+.ir-step-list em {
+  color: var(--brown);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 950;
+}
+.ir-step-list em {
+  color: var(--orange-dark);
+  text-align: right;
+}
+.ir-step-list span {
+  height: 8px;
+}
+.about-page {
+  background: var(--paper);
+}
+.about-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, .62fr);
+  gap: 28px;
+  align-items: stretch;
+  padding: 64px clamp(32px,5vw,86px) 42px;
+  background: linear-gradient(135deg, #fffdf8, #fff4e6);
+}
+.about-hero h1 {
+  margin: 8px 0 18px;
+  color: var(--brown);
+  font-size: clamp(56px, 7vw, 112px);
+  line-height: .95;
+}
+.about-hero p {
+  max-width: 860px;
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 850;
+  line-height: 1.95;
+}
+.about-hero-image {
+  position: relative;
+  min-height: 500px;
+  overflow: hidden;
+  border-radius: 34px;
+  background: var(--brown);
+  box-shadow: 0 24px 70px rgba(83,43,11,.14);
+}
+.about-hero-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 38%, rgba(63,33,13,.86));
+}
+.about-hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.about-hero-image div {
+  position: absolute;
+  z-index: 1;
+  left: 30px;
+  right: 30px;
+  bottom: 30px;
+}
+.about-hero-image span {
+  color: #ffd3a1;
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.about-hero-image strong {
+  display: block;
+  margin-top: 10px;
+  color: #fff;
+  font-size: clamp(30px, 3.8vw, 54px);
+  line-height: 1.15;
+}
+.about-belief,
+.about-system,
+.about-method {
+  padding: 52px clamp(32px,5vw,86px);
+}
+.about-section-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .52fr);
+  gap: 22px;
+  align-items: end;
+  margin-bottom: 22px;
+}
+.about-section-head .eyebrow {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.about-section-head h2 {
+  grid-column: 1;
+  margin: 0;
+  color: var(--brown);
+  font-size: clamp(38px, 5vw, 72px);
+  line-height: 1.1;
+}
+.about-section-head span {
+  grid-column: 2;
+  color: var(--muted);
+  font-weight: 850;
+  line-height: 1.85;
+}
+.about-value-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.about-value-grid article,
+.about-system-copy,
+.about-system-grid article,
+.about-stats article,
+.about-step-grid article {
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.about-value-grid article {
+  position: relative;
+  min-height: 250px;
+  padding: 30px;
+  overflow: hidden;
+}
+.about-value-grid article span {
+  display: block;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 24px;
+  border-radius: 999px;
+  background: var(--orange);
+}
+.about-value-grid h3,
+.about-system-grid h3,
+.about-step-grid h3 {
+  margin: 0 0 12px;
+  color: var(--brown);
+  font-size: 30px;
+  line-height: 1.25;
+}
+.about-value-grid p,
+.about-system-copy p,
+.about-system-grid p,
+.about-step-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.8;
+}
+.about-system {
+  display: grid;
+  grid-template-columns: minmax(360px, .52fr) minmax(0, 1fr);
+  gap: 18px;
+}
+.about-system-copy {
+  display: grid;
+  align-content: center;
+  padding: 34px;
+}
+.about-system-copy h2 {
+  margin: 8px 0 18px;
+  color: var(--brown);
+  font-size: clamp(36px, 4.5vw, 64px);
+  line-height: 1.08;
+}
+.about-system-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.about-system-grid article {
+  overflow: hidden;
+}
+.about-system-grid img {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+}
+.about-system-grid div {
+  padding: 22px;
+}
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  padding: 28px clamp(32px,5vw,86px) 52px;
+}
+.about-stats article {
+  display: grid;
+  gap: 8px;
+  padding: 26px;
+  background: linear-gradient(135deg, #fff, var(--cream));
+}
+.about-stats strong {
+  color: var(--orange-dark);
+  font-size: 52px;
+  line-height: 1;
+}
+.about-stats span {
+  color: var(--brown);
+  font-size: 19px;
+  font-weight: 1000;
+}
+.about-stats p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.55;
+}
+.about-step-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.about-step-grid article {
+  min-height: 250px;
+  padding: 26px;
+}
+.about-step-grid b {
+  display: block;
+  margin-bottom: 28px;
+  color: var(--orange-dark);
+  font-size: 20px;
+  letter-spacing: .12em;
+}
+.milestones-page {
+  background: #fffaf2;
+  color: var(--brown);
+}
+.milestone-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, .58fr);
+  gap: 28px;
+  align-items: stretch;
+  min-height: calc(100vh - 92px);
+  padding: 74px clamp(32px,5vw,86px) 54px;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(240,138,36,.16), transparent 34%),
+    linear-gradient(135deg, #fffdf9 0%, #fff2df 100%);
+}
+.milestone-hero h1 {
+  margin: 10px 0 16px;
+  font-size: clamp(70px, 10vw, 150px);
+  line-height: .9;
+  letter-spacing: 0;
+}
+.milestone-hero p {
+  max-width: 820px;
+  color: var(--muted);
+  font-size: 19px;
+  font-weight: 850;
+  line-height: 1.9;
+}
+.milestone-scroll-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 42px;
+  color: var(--orange-dark);
+  font-size: 14px;
+  font-weight: 1000;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.milestone-scroll-cue span {
+  position: relative;
+  width: 34px;
+  height: 58px;
+  border: 2px solid rgba(198,100,18,.5);
+  border-radius: 999px;
+}
+.milestone-scroll-cue span::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--orange);
+  transform: translateX(-50%);
+  animation: milestoneDot 1.35s ease-in-out infinite;
+}
+@keyframes milestoneDot {
+  0% { opacity: 0; transform: translate(-50%, 0); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, 22px); }
+}
+.milestone-hero-card {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 36px;
+  background: var(--brown);
+  box-shadow: 0 30px 90px rgba(83,43,11,.16);
+}
+.milestone-hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 42%, rgba(63,33,13,.9));
+}
+.milestone-hero-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.milestone-hero-card div {
+  position: absolute;
+  z-index: 1;
+  left: 30px;
+  right: 30px;
+  bottom: 30px;
+}
+.milestone-hero-card span {
+  color: #ffd3a1;
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.milestone-hero-card strong {
+  display: block;
+  margin-top: 10px;
+  color: #fff;
+  font-size: clamp(30px, 3vw, 48px);
+  line-height: 1.18;
+}
+.milestone-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  padding: 28px clamp(32px,5vw,86px) 36px;
+}
+.milestone-stats article {
+  min-height: 178px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 18px 44px rgba(83,43,11,.07);
+}
+.milestone-stats strong {
+  display: block;
+  color: var(--orange-dark);
+  font-size: 54px;
+  line-height: 1;
+}
+.milestone-stats span {
+  display: block;
+  margin: 10px 0 8px;
+  color: var(--brown);
+  font-size: 19px;
+  font-weight: 1000;
+}
+.milestone-stats p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.55;
+}
+.milestone-journey {
+  position: relative;
+  display: grid;
+  grid-template-columns: 92px minmax(320px, .44fr) minmax(0, 1fr);
+  gap: 28px;
+  padding: 58px clamp(32px,5vw,86px) 72px;
+}
+.milestone-rail {
+  position: sticky;
+  top: 124px;
+  width: 4px;
+  height: calc(100vh - 180px);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(198,100,18,.18);
+}
+.milestone-rail-progress {
+  display: block;
+  width: 100%;
+  height: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--orange), var(--orange-dark));
+  transition: height .18s ease-out;
+}
+.milestone-intro {
+  position: sticky;
+  top: 124px;
+  align-self: start;
+  min-height: calc(100vh - 180px);
+  display: grid;
+  align-content: center;
+}
+.milestone-intro h2 {
+  margin: 8px 0 18px;
+  color: var(--brown);
+  font-size: clamp(34px, 4vw, 64px);
+  line-height: 1.08;
+}
+.milestone-intro p:not(.eyebrow) {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 850;
+  line-height: 1.85;
+}
+.milestone-list {
+  display: grid;
+  gap: 34px;
+}
+.milestone-card {
+  display: grid;
+  grid-template-columns: 132px minmax(260px, .44fr) minmax(0, 1fr);
+  gap: 22px;
+  align-items: stretch;
+  min-height: 320px;
+  padding: 18px;
+  border: 1px solid rgba(230,190,142,.8);
+  border-radius: 34px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 18px 48px rgba(83,43,11,.06);
+  opacity: .58;
+  transform: translateY(16px) scale(.985);
+  transition: opacity .35s ease, transform .35s ease, box-shadow .35s ease, border-color .35s ease, background .35s ease;
+}
+.milestone-card.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  border-color: rgba(240,138,36,.9);
+  background: #fff;
+  box-shadow: 0 30px 76px rgba(83,43,11,.14);
+}
+.milestone-year {
+  display: grid;
+  align-content: space-between;
+  padding: 18px 8px 18px 18px;
+}
+.milestone-year span {
+  color: var(--orange-dark);
+  font-size: 42px;
+  font-weight: 1000;
+  line-height: 1;
+  writing-mode: vertical-rl;
+}
+.milestone-year b {
+  color: rgba(83,43,11,.28);
+  font-size: 18px;
+  letter-spacing: .14em;
+}
+.milestone-card figure {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--cream);
+}
+.milestone-card img {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  object-fit: cover;
+  filter: saturate(.9);
+  transform: scale(1.03);
+  transition: transform .6s ease, filter .35s ease;
+}
+.milestone-card.active img {
+  filter: saturate(1.04);
+  transform: scale(1);
+}
+.milestone-copy {
+  display: grid;
+  align-content: center;
+  padding: 24px 24px 24px 8px;
+}
+.milestone-copy small {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.milestone-copy h3 {
+  margin: 12px 0 16px;
+  color: var(--brown);
+  font-size: clamp(30px, 3.6vw, 52px);
+  line-height: 1.12;
+}
+.milestone-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 17px;
+  font-weight: 850;
+  line-height: 1.85;
+}
+.milestone-next {
+  margin: 0 clamp(32px,5vw,86px) 78px;
+  padding: 46px;
+  border: 1px solid var(--line);
+  border-radius: 34px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.94), rgba(255,244,230,.96)),
+    url("assets/homepage-batch/15-phone-consultation.png") center/cover;
+  box-shadow: 0 20px 60px rgba(83,43,11,.08);
+}
+.milestone-next h2 {
+  max-width: 920px;
+  margin: 8px 0 12px;
+  color: var(--brown);
+  font-size: clamp(34px, 5vw, 72px);
+  line-height: 1.1;
+}
+.milestone-next p:not(.eyebrow) {
+  max-width: 780px;
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-weight: 850;
+  line-height: 1.8;
+}
 .ir-tab-panel {
   display: none;
   padding: 34px clamp(32px,5vw,86px) 86px;
@@ -2540,6 +3142,844 @@ h2 {
 }
 .shareholders-page .shareholder-contact {
   min-height: 390px;
+}
+.career-page {
+  background: var(--paper);
+}
+.career-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, .55fr);
+  gap: 28px;
+  align-items: stretch;
+  padding: 64px clamp(32px,5vw,86px) 34px;
+  background:
+    linear-gradient(120deg, rgba(255,253,248,.96), rgba(255,248,238,.9)),
+    url("assets/homepage-batch/05-orange-polo-caregiver.png") center / cover;
+}
+.career-hero h1 {
+  max-width: 900px;
+  color: var(--brown);
+  font-size: clamp(48px, 6vw, 92px);
+}
+.career-hero p {
+  max-width: 760px;
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.9;
+}
+.career-hero-card {
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  border-radius: 30px;
+  background: var(--brown);
+  box-shadow: 0 22px 58px rgba(83,43,11,.12);
+}
+.career-hero-card::after,
+.career-dept-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 38%, rgba(63,33,13,.84));
+}
+.career-hero-card img,
+.career-dept-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.career-hero-card div,
+.career-dept-image div {
+  position: absolute;
+  z-index: 1;
+  left: 28px;
+  right: 28px;
+  bottom: 28px;
+}
+.career-hero-card span,
+.career-dept-image span {
+  color: #ffd3a1;
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.career-hero-card strong,
+.career-dept-image h3 {
+  display: block;
+  margin-top: 10px;
+  color: #fff;
+  font-size: clamp(30px, 3.6vw, 50px);
+  line-height: 1.18;
+}
+.career-tabs {
+  position: sticky;
+  top: 96px;
+  z-index: 5;
+  display: flex;
+  gap: 10px;
+  padding: 16px clamp(32px,5vw,86px);
+  overflow-x: auto;
+  border-block: 1px solid var(--line);
+  background: rgba(255, 252, 247, .92);
+  backdrop-filter: blur(18px);
+}
+.career-tabs button {
+  flex: 0 0 auto;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brown);
+  font-weight: 1000;
+  cursor: pointer;
+  transition: transform .22s ease, background .22s ease, color .22s ease, border-color .22s ease;
+}
+.career-tabs button:hover,
+.career-tabs button.active {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.career-tab-panel {
+  display: none;
+  padding: 34px clamp(32px,5vw,86px) 72px;
+}
+.career-tab-panel.active {
+  display: block;
+}
+.career-growth-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.career-growth-intro article,
+.career-growth-intro > div,
+.career-track-card,
+.career-evaluation-grid article {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.career-growth-intro article {
+  padding: 28px;
+}
+.career-growth-intro article > span {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.career-growth-intro h3 {
+  margin: 12px 0 10px;
+  color: var(--brown);
+  font-size: clamp(30px, 3.4vw, 52px);
+  line-height: 1.12;
+}
+.career-growth-intro p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 850;
+  line-height: 1.9;
+}
+.career-growth-intro > div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-content: center;
+  gap: 12px 16px;
+  padding: 28px;
+  background: linear-gradient(135deg, #fff, var(--cream));
+}
+.career-growth-intro b {
+  color: var(--orange-dark);
+  font-size: 42px;
+  line-height: 1;
+}
+.career-growth-intro div span {
+  align-self: center;
+  color: var(--brown);
+  font-weight: 1000;
+}
+.career-section-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .55fr);
+  gap: 22px;
+  align-items: end;
+  margin-bottom: 22px;
+}
+.career-section-head .eyebrow {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.career-section-head h2 {
+  grid-column: 1;
+  margin: 0;
+  color: var(--brown);
+  font-size: clamp(38px, 5vw, 72px);
+  line-height: 1.08;
+}
+.career-section-head span {
+  grid-column: 2;
+  color: var(--muted);
+  font-weight: 800;
+  line-height: 1.8;
+}
+.career-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.career-timeline article,
+.benefit-grid article,
+.career-role-grid article,
+.career-growth-board article {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.career-timeline article {
+  min-height: 260px;
+  padding: 26px;
+}
+.career-timeline span,
+.benefit-grid span,
+.career-role-grid span,
+.opening-grid span {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.career-timeline h3,
+.benefit-grid h3 {
+  color: var(--brown);
+  font-size: 28px;
+  line-height: 1.35;
+}
+.career-timeline p,
+.benefit-grid p,
+.career-dept-content p,
+.opening-grid p {
+  color: var(--muted);
+  font-weight: 800;
+  line-height: 1.85;
+}
+.career-growth-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.career-growth-board article {
+  display: grid;
+  gap: 8px;
+  padding: 24px;
+  background: linear-gradient(135deg, #fff, var(--cream));
+}
+.career-growth-board b {
+  color: var(--brown);
+  font-size: 40px;
+}
+.career-growth-board span {
+  color: var(--muted);
+  font-weight: 900;
+}
+.career-track-map {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.career-track-card {
+  padding: 24px;
+}
+.career-track-card h3 {
+  margin: 0 0 16px;
+  color: var(--brown);
+  font-size: 25px;
+}
+.career-stage-list {
+  display: grid;
+  gap: 10px;
+}
+.career-stage-list span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.career-stage-list i {
+  display: inline-grid;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--orange);
+  color: #fff;
+  font-size: 13px;
+  font-style: normal;
+}
+.career-evaluation-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.career-evaluation-grid article {
+  min-height: 210px;
+  padding: 24px;
+}
+.career-evaluation-grid span {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.career-evaluation-grid h3 {
+  margin: 14px 0 10px;
+  color: var(--brown);
+  font-size: 24px;
+}
+.career-evaluation-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.8;
+}
+.benefit-hero-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.benefit-hero-copy,
+.benefit-highlight-grid,
+.benefit-system-board article {
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.benefit-hero-copy {
+  min-height: 330px;
+  padding: 34px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.96) 0%, rgba(255,255,255,.78) 54%, rgba(255,255,255,.22) 100%),
+    url("assets/homepage-batch/04-admin-team-office.png") center right / cover;
+}
+.benefit-hero-copy > span {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.benefit-hero-copy h3 {
+  max-width: 760px;
+  margin: 18px 0 14px;
+  color: var(--brown);
+  font-size: clamp(34px, 4.2vw, 64px);
+  line-height: 1.08;
+}
+.benefit-hero-copy p {
+  max-width: 700px;
+  margin: 0;
+  color: var(--muted);
+  font-weight: 850;
+  line-height: 1.9;
+}
+.benefit-highlight-grid {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  background: linear-gradient(135deg, #fff, var(--cream));
+}
+.benefit-highlight-grid div {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 4px 16px;
+  align-items: center;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.78);
+}
+.benefit-highlight-grid strong {
+  grid-row: span 2;
+  color: var(--orange-dark);
+  font-size: 42px;
+  line-height: 1;
+}
+.benefit-highlight-grid span {
+  color: var(--brown);
+  font-weight: 1000;
+}
+.benefit-highlight-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 820;
+  line-height: 1.55;
+}
+.benefit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.benefit-grid article {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-height: 300px;
+  padding: 26px;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.benefit-grid article:hover {
+  transform: translateY(-6px);
+  border-color: rgba(240,138,36,.55);
+  box-shadow: 0 26px 64px rgba(83,43,11,.14);
+}
+.benefit-grid h3 {
+  margin: 0;
+}
+.benefit-grid p {
+  margin: 0;
+}
+.benefit-grid div {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: end;
+  gap: 8px;
+  margin-top: 4px;
+}
+.benefit-grid em {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 1000;
+}
+.benefit-system-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.benefit-system-board article {
+  padding: 24px;
+}
+.benefit-system-board h3 {
+  margin: 0 0 14px;
+  color: var(--brown);
+  font-size: 25px;
+}
+.benefit-system-board ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.benefit-system-board li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--muted);
+  font-weight: 900;
+  line-height: 1.65;
+}
+.benefit-system-board li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .72em;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--orange);
+}
+.career-dept-layout {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(420px, .7fr);
+  gap: 18px;
+}
+.career-dept-image {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+  border-radius: 30px;
+  background: var(--brown);
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.career-dept-content {
+  display: grid;
+  align-content: center;
+  gap: 18px;
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.career-dept-content h2 {
+  color: var(--brown);
+  font-size: clamp(38px, 4.4vw, 66px);
+}
+.career-role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.career-role-grid article {
+  padding: 18px;
+  box-shadow: none;
+}
+.career-role-grid strong {
+  color: var(--brown);
+  font-size: 20px;
+}
+.career-skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.career-skill-list span {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--orange-dark);
+  font-weight: 1000;
+}
+.homecare-recruit {
+  display: grid;
+  gap: 22px;
+}
+.homecare-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(420px, .72fr);
+  gap: 18px;
+  align-items: stretch;
+}
+.homecare-intro > div,
+.homecare-intro aside,
+.homecare-role-card {
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.homecare-intro > div {
+  display: grid;
+  align-content: center;
+  gap: 18px;
+  padding: 34px;
+}
+.homecare-intro h2 {
+  margin: 0;
+  color: var(--brown);
+  font-size: clamp(42px, 5vw, 78px);
+  line-height: 1.05;
+}
+.homecare-intro p {
+  max-width: 840px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 850;
+  line-height: 1.95;
+}
+.homecare-highlight-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.homecare-highlight-row article {
+  display: grid;
+  gap: 8px;
+  min-height: 118px;
+  padding: 18px;
+  border-radius: 22px;
+  background: var(--cream);
+}
+.homecare-highlight-row span {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+}
+.homecare-highlight-row strong {
+  color: var(--brown);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.homecare-intro aside {
+  position: relative;
+  min-height: 520px;
+  overflow: hidden;
+  background: var(--brown);
+}
+.homecare-intro aside::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 42%, rgba(63,33,13,.86));
+}
+.homecare-intro aside img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.homecare-intro aside div {
+  position: absolute;
+  z-index: 1;
+  left: 28px;
+  right: 28px;
+  bottom: 28px;
+}
+.homecare-intro aside span {
+  color: #ffd3a1;
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.homecare-intro aside strong {
+  display: block;
+  margin-top: 10px;
+  color: #fff;
+  font-size: clamp(30px, 3.4vw, 48px);
+  line-height: 1.15;
+}
+.homecare-gallery {
+  display: grid;
+  grid-template-columns: 1.25fr repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.homecare-gallery figure {
+  position: relative;
+  min-height: 260px;
+  overflow: hidden;
+  margin: 0;
+  border-radius: 26px;
+  background: var(--brown);
+  box-shadow: 0 14px 34px rgba(83,43,11,.08);
+}
+.homecare-gallery figure:first-child {
+  min-height: 330px;
+}
+.homecare-gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .32s ease;
+}
+.homecare-gallery figure:hover img {
+  transform: scale(1.05);
+}
+.homecare-gallery figcaption {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.9);
+  color: var(--brown);
+  font-size: 14px;
+  font-weight: 950;
+  line-height: 1.45;
+}
+.homecare-role-section {
+  display: grid;
+  gap: 18px;
+}
+.career-section-head.compact {
+  margin-bottom: 0;
+}
+.homecare-role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.homecare-role-card {
+  overflow: hidden;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.homecare-role-card:hover,
+.homecare-role-card[open] {
+  transform: translateY(-4px);
+  border-color: rgba(240,138,36,.58);
+  box-shadow: 0 26px 64px rgba(83,43,11,.14);
+}
+.homecare-role-card[open] {
+  grid-column: 1 / -1;
+}
+.homecare-role-card summary {
+  position: relative;
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 20px;
+  min-height: 220px;
+  padding: 18px 18px 62px;
+  list-style: none;
+  cursor: pointer;
+}
+.homecare-role-card summary::-webkit-details-marker {
+  display: none;
+}
+.homecare-role-card summary img {
+  width: 100%;
+  height: 100%;
+  min-height: 184px;
+  border-radius: 22px;
+  object-fit: cover;
+}
+.homecare-role-card summary span {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+}
+.homecare-role-card summary h3 {
+  margin: 8px 0 10px;
+  color: var(--brown);
+  font-size: 30px;
+  line-height: 1.25;
+}
+.homecare-role-card summary p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.75;
+}
+.homecare-role-card summary b {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+}
+.homecare-role-card[open] summary b {
+  background: var(--orange);
+  color: #fff;
+}
+.homecare-role-detail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 0 18px 18px;
+}
+.homecare-role-detail article {
+  padding: 18px;
+  border-radius: 22px;
+  background: var(--cream);
+}
+.homecare-role-detail h4 {
+  margin: 0 0 10px;
+  color: var(--brown);
+  font-size: 20px;
+}
+.homecare-role-detail ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-weight: 850;
+  line-height: 1.65;
+}
+.homecare-role-support {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  gap: 8px;
+}
+.homecare-role-support span {
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: #fff4e6;
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+}
+.homecare-role-detail .primary-button {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.daycare-cover img {
+  display: block;
+}
+.daycare-gallery figure::after,
+.daycare-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 42%, rgba(63,33,13,.86));
+}
+.daycare-gallery figure:hover {
+  filter: saturate(1.05);
+}
+.daycare-gallery figcaption {
+  z-index: 1;
+}
+.career-openings {
+  padding: 20px clamp(32px,5vw,86px) 90px;
+}
+.opening-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.opening-grid article {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+.opening-grid article:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 26px 64px rgba(83,43,11,.14);
+}
+.opening-grid img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+.opening-grid div {
+  padding: 22px;
+}
+.opening-grid h3 {
+  color: var(--brown);
+  font-size: 28px;
+}
+.opening-grid a {
+  color: var(--orange-dark);
+  font-weight: 1000;
 }
 .investor-section-head {
   display: grid;
@@ -3533,7 +4973,13 @@ h2 {
   .primary-nav { gap: 16px; font-size: 14px; letter-spacing: .06em; }
   .primary-nav > a, .nav-trigger { padding-inline: 8px; }
   .nav-cta { min-height: 48px !important; padding: 10px 16px !important; }
-  .hero, .news-service-layout, .care-layout, .content-wall, .care-values, .network-board, .redesigned-network, .video-section, .contact-section, .footer-main, .courses-hero, .article-row, .celebrity-row, .article-hero, .article-layout, .investor-hero, .finance-grid, .shareholder-grid, .investor-section-head, .ir-sub-hero, .finance-dashboard, .analysis-grid, .report-layout, .annual-grid, .governance-news-grid, .whistle-layout, .risk-layout, .integrity-layout, .shareholder-info-grid, .meeting-layout, .conference-layout, .faq-layout { grid-template-columns: 1fr; }
+  .hero, .news-service-layout, .care-layout, .content-wall, .care-values, .network-board, .redesigned-network, .video-section, .contact-section, .footer-main, .courses-hero, .article-row, .celebrity-row, .article-hero, .article-layout, .investor-hero, .finance-grid, .shareholder-grid, .investor-section-head, .ir-sub-hero, .finance-dashboard, .analysis-grid, .report-layout, .annual-grid, .governance-news-grid, .whistle-layout, .risk-layout, .integrity-layout, .shareholder-info-grid, .meeting-layout, .conference-layout, .faq-layout, .career-hero, .career-section-head, .career-dept-layout, .about-hero, .about-section-head, .about-system, .milestone-hero, .milestone-journey { grid-template-columns: 1fr; }
+  .homecare-intro {
+    grid-template-columns: 1fr;
+  }
+  .homecare-gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
   .media-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .celebrity-slider article { flex-basis: calc((100% - 16px) / 2); }
   .care-values .scene-side-title, .celebrity-head { min-height: auto; }
@@ -3578,10 +5024,47 @@ h2 {
   }
   .investor-directory,
   .ir-updates-grid,
+  .ir-progress-grid,
+  .about-value-grid,
+  .about-system-grid,
+  .about-stats,
+  .about-step-grid,
+  .milestone-stats,
   .download-grid,
   .executive-grid,
-  .audit-grid {
+  .audit-grid,
+  .career-timeline,
+  .career-track-map,
+  .career-evaluation-grid,
+  .benefit-hero-board,
+  .benefit-grid,
+  .benefit-system-board,
+  .homecare-highlight-row,
+  .homecare-role-grid,
+  .opening-grid {
     grid-template-columns: 1fr 1fr;
+  }
+  .career-growth-intro {
+    grid-template-columns: 1fr;
+  }
+  .career-section-head h2,
+  .career-section-head span,
+  .about-section-head h2,
+  .about-section-head span {
+    grid-column: 1;
+  }
+  .milestone-journey {
+    gap: 24px;
+  }
+  .milestone-rail {
+    display: none;
+  }
+  .milestone-intro {
+    position: static;
+    min-height: 0;
+  }
+  .milestone-card {
+    grid-template-columns: 112px minmax(260px, .45fr) minmax(0, 1fr);
   }
   .evaluation-grid {
     grid-template-columns: 1fr;
@@ -3660,10 +5143,77 @@ h2 {
   }
   .investor-directory,
   .ir-updates-grid,
+  .ir-progress-grid,
+  .about-value-grid,
+  .about-system-grid,
+  .about-stats,
+  .about-step-grid,
+  .milestone-stats,
   .download-grid,
   .executive-grid,
-  .audit-grid {
+  .audit-grid,
+  .career-timeline,
+  .career-track-map,
+  .career-evaluation-grid,
+  .benefit-hero-board,
+  .benefit-grid,
+  .benefit-system-board,
+  .homecare-highlight-row,
+  .homecare-gallery,
+  .homecare-role-grid,
+  .opening-grid {
     grid-template-columns: 1fr;
+  }
+  .milestone-hero {
+    min-height: auto;
+  }
+  .milestone-hero-card {
+    min-height: 440px;
+  }
+  .milestone-card {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .milestone-year {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px 0;
+  }
+  .milestone-year span {
+    writing-mode: horizontal-tb;
+  }
+  .milestone-card img {
+    min-height: 260px;
+  }
+  .milestone-copy {
+    padding: 4px 14px 18px;
+  }
+  .milestone-next {
+    margin-inline: 20px;
+    padding: 26px;
+  }
+  .homecare-intro aside {
+    min-height: 420px;
+  }
+  .homecare-gallery figure,
+  .homecare-gallery figure:first-child {
+    min-height: 280px;
+  }
+  .homecare-role-card summary {
+    grid-template-columns: 1fr;
+  }
+  .homecare-role-card summary img {
+    height: 220px;
+  }
+  .homecare-role-detail {
+    grid-template-columns: 1fr;
+  }
+  .career-growth-intro {
+    grid-template-columns: 1fr;
+  }
+  .career-tabs {
+    top: 80px;
   }
 }
 @media (max-width: 640px) {
@@ -3673,11 +5223,14 @@ h2 {
   .brand strong { font-size: 18px; }
   h1 { font-size: clamp(38px, 11vw, 46px); }
   h2 { font-size: clamp(30px, 9vw, 40px); }
-  .hero, .section, .detail-hero, .detail-content, .site-footer, .health-hero, .health-grid, .courses-hero, .course-list, .article-topbar, .article-layout, .investor-hero, .investor-panel, .ir-sub-hero, .ir-tab-panel { padding-inline: 20px; }
+  .hero, .section, .detail-hero, .detail-content, .site-footer, .health-hero, .health-grid, .courses-hero, .course-list, .article-topbar, .article-layout, .investor-hero, .investor-panel, .ir-sub-hero, .ir-tab-panel, .career-hero, .career-tab-panel, .career-openings, .about-hero, .about-belief, .about-system, .about-method, .about-stats, .milestone-hero, .milestone-stats, .milestone-journey { padding-inline: 20px; }
   .hero { min-height: auto; padding-top: 74px; }
   .wall-main, .video-panel { min-height: 360px; border-radius: 24px; }
   .north-map { min-height: 0; border-radius: 24px; }
-  .care-flow, .service-grid, .contact-form, .detail-content, .footer-sitemap, .health-grid, .course-list, .course-search, .footer-main, .mini-article-grid, .media-row, .health-board, .health-quick-grid, .health-latest-grid, .health-media-grid, .health-pack-grid, .health-event-grid, .investor-snapshot div { grid-template-columns: 1fr; }
+  .care-flow, .service-grid, .contact-form, .detail-content, .footer-sitemap, .health-grid, .course-list, .course-search, .footer-main, .mini-article-grid, .media-row, .health-board, .health-quick-grid, .health-latest-grid, .health-media-grid, .health-pack-grid, .health-event-grid, .investor-snapshot div, .career-growth-board, .career-role-grid { grid-template-columns: 1fr; }
+  .ir-step-list div {
+    grid-template-columns: 82px minmax(0, 1fr) 38px;
+  }
   .story-slider article { flex-basis: 86vw; }
   .celebrity-slider article { flex-basis: 86vw; }
   .news-list article { grid-template-columns: 1fr; }
@@ -3726,6 +5279,42 @@ h2 {
   }
   .investor-tabs button {
     flex: 0 0 auto;
+  }
+  .career-tabs {
+    top: 72px;
+    padding-inline: 20px;
+  }
+  .career-tabs button {
+    flex: 0 0 auto;
+  }
+  .career-hero-card,
+  .career-dept-image {
+    min-height: 360px;
+  }
+  .benefit-hero-copy {
+    min-height: 0;
+    padding: 24px;
+    background:
+      linear-gradient(90deg, rgba(255,255,255,.96), rgba(255,255,255,.84)),
+      url("assets/homepage-batch/04-admin-team-office.png") center / cover;
+  }
+  .benefit-highlight-grid div {
+    grid-template-columns: 1fr;
+  }
+  .benefit-highlight-grid strong {
+    grid-row: auto;
+  }
+  .homecare-intro > div {
+    padding: 24px;
+  }
+  .homecare-intro aside {
+    min-height: 360px;
+  }
+  .homecare-role-card summary {
+    padding: 14px 14px 58px;
+  }
+  .homecare-role-detail {
+    padding-inline: 14px;
   }
   .investor-directory {
     padding-inline: 20px;
