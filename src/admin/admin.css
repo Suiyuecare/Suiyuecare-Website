@@ -172,10 +172,24 @@ input {
   cursor: pointer;
 }
 
+.admin-form .admin-secondary-action {
+  border: 1px solid rgba(240,138,36,.42);
+  background: #fff7ec;
+  color: var(--admin-orange-dark);
+}
+
 .admin-form button:disabled,
 .admin-userbox button:disabled {
   cursor: wait;
   opacity: .72;
+}
+
+.admin-login-note {
+  margin: -4px 0 0;
+  color: var(--admin-muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.7;
 }
 
 .admin-form-status,
