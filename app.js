@@ -2252,6 +2252,135 @@ function renderNursingPage() {
   `;
 }
 
+function renderMigrantTrainingPage() {
+  const highlights = [
+    ["照顧技能實作", "把翻身、移位、沐浴、用餐、陪走等動作拆成能理解、能練習、能回家使用的步驟。"],
+    ["家庭溝通情境", "協助移工理解家屬期待、長輩情緒與日常回報方式，減少照顧誤會。"],
+    ["安全與衛教", "將跌倒預防、感染控制、用藥提醒、營養觀察與環境安全放入課程。"],
+    ["訓後追蹤支持", "課後可搭配督導回饋、家屬諮詢與複訓安排，讓學會的技巧真的用得上。"]
+  ];
+  const scenes = [
+    ["assets/migrant-recruit-01-classroom.png", "照顧課堂示範", "用圖像、示範與情境練習，讓照顧技巧不只停在聽懂。"],
+    ["assets/migrant-recruit-02-transfer.png", "安全移位練習", "移位與翻身是家庭照顧的高風險動作，必須反覆練習到穩定。"],
+    ["assets/migrant-recruit-03-meal-prep.png", "餐食與營養觀察", "從備餐、用餐姿勢到食慾觀察，讓照顧更貼近日常。"],
+    ["assets/migrant-recruit-04-communication.png", "家庭溝通訓練", "透過情境對話，降低語言、文化與期待差異造成的照顧落差。"]
+  ];
+  const serviceItems = [
+    ["基礎照顧訓練", "翻身、拍背、移位、沐浴、如廁、用餐與陪同活動", "適合剛到家庭服務或需要建立基礎技巧的移工"],
+    ["長輩狀態觀察", "食慾、睡眠、精神、跌倒風險、皮膚與排泄狀況觀察", "適合需要協助回報長輩狀態的照顧者"],
+    ["家庭情境演練", "家屬交代、長輩拒絕照顧、突發狀況與每日回報練習", "適合家庭溝通容易卡住或照顧分工不清者"],
+    ["證書與複訓", "課程紀錄、完訓證明、複訓安排與督導建議", "適合企業、家庭或仲介單位安排系統化訓練"]
+  ];
+  const flow = [
+    ["01", "確認訓練需求", "了解家庭照顧情境、移工語言能力、照顧對象狀態與最需要補強的技巧。"],
+    ["02", "安排課程模組", "依照需求選擇基礎照顧、安全移位、餐食照顧、溝通情境或衛教主題。"],
+    ["03", "實作與演練", "透過示範、分組練習與情境演練，把照顧方法變成可操作的動作。"],
+    ["04", "回饋與追蹤", "課後提供重點回饋，必要時安排複訓、督導諮詢或家庭照顧建議。"]
+  ];
+
+  return `
+    <div class="service-detail-page migrant-training-page">
+      <section class="service-detail-hero migrant-training-hero">
+        <div class="service-detail-copy">
+          <p class="eyebrow">Migrant Care Training</p>
+          <h1>移工培訓</h1>
+          <p>歲悅移工培訓把家庭照顧現場常見的困難轉成可練習的課程，讓移工、家屬與長輩之間有更清楚的照顧方法與溝通節奏。</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#contact">洽詢培訓課程</a>
+            <a class="secondary-button" href="#courses">查看課程報名</a>
+          </div>
+        </div>
+        <aside class="service-hero-card">
+          <img src="assets/migrant-recruit-01-classroom.png" alt="歲悅移工照顧培訓課堂情境" />
+          <div>
+            <span>Training Program</span>
+            <strong>把照顧技巧教到能真的回家使用。</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Training Focus</p>
+          <h2>移工培訓在做什麼</h2>
+          <span>不是上完課就結束，而是把家庭照顧的真實情境拆解成技能、溝通、安全與回報。</span>
+        </div>
+        <div class="service-highlight-grid">
+          ${highlights.map(([title, copy], index) => `
+            <article>
+              <span>${String(index + 1).padStart(2, "0")}</span>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Training Scenes</p>
+          <h2>訓練現場情境</h2>
+          <span>使用之前生成的移工培訓照片，呈現課堂、移位、餐食照顧與家庭溝通演練。</span>
+        </div>
+        <div class="community-scene-grid">
+          ${scenes.map(([image, title, copy]) => `
+            <figure>
+              <img src="${image}" alt="${title}" />
+              <figcaption>
+                <strong>${title}</strong>
+                <span>${copy}</span>
+              </figcaption>
+            </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Courses</p>
+          <h2>培訓內容</h2>
+          <span>課程可以依家庭、企業或合作單位需求調整，讓不同程度的照顧者都能找到適合模組。</span>
+        </div>
+        <div class="community-program-grid">
+          ${serviceItems.map(([title, items, fit]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${items}</p>
+              <span>${fit}</span>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">How It Works</p>
+          <h2>從需求到訓後支持</h2>
+          <span>先理解家庭照顧問題，再安排課程與演練，最後用回饋讓訓練不只是一次性活動。</span>
+        </div>
+        <div class="service-flow-track">
+          ${flow.map(([step, title, copy]) => `
+            <article>
+              <b>${step}</b>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel">
+        <div>
+          <p class="eyebrow">Training Inquiry</p>
+          <h2>想讓家中的照顧方法更穩定嗎？</h2>
+          <p>留下需求後，歲悅會協助確認照顧情境、訓練人數、語言需求與適合的移工培訓模組。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡我們</a>
+      </section>
+    </div>
+  `;
+}
+
 function renderCommunityPage() {
   const highlights = [
     ["健康促進", "每週安排量測、伸展、肌力與認知活動，讓長輩用輕鬆節奏維持身體功能。"],
@@ -3990,6 +4119,10 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderNursingPage();
+  } else if (normalized === "migrant-training") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderMigrantTrainingPage();
   } else if (normalized === "health") {
     home.classList.remove("active");
     pageView.classList.add("active");
