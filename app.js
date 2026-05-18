@@ -1,5 +1,11 @@
 import { supabase } from "./src/lib/supabaseClient.js";
 
+const bundledAssetUrls = import.meta.glob("./assets/**/*.{png,jpg,jpeg,svg,ico}", {
+  eager: true,
+  query: "?url",
+  import: "default"
+});
+
 const pages = {
   about: {
     eyebrow: "About",
@@ -489,6 +495,18 @@ function escapeHTML(value = "") {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function resolveAssetUrl(path = "") {
+  const value = String(path);
+  if (!value.startsWith("assets/")) return value;
+  return bundledAssetUrls[`./${value}`] || value;
+}
+
+function hydrateBundledImages(root = document) {
+  root.querySelectorAll("img[src^='assets/']").forEach((image) => {
+    image.setAttribute("src", resolveAssetUrl(image.getAttribute("src")));
+  });
 }
 
 function formatPostDate(dateValue, yearOnly = false) {
@@ -4540,6 +4558,8 @@ function renderPage(slug) {
   } else {
     window.scrollTo({ top: 0, behavior: "auto" });
   }
+
+  hydrateBundledImages(pageView);
 }
 
 if ("IntersectionObserver" in window) {
@@ -4798,6 +4818,7 @@ if (sceneImages.length > 1) {
 window.addEventListener("hashchange", () => renderPage(location.hash.slice(1)));
 window.addEventListener("scroll", updateMilestoneProgress, { passive: true });
 window.addEventListener("resize", updateMilestoneProgress);
+hydrateBundledImages(document);
 renderPage(location.hash.slice(1));
 loadSupabasePageContent("home");
 loadWordPressContent();
