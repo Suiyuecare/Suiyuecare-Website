@@ -1865,6 +1865,264 @@ function renderMilestonesPage() {
   `;
 }
 
+function renderHomeCarePage() {
+  const highlights = [
+    ["到宅生活支持", "協助備餐、陪伴、環境整理與日常安全觀察，讓長輩在熟悉的家裡維持生活節奏。"],
+    ["身體照顧服務", "依照個案狀態安排沐浴、如廁、移位、翻身、用餐與陪同外出等照顧。"],
+    ["督導品質追蹤", "督導定期回訪，確認服務內容、照顧風險與家屬回饋，讓服務不是派人到場而已。"],
+    ["家屬即時回報", "透過照顧紀錄、異常提醒與溝通窗口，讓家人下班後也能掌握長輩狀況。"]
+  ];
+  const scenes = [
+    ["assets/homepage-batch/01-care-home-greeting.png", "到宅前的安心問候", "好的居家照顧從進門開始，先理解長輩今天的狀態與情緒。"],
+    ["assets/homepage-batch/07-orange-apron-meal-prep.png", "生活照顧與營養陪伴", "備餐、用餐觀察與日常陪伴，是讓長輩穩定生活的重要細節。"],
+    ["assets/homepage-batch/08-orange-apron-walking.png", "陪同活動與安全移動", "用合適步調陪長輩走動，維持活動量，也降低跌倒風險。"],
+    ["assets/homepage-batch/03-supervisor-care-plan.png", "督導與家屬討論計畫", "把照顧需求、服務目標與回報方式說清楚，讓家庭不用自己猜。"]
+  ];
+  const serviceItems = [
+    ["身體照顧", "沐浴、穿脫衣物、如廁、移位、翻身、拍背、用餐協助", "適合出院返家、行動不便或需穩定照顧者"],
+    ["生活照顧", "備餐、陪伴、環境整理、陪同外出、代購與生活提醒", "適合獨居、白天家人不在或需要日常支持者"],
+    ["喘息支持", "短時段照顧接手，讓主要照顧者能休息、辦事或安心上班", "適合長期照顧壓力較高的家庭"],
+    ["照顧紀錄", "服務紀錄、狀態回報、異常提醒、督導追蹤與家屬溝通", "適合希望清楚掌握照顧品質的家屬"]
+  ];
+  const flow = [
+    ["01", "需求諮詢", "了解長輩生活能力、疾病狀態、家屬期待與目前最困擾的照顧問題。"],
+    ["02", "照顧評估", "由專人整理服務目標、風險提醒、時段需求與適合的照顧內容。"],
+    ["03", "人員媒合", "依照地區、服務時段、照顧需求與個案特性安排合適照顧服務員。"],
+    ["04", "服務追蹤", "透過紀錄、督導與回訪持續調整，讓照顧能穩定走得長久。"]
+  ];
+
+  return `
+    <div class="service-detail-page home-care-page">
+      <section class="service-detail-hero home-care-hero">
+        <div class="service-detail-copy">
+          <p class="eyebrow">Home Care</p>
+          <h1>居家照顧</h1>
+          <p>歲悅居家照顧把專業服務帶進家裡，從身體照顧、生活支持到家屬回報，讓長輩能在熟悉的環境中被穩定照顧，也讓家人知道每一步都有依靠。</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#contact">預約居家諮詢</a>
+            <a class="secondary-button" href="#network">查看服務區域</a>
+          </div>
+        </div>
+        <aside class="service-hero-card">
+          <img src="assets/homepage-batch/01-care-home-greeting.png" alt="歲悅居家照顧到宅服務情境" />
+          <div>
+            <span>Home Care Service</span>
+            <strong>把照顧安排進熟悉的日常。</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Focus</p>
+          <h2>居家照顧在做什麼</h2>
+          <span>不是單純派人到家，而是把照顧需求、服務紀錄、督導追蹤與家屬溝通串成穩定系統。</span>
+        </div>
+        <div class="service-highlight-grid">
+          ${highlights.map(([title, copy], index) => `
+            <article>
+              <span>${String(index + 1).padStart(2, "0")}</span>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Service Scenes</p>
+          <h2>真實服務情境</h2>
+          <span>使用先前生成的歲悅照顧形象照，呈現居家照顧的核心現場：進門問候、備餐陪伴、安全移動與督導溝通。</span>
+        </div>
+        <div class="community-scene-grid">
+          ${scenes.map(([image, title, copy]) => `
+            <figure>
+              <img src="${image}" alt="${title}" />
+              <figcaption>
+                <strong>${title}</strong>
+                <span>${copy}</span>
+              </figcaption>
+            </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Services</p>
+          <h2>服務內容</h2>
+          <span>居家照顧會依長輩狀態與家庭節奏調整，不把每個家庭硬塞進同一套流程。</span>
+        </div>
+        <div class="community-program-grid">
+          ${serviceItems.map(([title, items, fit]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${items}</p>
+              <span>${fit}</span>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">How It Works</p>
+          <h2>從諮詢到穩定服務</h2>
+          <span>讓家屬不用自己摸索：先釐清需求，再安排服務，最後用紀錄與督導讓照顧持續被看見。</span>
+        </div>
+        <div class="service-flow-track">
+          ${flow.map(([step, title, copy]) => `
+            <article>
+              <b>${step}</b>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel">
+        <div>
+          <p class="eyebrow">Start Home Care</p>
+          <h2>家裡開始需要有人幫忙照顧了嗎？</h2>
+          <p>留下需求後，歲悅會協助確認長輩狀態、服務區域、可安排時段與適合的居家照顧內容。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡我們</a>
+      </section>
+    </div>
+  `;
+}
+
+function renderDayCarePage() {
+  const highlights = [
+    ["白天安心托顧", "讓長輩白天有規律作息、有人陪伴，晚上仍能回到熟悉的家。"],
+    ["活動與復能", "安排伸展、肌力、認知、手作與團體互動，維持生活能力與參與感。"],
+    ["餐食與休息", "照顧用餐、飲水、午休與身體狀態，讓家屬不用擔心白天照顧空窗。"],
+    ["家屬喘息支持", "讓主要照顧者能上班、休息或處理生活，也能持續掌握長輩狀態。"]
+  ];
+  const scenes = [
+    ["assets/homepage-batch/02-daycare-group-exercise.png", "日照團體律動", "透過安全、可跟上的活動節奏，讓長輩維持肌力、平衡與自信。"],
+    ["assets/daycare-recruit-03-meal.png", "餐食與用餐照顧", "從用餐狀況、食慾到吞嚥觀察，讓日常照顧更細緻。"],
+    ["assets/daycare-recruit-04-activity.png", "手作與團體活動", "活動不是填時間，而是讓長輩有互動、有選擇，也有成就感。"],
+    ["assets/daycare-recruit-05-handover.png", "交班與家屬回報", "服務紀錄與交班讓家屬知道今天發生什麼，也讓團隊延續照顧。"]
+  ];
+  const serviceItems = [
+    ["日間生活照顧", "接待、量測、用餐、午休、如廁與生活安全觀察", "適合白天需要陪伴與規律照顧的長輩"],
+    ["健康促進活動", "椅上運動、伸展、肌力、平衡、音樂律動與認知刺激", "適合希望維持功能與活動量的長輩"],
+    ["社交陪伴", "共餐、團體活動、節慶活動與人際互動", "適合在家較少出門、需要生活刺激者"],
+    ["家庭喘息", "白天照顧接手、狀態回報、服務建議與資源轉介", "適合主要照顧者需要穩定支持的家庭"]
+  ];
+  const flow = [
+    ["01", "諮詢與參觀", "了解長輩身體狀態、生活習慣、交通需求與家屬期待。"],
+    ["02", "初次評估", "整理照顧風險、活動能力、用餐需求與適合參與的活動節奏。"],
+    ["03", "試讀體驗", "讓長輩熟悉環境、人員與活動安排，降低第一次到新地方的不安。"],
+    ["04", "穩定參與", "依照出席、活動、餐食與精神狀態，持續調整照顧安排。"]
+  ];
+
+  return `
+    <div class="service-detail-page day-care-page">
+      <section class="service-detail-hero day-care-hero">
+        <div class="service-detail-copy">
+          <p class="eyebrow">Day Care</p>
+          <h1>日間照顧</h1>
+          <p>歲悅日間照顧讓長輩白天有安全場域、規律活動、餐食照顧與社交陪伴，也讓家屬能在工作與照顧之間找到可以喘息的節奏。</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#contact">預約參觀日照</a>
+            <a class="secondary-button" href="#courses">查看體驗活動</a>
+          </div>
+        </div>
+        <aside class="service-hero-card">
+          <img src="assets/homepage-batch/02-daycare-group-exercise.png" alt="歲悅日間照顧團體活動情境" />
+          <div>
+            <span>Day Care Center</span>
+            <strong>白天有人陪，晚上安心回家。</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Focus</p>
+          <h2>日間照顧在做什麼</h2>
+          <span>日照不是把長輩安置一整天，而是用活動、餐食、休息、觀察與回報，幫家庭建立可持續的照顧節奏。</span>
+        </div>
+        <div class="service-highlight-grid">
+          ${highlights.map(([title, copy], index) => `
+            <article>
+              <span>${String(index + 1).padStart(2, "0")}</span>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Service Scenes</p>
+          <h2>真實服務情境</h2>
+          <span>使用先前生成的日間照顧照片，呈現活動、餐食、團體互動與交班回報等日照現場。</span>
+        </div>
+        <div class="community-scene-grid">
+          ${scenes.map(([image, title, copy]) => `
+            <figure>
+              <img src="${image}" alt="${title}" />
+              <figcaption>
+                <strong>${title}</strong>
+                <span>${copy}</span>
+              </figcaption>
+            </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Services</p>
+          <h2>服務內容</h2>
+          <span>依照長輩能力、家屬需求與出席頻率安排，不只照顧身體，也保留長輩的生活感。</span>
+        </div>
+        <div class="community-program-grid">
+          ${serviceItems.map(([title, items, fit]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${items}</p>
+              <span>${fit}</span>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">How It Works</p>
+          <h2>從參觀到穩定出席</h2>
+          <span>先讓長輩與家屬理解環境，再用試讀與回報建立信任，讓日照變成家庭穩定支持。</span>
+        </div>
+        <div class="service-flow-track">
+          ${flow.map(([step, title, copy]) => `
+            <article>
+              <b>${step}</b>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel">
+        <div>
+          <p class="eyebrow">Visit Day Care</p>
+          <h2>想讓家人白天有安全又有活力的照顧場域？</h2>
+          <p>留下需求後，歲悅會協助確認長輩狀態、交通距離、體驗參觀時段與適合的日照參與方式。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡我們</a>
+      </section>
+    </div>
+  `;
+}
+
 function renderCommunityPage() {
   const highlights = [
     ["健康促進", "每週安排量測、伸展、肌力與認知活動，讓長輩用輕鬆節奏維持身體功能。"],
@@ -3568,6 +3826,14 @@ function renderPage(slug) {
     pageView.classList.add("active");
     pageView.innerHTML = renderMilestonesPage();
     initMilestonePage();
+  } else if (normalized === "home-care") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderHomeCarePage();
+  } else if (normalized === "day-care") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderDayCarePage();
   } else if (normalized === "community") {
     home.classList.remove("active");
     pageView.classList.add("active");
