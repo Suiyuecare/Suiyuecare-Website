@@ -1,0 +1,19 @@
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        admin: "admin/index.html",
+        adminLogin: "admin/login/index.html",
+        adminPages: "admin/pages/index.html",
+        adminPageEdit: "admin/pages/[id]/index.html",
+        adminMedia: "admin/media/index.html",
+        adminCategories: "admin/categories/index.html",
+        adminArticles: "admin/articles/index.html",
+        adminArticleEdit: "admin/articles/[id]/index.html"
+      }
+    }
+  }
+});

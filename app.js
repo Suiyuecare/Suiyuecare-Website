@@ -1,3 +1,5 @@
+import { supabase } from "./src/lib/supabaseClient.js";
+
 const pages = {
   about: {
     eyebrow: "About",
@@ -468,6 +470,14 @@ const healthArticles = [
   }
 ];
 
+let supabaseHealthArticles = [];
+let supabaseHealthArticlesLoaded = false;
+let supabaseHealthArticlesPromise = null;
+let supabaseArticleCategories = [];
+let supabaseArticleCategoriesLoaded = false;
+let supabaseArticleCategoriesPromise = null;
+const supabaseArticlePageCache = new Map();
+
 function stripHTML(value = "") {
   return value.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
@@ -492,6 +502,426 @@ function getPostImage(post, fallback = "assets/homepage-batch/02-daycare-group-e
   const embedded = post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
   const acfImage = post?.acf?.image?.url || post?.acf?.avatar?.url || post?.acf?.speaker_photo?.url || post?.acf?.cover?.url;
   return acfImage || embedded || fallback;
+}
+
+function formatArticleDate(dateValue) {
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function getHealthArticleList() {
+  return supabaseHealthArticles.length ? supabaseHealthArticles : healthArticles.map(normalizeStaticArticle);
+}
+
+function categorySlug(value = "") {
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getHealthCategoryList() {
+  if (supabaseArticleCategories.length) return supabaseArticleCategories;
+  const uniqueCategories = [...new Set(healthArticles.map((article) => article.category).filter(Boolean))];
+  return uniqueCategories.map((name) => ({ name, slug: categorySlug(name) }));
+}
+
+function normalizeSupabaseArticle(article, mediaById, categoriesById) {
+  const categoryData = categoriesById.get(article.category_id);
+  const category = categoryData?.name || "照顧知識";
+  const slug = categoryData?.slug || categorySlug(category);
+  const cover = mediaById.get(article.cover_image_id);
+  const image = cover?.public_url || "assets/homepage-batch/10-family-consultation.png";
+  const subtitle = article.subtitle || article.excerpt || "";
+  const excerpt = article.excerpt || article.subtitle || stripHTML(article.content || "").slice(0, 88);
+  const publishedAt = article.published_at || article.updated_at;
+  const tags = Array.isArray(article.tags) ? article.tags.join(" ") : "";
+
+  return {
+    href: `#article-${article.slug}`,
+    slug: article.slug,
+    category,
+    categorySlug: slug,
+    title: article.title || "未命名文章",
+    subtitle,
+    excerpt,
+    image,
+    author: article.author_name || "歲悅照顧編輯部",
+    date: formatArticleDate(publishedAt),
+    publishedAt,
+    isFeatured: Boolean(article.is_featured),
+    keywords: `${article.title || ""} ${subtitle} ${excerpt} ${category} ${tags}`
+  };
+}
+
+function normalizeStaticArticle(article) {
+  return {
+    ...article,
+    categorySlug: article.categorySlug || categorySlug(article.category)
+  };
+}
+
+async function fetchSupabaseArticleCategories() {
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("article_categories")
+    .select("id, name, slug, sort_order, is_enabled")
+    .eq("is_enabled", true)
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+
+  if (error) throw error;
+  return (data || []).map((category) => ({
+    id: category.id,
+    name: category.name,
+    slug: category.slug || categorySlug(category.name)
+  }));
+}
+
+async function loadSupabaseArticleCategories({ rerender = false } = {}) {
+  if (supabaseArticleCategoriesLoaded) return supabaseArticleCategories;
+  if (!supabaseArticleCategoriesPromise) {
+    supabaseArticleCategoriesPromise = fetchSupabaseArticleCategories()
+      .then((categories) => {
+        supabaseArticleCategories = categories;
+        supabaseArticleCategoriesLoaded = true;
+        return categories;
+      })
+      .catch((error) => {
+        console.warn("Supabase article categories unavailable, using static categories.", error);
+        supabaseArticleCategoriesLoaded = true;
+        return [];
+      });
+  }
+
+  const categories = await supabaseArticleCategoriesPromise;
+  if (rerender && categories.length) {
+    const current = location.hash.slice(1).split("?")[0] || "home";
+    if (current === "health") renderPage(location.hash.slice(1));
+  }
+  return categories;
+}
+
+async function fetchSupabaseHealthArticles() {
+  if (!supabase) return [];
+
+  const { data: articles, error: articleError } = await supabase
+    .from("articles")
+    .select(`
+      id,
+      category_id,
+      slug,
+      title,
+      subtitle,
+      excerpt,
+      content,
+      cover_image_id,
+      author_name,
+      tags,
+      is_featured,
+      published_at,
+      updated_at
+    `)
+    .eq("status", "published")
+    .eq("is_enabled", true)
+    .order("is_featured", { ascending: false })
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(48);
+
+  if (articleError) throw articleError;
+  if (!articles?.length) return [];
+
+  const mediaIds = [...new Set(articles.map((article) => article.cover_image_id).filter(Boolean))];
+  const categoryIds = [...new Set(articles.map((article) => article.category_id).filter(Boolean))];
+  const [mediaResult, categoriesResult] = await Promise.all([
+    mediaIds.length
+      ? supabase.from("media").select("id, public_url, alt_text, file_name").in("id", mediaIds)
+      : Promise.resolve({ data: [], error: null }),
+    categoryIds.length
+      ? supabase.from("article_categories").select("id, name, slug").in("id", categoryIds)
+      : Promise.resolve({ data: [], error: null })
+  ]);
+
+  if (mediaResult.error) throw mediaResult.error;
+  if (categoriesResult.error) throw categoriesResult.error;
+
+  const mediaById = new Map((mediaResult.data || []).map((media) => [media.id, media]));
+  const categoriesById = new Map((categoriesResult.data || []).map((category) => [category.id, category]));
+  return articles.map((article) => normalizeSupabaseArticle(article, mediaById, categoriesById));
+}
+
+async function loadSupabaseHealthArticles({ rerender = false } = {}) {
+  if (supabaseHealthArticlesLoaded) return supabaseHealthArticles;
+  if (!supabaseHealthArticlesPromise) {
+    supabaseHealthArticlesPromise = fetchSupabaseHealthArticles()
+      .then((articles) => {
+        supabaseHealthArticles = articles;
+        supabaseHealthArticlesLoaded = true;
+        return articles;
+      })
+      .catch((error) => {
+        console.warn("Supabase articles unavailable, using static health articles.", error);
+        supabaseHealthArticlesLoaded = true;
+        return [];
+      });
+  }
+
+  const articles = await supabaseHealthArticlesPromise;
+  if (rerender && articles.length) {
+    const current = location.hash.slice(1).split("?")[0] || "home";
+    if (current === "health" || current === "search") renderPage(location.hash.slice(1));
+  }
+  return articles;
+}
+
+function renderMarkdownContent(content = "") {
+  const lines = String(content || "").split(/\r?\n/);
+  const blocks = [];
+  let paragraph = [];
+  let list = [];
+
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    blocks.push(`<p>${escapeHTML(paragraph.join(" "))}</p>`);
+    paragraph = [];
+  };
+
+  const flushList = () => {
+    if (!list.length) return;
+    blocks.push(`<ul>${list.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>`);
+    list = [];
+  };
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flushParagraph();
+      flushList();
+      return;
+    }
+
+    if (trimmed.startsWith("### ")) {
+      flushParagraph();
+      flushList();
+      blocks.push(`<h3>${escapeHTML(trimmed.slice(4))}</h3>`);
+      return;
+    }
+
+    if (trimmed.startsWith("## ")) {
+      flushParagraph();
+      flushList();
+      blocks.push(`<h2>${escapeHTML(trimmed.slice(3))}</h2>`);
+      return;
+    }
+
+    if (/^[-*]\s+/.test(trimmed)) {
+      flushParagraph();
+      list.push(trimmed.replace(/^[-*]\s+/, ""));
+      return;
+    }
+
+    flushList();
+    paragraph.push(trimmed);
+  });
+
+  flushParagraph();
+  flushList();
+
+  return blocks.length ? blocks.join("") : "<p>文章內容準備中。</p>";
+}
+
+function normalizeSupabaseArticlePage(article, category, cover) {
+  const publishedAt = article.published_at || article.updated_at;
+  return {
+    slug: article.slug,
+    category: category?.name || "照顧知識",
+    categorySlug: category?.slug || categorySlug(category?.name || "照顧知識"),
+    title: article.title || "未命名文章",
+    subtitle: article.subtitle || article.excerpt || "",
+    excerpt: article.excerpt || article.subtitle || "",
+    image: cover?.public_url || "assets/homepage-batch/10-family-consultation.png",
+    author: article.author_name || "歲悅照顧編輯部",
+    date: formatArticleDate(publishedAt),
+    tags: Array.isArray(article.tags) ? article.tags : [],
+    content: article.content || "",
+    seoTitle: article.seo_title || "",
+    seoDescription: article.seo_description || ""
+  };
+}
+
+async function fetchSupabaseArticlePage(slug) {
+  if (!supabase || !slug) return null;
+  if (supabaseArticlePageCache.has(slug)) return supabaseArticlePageCache.get(slug);
+
+  const { data: article, error } = await supabase
+    .from("articles")
+    .select(`
+      id,
+      category_id,
+      slug,
+      title,
+      subtitle,
+      excerpt,
+      content,
+      cover_image_id,
+      author_name,
+      tags,
+      status,
+      is_enabled,
+      published_at,
+      updated_at,
+      seo_title,
+      seo_description
+    `)
+    .eq("slug", slug)
+    .eq("status", "published")
+    .eq("is_enabled", true)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!article) {
+    supabaseArticlePageCache.set(slug, null);
+    return null;
+  }
+
+  const [categoryResult, coverResult] = await Promise.all([
+    article.category_id
+      ? supabase
+          .from("article_categories")
+          .select("id, name, slug")
+          .eq("id", article.category_id)
+          .eq("is_enabled", true)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+    article.cover_image_id
+      ? supabase
+          .from("media")
+          .select("id, public_url, alt_text, file_name")
+          .eq("id", article.cover_image_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null })
+  ]);
+
+  if (categoryResult.error) throw categoryResult.error;
+  if (coverResult.error) throw coverResult.error;
+
+  const normalized = normalizeSupabaseArticlePage(article, categoryResult.data, coverResult.data);
+  supabaseArticlePageCache.set(slug, normalized);
+  return normalized;
+}
+
+function getSectionContent(section) {
+  return section?.content_json && typeof section.content_json === "object" ? section.content_json : {};
+}
+
+function setCmsText(root, field, value) {
+  if (value === undefined || value === null || value === "") return;
+  root.querySelectorAll(`[data-cms-field="${field}"]`).forEach((element) => {
+    element.textContent = value;
+  });
+}
+
+function setCmsImage(root, field, url, alt = "") {
+  if (!url) return;
+  root.querySelectorAll(`[data-cms-field="${field}"]`).forEach((element) => {
+    if (element.tagName === "IMG") {
+      element.src = url;
+      if (alt) element.alt = alt;
+    } else {
+      element.style.backgroundImage = `url("${url}")`;
+    }
+  });
+}
+
+function setCmsButton(root, buttonName, text, href) {
+  const button = root.querySelector(`[data-cms-button="${buttonName}"]`);
+  if (!button) return;
+  if (text) button.textContent = text;
+  if (href) button.setAttribute("href", href);
+}
+
+function findCmsSectionRoot(sectionKey) {
+  return [...document.querySelectorAll("[data-cms-section]")]
+    .find((section) => section.dataset.cmsSection === sectionKey) || null;
+}
+
+function applyCmsSection(section) {
+  const root = findCmsSectionRoot(section.section_key);
+  if (!root) return;
+
+  const content = getSectionContent(section);
+  root.hidden = false;
+  root.dataset.cmsLoaded = "true";
+
+  setCmsText(root, "eyebrow", content.eyebrow);
+  setCmsText(root, "title", section.title || content.title);
+  setCmsText(root, "subtitle", content.subtitle);
+  setCmsText(root, "body", section.body || content.body);
+
+  if (content.fields && typeof content.fields === "object") {
+    Object.entries(content.fields).forEach(([field, value]) => setCmsText(root, field, value));
+  }
+
+  const imageUrl = content.image_url || content.background_image_url;
+  setCmsImage(root, "image", imageUrl, content.image_alt || section.title || "");
+  setCmsImage(root, "background_image", content.background_image_url || imageUrl, content.image_alt || section.title || "");
+
+  setCmsButton(root, "primary", content.button_text, content.button_href);
+  setCmsButton(root, "secondary", content.secondary_button_text, content.secondary_button_href);
+}
+
+function applyCmsPage(page, sections) {
+  if (page.seo_title || page.title) document.title = page.seo_title || `${page.title}｜Suiyuecare Corps.`;
+  const seoDescription = document.querySelector('meta[name="description"]');
+  if (seoDescription && page.seo_description) seoDescription.setAttribute("content", page.seo_description);
+
+  const pageContent = getSectionContent(page);
+  const managedSections = Array.isArray(pageContent.managed_sections) ? pageContent.managed_sections : [];
+  const isCmsManaged = sections.length > 0 || pageContent.cms_mode === true || managedSections.length > 0;
+  if (!isCmsManaged) return;
+
+  const sectionsToHide = managedSections.length
+    ? managedSections.map(findCmsSectionRoot).filter(Boolean)
+    : [...document.querySelectorAll("[data-cms-section]")];
+
+  sectionsToHide.forEach((section) => {
+    section.hidden = true;
+    section.dataset.cmsLoaded = "false";
+  });
+  sections.forEach(applyCmsSection);
+}
+
+async function loadSupabasePageContent(slug) {
+  if (!supabase) return;
+
+  try {
+    const { data: page, error: pageError } = await supabase
+      .from("pages")
+      .select("id, slug, title, seo_title, seo_description, content_json")
+      .eq("slug", slug)
+      .eq("status", "published")
+      .eq("is_enabled", true)
+      .maybeSingle();
+
+    if (pageError) throw pageError;
+    if (!page) return;
+
+    const { data: sections, error: sectionsError } = await supabase
+      .from("page_sections")
+      .select("id, section_key, title, body, image_id, content_json, sort_order")
+      .eq("page_id", page.id)
+      .eq("status", "published")
+      .eq("is_enabled", true)
+      .order("sort_order", { ascending: true });
+
+    if (sectionsError) throw sectionsError;
+    applyCmsPage(page, sections || []);
+  } catch (error) {
+    console.warn(`Supabase page content unavailable for ${slug}.`, error);
+  }
 }
 
 async function fetchWordPressJSON(path) {
@@ -747,10 +1177,16 @@ function updateLocation(locationKey) {
   });
 }
 
-function renderHealthPage() {
-  const feature = healthArticles[0];
-  const quickCards = healthArticles.slice(1, 5);
-  const latestCards = healthArticles.slice(0, 6);
+function renderHealthPage(selectedCategorySlug = "") {
+  const allArticles = getHealthArticleList();
+  const categories = getHealthCategoryList();
+  const activeCategory = selectedCategorySlug || "";
+  const articles = activeCategory
+    ? allArticles.filter((article) => article.categorySlug === activeCategory)
+    : allArticles;
+  const feature = articles[0];
+  const quickCards = articles.slice(1, 5);
+  const latestCards = articles.slice(0, 10);
   const lazyPacks = [
     ["長照申請懶人包", "從評估、補助、服務媒合到第一次到宅，照著順序看就懂。", "assets/homepage-batch/10-family-consultation.png", "#article-longterm-care-apply"],
     ["出院返家照顧包", "把返家前準備、移位、用餐與每日觀察整理成家屬清單。", "assets/homepage-batch/01-care-home-greeting.png", "#article-family-care-story"],
@@ -783,29 +1219,33 @@ function renderHealthPage() {
           </form>
         </div>
         <div class="health-cats">
-          ${["疾病症狀", "健康生活", "飲食營養", "復能運動", "失智照顧", "影音專區", "專家專欄", "圖解文章", "家屬支持", "課程活動"].map((cat) => `<button class="click-card" type="button" data-href="#search?q=${encodeURIComponent(cat)}">${cat}</button>`).join("")}
+          <button class="click-card ${activeCategory ? "" : "active"}" type="button" data-href="#health">全部文章</button>
+          ${categories.map((category) => `
+            <button class="click-card ${activeCategory === category.slug ? "active" : ""}" type="button" data-href="#health?category=${encodeURIComponent(category.slug)}">${escapeHTML(category.name)}</button>
+          `).join("")}
         </div>
       </section>
 
+      ${articles.length ? `
       <section class="health-board">
-        <article class="health-feature click-card" data-href="${feature.href}" tabindex="0" role="link">
-          <img src="${feature.image}" alt="${feature.title}" />
+        <article class="health-feature click-card" data-href="${escapeHTML(feature.href)}" tabindex="0" role="link">
+          <img src="${escapeHTML(feature.image)}" alt="${escapeHTML(feature.title)}" />
           <div>
             <span class="health-tag">本週精選</span>
-            <h2>${feature.title}</h2>
-            <p>${feature.excerpt}</p>
-            <a class="health-readmore" href="${feature.href}">Read More</a>
+            <h2>${escapeHTML(feature.title)}</h2>
+            <p>${escapeHTML(feature.subtitle || feature.excerpt)}</p>
+            <a class="health-readmore" href="${escapeHTML(feature.href)}">Read More</a>
           </div>
         </article>
 
         <div class="health-quick-grid">
           ${quickCards.map((post) => `
-            <article class="health-card click-card" data-href="${post.href}" tabindex="0" role="link">
-              <img src="${post.image}" alt="${post.title}" />
+            <article class="health-card click-card" data-href="${escapeHTML(post.href)}" tabindex="0" role="link">
+              <img src="${escapeHTML(post.image)}" alt="${escapeHTML(post.title)}" />
               <div>
-                <span class="health-tag">${post.category}</span>
-                <h3>${post.title}</h3>
-                <a href="${post.href}">Read More</a>
+                <span class="health-tag">${escapeHTML(post.category)}</span>
+                <h3>${escapeHTML(post.title)}</h3>
+                <a href="${escapeHTML(post.href)}">Read More</a>
               </div>
             </article>
           `).join("")}
@@ -814,10 +1254,17 @@ function renderHealthPage() {
         <aside class="ranking-panel">
           <div class="ranking-title"><span>Ranking</span><h3>熱門文章</h3></div>
           <ol>
-            ${healthArticles.slice(0, 6).map((post) => `<li><a href="${post.href}">${post.title}</a></li>`).join("")}
+            ${articles.slice(0, 6).map((post) => `<li><a href="${escapeHTML(post.href)}">${escapeHTML(post.title)}</a></li>`).join("")}
           </ol>
         </aside>
       </section>
+      ` : `
+      <section class="health-empty-state">
+        <h2>這個分類目前還沒有已發布文章</h2>
+        <p>後台新增並發布文章後，這裡會自動同步顯示。</p>
+        <a href="#health">查看全部文章</a>
+      </section>
+      `}
 
       <section class="health-topic-strip">
         ${["長照2.0", "出院返家", "跌倒預防", "營養補充", "失智陪伴", "日間照顧", "復能訓練", "喘息服務"].map((keyword) => `<a href="#search?q=${encodeURIComponent(keyword)}"># ${keyword}</a>`).join("")}
@@ -845,13 +1292,13 @@ function renderHealthPage() {
         </div>
         <div class="health-latest-grid">
           ${latestCards.map((post) => `
-            <article class="health-list-card click-card" data-href="${post.href}" tabindex="0" role="link">
-              <img src="${post.image}" alt="${post.title}" />
+            <article class="health-list-card click-card" data-href="${escapeHTML(post.href)}" tabindex="0" role="link">
+              <img src="${escapeHTML(post.image)}" alt="${escapeHTML(post.title)}" />
               <div>
-                <span>${post.category}</span>
-                <h3>${post.title}</h3>
-                <p>${post.excerpt}</p>
-                <small>${post.author} · ${post.date}</small>
+                <span>${escapeHTML(post.category)}</span>
+                <h3>${escapeHTML(post.title)}</h3>
+                <p>${escapeHTML(post.subtitle || post.excerpt)}</p>
+                <small>${escapeHTML(post.author)} · ${escapeHTML(post.date)}</small>
               </div>
             </article>
           `).join("")}
@@ -894,9 +1341,10 @@ function renderHealthPage() {
 function renderSearchPage(query = "") {
   const keyword = decodeURIComponent(query || "").trim();
   const normalizedKeyword = keyword.toLowerCase();
+  const articles = getHealthArticleList();
   const results = normalizedKeyword
-    ? healthArticles.filter((post) => `${post.title} ${post.excerpt} ${post.category} ${post.keywords}`.toLowerCase().includes(normalizedKeyword))
-    : healthArticles;
+    ? articles.filter((post) => `${post.title} ${post.subtitle || ""} ${post.excerpt} ${post.category} ${post.keywords}`.toLowerCase().includes(normalizedKeyword))
+    : articles;
 
   return `
     <div class="search-page">
@@ -912,13 +1360,13 @@ function renderSearchPage(query = "") {
       </section>
       <section class="search-results">
         ${results.length ? results.map((post) => `
-          <article class="search-result-card click-card" data-href="${post.href}" tabindex="0" role="link">
-            <img src="${post.image}" alt="${post.title}" />
+          <article class="search-result-card click-card" data-href="${escapeHTML(post.href)}" tabindex="0" role="link">
+            <img src="${escapeHTML(post.image)}" alt="${escapeHTML(post.title)}" />
             <div>
-              <span>${post.category}</span>
-              <h2>${post.title}</h2>
-              <p>${post.excerpt}</p>
-              <small>${post.author} · ${post.date}</small>
+              <span>${escapeHTML(post.category)}</span>
+              <h2>${escapeHTML(post.title)}</h2>
+              <p>${escapeHTML(post.subtitle || post.excerpt)}</p>
+              <small>${escapeHTML(post.author)} · ${escapeHTML(post.date)}</small>
             </div>
           </article>
         `).join("") : `
@@ -2796,25 +3244,70 @@ function renderIrPlaceholderPage(kind) {
   `;
 }
 
-function renderArticlePage(slug) {
-  const article = articlePages[slug] || articlePages["longterm-care-apply"];
-  const related = relatedArticleCards
+function renderArticleLoadingPage() {
+  return `
+    <article class="article-page">
+      <div class="article-topbar">
+        <a class="article-back" href="#health">返回上一頁</a>
+        <span class="article-category">Health 3.0</span>
+      </div>
+      <section class="health-empty-state">
+        <h2>正在讀取文章</h2>
+        <p>請稍候，正在從 Supabase 取得已發布內容。</p>
+      </section>
+    </article>
+  `;
+}
+
+function renderArticleNotFoundPage() {
+  return `
+    <article class="article-page">
+      <div class="article-topbar">
+        <a class="article-back" href="#health">返回上一頁</a>
+        <span class="article-category">Health 3.0</span>
+      </div>
+      <section class="health-empty-state">
+        <h2>文章尚未發布或不存在</h2>
+        <p>前台只會顯示已發布並啟用的文章。若這篇文章還是草稿，請先到後台文章管理將狀態改為已發布。</p>
+        <a href="#health">回健康3.0</a>
+      </section>
+    </article>
+  `;
+}
+
+function getRelatedArticles(slug) {
+  const cmsRelated = getHealthArticleList()
+    .filter((item) => item.slug !== slug && item.href !== `#article-${slug}`)
+    .slice(0, 7)
+    .map((item) => ({
+      href: item.href,
+      image: item.image,
+      category: item.category,
+      title: item.title
+    }));
+
+  if (cmsRelated.length) return cmsRelated;
+  return relatedArticleCards
     .filter((item) => item.href !== `#article-${slug}`)
     .slice(0, 7);
+}
+
+function renderArticleLayout(article) {
+  const related = getRelatedArticles(article.slug);
 
   return `
     <article class="article-page">
       <div class="article-topbar">
         <a class="article-back" href="#health">返回上一頁</a>
-        <span class="article-category">${article.category}</span>
+        <span class="article-category">${escapeHTML(article.category)}</span>
       </div>
 
       <header class="article-hero">
         <figure>
-          <img src="${article.image}" alt="${article.title}" />
+          <img src="${escapeHTML(article.image)}" alt="${escapeHTML(article.title)}" />
           <figcaption>
-            <h1>${article.title}</h1>
-            <p>${article.dek}</p>
+            <h1>${escapeHTML(article.title)}</h1>
+            <p>${escapeHTML(article.subtitle || article.excerpt || "")}</p>
           </figcaption>
         </figure>
       </header>
@@ -2822,25 +3315,27 @@ function renderArticlePage(slug) {
       <section class="article-layout">
         <div class="article-main">
           <div class="article-meta">
-            <span class="meta-editor">編輯人｜${article.author}</span>
-            <span class="meta-date">${article.date}</span>
-            ${article.tags.map((tag) => `<span class="meta-tag"># ${tag}</span>`).join("")}
+            <span class="meta-editor">編輯人｜${escapeHTML(article.author)}</span>
+            <span class="meta-date">${escapeHTML(article.date)}</span>
+            ${(article.tags || []).map((tag) => `<span class="meta-tag"># ${escapeHTML(tag)}</span>`).join("")}
           </div>
 
-          <div class="article-summary">
-            <strong>本文重點</strong>
-            <ul>${article.summary.map((item) => `<li>${item}</li>`).join("")}</ul>
-          </div>
+          ${article.summary?.length ? `
+            <div class="article-summary">
+              <strong>本文重點</strong>
+              <ul>${article.summary.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>
+            </div>
+          ` : ""}
 
           <div class="article-body">
-            ${article.content.map(([heading, body]) => `
+            ${Array.isArray(article.content) ? article.content.map(([heading, body]) => `
               <section>
-                <h2>${heading}</h2>
-                <p>${body}</p>
+                <h2>${escapeHTML(heading)}</h2>
+                <p>${escapeHTML(body)}</p>
               </section>
-            `).join("")}
+            `).join("") : renderMarkdownContent(article.content)}
             <div class="article-cta">
-              <p>${article.cta}</p>
+              <p>${escapeHTML(article.cta || "不確定下一步怎麼安排？留下需求，讓歲悅協助判斷。")}</p>
               <a href="#contact">預約照顧諮詢</a>
             </div>
           </div>
@@ -2852,10 +3347,10 @@ function renderArticlePage(slug) {
             </div>
             <div class="article-related-grid">
               ${related.map((item) => `
-                <a href="${item.href}">
-                  <img src="${item.image}" alt="" />
-                  <span>${item.category}</span>
-                  <b>${item.title}</b>
+                <a href="${escapeHTML(item.href)}">
+                  <img src="${escapeHTML(item.image)}" alt="" />
+                  <span>${escapeHTML(item.category)}</span>
+                  <b>${escapeHTML(item.title)}</b>
                 </a>
               `).join("")}
             </div>
@@ -2885,6 +3380,36 @@ function renderArticlePage(slug) {
   `;
 }
 
+function renderStaticArticlePage(slug) {
+  const article = articlePages[slug] || articlePages["longterm-care-apply"];
+  return renderArticleLayout({
+    slug,
+    category: article.category,
+    title: article.title,
+    subtitle: article.dek,
+    excerpt: article.dek,
+    image: article.image,
+    author: article.author,
+    date: article.date,
+    tags: article.tags,
+    summary: article.summary,
+    content: article.content,
+    cta: article.cta
+  });
+}
+
+async function loadArticlePage(slug) {
+  try {
+    const article = await fetchSupabaseArticlePage(slug);
+    if (location.hash.slice(1).split("?")[0] !== `article-${slug}`) return;
+    pageView.innerHTML = article ? renderArticleLayout(article) : renderArticleNotFoundPage();
+  } catch (error) {
+    console.warn("Supabase article page unavailable.", error);
+    if (location.hash.slice(1).split("?")[0] !== `article-${slug}`) return;
+    pageView.innerHTML = supabase ? renderArticleNotFoundPage() : renderStaticArticlePage(slug);
+  }
+}
+
 function renderPage(slug) {
   if (!home || !pageView) return;
 
@@ -2903,7 +3428,8 @@ function renderPage(slug) {
   if (articleSlug) {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderArticlePage(articleSlug);
+    pageView.innerHTML = renderArticleLoadingPage();
+    loadArticlePage(articleSlug);
   } else if (normalized === "about") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -2916,11 +3442,14 @@ function renderPage(slug) {
   } else if (normalized === "health") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderHealthPage();
+    pageView.innerHTML = renderHealthPage(searchParams.get("category") || "");
+    loadSupabaseHealthArticles({ rerender: true });
+    loadSupabaseArticleCategories({ rerender: true });
   } else if (normalized === "search") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderSearchPage(searchParams.get("q") || "");
+    loadSupabaseHealthArticles({ rerender: true });
   } else if (normalized === "courses") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -3250,6 +3779,7 @@ window.addEventListener("hashchange", () => renderPage(location.hash.slice(1)));
 window.addEventListener("scroll", updateMilestoneProgress, { passive: true });
 window.addEventListener("resize", updateMilestoneProgress);
 renderPage(location.hash.slice(1));
+loadSupabasePageContent("home");
 loadWordPressContent();
 
 window.setTimeout(() => {

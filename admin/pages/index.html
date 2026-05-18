@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>頁面管理｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/">
+            <img src="/assets/company-logo.png" alt="" />
+            <span>
+              <strong>歲悅長照集團</strong>
+              <small>CMS Console</small>
+            </span>
+          </a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a class="active" href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+        </nav>
+        <div class="admin-sidebar-note">
+          <span>Pages</span>
+          <strong>前台頁面內容</strong>
+          <p>管理頁面名稱、slug、啟用狀態與發布資料。</p>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Content</p>
+            <h1>頁面管理</h1>
+            <span>從 Supabase pages 資料表讀取所有前台頁面。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="admin-preview-link" href="/" target="_blank" rel="noopener">查看前台</a>
+            <div class="admin-userbox">
+              <b id="adminUserInitial">S</b>
+              <span>
+                <small>登入者</small>
+                <strong id="adminUserEmail">正在確認登入狀態...</strong>
+              </span>
+              <button id="adminLogout" type="button">登出</button>
+            </div>
+          </div>
+        </header>
+
+        <section class="admin-workspace-panel admin-pages-panel">
+          <div class="admin-workspace-head">
+            <div>
+              <p class="admin-eyebrow">Pages Table</p>
+              <h2>前台頁面列表</h2>
+            </div>
+            <button type="button" id="adminRefreshPages">重新整理</button>
+          </div>
+          <div id="adminPagesStatus" class="admin-data-status">正在讀取 Supabase pages...</div>
+          <div class="admin-table-wrap">
+            <table class="admin-data-table">
+              <thead>
+                <tr>
+                  <th>頁面名稱</th>
+                  <th>Slug</th>
+                  <th>啟用狀態</th>
+                  <th>最後更新</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="adminPagesTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="adminLoading" class="admin-loading">
+      <strong>正在檢查登入狀態</strong>
+      <span>請稍候...</span>
+    </div>
+
+    <script type="module" src="/src/admin/pages.js"></script>
+  </body>
+</html>

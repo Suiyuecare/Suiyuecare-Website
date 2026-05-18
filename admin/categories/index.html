@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>分類管理｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/">
+            <img src="/assets/company-logo.png" alt="" />
+            <span>
+              <strong>歲悅長照集團</strong>
+              <small>CMS Console</small>
+            </span>
+          </a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a class="active" href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+        </nav>
+        <div class="admin-sidebar-note">
+          <span>Categories</span>
+          <strong>文章分類</strong>
+          <p>前台文章分類篩選會讀取啟用中的分類，不需要改程式碼。</p>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Taxonomy</p>
+            <h1>分類管理</h1>
+            <span>新增、編輯、刪除文章分類，並控制前台分類篩選顯示。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="admin-preview-link" href="/" target="_blank" rel="noopener">查看前台</a>
+            <div class="admin-userbox">
+              <b id="adminUserInitial">S</b>
+              <span>
+                <small>登入者</small>
+                <strong id="adminUserEmail">正在確認登入狀態...</strong>
+              </span>
+              <button id="adminLogout" type="button">登出</button>
+            </div>
+          </div>
+        </header>
+
+        <section class="admin-workspace-panel admin-category-panel">
+          <div class="admin-workspace-head">
+            <div>
+              <p class="admin-eyebrow">Category Form</p>
+              <h2 id="categoryFormTitle">新增分類</h2>
+            </div>
+            <button type="submit" form="adminCategoryForm">儲存分類</button>
+          </div>
+          <form id="adminCategoryForm" class="admin-form-grid">
+            <input type="hidden" name="id" />
+            <label>
+              <span>分類名稱</span>
+              <input type="text" name="name" required placeholder="例如：健康3.0" />
+            </label>
+            <label>
+              <span>Slug</span>
+              <input type="text" name="slug" required placeholder="例如：health-30" />
+            </label>
+            <label>
+              <span>排序</span>
+              <input type="number" name="sort_order" min="0" value="0" />
+            </label>
+            <label class="admin-toggle-field">
+              <input type="checkbox" name="is_enabled" checked />
+              <span>啟用此分類</span>
+            </label>
+            <label class="admin-field-wide">
+              <span>描述</span>
+              <textarea name="description" rows="4" placeholder="分類介紹，可用於前台或 SEO。"></textarea>
+            </label>
+          </form>
+          <div id="adminCategoriesStatus" class="admin-data-status">正在讀取分類資料...</div>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div>
+              <p class="admin-eyebrow">Category Table</p>
+              <h2>文章分類列表</h2>
+            </div>
+            <button type="button" id="adminRefreshCategories">重新整理</button>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-data-table">
+              <thead>
+                <tr>
+                  <th>分類名稱</th>
+                  <th>Slug</th>
+                  <th>排序</th>
+                  <th>啟用狀態</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="adminCategoriesTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="adminLoading" class="admin-loading">
+      <strong>正在檢查登入狀態</strong>
+      <span>請稍候...</span>
+    </div>
+
+    <script type="module" src="/src/admin/categories.js"></script>
+  </body>
+</html>

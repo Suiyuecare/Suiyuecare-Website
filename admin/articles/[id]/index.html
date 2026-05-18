@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>編輯文章｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/">
+            <img src="/assets/company-logo.png" alt="" />
+            <span>
+              <strong>歲悅長照集團</strong>
+              <small>CMS Console</small>
+            </span>
+          </a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a class="active" href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+        </nav>
+        <div class="admin-sidebar-note">
+          <span>Article Editor</span>
+          <strong>文章內容編輯</strong>
+          <p>建立或更新文章內容、分類、發布狀態與 SEO。</p>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Article Editor</p>
+            <h1 id="articleEditorTitle">新增文章</h1>
+            <span id="articleEditorMeta">請填寫文章內容並儲存。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="admin-preview-link" href="/admin/articles">返回列表</a>
+            <a class="admin-preview-link" href="/" target="_blank" rel="noopener">查看前台</a>
+            <div class="admin-userbox">
+              <b id="adminUserInitial">S</b>
+              <span>
+                <small>登入者</small>
+                <strong id="adminUserEmail">正在確認登入狀態...</strong>
+              </span>
+              <button id="adminLogout" type="button">登出</button>
+            </div>
+          </div>
+        </header>
+
+        <section class="admin-workspace-panel admin-article-editor-panel">
+          <div class="admin-workspace-head">
+            <div>
+              <p class="admin-eyebrow">Content Fields</p>
+              <h2>文章資料</h2>
+            </div>
+            <button type="submit" form="articleEditorForm">儲存文章</button>
+          </div>
+          <div id="articleEditorStatus" class="admin-data-status">正在準備文章編輯器...</div>
+
+          <form id="articleEditorForm" class="admin-editor-form">
+            <div class="admin-form-grid">
+              <label>
+                <span>文章標題</span>
+                <input type="text" name="title" required />
+              </label>
+              <label>
+                <span>Slug</span>
+                <input type="text" name="slug" required placeholder="health-care-story" />
+              </label>
+              <label>
+                <span>文章分類</span>
+                <select name="category_id">
+                  <option value="">未分類</option>
+                </select>
+              </label>
+              <label>
+                <span>發布狀態</span>
+                <select name="status">
+                  <option value="draft">草稿</option>
+                  <option value="scheduled">排程</option>
+                  <option value="published">已發布</option>
+                  <option value="archived">封存</option>
+                </select>
+              </label>
+              <label>
+                <span>發布日期</span>
+                <input type="datetime-local" name="published_at" />
+              </label>
+              <label>
+                <span>排序權重</span>
+                <input type="number" name="sort_order" value="0" />
+              </label>
+              <label class="admin-toggle-field">
+                <input type="checkbox" name="is_featured" />
+                <span>置頂文章</span>
+              </label>
+              <label class="admin-toggle-field">
+                <input type="checkbox" name="is_enabled" checked />
+                <span>啟用文章</span>
+              </label>
+              <label class="admin-field-wide">
+                <span>副標題</span>
+                <input type="text" name="subtitle" />
+              </label>
+              <label class="admin-field-wide">
+                <span>文章摘要</span>
+                <textarea name="excerpt" rows="3"></textarea>
+              </label>
+              <div class="admin-section-image-tools admin-field-wide">
+                <figure id="articleCoverPreview" class="empty">
+                  <span>尚未選擇封面圖</span>
+                </figure>
+                <div>
+                  <strong>文章封面圖</strong>
+                  <p>可從媒體庫選擇已上傳圖片，也可以直接上傳新圖片。儲存後會寫入 <code>articles.cover_image_id</code>。</p>
+                  <div class="admin-inline-actions">
+                    <button type="button" id="openArticleCoverPicker">選擇或上傳封面</button>
+                    <button type="button" id="clearArticleCover">清除封面</button>
+                  </div>
+                </div>
+              </div>
+              <label>
+                <span>作者名稱</span>
+                <input type="text" name="author_name" />
+              </label>
+              <label>
+                <span>作者職稱</span>
+                <input type="text" name="author_title" />
+              </label>
+              <label class="admin-field-wide">
+                <span>文章標籤</span>
+                <input type="text" name="tags" placeholder="用逗號分隔，例如：居家照顧,復能,家庭照顧者" />
+              </label>
+              <label class="admin-field-wide">
+                <span>文章內容</span>
+                <textarea name="content" rows="12" placeholder="可先使用純文字或 Markdown 撰寫。"></textarea>
+              </label>
+              <label>
+                <span>SEO 標題</span>
+                <input type="text" name="seo_title" />
+              </label>
+              <label>
+                <span>SEO 描述</span>
+                <textarea name="seo_description" rows="4"></textarea>
+              </label>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <section id="articleCoverPicker" class="admin-modal" hidden aria-modal="true" role="dialog" aria-labelledby="articleCoverPickerTitle">
+      <div class="admin-modal-panel">
+        <header>
+          <div>
+            <p class="admin-eyebrow">Media Picker</p>
+            <h2 id="articleCoverPickerTitle">選擇文章封面</h2>
+          </div>
+          <button type="button" data-close-cover-picker>關閉</button>
+        </header>
+
+        <form id="articleCoverUploadForm" class="admin-form-grid admin-inline-upload">
+          <label>
+            <span>直接上傳新封面</span>
+            <input type="file" name="file" accept="image/*" />
+          </label>
+          <label>
+            <span>Alt text</span>
+            <input type="text" name="alt_text" placeholder="圖片替代文字" />
+          </label>
+          <label class="admin-field-wide">
+            <span>圖片說明</span>
+            <input type="text" name="caption" placeholder="可選填" />
+          </label>
+          <button type="submit">上傳並選用</button>
+        </form>
+
+        <div id="articleCoverPickerStatus" class="admin-data-status">正在讀取媒體庫...</div>
+        <div id="articleCoverPickerGrid" class="admin-picker-grid"></div>
+      </div>
+    </section>
+
+    <div id="adminLoading" class="admin-loading">
+      <strong>正在檢查登入狀態</strong>
+      <span>請稍候...</span>
+    </div>
+
+    <script type="module" src="/src/admin/article-edit.js"></script>
+  </body>
+</html>

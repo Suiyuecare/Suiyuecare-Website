@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>編輯頁面｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/">
+            <img src="/assets/company-logo.png" alt="" />
+            <span>
+              <strong>歲悅長照集團</strong>
+              <small>CMS Console</small>
+            </span>
+          </a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a class="active" href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+        </nav>
+        <div class="admin-sidebar-note">
+          <span>Editing</span>
+          <strong>頁面內容編輯</strong>
+          <p>編輯頁面基本資料、SEO 與多個內容區塊。</p>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Pages</p>
+            <h1 id="pageEditorTitle">編輯頁面</h1>
+            <span id="pageEditorSlug">正在讀取頁面資料...</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="admin-preview-link" href="/admin/pages">返回列表</a>
+            <a class="admin-preview-link" href="/" target="_blank" rel="noopener">查看前台</a>
+            <div class="admin-userbox">
+              <b id="adminUserInitial">S</b>
+              <span>
+                <small>登入者</small>
+                <strong id="adminUserEmail">正在確認登入狀態...</strong>
+              </span>
+              <button id="adminLogout" type="button">登出</button>
+            </div>
+          </div>
+        </header>
+
+        <div id="pageEditorStatus" class="admin-data-status">正在讀取 Supabase page...</div>
+
+        <form id="pageEditorForm" class="admin-editor-layout">
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head">
+              <div>
+                <p class="admin-eyebrow">Page Settings</p>
+                <h2>頁面基本資料</h2>
+              </div>
+              <button type="submit">儲存頁面</button>
+            </div>
+
+            <div class="admin-form-grid">
+              <label>
+                <span>頁面標題</span>
+                <input type="text" name="title" required />
+              </label>
+              <label>
+                <span>SEO 標題</span>
+                <input type="text" name="seo_title" />
+              </label>
+              <label class="admin-field-wide">
+                <span>SEO 描述</span>
+                <textarea name="seo_description" rows="4"></textarea>
+              </label>
+              <label class="admin-toggle-field">
+                <input type="checkbox" name="is_enabled" />
+                <span>啟用此頁面</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head">
+              <div>
+                <p class="admin-eyebrow">Page Sections</p>
+                <h2>內容區塊</h2>
+              </div>
+              <button type="button" id="addSectionButton">新增 Section</button>
+            </div>
+            <div id="pageSectionsEditor" class="admin-section-editor-list"></div>
+          </section>
+        </form>
+      </main>
+    </div>
+
+    <section id="sectionImagePicker" class="admin-modal" hidden aria-modal="true" role="dialog" aria-labelledby="sectionImagePickerTitle">
+      <div class="admin-modal-panel">
+        <header>
+          <div>
+            <p class="admin-eyebrow">Media Picker</p>
+            <h2 id="sectionImagePickerTitle">選擇 Section 圖片</h2>
+          </div>
+          <button type="button" data-close-image-picker>關閉</button>
+        </header>
+
+        <form id="sectionImageUploadForm" class="admin-form-grid admin-inline-upload">
+          <label>
+            <span>直接上傳新圖片</span>
+            <input type="file" name="file" accept="image/*" />
+          </label>
+          <label>
+            <span>Alt text</span>
+            <input type="text" name="alt_text" placeholder="圖片替代文字" />
+          </label>
+          <label class="admin-field-wide">
+            <span>圖片說明</span>
+            <input type="text" name="caption" placeholder="可選填" />
+          </label>
+          <button type="submit">上傳並選用</button>
+        </form>
+
+        <div id="sectionImagePickerStatus" class="admin-data-status">正在讀取媒體庫...</div>
+        <div id="sectionImagePickerGrid" class="admin-picker-grid"></div>
+      </div>
+    </section>
+
+    <div id="adminLoading" class="admin-loading">
+      <strong>正在檢查登入狀態</strong>
+      <span>請稍候...</span>
+    </div>
+
+    <script type="module" src="/src/admin/page-edit.js"></script>
+  </body>
+</html>

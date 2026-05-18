@@ -14,6 +14,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
@@ -1347,6 +1348,36 @@ h2 {
 }
 .health-cats button {
   cursor: pointer;
+}
+.health-cats button.active {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(240,138,36,.22);
+}
+.health-empty-state {
+  margin: 34px clamp(32px,5vw,86px) 18px;
+  padding: 44px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.health-empty-state h2 {
+  margin: 0;
+  color: var(--brown);
+  font-size: clamp(30px, 4vw, 48px);
+}
+.health-empty-state p {
+  max-width: 680px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.health-empty-state a {
+  display: inline-flex;
+  margin-top: 10px;
+  color: var(--orange-dark);
+  font-weight: 900;
 }
 .click-card,
 .health-preview,

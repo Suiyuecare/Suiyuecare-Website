@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>後台登入｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-auth-page">
+    <main class="admin-login-shell">
+      <section class="admin-login-brand">
+        <a class="admin-brand" href="/">
+          <img src="/assets/company-logo.png" alt="" />
+          <span>
+            <strong>歲悅長照集團</strong>
+            <small>Suiyuecare Corps.</small>
+          </span>
+        </a>
+        <div>
+          <p class="admin-eyebrow">CMS Login</p>
+          <h1>後台內容管理</h1>
+          <p>登入後可管理頁面文案、圖片、文章分類與未來的 CMS 內容。</p>
+        </div>
+      </section>
+
+      <section class="admin-login-card" aria-labelledby="loginTitle">
+        <p class="admin-eyebrow">Admin</p>
+        <h2 id="loginTitle">登入後台</h2>
+        <form id="adminLoginForm" class="admin-form">
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" autocomplete="email" required placeholder="admin@suiyuecare.com" />
+          </label>
+          <label>
+            <span>Password</span>
+            <input type="password" name="password" autocomplete="current-password" required placeholder="請輸入密碼" />
+          </label>
+          <button type="submit">登入後台</button>
+          <p id="loginStatus" class="admin-form-status" role="status"></p>
+        </form>
+      </section>
+    </main>
+    <script type="module" src="/src/admin/login.js"></script>
+  </body>
+</html>
