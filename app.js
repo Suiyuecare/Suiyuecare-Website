@@ -2381,6 +2381,151 @@ function renderMigrantTrainingPage() {
   `;
 }
 
+function renderLandRecruitingPage() {
+  const siteTypes = [
+    ["日間照顧中心", "建議一樓或低樓層、動線平整、可規劃活動區、用餐區、休息區與復能空間。", "120-300坪"],
+    ["社區據點", "適合鄰近市場、公園、里民活動中心或長輩日常移動路線，方便長輩固定參與。", "40-120坪"],
+    ["複合式長照基地", "可結合居家服務辦公、課程教室、社區據點與日照籌設，形成區域照顧中心。", "180坪以上"],
+    ["教育訓練場域", "適合移工培訓、照服員內訓、家屬課程與實作教室，需具備良好採光與可彈性配置空間。", "60-180坪"]
+  ];
+  const cooperation = [
+    ["租賃合作", "由歲悅評估基地條件與區域需求，簽訂租賃後進行裝修規劃與長照用途申請。"],
+    ["地主共創", "地主提供空間資源，歲悅負責服務設計、營運管理與品牌導入，共同建立在地照顧據點。"],
+    ["建物活化", "協助閒置店面、辦公室、校舍或社區空間轉型為可長期營運的照顧服務場域。"]
+  ];
+  const checklist = [
+    ["位置", "北北桃人口密集、交通便利、鄰近住宅區或醫療生活圈。"],
+    ["動線", "出入口清楚、可改善無障礙、消防與接送動線，長輩進出安全。"],
+    ["空間", "格局方正、採光通風佳，可分區規劃活動、休息、備餐、辦公與衛浴。"],
+    ["法規", "可進行用途、消防、建管與長照設立可行性初評。"],
+    ["鄰里", "周邊具長輩服務需求，且能與里辦、醫療、社區資源串聯。"],
+    ["期程", "屋況、租期與裝修條件能支援長期穩定營運。"]
+  ];
+  const flow = [
+    ["01", "提供基地資料", "填寫地址、坪數、樓層、照片、平面圖或現況說明。"],
+    ["02", "初步可行性評估", "歲悅從區域需求、法規限制、動線、租期與營運模型進行初評。"],
+    ["03", "現場會勘", "確認出入口、格局、採光、消防、無障礙與未來服務配置方式。"],
+    ["04", "合作方案討論", "依基地條件規劃租賃、共創或建物活化合作方式。"]
+  ];
+  const targetAreas = ["臺北市：士林、北投、大同、萬華、信義、南港", "新北市：新店、中和、永和、新莊", "桃園市：蘆竹、大園、桃園核心生活圈"];
+
+  return `
+    <div class="service-detail-page land-recruit-page">
+      <section class="service-detail-hero land-recruit-hero">
+        <div class="service-detail-copy">
+          <p class="eyebrow">Land Partnership</p>
+          <h1>土地招募</h1>
+          <p>歲悅正在尋找能承接長照服務的土地、店面、辦公空間與社區場域。從基地評估、設立可行性到營運規劃，我們希望和地主、建物持有人與合作夥伴一起打造北北桃的照顧基礎建設。</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#contact">提供基地資料</a>
+            <a class="secondary-button" href="#investors">查看展店進度</a>
+          </div>
+        </div>
+        <aside class="service-hero-card">
+          <img src="assets/homepage-batch/16-taipei-service-office.png" alt="歲悅長照北北桃服務基地合作場域" />
+          <div>
+            <span>Care Infrastructure</span>
+            <strong>把合適的空間，變成家庭真正用得到的照顧據點。</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Site Needs</p>
+          <h2>我們正在找的場域</h2>
+          <span>不只找坪數，更重視動線、社區需求、設立條件與能不能長期穩定服務附近家庭。</span>
+        </div>
+        <div class="community-program-grid land-site-grid">
+          ${siteTypes.map(([title, copy, size]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+              <span>${size}</span>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section land-evaluation-section">
+        <div class="land-evaluation-card">
+          <div>
+            <p class="eyebrow">Evaluation</p>
+            <h2>基地初評會看什麼？</h2>
+            <p>歲悅會用長照設立與實際營運兩個角度檢視場地，不會只看地點漂亮，而是判斷未來能不能安全、合規、可持續地服務長輩。</p>
+          </div>
+          <img src="assets/homepage-batch/04-admin-team-office.png" alt="歲悅團隊進行基地與營運評估" />
+        </div>
+        <div class="land-checklist-grid">
+          ${checklist.map(([title, copy]) => `
+            <article>
+              <strong>${title}</strong>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Cooperation Models</p>
+          <h2>合作模式</h2>
+          <span>可依空間狀態與合作期待討論租賃、共創或建物活化，不同基地會有不同的切入方式。</span>
+        </div>
+        <div class="service-highlight-grid land-model-grid">
+          ${cooperation.map(([title, copy], index) => `
+            <article>
+              <span>${String(index + 1).padStart(2, "0")}</span>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section land-area-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Priority Areas</p>
+          <h2>優先招募區域</h2>
+          <span>目前以北北桃生活圈為主要拓點方向，會依照服務需求、交通可近性與照顧資源缺口做排序。</span>
+        </div>
+        <div class="land-area-board">
+          <img src="assets/north-service-map.png" alt="歲悅土地招募北北桃優先區域地圖" />
+          <div>
+            ${targetAreas.map((area) => `<span>${area}</span>`).join("")}
+          </div>
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Process</p>
+          <h2>從提供資料到合作討論</h2>
+          <span>如果你手上有合適空間，先不需要整理成完整企劃，只要有基本資料與照片，就可以先讓我們評估。</span>
+        </div>
+        <div class="service-flow-track">
+          ${flow.map(([step, title, copy]) => `
+            <article>
+              <b>${step}</b>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel">
+        <div>
+          <p class="eyebrow">Land Inquiry</p>
+          <h2>有店面、土地或閒置空間想一起活化嗎？</h2>
+          <p>請提供地址、坪數、樓層、使用現況、照片與聯絡方式，歲悅會協助做第一輪長照用途可行性評估。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡土地合作</a>
+      </section>
+    </div>
+  `;
+}
+
 function renderCommunityPage() {
   const highlights = [
     ["健康促進", "每週安排量測、伸展、肌力與認知活動，讓長輩用輕鬆節奏維持身體功能。"],
@@ -4123,6 +4268,10 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderMigrantTrainingPage();
+  } else if (normalized === "land") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderLandRecruitingPage();
   } else if (normalized === "health") {
     home.classList.remove("active");
     pageView.classList.add("active");
