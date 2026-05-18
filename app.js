@@ -1865,6 +1865,135 @@ function renderMilestonesPage() {
   `;
 }
 
+function renderCommunityPage() {
+  const highlights = [
+    ["健康促進", "每週安排量測、伸展、肌力與認知活動，讓長輩用輕鬆節奏維持身體功能。"],
+    ["共餐陪伴", "透過共餐、茶敘與節慶活動，讓長輩有固定出門理由，也讓家屬少一點擔心。"],
+    ["預防延緩", "把跌倒預防、營養提醒、用藥安全與日常觀察放進社區課程。"],
+    ["資源串聯", "協助串接居家照顧、日間照顧、護理復能與長照資源，不讓家庭自己摸索。"]
+  ];
+  const scenes = [
+    ["assets/homepage-batch/12-community-health-class.png", "健康促進小組", "透過團體活動維持身體功能，也讓長輩重新建立社交節奏。"],
+    ["assets/homepage-batch/11-elder-art-activity.png", "手作與認知活動", "以手作、懷舊與互動設計，讓活動不只是打發時間，而是生活參與。"],
+    ["assets/homepage-batch/02-daycare-group-exercise.png", "規律運動課", "用安全、可跟上的動作，協助長輩練習肌力、平衡與活動信心。"],
+    ["assets/homepage-batch/16-taipei-service-office.png", "在地服務窗口", "據點也是家庭諮詢入口，讓需要照顧的人可以更快被接住。"]
+  ];
+  const flow = [
+    ["01", "電話或 LINE 諮詢", "先了解長輩年齡、生活狀態、活動能力與家屬期待。"],
+    ["02", "據點活動媒合", "依照體力、興趣與交通距離，建議適合的課程或活動時段。"],
+    ["03", "第一次參與", "由據點人員協助熟悉環境、活動節奏與安全注意事項。"],
+    ["04", "持續追蹤", "觀察出席、互動、食慾與精神狀態，必要時轉介其他長照服務。"]
+  ];
+  const programs = [
+    ["活力伸展班", "椅上運動、肌力練習、平衡訓練", "適合行動較慢、想維持體力的長輩"],
+    ["共餐關懷", "營養餐食、用餐陪伴、日常觀察", "適合獨居、白天需要社交與關懷者"],
+    ["認知手作課", "手作、桌遊、懷舊活動與團體互動", "適合希望維持專注與人際互動者"],
+    ["家屬支持", "資源說明、照顧技巧、服務轉介", "適合剛開始面對長照需求的家庭"]
+  ];
+
+  return `
+    <div class="service-detail-page community-page">
+      <section class="service-detail-hero community-hero">
+        <div class="service-detail-copy">
+          <p class="eyebrow">Community Care</p>
+          <h1>社區據點</h1>
+          <p>歲悅把健康促進、共餐陪伴、預防延緩失能與家屬支持放進社區，讓長輩在離家更近的地方被看見、被邀請，也被穩定支持。</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#contact">預約據點諮詢</a>
+            <a class="secondary-button" href="#network">查看服務區域</a>
+          </div>
+        </div>
+        <aside class="service-hero-card">
+          <img src="assets/homepage-batch/12-community-health-class.png" alt="歲悅社區據點健康促進活動" />
+          <div>
+            <span>Community Hub</span>
+            <strong>讓照顧從家門口附近開始。</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Focus</p>
+          <h2>社區據點在做什麼</h2>
+          <span>不是把長輩集中起來而已，而是用規律活動、熟悉人際與專業觀察，提早支持生活功能。</span>
+        </div>
+        <div class="service-highlight-grid">
+          ${highlights.map(([title, copy], index) => `
+            <article>
+              <span>${String(index + 1).padStart(2, "0")}</span>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section community-scenes">
+        <div class="service-section-head">
+          <p class="eyebrow">Service Scenes</p>
+          <h2>真實服務情境</h2>
+          <span>用之前生成的歲悅形象照，呈現社區據點最重要的幾個現場：活動、共餐、運動與諮詢。</span>
+        </div>
+        <div class="community-scene-grid">
+          ${scenes.map(([image, title, copy]) => `
+            <figure>
+              <img src="${image}" alt="${title}" />
+              <figcaption>
+                <strong>${title}</strong>
+                <span>${copy}</span>
+              </figcaption>
+            </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section community-programs">
+        <div class="service-section-head">
+          <p class="eyebrow">Programs</p>
+          <h2>據點服務內容</h2>
+          <span>每一項活動都以「長輩願意來、家屬看得懂、狀態能追蹤」為設計核心。</span>
+        </div>
+        <div class="community-program-grid">
+          ${programs.map(([title, items, fit]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${items}</p>
+              <span>${fit}</span>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section community-flow-section">
+        <div class="service-section-head">
+          <p class="eyebrow">How It Works</p>
+          <h2>從諮詢到穩定參與</h2>
+          <span>我們把社區據點設計成長照入口，讓家屬知道下一步該怎麼走。</span>
+        </div>
+        <div class="service-flow-track">
+          ${flow.map(([step, title, copy]) => `
+            <article>
+              <b>${step}</b>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel">
+        <div>
+          <p class="eyebrow">Start From Nearby</p>
+          <h2>想替家人找一個可以安心出門的地方？</h2>
+          <p>留下需求後，歲悅會協助確認服務區域、據點活動、交通可近性與是否需要同步評估居家或日照服務。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡我們</a>
+      </section>
+    </div>
+  `;
+}
+
 function renderFinancePage() {
   const revenueRows = [
     ["2026.05", "8.6M", "+12.4%", "居家照顧與教育品管需求提升"],
@@ -3439,6 +3568,10 @@ function renderPage(slug) {
     pageView.classList.add("active");
     pageView.innerHTML = renderMilestonesPage();
     initMilestonePage();
+  } else if (normalized === "community") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderCommunityPage();
   } else if (normalized === "health") {
     home.classList.remove("active");
     pageView.classList.add("active");
