@@ -2123,6 +2123,135 @@ function renderDayCarePage() {
   `;
 }
 
+function renderNursingPage() {
+  const highlights = [
+    ["護理觀察", "定期觀察血壓、食慾、睡眠、傷口、用藥與身體變化，及早看見照顧風險。"],
+    ["復能陪伴", "依照長輩能力設定可達成的小目標，陪同練習步行、肌力、平衡與日常動作。"],
+    ["家庭教學", "把移位、翻身、用餐、跌倒預防與照顧注意事項教給家屬與照顧者。"],
+    ["跨專業回報", "讓護理、督導、照服員與家屬用同一份紀錄理解長輩狀態。"]
+  ];
+  const scenes = [
+    ["assets/homepage-batch/13-rehab-walking-practice.png", "步行與平衡練習", "復能不是催促長輩，而是陪他一步一步重新找回把握。"],
+    ["assets/homepage-batch/09-nurse-blood-pressure.png", "護理觀察與量測", "用日常量測與觀察提早發現變化，減少家屬不確定感。"],
+    ["assets/homepage-batch/14-care-notes.png", "照顧紀錄追蹤", "把每次服務、觀察與提醒留下紀錄，讓照顧可以延續。"],
+    ["assets/homepage-batch/03-supervisor-care-plan.png", "復能目標討論", "督導與家庭一起確認目標，讓練習符合生活需求。"]
+  ];
+  const serviceItems = [
+    ["健康狀態追蹤", "血壓、食慾、睡眠、排泄、皮膚與傷口狀態觀察", "適合出院返家、慢性病或身體狀況需追蹤者"],
+    ["復能訓練支持", "坐站、步行、平衡、肌力與日常生活動作練習", "適合希望恢復活動能力與生活自理者"],
+    ["照顧風險提醒", "跌倒風險、環境動線、用藥安全、吞嚥與營養提醒", "適合家屬擔心照顧細節與意外風險者"],
+    ["家屬與照顧者教學", "移位技巧、翻身、沐浴安全、陪走與日常觀察方法", "適合家中多人共同照顧或有移工照顧者"]
+  ];
+  const flow = [
+    ["01", "狀態評估", "先了解疾病史、近期變化、活動能力、用藥與家庭照顧方式。"],
+    ["02", "目標設定", "把復能目標拆成小步驟，例如安全起身、穩定步行或自行用餐。"],
+    ["03", "到宅支持", "由專業人員陪同練習，並同步提醒家屬日常照顧注意事項。"],
+    ["04", "追蹤調整", "依照紀錄與回饋調整訓練強度、照顧方式與風險提醒。"]
+  ];
+
+  return `
+    <div class="service-detail-page nursing-page">
+      <section class="service-detail-hero nursing-hero">
+        <div class="service-detail-copy">
+          <p class="eyebrow">Nursing & Reablement</p>
+          <h1>護理復能</h1>
+          <p>歲悅護理復能把護理觀察、復能目標與家庭照顧教學串在一起，讓長輩不是被動被照顧，而是在安全支持下慢慢恢復生活能力。</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#contact">預約復能諮詢</a>
+            <a class="secondary-button" href="#health">閱讀復能知識</a>
+          </div>
+        </div>
+        <aside class="service-hero-card">
+          <img src="assets/homepage-batch/13-rehab-walking-practice.png" alt="歲悅護理復能步行練習情境" />
+          <div>
+            <span>Nursing Reablement</span>
+            <strong>復能不是催促，而是陪長輩一步一步重新有把握。</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Focus</p>
+          <h2>護理復能在做什麼</h2>
+          <span>以護理觀察看見風險，以復能練習維持功能，再把方法教給家庭，讓照顧能延續到每天。</span>
+        </div>
+        <div class="service-highlight-grid">
+          ${highlights.map(([title, copy], index) => `
+            <article>
+              <span>${String(index + 1).padStart(2, "0")}</span>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Service Scenes</p>
+          <h2>真實服務情境</h2>
+          <span>使用先前生成的護理復能照片，呈現步行練習、健康量測、紀錄追蹤與目標討論。</span>
+        </div>
+        <div class="community-scene-grid">
+          ${scenes.map(([image, title, copy]) => `
+            <figure>
+              <img src="${image}" alt="${title}" />
+              <figcaption>
+                <strong>${title}</strong>
+                <span>${copy}</span>
+              </figcaption>
+            </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Services</p>
+          <h2>服務內容</h2>
+          <span>護理復能會依照長輩身體狀況、生活目標與家庭照顧能力安排，不做過度訓練，也不放任風險。</span>
+        </div>
+        <div class="community-program-grid">
+          ${serviceItems.map(([title, items, fit]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${items}</p>
+              <span>${fit}</span>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">How It Works</p>
+          <h2>從評估到生活能力恢復</h2>
+          <span>先理解長輩的身體狀態，再把復能目標放回真正的生活場景裡。</span>
+        </div>
+        <div class="service-flow-track">
+          ${flow.map(([step, title, copy]) => `
+            <article>
+              <b>${step}</b>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel">
+        <div>
+          <p class="eyebrow">Reablement Support</p>
+          <h2>想讓長輩安全恢復更多生活能力？</h2>
+          <p>留下需求後，歲悅會協助確認長輩狀態、復能目標、家庭照顧方式與適合的護理復能支持。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡我們</a>
+      </section>
+    </div>
+  `;
+}
+
 function renderCommunityPage() {
   const highlights = [
     ["健康促進", "每週安排量測、伸展、肌力與認知活動，讓長輩用輕鬆節奏維持身體功能。"],
@@ -3857,6 +3986,10 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderCommunityPage();
+  } else if (normalized === "nursing") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderNursingPage();
   } else if (normalized === "health") {
     home.classList.remove("active");
     pageView.classList.add("active");
