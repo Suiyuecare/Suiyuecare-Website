@@ -2831,6 +2831,123 @@ h2 {
   line-height: 1.55;
   box-shadow: 0 14px 28px rgba(240,138,36,.18);
 }
+.investor-recruit-card img {
+  object-position: center;
+}
+.investor-thesis-grid article {
+  min-height: 300px;
+}
+.investor-growth-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(380px, .58fr);
+  gap: 18px;
+  align-items: stretch;
+}
+.investor-growth-copy,
+.investor-fund-card {
+  border: 1px solid rgba(234,211,179,.95);
+  border-radius: 30px;
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+}
+.investor-growth-copy {
+  padding: 34px;
+}
+.investor-growth-copy h2 {
+  max-width: 940px;
+  margin: 0 0 14px;
+  color: var(--brown);
+  font-size: clamp(38px, 5vw, 72px);
+  line-height: 1.05;
+}
+.investor-growth-copy > p:not(.eyebrow) {
+  max-width: 860px;
+  margin: 0;
+  color: var(--muted);
+  font-weight: 850;
+  line-height: 1.9;
+}
+.investor-metric-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 26px;
+}
+.investor-metric-row article {
+  padding: 18px;
+  border-radius: 22px;
+  background: var(--cream);
+}
+.investor-metric-row strong {
+  display: block;
+  color: var(--orange-dark);
+  font-size: 44px;
+  line-height: 1;
+}
+.investor-metric-row span {
+  display: block;
+  margin-top: 8px;
+  color: var(--brown);
+  font-weight: 1000;
+}
+.investor-metric-row p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 820;
+  line-height: 1.55;
+}
+.investor-fund-card {
+  display: grid;
+  align-content: center;
+  gap: 16px;
+  padding: 28px;
+  background: linear-gradient(135deg, #fff, #fff3e5);
+}
+.investor-fund-card h3 {
+  margin: 0 0 4px;
+  color: var(--brown);
+  font-size: 32px;
+}
+.fund-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
+  align-items: center;
+}
+.fund-bar span,
+.fund-bar b {
+  color: var(--brown);
+  font-weight: 1000;
+}
+.fund-bar i {
+  grid-column: 1 / -1;
+  display: block;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f6e9d9;
+}
+.fund-bar em {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--orange), #ffbd6a);
+}
+.investor-model-grid article {
+  min-height: 260px;
+}
+.investor-doc-grid a {
+  min-height: 210px;
+}
+.investor-doc-grid em {
+  display: block;
+  margin-top: 12px;
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 820;
+  line-height: 1.65;
+}
 .community-area-section {
   padding-top: 20px;
 }
@@ -5386,7 +5503,7 @@ h2 {
   .primary-nav { gap: 16px; font-size: 14px; letter-spacing: .06em; }
   .primary-nav > a, .nav-trigger { padding-inline: 8px; }
   .nav-cta { min-height: 48px !important; padding: 10px 16px !important; }
-  .hero, .news-service-layout, .care-layout, .content-wall, .care-values, .network-board, .redesigned-network, .video-section, .contact-section, .footer-main, .courses-hero, .article-row, .celebrity-row, .article-hero, .article-layout, .investor-hero, .finance-grid, .shareholder-grid, .investor-section-head, .ir-sub-hero, .finance-dashboard, .analysis-grid, .report-layout, .annual-grid, .governance-news-grid, .whistle-layout, .risk-layout, .integrity-layout, .shareholder-info-grid, .meeting-layout, .conference-layout, .faq-layout, .career-hero, .career-section-head, .career-dept-layout, .about-hero, .about-section-head, .about-system, .milestone-hero, .milestone-journey, .service-detail-hero, .service-section-head, .land-evaluation-section, .land-area-board { grid-template-columns: 1fr; }
+  .hero, .news-service-layout, .care-layout, .content-wall, .care-values, .network-board, .redesigned-network, .video-section, .contact-section, .footer-main, .courses-hero, .article-row, .celebrity-row, .article-hero, .article-layout, .investor-hero, .finance-grid, .shareholder-grid, .investor-section-head, .ir-sub-hero, .finance-dashboard, .analysis-grid, .report-layout, .annual-grid, .governance-news-grid, .whistle-layout, .risk-layout, .integrity-layout, .shareholder-info-grid, .meeting-layout, .conference-layout, .faq-layout, .career-hero, .career-section-head, .career-dept-layout, .about-hero, .about-section-head, .about-system, .milestone-hero, .milestone-journey, .service-detail-hero, .service-section-head, .land-evaluation-section, .land-area-board, .investor-growth-section { grid-template-columns: 1fr; }
   .homecare-intro {
     grid-template-columns: 1fr;
   }
@@ -5401,6 +5518,9 @@ h2 {
   }
   .community-scene-grid {
     grid-template-columns: 1fr 1fr;
+  }
+  .investor-metric-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .community-area-card {
     grid-template-columns: 1fr;
@@ -5601,7 +5721,9 @@ h2 {
   .land-evaluation-section,
   .land-checklist-grid,
   .land-area-board,
-  .land-model-grid {
+  .land-model-grid,
+  .investor-growth-section,
+  .investor-metric-row {
     grid-template-columns: 1fr;
   }
   .service-hero-card {

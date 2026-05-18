@@ -2381,6 +2381,189 @@ function renderMigrantTrainingPage() {
   `;
 }
 
+function renderInvestorRecruitingPage() {
+  const thesis = [
+    ["剛性需求", "高齡化、家庭照顧人力不足與出院返家支持需求，讓長照服務不是短期題材，而是長期基礎服務。"],
+    ["多事業佈局", "居家照顧、日間照顧、社區據點、護理復能、移工培訓與教育品管可彼此導流與支援。"],
+    ["區域複製", "以北北桃為核心建立服務密度，再用標準化流程、人力訓練與品管制度複製到新區域。"],
+    ["品牌差異", "用溫暖、可信任、容易理解的品牌語言降低家庭進入長照服務的門檻。"]
+  ];
+  const model = [
+    ["居家服務密度", "先以居家照顧與家屬諮詢建立區域服務入口，累積需求資料與服務口碑。", "Phase 01"],
+    ["日照與社區基地", "在需求成熟區域導入日照、社區據點與課程服務，提升區域服務覆蓋。", "Phase 02"],
+    ["教育品管中台", "用訓練、督導、服務紀錄與標準作業支撐展店速度，降低品質落差。", "Phase 03"],
+    ["投資與合作擴張", "透過資金、場域、政府合作與營運夥伴，形成可管理的展店節奏。", "Phase 04"]
+  ];
+  const metrics = [
+    ["3", "核心縣市", "臺北、新北、桃園優先布局"],
+    ["6", "服務事業", "照顧、日照、據點、復能、培訓、品管"],
+    ["12+", "籌設節點", "服務區域與基地持續評估"],
+    ["95%", "服務滿意度", "以回報、督導與品管追蹤服務體驗"]
+  ];
+  const useOfFunds = [
+    ["展店與場域", 34],
+    ["人才招募訓練", 24],
+    ["系統與品管", 18],
+    ["品牌與內容", 14],
+    ["營運週轉", 10]
+  ];
+  const process = [
+    ["01", "初步洽談", "了解投資人背景、合作期待、投資規模與關注的風險議題。"],
+    ["02", "資料說明", "提供公司簡介、事業布局、展店模型、營運進度與初步財務假設。"],
+    ["03", "策略會議", "針對投資架構、投入資源、治理權責與合作期程進一步討論。"],
+    ["04", "盡調與簽約", "進入文件、財務、法務與合作條件確認，完成投資或策略合作安排。"]
+  ];
+  const documents = [
+    ["Company Deck", "歲悅長照集團簡介", "品牌、服務事業、北北桃布局與核心團隊"],
+    ["Expansion Plan", "展店與基地策略", "居家長照機構、日照中心與社區據點籌設進度"],
+    ["Governance Note", "治理與風險說明", "品管制度、資訊揭露、內控方向與營運風險控管"]
+  ];
+
+  return `
+    <div class="service-detail-page investor-recruit-page">
+      <section class="service-detail-hero investor-recruit-hero">
+        <div class="service-detail-copy">
+          <p class="eyebrow">Investor Recruiting</p>
+          <h1>投資人招募</h1>
+          <p>歲悅長照集團正在尋找理解長照產業、認同在地服務網絡與長期品牌價值的投資夥伴。這不是單一據點生意，而是用服務密度、標準化訓練與品管中台建立可擴張的照顧基礎建設。</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#contact">預約投資洽談</a>
+            <a class="secondary-button" href="#investors">前往投資人專區</a>
+          </div>
+        </div>
+        <aside class="service-hero-card investor-recruit-card">
+          <img src="assets/homepage-batch/04-admin-team-office.png" alt="歲悅長照集團投資人招募與營運團隊會議" />
+          <div>
+            <span>Suiyuecare Growth</span>
+            <strong>把長照需求，變成可治理、可複製、可長期信任的服務網絡。</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Why Suiyuecare</p>
+          <h2>投資歲悅的核心邏輯</h2>
+          <span>我們聚焦的是長照服務網絡，不是只開一個漂亮據點。服務、場域、人力與內容要能互相支援，才有機會走得久。</span>
+        </div>
+        <div class="service-highlight-grid investor-thesis-grid">
+          ${thesis.map(([title, copy], index) => `
+            <article>
+              <span>${String(index + 1).padStart(2, "0")}</span>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section investor-growth-section">
+        <div class="investor-growth-copy">
+          <p class="eyebrow">Growth Snapshot</p>
+          <h2>從北北桃開始，建立可管理的展店節奏</h2>
+          <p>歲悅會用居家服務作為區域入口，逐步延伸日照、社區據點、護理復能與培訓服務。投資資源將優先投入能提升服務密度、人才供給與品質穩定度的項目。</p>
+          <div class="investor-metric-row">
+            ${metrics.map(([value, label, copy]) => `
+              <article>
+                <strong>${value}</strong>
+                <span>${label}</span>
+                <p>${copy}</p>
+              </article>
+            `).join("")}
+          </div>
+        </div>
+        <aside class="investor-fund-card">
+          <p class="eyebrow">Use of Funds</p>
+          <h3>資金用途規劃</h3>
+          ${useOfFunds.map(([label, value]) => `
+            <div class="fund-bar">
+              <span>${label}</span>
+              <b>${value}%</b>
+              <i><em style="width:${value}%"></em></i>
+            </div>
+          `).join("")}
+        </aside>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Expansion Model</p>
+          <h2>事業擴張模型</h2>
+          <span>從單點服務到區域服務網絡，每一階段都需要營運數據、人才訓練、場域策略與投資資源配合。</span>
+        </div>
+        <div class="community-program-grid investor-model-grid">
+          ${model.map(([title, copy, phase]) => `
+            <article>
+              <span>${phase}</span>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section investor-map-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Regional Strategy</p>
+          <h2>北北桃優先布局</h2>
+          <span>投資人可從投資人專區追蹤居家長照機構與日間照顧中心的設立進度，理解展店不是概念，而是可拆解的專案管理。</span>
+        </div>
+        <div class="land-area-board investor-area-board">
+          <img src="assets/north-service-map.png" alt="歲悅長照投資人招募北北桃布局地圖" />
+          <div>
+            <span>臺北市：士林、北投、大同、萬華、信義、南港服務密度提升</span>
+            <span>新北市：新店、中永和、新莊照顧服務與場域合作評估</span>
+            <span>桃園市：蘆竹、大園與桃園核心生活圈拓點規劃</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Investor Materials</p>
+          <h2>投資人資料包</h2>
+          <span>正式資料可於洽談後提供，目前先以模板呈現未來下載區塊，方便後續接 CMS 或投資人文件管理。</span>
+        </div>
+        <div class="download-grid investor-doc-grid">
+          ${documents.map(([type, title, copy]) => `
+            <a href="#contact">
+              <span>${type}</span>
+              <strong>${title}</strong>
+              <em>${copy}</em>
+            </a>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Process</p>
+          <h2>投資洽談流程</h2>
+          <span>我們希望把合作講清楚，所以會先確認期待與風險，再進入資料、策略會議與盡調流程。</span>
+        </div>
+        <div class="service-flow-track">
+          ${process.map(([step, title, copy]) => `
+            <article>
+              <b>${step}</b>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel">
+        <div>
+          <p class="eyebrow">Investor Contact</p>
+          <h2>想參與歲悅長照集團的下一階段成長嗎？</h2>
+          <p>留下聯絡方式、投資或合作方向、可投入資源與希望了解的議題，我們會安排投資人窗口與你進一步說明。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡投資人窗口</a>
+      </section>
+    </div>
+  `;
+}
+
 function renderLandRecruitingPage() {
   const siteTypes = [
     ["日間照顧中心", "建議一樓或低樓層、動線平整、可規劃活動區、用餐區、休息區與復能空間。", "120-300坪"],
@@ -4272,6 +4455,10 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderLandRecruitingPage();
+  } else if (normalized === "investor-recruiting") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderInvestorRecruitingPage();
   } else if (normalized === "health") {
     home.classList.remove("active");
     pageView.classList.add("active");
