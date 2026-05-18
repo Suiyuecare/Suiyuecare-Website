@@ -2223,6 +2223,25 @@ function renderCommunityPage() {
         </div>
       </section>
 
+      <section class="service-detail-section community-area-section">
+        <div class="community-area-card">
+          <img src="assets/north-service-map.png" alt="歲悅北北桃社區服務區域地圖" />
+          <div>
+            <p class="eyebrow">North Taiwan Network</p>
+            <h2>北北桃社區據點與健康促進服務</h2>
+            <p>服務規劃以臺北、新北、桃園為核心，串接社區活動、健康促進、長照諮詢與家庭照顧資源，讓據點成為家屬可以先問、長輩可以先來的照顧入口。</p>
+            <div class="community-area-tags">
+              <span>臺北市</span>
+              <span>新北市</span>
+              <span>桃園市</span>
+              <span>共餐陪伴</span>
+              <span>健康促進</span>
+              <span>預防延緩失能</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="service-detail-section community-flow-section">
         <div class="service-section-head">
           <p class="eyebrow">How It Works</p>
