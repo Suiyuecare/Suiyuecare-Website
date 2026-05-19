@@ -491,6 +491,55 @@ function escapeHTML(value = "") {
     .replace(/'/g, "&#039;");
 }
 
+function focalPointToObjectPosition(value = "center") {
+  const positions = {
+    center: "center center",
+    top: "center top",
+    bottom: "center bottom",
+    left: "left center",
+    right: "right center",
+    "top-left": "left top",
+    "top-right": "right top",
+    "bottom-left": "left bottom",
+    "bottom-right": "right bottom"
+  };
+  return positions[value] || positions.center;
+}
+
+function imageUsageToAspectRatio(value = "card") {
+  const ratios = {
+    hero: "21 / 9",
+    service_hero: "4 / 3",
+    article_cover: "16 / 9",
+    card: "4 / 3",
+    square: "1 / 1",
+    avatar: "1 / 1",
+    logo: "auto",
+    map: "auto",
+    freeform: "auto"
+  };
+  return ratios[value] || ratios.card;
+}
+
+function imageUsageToFit(value = "card", explicitFit = "") {
+  if (explicitFit) return explicitFit;
+  return ["logo", "map"].includes(value) ? "contain" : "cover";
+}
+
+function cmsImageStyle({ usage = "card", focalPoint = "center", fit = "" } = {}) {
+  const aspectRatio = imageUsageToAspectRatio(usage);
+  const declarations = [
+    `--cms-image-position:${focalPointToObjectPosition(focalPoint)}`,
+    `--cms-image-fit:${imageUsageToFit(usage, fit)}`
+  ];
+  if (aspectRatio !== "auto") declarations.push(`--cms-image-ratio:${aspectRatio}`);
+  return declarations.join(";");
+}
+
+function imageStyleAttr(options = {}) {
+  return ` style="${escapeHTML(cmsImageStyle(options))}"`;
+}
+
 function formatPostDate(dateValue, yearOnly = false) {
   const date = new Date(dateValue);
   if (Number.isNaN(date.getTime())) return "";
@@ -548,6 +597,8 @@ function normalizeSupabaseArticle(article, mediaById, categoriesById) {
     subtitle,
     excerpt,
     image,
+    imageUsage: cover?.image_usage || "article_cover",
+    focalPoint: cover?.focal_point || "center",
     author: article.author_name || "歲悅照顧編輯部",
     date: formatArticleDate(publishedAt),
     publishedAt,
@@ -638,7 +689,7 @@ async function fetchSupabaseHealthArticles() {
   const categoryIds = [...new Set(articles.map((article) => article.category_id).filter(Boolean))];
   const [mediaResult, categoriesResult] = await Promise.all([
     mediaIds.length
-      ? supabase.from("media").select("id, public_url, alt_text, file_name").in("id", mediaIds)
+      ? supabase.from("media").select("id, public_url, alt_text, file_name, image_usage, focal_point").in("id", mediaIds)
       : Promise.resolve({ data: [], error: null }),
     categoryIds.length
       ? supabase.from("article_categories").select("id, name, slug").in("id", categoryIds)
@@ -743,6 +794,8 @@ function normalizeSupabaseArticlePage(article, category, cover) {
     subtitle: article.subtitle || article.excerpt || "",
     excerpt: article.excerpt || article.subtitle || "",
     image: cover?.public_url || "assets/homepage-batch/10-family-consultation.png",
+    imageUsage: cover?.image_usage || "article_cover",
+    focalPoint: cover?.focal_point || "center",
     author: article.author_name || "歲悅照顧編輯部",
     date: formatArticleDate(publishedAt),
     tags: Array.isArray(article.tags) ? article.tags : [],
@@ -799,7 +852,7 @@ async function fetchSupabaseArticlePage(slug) {
     article.cover_image_id
       ? supabase
           .from("media")
-          .select("id, public_url, alt_text, file_name")
+          .select("id, public_url, alt_text, file_name, image_usage, focal_point")
           .eq("id", article.cover_image_id)
           .maybeSingle()
       : Promise.resolve({ data: null, error: null })
@@ -826,7 +879,17 @@ function setCmsText(root, field, value) {
 
 function setCmsImage(root, field, url, alt = "") {
   if (!url) return;
+  const content = root.__cmsContent || {};
+  const usage = content.image_usage || "card";
+  const focalPoint = content.focal_point || "center";
+  const fit = content.image_fit || "";
   root.querySelectorAll(`[data-cms-field="${field}"]`).forEach((element) => {
+    element.dataset.imageUsage = usage;
+    element.dataset.focalPoint = focalPoint;
+    element.style.setProperty("--cms-image-position", focalPointToObjectPosition(focalPoint));
+    element.style.setProperty("--cms-image-fit", imageUsageToFit(usage, fit));
+    const ratio = imageUsageToAspectRatio(usage);
+    if (ratio !== "auto") element.style.setProperty("--cms-image-ratio", ratio);
     if (element.tagName === "IMG") {
       element.src = url;
       if (alt) element.alt = alt;
@@ -853,6 +916,7 @@ function applyCmsSection(section) {
   if (!root) return;
 
   const content = getSectionContent(section);
+  root.__cmsContent = content;
   root.hidden = false;
   root.dataset.cmsLoaded = "true";
 
@@ -1229,7 +1293,7 @@ function renderHealthPage(selectedCategorySlug = "") {
       ${articles.length ? `
       <section class="health-board">
         <article class="health-feature click-card" data-href="${escapeHTML(feature.href)}" tabindex="0" role="link">
-          <img src="${escapeHTML(feature.image)}" alt="${escapeHTML(feature.title)}" />
+          <img src="${escapeHTML(feature.image)}" alt="${escapeHTML(feature.title)}"${imageStyleAttr({ usage: feature.imageUsage || "article_cover", focalPoint: feature.focalPoint })} />
           <div>
             <span class="health-tag">本週精選</span>
             <h2>${escapeHTML(feature.title)}</h2>
@@ -1241,7 +1305,7 @@ function renderHealthPage(selectedCategorySlug = "") {
         <div class="health-quick-grid">
           ${quickCards.map((post) => `
             <article class="health-card click-card" data-href="${escapeHTML(post.href)}" tabindex="0" role="link">
-              <img src="${escapeHTML(post.image)}" alt="${escapeHTML(post.title)}" />
+              <img src="${escapeHTML(post.image)}" alt="${escapeHTML(post.title)}"${imageStyleAttr({ usage: "card", focalPoint: post.focalPoint })} />
               <div>
                 <span class="health-tag">${escapeHTML(post.category)}</span>
                 <h3>${escapeHTML(post.title)}</h3>
@@ -1293,7 +1357,7 @@ function renderHealthPage(selectedCategorySlug = "") {
         <div class="health-latest-grid">
           ${latestCards.map((post) => `
             <article class="health-list-card click-card" data-href="${escapeHTML(post.href)}" tabindex="0" role="link">
-              <img src="${escapeHTML(post.image)}" alt="${escapeHTML(post.title)}" />
+              <img src="${escapeHTML(post.image)}" alt="${escapeHTML(post.title)}"${imageStyleAttr({ usage: "article_cover", focalPoint: post.focalPoint })} />
               <div>
                 <span>${escapeHTML(post.category)}</span>
                 <h3>${escapeHTML(post.title)}</h3>
@@ -1361,7 +1425,7 @@ function renderSearchPage(query = "") {
       <section class="search-results">
         ${results.length ? results.map((post) => `
           <article class="search-result-card click-card" data-href="${escapeHTML(post.href)}" tabindex="0" role="link">
-            <img src="${escapeHTML(post.image)}" alt="${escapeHTML(post.title)}" />
+            <img src="${escapeHTML(post.image)}" alt="${escapeHTML(post.title)}"${imageStyleAttr({ usage: "article_cover", focalPoint: post.focalPoint })} />
             <div>
               <span>${escapeHTML(post.category)}</span>
               <h2>${escapeHTML(post.title)}</h2>
@@ -4446,7 +4510,7 @@ function renderArticleLayout(article) {
 
       <header class="article-hero">
         <figure>
-          <img src="${escapeHTML(article.image)}" alt="${escapeHTML(article.title)}" />
+          <img src="${escapeHTML(article.image)}" alt="${escapeHTML(article.title)}"${imageStyleAttr({ usage: article.imageUsage || "article_cover", focalPoint: article.focalPoint })} />
           <figcaption>
             <h1>${escapeHTML(article.title)}</h1>
             <p>${escapeHTML(article.subtitle || article.excerpt || "")}</p>
@@ -4490,7 +4554,7 @@ function renderArticleLayout(article) {
             <div class="article-related-grid">
               ${related.map((item) => `
                 <a href="${escapeHTML(item.href)}">
-                  <img src="${escapeHTML(item.image)}" alt="" />
+                  <img src="${escapeHTML(item.image)}" alt=""${imageStyleAttr({ usage: "card", focalPoint: item.focalPoint })} />
                   <span>${escapeHTML(item.category)}</span>
                   <b>${escapeHTML(item.title)}</b>
                 </a>

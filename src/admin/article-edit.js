@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabaseClient.js";
-import { fetchMediaImages, uploadImageToMedia } from "./media-utils.js";
+import { fetchMediaImages, getFocalPointOption, getImageUsageOption, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
 
@@ -95,7 +95,7 @@ function renderCoverImage() {
 
   coverPreview.classList.remove("empty");
   coverPreview.innerHTML = `
-    <img src="${escapeHTML(selectedCoverMedia.public_url)}" alt="${escapeHTML(selectedCoverMedia.alt_text || selectedCoverMedia.file_name || "文章封面")}" />
+    <img src="${escapeHTML(selectedCoverMedia.public_url)}" alt="${escapeHTML(selectedCoverMedia.alt_text || selectedCoverMedia.file_name || "文章封面")}" data-image-usage="${escapeHTML(selectedCoverMedia.image_usage || "article_cover")}" data-focal-point="${escapeHTML(selectedCoverMedia.focal_point || "center")}" />
   `;
 }
 
@@ -166,7 +166,7 @@ async function loadCoverMedia(coverImageId) {
 
   const { data, error } = await supabase
     .from("media")
-    .select("id, public_url, file_name, alt_text, caption")
+    .select("id, public_url, file_name, alt_text, caption, image_usage, focal_point")
     .eq("id", coverImageId)
     .maybeSingle();
 
@@ -245,8 +245,9 @@ function renderCoverPickerGrid(items) {
 
   coverPickerGrid.innerHTML = items.map((item) => `
     <button type="button" class="admin-picker-card" data-media-id="${escapeHTML(item.id)}">
-      <img src="${escapeHTML(item.public_url || "")}" alt="${escapeHTML(item.alt_text || item.file_name || "媒體圖片")}" />
+      <img src="${escapeHTML(item.public_url || "")}" alt="${escapeHTML(item.alt_text || item.file_name || "媒體圖片")}" data-image-usage="${escapeHTML(item.image_usage || "card")}" data-focal-point="${escapeHTML(item.focal_point || "center")}" />
       <span>${escapeHTML(item.file_name || "未命名圖片")}</span>
+      <small>${escapeHTML(getImageUsageOption(item.image_usage)?.label || "卡片縮圖")} · ${escapeHTML(getFocalPointOption(item.focal_point)?.label || "置中")}</small>
     </button>
   `).join("");
 }
@@ -299,7 +300,9 @@ async function uploadAndSelectCover(event) {
     const media = await uploadImageToMedia({
       file,
       altText: coverUploadForm.elements.alt_text.value,
-      caption: coverUploadForm.elements.caption.value
+      caption: coverUploadForm.elements.caption.value,
+      imageUsage: coverUploadForm.elements.image_usage.value || "article_cover",
+      focalPoint: coverUploadForm.elements.focal_point.value || "center"
     });
     applyCoverMedia(media);
   } catch (error) {
@@ -375,7 +378,7 @@ coverPickerGrid?.addEventListener("click", async (event) => {
 
   const { data, error } = await supabase
     .from("media")
-    .select("id, public_url, file_name, alt_text, caption")
+    .select("id, public_url, file_name, alt_text, caption, image_usage, focal_point")
     .eq("id", card.dataset.mediaId)
     .single();
 

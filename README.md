@@ -209,10 +209,23 @@ Page section 圖片選擇器：
 
 - 編輯 `page_sections` 時可從 `media` 資料表選擇已上傳圖片
 - 也可在選擇器內直接上傳新圖片到 Supabase Storage
+- 上傳或選圖時可設定 `image_usage` 與 `focal_point`，前台會依用途鎖定比例與裁切焦點，避免後台換圖後跑版
 - 選定後會同步寫入：
   - `page_sections.image_id`
   - `page_sections.content_json.image_url`
+  - `page_sections.content_json.image_usage`
+  - `page_sections.content_json.focal_point`
+  - `page_sections.content_json.image_fit`
 - 前台渲染 section 圖片時應優先讀取 `content_json.image_url`
+
+圖片用途建議：
+
+- `hero`：首頁大型橫幅，建議 21:9，人物可用 `focal_point = center/top/right`
+- `service_hero`：服務頁主視覺，建議 4:3
+- `article_cover`：文章封面與健康3.0卡片，建議 16:9
+- `card`：一般卡片縮圖，建議 4:3
+- `square` / `avatar`：方形輪播與人物頭像，建議 1:1
+- `logo` / `map`：識別與地圖，前台會使用 `contain`，盡量完整顯示不裁切
 
 首頁 section 可使用的 `content_json` 欄位：
 

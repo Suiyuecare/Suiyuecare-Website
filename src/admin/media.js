@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabaseClient.js";
-import { fetchMediaImages, uploadImageToMedia } from "./media-utils.js";
+import { fetchMediaImages, getFocalPointOption, getImageUsageOption, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
 
@@ -30,12 +30,14 @@ function renderMedia(items) {
 
   mediaGrid.innerHTML = items.map((item) => `
     <article class="admin-media-card" data-media-id="${escapeHTML(item.id)}" data-bucket="${escapeHTML(item.bucket)}" data-path="${escapeHTML(item.storage_path)}">
-      <figure>
+      <figure data-image-usage="${escapeHTML(item.image_usage || "card")}" data-focal-point="${escapeHTML(item.focal_point || "center")}">
         <img src="${escapeHTML(item.public_url || "")}" alt="${escapeHTML(item.alt_text || item.file_name || "媒體圖片")}" loading="lazy" />
       </figure>
       <div>
         <strong>${escapeHTML(item.file_name || "未命名圖片")}</strong>
         <span>${escapeHTML(item.alt_text || "尚未填寫 alt text")}</span>
+        <span>用途：${escapeHTML(getImageUsageOption(item.image_usage)?.label || "卡片縮圖")} · 焦點：${escapeHTML(getFocalPointOption(item.focal_point)?.label || "置中")}</span>
+        <span>${item.width && item.height ? `${item.width} × ${item.height}` : "尺寸未記錄"}</span>
         <code>${escapeHTML(item.public_url || "")}</code>
         <time>上傳時間：${formatUpdatedAt(item.created_at)}</time>
         <button type="button" data-delete-media>刪除圖片</button>
@@ -85,7 +87,9 @@ async function uploadMedia(event) {
     await uploadImageToMedia({
       file,
       altText: uploadForm.elements.alt_text.value,
-      caption: uploadForm.elements.caption.value
+      caption: uploadForm.elements.caption.value,
+      imageUsage: uploadForm.elements.image_usage.value,
+      focalPoint: uploadForm.elements.focal_point.value
     });
 
     uploadForm.reset();

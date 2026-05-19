@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabaseClient.js";
-import { fetchMediaImages, uploadImageToMedia } from "./media-utils.js";
+import { fetchMediaImages, getFocalPointOption, getImageUsageOption, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML } from "./utils.js";
 
@@ -44,6 +44,14 @@ function getSectionContent(section) {
   return section.content_json && typeof section.content_json === "object" ? section.content_json : {};
 }
 
+function getSectionImageSettings(content = {}) {
+  return {
+    image_usage: content.image_usage || "card",
+    image_fit: content.image_fit || (["logo", "map"].includes(content.image_usage) ? "contain" : "cover"),
+    focal_point: content.focal_point || "center"
+  };
+}
+
 function createEmptySection() {
   return {
     id: `new-${crypto.randomUUID()}`,
@@ -57,7 +65,10 @@ function createEmptySection() {
     content_json: {
       button_text: "",
       button_href: "",
-      image_url: ""
+      image_url: "",
+      image_usage: "card",
+      image_fit: "cover",
+      focal_point: "center"
     }
   };
 }
@@ -73,6 +84,7 @@ function renderSections() {
   sectionsEditor.innerHTML = currentSections.map((section, index) => {
     const content = getSectionContent(section);
     const imageUrl = content.image_url || "";
+    const imageSettings = getSectionImageSettings(content);
     return `
       <article class="admin-section-card" data-section-id="${escapeHTML(section.id)}">
         <header>
@@ -110,13 +122,32 @@ function renderSections() {
             <span>圖片 URL</span>
             <input type="text" data-content-field="image_url" value="${escapeHTML(imageUrl)}" placeholder="https://... 或 Supabase Storage public URL" />
           </label>
+          <label>
+            <span>圖片用途</span>
+            <select data-content-field="image_usage">
+              ${["hero","service_hero","article_cover","card","square","avatar","logo","map","freeform"].map((value) => `<option value="${value}" ${imageSettings.image_usage === value ? "selected" : ""}>${escapeHTML(getImageUsageOption(value)?.label || value)}</option>`).join("")}
+            </select>
+          </label>
+          <label>
+            <span>圖片顯示方式</span>
+            <select data-content-field="image_fit">
+              <option value="cover" ${imageSettings.image_fit === "cover" ? "selected" : ""}>裁切填滿 cover</option>
+              <option value="contain" ${imageSettings.image_fit === "contain" ? "selected" : ""}>完整顯示 contain</option>
+            </select>
+          </label>
+          <label>
+            <span>裁切焦點</span>
+            <select data-content-field="focal_point">
+              ${["center","top","bottom","left","right","top-left","top-right","bottom-left","bottom-right"].map((value) => `<option value="${value}" ${imageSettings.focal_point === value ? "selected" : ""}>${escapeHTML(getFocalPointOption(value)?.label || value)}</option>`).join("")}
+            </select>
+          </label>
           <div class="admin-section-image-tools admin-field-wide">
-            <figure class="${imageUrl ? "" : "empty"}">
+            <figure class="${imageUrl ? "" : "empty"}" data-image-usage="${escapeHTML(imageSettings.image_usage)}" data-focal-point="${escapeHTML(imageSettings.focal_point)}" data-image-fit="${escapeHTML(imageSettings.image_fit)}">
               ${imageUrl ? `<img src="${escapeHTML(imageUrl)}" alt="${escapeHTML(section.title || "Section image")}" />` : "<span>尚未選擇圖片</span>"}
             </figure>
             <div>
               <strong>Section 圖片</strong>
-              <p>選定後會儲存到 <code>page_sections.image_id</code> 與 <code>content_json.image_url</code>，前台讀取 section 時即可顯示此圖。</p>
+              <p>選定後會儲存圖片、用途、顯示方式與裁切焦點。前台會固定容器比例，避免因為圖片尺寸不同而跑版。</p>
               <button type="button" data-open-image-picker>選擇或上傳圖片</button>
             </div>
           </div>
@@ -269,6 +300,10 @@ function applyMediaToActiveSection(media) {
   const content = getSectionContent(section);
   section.image_id = media.id;
   content.image_url = media.public_url || "";
+  content.image_alt = media.alt_text || media.file_name || "";
+  content.image_usage = media.image_usage || content.image_usage || "card";
+  content.focal_point = media.focal_point || content.focal_point || "center";
+  content.image_fit = ["logo", "map"].includes(content.image_usage) ? "contain" : (content.image_fit || "cover");
   section.content_json = content;
   closeImagePicker();
   renderSections();
@@ -283,8 +318,9 @@ function renderImagePickerGrid(items) {
 
   imagePickerGrid.innerHTML = items.map((item) => `
     <button type="button" class="admin-picker-card" data-media-id="${escapeHTML(item.id)}">
-      <img src="${escapeHTML(item.public_url || "")}" alt="${escapeHTML(item.alt_text || item.file_name || "媒體圖片")}" />
+      <img src="${escapeHTML(item.public_url || "")}" alt="${escapeHTML(item.alt_text || item.file_name || "媒體圖片")}" data-image-usage="${escapeHTML(item.image_usage || "card")}" data-focal-point="${escapeHTML(item.focal_point || "center")}" />
       <span>${escapeHTML(item.file_name || "未命名圖片")}</span>
+      <small>${escapeHTML(getImageUsageOption(item.image_usage)?.label || "卡片縮圖")} · ${escapeHTML(getFocalPointOption(item.focal_point)?.label || "置中")}</small>
     </button>
   `).join("");
 }
@@ -333,7 +369,9 @@ async function uploadAndSelectImage(event) {
     const media = await uploadImageToMedia({
       file,
       altText: imageUploadForm.elements.alt_text.value,
-      caption: imageUploadForm.elements.caption.value
+      caption: imageUploadForm.elements.caption.value,
+      imageUsage: imageUploadForm.elements.image_usage.value,
+      focalPoint: imageUploadForm.elements.focal_point.value
     });
     applyMediaToActiveSection(media);
     setEditorStatus("圖片已選定，請記得儲存頁面。", "success");
@@ -368,7 +406,7 @@ imagePickerGrid?.addEventListener("click", async (event) => {
   const mediaId = card.dataset.mediaId;
   const { data, error } = await supabase
     .from("media")
-    .select("id, public_url, file_name, alt_text")
+    .select("id, public_url, file_name, alt_text, image_usage, focal_point")
     .eq("id", mediaId)
     .single();
   if (error) {

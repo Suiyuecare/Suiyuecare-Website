@@ -814,12 +814,66 @@ input {
   overflow: hidden;
   background: var(--admin-soft);
 }
+.admin-media-card figure[data-image-usage="hero"] {
+  aspect-ratio: 21 / 9;
+}
+.admin-media-card figure[data-image-usage="article_cover"] {
+  aspect-ratio: 16 / 9;
+}
+.admin-media-card figure[data-image-usage="square"],
+.admin-media-card figure[data-image-usage="avatar"] {
+  aspect-ratio: 1 / 1;
+}
+.admin-media-card figure[data-image-usage="logo"],
+.admin-media-card figure[data-image-usage="map"] {
+  aspect-ratio: 16 / 9;
+}
 
 .admin-media-card img {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
+  object-position: center center;
+}
+[data-focal-point="top"] img,
+img[data-focal-point="top"] {
+  object-position: center top;
+}
+[data-focal-point="bottom"] img,
+img[data-focal-point="bottom"] {
+  object-position: center bottom;
+}
+[data-focal-point="left"] img,
+img[data-focal-point="left"] {
+  object-position: left center;
+}
+[data-focal-point="right"] img,
+img[data-focal-point="right"] {
+  object-position: right center;
+}
+[data-focal-point="top-left"] img,
+img[data-focal-point="top-left"] {
+  object-position: left top;
+}
+[data-focal-point="top-right"] img,
+img[data-focal-point="top-right"] {
+  object-position: right top;
+}
+[data-focal-point="bottom-left"] img,
+img[data-focal-point="bottom-left"] {
+  object-position: left bottom;
+}
+[data-focal-point="bottom-right"] img,
+img[data-focal-point="bottom-right"] {
+  object-position: right bottom;
+}
+[data-image-usage="logo"] img,
+[data-image-usage="map"] img,
+img[data-image-usage="logo"],
+img[data-image-usage="map"],
+[data-image-fit="contain"] img {
+  object-fit: contain;
 }
 
 .admin-media-card > div {
@@ -994,10 +1048,21 @@ input {
   display: grid;
   place-items: center;
   min-height: 150px;
+  aspect-ratio: 4 / 3;
   margin: 0;
   overflow: hidden;
   border-radius: 18px;
   background: var(--admin-soft);
+}
+.admin-section-image-tools figure[data-image-usage="hero"] {
+  aspect-ratio: 21 / 9;
+}
+.admin-section-image-tools figure[data-image-usage="article_cover"] {
+  aspect-ratio: 16 / 9;
+}
+.admin-section-image-tools figure[data-image-usage="square"],
+.admin-section-image-tools figure[data-image-usage="avatar"] {
+  aspect-ratio: 1 / 1;
 }
 
 .admin-section-image-tools figure.empty {

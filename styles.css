@@ -29,6 +29,20 @@ a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; }
 img, svg, video, canvas { max-width: 100%; }
 img, video { height: auto; }
+[data-cms-field="image"],
+[data-cms-field="background_image"],
+.health-feature img,
+.health-card img,
+.health-list-card img,
+.search-result-card img,
+.article-hero img,
+.article-related img {
+  object-position: var(--cms-image-position, center center);
+  object-fit: var(--cms-image-fit, cover);
+}
+[data-cms-field="image"] {
+  aspect-ratio: var(--cms-image-ratio, auto);
+}
 .page,
 main,
 section,
