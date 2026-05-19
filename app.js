@@ -194,7 +194,8 @@ function analyticsBasePayload() {
 
 function insertAnalyticsRow(table, payload) {
   if (!supabase) return;
-  supabase.from(table).insert(payload).then(({ error }) => {
+  const rpcName = table === "analytics_page_views" ? "track_page_view" : "track_analytics_event";
+  supabase.rpc(rpcName, { payload }).then(({ error }) => {
     if (error) console.warn(`Analytics insert failed for ${table}.`, error);
   });
 }
