@@ -212,6 +212,39 @@ function trackAnalyticsEvent(eventType, options = {}) {
   });
 }
 
+function formDataValue(formData, keys) {
+  for (const key of keys) {
+    const value = String(formData.get(key) || "").trim();
+    if (value) return value;
+  }
+  return "";
+}
+
+async function recordFormSubmission(form, formType = "contact") {
+  if (!supabase || !form) return null;
+  const formData = new FormData(form);
+  const payload = {
+    form_type: formType,
+    name: formDataValue(formData, ["姓名", "您的大名", "name"]),
+    phone: formDataValue(formData, ["電話", "您的電話", "phone", "tel"]),
+    email: formDataValue(formData, ["Email", "email", "信箱"]),
+    subject: formDataValue(formData, ["需求", "您本次報名的課程", "course", "subject"]) || formType,
+    message: formDataValue(formData, ["說明", "message", "內容"]),
+    source_path: location.hash || "#home",
+    metadata: {
+      page_title: document.title,
+      form_id: form.id || null,
+      form_class: form.className || null
+    }
+  };
+  const { data, error } = await supabase.rpc("submit_form_submission", { payload });
+  if (error) {
+    console.warn("Form submission backup failed.", error);
+    return null;
+  }
+  return data;
+}
+
 function flushPageEngagement() {
   if (!analyticsState.currentPath) return;
   const durationSeconds = Math.max(1, Math.round((Date.now() - analyticsState.pageStartedAt) / 1000));
@@ -5077,6 +5110,7 @@ document.addEventListener("submit", async (event) => {
   });
 
   document.body.appendChild(submitForm);
+  await recordFormSubmission(form, "course_signup");
   submitForm.submit();
   trackAnalyticsEvent("form_submit", {
     label: "課程報名",
@@ -5102,6 +5136,20 @@ document.addEventListener("submit", async (event) => {
 document.addEventListener("submit", (event) => {
   const form = event.target.closest("form");
   if (!form || form.id === "courseSignupForm" || form.classList.contains("health-search")) return;
+  if (form.classList.contains("contact-form")) {
+    event.preventDefault();
+    const submitButton = form.querySelector("button[type='submit']");
+    submitButton?.setAttribute("disabled", "true");
+    recordFormSubmission(form, "contact").finally(() => {
+      trackAnalyticsEvent("form_submit", {
+        label: "聯絡我們",
+        targetUrl: form.action || location.href,
+        metadata: { form_class: "contact-form" }
+      });
+      form.submit();
+    });
+    return;
+  }
   trackAnalyticsEvent("form_submit", {
     label: form.getAttribute("aria-label") || form.id || form.className || "前台表單",
     targetUrl: form.action || location.href,
