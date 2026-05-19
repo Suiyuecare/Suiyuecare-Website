@@ -2381,6 +2381,135 @@ function renderMigrantTrainingPage() {
   `;
 }
 
+function renderQualityPage() {
+  const highlights = [
+    ["標準化教材", "把第一線照顧經驗整理成教材、流程與檢核表，讓好服務不是只靠個人經驗。"],
+    ["新人與在職訓練", "依職務與服務情境安排訓練，讓照服員、督導與行政都能理解照顧品質標準。"],
+    ["服務紀錄稽核", "透過紀錄檢視、督導回饋與異常追蹤，讓照顧品質被看見、被討論、被改善。"],
+    ["持續改善機制", "從家屬回饋、現場問題與教育訓練資料中，持續修正服務流程。"]
+  ];
+  const scenes = [
+    ["assets/quality-recruit-01-materials.png", "教材與流程整理", "把照顧現場的經驗整理成可學習、可複製、可追蹤的訓練資料。"],
+    ["assets/quality-recruit-02-training.png", "內部教育訓練", "訓練不是把人叫來上課，而是讓服務方法更一致。"],
+    ["assets/quality-recruit-03-record-review.png", "服務紀錄檢核", "從紀錄看見服務品質、照顧風險與需要再支持的現場問題。"],
+    ["assets/quality-recruit-04-quality-meeting.png", "品質改善會議", "讓督導、教育與營運一起把問題轉成下一輪改善行動。"]
+  ];
+  const serviceItems = [
+    ["教育訓練規劃", "新人訓練、在職訓練、專題課程、情境演練與訓後回饋", "適合照服員、督導、行政與跨部門團隊"],
+    ["服務標準建立", "照顧流程、紀錄格式、風險提醒、家屬回報與異常處理標準", "適合需要擴張服務但仍維持品質的團隊"],
+    ["品管稽核", "服務紀錄、家屬回饋、督導訪視、課程出席與改善追蹤", "適合需要定期檢視服務穩定度的單位"],
+    ["改善專案", "問題盤點、原因分析、改善方案、追蹤指標與回饋會議", "適合想把現場問題轉成制度改善的團隊"]
+  ];
+  const flow = [
+    ["01", "盤點品質議題", "整理服務紀錄、家屬回饋、督導觀察與現場常見問題。"],
+    ["02", "建立訓練模組", "把議題轉成教材、演練情境、檢核表與可追蹤指標。"],
+    ["03", "執行教育品管", "安排課程、紀錄檢核、督導回饋與跨部門改善會議。"],
+    ["04", "追蹤改善成效", "定期回看服務品質、訓練覆蓋率與問題改善狀態。"]
+  ];
+
+  return `
+    <div class="service-detail-page quality-page">
+      <section class="service-detail-hero quality-hero">
+        <div class="service-detail-copy">
+          <p class="eyebrow">Education & Quality</p>
+          <h1>教育品管</h1>
+          <p>歲悅教育品管把前線服務、督導經驗、家屬回饋與訓練制度串在一起，讓照顧品質不是靠運氣，而是能被訓練、被追蹤、被持續改善。</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#contact">洽詢品管合作</a>
+            <a class="secondary-button" href="#courses">查看訓練課程</a>
+          </div>
+        </div>
+        <aside class="service-hero-card">
+          <img src="assets/quality-recruit-04-quality-meeting.png" alt="歲悅教育品管品質改善會議情境" />
+          <div>
+            <span>Quality System</span>
+            <strong>讓好的照顧可以被教會，也可以被穩定複製。</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Quality Focus</p>
+          <h2>教育品管在做什麼</h2>
+          <span>把照顧現場的經驗轉成教材、標準、紀錄與改善流程，讓團隊在擴張時仍能維持服務品質。</span>
+        </div>
+        <div class="service-highlight-grid">
+          ${highlights.map(([title, copy], index) => `
+            <article>
+              <span>${String(index + 1).padStart(2, "0")}</span>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Quality Scenes</p>
+          <h2>教育品管情境</h2>
+          <span>使用之前生成的教學品管照片，呈現教材整理、內部訓練、紀錄檢核與品質改善會議。</span>
+        </div>
+        <div class="community-scene-grid">
+          ${scenes.map(([image, title, copy]) => `
+            <figure>
+              <img src="${image}" alt="${title}" />
+              <figcaption>
+                <strong>${title}</strong>
+                <span>${copy}</span>
+              </figcaption>
+            </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Quality Modules</p>
+          <h2>品管服務內容</h2>
+          <span>以訓練、標準、稽核與改善四個模組承接服務品質，讓前線有方法、管理者有依據。</span>
+        </div>
+        <div class="community-program-grid">
+          ${serviceItems.map(([title, items, fit]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${items}</p>
+              <span>${fit}</span>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">How It Works</p>
+          <h2>從現場問題到制度改善</h2>
+          <span>教育品管的重點不是抓錯，而是把問題轉成團隊下一次能做得更好的方法。</span>
+        </div>
+        <div class="service-flow-track">
+          ${flow.map(([step, title, copy]) => `
+            <article>
+              <b>${step}</b>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel">
+        <div>
+          <p class="eyebrow">Quality Partnership</p>
+          <h2>想讓照顧服務品質變成可管理的系統？</h2>
+          <p>留下需求後，歲悅會協助確認訓練對象、品管目標、目前流程與適合的教育品管模組。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡我們</a>
+      </section>
+    </div>
+  `;
+}
+
 function renderInvestorRecruitingPage() {
   const thesis = [
     ["剛性需求", "高齡化、家庭照顧人力不足與出院返家支持需求，讓長照服務不是短期題材，而是長期基礎服務。"],
@@ -4472,6 +4601,10 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderMigrantTrainingPage();
+  } else if (normalized === "quality") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderQualityPage();
   } else if (normalized === "land") {
     home.classList.remove("active");
     pageView.classList.add("active");
