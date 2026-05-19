@@ -2902,6 +2902,13 @@ function renderFinancePage() {
         <button type="button" data-ir-tab="annual-reports">股東會年報</button>
       </nav>
 
+      <section class="ir-kpi-strip" aria-label="財務資訊摘要">
+        <article><span>Monthly Revenue</span><strong>NT$ 8.6M</strong><em>最近月營收示意</em></article>
+        <article><span>YoY Growth</span><strong>+12.4%</strong><em>年增率示意</em></article>
+        <article><span>Service Mix</span><strong>4 Units</strong><em>主要收入來源</em></article>
+        <article><span>Disclosure</span><strong>Quarterly</strong><em>季度更新節奏</em></article>
+      </section>
+
       <section class="ir-tab-panel active" data-ir-panel="monthly-revenue">
         <div class="investor-section-head">
           <p class="eyebrow">Monthly Revenue</p>
@@ -3044,6 +3051,13 @@ function renderGovernancePage() {
         <button type="button" data-ir-tab="risk-management">風險管理</button>
         <button type="button" data-ir-tab="integrity">誠信經營</button>
       </nav>
+
+      <section class="ir-kpi-strip governance-kpis" aria-label="公司治理摘要">
+        <article><span>Governance Index</span><strong>91</strong><em>治理成熟度示意</em></article>
+        <article><span>Audit Coverage</span><strong>92%</strong><em>服務紀錄稽核</em></article>
+        <article><span>Training</span><strong>96%</strong><em>年度訓練覆蓋</em></article>
+        <article><span>Open Cases</span><strong>0</strong><em>重大未結案件</em></article>
+      </section>
 
       <section class="ir-tab-panel active" data-ir-panel="governance-news">
         <div class="investor-section-head">
@@ -3240,6 +3254,13 @@ function renderShareholdersPage() {
         <button type="button" data-ir-tab="investor-conference">法說會</button>
         <button type="button" data-ir-tab="shareholder-faq">常見問答</button>
       </nav>
+
+      <section class="ir-kpi-strip shareholder-kpis" aria-label="股東服務摘要">
+        <article><span>Service Line</span><strong>02-6604-5432</strong><em>股東服務窗口</em></article>
+        <article><span>Documents</span><strong>11+</strong><em>可下載文件</em></article>
+        <article><span>Meetings</span><strong>Annual</strong><em>股東會資訊</em></article>
+        <article><span>Response</span><strong>Business Day</strong><em>工作日回覆</em></article>
+      </section>
 
       <section class="ir-tab-panel active" data-ir-panel="stock-affairs">
         <div class="investor-section-head">

@@ -1784,7 +1784,8 @@ h2 {
   font-weight: 900;
 }
 .investor-page {
-  background: var(--paper);
+  background:
+    linear-gradient(180deg, #fffaf2 0, #fffdf8 360px, var(--paper) 100%);
 }
 .investor-hero {
   display: grid;
@@ -1861,31 +1862,57 @@ h2 {
 .investor-tabs {
   position: sticky;
   top: 96px;
-  z-index: 5;
+  z-index: 8;
   display: flex;
-  gap: 10px;
-  padding: 16px clamp(32px,5vw,86px);
-  border-block: 1px solid var(--line);
-  background: rgba(255, 252, 247, .92);
+  gap: 0;
+  padding: 0 clamp(32px,5vw,86px);
+  border-block: 1px solid rgba(84, 48, 18, .14);
+  background: rgba(255, 253, 248, .96);
+  box-shadow: 0 14px 32px rgba(83,43,11,.06);
   backdrop-filter: blur(18px);
+  overflow-x: auto;
 }
 .investor-tabs button {
-  min-height: 48px;
-  padding: 0 22px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: #fff;
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 66px;
+  padding: 0 24px;
+  border: 0;
+  border-left: 1px solid rgba(84,48,18,.1);
+  border-radius: 0;
+  background: transparent;
   color: var(--brown);
-  font-weight: 1000;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .04em;
   cursor: pointer;
-  transition: transform .22s ease, background .22s ease, color .22s ease, border-color .22s ease;
+  transition: background .22s ease, color .22s ease;
+}
+.investor-tabs button:last-child {
+  border-right: 1px solid rgba(84,48,18,.1);
+}
+.investor-tabs button::after {
+  position: absolute;
+  right: 18px;
+  bottom: 0;
+  left: 18px;
+  height: 4px;
+  border-radius: 999px 999px 0 0;
+  background: var(--orange);
+  content: "";
+  opacity: 0;
+  transform: scaleX(.3);
+  transition: opacity .22s ease, transform .22s ease;
 }
 .investor-tabs button:hover,
 .investor-tabs button.active {
-  border-color: var(--orange);
-  background: var(--orange);
-  color: #fff;
-  transform: translateY(-2px);
+  background: rgba(240,138,36,.08);
+  color: var(--orange-dark);
+}
+.investor-tabs button:hover::after,
+.investor-tabs button.active::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 .investor-directory {
   display: grid;
@@ -3084,13 +3111,16 @@ h2 {
   grid-template-columns: minmax(0, 1fr) minmax(360px, .52fr);
   gap: 28px;
   align-items: stretch;
-  padding: 60px clamp(32px,5vw,86px) 34px;
+  padding: 56px clamp(32px,5vw,86px) 34px;
+  border-bottom: 1px solid rgba(84,48,18,.1);
   background: linear-gradient(135deg, #fffaf2, #fff);
 }
 .ir-sub-hero h1 {
   margin: 8px 0 18px;
   color: var(--brown);
   font-size: clamp(48px, 6vw, 92px);
+  letter-spacing: 0;
+  line-height: .96;
 }
 .ir-sub-hero p {
   max-width: 760px;
@@ -3114,6 +3144,47 @@ h2 {
   background: rgba(255,255,255,.88);
   box-shadow: 0 22px 58px rgba(83,43,11,.12);
   backdrop-filter: blur(12px);
+}
+.ir-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 0 clamp(32px,5vw,86px);
+  border-bottom: 1px solid rgba(84,48,18,.12);
+  background: #fff;
+}
+.ir-kpi-strip article {
+  display: grid;
+  align-content: center;
+  min-height: 132px;
+  padding: 24px 28px;
+  border-left: 1px solid rgba(84,48,18,.1);
+}
+.ir-kpi-strip article:last-child {
+  border-right: 1px solid rgba(84,48,18,.1);
+}
+.ir-kpi-strip span {
+  color: var(--orange-dark);
+  font-size: 12px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.ir-kpi-strip strong {
+  margin-top: 8px;
+  color: var(--brown);
+  font-size: clamp(28px, 2.5vw, 42px);
+  line-height: 1.05;
+}
+.ir-kpi-strip em {
+  margin-top: 8px;
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 800;
+}
+.governance-kpis strong,
+.shareholder-kpis strong {
+  font-size: clamp(26px, 2.2vw, 38px);
 }
 .finance-hero-chart > span,
 .chart-card-head span {
@@ -3167,11 +3238,11 @@ h2 {
 }
 .chart-card {
   min-height: 390px;
-  padding: 26px;
-  border: 1px solid var(--line);
-  border-radius: 30px;
+  padding: 28px;
+  border: 1px solid rgba(84,48,18,.13);
+  border-radius: 18px;
   background: #fff;
-  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+  box-shadow: 0 16px 34px rgba(83,43,11,.07);
 }
 .chart-card.wide {
   min-height: 390px;
@@ -3182,6 +3253,8 @@ h2 {
   gap: 18px;
   align-items: start;
   margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(84,48,18,.1);
 }
 .chart-card-head strong {
   color: var(--brown);
@@ -3294,12 +3367,18 @@ h2 {
 .download-grid a {
   display: grid;
   gap: 10px;
-  min-height: 150px;
-  padding: 22px;
-  border: 1px solid var(--line);
-  border-radius: 24px;
+  min-height: 138px;
+  padding: 22px 24px;
+  border: 1px solid rgba(84,48,18,.13);
+  border-radius: 18px;
   background: #fff;
-  box-shadow: 0 18px 46px rgba(83,43,11,.06);
+  box-shadow: 0 14px 30px rgba(83,43,11,.055);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.download-grid a:hover {
+  transform: translateY(-4px);
+  border-color: rgba(240,138,36,.44);
+  box-shadow: 0 20px 46px rgba(83,43,11,.1);
 }
 .download-grid span {
   color: var(--orange-dark);
@@ -3413,7 +3492,7 @@ h2 {
   position: relative;
   min-height: 460px;
   overflow: hidden;
-  border-radius: 30px;
+  border-radius: 18px;
   background: var(--brown);
   box-shadow: 0 18px 46px rgba(83,43,11,.08);
 }
@@ -3467,14 +3546,19 @@ h2 {
 }
 .executive-grid article {
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 28px;
+  border: 1px solid rgba(84,48,18,.13);
+  border-radius: 18px;
   background: #fff;
-  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+  box-shadow: 0 14px 34px rgba(83,43,11,.07);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.executive-grid article:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 50px rgba(83,43,11,.12);
 }
 .executive-grid img {
   width: 100%;
-  height: 260px;
+  height: 240px;
   object-fit: cover;
 }
 .executive-grid div {
@@ -3498,8 +3582,8 @@ h2 {
 .process-card,
 .risk-matrix {
   padding: 28px;
-  border: 1px solid var(--line);
-  border-radius: 30px;
+  border: 1px solid rgba(84,48,18,.13);
+  border-radius: 18px;
   background: #fff;
   box-shadow: 0 18px 46px rgba(83,43,11,.08);
 }
@@ -4613,15 +4697,19 @@ h2 {
 }
 .investor-table-card {
   margin-top: 18px;
-  padding: 26px;
+  padding: 0;
   overflow-x: auto;
+  border-radius: 18px;
 }
 .table-title {
   display: flex;
   justify-content: space-between;
   gap: 18px;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 0;
+  padding: 22px 26px;
+  border-bottom: 1px solid rgba(84,48,18,.1);
+  background: linear-gradient(180deg, #fff, #fffaf2);
 }
 .table-title h3,
 .investor-calendar h3 {
@@ -4639,18 +4727,25 @@ h2 {
   width: 100%;
   border-collapse: collapse;
   min-width: 680px;
+  background: #fff;
 }
 .investor-table-card th,
 .investor-table-card td {
-  padding: 18px 14px;
-  border-bottom: 1px solid var(--line);
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(84,48,18,.1);
   color: var(--muted);
   text-align: left;
   font-weight: 800;
 }
 .investor-table-card th {
   color: var(--brown);
-  background: var(--cream);
+  background: #f8efe4;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.investor-table-card tr:hover td {
+  background: rgba(240,138,36,.045);
 }
 .governance-layout {
   display: grid;
@@ -4677,6 +4772,7 @@ h2 {
 }
 .shareholder-contact {
   padding: 30px;
+  border-radius: 18px;
 }
 .shareholder-contact h3 {
   color: var(--brown);
@@ -4709,16 +4805,28 @@ h2 {
 }
 .shareholder-faq details {
   padding: 20px 22px;
-  border: 1px solid var(--line);
-  border-radius: 24px;
+  border: 1px solid rgba(84,48,18,.13);
+  border-radius: 18px;
   background: #fff;
   box-shadow: 0 18px 46px rgba(83,43,11,.06);
 }
 .shareholder-faq summary {
+  list-style: none;
   color: var(--brown);
   font-size: 20px;
   font-weight: 1000;
   cursor: pointer;
+}
+.shareholder-faq summary::-webkit-details-marker {
+  display: none;
+}
+.shareholder-faq summary::after {
+  float: right;
+  color: var(--orange-dark);
+  content: "+";
+}
+.shareholder-faq details[open] summary::after {
+  content: "-";
 }
 .investor-calendar {
   display: grid;
@@ -5608,6 +5716,7 @@ h2 {
     grid-column: 1 / -1;
   }
   .investor-directory,
+  .ir-kpi-strip,
   .ir-updates-grid,
   .ir-progress-grid,
   .about-value-grid,
@@ -5736,6 +5845,7 @@ h2 {
     grid-template-columns: 1fr;
   }
   .investor-directory,
+  .ir-kpi-strip,
   .ir-updates-grid,
   .ir-progress-grid,
   .about-value-grid,
@@ -6041,6 +6151,14 @@ h2 {
   }
   .investor-directory {
     padding-inline: 20px;
+  }
+  .ir-kpi-strip {
+    grid-template-columns: 1fr;
+    padding-inline: 20px;
+  }
+  .ir-kpi-strip article {
+    min-height: 112px;
+    border-right: 1px solid rgba(84,48,18,.1);
   }
   .investor-hero h1 {
     font-size: 42px;
