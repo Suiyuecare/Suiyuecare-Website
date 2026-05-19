@@ -4584,14 +4584,14 @@ function renderTalentPage() {
 
   return `
     <div class="career-page">
-      <section class="career-hero">
-        <div>
+      <section class="service-detail-hero talent-recruit-hero">
+        <div class="service-detail-copy">
           <p class="eyebrow">We want you</p>
           <h1>加入歲悅，把照顧變成一份能長久發展的專業。</h1>
           <p>歲悅長照集團提供清楚訓練、督導支持、部門分工與升遷制度，讓照顧工作不只是辛苦，而是能被支持、被看見、被成就。</p>
           <div class="hero-actions"><a class="primary-button" href="#contact">投遞履歷</a><a class="secondary-button" href="#career-openings">查看職缺</a></div>
         </div>
-        <aside class="career-hero-card">
+        <aside class="service-hero-card">
           <img src="assets/homepage-batch/06-orange-polo-supervisor.png" alt="歲悅長照人才招募" />
           <div><span>Suiyuecare Careers</span><strong>有制度的照顧，才走得長久。</strong></div>
         </aside>
