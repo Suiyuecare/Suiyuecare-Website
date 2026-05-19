@@ -12,7 +12,8 @@ export default defineConfig({
         adminMedia: "admin/media/index.html",
         adminCategories: "admin/categories/index.html",
         adminArticles: "admin/articles/index.html",
-        adminArticleEdit: "admin/articles/[id]/index.html"
+        adminArticleEdit: "admin/articles/[id]/index.html",
+        adminTraffic: "admin/traffic/index.html"
       }
     }
   }

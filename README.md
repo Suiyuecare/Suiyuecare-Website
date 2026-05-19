@@ -275,6 +275,8 @@ git diff --check
 - 圖片上傳流程會寫入 Supabase Storage，並同步新增 `media` 資料表紀錄
 - 圖片刪除流程會刪除 Storage object 與 `media` 資料
 - 頁面內容編輯器可選擇既有 media 圖片，也可直接上傳新圖片並寫入 `page_sections.image_id` / `content_json.image_url`
+- `/admin/traffic` 是網站流量中心，讀取 `analytics_page_views`、`analytics_events`、`analytics_alerts`、`analytics_report_schedules`，顯示流量、來源、頁面表現、轉換、SEO、網站健康度、警示與報表匯出。
+- 前台 `app.js` 會匿名寫入頁面瀏覽與轉換事件，包含表單送出、LINE 點擊、電話點擊、Email 點擊、Google Maps 點擊、PDF 下載、預約/CTA 點擊與加入 LINE。
 - 頁面文案可更新 `pages` 與 `page_sections`
 - 文章列表 `/admin/articles` 可讀取、顯示、刪除文章
 - 文章新增/編輯頁 `/admin/articles/new`、`/admin/articles/:id` 可編輯標題、副標題、slug、封面圖、分類、內容、發布狀態、發布日期、SEO、置頂與排序

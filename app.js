@@ -117,6 +117,134 @@ const revealItems = document.querySelectorAll(".reveal");
 const introLoader = document.querySelector(".intro-loader");
 const COURSE_NOTIFY_EMAIL = "edu.control@suiyuecare.com";
 const COURSE_LINE_URL = "https://lin.ee/oaPkGiq";
+
+const analyticsState = {
+  currentPath: "",
+  pageStartedAt: Date.now()
+};
+
+function getStoredAnalyticsId(key) {
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+  const created = crypto.randomUUID();
+  localStorage.setItem(key, created);
+  return created;
+}
+
+function getAnalyticsSessionId() {
+  const key = "suiyuecare_analytics_session";
+  const timestampKey = "suiyuecare_analytics_session_at";
+  const now = Date.now();
+  const lastActive = Number(sessionStorage.getItem(timestampKey) || 0);
+  let sessionId = sessionStorage.getItem(key);
+  if (!sessionId || now - lastActive > 30 * 60 * 1000) {
+    sessionId = crypto.randomUUID();
+    sessionStorage.setItem(key, sessionId);
+  }
+  sessionStorage.setItem(timestampKey, String(now));
+  return sessionId;
+}
+
+function getAnalyticsVisitorId() {
+  return getStoredAnalyticsId("suiyuecare_analytics_visitor");
+}
+
+function getDeviceType() {
+  const width = window.innerWidth;
+  if (width < 768) return "mobile";
+  if (width < 1180) return "tablet";
+  return "desktop";
+}
+
+function getAttribution() {
+  const params = new URLSearchParams(window.location.search);
+  const referrerHost = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, "") : "";
+  const utmSource = params.get("utm_source");
+  const utmMedium = params.get("utm_medium");
+  const utmCampaign = params.get("utm_campaign");
+  if (utmSource || utmMedium || utmCampaign) {
+    return {
+      source: utmSource || "utm",
+      medium: utmMedium || "unknown",
+      campaign: utmCampaign || null
+    };
+  }
+  if (!referrerHost || referrerHost === location.hostname.replace(/^www\./, "")) {
+    return { source: "direct", medium: "none", campaign: null };
+  }
+  if (/google|bing|yahoo|duckduckgo/.test(referrerHost)) {
+    return { source: "organic search", medium: "organic", campaign: null };
+  }
+  if (/facebook|instagram|line|threads|linkedin|youtube|tiktok/.test(referrerHost)) {
+    return { source: referrerHost, medium: "social", campaign: null };
+  }
+  return { source: referrerHost, medium: "referral", campaign: null };
+}
+
+function analyticsBasePayload() {
+  const attribution = getAttribution();
+  return {
+    session_id: getAnalyticsSessionId(),
+    visitor_id: getAnalyticsVisitorId(),
+    source: attribution.source,
+    medium: attribution.medium,
+    campaign: attribution.campaign
+  };
+}
+
+function insertAnalyticsRow(table, payload) {
+  if (!supabase) return;
+  supabase.from(table).insert(payload).then(({ error }) => {
+    if (error) console.warn(`Analytics insert failed for ${table}.`, error);
+  });
+}
+
+function trackAnalyticsEvent(eventType, options = {}) {
+  insertAnalyticsRow("analytics_events", {
+    ...analyticsBasePayload(),
+    event_type: eventType,
+    event_label: options.label || null,
+    page_path: location.hash || "#home",
+    target_url: options.targetUrl || null,
+    value: options.value || null,
+    metadata: options.metadata || {}
+  });
+}
+
+function flushPageEngagement() {
+  if (!analyticsState.currentPath) return;
+  const durationSeconds = Math.max(1, Math.round((Date.now() - analyticsState.pageStartedAt) / 1000));
+  trackAnalyticsEvent("page_engagement", {
+    label: analyticsState.currentPath,
+    value: durationSeconds,
+    metadata: { duration_seconds: durationSeconds }
+  });
+}
+
+function trackPageView(path) {
+  const normalizedPath = path || location.hash || "#home";
+  if (analyticsState.currentPath === normalizedPath) return;
+  flushPageEngagement();
+  analyticsState.currentPath = normalizedPath;
+  analyticsState.pageStartedAt = Date.now();
+
+  insertAnalyticsRow("analytics_page_views", {
+    ...analyticsBasePayload(),
+    page_path: normalizedPath,
+    page_title: document.title,
+    referrer: document.referrer || null,
+    device_type: getDeviceType(),
+    browser_language: navigator.language,
+    user_agent: navigator.userAgent,
+    metadata: {
+      pathname: location.pathname,
+      search: location.search,
+      hash: location.hash,
+      viewport_width: window.innerWidth,
+      viewport_height: window.innerHeight
+    }
+  });
+}
 const WP_API_BASE = "https://www.suiyuecare.com/wp-json/wp/v2";
 const WP_CATEGORIES = {
   latestNews: "latest-news",
@@ -4758,6 +4886,8 @@ function renderPage(slug) {
   } else {
     window.scrollTo({ top: 0, behavior: "auto" });
   }
+
+  trackPageView(`#${rawSlug || "home"}`);
 }
 
 if ("IntersectionObserver" in window) {
@@ -4867,10 +4997,33 @@ function initMilestonePage() {
 }
 
 document.addEventListener("click", (event) => {
+  const link = event.target.closest("a[href]");
+  if (link) {
+    const href = link.getAttribute("href") || "";
+    const label = link.textContent.trim().slice(0, 80) || href;
+    if (href.startsWith("tel:")) {
+      trackAnalyticsEvent("phone_click", { label, targetUrl: href });
+    } else if (href.startsWith("mailto:")) {
+      trackAnalyticsEvent("email_click", { label, targetUrl: href });
+    } else if (/lin\.ee|line\.me/i.test(href)) {
+      trackAnalyticsEvent("line_click", { label, targetUrl: href });
+    } else if (/google\.[^/]+\/maps|maps\.app\.goo\.gl/i.test(href)) {
+      trackAnalyticsEvent("google_maps_click", { label, targetUrl: href });
+    } else if (/\.pdf($|\?)/i.test(href) || /下載|download/i.test(label)) {
+      trackAnalyticsEvent("pdf_download", { label, targetUrl: href });
+    } else if (/預約參觀|預約|申請|聯絡|諮詢|應徵|官方 LINE/i.test(label)) {
+      trackAnalyticsEvent("cta_click", { label, targetUrl: href });
+    }
+  }
+
   const registerButton = event.target.closest(".course-register");
   if (registerButton) {
     event.preventDefault();
     event.stopPropagation();
+    trackAnalyticsEvent("reservation_click", {
+      label: registerButton.dataset.courseTitle || registerButton.textContent.trim(),
+      targetUrl: "#courses"
+    });
     openCourseSignup(registerButton.dataset.courseTitle || registerButton.closest("[data-course-title]")?.dataset.courseTitle || "");
     return;
   }
@@ -4924,6 +5077,11 @@ document.addEventListener("submit", async (event) => {
 
   document.body.appendChild(submitForm);
   submitForm.submit();
+  trackAnalyticsEvent("form_submit", {
+    label: "課程報名",
+    targetUrl: COURSE_NOTIFY_EMAIL,
+    metadata: { form_id: "courseSignupForm" }
+  });
   window.setTimeout(() => submitForm.remove(), 500);
 
   let seconds = 2;
@@ -4932,12 +5090,23 @@ document.addEventListener("submit", async (event) => {
     seconds -= 1;
     if (seconds <= 0) {
       window.clearInterval(countdown);
+      trackAnalyticsEvent("join_line_click", { label: "課程報名完成後前往 LINE@", targetUrl: COURSE_LINE_URL });
       window.location.assign(COURSE_LINE_URL);
     } else {
       status.textContent = `報名資訊已送出，${seconds} 秒後前往 LINE@。`;
     }
   }, 1000);
 });
+
+document.addEventListener("submit", (event) => {
+  const form = event.target.closest("form");
+  if (!form || form.id === "courseSignupForm" || form.classList.contains("health-search")) return;
+  trackAnalyticsEvent("form_submit", {
+    label: form.getAttribute("aria-label") || form.id || form.className || "前台表單",
+    targetUrl: form.action || location.href,
+    metadata: { form_id: form.id || null, form_class: form.className || null }
+  });
+}, true);
 
 document.addEventListener("click", (event) => {
   const careerTab = event.target.closest("[data-career-tab]");
@@ -5016,6 +5185,7 @@ if (sceneImages.length > 1) {
 window.addEventListener("hashchange", () => renderPage(location.hash.slice(1)));
 window.addEventListener("scroll", updateMilestoneProgress, { passive: true });
 window.addEventListener("resize", updateMilestoneProgress);
+window.addEventListener("pagehide", flushPageEngagement);
 renderPage(location.hash.slice(1));
 loadSupabasePageContent("home");
 loadWordPressContent();
