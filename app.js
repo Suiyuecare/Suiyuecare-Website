@@ -228,7 +228,7 @@ async function recordFormSubmission(form, formType = "contact") {
     name: formDataValue(formData, ["姓名", "您的大名", "name"]),
     phone: formDataValue(formData, ["電話", "您的電話", "phone", "tel"]),
     email: formDataValue(formData, ["Email", "email", "信箱"]),
-    subject: formDataValue(formData, ["需求", "您本次報名的課程", "course", "subject"]) || formType,
+    subject: formDataValue(formData, ["需求", "課程", "您本次報名的課程", "course", "subject"]) || formType,
     message: formDataValue(formData, ["說明", "message", "內容"]),
     source_path: location.hash || "#home",
     metadata: {
@@ -243,6 +243,38 @@ async function recordFormSubmission(form, formType = "contact") {
     return null;
   }
   return data;
+}
+
+async function sendBackendForm(form, formType = "contact") {
+  const formData = new FormData(form);
+  const payload = {
+    form_type: formType,
+    name: formDataValue(formData, ["姓名", "您的大名", "name"]),
+    phone: formDataValue(formData, ["電話", "您的電話", "phone", "tel"]),
+    email: formDataValue(formData, ["Email", "email", "信箱"]),
+    subject: formDataValue(formData, ["需求", "課程", "您本次報名的課程", "course", "subject"]) || formType,
+    message: formDataValue(formData, ["說明", "message", "內容"]),
+    course_title: formDataValue(formData, ["課程", "您本次報名的課程", "course_title"]),
+    source_path: location.hash || "#home",
+    page_title: document.title,
+    user_agent: navigator.userAgent
+  };
+
+  if (location.protocol === "file:") {
+    await recordFormSubmission(form, formType);
+    return { ok: true, emailSent: false, localOnly: true };
+  }
+
+  const response = await fetch("/api/send-email", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok && response.status !== 202) {
+    throw new Error(result.message || "表單送出失敗，請稍後再試。");
+  }
+  return result;
 }
 
 function flushPageEngagement() {
@@ -276,6 +308,20 @@ function trackPageView(path) {
       hash: location.hash,
       viewport_width: window.innerWidth,
       viewport_height: window.innerHeight
+    }
+  });
+}
+
+function trackFrontendError(errorType, detail = {}) {
+  trackAnalyticsEvent("frontend_error", {
+    label: errorType,
+    targetUrl: location.href,
+    metadata: {
+      message: String(detail.message || "").slice(0, 500),
+      filename: detail.filename || null,
+      lineno: detail.lineno || null,
+      colno: detail.colno || null,
+      stack: String(detail.stack || "").slice(0, 1200)
     }
   });
 }
@@ -1147,6 +1193,90 @@ async function loadSupabasePageContent(slug) {
     applyCmsPage(page, sections || []);
   } catch (error) {
     console.warn(`Supabase page content unavailable for ${slug}.`, error);
+  }
+}
+
+function renderCmsDetailPage(page, sections = []) {
+  const pageContent = getSectionContent(page);
+  const heroImage = pageContent.hero_image_url || sections.find((section) => getSectionContent(section).image_url)?.content_json?.image_url || "assets/hero-care.png";
+  const heroAlt = pageContent.hero_image_alt || page.title || "歲悅長照頁面主視覺";
+  const primaryText = pageContent.button_text || "聯絡諮詢";
+  const primaryHref = pageContent.button_href || "#contact";
+
+  return `
+    <article class="cms-detail-page">
+      <section class="service-detail-hero">
+        <div>
+          <p class="eyebrow">${escapeHTML(pageContent.eyebrow || page.menu_label || "Suiyuecare")}</p>
+          <h1>${escapeHTML(page.hero_title || page.title)}</h1>
+          <p>${escapeHTML(page.hero_body || page.subtitle || pageContent.body || page.seo_description || "")}</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="${escapeHTML(primaryHref)}">${escapeHTML(primaryText)}</a>
+            <a class="secondary-button" href="#home">回到首頁</a>
+          </div>
+        </div>
+        <figure>
+          <img src="${escapeHTML(heroImage)}" alt="${escapeHTML(heroAlt)}"${imageStyleAttr({ usage: pageContent.image_usage || "service_hero", focalPoint: pageContent.focal_point || "center" })} />
+        </figure>
+      </section>
+      <section class="cms-section-stack">
+        ${sections.map((section, index) => {
+          const content = getSectionContent(section);
+          const image = content.image_url || content.background_image_url || "";
+          const items = Array.isArray(content.items) ? content.items : [];
+          return `
+            <article class="cms-managed-section ${image ? "has-image" : ""}">
+              ${image ? `<img src="${escapeHTML(image)}" alt="${escapeHTML(content.image_alt || section.title || page.title)}"${imageStyleAttr({ usage: content.image_usage || "card", focalPoint: content.focal_point || "center" })} />` : ""}
+              <div>
+                <span>${String(index + 1).padStart(2, "0")}</span>
+                <p class="eyebrow">${escapeHTML(content.eyebrow || section.eyebrow || section.section_key)}</p>
+                <h2>${escapeHTML(section.title || content.title || "")}</h2>
+                <p>${escapeHTML(section.body || content.body || section.subtitle || "")}</p>
+                ${items.length ? `<ul>${items.map((item) => `<li>${escapeHTML(item.title || item)}</li>`).join("")}</ul>` : ""}
+                ${content.button_href ? `<a href="${escapeHTML(content.button_href)}">${escapeHTML(content.button_text || "Read More")}</a>` : ""}
+              </div>
+            </article>
+          `;
+        }).join("")}
+      </section>
+    </article>
+  `;
+}
+
+async function loadSupabaseDetailPage(slug) {
+  if (!supabase || !slug || slug === "home") return;
+
+  try {
+    const { data: page, error: pageError } = await supabase
+      .from("pages")
+      .select("id, slug, title, subtitle, menu_label, hero_title, hero_body, seo_title, seo_description, content_json")
+      .eq("slug", slug)
+      .eq("status", "published")
+      .eq("is_enabled", true)
+      .maybeSingle();
+
+    if (pageError) throw pageError;
+    if (!page) return;
+
+    const { data: sections, error: sectionsError } = await supabase
+      .from("page_sections")
+      .select("id, section_key, title, subtitle, eyebrow, body, image_id, content_json, sort_order")
+      .eq("page_id", page.id)
+      .eq("status", "published")
+      .eq("is_enabled", true)
+      .order("sort_order", { ascending: true });
+
+    if (sectionsError) throw sectionsError;
+    const pageContent = getSectionContent(page);
+    const shouldOverride = pageContent.cms_mode === true || (sections || []).length > 0;
+    if (!shouldOverride || location.hash.slice(1).split("?")[0] !== slug) return;
+
+    document.title = page.seo_title || `${page.title}｜Suiyuecare Corps.`;
+    const seoDescription = document.querySelector('meta[name="description"]');
+    if (seoDescription && page.seo_description) seoDescription.setAttribute("content", page.seo_description);
+    pageView.innerHTML = renderCmsDetailPage(page, sections || []);
+  } catch (error) {
+    console.warn(`Supabase detail page unavailable for ${slug}.`, error);
   }
 }
 
@@ -4643,6 +4773,26 @@ function renderArticleNotFoundPage() {
   `;
 }
 
+function renderNotFoundPage(slug = "") {
+  return `
+    <section class="not-found-page">
+      <div>
+        <p class="eyebrow">404</p>
+        <h1>這個頁面目前不存在或尚未發布。</h1>
+        <p>你可以回到首頁、健康3.0，或直接留下需求讓歲悅協助判斷下一步。</p>
+        <div class="hero-actions">
+          <a class="primary-button" href="#home">回到首頁</a>
+          <a class="secondary-button" href="#contact">聯絡我們</a>
+        </div>
+      </div>
+      <aside>
+        <strong>找不到的路徑</strong>
+        <code>${escapeHTML(slug || location.hash || location.pathname)}</code>
+      </aside>
+    </section>
+  `;
+}
+
 function getRelatedArticles(slug) {
   const cmsRelated = getHealthArticleList()
     .filter((item) => item.slug !== slug && item.href !== `#article-${slug}`)
@@ -4787,7 +4937,7 @@ function renderPage(slug) {
   const articleSlug = normalized.startsWith("article-") ? normalized.replace("article-", "") : null;
   const anchorTarget = normalized === "home" ? null : document.getElementById(normalized);
   const page = anchorTarget ? null : pages[normalized];
-  const isHome = !articleSlug && (normalized === "home" || Boolean(anchorTarget) || !page);
+  const isHome = !articleSlug && (normalized === "home" || Boolean(anchorTarget));
 
   home.classList.toggle("active", isHome);
   pageView.classList.toggle("active", !isHome);
@@ -4874,7 +5024,7 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderShareholdersPage();
-  } else if (!isHome) {
+  } else if (page) {
     pageView.innerHTML = `
       <div class="detail-hero">
         <div>
@@ -4905,6 +5055,15 @@ function renderPage(slug) {
           .join("")}
       </div>
     `;
+  } else if (!articleSlug && normalized !== "home" && !anchorTarget && !page) {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderNotFoundPage(rawSlug);
+    trackAnalyticsEvent("error_404", {
+      label: rawSlug,
+      targetUrl: location.href,
+      metadata: { normalized }
+    });
   }
 
   document.querySelectorAll(".primary-nav a, .dropdown a").forEach((link) => {
@@ -4919,6 +5078,10 @@ function renderPage(slug) {
     anchorTarget.scrollIntoView({ behavior: "smooth", block: "start" });
   } else {
     window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  if (!isHome && !articleSlug && !["health", "search"].includes(normalized)) {
+    loadSupabaseDetailPage(normalized);
   }
 
   trackPageView(`#${rawSlug || "home"}`);
@@ -5086,38 +5249,20 @@ document.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
   status.textContent = "正在送出報名資訊...";
 
-  const iframeName = "courseSignupSubmitFrame";
-  let iframe = document.querySelector(`iframe[name="${iframeName}"]`);
-  if (!iframe) {
-    iframe = document.createElement("iframe");
-    iframe.name = iframeName;
-    iframe.hidden = true;
-    document.body.appendChild(iframe);
+  try {
+    const result = await sendBackendForm(form, "course_signup");
+    trackAnalyticsEvent("form_submit", {
+      label: "課程報名",
+      targetUrl: COURSE_NOTIFY_EMAIL,
+      metadata: { form_id: "courseSignupForm", email_sent: Boolean(result.emailSent) }
+    });
+  } catch (error) {
+    console.warn("Course signup failed.", error);
+    trackFrontendError("course_signup_failed", { message: error.message, stack: error.stack });
+    status.textContent = error.message || "送出失敗，請稍後再試。";
+    submitButton.disabled = false;
+    return;
   }
-
-  const submitForm = document.createElement("form");
-  submitForm.method = "POST";
-  submitForm.action = `https://formsubmit.co/${COURSE_NOTIFY_EMAIL}`;
-  submitForm.target = iframeName;
-  submitForm.hidden = true;
-
-  new FormData(form).forEach((value, key) => {
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = key;
-    input.value = value;
-    submitForm.appendChild(input);
-  });
-
-  document.body.appendChild(submitForm);
-  await recordFormSubmission(form, "course_signup");
-  submitForm.submit();
-  trackAnalyticsEvent("form_submit", {
-    label: "課程報名",
-    targetUrl: COURSE_NOTIFY_EMAIL,
-    metadata: { form_id: "courseSignupForm" }
-  });
-  window.setTimeout(() => submitForm.remove(), 500);
 
   let seconds = 2;
   status.textContent = `報名資訊已送出，${seconds} 秒後前往 LINE@。`;
@@ -5139,14 +5284,25 @@ document.addEventListener("submit", (event) => {
   if (form.classList.contains("contact-form")) {
     event.preventDefault();
     const submitButton = form.querySelector("button[type='submit']");
+    const originalText = submitButton?.textContent || "送出諮詢";
     submitButton?.setAttribute("disabled", "true");
-    recordFormSubmission(form, "contact").finally(() => {
+    if (submitButton) submitButton.textContent = "送出中...";
+    sendBackendForm(form, "contact").then((result) => {
       trackAnalyticsEvent("form_submit", {
         label: "聯絡我們",
         targetUrl: form.action || location.href,
-        metadata: { form_class: "contact-form" }
+        metadata: { form_class: "contact-form", email_sent: Boolean(result.emailSent) }
       });
-      form.submit();
+      form.reset();
+      if (submitButton) submitButton.textContent = "已送出，我們會盡快聯絡";
+    }).catch((error) => {
+      console.warn("Contact form failed.", error);
+      trackFrontendError("contact_form_failed", { message: error.message, stack: error.stack });
+      window.alert(error.message || "送出失敗，請稍後再試。");
+      if (submitButton) {
+        submitButton.textContent = originalText;
+        submitButton.removeAttribute("disabled");
+      }
     });
     return;
   }
@@ -5233,6 +5389,21 @@ if (sceneImages.length > 1) {
 
 window.addEventListener("hashchange", () => renderPage(location.hash.slice(1)));
 window.addEventListener("scroll", updateMilestoneProgress, { passive: true });
+window.addEventListener("error", (event) => {
+  trackFrontendError("window_error", {
+    message: event.message,
+    filename: event.filename,
+    lineno: event.lineno,
+    colno: event.colno,
+    stack: event.error?.stack
+  });
+});
+window.addEventListener("unhandledrejection", (event) => {
+  trackFrontendError("unhandled_rejection", {
+    message: event.reason?.message || event.reason,
+    stack: event.reason?.stack
+  });
+});
 window.addEventListener("resize", updateMilestoneProgress);
 window.addEventListener("pagehide", flushPageEngagement);
 renderPage(location.hash.slice(1));

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>內容健康檢查｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/">
+            <img src="/assets/company-logo.png" alt="" />
+            <span>
+              <strong>歲悅長照集團</strong>
+              <small>CMS Console</small>
+            </span>
+          </a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+          <a href="/admin/traffic"><span>AN</span><strong>網站流量中心</strong></a>
+          <a class="active" href="/admin/content-health"><span>QA</span><strong>內容健康檢查</strong></a>
+        </nav>
+        <div class="admin-sidebar-note">
+          <span>Content QA</span>
+          <strong>上線前內容檢查</strong>
+          <p>檢查缺圖、缺 alt、缺 SEO、未發布文章與頁面區塊狀態。</p>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Content Health</p>
+            <h1>內容健康檢查</h1>
+            <span>用上線審核角度檢查每個頁面、圖片、文章與分類是否完整。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="admin-preview-link" href="/" target="_blank" rel="noopener">查看前台</a>
+            <div class="admin-userbox">
+              <b id="adminUserInitial">S</b>
+              <span>
+                <small>登入者</small>
+                <strong id="adminUserEmail">正在確認登入狀態...</strong>
+              </span>
+              <button id="adminLogout" type="button">登出</button>
+            </div>
+          </div>
+        </header>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div>
+              <p class="admin-eyebrow">Audit Summary</p>
+              <h2>整體健康度</h2>
+            </div>
+            <button type="button" id="contentHealthRefresh">重新檢查</button>
+          </div>
+          <p id="contentHealthStatus" class="admin-data-status">正在讀取內容資料...</p>
+          <div id="contentHealthKpis" class="traffic-kpi-grid compact"></div>
+        </section>
+
+        <section class="traffic-tabs content-health-tabs" aria-label="內容健康檢查分類">
+          <button type="button" class="active" data-health-filter="all">全部問題</button>
+          <button type="button" data-health-filter="critical">Critical</button>
+          <button type="button" data-health-filter="warning">Warning</button>
+          <button type="button" data-health-filter="page">頁面</button>
+          <button type="button" data-health-filter="article">文章</button>
+          <button type="button" data-health-filter="media">圖片</button>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div>
+              <p class="admin-eyebrow">Issues</p>
+              <h2>待修正清單</h2>
+            </div>
+            <button type="button" id="contentHealthExport">匯出 CSV</button>
+          </div>
+          <div id="contentHealthIssueList" class="content-health-list"></div>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div>
+              <p class="admin-eyebrow">Templates</p>
+              <h2>內容模板提醒</h2>
+            </div>
+          </div>
+          <div class="admin-module-list compact">
+            <article><span>服務</span><div><strong>服務頁模板</strong><p>Hero、服務對象、服務內容、流程、據點/案例、FAQ、CTA。</p></div><a href="/admin/pages">編輯頁面</a></article>
+            <article><span>文章</span><div><strong>文章頁模板</strong><p>封面、分類、作者、日期、本文重點、正文、延伸閱讀、SEO。</p></div><a href="/admin/articles">編輯文章</a></article>
+            <article><span>招募</span><div><strong>招募頁模板</strong><p>部門簡介、職缺卡片、資格條件、福利、申請 CTA。</p></div><a href="/admin/pages">編輯頁面</a></article>
+            <article><span>IR</span><div><strong>投資人公告模板</strong><p>公告日期、公告類型、下載檔案、重大訊息摘要、聯絡窗口。</p></div><a href="/admin/articles/new">新增公告</a></article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="adminLoading" class="admin-loading">
+      <strong>正在檢查登入狀態</strong>
+      <span>請稍候...</span>
+    </div>
+
+    <script type="module" src="/src/admin/content-health.js"></script>
+  </body>
+</html>

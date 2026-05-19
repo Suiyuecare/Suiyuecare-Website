@@ -12,5 +12,19 @@
       "source": "/admin/articles/:id",
       "destination": "/admin/articles/[id]"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/report-digest",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/report-digest-weekly",
+      "schedule": "0 2 * * 1"
+    },
+    {
+      "path": "/api/report-digest-monthly",
+      "schedule": "0 3 1 * *"
+    }
   ]
 }

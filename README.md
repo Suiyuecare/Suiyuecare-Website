@@ -329,3 +329,119 @@ npm run build
 ```
 
 這樣 `/admin/login`、`/admin` 與 `src/` 裡的 Supabase module 才會被正確打包。
+
+## Launch Hardening
+
+### 正式後端寄信
+
+前台聯絡表單與課程報名已改走 Vercel Serverless Function：
+
+- `POST /api/send-email`
+- 先寫入 Supabase `form_submissions`
+- 再使用 Resend 寄信
+- 若 `RESEND_API_KEY` 尚未設定，API 會回傳 `202`，資料仍會留存在後台，避免名單遺失
+
+Vercel 需要設定：
+
+```bash
+SUPABASE_URL=https://ussnmxdpxeoshlrdchov.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=...
+RESEND_API_KEY=...
+MAIL_FROM="Suiyuecare Website <noreply@suiyuecare.com>"
+CONTACT_NOTIFY_EMAIL=generalaffairs@suiyuecare.com
+COURSE_NOTIFY_EMAIL=edu.control@suiyuecare.com
+REPORT_FALLBACK_EMAIL=generalaffairs@suiyuecare.com
+REPORT_CRON_SECRET=...
+```
+
+### 內容模板
+
+已新增 Supabase migration：
+
+- `content_templates`
+- `content_audit_runs`
+- `backup_manifests`
+
+內建模板：
+
+- 服務頁：Hero、服務對象、服務內容、流程、FAQ、CTA
+- 文章頁：封面、分類、作者、日期、本文重點、正文、延伸閱讀、SEO
+- 招募頁：部門簡介、職缺卡片、資格條件、福利、申請 CTA
+- 投資人公告：公告日期、公告類型、下載檔案、重大訊息摘要、聯絡窗口
+
+### 內容健康檢查
+
+後台新增：
+
+```text
+/admin/content-health
+```
+
+會檢查：
+
+- 頁面缺 SEO title / description
+- 頁面或區塊未發布
+- 區塊可能缺圖
+- 圖片缺 alt
+- 文章缺封面、摘要、SEO、發布日期
+- 圖片缺尺寸或 public URL
+
+### 404 與錯誤追蹤
+
+- 新增 `404.html`
+- 前台未知 hash route 會顯示 404 區塊
+- 前台 `window.error` 與 `unhandledrejection` 會寫入 `analytics_events`，事件類型為 `frontend_error`
+- 找不到頁面會寫入 `error_404`
+
+### SEO
+
+已補：
+
+- `robots.txt`
+- `sitemap.xml`
+- canonical
+- Open Graph image / title / description
+- Twitter card
+
+正式網域切到 Vercel 後，請確認 `https://suiyuecare.com/robots.txt` 與 `https://suiyuecare.com/sitemap.xml` 均可讀取。
+
+### 自動報表
+
+新增：
+
+```text
+GET /api/report-digest
+GET /api/report-digest-weekly
+GET /api/report-digest-monthly
+```
+
+Vercel Cron 已設定日報、週報、月報。此功能需要：
+
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `RESEND_API_KEY`
+- `REPORT_CRON_SECRET`
+
+### 備份與還原
+
+備份 CMS 主要資料表：
+
+```bash
+SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run backup:supabase
+```
+
+還原：
+
+```bash
+SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run restore:supabase -- backups/your-backup.json
+```
+
+備份內容包含：
+
+- `pages`
+- `page_sections`
+- `media`
+- `article_categories`
+- `articles`
+- `form_submissions`
+- `content_templates`
+- `analytics_report_schedules`
