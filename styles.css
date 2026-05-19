@@ -2629,6 +2629,17 @@ h2 {
   height: 100%;
   object-fit: cover;
 }
+.nursing-hero .service-hero-card,
+.migrant-training-hero .service-hero-card,
+.quality-hero .service-hero-card {
+  min-height: 0;
+  height: clamp(360px, 34vw, 500px);
+  align-self: center;
+}
+.migrant-training-hero .service-hero-card img,
+.quality-hero .service-hero-card img {
+  object-position: center;
+}
 .service-hero-card div {
   position: absolute;
   z-index: 1;
@@ -5913,6 +5924,11 @@ h2 {
   .service-hero-card {
     min-height: 420px;
   }
+  .nursing-hero .service-hero-card,
+  .migrant-training-hero .service-hero-card,
+  .quality-hero .service-hero-card {
+    height: 420px;
+  }
   .service-detail-hero,
   .service-detail-section {
     padding-inline: 32px;
@@ -6048,6 +6064,11 @@ h2 {
   .service-hero-card {
     min-height: 320px;
     border-radius: 24px;
+  }
+  .nursing-hero .service-hero-card,
+  .migrant-training-hero .service-hero-card,
+  .quality-hero .service-hero-card {
+    height: 320px;
   }
   .service-hero-card div {
     left: 20px;
