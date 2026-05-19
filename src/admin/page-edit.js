@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabaseClient.js";
-import { fetchMediaImages, getFocalPointOption, getImageUsageOption, uploadImageToMedia } from "./media-utils.js";
+import { fetchMediaImages, getFocalPointOption, getImageUsageOption, prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML } from "./utils.js";
 
@@ -363,11 +363,17 @@ async function uploadAndSelectImage(event) {
 
   const submitButton = imageUploadForm.querySelector("button[type='submit']");
   submitButton?.setAttribute("disabled", "true");
-  setImagePickerStatus("正在上傳圖片並寫入 media 資料表...", "info");
+  setImagePickerStatus("正在檢查圖片比例...", "info");
 
   try {
+    const preparedFile = await prepareImageForUpload(file, imageUploadForm.elements.image_usage.value);
+    if (!preparedFile) {
+      setImagePickerStatus("已取消上傳。", "info");
+      return;
+    }
+    setImagePickerStatus("正在上傳圖片並寫入 media 資料表...", "info");
     const media = await uploadImageToMedia({
-      file,
+      file: preparedFile,
       altText: imageUploadForm.elements.alt_text.value,
       caption: imageUploadForm.elements.caption.value,
       imageUsage: imageUploadForm.elements.image_usage.value,

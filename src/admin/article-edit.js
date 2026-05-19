@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabaseClient.js";
-import { fetchMediaImages, getFocalPointOption, getImageUsageOption, uploadImageToMedia } from "./media-utils.js";
+import { fetchMediaImages, getFocalPointOption, getImageUsageOption, prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
 
@@ -294,11 +294,17 @@ async function uploadAndSelectCover(event) {
 
   const submitButton = coverUploadForm.querySelector("button[type='submit']");
   submitButton?.setAttribute("disabled", "true");
-  setCoverPickerStatus("正在上傳封面並寫入 media 資料表...", "info");
+  setCoverPickerStatus("正在檢查圖片比例...", "info");
 
   try {
+    const preparedFile = await prepareImageForUpload(file, coverUploadForm.elements.image_usage.value || "article_cover");
+    if (!preparedFile) {
+      setCoverPickerStatus("已取消上傳。", "info");
+      return;
+    }
+    setCoverPickerStatus("正在上傳封面並寫入 media 資料表...", "info");
     const media = await uploadImageToMedia({
-      file,
+      file: preparedFile,
       altText: coverUploadForm.elements.alt_text.value,
       caption: coverUploadForm.elements.caption.value,
       imageUsage: coverUploadForm.elements.image_usage.value || "article_cover",

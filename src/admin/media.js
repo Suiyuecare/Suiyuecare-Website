@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabaseClient.js";
-import { fetchMediaImages, getFocalPointOption, getImageUsageOption, uploadImageToMedia } from "./media-utils.js";
+import { fetchMediaImages, getFocalPointOption, getImageUsageOption, prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
 
@@ -81,11 +81,17 @@ async function uploadMedia(event) {
 
   const submitButton = document.querySelector('button[form="adminMediaUploadForm"]');
   submitButton?.setAttribute("disabled", "true");
-  setMediaStatus("正在上傳圖片到 Supabase Storage...", "info");
+  setMediaStatus("正在檢查圖片比例...", "info");
 
   try {
+    const preparedFile = await prepareImageForUpload(file, uploadForm.elements.image_usage.value);
+    if (!preparedFile) {
+      setMediaStatus("已取消上傳。", "info");
+      return;
+    }
+    setMediaStatus("正在上傳圖片到 Supabase Storage...", "info");
     await uploadImageToMedia({
-      file,
+      file: preparedFile,
       altText: uploadForm.elements.alt_text.value,
       caption: uploadForm.elements.caption.value,
       imageUsage: uploadForm.elements.image_usage.value,

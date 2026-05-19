@@ -34,6 +34,251 @@ export function getFocalPointOption(value = "center") {
   return focalPointOptions.find((option) => option.value === value) || focalPointOptions[0];
 }
 
+const imageUsageRatios = {
+  hero: 21 / 9,
+  service_hero: 4 / 3,
+  article_cover: 16 / 9,
+  card: 4 / 3,
+  square: 1,
+  avatar: 1
+};
+
+const cropOutputSizes = {
+  hero: { width: 1920, height: 823 },
+  service_hero: { width: 1400, height: 1050 },
+  article_cover: { width: 1600, height: 900 },
+  card: { width: 1200, height: 900 },
+  square: { width: 1200, height: 1200 },
+  avatar: { width: 900, height: 900 }
+};
+
+function getImageUsageRatio(value = "card") {
+  return imageUsageRatios[value] || null;
+}
+
+function readImage(file) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("圖片讀取失敗，請換一張圖片再試。"));
+    };
+    image.src = objectUrl;
+  });
+}
+
+function clamp(value, min, max) {
+  if (min > max) return (min + max) / 2;
+  return Math.min(Math.max(value, min), max);
+}
+
+function makeCroppedFileName(name = "image.jpg") {
+  const extension = name.toLowerCase().endsWith(".png") ? "png" : "jpg";
+  const base = name
+    .replace(/\.[^.]+$/, "")
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48) || "image";
+  return `${base}-cropped.${extension}`;
+}
+
+function canvasToFile(canvas, originalFile) {
+  const isPng = originalFile.type === "image/png";
+  const mimeType = isPng ? "image/png" : "image/jpeg";
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("裁切圖片失敗，請再試一次。"));
+        return;
+      }
+      resolve(new File([blob], makeCroppedFileName(originalFile.name), {
+        type: mimeType,
+        lastModified: Date.now()
+      }));
+    }, mimeType, isPng ? undefined : 0.92);
+  });
+}
+
+function createCropModal() {
+  let modal = document.querySelector("[data-image-crop-modal]");
+  if (modal) return modal;
+
+  modal = document.createElement("section");
+  modal.className = "admin-modal admin-crop-modal";
+  modal.hidden = true;
+  modal.dataset.imageCropModal = "true";
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.innerHTML = `
+    <div class="admin-modal-panel admin-crop-panel">
+      <header>
+        <div>
+          <p class="admin-kicker">IMAGE CROP</p>
+          <h2>調整圖片裁切</h2>
+        </div>
+        <button type="button" data-crop-cancel>取消</button>
+      </header>
+      <div class="admin-crop-layout">
+        <div>
+          <div class="admin-crop-frame" data-crop-frame>
+            <img alt="裁切預覽" data-crop-image />
+          </div>
+          <p class="admin-crop-hint" data-crop-hint></p>
+        </div>
+        <aside class="admin-crop-tools">
+          <strong data-crop-title>圖片比例不符合版位</strong>
+          <p data-crop-copy></p>
+          <label>
+            縮放
+            <input type="range" min="1" max="3" step="0.01" value="1" data-crop-zoom />
+          </label>
+          <div class="admin-crop-actions">
+            <button type="button" data-crop-skip>保留原圖</button>
+            <button type="button" data-crop-apply>套用裁切</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  return modal;
+}
+
+export async function prepareImageForUpload(file, imageUsage = "card") {
+  const ratio = getImageUsageRatio(imageUsage);
+  if (!file || !ratio || !file.type?.startsWith("image/")) return file;
+
+  const image = await readImage(file);
+  const currentRatio = image.naturalWidth / image.naturalHeight;
+  if (Math.abs(currentRatio - ratio) / ratio < 0.035) return file;
+
+  return new Promise((resolve) => {
+    const modal = createCropModal();
+    const frame = modal.querySelector("[data-crop-frame]");
+    const preview = modal.querySelector("[data-crop-image]");
+    const zoomInput = modal.querySelector("[data-crop-zoom]");
+    const hint = modal.querySelector("[data-crop-hint]");
+    const title = modal.querySelector("[data-crop-title]");
+    const copy = modal.querySelector("[data-crop-copy]");
+    const usageOption = getImageUsageOption(imageUsage);
+    const outputSize = cropOutputSizes[imageUsage] || cropOutputSizes.card;
+    let objectUrl = URL.createObjectURL(file);
+    let baseScale = 1;
+    let zoom = 1;
+    let x = 0;
+    let y = 0;
+    let dragging = false;
+    let startX = 0;
+    let startY = 0;
+    let originX = 0;
+    let originY = 0;
+    let settled = false;
+
+    function cleanup(result) {
+      if (settled) return;
+      settled = true;
+      URL.revokeObjectURL(objectUrl);
+      modal.hidden = true;
+      document.body.classList.remove("modal-open");
+      preview.src = "";
+      resolve(result);
+    }
+
+    function updateImage() {
+      const rect = frame.getBoundingClientRect();
+      const scale = baseScale * zoom;
+      const renderedWidth = image.naturalWidth * scale;
+      const renderedHeight = image.naturalHeight * scale;
+      x = clamp(x, rect.width - renderedWidth, 0);
+      y = clamp(y, rect.height - renderedHeight, 0);
+      preview.style.width = `${renderedWidth}px`;
+      preview.style.height = `${renderedHeight}px`;
+      preview.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    function resetPosition() {
+      const rect = frame.getBoundingClientRect();
+      baseScale = Math.max(rect.width / image.naturalWidth, rect.height / image.naturalHeight);
+      zoom = Number(zoomInput.value || 1);
+      const renderedWidth = image.naturalWidth * baseScale * zoom;
+      const renderedHeight = image.naturalHeight * baseScale * zoom;
+      x = (rect.width - renderedWidth) / 2;
+      y = (rect.height - renderedHeight) / 2;
+      updateImage();
+    }
+
+    async function applyCrop() {
+      const rect = frame.getBoundingClientRect();
+      const scale = baseScale * zoom;
+      const sx = clamp(-x / scale, 0, image.naturalWidth);
+      const sy = clamp(-y / scale, 0, image.naturalHeight);
+      const sw = clamp(rect.width / scale, 1, image.naturalWidth - sx);
+      const sh = clamp(rect.height / scale, 1, image.naturalHeight - sy);
+      const canvas = document.createElement("canvas");
+      canvas.width = outputSize.width;
+      canvas.height = outputSize.height;
+      const context = canvas.getContext("2d");
+      context.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+      cleanup(await canvasToFile(canvas, file));
+    }
+
+    title.textContent = `${usageOption?.label || "此版位"}建議比例：${usageOption?.ratio || ""}`;
+    copy.textContent = `目前圖片為 ${image.naturalWidth} × ${image.naturalHeight}，和版位比例不同。可拖曳圖片調整重點，或直接保留原圖。`;
+    hint.textContent = "拖曳圖片可調整裁切位置，右側滑桿可放大圖片。";
+    frame.style.aspectRatio = `${ratio}`;
+    preview.src = objectUrl;
+    zoomInput.value = "1";
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+    requestAnimationFrame(resetPosition);
+
+    zoomInput.oninput = () => {
+      const rect = frame.getBoundingClientRect();
+      const previousScale = baseScale * zoom;
+      const centerX = rect.width / 2 - x;
+      const centerY = rect.height / 2 - y;
+      zoom = Number(zoomInput.value || 1);
+      const nextScale = baseScale * zoom;
+      x -= centerX * (nextScale / previousScale - 1);
+      y -= centerY * (nextScale / previousScale - 1);
+      updateImage();
+    };
+
+    frame.onpointerdown = (event) => {
+      dragging = true;
+      frame.setPointerCapture(event.pointerId);
+      startX = event.clientX;
+      startY = event.clientY;
+      originX = x;
+      originY = y;
+    };
+    frame.onpointermove = (event) => {
+      if (!dragging) return;
+      x = originX + event.clientX - startX;
+      y = originY + event.clientY - startY;
+      updateImage();
+    };
+    frame.onpointerup = () => {
+      dragging = false;
+    };
+    frame.onpointercancel = () => {
+      dragging = false;
+    };
+
+    modal.querySelector("[data-crop-cancel]").onclick = () => cleanup(null);
+    modal.querySelector("[data-crop-skip]").onclick = () => cleanup(file);
+    modal.querySelector("[data-crop-apply]").onclick = applyCrop;
+    modal.onclick = (event) => {
+      if (event.target === modal) cleanup(null);
+    };
+  });
+}
+
 export function slugifyFileName(name = "image") {
   const extension = name.includes(".") ? name.split(".").pop().toLowerCase() : "png";
   const base = name
