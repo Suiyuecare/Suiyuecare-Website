@@ -4243,24 +4243,36 @@ function renderTalentPage() {
 
   const departmentPanel = (key) => {
     const item = departments[key];
+    const departmentHero = ({ eyebrow, title, copy, highlights, image, imageAlt, coverClass = "", coverEyebrow, coverTitle }) => `
+            <section class="homecare-intro ${coverClass ? `${coverClass}-intro` : ""}">
+              <div>
+                <p class="eyebrow">${eyebrow}</p>
+                <h2>${title}</h2>
+                <p>${copy}</p>
+                <div class="homecare-highlight-row">
+                  ${highlights.map(([highlightTitle, highlightCopy]) => `<article><span>${highlightTitle}</span><strong>${highlightCopy}</strong></article>`).join("")}
+                </div>
+              </div>
+              <aside class="${coverClass ? `${coverClass}-cover` : ""}">
+                <img src="${image}" alt="${imageAlt}" />
+                <div><span>${coverEyebrow}</span><strong>${coverTitle}</strong></div>
+              </aside>
+            </section>
+    `;
     if (key === "home-care-team") {
       return `
         <section class="career-tab-panel" data-career-panel="${key}">
           <div class="homecare-recruit">
-            <section class="homecare-intro">
-              <div>
-                <p class="eyebrow">Home Care Team</p>
-                <h2>居家照顧部門</h2>
-                <p>居家照顧是歲悅最靠近家庭的一線服務。我們進到長輩熟悉的家，把身體照顧、生活支持、家屬溝通與服務紀錄串成一套穩定流程，讓家庭不用自己猜、照顧者也不是單打獨鬥。</p>
-                <div class="homecare-highlight-row">
-                  ${homeCareRecruit.highlights.map(([title, copy]) => `<article><span>${title}</span><strong>${copy}</strong></article>`).join("")}
-                </div>
-              </div>
-              <aside>
-                <img src="assets/homepage-batch/01-care-home-greeting.png" alt="歲悅居家照顧服務情境" />
-                <div><span>Suiyuecare Home Care</span><strong>把照顧帶進家裡，也把安心留在家裡。</strong></div>
-              </aside>
-            </section>
+            ${departmentHero({
+              eyebrow: "Home Care Team",
+              title: "居家照顧部門",
+              copy: "居家照顧是歲悅最靠近家庭的一線服務。我們進到長輩熟悉的家，把身體照顧、生活支持、家屬溝通與服務紀錄串成一套穩定流程，讓家庭不用自己猜、照顧者也不是單打獨鬥。",
+              highlights: homeCareRecruit.highlights,
+              image: "assets/homepage-batch/01-care-home-greeting.png",
+              imageAlt: "歲悅居家照顧服務情境",
+              coverEyebrow: "Suiyuecare Home Care",
+              coverTitle: "把照顧帶進家裡，也把安心留在家裡。"
+            })}
 
             <section class="homecare-gallery" aria-label="居家照顧工作情境">
               ${homeCareRecruit.gallery.map(([image, caption]) => `<figure><img src="${image}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
@@ -4310,20 +4322,17 @@ function renderTalentPage() {
       return `
         <section class="career-tab-panel" data-career-panel="${key}">
           <div class="homecare-recruit daycare-recruit">
-            <section class="homecare-intro daycare-intro">
-              <div>
-                <p class="eyebrow">Day Care Team</p>
-                <h2>日間照顧部</h2>
-                <p>日間照顧是讓長輩白天有安全、有活動、有同伴，也讓家庭有喘息空間的服務。歲悅的日照團隊把作息、餐食、活動、健康觀察與家屬回報整合在一起，讓每一天都被好好安排。</p>
-                <div class="homecare-highlight-row">
-                  ${dayCareRecruit.highlights.map(([title, copy]) => `<article><span>${title}</span><strong>${copy}</strong></article>`).join("")}
-                </div>
-              </div>
-              <aside class="daycare-cover">
-                <img src="assets/daycare-recruit-02-exercise.png" alt="歲悅日間照顧團體活動情境" />
-                <div><span>Suiyuecare Day Care</span><strong>讓長輩白天被陪伴，也讓家庭晚上更安心。</strong></div>
-              </aside>
-            </section>
+            ${departmentHero({
+              eyebrow: "Day Care Team",
+              title: "日間照顧部",
+              copy: "日間照顧是讓長輩白天有安全、有活動、有同伴，也讓家庭有喘息空間的服務。歲悅的日照團隊把作息、餐食、活動、健康觀察與家屬回報整合在一起，讓每一天都被好好安排。",
+              highlights: dayCareRecruit.highlights,
+              image: "assets/daycare-recruit-02-exercise.png",
+              imageAlt: "歲悅日間照顧團體活動情境",
+              coverClass: "daycare",
+              coverEyebrow: "Suiyuecare Day Care",
+              coverTitle: "讓長輩白天被陪伴，也讓家庭晚上更安心。"
+            })}
 
             <section class="homecare-gallery daycare-gallery" aria-label="日間照顧工作情境">
               ${dayCareRecruit.gallery.map(([image, caption]) => `<figure><img src="${image}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
@@ -4373,20 +4382,17 @@ function renderTalentPage() {
       return `
         <section class="career-tab-panel" data-career-panel="${key}">
           <div class="homecare-recruit migrant-recruit">
-            <section class="homecare-intro migrant-intro">
-              <div>
-                <p class="eyebrow">Migrant Training</p>
-                <h2>移工培訓部</h2>
-                <p>移工培訓部把家庭照顧常見的身體照顧、移位安全、備餐營養、溝通回報與照顧紀錄，整理成可以聽懂、看懂、練習、回家後能執行的課程。這個部門不只是教技能，更是在家庭、移工與照顧團隊之間建立共同語言。</p>
-                <div class="homecare-highlight-row">
-                  ${migrantRecruit.highlights.map(([title, copy]) => `<article><span>${title}</span><strong>${copy}</strong></article>`).join("")}
-                </div>
-              </div>
-              <aside class="migrant-cover">
-                <img src="assets/migrant-recruit-01-classroom.png" alt="歲悅移工培訓課堂情境" />
-                <div><span>Suiyuecare Training</span><strong>把照顧教到會，也把家庭接得更穩。</strong></div>
-              </aside>
-            </section>
+            ${departmentHero({
+              eyebrow: "Migrant Training",
+              title: "移工培訓部",
+              copy: "移工培訓部把家庭照顧常見的身體照顧、移位安全、備餐營養、溝通回報與照顧紀錄，整理成可以聽懂、看懂、練習、回家後能執行的課程。這個部門不只是教技能，更是在家庭、移工與照顧團隊之間建立共同語言。",
+              highlights: migrantRecruit.highlights,
+              image: "assets/migrant-recruit-01-classroom.png",
+              imageAlt: "歲悅移工培訓課堂情境",
+              coverClass: "migrant",
+              coverEyebrow: "Suiyuecare Training",
+              coverTitle: "把照顧教到會，也把家庭接得更穩。"
+            })}
 
             <section class="homecare-gallery migrant-gallery" aria-label="移工培訓工作情境">
               ${migrantRecruit.gallery.map(([image, caption]) => `<figure><img src="${image}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
@@ -4436,20 +4442,17 @@ function renderTalentPage() {
       return `
         <section class="career-tab-panel" data-career-panel="${key}">
           <div class="homecare-recruit quality-recruit">
-            <section class="homecare-intro quality-intro">
-              <div>
-                <p class="eyebrow">Teaching Quality</p>
-                <h2>教學品管部</h2>
-                <p>教學品管部把前線照顧經驗變成可被學習、檢核與改善的系統。從新人訓練、教材設計、服務紀錄檢核到品質改善專案，這個部門讓歲悅的服務不是只靠個人努力，而是靠制度穩定變好。</p>
-                <div class="homecare-highlight-row">
-                  ${qualityRecruit.highlights.map(([title, copy]) => `<article><span>${title}</span><strong>${copy}</strong></article>`).join("")}
-                </div>
-              </div>
-              <aside class="quality-cover">
-                <img src="assets/quality-recruit-04-quality-meeting.png" alt="歲悅教學品管品質會議情境" />
-                <div><span>Suiyuecare Quality</span><strong>把好的照顧整理成方法，再讓方法長成制度。</strong></div>
-              </aside>
-            </section>
+            ${departmentHero({
+              eyebrow: "Teaching Quality",
+              title: "教學品管部",
+              copy: "教學品管部把前線照顧經驗變成可被學習、檢核與改善的系統。從新人訓練、教材設計、服務紀錄檢核到品質改善專案，這個部門讓歲悅的服務不是只靠個人努力，而是靠制度穩定變好。",
+              highlights: qualityRecruit.highlights,
+              image: "assets/quality-recruit-04-quality-meeting.png",
+              imageAlt: "歲悅教學品管品質會議情境",
+              coverClass: "quality",
+              coverEyebrow: "Suiyuecare Quality",
+              coverTitle: "把好的照顧整理成方法，再讓方法長成制度。"
+            })}
 
             <section class="homecare-gallery quality-gallery" aria-label="教學品管工作情境">
               ${qualityRecruit.gallery.map(([image, caption]) => `<figure><img src="${image}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
@@ -4499,20 +4502,17 @@ function renderTalentPage() {
       return `
         <section class="career-tab-panel" data-career-panel="${key}">
           <div class="homecare-recruit admin-recruit">
-            <section class="homecare-intro admin-intro">
-              <div>
-                <p class="eyebrow">Administration</p>
-                <h2>行政部</h2>
-                <p>行政部是讓歲悅前線服務能穩定運作的後勤核心。從人資招募、營運調度、財務行政、客服總務到投資人與專案支援，每一個看似細節的流程，都會影響照顧是否能準時、清楚、持續地被交付。</p>
-                <div class="homecare-highlight-row">
-                  ${adminRecruit.highlights.map(([title, copy]) => `<article><span>${title}</span><strong>${copy}</strong></article>`).join("")}
-                </div>
-              </div>
-              <aside class="admin-cover">
-                <img src="assets/admin-recruit-05-meeting.png" alt="歲悅行政部跨部門會議情境" />
-                <div><span>Suiyuecare Admin</span><strong>讓後勤有秩序，前線照顧才有餘裕。</strong></div>
-              </aside>
-            </section>
+            ${departmentHero({
+              eyebrow: "Administration",
+              title: "行政部",
+              copy: "行政部是讓歲悅前線服務能穩定運作的後勤核心。從人資招募、營運調度、財務行政、客服總務到投資人與專案支援，每一個看似細節的流程，都會影響照顧是否能準時、清楚、持續地被交付。",
+              highlights: adminRecruit.highlights,
+              image: "assets/admin-recruit-05-meeting.png",
+              imageAlt: "歲悅行政部跨部門會議情境",
+              coverClass: "admin",
+              coverEyebrow: "Suiyuecare Admin",
+              coverTitle: "讓後勤有秩序，前線照顧才有餘裕。"
+            })}
 
             <section class="homecare-gallery admin-gallery" aria-label="行政部工作情境">
               ${adminRecruit.gallery.map(([image, caption]) => `<figure><img src="${image}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
