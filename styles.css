@@ -1806,16 +1806,16 @@ h2 {
   grid-template-columns: minmax(0, 1.15fr) minmax(360px, .55fr);
   gap: 28px;
   align-items: stretch;
-  padding: 64px clamp(32px,5vw,86px) 34px;
+  padding: 54px clamp(32px,5vw,86px) 30px;
   background:
     linear-gradient(120deg, rgba(255,255,255,.96), rgba(255,248,238,.9)),
     radial-gradient(circle at 88% 12%, rgba(240,138,36,.18), transparent 32%);
 }
 .investor-hero h1 {
-  margin: 10px 0 18px;
+  margin: 10px 0 20px;
   color: var(--brown);
-  font-size: clamp(48px, 6vw, 92px);
-  line-height: .96;
+  font-size: clamp(46px, 5.4vw, 82px);
+  line-height: 1;
 }
 .investor-hero p {
   max-width: 760px;
@@ -1834,12 +1834,12 @@ h2 {
   display: grid;
   align-content: space-between;
   gap: 24px;
-  min-height: 360px;
-  padding: 30px;
+  min-height: 320px;
+  padding: 26px;
   border: 1px solid var(--line);
-  border-radius: 30px;
+  border-radius: 24px;
   background: #fff;
-  box-shadow: 0 22px 58px rgba(83,43,11,.1);
+  box-shadow: 0 14px 38px rgba(83,43,11,.07);
 }
 .investor-snapshot > span {
   color: var(--orange-dark);
@@ -1849,7 +1849,7 @@ h2 {
 }
 .investor-snapshot strong {
   color: var(--brown);
-  font-size: 34px;
+  font-size: 28px;
   line-height: 1.25;
 }
 .investor-snapshot div {
@@ -1882,15 +1882,15 @@ h2 {
   padding: 0 clamp(32px,5vw,86px);
   border-block: 1px solid rgba(84, 48, 18, .14);
   background: rgba(255, 253, 248, .96);
-  box-shadow: 0 14px 32px rgba(83,43,11,.06);
+  box-shadow: 0 8px 22px rgba(83,43,11,.05);
   backdrop-filter: blur(18px);
   overflow-x: auto;
 }
 .investor-tabs button {
   position: relative;
   flex: 0 0 auto;
-  min-height: 66px;
-  padding: 0 24px;
+  min-height: 58px;
+  padding: 0 20px;
   border: 0;
   border-left: 1px solid rgba(84,48,18,.1);
   border-radius: 0;
@@ -1931,25 +1931,25 @@ h2 {
 .investor-directory {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  padding: 28px clamp(32px,5vw,86px);
+  gap: 14px;
+  padding: 22px clamp(32px,5vw,86px);
   background: var(--paper);
 }
 .investor-directory a {
   display: grid;
   gap: 10px;
-  min-height: 190px;
-  padding: 26px;
+  min-height: 158px;
+  padding: 22px;
   border: 1px solid var(--line);
-  border-radius: 30px;
+  border-radius: 22px;
   background: #fff;
-  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+  box-shadow: 0 10px 28px rgba(83,43,11,.06);
   transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
 }
 .investor-directory a:hover {
   transform: translateY(-6px);
   border-color: rgba(240,138,36,.5);
-  box-shadow: 0 26px 64px rgba(83,43,11,.14);
+  box-shadow: 0 18px 44px rgba(83,43,11,.11);
 }
 .investor-directory span,
 .ir-update-card time {
@@ -1961,7 +1961,7 @@ h2 {
 }
 .investor-directory strong {
   color: var(--brown);
-  font-size: 30px;
+  font-size: 25px;
 }
 .investor-directory em {
   color: var(--muted);
@@ -1971,7 +1971,7 @@ h2 {
 }
 .investor-panel {
   display: none;
-  padding: 34px clamp(32px,5vw,86px) 86px;
+  padding: 28px clamp(32px,5vw,86px) 70px;
 }
 .investor-panel.active {
   display: block;
@@ -2294,22 +2294,22 @@ h2 {
   grid-template-columns: minmax(0, 1fr) minmax(420px, .58fr);
   gap: 28px;
   align-items: stretch;
-  min-height: min(760px, calc(100vh - 92px));
-  padding: 64px clamp(32px,5vw,86px) 46px;
+  min-height: min(640px, calc(100vh - 92px));
+  padding: 54px clamp(32px,5vw,86px) 38px;
   background:
     radial-gradient(circle at 12% 18%, rgba(240,138,36,.16), transparent 34%),
     linear-gradient(135deg, #fffdf9 0%, #fff2df 100%);
 }
 .milestone-hero h1 {
-  margin: 10px 0 16px;
-  font-size: clamp(58px, 8vw, 118px);
-  line-height: .95;
+  margin: 10px 0 18px;
+  font-size: clamp(54px, 6.8vw, 100px);
+  line-height: 1;
   letter-spacing: 0;
 }
 .milestone-hero p {
   max-width: 820px;
   color: var(--muted);
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 850;
   line-height: 1.9;
 }
@@ -2317,7 +2317,7 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 14px;
-  margin-top: 42px;
+  margin-top: 30px;
   color: var(--orange-dark);
   font-size: 14px;
   font-weight: 1000;
@@ -2350,12 +2350,12 @@ h2 {
 }
 .milestone-hero-card {
   position: relative;
-  min-height: clamp(420px, 40vw, 540px);
+  min-height: clamp(360px, 34vw, 480px);
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 28px;
   background: var(--brown);
-  box-shadow: 0 30px 90px rgba(83,43,11,.16);
+  box-shadow: 0 22px 58px rgba(83,43,11,.12);
 }
 .milestone-hero-card::after {
   content: "";
@@ -2392,21 +2392,21 @@ h2 {
 .milestone-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  padding: 28px clamp(32px,5vw,86px) 36px;
+  gap: 14px;
+  padding: 22px clamp(32px,5vw,86px) 28px;
 }
 .milestone-stats article {
-  min-height: 178px;
-  padding: 26px;
+  min-height: 142px;
+  padding: 22px;
   border: 1px solid var(--line);
-  border-radius: 28px;
+  border-radius: 22px;
   background: #fff;
-  box-shadow: 0 18px 44px rgba(83,43,11,.07);
+  box-shadow: 0 10px 28px rgba(83,43,11,.05);
 }
 .milestone-stats strong {
   display: block;
   color: var(--orange-dark);
-  font-size: 54px;
+  font-size: 42px;
   line-height: 1;
 }
 .milestone-stats span {
@@ -2425,9 +2425,9 @@ h2 {
 .milestone-journey {
   position: relative;
   display: grid;
-  grid-template-columns: 92px minmax(320px, .44fr) minmax(0, 1fr);
-  gap: 28px;
-  padding: 58px clamp(32px,5vw,86px) 72px;
+  grid-template-columns: 72px minmax(300px, .38fr) minmax(0, 1fr);
+  gap: 22px;
+  padding: 44px clamp(32px,5vw,86px) 58px;
 }
 .milestone-rail {
   position: sticky;
@@ -2469,21 +2469,21 @@ h2 {
 }
 .milestone-list {
   display: grid;
-  gap: 34px;
+  gap: 24px;
 }
 .milestone-card {
   display: grid;
-  grid-template-columns: 132px minmax(260px, .44fr) minmax(0, 1fr);
-  gap: 22px;
+  grid-template-columns: 104px minmax(240px, .38fr) minmax(0, 1fr);
+  gap: 18px;
   align-items: stretch;
-  min-height: 320px;
-  padding: 18px;
+  min-height: 280px;
+  padding: 14px;
   border: 1px solid rgba(230,190,142,.8);
-  border-radius: 34px;
+  border-radius: 28px;
   background: rgba(255,255,255,.72);
-  box-shadow: 0 18px 48px rgba(83,43,11,.06);
-  opacity: .58;
-  transform: translateY(16px) scale(.985);
+  box-shadow: 0 12px 32px rgba(83,43,11,.05);
+  opacity: .72;
+  transform: translateY(10px) scale(.99);
   transition: opacity .35s ease, transform .35s ease, box-shadow .35s ease, border-color .35s ease, background .35s ease;
 }
 .milestone-card.active {
@@ -2491,7 +2491,7 @@ h2 {
   transform: translateY(0) scale(1);
   border-color: rgba(240,138,36,.9);
   background: #fff;
-  box-shadow: 0 30px 76px rgba(83,43,11,.14);
+  box-shadow: 0 20px 52px rgba(83,43,11,.1);
 }
 .milestone-year {
   display: grid;
@@ -2500,7 +2500,7 @@ h2 {
 }
 .milestone-year span {
   color: var(--orange-dark);
-  font-size: 42px;
+  font-size: 34px;
   font-weight: 1000;
   line-height: 1;
   writing-mode: vertical-rl;
@@ -2519,7 +2519,7 @@ h2 {
 .milestone-card img {
   width: 100%;
   height: 100%;
-  min-height: 280px;
+  min-height: 240px;
   object-fit: cover;
   filter: saturate(.9);
   transform: scale(1.03);
@@ -2532,7 +2532,7 @@ h2 {
 .milestone-copy {
   display: grid;
   align-content: center;
-  padding: 24px 24px 24px 8px;
+  padding: 18px 18px 18px 6px;
 }
 .milestone-copy small {
   color: var(--orange-dark);
@@ -2544,7 +2544,7 @@ h2 {
 .milestone-copy h3 {
   margin: 12px 0 16px;
   color: var(--brown);
-  font-size: clamp(30px, 3.6vw, 52px);
+  font-size: clamp(28px, 3vw, 44px);
   line-height: 1.12;
 }
 .milestone-copy p {
@@ -2595,19 +2595,21 @@ h2 {
 .service-detail-copy {
   display: grid;
   align-content: center;
+  gap: 20px;
 }
 .service-detail-copy h1 {
-  margin: 0;
+  margin: 0 0 4px;
   color: var(--brown);
-  font-size: clamp(52px, 6vw, 96px);
-  line-height: .94;
+  font-size: clamp(48px, 5.4vw, 88px);
+  line-height: 1;
 }
 .service-detail-copy > p:not(.eyebrow) {
   max-width: 760px;
+  margin: 0;
   color: var(--muted);
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 800;
-  line-height: 1.95;
+  line-height: 1.9;
 }
 .service-hero-card {
   position: relative;
@@ -2663,7 +2665,7 @@ h2 {
   line-height: 1.1;
 }
 .service-detail-section {
-  padding: 42px clamp(28px, 6vw, 92px);
+  padding: clamp(34px, 4.2vw, 52px) clamp(28px, 6vw, 92px);
 }
 .service-section-head {
   display: grid;
@@ -3152,16 +3154,16 @@ h2 {
   grid-template-columns: minmax(0, 1fr) minmax(360px, .52fr);
   gap: 28px;
   align-items: stretch;
-  padding: 56px clamp(32px,5vw,86px) 34px;
+  padding: 48px clamp(32px,5vw,86px) 28px;
   border-bottom: 1px solid rgba(84,48,18,.1);
   background: linear-gradient(135deg, #fffaf2, #fff);
 }
 .ir-sub-hero h1 {
-  margin: 8px 0 18px;
+  margin: 8px 0 20px;
   color: var(--brown);
-  font-size: clamp(48px, 6vw, 92px);
+  font-size: clamp(44px, 5.2vw, 78px);
   letter-spacing: 0;
-  line-height: .96;
+  line-height: 1;
 }
 .ir-sub-hero p {
   max-width: 760px;
@@ -3178,12 +3180,12 @@ h2 {
 .finance-hero-chart {
   display: grid;
   align-content: space-between;
-  min-height: 360px;
-  padding: 28px;
+  min-height: 300px;
+  padding: 24px;
   border: 1px solid rgba(255,255,255,.5);
-  border-radius: 30px;
+  border-radius: 24px;
   background: rgba(255,255,255,.88);
-  box-shadow: 0 22px 58px rgba(83,43,11,.12);
+  box-shadow: 0 14px 38px rgba(83,43,11,.08);
   backdrop-filter: blur(12px);
 }
 .ir-kpi-strip {
@@ -3197,8 +3199,8 @@ h2 {
 .ir-kpi-strip article {
   display: grid;
   align-content: center;
-  min-height: 132px;
-  padding: 24px 28px;
+  min-height: 112px;
+  padding: 20px 24px;
   border-left: 1px solid rgba(84,48,18,.1);
 }
 .ir-kpi-strip article:last-child {
@@ -3214,7 +3216,7 @@ h2 {
 .ir-kpi-strip strong {
   margin-top: 8px;
   color: var(--brown);
-  font-size: clamp(28px, 2.5vw, 42px);
+  font-size: clamp(24px, 2.2vw, 36px);
   line-height: 1.05;
 }
 .ir-kpi-strip em {
