@@ -25,6 +25,10 @@
     {
       "path": "/api/report-digest-monthly",
       "schedule": "0 3 1 * *"
+    },
+    {
+      "path": "/api/site-health-check",
+      "schedule": "*/30 * * * *"
     }
   ]
 }

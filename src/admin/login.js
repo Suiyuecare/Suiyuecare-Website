@@ -10,6 +10,14 @@ import {
 const form = document.querySelector("#adminLoginForm");
 const status = document.querySelector("#loginStatus");
 const quickLoginButton = document.querySelector("#adminQuickLoginButton");
+const googleLoginButton = document.querySelector("#adminGoogleLoginButton");
+
+function getAdminRedirectUrl() {
+  if (window.location.protocol === "file:") {
+    return null;
+  }
+  return `${window.location.origin}${ADMIN_HOME_PATH}`;
+}
 
 async function bootLoginPage() {
   if (!ensureSupabaseConfigured(status)) {
@@ -52,6 +60,12 @@ form?.addEventListener("submit", async (event) => {
 quickLoginButton?.addEventListener("click", async () => {
   if (!form || !ensureSupabaseConfigured(status)) return;
 
+  const redirectTo = getAdminRedirectUrl();
+  if (!redirectTo) {
+    setStatus(status, "Google/快速登入需要使用 http 或 https 網址，請從本機伺服器或正式站開啟後台。", "error");
+    return;
+  }
+
   const formData = new FormData(form);
   const email = String(formData.get("email") || "").trim();
   if (!email) {
@@ -66,7 +80,7 @@ quickLoginButton?.addEventListener("click", async () => {
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${window.location.origin}${ADMIN_HOME_PATH}`
+      emailRedirectTo: redirectTo
     }
   });
 
@@ -78,6 +92,35 @@ quickLoginButton?.addEventListener("click", async () => {
   }
 
   setStatus(status, "快速登入連結已寄出，請到信箱點擊連結進入後台。", "success");
+});
+
+googleLoginButton?.addEventListener("click", async () => {
+  if (!ensureSupabaseConfigured(status)) return;
+
+  const redirectTo = getAdminRedirectUrl();
+  if (!redirectTo) {
+    setStatus(status, "Google 登入需要使用 http 或 https 網址，請從本機伺服器或正式站開啟後台。", "error");
+    return;
+  }
+
+  googleLoginButton.disabled = true;
+  setStatus(status, "正在前往 Google 登入...", "info");
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo,
+      queryParams: {
+        access_type: "offline",
+        prompt: "select_account"
+      }
+    }
+  });
+
+  if (error) {
+    googleLoginButton.disabled = false;
+    setStatus(status, `Google 登入失敗：${error.message}`, "error");
+  }
 });
 
 bootLoginPage().catch((error) => {

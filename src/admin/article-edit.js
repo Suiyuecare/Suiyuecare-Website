@@ -15,6 +15,7 @@ const form = document.querySelector("#articleEditorForm");
 const coverPreview = document.querySelector("#articleCoverPreview");
 const openCoverPickerButton = document.querySelector("#openArticleCoverPicker");
 const clearCoverButton = document.querySelector("#clearArticleCover");
+const requestPublishButton = document.querySelector("#requestArticlePublishButton");
 const coverPicker = document.querySelector("#articleCoverPicker");
 const coverPickerGrid = document.querySelector("#articleCoverPickerGrid");
 const coverPickerStatus = document.querySelector("#articleCoverPickerStatus");
@@ -363,6 +364,44 @@ async function saveArticle(event) {
   }
 }
 
+async function requestArticlePublish() {
+  if (isNewArticle || !articleId) {
+    setEditorStatus("請先儲存文章草稿，再送審發布。", "error");
+    return;
+  }
+
+  const note = window.prompt("送審備註（可留空）：", "請協助審核文章內容、封面圖與 SEO 後發布。");
+  if (note === null) return;
+
+  requestPublishButton?.setAttribute("disabled", "true");
+  setEditorStatus("正在建立送審發布申請...", "info");
+  try {
+    const { error } = await supabase.from("publish_requests").insert({
+      entity_table: "articles",
+      entity_id: articleId,
+      entity_title: form.elements.title.value.trim() || editorTitle.textContent,
+      target_status: "published",
+      request_note: note || null,
+      status: "pending"
+    });
+    if (error) throw error;
+
+    await supabase.from("admin_activity_logs").insert({
+      action: "publish_request_created",
+      entity_table: "articles",
+      entity_id: articleId,
+      message: form.elements.title.value.trim() || "文章送審發布"
+    });
+
+    setEditorStatus("已送出發布審核，請到「發布與權限」查看進度。", "success");
+  } catch (error) {
+    console.error("Failed to request article publish", error);
+    setEditorStatus(`送審失敗：${error.message}`, "error");
+  } finally {
+    requestPublishButton?.removeAttribute("disabled");
+  }
+}
+
 form?.addEventListener("submit", saveArticle);
 form?.elements.title.addEventListener("input", () => {
   if (isNewArticle && !form.elements.slug.value) {
@@ -400,6 +439,7 @@ coverPicker?.addEventListener("click", (event) => {
   }
 });
 coverUploadForm?.addEventListener("submit", uploadAndSelectCover);
+requestPublishButton?.addEventListener("click", requestArticlePublish);
 bindAdminLogout(logoutButton);
 
 bootProtectedAdminPage({

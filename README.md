@@ -188,6 +188,8 @@ import { supabase, requireSupabaseClient, supabaseStorageBuckets } from "./src/l
 - `/admin/categories` 可新增、編輯、刪除 `article_categories`，欄位包含名稱、slug、描述、排序與啟用狀態
 - `/admin/articles` 從 Supabase `articles` 讀取文章列表，顯示標題、分類、發布狀態、置頂、發布日期、最後更新，並提供新增、編輯與刪除入口
 - `/admin/articles/new` 與 `/admin/articles/:id` 可新增或編輯文章標題、副標題、slug、分類、內容、發布狀態、發布日期、SEO、置頂與排序權重
+- `/admin/home-modules` 可管理首頁最新動態、得標紀錄、員工招募、單位影片、真實照顧情境與名人講堂。
+- `/admin/template-fields` 可管理服務頁與招募頁固定模板欄位，避免員工自由排版造成前台跑版。
 - 前台 `#health` 與 `#search` 會從 Supabase `articles` 讀取 `status = published` 且 `is_enabled = true` 的文章，顯示封面圖、標題、副標題、分類與發布日期，排序規則為置頂優先、發布日期新到舊。若 Supabase 尚未設定或沒有資料，會保留原本靜態內容作為 fallback。
 - 前台 `#health` 分類列會從 Supabase `article_categories` 讀取 `is_enabled = true` 的分類。使用者點選分類後會切到 `#health?category=分類slug`，只顯示該分類文章；後台新增或停用分類後，前台重新載入即可自動同步。
 - 前台單篇文章路由 `#article-文章slug` 會用 slug 從 Supabase `articles` 讀取單篇文章，並明確限制 `status = published`、`is_enabled = true`。草稿、封存或停用文章即使知道 slug 也不會在前台顯示。
@@ -255,7 +257,48 @@ VITE_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY
 ```
 
-後台登入目前先檢查 Supabase session。下一階段可以再接 `profiles` / `admins` 資料表，限制只有 `owner`、`admin`、`editor` 可以進入 CMS 管理介面。
+後台登入會檢查 Supabase session，並透過 `profiles` / `admins` 判斷細項權限。只有已開通 profile 且具備對應權限的帳號可以進入 CMS 管理介面。
+
+### Google Login
+
+後台登入頁 `/admin/login` 已支援 Supabase Google OAuth：
+
+- 前端按鈕會呼叫 `supabase.auth.signInWithOAuth({ provider: "google" })`
+- 登入成功後導回 `/admin`
+- Google 登入後仍會檢查 `profiles` / `admins` 權限，不會自動取得後台權限
+- 若使用者尚未開通，會顯示「此帳號尚未開通後台權限」
+
+Supabase Dashboard 需要設定：
+
+1. Authentication → Providers → Google：啟用 Google provider。
+2. 填入 Google Cloud OAuth Client ID 與 Client Secret。
+3. Authentication → URL Configuration：加入正式站與本機 redirect URL。
+
+建議加入的 Supabase Redirect URLs：
+
+```text
+https://suiyuecare-website.vercel.app/admin
+https://www.suiyuecare.com/admin
+https://suiyuecare.com/admin
+http://localhost:5173/admin
+http://127.0.0.1:4188/admin
+```
+
+Google Cloud Console 的 Authorized redirect URI 應使用 Supabase Auth callback：
+
+```text
+https://ussnmxdpxeoshlrdchov.supabase.co/auth/v1/callback
+```
+
+Google Cloud Console 的 Authorized JavaScript origins 建議加入：
+
+```text
+https://suiyuecare-website.vercel.app
+https://www.suiyuecare.com
+https://suiyuecare.com
+http://localhost:5173
+http://127.0.0.1:4188
+```
 
 ## Admin Feature Test Checklist
 
@@ -275,8 +318,9 @@ git diff --check
 - 圖片上傳流程會寫入 Supabase Storage，並同步新增 `media` 資料表紀錄
 - 圖片刪除流程會刪除 Storage object 與 `media` 資料
 - 頁面內容編輯器可選擇既有 media 圖片，也可直接上傳新圖片並寫入 `page_sections.image_id` / `content_json.image_url`
-- `/admin/traffic` 是網站流量中心，讀取 `analytics_page_views`、`analytics_events`、`analytics_alerts`、`analytics_report_schedules`，顯示流量、來源、頁面表現、轉換、SEO、網站健康度、警示與報表匯出。
+- `/admin/traffic` 是網站流量中心，讀取 `analytics_page_views`、`analytics_events`、`analytics_alerts`、`analytics_health_checks`、`analytics_report_schedules`，顯示流量、來源、頁面表現、轉換、SEO、網站健康度、警示與報表匯出。
 - 前台 `app.js` 會匿名寫入頁面瀏覽與轉換事件，包含表單送出、LINE 點擊、電話點擊、Email 點擊、Google Maps 點擊、PDF 下載、預約/CTA 點擊與加入 LINE。
+- `/api/site-health-check` 可由 Vercel Cron 執行，會檢查首頁、Supabase API、表單端點、SSL 與近 24 小時流量/錯誤，並寫入健康檢查與異常警示。
 - 頁面文案可更新 `pages` 與 `page_sections`
 - 文章列表 `/admin/articles` 可讀取、顯示、刪除文章
 - 文章新增/編輯頁 `/admin/articles/new`、`/admin/articles/:id` 可編輯標題、副標題、slug、封面圖、分類、內容、發布狀態、發布日期、SEO、置頂與排序
@@ -352,6 +396,64 @@ CONTACT_NOTIFY_EMAIL=generalaffairs@suiyuecare.com
 COURSE_NOTIFY_EMAIL=edu.control@suiyuecare.com
 REPORT_FALLBACK_EMAIL=generalaffairs@suiyuecare.com
 REPORT_CRON_SECRET=...
+SUPABASE_STORAGE_BUCKET_INVESTOR_FILES=investor-files
+VITE_SUPABASE_STORAGE_BUCKET_COURSE_IMAGES=course-images
+```
+
+### 第一優先後台模組
+
+已新增三個固定欄位管理模組，目標是讓員工能更新內容，但不碰前台版型：
+
+- `/admin/courses`：課程管理，可新增、編輯、下架課程，管理課程圖片、日期、時間、地點、價格、名額、報名狀態與重要課程輪播。
+- `/admin/files`：檔案下載管理，可上傳 PDF / Excel / Word，分類到投資人文件、財務資訊、公司治理、股東專區、課程簡章等。
+- `/admin/forms`：表單資料管理，可查看聯絡我們、課程報名、人才招募、投資洽談等送出紀錄，並更新處理狀態與內部備註。
+
+相關 migration：
+
+```text
+supabase/migrations/20260521000100_add_courses_files_and_form_admin.sql
+```
+
+前台 `#courses` 已改為優先讀取 Supabase `courses` 已發布資料；若 Supabase 暫時不可用，才回到原本的示範課程，避免頁面空白。
+
+### 第二優先後台模組
+
+已新增首頁內容模組與服務/招募頁固定模板欄位：
+
+- `content_modules`：以 `target_slug = home` 管理首頁模組資料。前台目前支援 `news`、`awards`、`recruit`、`video`、`care_story`、`master_talk`，只讀取 `status = published` 且 `is_enabled = true` 的內容；若沒有 Supabase 資料，保留靜態/WordPress fallback。
+- 首頁剩餘模組已 CMS 化：`hero`、`service_item`、`location`、`partner`。管理者可在 `/admin/home-modules` 新增、編輯、刪除首頁 Hero、營業項目卡、服務據點與合作單位。
+- 服務據點會使用 `location` 模組的 `item_key` 作為點位識別，`metadata.pin_class` 或 `metadata.pin_style` 控制地圖旗子位置；萬華一館/二館可用相同 `metadata.tab_group` 呈現分館 tab。
+- 合作單位使用 `partner` 模組，前台會自動複製一組跑馬燈內容維持連續動畫。
+- `page_template_fields`：以 `page_slug` 與 `field_key` 管理固定欄位，例如服務範圍、工作特色、適合對象、部門簡介等。這是後續將八大服務頁與三大招募頁完全固定模板化的資料基礎。
+- `/admin/home-modules`：管理首頁模組文字、圖片、連結、日期、排序、發布狀態與是否啟用。
+- `/admin/template-fields`：管理各服務/招募頁固定欄位內容。設計目標是讓員工只改文字與圖片，不改版型。
+
+相關 migration：
+
+```text
+supabase/migrations/20260521000200_add_home_modules_and_page_templates.sql
+supabase/migrations/20260521000400_seed_home_remaining_modules.sql
+```
+
+### 第三優先後台模組
+
+已新增版本紀錄、發布流程與權限分級基礎：
+
+- `content_versions`：自動記錄 pages、page_sections、articles、courses、downloadable_files、content_modules 的新增、修改、刪除、發布與封存版本快照。
+- `publish_requests`：編輯可建立送審發布申請，具審核權限者可在 `/admin/governance` 核准或退回。
+- `admin_activity_logs`：記錄送審、審核等後台操作。
+- `admins` 新增細分權限欄位，例如 `can_publish`、`can_review_publish`、`can_edit_pages`、`can_edit_articles`、`can_edit_courses`、`can_manage_files`、`can_view_forms`、`can_view_analytics`。
+- 資料庫 trigger 會阻擋沒有發布權限的登入者直接把內容改成 `published`。
+- `/admin/governance`：發布與權限中心，可查看目前帳號權限、待審發布、最近版本紀錄與操作紀錄。
+- `/admin/users`：使用者權限管理，Owner/Admin 可調整角色、停用帳號與細項權限。新增 Auth 帳號仍需先在 Supabase Auth 建立。
+- 後台頁面會依權限守門與隱藏選單，例如沒有 `can_view_analytics` 不能進網站流量中心，沒有 `can_edit_courses` 不能進課程管理。
+- Supabase RLS 已細分為頁面、文章、課程、檔案、表單、圖片、流量與使用者管理等模組權限。
+- 文章編輯與頁面編輯已新增「送審發布」按鈕。頁面送審核准後，會同步將該頁啟用中的 sections 發布，避免只發布頁面外殼。
+
+相關 migration：
+
+```text
+supabase/migrations/20260521000300_add_versions_publish_workflow_permissions.sql
 ```
 
 ### 內容模板
@@ -413,13 +515,15 @@ REPORT_CRON_SECRET=...
 GET /api/report-digest
 GET /api/report-digest-weekly
 GET /api/report-digest-monthly
+GET /api/site-health-check
 ```
 
-Vercel Cron 已設定日報、週報、月報。此功能需要：
+Vercel Cron 已設定日報、週報、月報，以及每 30 分鐘網站健康檢查。此功能需要：
 
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `RESEND_API_KEY`
 - `REPORT_CRON_SECRET`
+- `SITE_URL`
 
 ### 備份與還原
 

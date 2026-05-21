@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>發布與權限中心｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/">
+            <img src="/assets/company-logo.png" alt="" />
+            <span><strong>歲悅長照集團</strong><small>CMS Console</small></span>
+          </a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/home-modules"><span>HM</span><strong>首頁模組</strong></a>
+          <a href="/admin/template-fields"><span>TF</span><strong>模板欄位</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a href="/admin/courses"><span>CS</span><strong>課程管理</strong></a>
+          <a href="/admin/files"><span>DL</span><strong>檔案下載</strong></a>
+          <a href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
+          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+          <a class="active" href="/admin/governance"><span>GV</span><strong>發布與權限</strong></a>
+          <a href="/admin/users"><span>US</span><strong>使用者權限</strong></a>
+          <a href="/admin/traffic"><span>AN</span><strong>網站流量中心</strong></a>
+          <a href="/admin/content-health"><span>QA</span><strong>內容健康檢查</strong></a>
+        </nav>
+        <div class="admin-sidebar-note">
+          <span>Governance</span>
+          <strong>版本、發布、權限</strong>
+          <p>讓內容可以送審、審核、發布，並留下每次改動紀錄。</p>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Governance Center</p>
+            <h1>發布與權限中心</h1>
+            <span>檢視目前登入者權限、待審發布、版本紀錄與後台操作紀錄。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <button class="admin-preview-link" id="refreshGovernanceButton" type="button">重新整理</button>
+            <div class="admin-userbox">
+              <b id="adminUserInitial">S</b>
+              <span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span>
+              <button id="adminLogout" type="button">登出</button>
+            </div>
+          </div>
+        </header>
+
+        <div id="governanceStatus" class="admin-data-status">正在讀取發布流程資料...</div>
+
+        <section class="admin-dashboard-grid governance-permission-grid" id="permissionGrid" aria-label="目前登入權限"></section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">Publish Queue</p><h2>待審發布</h2></div>
+            <span class="admin-soft-note">編輯可送審，具發布/審核權限者可核准或退回。</span>
+          </div>
+          <div id="publishRequestsList" class="governance-request-list"></div>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">Version History</p><h2>最近版本紀錄</h2></div>
+          </div>
+          <div id="contentVersionsList" class="governance-version-list"></div>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">Role Matrix</p><h2>權限分級建議</h2></div>
+          </div>
+          <div class="governance-role-grid">
+            <article><span>Owner</span><strong>最高權限</strong><p>管理使用者、權限、發布、檔案、表單、流量中心與所有內容。</p></article>
+            <article><span>Admin</span><strong>營運管理者</strong><p>可審核發布、管理內容與檔案，但不建議日常共用帳號。</p></article>
+            <article><span>Editor</span><strong>內容編輯</strong><p>可新增與修改內容，發布需送審，避免未檢查就上線。</p></article>
+            <article><span>Viewer</span><strong>檢視者</strong><p>只能查看後台資料，不應有寫入與發布權限。</p></article>
+          </div>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">Activity</p><h2>最近後台操作</h2></div>
+          </div>
+          <div id="activityLogList" class="governance-activity-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="adminLoading" class="admin-loading">
+      <strong>正在檢查登入狀態</strong>
+      <span>請稍候...</span>
+    </div>
+
+    <script type="module" src="/src/admin/governance.js"></script>
+  </body>
+</html>

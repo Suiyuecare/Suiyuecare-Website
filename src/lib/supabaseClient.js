@@ -11,7 +11,9 @@ export const supabaseStorageBuckets = {
   articleCovers: import.meta.env.VITE_SUPABASE_STORAGE_BUCKET_ARTICLE_COVERS || "article-covers",
   pageHeroes: import.meta.env.VITE_SUPABASE_STORAGE_BUCKET_PAGE_HEROES || "page-heroes",
   courseImages: import.meta.env.VITE_SUPABASE_STORAGE_BUCKET_COURSE_IMAGES || "course-images",
-  jobImages: import.meta.env.VITE_SUPABASE_STORAGE_BUCKET_JOB_IMAGES || "job-images"
+  jobImages: import.meta.env.VITE_SUPABASE_STORAGE_BUCKET_JOB_IMAGES || "job-images",
+  investorFiles: import.meta.env.VITE_SUPABASE_STORAGE_BUCKET_INVESTOR_FILES || "investor-files",
+  privateDocuments: import.meta.env.VITE_SUPABASE_STORAGE_BUCKET_PRIVATE_DOCUMENTS || "private-documents"
 };
 
 export const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey);

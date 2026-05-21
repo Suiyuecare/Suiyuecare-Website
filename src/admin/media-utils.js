@@ -52,8 +52,45 @@ const cropOutputSizes = {
   avatar: { width: 900, height: 900 }
 };
 
+const responsivePreviewProfiles = {
+  hero: [
+    { key: "desktop", label: "網頁", ratio: "21 / 9" },
+    { key: "tablet", label: "平板", ratio: "16 / 9" },
+    { key: "mobile", label: "手機", ratio: "4 / 5" }
+  ],
+  service_hero: [
+    { key: "desktop", label: "網頁", ratio: "4 / 3" },
+    { key: "tablet", label: "平板", ratio: "3 / 2" },
+    { key: "mobile", label: "手機", ratio: "4 / 3" }
+  ],
+  article_cover: [
+    { key: "desktop", label: "網頁", ratio: "16 / 9" },
+    { key: "tablet", label: "平板", ratio: "16 / 10" },
+    { key: "mobile", label: "手機", ratio: "4 / 3" }
+  ],
+  card: [
+    { key: "desktop", label: "網頁", ratio: "4 / 3" },
+    { key: "tablet", label: "平板", ratio: "4 / 3" },
+    { key: "mobile", label: "手機", ratio: "1 / 1" }
+  ],
+  square: [
+    { key: "desktop", label: "網頁", ratio: "1 / 1" },
+    { key: "tablet", label: "平板", ratio: "1 / 1" },
+    { key: "mobile", label: "手機", ratio: "1 / 1" }
+  ],
+  avatar: [
+    { key: "desktop", label: "網頁", ratio: "1 / 1" },
+    { key: "tablet", label: "平板", ratio: "1 / 1" },
+    { key: "mobile", label: "手機", ratio: "1 / 1" }
+  ]
+};
+
 function getImageUsageRatio(value = "card") {
   return imageUsageRatios[value] || null;
+}
+
+function getResponsivePreviewProfile(value = "card") {
+  return responsivePreviewProfiles[value] || responsivePreviewProfiles.card;
 }
 
 function readImage(file) {
@@ -137,6 +174,13 @@ function createCropModal() {
             縮放
             <input type="range" min="1" max="3" step="0.01" value="1" data-crop-zoom />
           </label>
+          <div class="admin-crop-device-preview">
+            <div>
+              <span>RWD 可視範圍</span>
+              <small>拖曳左側圖片時，這裡會同步顯示各裝置最可能看到的畫面。</small>
+            </div>
+            <div class="admin-crop-device-grid" data-crop-device-grid></div>
+          </div>
           <div class="admin-crop-actions">
             <button type="button" data-crop-skip>保留原圖</button>
             <button type="button" data-crop-apply>套用裁切</button>
@@ -165,8 +209,10 @@ export async function prepareImageForUpload(file, imageUsage = "card") {
     const hint = modal.querySelector("[data-crop-hint]");
     const title = modal.querySelector("[data-crop-title]");
     const copy = modal.querySelector("[data-crop-copy]");
+    const deviceGrid = modal.querySelector("[data-crop-device-grid]");
     const usageOption = getImageUsageOption(imageUsage);
     const outputSize = cropOutputSizes[imageUsage] || cropOutputSizes.card;
+    const previewProfile = getResponsivePreviewProfile(imageUsage);
     let objectUrl = URL.createObjectURL(file);
     let baseScale = 1;
     let zoom = 1;
@@ -199,6 +245,27 @@ export async function prepareImageForUpload(file, imageUsage = "card") {
       preview.style.width = `${renderedWidth}px`;
       preview.style.height = `${renderedHeight}px`;
       preview.style.transform = `translate(${x}px, ${y}px)`;
+      updateDevicePreviews();
+    }
+
+    function getCropCenterPosition() {
+      const rect = frame.getBoundingClientRect();
+      const scale = baseScale * zoom;
+      const sx = clamp(-x / scale, 0, image.naturalWidth);
+      const sy = clamp(-y / scale, 0, image.naturalHeight);
+      const sw = clamp(rect.width / scale, 1, image.naturalWidth - sx);
+      const sh = clamp(rect.height / scale, 1, image.naturalHeight - sy);
+      const centerX = clamp(((sx + sw / 2) / image.naturalWidth) * 100, 0, 100);
+      const centerY = clamp(((sy + sh / 2) / image.naturalHeight) * 100, 0, 100);
+      return { centerX, centerY };
+    }
+
+    function updateDevicePreviews() {
+      if (!deviceGrid) return;
+      const { centerX, centerY } = getCropCenterPosition();
+      deviceGrid.querySelectorAll("[data-device-preview-image]").forEach((previewImage) => {
+        previewImage.style.objectPosition = `${centerX}% ${centerY}%`;
+      });
     }
 
     function resetPosition() {
@@ -230,6 +297,14 @@ export async function prepareImageForUpload(file, imageUsage = "card") {
     title.textContent = `${usageOption?.label || "此版位"}建議比例：${usageOption?.ratio || ""}`;
     copy.textContent = `目前圖片為 ${image.naturalWidth} × ${image.naturalHeight}，和版位比例不同。可拖曳圖片調整重點，或直接保留原圖。`;
     hint.textContent = "拖曳圖片可調整裁切位置，右側滑桿可放大圖片。";
+    deviceGrid.innerHTML = previewProfile.map((item) => `
+      <figure class="admin-crop-device-card" data-device-preview="${item.key}">
+        <span>${item.label}</span>
+        <div style="aspect-ratio:${item.ratio}">
+          <img src="${objectUrl}" alt="${item.label}端預覽" data-device-preview-image />
+        </div>
+      </figure>
+    `).join("");
     frame.style.aspectRatio = `${ratio}`;
     preview.src = objectUrl;
     zoomInput.value = "1";

@@ -32,6 +32,7 @@ const sourceLabels = {
   direct: "Direct",
   social: "Social",
   paid: "Paid Ads",
+  "paid ads": "Paid Ads",
   referral: "Referral",
   email: "Email",
   "qr code": "QR Code"
@@ -99,6 +100,18 @@ function groupBy(rows, getKey) {
 
 function conversionCount(events = state.events) {
   return events.filter((event) => conversionEvents.includes(event.event_type)).length;
+}
+
+function sourceCategory(row = {}) {
+  const medium = String(row.medium || "").toLowerCase();
+  const source = String(row.source || "").toLowerCase();
+  if (/paid|cpc|ppc|ads?/.test(medium)) return "Paid Ads";
+  if (/email|edm|newsletter/.test(medium) || /mail/.test(source)) return "Email";
+  if (/qr/.test(medium) || /qr/.test(source)) return "QR Code";
+  if (/organic/.test(medium) || /organic search/.test(source)) return "Organic Search";
+  if (/social/.test(medium) || /facebook|instagram|line|threads|linkedin|youtube|tiktok/.test(source)) return "Social";
+  if (source === "direct" || medium === "none") return "Direct";
+  return sourceLabels[source] || "Referral";
 }
 
 function getPageTitle(path) {
@@ -253,7 +266,7 @@ function renderOverview() {
   renderMiniBars("#trafficTrend7", getDailyPoints(7));
   renderMiniBars("#trafficTrend30", getDailyPoints(30));
   renderRankList("#topPages", pageRows().sort((a, b) => b.views - a.views).slice(0, 8).map((row) => ({ label: row.title, meta: row.path, value: row.views })));
-  renderRankList("#topSources", sourceRows().sort((a, b) => b.visitors - a.visitors).slice(0, 8).map((row) => ({ label: sourceLabels[row.source] || row.source, meta: row.medium, value: row.visitors })));
+  renderRankList("#topSources", sourceRows().sort((a, b) => b.visitors - a.visitors).slice(0, 8).map((row) => ({ label: sourceCategory(row), meta: `${row.source} / ${row.medium}`, value: row.visitors })));
   renderRankList("#deviceShare", [...groupBy(state.pageViews, (view) => view.device_type || "unknown").entries()].map(([device, views]) => ({ label: device, meta: "裝置", value: views.length })));
 }
 
@@ -270,7 +283,7 @@ function renderTrafficAnalysis() {
 function renderSources() {
   const rows = sourceRows().sort((a, b) => b.visitors - a.visitors);
   document.querySelector("#sourceSummary").innerHTML = rows.length ? rows.slice(0, 7).map((row) => `
-    <article><span>${escapeHTML(row.medium)}</span><strong>${escapeHTML(sourceLabels[row.source] || row.source)}</strong><p>${formatCount(row.visitors)} 訪客 · ${percent(row.rate)} 轉換率</p></article>
+    <article><span>${escapeHTML(row.medium)}</span><strong>${escapeHTML(sourceCategory(row))}</strong><p>${formatCount(row.visitors)} 訪客 · ${percent(row.rate)} 轉換率</p></article>
   `).join("") : '<div class="admin-empty-state">目前沒有來源資料。</div>';
   renderTable("#utmTable", ["utm_source", "utm_medium", "utm_campaign", "訪客數", "瀏覽量", "轉換數", "轉換率"], rows.map((row) => [
     escapeHTML(row.source),
@@ -392,6 +405,15 @@ async function checkSiteHealth() {
 function renderHealth() {
   const errors404 = state.events.filter((event) => event.event_type === "error_404").length;
   const errors500 = state.events.filter((event) => event.event_type === "error_500").length;
+  const latestChecks = [...state.healthChecks].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+  const latestByType = [...groupBy(latestChecks, (check) => check.check_type).entries()].map(([, checks]) => checks[0]);
+  const persistedChecks = latestByType.map((check) => [
+    escapeHTML(check.check_type),
+    escapeHTML(check.status),
+    escapeHTML(check.message || ""),
+    check.response_time_ms ? `${check.response_time_ms}ms` : "-",
+    formatUpdatedAt(check.created_at)
+  ]);
   const checks = [
     ["網站是否在線", state.siteHealth?.online ? "ok" : "critical", state.siteHealth?.online ? "正常" : "無法連線"],
     ["首頁載入速度", (state.siteHealth?.responseTime || 0) > 5000 ? "critical" : "ok", state.siteHealth?.responseTime ? `${state.siteHealth.responseTime}ms` : "待檢查"],
@@ -404,7 +426,7 @@ function renderHealth() {
   document.querySelector("#siteHealthGrid").innerHTML = checks.map(([label, status, text]) => `
     <article data-health="${escapeHTML(status)}"><span>${escapeHTML(status)}</span><strong>${escapeHTML(label)}</strong><p>${escapeHTML(text)}</p></article>
   `).join("");
-  renderTable("#errorTable", ["類型", "數量"], [["404", formatCount(errors404)], ["500", formatCount(errors500)]]);
+  renderTable("#errorTable", ["檢查項目", "狀態", "訊息", "回應時間", "更新"], persistedChecks.length ? persistedChecks : [["404", "event", `${formatCount(errors404)} 筆`, "-", "即時"], ["500", "event", `${formatCount(errors500)} 筆`, "-", "即時"]]);
 }
 
 function generatedAlerts() {
@@ -460,21 +482,24 @@ async function fetchData() {
   setStatus("正在讀取網站流量資料...", "info");
   refreshButton?.setAttribute("disabled", "true");
   try {
-    const [viewsResult, eventsResult, alertsResult, pagesResult, schedulesResult] = await Promise.all([
+    const [viewsResult, eventsResult, alertsResult, healthResult, pagesResult, schedulesResult] = await Promise.all([
       supabase.from("analytics_page_views").select("*").gte("created_at", start.toISOString()).lte("created_at", end.toISOString()).order("created_at", { ascending: false }).limit(10000),
       supabase.from("analytics_events").select("*").gte("created_at", start.toISOString()).lte("created_at", end.toISOString()).order("created_at", { ascending: false }).limit(10000),
       supabase.from("analytics_alerts").select("*").order("created_at", { ascending: false }).limit(80),
+      supabase.from("analytics_health_checks").select("*").order("created_at", { ascending: false }).limit(120),
       supabase.from("pages").select("id, slug, title, seo_title, seo_description, is_enabled, status").order("sort_order", { ascending: true }),
       supabase.from("analytics_report_schedules").select("*").order("created_at", { ascending: false })
     ]);
     if (viewsResult.error) throw viewsResult.error;
     if (eventsResult.error) throw eventsResult.error;
     if (alertsResult.error) throw alertsResult.error;
+    if (healthResult.error) throw healthResult.error;
     if (pagesResult.error) throw pagesResult.error;
     if (schedulesResult.error) throw schedulesResult.error;
     state.pageViews = viewsResult.data || [];
     state.events = eventsResult.data || [];
     state.alerts = alertsResult.data || [];
+    state.healthChecks = healthResult.data || [];
     state.pages = pagesResult.data || [];
     state.schedules = schedulesResult.data || [];
     state.siteHealth = await checkSiteHealth();

@@ -1,1 +1,1 @@
-module.exports = require("./report-digest.js");
+module.exports = require("./report-digest");

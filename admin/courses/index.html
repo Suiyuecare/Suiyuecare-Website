@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>課程管理｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/">
+            <img src="/assets/company-logo.png" alt="" />
+            <span><strong>歲悅長照集團</strong><small>CMS Console</small></span>
+          </a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a class="active" href="/admin/courses"><span>CS</span><strong>課程管理</strong></a>
+          <a href="/admin/files"><span>DL</span><strong>檔案下載</strong></a>
+          <a href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
+          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+          <a href="/admin/traffic"><span>AN</span><strong>網站流量中心</strong></a>
+          <a href="/admin/content-health"><span>QA</span><strong>內容健康檢查</strong></a>
+        </nav>
+        <div class="admin-sidebar-note">
+          <span>Courses</span>
+          <strong>固定版型內容</strong>
+          <p>只管理課程資料與圖片，前台卡片版型維持固定。</p>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Courses</p>
+            <h1>課程管理</h1>
+            <span>新增、編輯、置頂與下架課程，前台會依發布中的課程數量自動呈現。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="admin-preview-link" href="/#courses" target="_blank" rel="noopener">查看前台</a>
+            <div class="admin-userbox">
+              <b id="adminUserInitial">S</b>
+              <span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span>
+              <button id="adminLogout" type="button">登出</button>
+            </div>
+          </div>
+        </header>
+
+        <div id="adminCoursesStatus" class="admin-data-status">正在讀取課程資料...</div>
+
+        <section class="admin-editor-layout">
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head">
+              <div><p class="admin-eyebrow">Course Form</p><h2 id="courseFormTitle">新增課程</h2></div>
+              <button type="button" id="newCourseButton">清空新增</button>
+            </div>
+            <form id="courseEditorForm" class="admin-form-grid">
+              <input type="hidden" name="id" />
+              <input type="hidden" name="cover_image_id" />
+              <label><span>課程名稱</span><input name="title" type="text" required /></label>
+              <label><span>Slug</span><input name="slug" type="text" required placeholder="family-care-class" /></label>
+              <label><span>課程類型</span><select name="course_type"><option>實體課</option><option>線上同步課</option><option>預錄課</option></select></label>
+              <label><span>報名狀態</span><select name="registration_status"><option value="open">開放報名</option><option value="coming_soon">即將開放</option><option value="full">名額已滿</option><option value="closed">截止報名</option></select></label>
+              <label class="admin-field-wide"><span>簡介</span><textarea name="excerpt" rows="3"></textarea></label>
+              <label class="admin-field-wide"><span>詳細說明</span><textarea name="description" rows="5"></textarea></label>
+              <label><span>日期時間</span><input name="starts_at" type="datetime-local" /></label>
+              <label><span>結束時間</span><input name="ends_at" type="datetime-local" /></label>
+              <label><span>地點</span><input name="location" type="text" placeholder="臺北教室 / Zoom" /></label>
+              <label><span>地點補充</span><input name="location_detail" type="text" /></label>
+              <label><span>價格文字</span><input name="price_text" type="text" placeholder="免費 / NT$ 1,200" /></label>
+              <label><span>名額</span><input name="capacity" type="number" min="0" /></label>
+              <label><span>人數標籤</span><input name="seats_label" type="text" placeholder="剩餘 12 名" /></label>
+              <label><span>排序</span><input name="sort_order" type="number" value="0" /></label>
+              <label class="admin-field-wide"><span>外部報名連結（可空白）</span><input name="registration_url" type="url" /></label>
+              <label><span>發布狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
+              <label class="admin-toggle-field"><input name="is_featured" type="checkbox" /><span>重要課程輪播</span></label>
+              <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>
+              <label class="admin-field-wide"><span>課程封面圖</span><input name="cover_file" type="file" accept="image/*" /></label>
+              <div id="courseCoverPreview" class="admin-section-image-tools admin-field-wide"></div>
+              <button type="submit">儲存課程</button>
+            </form>
+          </section>
+
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head">
+              <div><p class="admin-eyebrow">Course List</p><h2>課程列表</h2></div>
+              <button type="button" id="refreshCoursesButton">重新整理</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-data-table admin-article-table">
+                <thead><tr><th>課程</th><th>日期</th><th>類型</th><th>狀態</th><th>置頂</th><th>操作</th></tr></thead>
+                <tbody id="coursesTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div id="adminLoading" class="admin-loading"><strong>正在檢查登入狀態</strong><span>請稍候...</span></div>
+    <script type="module" src="/src/admin/courses.js"></script>
+  </body>
+</html>

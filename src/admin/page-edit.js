@@ -14,6 +14,7 @@ const editorSlug = document.querySelector("#pageEditorSlug");
 const form = document.querySelector("#pageEditorForm");
 const sectionsEditor = document.querySelector("#pageSectionsEditor");
 const addSectionButton = document.querySelector("#addSectionButton");
+const requestPublishButton = document.querySelector("#requestPagePublishButton");
 const imagePicker = document.querySelector("#sectionImagePicker");
 const imagePickerGrid = document.querySelector("#sectionImagePickerGrid");
 const imagePickerStatus = document.querySelector("#sectionImagePickerStatus");
@@ -282,6 +283,44 @@ async function savePage() {
   }
 }
 
+async function requestPagePublish() {
+  if (!currentPage?.id) {
+    setEditorStatus("請先讀取頁面後再送審發布。", "error");
+    return;
+  }
+
+  const note = window.prompt("送審備註（可留空）：", "請協助審核頁面文案、圖片與 SEO 後發布。");
+  if (note === null) return;
+
+  requestPublishButton?.setAttribute("disabled", "true");
+  setEditorStatus("正在建立頁面送審發布申請...", "info");
+  try {
+    const { error } = await supabase.from("publish_requests").insert({
+      entity_table: "pages",
+      entity_id: currentPage.id,
+      entity_title: form.elements.title.value.trim() || currentPage.title,
+      target_status: "published",
+      request_note: note || null,
+      status: "pending"
+    });
+    if (error) throw error;
+
+    await supabase.from("admin_activity_logs").insert({
+      action: "publish_request_created",
+      entity_table: "pages",
+      entity_id: currentPage.id,
+      message: form.elements.title.value.trim() || "頁面送審發布"
+    });
+
+    setEditorStatus("已送出發布審核，請到「發布與權限」查看進度。", "success");
+  } catch (error) {
+    console.error("Failed to request page publish", error);
+    setEditorStatus(`送審失敗：${error.message}`, "error");
+  } finally {
+    requestPublishButton?.removeAttribute("disabled");
+  }
+}
+
 function setImagePickerStatus(message, type = "info") {
   if (!imagePickerStatus) return;
   imagePickerStatus.hidden = !message;
@@ -430,6 +469,7 @@ imagePicker?.addEventListener("click", (event) => {
 });
 
 imageUploadForm?.addEventListener("submit", uploadAndSelectImage);
+requestPublishButton?.addEventListener("click", requestPagePublish);
 
 bindAdminLogout(logoutButton);
 

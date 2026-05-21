@@ -5,6 +5,7 @@ const FORM_RECIPIENTS = {
   contact: process.env.CONTACT_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
   course_signup: process.env.COURSE_NOTIFY_EMAIL || "edu.control@suiyuecare.com",
   investor: process.env.INVESTOR_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
+  land: process.env.LAND_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
   recruiting: process.env.RECRUITING_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com"
 };
 
@@ -20,16 +21,26 @@ function sanitize(value, maxLength = 2000) {
 }
 
 function buildSubmissionPayload(body) {
+  const formType = sanitize(body.form_type || "contact", 80);
   return {
-    form_type: sanitize(body.form_type || "contact", 80),
+    form_type: formType,
     name: sanitize(body.name || body["姓名"] || body["您的大名"], 160),
     phone: sanitize(body.phone || body["電話"] || body["您的電話"], 80),
     email: sanitize(body.email || body["信箱"] || body.Email, 180),
     subject: sanitize(body.subject || body["需求"] || body["課程"] || body["您本次報名的課程"] || body.course || "官網表單", 220),
     message: sanitize(body.message || body["說明"] || body["內容"], 2000),
     source_path: sanitize(body.source_path || body.page_path || "/", 500),
+    recipient_email: FORM_RECIPIENTS[formType] || FORM_RECIPIENTS.contact,
+    email_sent: false,
     metadata: {
       course_title: sanitize(body.course_title || body["課程"] || body["您本次報名的課程"], 220),
+      course_id: sanitize(body.course_id, 120),
+      recruiting_page: sanitize(body.recruiting_page, 120),
+      department_id: sanitize(body.department_id, 120),
+      department_title: sanitize(body.department_title, 180),
+      opening_id: sanitize(body.opening_id, 120),
+      opening_title: sanitize(body.opening_title, 220),
+      opening_slug: sanitize(body.opening_slug, 160),
       user_agent: sanitize(body.user_agent, 500),
       page_title: sanitize(body.page_title, 240),
       submitted_at: new Date().toISOString()
@@ -59,6 +70,23 @@ async function saveToSupabase(payload) {
   return response.json();
 }
 
+async function updateSubmissionEmailStatus(submissionId, emailSent) {
+  if (!submissionId) return;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
+
+  await fetch(`${supabaseUrl}/rest/v1/form_submissions?id=eq.${encodeURIComponent(String(submissionId).replace(/^"|"$/g, ""))}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      Prefer: "return=minimal"
+    },
+    body: JSON.stringify({ email_sent: Boolean(emailSent) })
+  });
+}
+
 function renderEmailHtml(payload) {
   const rows = [
     ["表單類型", payload.form_type],
@@ -67,6 +95,8 @@ function renderEmailHtml(payload) {
     ["Email", payload.email],
     ["主旨/需求", payload.subject],
     ["內容", payload.message],
+    ["部門/分類", payload.metadata.department_title],
+    ["職缺/項目", payload.metadata.opening_title],
     ["來源頁面", payload.source_path],
     ["送出時間", payload.metadata.submitted_at]
   ];
@@ -91,7 +121,7 @@ async function sendEmail(payload) {
     return { skipped: true, reason: "Missing RESEND_API_KEY" };
   }
 
-  const recipient = FORM_RECIPIENTS[payload.form_type] || FORM_RECIPIENTS.contact;
+  const recipient = payload.recipient_email || FORM_RECIPIENTS[payload.form_type] || FORM_RECIPIENTS.contact;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -140,6 +170,7 @@ module.exports = async function handler(request, response) {
       });
     }
 
+    await updateSubmissionEmailStatus(submissionId, !email?.skipped);
     return json(response, 200, { ok: true, submissionId, emailSent: !email?.skipped, email });
   } catch (error) {
     console.error(error);

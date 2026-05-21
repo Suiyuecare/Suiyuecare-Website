@@ -30,6 +30,24 @@ async function supabaseSelect(path) {
   return response.json();
 }
 
+async function supabasePatch(path, payload) {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!key) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY.");
+
+  const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      Prefer: "return=minimal"
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!response.ok) throw new Error(await response.text());
+}
+
 async function sendDigest({ to, reportType, pageViews, events, alerts }) {
   if (!process.env.RESEND_API_KEY) {
     return { skipped: true, reason: "Missing RESEND_API_KEY" };
@@ -108,6 +126,7 @@ module.exports = async function handler(request, response) {
     for (const recipient of recipients) {
       results.push(await sendDigest({ to: recipient, reportType, pageViews, events, alerts }));
     }
+    await Promise.all((schedules || []).map((schedule) => supabasePatch(`analytics_report_schedules?id=eq.${encodeURIComponent(schedule.id)}`, { last_sent_at: new Date().toISOString() })));
 
     return json(response, 200, { ok: true, reportType, recipients, results });
   } catch (error) {

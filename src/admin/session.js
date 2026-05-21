@@ -1,5 +1,15 @@
 import { supabase } from "../lib/supabaseClient.js";
-import { ensureSupabaseConfigured, redirectWhenSignedOut, requireAdminSession, setStatus } from "./auth.js";
+import {
+  applyAdminPermissionUi,
+  ensureSupabaseConfigured,
+  getAdminPermissions,
+  hasAdminPermission,
+  permissionDeniedMessage,
+  redirectWhenSignedOut,
+  requiredPermissionForPath,
+  requireAdminSession,
+  setStatus
+} from "./auth.js";
 
 export async function bootProtectedAdminPage({
   loading,
@@ -13,6 +23,16 @@ export async function bootProtectedAdminPage({
 
   const session = await requireAdminSession();
   if (!session) return null;
+  const permissions = await getAdminPermissions();
+  if (!permissions?.role) {
+    setStatus(loading, "此帳號尚未開通後台權限，請請 owner/admin 到 Supabase profiles 指派角色。", "error");
+    return null;
+  }
+  const requiredPermission = requiredPermissionForPath();
+  if (requiredPermission && !hasAdminPermission(permissions, requiredPermission)) {
+    setStatus(loading, permissionDeniedMessage(requiredPermission), "error");
+    return null;
+  }
 
   if (userEmail) {
     userEmail.textContent = session.user.email || "已登入";
@@ -20,12 +40,16 @@ export async function bootProtectedAdminPage({
   if (userInitial) {
     userInitial.textContent = (session.user.email || "S").trim().charAt(0).toUpperCase();
   }
+  document.body.dataset.adminRole = permissions.role || "viewer";
+  document.body.dataset.canPublish = permissions.can_publish ? "true" : "false";
+  document.body.dataset.canReviewPublish = permissions.can_review_publish ? "true" : "false";
+  applyAdminPermissionUi(permissions);
 
   loading?.remove();
   if (shell) shell.hidden = false;
   redirectWhenSignedOut();
-  onReady?.(session);
-  return session;
+  onReady?.(session, permissions);
+  return { session, permissions };
 }
 
 export function bindAdminLogout(logoutButton) {

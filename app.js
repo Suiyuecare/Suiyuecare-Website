@@ -110,13 +110,14 @@ const pages = {
 
 const nav = document.querySelector(".primary-nav");
 const menuToggle = document.querySelector(".menu-toggle");
-const groups = document.querySelectorAll(".nav-group");
+let navGroups = document.querySelectorAll(".nav-group");
 const home = document.querySelector("#home");
 const pageView = document.querySelector("#pageView");
 const revealItems = document.querySelectorAll(".reveal");
 const introLoader = document.querySelector(".intro-loader");
 const COURSE_NOTIFY_EMAIL = "edu.control@suiyuecare.com";
 const COURSE_LINE_URL = "https://lin.ee/oaPkGiq";
+let siteSettings = {};
 
 const analyticsState = {
   currentPath: "",
@@ -163,9 +164,18 @@ function getAttribution() {
   const utmMedium = params.get("utm_medium");
   const utmCampaign = params.get("utm_campaign");
   if (utmSource || utmMedium || utmCampaign) {
+    const normalizedMedium = String(utmMedium || "").toLowerCase();
+    const normalizedSource = String(utmSource || "").toLowerCase();
+    const groupedMedium = /cpc|ppc|paid|ads|ad/.test(normalizedMedium)
+      ? "paid ads"
+      : /email|edm|newsletter/.test(normalizedMedium)
+        ? "email"
+        : /qr/.test(normalizedMedium) || /qr/.test(normalizedSource)
+          ? "qr code"
+          : normalizedMedium || "unknown";
     return {
       source: utmSource || "utm",
-      medium: utmMedium || "unknown",
+      medium: groupedMedium,
       campaign: utmCampaign || null
     };
   }
@@ -234,7 +244,13 @@ async function recordFormSubmission(form, formType = "contact") {
     metadata: {
       page_title: document.title,
       form_id: form.id || null,
-      form_class: form.className || null
+      form_class: form.className || null,
+      recruiting_page: formDataValue(formData, ["recruiting_page"]),
+      department_id: formDataValue(formData, ["department_id"]),
+      department_title: formDataValue(formData, ["department_title"]),
+      opening_id: formDataValue(formData, ["opening_id"]),
+      opening_title: formDataValue(formData, ["opening_title"]),
+      opening_slug: formDataValue(formData, ["opening_slug"])
     }
   };
   const { data, error } = await supabase.rpc("submit_form_submission", { payload });
@@ -255,6 +271,13 @@ async function sendBackendForm(form, formType = "contact") {
     subject: formDataValue(formData, ["需求", "課程", "您本次報名的課程", "course", "subject"]) || formType,
     message: formDataValue(formData, ["說明", "message", "內容"]),
     course_title: formDataValue(formData, ["課程", "您本次報名的課程", "course_title"]),
+    course_id: formDataValue(formData, ["course_id"]),
+    recruiting_page: formDataValue(formData, ["recruiting_page"]),
+    department_id: formDataValue(formData, ["department_id"]),
+    department_title: formDataValue(formData, ["department_title"]),
+    opening_id: formDataValue(formData, ["opening_id"]),
+    opening_title: formDataValue(formData, ["opening_title"]),
+    opening_slug: formDataValue(formData, ["opening_slug"]),
     source_path: location.hash || "#home",
     page_title: document.title,
     user_agent: navigator.userAgent
@@ -685,6 +708,9 @@ let supabaseArticleCategories = [];
 let supabaseArticleCategoriesLoaded = false;
 let supabaseArticleCategoriesPromise = null;
 const supabaseArticlePageCache = new Map();
+let homeModulesLoadedFromSupabase = false;
+const careStoryPageCache = new Map();
+const expertTalkPageCache = new Map();
 
 function stripHTML(value = "") {
   return value.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
@@ -759,6 +785,33 @@ function getPostImage(post, fallback = "assets/homepage-batch/02-daycare-group-e
   const embedded = post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
   const acfImage = post?.acf?.image?.url || post?.acf?.avatar?.url || post?.acf?.speaker_photo?.url || post?.acf?.cover?.url;
   return acfImage || embedded || fallback;
+}
+
+function getCmsModuleImage(item, fallback = "assets/homepage-batch/02-daycare-group-exercise.png") {
+  return item?.image?.public_url || item?.metadata?.image_url || fallback;
+}
+
+function normalizeLocalAssetUrl(url = "") {
+  return location.protocol === "file:" ? String(url).replace(/^\/assets\//, "assets/") : url;
+}
+
+function normalizeYouTubeEmbedUrl(value = "") {
+  const rawValue = String(value || "").trim();
+  if (!rawValue) return "";
+  if (rawValue.includes("/embed/")) return rawValue;
+
+  try {
+    const url = new URL(rawValue);
+    let videoId = "";
+    if (url.hostname.includes("youtu.be")) {
+      videoId = url.pathname.split("/").filter(Boolean)[0] || "";
+    } else if (url.hostname.includes("youtube.com")) {
+      videoId = url.searchParams.get("v") || url.pathname.split("/").filter(Boolean).pop() || "";
+    }
+    return videoId ? `https://www.youtube.com/embed/${encodeURIComponent(videoId)}` : rawValue;
+  } catch {
+    return rawValue;
+  }
 }
 
 function formatArticleDate(dateValue) {
@@ -1280,6 +1333,771 @@ async function loadSupabaseDetailPage(slug) {
   }
 }
 
+const serviceTemplateSlugs = new Set([
+  "about",
+  "milestones",
+  "home-care",
+  "day-care",
+  "community",
+  "nursing",
+  "migrant-training",
+  "quality"
+]);
+
+function getTemplateFieldValue(field) {
+  if (!field) return "";
+  if (field.field_type === "image") return field.image?.public_url || field.text_value || "";
+  if (field.field_type === "boolean") return Boolean(field.boolean_value);
+  if (field.field_type === "number") return field.number_value ?? "";
+  if (field.field_type === "json") return field.json_value;
+  return field.text_value || "";
+}
+
+function mapTemplateFields(fields = []) {
+  return fields.reduce((map, field) => {
+    const current = map[field.field_key];
+    if (current?.field_type === "image" && current.image?.public_url && !field.image?.public_url) return map;
+    map[field.field_key] = field;
+    return map;
+  }, {});
+}
+
+function getTemplateText(fieldMap, key, fallback = "") {
+  const value = getTemplateFieldValue(fieldMap[key]);
+  if (Array.isArray(value) || typeof value === "object") return fallback;
+  return value === "" || value === null || value === undefined ? fallback : String(value);
+}
+
+function getTemplateArray(fieldMap, key, fallback = []) {
+  const value = getTemplateFieldValue(fieldMap[key]);
+  if (Array.isArray(value)) return value;
+  if (Array.isArray(value?.items)) return value.items;
+  return fallback;
+}
+
+function renderTemplateCards(items, type = "feature") {
+  const list = Array.isArray(items) ? items : [];
+  if (!list.length) return "";
+  if (type === "flow") {
+    return `
+      <div class="service-flow-track">
+        ${list.map((item, index) => `
+          <article>
+            <b>${escapeHTML(item.step || item.number || String(index + 1).padStart(2, "0"))}</b>
+            <h3>${escapeHTML(item.title || "")}</h3>
+            <p>${escapeHTML(item.body || item.description || "")}</p>
+          </article>
+        `).join("")}
+      </div>
+    `;
+  }
+  return `
+    <div class="service-highlight-grid">
+      ${list.map((item, index) => `
+        <article>
+          <span>${escapeHTML(item.label || String(index + 1).padStart(2, "0"))}</span>
+          <h3>${escapeHTML(item.title || "")}</h3>
+          <p>${escapeHTML(item.body || item.description || "")}</p>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderTemplateFaq(items) {
+  const list = Array.isArray(items) ? items : [];
+  if (!list.length) return "";
+  return `
+    <div class="shareholder-faq service-template-faq">
+      ${list.map((item, index) => `
+        <details ${index === 0 ? "open" : ""}>
+          <summary>${escapeHTML(item.question || item.title || "")}</summary>
+          <p>${escapeHTML(item.answer || item.body || "")}</p>
+        </details>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderFixedServiceTemplate(slug, fields = []) {
+  const fieldMap = mapTemplateFields(fields);
+  const title = getTemplateText(fieldMap, "hero_title", "歲悅服務");
+  const heroImage = getTemplateText(fieldMap, "hero_image", "assets/hero-care.png");
+  const primaryText = getTemplateText(fieldMap, "primary_cta_text", "預約諮詢");
+  const primaryUrl = getTemplateText(fieldMap, "primary_cta_url", "#contact");
+  const secondaryText = getTemplateText(fieldMap, "secondary_cta_text", "查看服務據點");
+  const secondaryUrl = getTemplateText(fieldMap, "secondary_cta_url", "#network");
+  const featureCards = getTemplateArray(fieldMap, "feature_cards");
+  const flowCards = getTemplateArray(fieldMap, "flow_cards");
+  const faqItems = getTemplateArray(fieldMap, "faq_items");
+
+  return `
+    <div class="service-detail-page service-template-page ${escapeHTML(slug)}-template-page">
+      <section class="service-detail-hero ${escapeHTML(slug)}-hero">
+        <div class="service-detail-copy">
+          <p class="eyebrow">${escapeHTML(getTemplateText(fieldMap, "hero_eyebrow", "Suiyuecare Service"))}</p>
+          <h1>${escapeHTML(title)}</h1>
+          <p>${escapeHTML(getTemplateText(fieldMap, "hero_body", ""))}</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="${escapeHTML(primaryUrl)}">${escapeHTML(primaryText)}</a>
+            <a class="secondary-button" href="${escapeHTML(secondaryUrl)}">${escapeHTML(secondaryText)}</a>
+          </div>
+        </div>
+        <aside class="service-hero-card">
+          <img src="${escapeHTML(heroImage)}" alt="${escapeHTML(title)}"${imageStyleAttr({ usage: "service_hero", focalPoint: getTemplateText(fieldMap, "hero_focal_point", "center") })} />
+          <div>
+            <span>${escapeHTML(getTemplateText(fieldMap, "hero_badge", "Suiyuecare Corps."))}</span>
+            <strong>${escapeHTML(getTemplateText(fieldMap, "hero_card_title", title))}</strong>
+          </div>
+        </aside>
+      </section>
+
+      ${featureCards.length ? `
+        <section class="service-detail-section">
+          <div class="service-section-head">
+            <p class="eyebrow">${escapeHTML(getTemplateText(fieldMap, "feature_eyebrow", "Care Focus"))}</p>
+            <h2>${escapeHTML(getTemplateText(fieldMap, "feature_title", "服務特色"))}</h2>
+            <span>${escapeHTML(getTemplateText(fieldMap, "feature_body", ""))}</span>
+          </div>
+          ${renderTemplateCards(featureCards)}
+        </section>
+      ` : ""}
+
+      ${flowCards.length ? `
+        <section class="service-detail-section">
+          <div class="service-section-head">
+            <p class="eyebrow">${escapeHTML(getTemplateText(fieldMap, "flow_eyebrow", "Service Flow"))}</p>
+            <h2>${escapeHTML(getTemplateText(fieldMap, "flow_title", "服務流程"))}</h2>
+            <span>${escapeHTML(getTemplateText(fieldMap, "flow_body", ""))}</span>
+          </div>
+          ${renderTemplateCards(flowCards, "flow")}
+        </section>
+      ` : ""}
+
+      ${faqItems.length ? `
+        <section class="service-detail-section">
+          <div class="service-section-head">
+            <p class="eyebrow">${escapeHTML(getTemplateText(fieldMap, "faq_eyebrow", "FAQ"))}</p>
+            <h2>${escapeHTML(getTemplateText(fieldMap, "faq_title", "常見問題"))}</h2>
+            <span>${escapeHTML(getTemplateText(fieldMap, "faq_body", "管理者可在後台新增或調整常見問答內容。"))}</span>
+          </div>
+          ${renderTemplateFaq(faqItems)}
+        </section>
+      ` : ""}
+
+      <section class="service-cta-panel">
+        <div>
+          <p class="eyebrow">${escapeHTML(getTemplateText(fieldMap, "cta_eyebrow", "Contact"))}</p>
+          <h2>${escapeHTML(getTemplateText(fieldMap, "cta_title", "讓歲悅協助你安排下一步"))}</h2>
+          <p>${escapeHTML(getTemplateText(fieldMap, "cta_body", "留下需求，我們會由專人協助判斷適合的服務與合作方式。"))}</p>
+        </div>
+        <a class="primary-button" href="${escapeHTML(getTemplateText(fieldMap, "cta_button_url", "#contact"))}">${escapeHTML(getTemplateText(fieldMap, "cta_button_text", "聯絡我們"))}</a>
+      </section>
+    </div>
+  `;
+}
+
+async function loadSupabaseServiceTemplatePage(slug) {
+  if (!supabase || !serviceTemplateSlugs.has(slug)) return;
+
+  try {
+    const { data, error } = await supabase
+      .from("page_template_fields")
+      .select("template_key, field_key, field_label, field_type, text_value, number_value, boolean_value, json_value, sort_order, image:media!page_template_fields_image_id_fkey(id, public_url, alt_text, file_name)")
+      .eq("page_slug", slug)
+      .eq("is_enabled", true)
+      .order("sort_order", { ascending: true });
+
+    if (error) throw error;
+    if (!data?.some((field) => field.field_key === "hero_title")) return;
+    if (location.hash.slice(1).split("?")[0] !== slug) return;
+    pageView.innerHTML = renderFixedServiceTemplate(slug, data);
+  } catch (error) {
+    console.warn(`Supabase service template unavailable for ${slug}.`, error);
+  }
+}
+
+const recruitingTemplateSlugs = new Set(["talent", "land", "investor-recruiting"]);
+const supabaseRecruitingPageCache = new Map();
+
+function getRecruitingImage(item, fallback = "assets/homepage-batch/04-admin-team-office.png") {
+  const url = item?.image?.public_url || item?.hero_image?.public_url || item?.image_url || item?.hero_image_url || fallback;
+  return normalizeRecruitingAssetUrl(url);
+}
+
+function normalizeRecruitingAssetUrl(url = "") {
+  return location.protocol === "file:" ? String(url).replace(/^\/assets\//, "assets/") : url;
+}
+
+function normalizeRecruitingList(value) {
+  if (Array.isArray(value)) return value;
+  if (Array.isArray(value?.items)) return value.items;
+  return [];
+}
+
+function renderRecruitingHero(page) {
+  const image = getRecruitingImage(page, "assets/homepage-batch/04-admin-team-office.png");
+  return `
+    <section class="service-detail-hero recruiting-cms-hero ${escapeHTML(page.page_slug)}-recruiting-hero">
+      <div class="service-detail-copy">
+        <p class="eyebrow">${escapeHTML(page.eyebrow || "Recruiting")}</p>
+        <h1>${escapeHTML(page.title || "")}</h1>
+        <p>${escapeHTML(page.body || page.subtitle || "")}</p>
+        <div class="hero-actions">
+          <a class="primary-button" href="${escapeHTML(page.primary_cta_url || "#recruiting-openings")}">${escapeHTML(page.primary_cta_text || "查看內容")}</a>
+          <a class="secondary-button" href="${escapeHTML(page.secondary_cta_url || "#contact")}">${escapeHTML(page.secondary_cta_text || "聯絡我們")}</a>
+        </div>
+      </div>
+      <aside class="service-hero-card">
+        <img src="${escapeHTML(image)}" alt="${escapeHTML(page.title || "歲悅招募")}"${imageStyleAttr({ usage: "service_hero", focalPoint: page.metadata?.focal_point || "center" })} />
+        <div>
+          <span>${escapeHTML(page.hero_badge || "Suiyuecare Corps.")}</span>
+          <strong>${escapeHTML(page.hero_card_title || page.subtitle || page.title || "")}</strong>
+        </div>
+      </aside>
+    </section>
+  `;
+}
+
+function renderRecruitingDepartmentTabs(departments) {
+  if (!departments.length) return "";
+  return `
+    <nav class="career-tabs recruiting-cms-tabs" aria-label="招募部門分頁">
+      ${departments.map((department, index) => `
+        <button class="${index === 0 ? "active" : ""}" type="button" data-career-tab="${escapeHTML(department.department_slug)}">${escapeHTML(department.title)}</button>
+      `).join("")}
+    </nav>
+  `;
+}
+
+function renderRecruitingDepartmentPanel(page, department, openings, index) {
+  const image = getRecruitingImage(department, "assets/recruit-home-care-worker.png");
+  const highlights = normalizeRecruitingList(department.highlights);
+  const gallery = normalizeRecruitingList(department.gallery);
+  return `
+    <section class="career-tab-panel ${index === 0 ? "active" : ""}" data-career-panel="${escapeHTML(department.department_slug)}">
+      <div class="homecare-recruit recruiting-cms-department">
+        <section class="career-hero">
+          <div class="service-detail-copy">
+            <p class="eyebrow">${escapeHTML(department.eyebrow || page.eyebrow || "Recruiting")}</p>
+            <h2>${escapeHTML(department.title)}</h2>
+            <p>${escapeHTML(department.description || "")}</p>
+            ${highlights.length ? `
+              <div class="career-hero-points">
+                ${highlights.map((item) => `<span>${escapeHTML(item.title || item)}</span>`).join("")}
+              </div>
+            ` : ""}
+          </div>
+          <figure class="career-dept-image">
+            <img src="${escapeHTML(image)}" alt="${escapeHTML(department.title)}" />
+            <figcaption>${escapeHTML(department.metadata?.caption || department.title)}</figcaption>
+          </figure>
+        </section>
+
+        ${gallery.length ? `
+          <section class="homecare-gallery recruiting-cms-gallery" aria-label="${escapeHTML(department.title)}工作情境">
+            ${gallery.map((item) => `
+              <figure>
+                <img src="${escapeHTML(normalizeRecruitingAssetUrl(item.image || item.url || image))}" alt="${escapeHTML(item.caption || department.title)}" />
+                <figcaption>${escapeHTML(item.caption || "")}</figcaption>
+              </figure>
+            `).join("")}
+          </section>
+        ` : ""}
+
+        <section class="homecare-role-section" id="${index === 0 ? "career-openings" : ""}">
+          <div class="career-section-head compact">
+            <p class="eyebrow">Open Roles</p>
+            <h2>${escapeHTML(department.title)}招募卡片</h2>
+            <span>這些職缺與合作卡片來自 Supabase，後台增減卡片後前台會跟著變動。</span>
+          </div>
+          ${renderRecruitingOpeningGrid(page, department, openings)}
+        </section>
+      </div>
+    </section>
+  `;
+}
+
+function renderRecruitingOpeningGrid(page, department, openings) {
+  if (!openings.length) return `<div class="health-empty-state"><h2>目前尚未開放卡片</h2><p>請到後台新增職缺或合作項目。</p></div>`;
+  return `
+    <div class="homecare-role-grid recruiting-opening-grid">
+      ${openings.map((opening, index) => renderRecruitingOpeningCard(page, department, opening, index)).join("")}
+    </div>
+  `;
+}
+
+function renderRecruitingOpeningCard(page, department, opening, index) {
+  const image = getRecruitingImage(opening, getRecruitingImage(department, "assets/recruit-home-care-worker.png"));
+  const duties = normalizeRecruitingList(opening.duties);
+  const requirements = normalizeRecruitingList(opening.requirements);
+  const benefits = normalizeRecruitingList(opening.benefits);
+  const formType = opening.metadata?.form_type || page.metadata?.form_type || "recruiting";
+  return `
+    <details class="homecare-role-card recruiting-opening-card" ${index === 0 ? "open" : ""}>
+      <summary>
+        <img src="${escapeHTML(image)}" alt="${escapeHTML(opening.title)}" />
+        <div>
+          <span>${escapeHTML(opening.subtitle || department?.title || page.title)}</span>
+          <h3>${escapeHTML(opening.title)}</h3>
+          <p>${escapeHTML(opening.summary || "")}</p>
+          <small>${[opening.employment_type, opening.location, opening.capacity_label].filter(Boolean).map(escapeHTML).join(" · ")}</small>
+        </div>
+        <b>查看內容</b>
+      </summary>
+      <div class="homecare-role-detail">
+        <article>
+          <h4>${page.page_slug === "talent" ? "工作內容" : "合作內容"}</h4>
+          <ul>${duties.map((item) => `<li>${escapeHTML(item.title || item)}</li>`).join("")}</ul>
+        </article>
+        <article>
+          <h4>${page.page_slug === "talent" ? "應徵條件" : "合作條件"}</h4>
+          <ul>${requirements.map((item) => `<li>${escapeHTML(item.title || item)}</li>`).join("")}</ul>
+        </article>
+        <div class="homecare-role-support">
+          ${benefits.map((item) => `<span>${escapeHTML(item.title || item)}</span>`).join("")}
+        </div>
+        <div class="course-info-line">
+          <span><em>地點</em>${escapeHTML(opening.location || "洽談確認")}</span>
+          <b><em>${page.page_slug === "talent" ? "薪資" : "模式"}</em>${escapeHTML(opening.salary_text || "洽談確認")}</b>
+        </div>
+        ${opening.apply_form_enabled ? `
+          <button
+            class="primary-button"
+            type="button"
+            data-recruit-apply
+            data-form-type="${escapeHTML(formType)}"
+            data-page-slug="${escapeHTML(page.page_slug)}"
+            data-department-id="${escapeHTML(department?.id || "")}"
+            data-department-title="${escapeHTML(department?.title || "")}"
+            data-opening-id="${escapeHTML(opening.id || "")}"
+            data-opening-slug="${escapeHTML(opening.opening_slug || "")}"
+            data-opening-title="${escapeHTML(opening.title || "")}"
+          >${escapeHTML(opening.apply_button_text || "申請應徵")}</button>
+        ` : ""}
+      </div>
+    </details>
+  `;
+}
+
+function renderRecruitingOpportunityPage(page, departments, openings) {
+  const primaryDepartment = departments[0] || { id: "", title: page.title, department_slug: page.page_slug };
+  return `
+    <div class="service-detail-page recruiting-cms-page ${escapeHTML(page.page_slug)}-cms-page">
+      ${renderRecruitingHero(page)}
+      <section class="service-detail-section" id="recruiting-openings">
+        <div class="service-section-head">
+          <p class="eyebrow">${escapeHTML(primaryDepartment.eyebrow || "Opportunities")}</p>
+          <h2>${escapeHTML(primaryDepartment.title || page.title)}</h2>
+          <span>${escapeHTML(primaryDepartment.description || page.subtitle || "")}</span>
+        </div>
+        ${renderRecruitingOpeningGrid(page, primaryDepartment, openings)}
+      </section>
+      ${renderRecruitingApplicationModal(page)}
+    </div>
+  `;
+}
+
+function renderRecruitingTalentPage(page, departments, openings) {
+  const panels = departments.map((department, index) => {
+    const departmentOpenings = openings.filter((opening) => opening.department_id === department.id);
+    return renderRecruitingDepartmentPanel(page, department, departmentOpenings, index);
+  }).join("");
+  return `
+    <div class="career-page recruiting-cms-page">
+      ${renderRecruitingHero(page)}
+      ${renderRecruitingDepartmentTabs(departments)}
+      ${panels || `<section class="service-detail-section"><div class="health-empty-state"><h2>尚未建立招募部門</h2><p>請到後台新增部門資料。</p></div></section>`}
+      ${renderRecruitingApplicationModal(page)}
+    </div>
+  `;
+}
+
+function renderRecruitingApplicationModal(page) {
+  return `
+    <div class="course-signup-modal recruiting-apply-modal" id="recruitApplyModal" hidden>
+      <div class="course-signup-dialog">
+        <button class="course-modal-close" type="button" data-recruit-close aria-label="關閉">×</button>
+        <p class="eyebrow">Apply</p>
+        <h2>${escapeHTML(page.page_slug === "talent" ? "申請應徵" : "提交洽談資料")}</h2>
+        <form id="recruitApplyForm">
+          <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
+          <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
+          <label>Email<input name="Email" type="email" placeholder="請輸入 Email" /></label>
+          <label>申請項目<input name="subject" id="recruitApplyTitle" type="text" readonly /></label>
+          <label>補充說明<textarea name="說明" rows="4" placeholder="可填寫可聯絡時間、經歷、場域資料或合作想法"></textarea></label>
+          <input name="recruiting_page" id="recruitApplyPage" type="hidden" />
+          <input name="department_id" id="recruitApplyDepartmentId" type="hidden" />
+          <input name="department_title" id="recruitApplyDepartmentTitle" type="hidden" />
+          <input name="opening_id" id="recruitApplyOpeningId" type="hidden" />
+          <input name="opening_slug" id="recruitApplyOpeningSlug" type="hidden" />
+          <input name="opening_title" id="recruitApplyOpeningTitle" type="hidden" />
+          <p class="course-confirm-text">送出後，資料會寄到歲悅窗口並留存在後台表單資料。</p>
+          <button class="primary-button" type="submit">確認送出</button>
+          <span id="recruitApplyStatus"></span>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+async function fetchSupabaseRecruitingPage(slug) {
+  if (supabaseRecruitingPageCache.has(slug)) return supabaseRecruitingPageCache.get(slug);
+  const pageQuery = supabase
+    .from("recruiting_pages")
+    .select("*, hero_image:media!recruiting_pages_hero_image_id_fkey(id, public_url, alt_text, file_name)")
+    .eq("page_slug", slug)
+    .eq("is_enabled", true)
+    .eq("status", "published")
+    .lte("published_at", new Date().toISOString())
+    .maybeSingle();
+
+  const departmentsQuery = supabase
+    .from("recruiting_departments")
+    .select("*, image:media!recruiting_departments_image_id_fkey(id, public_url, alt_text, file_name)")
+    .eq("page_slug", slug)
+    .eq("is_enabled", true)
+    .eq("status", "published")
+    .lte("published_at", new Date().toISOString())
+    .order("sort_order", { ascending: true });
+
+  const openingsQuery = supabase
+    .from("recruiting_openings")
+    .select("*, image:media!recruiting_openings_image_id_fkey(id, public_url, alt_text, file_name)")
+    .eq("page_slug", slug)
+    .eq("is_enabled", true)
+    .eq("status", "published")
+    .lte("published_at", new Date().toISOString())
+    .order("is_featured", { ascending: false })
+    .order("sort_order", { ascending: true });
+
+  const [{ data: page, error: pageError }, { data: departments, error: departmentsError }, { data: openings, error: openingsError }] = await Promise.all([
+    pageQuery,
+    departmentsQuery,
+    openingsQuery
+  ]);
+  if (pageError) throw pageError;
+  if (departmentsError) throw departmentsError;
+  if (openingsError) throw openingsError;
+  if (!page) return null;
+
+  const result = { page, departments: departments || [], openings: openings || [] };
+  supabaseRecruitingPageCache.set(slug, result);
+  return result;
+}
+
+async function loadSupabaseRecruitingPage(slug) {
+  if (!supabase || !recruitingTemplateSlugs.has(slug)) return;
+  try {
+    const data = await fetchSupabaseRecruitingPage(slug);
+    if (!data || location.hash.slice(1).split("?")[0] !== slug) return;
+    pageView.innerHTML = slug === "talent"
+      ? renderRecruitingTalentPage(data.page, data.departments, data.openings)
+      : renderRecruitingOpportunityPage(data.page, data.departments, data.openings);
+  } catch (error) {
+    console.warn(`Supabase recruiting page unavailable for ${slug}.`, error);
+  }
+}
+
+const supabaseInvestorCache = new Map();
+
+function fileHref(file) {
+  if (!file) return "#contact";
+  if (file.public_url) return file.public_url;
+  if (file.id) return `/api/download-file?id=${encodeURIComponent(file.id)}`;
+  return "#contact";
+}
+
+function groupByKey(items = [], key) {
+  return items.reduce((groups, item) => {
+    const value = item[key] || "general";
+    if (!groups[value]) groups[value] = [];
+    groups[value].push(item);
+    return groups;
+  }, {});
+}
+
+function renderCmsNoticeLinks(items, fallbackHref = "#investors") {
+  return (items || []).map((item) => `
+    <a href="${escapeHTML(item.link_url || fileHref(item.file) || fallbackHref)}">
+      <time>${escapeHTML(item.date_label || formatArticleDate(item.published_on || item.published_at))}</time>
+      <strong>${escapeHTML(item.title)}</strong>
+      <p>${escapeHTML(item.summary || item.body || "")}</p>
+    </a>
+  `).join("");
+}
+
+function renderCmsDownloadGrid(files, emptyText = "目前尚未上架檔案") {
+  if (!files?.length) return `<div class="health-empty-state"><h2>${escapeHTML(emptyText)}</h2><p>請到後台檔案下載管理新增投資人文件。</p></div>`;
+  return `
+    <div class="download-grid">
+      ${files.map((file) => `
+        <a href="${escapeHTML(fileHref(file))}" target="${file.public_url && file.public_url.startsWith("#") ? "" : "_blank"}" rel="noopener">
+          <span>${escapeHTML(file.file_type || "PDF")}</span>
+          <strong>${escapeHTML(file.title)}</strong>
+          <em>${escapeHTML(file.description || file.category || "下載檔案")}</em>
+        </a>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderCmsBarChart(points = []) {
+  const values = points.map((point) => Number(point.value || 0));
+  const max = Math.max(...values, 1);
+  return `
+    <div class="bar-line-chart">
+      ${points.map((point) => `<i style="--h:${Math.max(6, Math.round(Number(point.value || 0) / max * 100))}%"><b>${escapeHTML(point.label || "")}</b></i>`).join("")}
+    </div>
+  `;
+}
+
+function renderCmsDonutChart(points = [], label = "Data") {
+  const total = points.reduce((sum, point) => sum + Number(point.value || 0), 0) || 1;
+  const segments = points.slice(0, 4).map((point) => `${Math.round(Number(point.value || 0) / total * 100)}%`);
+  return `
+    <div class="donut-chart" style="--a:${segments[0] || "25%"};--b:${segments[1] || "25%"};--c:${segments[2] || "25%"};--d:${segments[3] || "25%"}"><em>${escapeHTML(label)}</em></div>
+    <ul class="chart-legend">${points.map((point) => `<li>${escapeHTML(point.label || "")} ${escapeHTML(point.value || "")}${escapeHTML(point.unit || "")}</li>`).join("")}</ul>
+  `;
+}
+
+function renderCmsLineChart(points = []) {
+  const values = points.map((point) => Number(point.value || 0));
+  const max = Math.max(...values, 1);
+  const coords = points.map((point, index) => {
+    const x = points.length <= 1 ? 50 : Math.round(index / (points.length - 1) * 100);
+    const y = 96 - Math.max(8, Math.round(Number(point.value || 0) / max * 88));
+    return `${x},${y}`;
+  }).join(" ");
+  return `
+    <div class="cms-line-chart">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="${escapeHTML(coords)}"></polyline></svg>
+      ${points.map((point, index) => {
+        const x = points.length <= 1 ? 50 : Math.round(index / (points.length - 1) * 100);
+        const y = Math.max(8, Math.round(Number(point.value || 0) / max * 92));
+        return `<i style="--x:${x}%;--y:${y}%"><b>${escapeHTML(point.label || "")}</b><em>${escapeHTML(point.value || "")}${escapeHTML(point.unit || "")}</em></i>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderCmsScoreChart(points = [], unitLabel = "Score") {
+  const primary = points[0] || { value: 0, label: unitLabel };
+  const score = Math.max(0, Math.min(100, Number(primary.value || 0)));
+  return `
+    <div class="score-ring cms-score-ring" style="--score:${score}%"><b>${escapeHTML(score)}</b><span>${escapeHTML(primary.label || unitLabel || "Score")}</span></div>
+    <ul class="chart-legend">${points.slice(1).map((point) => `<li>${escapeHTML(point.label || "")} ${escapeHTML(point.value || "")}${escapeHTML(point.unit || "")}</li>`).join("")}</ul>
+  `;
+}
+
+function renderCmsProgressCards(points = []) {
+  if (!points.length) return `<div class="health-empty-state"><h2>尚未建立進度資料</h2><p>請到後台投資人資料管理新增進度圖表。</p></div>`;
+  return `
+    <div class="ir-progress-grid">
+      ${points.map((project) => `
+        <article class="ir-progress-card"><div class="ir-progress-top"><span>${escapeHTML(project.type || "進度")}</span><strong>${escapeHTML(project.percent || project.value || 0)}%</strong></div><h3>${escapeHTML(project.area || project.label || "")}</h3><p>${escapeHTML(project.status || project.note || "")}</p><div class="ir-main-progress"><i style="width:${Number(project.percent || project.value || 0)}%"></i></div><div class="ir-step-list">${(project.steps || []).map((step) => {
+          const label = Array.isArray(step) ? step[0] : step.label;
+          const value = Array.isArray(step) ? step[1] : step.value;
+          return `<div><b>${escapeHTML(label || "")}</b><span><i style="width:${Number(value || 0)}%"></i></span><em>${escapeHTML(value || 0)}%</em></div>`;
+        }).join("")}</div></article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderCmsChart(chart, options = {}) {
+  const points = chart?.data_points || [];
+  const type = chart?.chart_type || options.fallbackType || "bar";
+  if (type === "donut") return renderCmsDonutChart(points, chart?.unit_label || options.label || "Data");
+  if (type === "line" || type === "combo") return renderCmsLineChart(points);
+  if (type === "score") return renderCmsScoreChart(points, chart?.unit_label || options.label || "Score");
+  if (type === "progress") return renderCmsProgressCards(points);
+  return renderCmsBarChart(points);
+}
+
+function renderCmsChartCard(chart, className = "") {
+  if (!chart) return "";
+  const points = chart.data_points || [];
+  const featured = points[0];
+  const featuredText = chart.chart_type === "donut"
+    ? "100%"
+    : featured ? `${featured.value ?? featured.percent ?? ""}${featured.unit || chart.unit_label || ""}` : "--";
+  return `
+    <article class="chart-card ${escapeHTML(className)}">
+      <div class="chart-card-head"><span>${escapeHTML(chart.chart_title || chart.chart_key || "圖表資料")}</span><strong>${escapeHTML(featuredText)}</strong></div>
+      ${renderCmsChart(chart)}
+    </article>
+  `;
+}
+
+function renderCmsChartGrid(charts = []) {
+  if (!charts.length) return "";
+  return `<div class="cms-chart-grid">${charts.map((chart, index) => renderCmsChartCard(chart, index % 3 === 0 ? "wide" : "")).join("")}</div>`;
+}
+
+async function fetchSupabaseInvestorData(pageSlug = "investors") {
+  const cacheKey = pageSlug;
+  if (supabaseInvestorCache.has(cacheKey)) return supabaseInvestorCache.get(cacheKey);
+
+  const now = new Date().toISOString();
+  const [{ data: notices, error: noticeError }, { data: financials, error: financialError }, { data: charts, error: chartError }, { data: files, error: fileError }] = await Promise.all([
+    supabase
+      .from("investor_notices")
+      .select("*, file:downloadable_files(id, title, public_url, file_type, category)")
+      .eq("is_enabled", true)
+      .eq("status", "published")
+      .lte("published_at", now)
+      .order("sort_order", { ascending: true })
+      .order("published_on", { ascending: false, nullsFirst: false }),
+    supabase
+      .from("investor_financial_items")
+      .select("*, file:downloadable_files(id, title, public_url, file_type, category)")
+      .eq("is_enabled", true)
+      .eq("status", "published")
+      .lte("published_at", now)
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("investor_chart_datasets")
+      .select("*")
+      .eq("is_enabled", true)
+      .eq("status", "published")
+      .lte("published_at", now)
+      .in("page_slug", ["investors", pageSlug])
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("downloadable_files")
+      .select("*")
+      .eq("is_enabled", true)
+      .eq("is_public", true)
+      .eq("status", "published")
+      .lte("published_at", now)
+      .in("category", ["monthly_revenue", "quarterly_report", "annual_report", "governance", "shareholder", "investor", "finance"])
+      .order("sort_order", { ascending: true })
+  ]);
+
+  if (noticeError) throw noticeError;
+  if (financialError) throw financialError;
+  if (chartError) throw chartError;
+  if (fileError) throw fileError;
+  const result = {
+    notices: notices || [],
+    noticesByType: groupByKey(notices || [], "notice_type"),
+    financials: financials || [],
+    financialsByType: groupByKey(financials || [], "item_type"),
+    charts: charts || [],
+    chartsByKey: groupByKey(charts || [], "chart_key"),
+    files: files || [],
+    filesByCategory: groupByKey(files || [], "category")
+  };
+  supabaseInvestorCache.set(cacheKey, result);
+  return result;
+}
+
+function renderCmsInvestorsPage(data) {
+  const progressChart = data.chartsByKey["establishment-progress"]?.[0];
+  const news = data.noticesByType.news || [];
+  const awards = data.noticesByType.award || [];
+  return `
+    <div class="investor-page">
+      <section class="investor-hero">
+        <div>
+          <p class="eyebrow">Investor Relations</p>
+          <h1>投資人專區</h1>
+          <p>以清楚、穩定、可信任的資訊揭露，讓投資人理解歲悅長照集團的服務網絡、治理節奏與成長策略。</p>
+          <div class="investor-hero-actions"><a class="primary-button" href="#contact">聯絡投資人窗口</a><a class="secondary-button" href="#investor-downloads">下載資料</a></div>
+        </div>
+        <aside class="investor-snapshot"><span>Suiyuecare Corps.</span><strong>照顧服務網絡持續擴張</strong><div><p><b>3</b>核心縣市</p><p><b>6</b>服務事業</p><p><b>95%</b>服務滿意度</p></div></aside>
+      </section>
+      <nav class="investor-directory" aria-label="投資人專區主要分類">
+        <a href="#ir-finance"><span>Financials</span><strong>財務資訊</strong><em>每月營收、財務分析、季報與年報</em></a>
+        <a href="#ir-governance"><span>Governance</span><strong>公司治理</strong><em>治理運作、稽核、風險與誠信經營</em></a>
+        <a href="#ir-shareholders"><span>Shareholders</span><strong>股東專區</strong><em>股務資訊、股東會、法說會與 FAQ</em></a>
+      </nav>
+      <section class="investor-panel active ir-progress-section">
+        <div class="investor-section-head"><p class="eyebrow">Expansion Progress</p><h2>機構設立進度</h2><span>這些進度資料來自後台圖表資料，可由管理者調整百分比與階段。</span></div>
+        ${renderCmsChart(progressChart, { fallbackType: "progress" })}
+      </section>
+      <section class="investor-panel active">
+        <div class="investor-section-head"><p class="eyebrow">Latest Updates</p><h2>投資人最新動態</h2><span>公告與得標紀錄由 Supabase 投資人公告資料表管理。</span></div>
+        <div class="ir-updates-grid">
+          <article class="ir-update-card"><div><p class="eyebrow">News</p><h3>最新消息</h3></div>${renderCmsNoticeLinks(news, "#ir-finance")}</article>
+          <article class="ir-update-card"><div><p class="eyebrow">Awards</p><h3>得標紀錄</h3></div>${renderCmsNoticeLinks(awards, "#ir-governance")}</article>
+        </div>
+      </section>
+      <section class="investor-panel active" id="investor-downloads"><div class="investor-section-head"><p class="eyebrow">Downloads</p><h2>投資人下載檔</h2><span>下載檔沿用後台檔案下載管理。</span></div>${renderCmsDownloadGrid(data.files)}</section>
+    </div>
+  `;
+}
+
+function renderCmsFinancePage(data) {
+  const revenueRows = data.financialsByType.monthly_revenue || [];
+  const quarterly = data.financialsByType.quarterly_report || [];
+  const annual = data.financialsByType.annual_report || [];
+  const revenueChart = data.chartsByKey["monthly-revenue-trend"]?.[0];
+  const serviceMix = data.chartsByKey["service-mix"]?.[0];
+  const latest = revenueRows[0];
+  return `
+    <div class="investor-page finance-page">
+      <section class="ir-sub-hero finance-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">Financial Information</p><h1>財務資訊</h1><p>財務資料來自後台投資人資料中心，月營收、財報與下載檔可獨立更新。</p></div><aside class="finance-hero-chart"><span>Revenue Trend</span><strong>${escapeHTML(latest?.amount_label || "更新中")}</strong><p>${escapeHTML(latest?.growth_label || "最近月營收")}</p></aside></section>
+      <nav class="investor-tabs ir-finance-tabs" aria-label="財務資訊分頁"><button class="active" type="button" data-ir-tab="monthly-revenue">每月營收</button><button type="button" data-ir-tab="finance-analysis">財務資訊分析</button><button type="button" data-ir-tab="quarterly-reports">季度財報</button><button type="button" data-ir-tab="annual-reports">股東會年報</button></nav>
+      <section class="ir-kpi-strip"><article><span>Monthly Revenue</span><strong>${escapeHTML(latest?.amount_label || "--")}</strong><em>最近月營收</em></article><article><span>Growth</span><strong>${escapeHTML(latest?.growth_label || "--")}</strong><em>成長率</em></article><article><span>Reports</span><strong>${quarterly.length}</strong><em>季度財報</em></article><article><span>Files</span><strong>${data.files.length}</strong><em>下載檔</em></article></section>
+      <section class="ir-tab-panel active" data-ir-panel="monthly-revenue"><div class="investor-section-head"><p class="eyebrow">Monthly Revenue</p><h2>每月營收</h2><span>月營收表格與圖表皆可由後台資料更新。</span></div><div class="finance-dashboard">${renderCmsChartCard(revenueChart, "wide") || `<article class="chart-card wide"><div class="chart-card-head"><span>月營收趨勢</span><strong>${escapeHTML(latest?.amount_label || "--")}</strong></div>${renderCmsBarChart([])}</article>`}${renderCmsChartCard(serviceMix) || `<article class="chart-card"><div class="chart-card-head"><span>服務收入組成</span><strong>100%</strong></div>${renderCmsDonutChart([], "Revenue")}</article>`}</div><div class="investor-table-card"><div class="table-title"><h3>月營收公告</h3><a href="#contact">訂閱財務通知</a></div><table><thead><tr><th>月份</th><th>營收</th><th>成長</th><th>說明</th><th>下載</th></tr></thead><tbody>${revenueRows.map((row) => `<tr><td>${escapeHTML(row.period_label)}</td><td>${escapeHTML(row.amount_label || "")}</td><td>${escapeHTML(row.growth_label || "")}</td><td>${escapeHTML(row.note || "")}</td><td><a href="${escapeHTML(fileHref(row.file))}">PDF</a></td></tr>`).join("")}</tbody></table></div></section>
+      <section class="ir-tab-panel" data-ir-panel="finance-analysis"><div class="investor-section-head"><p class="eyebrow">Analysis</p><h2>財務資訊分析</h2><span>可用投資人公告或下載檔補充管理層討論與分析。</span></div>${renderCmsDownloadGrid(data.filesByCategory.finance || data.files)}</section>
+      <section class="ir-tab-panel" data-ir-panel="quarterly-reports"><div class="investor-section-head"><p class="eyebrow">Quarterly Reports</p><h2>季度財報</h2><span>季度財報資料由後台財務項目與下載檔連動。</span></div><div class="investor-table-card compact-table"><table><thead><tr><th>文件</th><th>期間</th><th>說明</th><th>下載</th></tr></thead><tbody>${quarterly.map((row) => `<tr><td>${escapeHTML(row.title)}</td><td>${escapeHTML(row.period_label)}</td><td>${escapeHTML(row.note || "")}</td><td><a href="${escapeHTML(fileHref(row.file))}">下載</a></td></tr>`).join("")}</tbody></table></div></section>
+      <section class="ir-tab-panel" data-ir-panel="annual-reports"><div class="investor-section-head"><p class="eyebrow">Annual Reports</p><h2>股東會年報</h2><span>年度報告、議事手冊與附件集中管理。</span></div>${renderCmsDownloadGrid((data.filesByCategory.annual_report || []).concat(annual.map((item) => item.file).filter(Boolean)))}</section>
+    </div>
+  `;
+}
+
+function renderCmsGovernancePage(data) {
+  const notices = data.noticesByType.governance || [];
+  const files = data.filesByCategory.governance || [];
+  const charts = data.charts.filter((chart) => chart.page_slug === "ir-governance");
+  return `
+    <div class="investor-page governance-page">
+      <section class="ir-sub-hero governance-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">Corporate Governance</p><h1>公司治理</h1><p>治理公告、制度文件與下載檔改由後台管理。</p></div><aside class="governance-hero-card"><span>Governance</span><div class="score-ring governance-score"><b>91</b><span>Index</span></div><p>治理成熟度示意</p></aside></section>
+      <nav class="investor-tabs governance-tabs" aria-label="公司治理分頁"><button class="active" type="button" data-ir-tab="governance-news">重要訊息</button><button type="button" data-ir-tab="governance-operation">治理文件</button><button type="button" data-ir-tab="risk-management">風險管理</button></nav>
+      <section class="ir-kpi-strip governance-kpis"><article><span>Notices</span><strong>${notices.length}</strong><em>治理公告</em></article><article><span>Files</span><strong>${files.length}</strong><em>治理下載</em></article><article><span>Audit</span><strong>92%</strong><em>稽核完成率</em></article><article><span>Cases</span><strong>0</strong><em>重大未結</em></article></section>
+      ${renderCmsChartGrid(charts)}
+      <section class="ir-tab-panel active" data-ir-panel="governance-news"><div class="investor-section-head"><p class="eyebrow">Material Information</p><h2>重要訊息</h2><span>治理公告由後台公告資料表管理。</span></div><div class="ir-update-card">${renderCmsNoticeLinks(notices, "#ir-governance")}</div></section>
+      <section class="ir-tab-panel" data-ir-panel="governance-operation"><div class="investor-section-head"><p class="eyebrow">Documents</p><h2>治理文件</h2><span>公司治理、誠信經營、稽核與風險文件從下載檔管理。</span></div>${renderCmsDownloadGrid(files)}</section>
+      <section class="ir-tab-panel" data-ir-panel="risk-management"><div class="investor-section-head"><p class="eyebrow">Risk</p><h2>風險管理</h2><span>可上傳風險管理政策與年度報告。</span></div>${renderCmsDownloadGrid(files)}</section>
+    </div>
+  `;
+}
+
+function renderCmsShareholdersPage(data) {
+  const notices = data.noticesByType.shareholder || [];
+  const files = (data.filesByCategory.shareholder || []).concat(data.filesByCategory.annual_report || []);
+  const charts = data.charts.filter((chart) => chart.page_slug === "ir-shareholders");
+  return `
+    <div class="investor-page shareholders-page">
+      <section class="ir-sub-hero shareholders-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">Shareholders</p><h1>股東專區</h1><p>股務資訊、股東會、法說會與常見問答可逐步資料化。</p></div><aside class="shareholder-hero-card"><span>Shareholder Service</span><strong>${files.length}</strong><p>已上架股東文件</p></aside></section>
+      <nav class="investor-tabs shareholder-tabs" aria-label="股東專區分頁"><button class="active" type="button" data-ir-tab="stock-affairs">股務資訊</button><button type="button" data-ir-tab="shareholder-meeting">股東會</button><button type="button" data-ir-tab="investor-conference">法說會</button><button type="button" data-ir-tab="shareholder-faq">常見問答</button></nav>
+      <section class="ir-kpi-strip shareholder-kpis"><article><span>Notices</span><strong>${notices.length}</strong><em>股東公告</em></article><article><span>Files</span><strong>${files.length}</strong><em>股東文件</em></article><article><span>Contact</span><strong>IR</strong><em>投資人窗口</em></article><article><span>FAQ</span><strong>Online</strong><em>常見問答</em></article></section>
+      ${renderCmsChartGrid(charts)}
+      <section class="ir-tab-panel active" data-ir-panel="stock-affairs"><div class="investor-section-head"><p class="eyebrow">Stock Affairs</p><h2>股務資訊</h2><span>股東相關公告由後台資料表管理。</span></div><div class="ir-update-card">${renderCmsNoticeLinks(notices, "#ir-shareholders")}</div></section>
+      <section class="ir-tab-panel" data-ir-panel="shareholder-meeting"><div class="investor-section-head"><p class="eyebrow">Meeting</p><h2>股東會</h2><span>股東會年報、議事手冊與附件由檔案下載管理。</span></div>${renderCmsDownloadGrid(files)}</section>
+      <section class="ir-tab-panel" data-ir-panel="investor-conference"><div class="investor-section-head"><p class="eyebrow">Conference</p><h2>法說會</h2><span>未來可新增法說會簡報與影音連結。</span></div>${renderCmsDownloadGrid(data.filesByCategory.investor || [])}</section>
+      <section class="ir-tab-panel" data-ir-panel="shareholder-faq"><div class="investor-section-head"><p class="eyebrow">FAQ</p><h2>常見問答</h2><span>股東問題可先以公告與下載檔補充，之後可擴充 FAQ 資料表。</span></div><div class="shareholder-faq"><details open><summary>股東文件在哪裡下載？</summary><p>請在股東會或下載檔區塊查看已發布文件。</p></details><details><summary>如何聯絡投資人窗口？</summary><p>可由聯絡我們表單選擇投資洽談。</p></details></div></section>
+    </div>
+  `;
+}
+
+async function loadSupabaseInvestorPage(slug) {
+  if (!supabase || !["investors", "ir-finance", "ir-governance", "ir-shareholders"].includes(slug)) return;
+  try {
+    const data = await fetchSupabaseInvestorData(slug);
+    if (location.hash.slice(1).split("?")[0] !== slug) return;
+    if (slug === "investors") pageView.innerHTML = renderCmsInvestorsPage(data);
+    if (slug === "ir-finance") pageView.innerHTML = renderCmsFinancePage(data);
+    if (slug === "ir-governance") pageView.innerHTML = renderCmsGovernancePage(data);
+    if (slug === "ir-shareholders") pageView.innerHTML = renderCmsShareholdersPage(data);
+  } catch (error) {
+    console.warn(`Supabase investor data unavailable for ${slug}.`, error);
+  }
+}
+
 async function fetchWordPressJSON(path) {
   const response = await fetch(`${WP_API_BASE}${path}`);
   if (!response.ok) throw new Error(`WordPress API error: ${response.status}`);
@@ -1373,7 +2191,580 @@ function renderWordPressMasterTalk(posts) {
   }).join("");
 }
 
+function groupHomeModules(items = []) {
+  return items.reduce((groups, item) => {
+    if (!groups[item.module_key]) groups[item.module_key] = [];
+    groups[item.module_key].push(item);
+    return groups;
+  }, {});
+}
+
+function renderSupabaseNews(items, panel) {
+  if (!items?.length || !panel) return;
+  panel.innerHTML = items.map((item) => `
+    <article>
+      <time>${escapeHTML(item.date_label || item.eyebrow || "")}</time>
+      <strong>${escapeHTML(item.title || "")}</strong>
+      <p>${escapeHTML(item.body || item.subtitle || "")}</p>
+    </article>
+  `).join("");
+}
+
+function renderSupabaseRecruit(items) {
+  const recruitList = document.querySelector(".recruit-list");
+  if (!items?.length || !recruitList) return;
+
+  recruitList.innerHTML = items.map((item) => {
+    const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver.png");
+    return `
+      <a href="${escapeHTML(item.link_url || "#talent")}">
+        <figure>
+          <img src="${escapeHTML(image)}" alt="${escapeHTML(item.title || "員工招募")}" />
+          <figcaption>${escapeHTML(item.title || "員工招募")}</figcaption>
+        </figure>
+        <div><p>${escapeHTML(item.body || item.subtitle || "")}</p></div>
+      </a>
+    `;
+  }).join("");
+}
+
+function renderSupabaseVideo(items) {
+  const video = items?.[0];
+  const frame = document.querySelector(".youtube-frame iframe");
+  if (!video || !frame) return;
+
+  const nextSource = normalizeYouTubeEmbedUrl(video.link_url || video.body || video.metadata?.youtube_url);
+  if (nextSource) frame.src = nextSource;
+  if (video.title) frame.title = video.title;
+}
+
+function renderSupabaseStories(items) {
+  const slider = document.querySelector(".story-slider");
+  if (!items?.length || !slider) return;
+
+  slider.innerHTML = items.map((item) => {
+    const name = item.subtitle || item.metadata?.person_name || "家屬回饋";
+    const service = item.badge_label || item.metadata?.service_type || "居家照顧";
+    const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver.png");
+    return `
+      <article>
+        <img class="story-face" src="${escapeHTML(image)}" alt="${escapeHTML(name)}頭像" />
+        <span class="story-meta"><b>${escapeHTML(name)}</b><em>${escapeHTML(service)}</em></span>
+        <h3>${escapeHTML(item.title || "")}</h3>
+        <div class="story-points"><p>${escapeHTML(item.body || "")}</p></div>
+        <a class="story-readmore" href="${escapeHTML(item.link_url || "#health")}">${escapeHTML(item.link_text || "Read More")}</a>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderSupabaseMasterTalk(items) {
+  const slider = document.querySelector(".celebrity-slider");
+  if (!items?.length || !slider) return;
+
+  slider.innerHTML = items.map((item) => {
+    const speaker = item.subtitle || item.metadata?.speaker || "名人講堂";
+    const image = getCmsModuleImage(item, "assets/homepage-batch/10-family-consultation.png");
+    return `
+      <article>
+        <figure>
+          <img src="${escapeHTML(image)}" alt="${escapeHTML(speaker)}" />
+          <figcaption>${escapeHTML(speaker)}</figcaption>
+        </figure>
+        <div>
+          <h3>${escapeHTML(item.title || "")}</h3>
+          <p>${escapeHTML(item.body || "")}</p>
+          <a href="${escapeHTML(item.link_url || "#health")}">${escapeHTML(item.link_text || "Read More")}</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderSupabaseHero(items) {
+  const item = items?.[0];
+  const hero = document.querySelector(".hero");
+  if (!item || !hero) return;
+
+  const image = getCmsModuleImage(item, "assets/homepage-batch/01-care-home-greeting.png");
+  const background = hero.querySelector(".hero-bg");
+  if (background) {
+    background.style.background = `
+      linear-gradient(90deg, rgba(28, 12, 4, 0.78) 0%, rgba(28, 12, 4, 0.56) 34%, rgba(28, 12, 4, 0.18) 72%),
+      linear-gradient(180deg, rgba(28, 12, 4, 0.08), rgba(28, 12, 4, 0.64)),
+      url("${image}") ${item.metadata?.image_position || "center"} / cover
+    `;
+  }
+
+  const setText = (selector, value) => {
+    const element = hero.querySelector(selector);
+    if (element && value) element.textContent = value;
+  };
+  setText('[data-cms-field="eyebrow"]', item.eyebrow);
+  setText('[data-cms-field="title"]', item.title);
+  setText('[data-cms-field="subtitle"]', item.subtitle);
+  setText('[data-cms-field="body"]', item.body);
+
+  const primary = hero.querySelector('[data-cms-button="primary"]');
+  const secondary = hero.querySelector('[data-cms-button="secondary"]');
+  if (primary) {
+    if (item.link_text) primary.textContent = item.link_text;
+    if (item.link_url) primary.href = item.link_url;
+  }
+  if (secondary) {
+    if (item.metadata?.secondary_text) secondary.textContent = item.metadata.secondary_text;
+    if (item.metadata?.secondary_url) secondary.href = item.metadata.secondary_url;
+  }
+
+  const stats = Array.isArray(item.metadata?.stats) ? item.metadata.stats : [];
+  const statsRoot = hero.querySelector(".dash-stats");
+  if (stats.length && statsRoot) {
+    statsRoot.innerHTML = stats.map((stat) => `
+      <article><strong>${escapeHTML(stat.value || "")}</strong><span>${escapeHTML(stat.label || "")}</span></article>
+    `).join("");
+  }
+}
+
+function renderSupabaseServices(items) {
+  const grid = document.querySelector(".service-grid");
+  if (!items?.length || !grid) return;
+
+  grid.innerHTML = items.map((item, index) => {
+    const image = getCmsModuleImage(item, "assets/homepage-batch/07-orange-apron-meal-prep.png");
+    return `
+      <a href="${escapeHTML(item.link_url || "#contact")}">
+        <img src="${escapeHTML(image)}" alt="${escapeHTML(item.metadata?.image_alt || `${item.title}服務情境`)}" />
+        <span>${escapeHTML(item.badge_label || String(index + 1).padStart(2, "0"))}</span>
+        <strong>${escapeHTML(item.title || "")}</strong>
+        <p>${escapeHTML(item.body || item.subtitle || "")}</p>
+      </a>
+    `;
+  }).join("");
+}
+
+function normalizeSupabaseLocation(item) {
+  const metadata = item.metadata || {};
+  const key = item.item_key || item.id;
+  const email = metadata.email || "generalaffairs@suiyuecare.com";
+  const phone = metadata.phone || item.link_text || "02-6604-5432";
+  return {
+    image: getCmsModuleImage(item, "assets/homepage-batch/16-taipei-service-office.png"),
+    alt: metadata.image_alt || `${item.title}據點照片`,
+    type: item.subtitle || metadata.type || "服務據點",
+    name: item.title || "Suiyuecare Corps. 服務據點",
+    desc: item.body || "",
+    services: item.badge_label || metadata.services || "",
+    hours: item.date_label || metadata.hours || "",
+    phone,
+    phoneHref: metadata.phone_href || `tel:${phone.replace(/[^\d+]/g, "")}`,
+    address: metadata.address || "",
+    email,
+    key,
+    pinLabel: metadata.pin_label || item.title || key,
+    pinClass: metadata.pin_class || `pin-${key.replace(/-a|-b/g, "")}`,
+    pinStyle: metadata.pin_style || "",
+    tabGroup: metadata.tab_group || "",
+    tabLabel: metadata.tab_label || ""
+  };
+}
+
+function renderSupabaseLocations(items) {
+  if (!items?.length) return;
+  const map = document.querySelector(".north-map");
+  if (!map) return;
+
+  const nextLocationData = {};
+  const pinItems = [];
+  items.forEach((item) => {
+    const data = normalizeSupabaseLocation(item);
+    nextLocationData[data.key] = data;
+    const existingPinKey = data.tabGroup ? Object.values(nextLocationData).find((location) => location.tabGroup === data.tabGroup)?.key : "";
+    if (!data.tabGroup || existingPinKey === data.key) pinItems.push(data);
+  });
+
+  locationData = nextLocationData;
+  map.querySelectorAll(".location-pin").forEach((pin) => pin.remove());
+  pinItems.forEach((data, index) => {
+    const button = document.createElement("button");
+    button.className = `location-pin ${data.pinClass || ""} ${index === 0 ? "active" : ""}`.trim();
+    button.type = "button";
+    button.dataset.location = data.key;
+    button.textContent = data.pinLabel;
+    if (data.pinStyle) button.setAttribute("style", data.pinStyle);
+    map.appendChild(button);
+  });
+
+  bindLocationControls();
+  updateLocation(pinItems[0]?.key || Object.keys(locationData)[0]);
+}
+
+function renderSupabasePartners(items) {
+  const track = document.querySelector(".partners-track");
+  if (!items?.length || !track) return;
+
+  const partnerItems = items.map((item) => {
+    const image = getCmsModuleImage(item, "assets/company-logo.png");
+    return `
+      <a class="partner-item" href="${escapeHTML(item.link_url || "#contact")}" target="_blank" rel="noopener">
+        <img src="${escapeHTML(image)}" alt="" />
+        <span>${escapeHTML(item.title || "")}</span>
+      </a>
+    `;
+  }).join("");
+  track.innerHTML = partnerItems + partnerItems;
+}
+
+function setSectionText(root, selector, value) {
+  if (!root || !value) return;
+  const element = root.querySelector(selector);
+  if (element) element.textContent = value;
+}
+
+function renderSupabaseSectionSettings(items) {
+  if (!items?.length) return;
+  items.forEach((item) => {
+    const selector = item.metadata?.selector || `[data-cms-section="${item.item_key}"]`;
+    const root = document.querySelector(selector);
+    if (!root) return;
+
+    root.hidden = Boolean(item.metadata?.hidden);
+    root.classList.toggle("is-cms-hidden", Boolean(item.metadata?.hidden));
+    if (item.metadata?.hidden) return;
+
+    if (root.matches(".celebrity-head")) {
+      setSectionText(root, ".eyebrow", item.eyebrow);
+      setSectionText(root, "h3", item.title);
+      return;
+    }
+
+    if (root.matches(".partners-strip")) {
+      setSectionText(root, ".partners-heading span", item.eyebrow);
+      setSectionText(root, ".partners-heading strong", item.title);
+      return;
+    }
+
+    setSectionText(root, '[data-cms-field="eyebrow"]', item.eyebrow);
+    setSectionText(root, '[data-cms-field="title"]', item.title);
+    setSectionText(root, '[data-cms-field="subtitle"]', item.subtitle);
+    setSectionText(root, '[data-cms-field="body"]', item.body || item.subtitle);
+    setSectionText(root, ".section-head > p", item.body || item.subtitle);
+    setSectionText(root, ".section-head > div > .eyebrow", item.eyebrow);
+    setSectionText(root, ".section-head > div > h2", item.title);
+  });
+}
+
+const defaultPrimaryNav = [
+  { type: "group", label: "服務項目", items: [
+    { label: "關於歲悅", href: "#about" }, { label: "大記事", href: "#milestones" },
+    { label: "居家照顧", href: "#home-care" }, { label: "日間照顧", href: "#day-care" },
+    { label: "社區據點", href: "#community" }, { label: "護理復能", href: "#nursing" },
+    { label: "移工培訓", href: "#migrant-training" }, { label: "教育品管", href: "#quality" }
+  ] },
+  { type: "group", label: "招募與合作", items: [
+    { label: "人才招募", href: "#talent" }, { label: "土地招募", href: "#land" }, { label: "投資人招募", href: "#investor-recruiting" }
+  ] },
+  { type: "link", label: "健康3.0", href: "#health" },
+  { type: "link", label: "課程報名", href: "#courses" },
+  { type: "group", label: "投資人專區", items: [
+    { label: "投資人首頁", href: "#investors" }, { label: "財務資訊", href: "#ir-finance" },
+    { label: "公司治理", href: "#ir-governance" }, { label: "股東專區", href: "#ir-shareholders" }
+  ] },
+  { type: "cta", label: "聯絡我們", href: "#contact" }
+];
+
+const defaultFooterColumns = [
+  { title: "營業項目", items: [
+    { label: "居家照顧", href: "#home-care" }, { label: "日間照顧", href: "#day-care" },
+    { label: "社區據點", href: "#community" }, { label: "護理復能", href: "#nursing" }
+  ] },
+  { title: "合作入口", items: [
+    { label: "人才招募", href: "#talent" }, { label: "土地招募", href: "#land" },
+    { label: "投資人招募", href: "#investor-recruiting" }, { label: "教育品管", href: "#quality" }
+  ] },
+  { title: "資訊內容", items: [
+    { label: "健康3.0", href: "#health" }, { label: "課程報名", href: "#courses" },
+    { label: "投資人專區", href: "#investors" }, { label: "財務資訊", href: "#ir-finance" },
+    { label: "聯絡我們", href: "#contact" }
+  ] }
+];
+
+function getSiteText(key, fallback = "") {
+  return siteSettings[key]?.value_text || fallback;
+}
+
+function getSiteJson(key, fallback = []) {
+  const value = siteSettings[key]?.value_json;
+  return Array.isArray(value) ? value : fallback;
+}
+
+function bindNavigationDropdowns() {
+  navGroups = document.querySelectorAll(".nav-group");
+  navGroups.forEach((group) => {
+    const trigger = group.querySelector(".nav-trigger");
+    if (!trigger) return;
+    trigger.onclick = () => {
+      const open = group.classList.toggle("open");
+      trigger.setAttribute("aria-expanded", String(open));
+    };
+  });
+}
+
+function renderHeaderNav(items = defaultPrimaryNav) {
+  if (!nav || !Array.isArray(items) || !items.length) return;
+  nav.innerHTML = items.map((item) => {
+    if (item.type === "group" && Array.isArray(item.items)) {
+      return `
+        <div class="nav-group">
+          <button class="nav-trigger" type="button" aria-expanded="false">${escapeHTML(item.label || "選單")}</button>
+          <div class="dropdown">
+            ${item.items.map((link) => `<a href="${escapeHTML(link.href || "#home")}">${escapeHTML(link.label || "未命名")}</a>`).join("")}
+          </div>
+        </div>
+      `;
+    }
+    const className = item.type === "cta" ? ' class="nav-cta"' : "";
+    return `<a${className} href="${escapeHTML(item.href || "#home")}">${escapeHTML(item.label || "未命名")}</a>`;
+  }).join("");
+  bindNavigationDropdowns();
+  const current = `#${(location.hash.slice(1).split("?")[0] || "home")}`;
+  nav.querySelectorAll("a").forEach((link) => {
+    link.classList.toggle("active", link.getAttribute("href") === current);
+  });
+}
+
+function renderFooterColumns(columns = defaultFooterColumns) {
+  const footerSitemap = document.querySelector(".footer-sitemap");
+  if (!footerSitemap || !Array.isArray(columns) || !columns.length) return;
+  footerSitemap.innerHTML = columns.map((column) => `
+    <div>
+      <h3>${escapeHTML(column.title || "網站地圖")}</h3>
+      ${(column.items || []).map((item) => `<a href="${escapeHTML(item.href || "#home")}">${escapeHTML(item.label || "未命名")}</a>`).join("")}
+    </div>
+  `).join("");
+}
+
+function applySiteSettings() {
+  const brandName = getSiteText("brand_name", "歲悅長照集團");
+  const brandNameEn = getSiteText("brand_name_en", "Suiyuecare Corps.");
+  const slogan = getSiteText("slogan", "照顧就像去超商，買牛奶一樣簡單。");
+  const logoUrl = getSiteText("logo_url", "assets/company-logo.png");
+  const phone = getSiteText("phone", "02-6604-5432");
+  const email = getSiteText("email", "generalaffairs@suiyuecare.com");
+  const footerIntro = getSiteText("footer_intro", "服務諮詢、課程報名、人才合作與投資洽談");
+  const copyright = getSiteText("copyright", "© 2026 Suiyuecare Corps. All rights reserved.");
+  const contactCtaText = getSiteText("contact_cta_text", "聯絡我們");
+
+  document.querySelectorAll(".brand-mark img").forEach((image) => {
+    image.src = logoUrl;
+    image.alt = `${brandName} Logo`;
+  });
+  document.querySelectorAll(".brand strong").forEach((item) => { item.textContent = brandName; });
+  document.querySelectorAll(".brand small").forEach((item) => { item.textContent = brandNameEn; });
+
+  const introBrand = document.querySelector(".intro-brand");
+  if (introBrand) {
+    introBrand.querySelector("span").textContent = brandName;
+    introBrand.querySelector("strong").textContent = brandNameEn;
+    introBrand.querySelector("em").textContent = slogan;
+  }
+
+  renderHeaderNav(getSiteJson("primary_nav", defaultPrimaryNav));
+  const navCta = document.querySelector(".primary-nav .nav-cta");
+  if (navCta) navCta.textContent = contactCtaText;
+
+  const footerContact = document.querySelector(".footer-contact");
+  if (footerContact) {
+    footerContact.innerHTML = `
+      <h3>聯絡資訊</h3>
+      <p>電話 ${escapeHTML(phone)}</p>
+      <p>信箱 ${escapeHTML(email)}</p>
+      <p>${escapeHTML(footerIntro)}</p>
+    `;
+  }
+  renderFooterColumns(getSiteJson("footer_columns", defaultFooterColumns));
+  const footerBottom = document.querySelector(".footer-bottom");
+  if (footerBottom) footerBottom.innerHTML = `<span>${escapeHTML(copyright)}</span><span>${escapeHTML(slogan)}</span>`;
+
+  const locationPhone = document.querySelector("#locationPhone");
+  const locationEmail = document.querySelector("#locationEmail");
+  const locationMail = document.querySelector("#locationMail");
+  if (locationPhone) locationPhone.textContent = phone;
+  if (locationEmail) locationEmail.textContent = email;
+  if (locationMail) locationMail.href = `mailto:${email}`;
+}
+
+async function loadSupabaseSiteSettings() {
+  if (!supabase) return false;
+  try {
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("setting_key, value_text, value_json")
+      .eq("is_enabled", true)
+      .order("sort_order", { ascending: true });
+    if (error) throw error;
+    siteSettings = (data || []).reduce((acc, item) => {
+      acc[item.setting_key] = item;
+      return acc;
+    }, {});
+    applySiteSettings();
+    return true;
+  } catch (error) {
+    console.warn("Supabase site settings unavailable, using static global settings.", error);
+    return false;
+  }
+}
+
+async function loadSupabaseHomeModules() {
+  if (!supabase) return false;
+
+  try {
+    const { data, error } = await supabase
+      .from("content_modules")
+      .select("id, module_key, item_key, title, subtitle, eyebrow, body, date_label, badge_label, link_text, link_url, metadata, sort_order, is_featured, image:media!content_modules_image_id_fkey(id, public_url, alt_text, file_name)")
+      .eq("target_slug", "home")
+      .eq("status", "published")
+      .eq("is_enabled", true)
+      .order("module_key", { ascending: true })
+      .order("sort_order", { ascending: true });
+
+    if (error) throw error;
+    if (!data?.length) return false;
+
+    const groups = groupHomeModules(data);
+    renderSupabaseSectionSettings(groups.section_setting);
+    renderSupabaseHero(groups.hero);
+    renderSupabaseNews(groups.news, document.querySelector('[data-news-panel="news"]'));
+    renderSupabaseNews(groups.awards, document.querySelector('[data-news-panel="awards"]'));
+    renderSupabaseRecruit(groups.recruit);
+    renderSupabaseVideo(groups.video);
+    renderSupabaseServices(groups.service_item);
+    renderSupabaseLocations(groups.location);
+    renderSupabaseStories(groups.care_story);
+    renderSupabaseMasterTalk(groups.master_talk);
+    renderSupabasePartners(groups.partner);
+
+    homeModulesLoadedFromSupabase = true;
+    return true;
+  } catch (error) {
+    console.warn("Supabase home modules unavailable, falling back to WordPress/static homepage content.", error);
+    return false;
+  }
+}
+
+function normalizeCareStory(row) {
+  const cover = normalizeLocalAssetUrl(row.cover_image?.public_url || row.cover_image_url || "assets/homepage-batch/05-orange-polo-caregiver.png");
+  const avatar = normalizeLocalAssetUrl(row.avatar_image?.public_url || row.avatar_image_url || cover);
+  return {
+    slug: row.slug,
+    href: `#care-story-${row.slug}`,
+    name: row.person_name,
+    label: row.person_label || "家屬",
+    service: row.service_type,
+    title: row.title,
+    quote: row.quote,
+    praise: row.praise || row.summary || "",
+    body: row.story_body || "",
+    image: cover,
+    avatar,
+    date: formatArticleDate(row.published_at),
+    tags: row.tags || []
+  };
+}
+
+function normalizeExpertTalk(row) {
+  const image = normalizeLocalAssetUrl(row.image?.public_url || row.image_url || "assets/homepage-batch/10-family-consultation.png");
+  return {
+    slug: row.slug,
+    href: `#master-talk-${row.slug}`,
+    speaker: row.speaker_name,
+    titleLabel: row.speaker_title || "名人講堂",
+    organization: row.organization || "",
+    topic: row.topic || "照顧觀點",
+    title: row.title,
+    quote: row.quote,
+    summary: row.summary || "",
+    body: row.body || "",
+    image,
+    date: formatArticleDate(row.published_at),
+    tags: row.tags || []
+  };
+}
+
+function renderCareStorySlider(stories) {
+  const slider = document.querySelector(".story-slider");
+  if (!stories?.length || !slider) return false;
+  slider.innerHTML = stories.map((story) => `
+    <article data-href="${escapeHTML(story.href)}">
+      <img class="story-face" src="${escapeHTML(story.avatar)}" alt="${escapeHTML(story.name)}頭像" />
+      <span class="story-meta"><b>${escapeHTML(story.name)}</b><em>${escapeHTML(story.service)}</em></span>
+      <h3>${escapeHTML(story.title)}</h3>
+      <div class="story-points"><p>${escapeHTML(story.praise)}</p></div>
+      <a class="story-readmore" href="${escapeHTML(story.href)}">Read More</a>
+    </article>
+  `).join("");
+  return true;
+}
+
+function renderExpertTalkSlider(talks) {
+  const slider = document.querySelector(".celebrity-slider");
+  if (!talks?.length || !slider) return false;
+  slider.innerHTML = talks.map((talk) => `
+    <article data-href="${escapeHTML(talk.href)}">
+      <figure>
+        <img src="${escapeHTML(talk.image)}" alt="${escapeHTML(`${talk.titleLabel} ${talk.speaker}`)}" />
+        <figcaption>${escapeHTML(`${talk.titleLabel} ${talk.speaker}`)}</figcaption>
+      </figure>
+      <div>
+        <h3>${escapeHTML(talk.title)}</h3>
+        <p>${escapeHTML(talk.summary || talk.quote || "")}</p>
+        <a href="${escapeHTML(talk.href)}">Read More</a>
+      </div>
+    </article>
+  `).join("");
+  return true;
+}
+
+async function loadSupabaseStoryDatabases() {
+  if (!supabase) return false;
+  try {
+    const now = new Date().toISOString();
+    const [{ data: stories, error: storyError }, { data: talks, error: talkError }] = await Promise.all([
+      supabase
+        .from("care_stories")
+        .select("*, cover_image:media!care_stories_cover_image_id_fkey(id, public_url, alt_text), avatar_image:media!care_stories_avatar_image_id_fkey(id, public_url, alt_text)")
+        .eq("is_enabled", true)
+        .eq("status", "published")
+        .lte("published_at", now)
+        .order("is_featured", { ascending: false })
+        .order("sort_order", { ascending: true })
+        .limit(12),
+      supabase
+        .from("expert_talks")
+        .select("*, image:media!expert_talks_image_id_fkey(id, public_url, alt_text)")
+        .eq("is_enabled", true)
+        .eq("status", "published")
+        .lte("published_at", now)
+        .order("is_featured", { ascending: false })
+        .order("sort_order", { ascending: true })
+        .limit(12)
+    ]);
+    if (storyError) throw storyError;
+    if (talkError) throw talkError;
+    const normalizedStories = (stories || []).map(normalizeCareStory);
+    const normalizedTalks = (talks || []).map(normalizeExpertTalk);
+    normalizedStories.forEach((story) => careStoryPageCache.set(story.slug, story));
+    normalizedTalks.forEach((talk) => expertTalkPageCache.set(talk.slug, talk));
+    const renderedStories = renderCareStorySlider(normalizedStories);
+    const renderedTalks = renderExpertTalkSlider(normalizedTalks);
+    return renderedStories || renderedTalks;
+  } catch (error) {
+    console.warn("Supabase care stories / expert talks unavailable.", error);
+    return false;
+  }
+}
+
 async function loadWordPressContent() {
+  if (homeModulesLoadedFromSupabase) return;
   try {
     const [latestNews, awards, careStories, health30, masterTalk] = await Promise.all([
       fetchPostsByCategory(WP_CATEGORIES.latestNews, 10),
@@ -1393,7 +2784,7 @@ async function loadWordPressContent() {
   }
 }
 
-const locationData = {
+let locationData = {
   shilin: {
     image: "assets/homepage-batch/16-taipei-service-office.png",
     alt: "士林服務據點照片",
@@ -1504,7 +2895,11 @@ function updateLocation(locationKey) {
   const data = locationData[locationKey];
   const detail = document.querySelector("#locationDetail");
   if (!data || !detail) return;
-  const isWanhua = locationKey === "wanhua-a" || locationKey === "wanhua-b";
+  const activeGroup = data.tabGroup || "";
+  const groupedLocations = activeGroup
+    ? Object.entries(locationData).filter(([, location]) => location.tabGroup === activeGroup)
+    : [];
+  const showTabs = groupedLocations.length > 1;
 
   detail.querySelector("img").src = data.image;
   detail.querySelector("img").alt = data.alt;
@@ -1521,15 +2916,26 @@ function updateLocation(locationKey) {
 
   const wanhuaTabs = document.querySelector("#wanhuaTabs");
   if (wanhuaTabs) {
-    wanhuaTabs.hidden = !isWanhua;
-    wanhuaTabs.querySelectorAll("button").forEach((tab) => {
-      tab.classList.toggle("active", tab.dataset.locationTab === locationKey);
-    });
+    wanhuaTabs.hidden = !showTabs;
+    if (showTabs) {
+      wanhuaTabs.innerHTML = groupedLocations.map(([key, location]) => `
+        <button type="button" class="${key === locationKey ? "active" : ""}" data-location-tab="${escapeHTML(key)}">${escapeHTML(location.tabLabel || location.name)}</button>
+      `).join("");
+    }
   }
 
   document.querySelectorAll(".location-pin").forEach((pin) => {
-    const isActive = pin.dataset.location === locationKey || (pin.dataset.location === "wanhua-a" && isWanhua);
+    const pinLocation = locationData[pin.dataset.location];
+    const isActive = pin.dataset.location === locationKey || (activeGroup && pinLocation?.tabGroup === activeGroup);
     pin.classList.toggle("active", isActive);
+  });
+}
+
+function bindLocationControls() {
+  document.querySelectorAll(".location-pin").forEach((pin) => {
+    if (pin.dataset.boundLocation === "true") return;
+    pin.dataset.boundLocation = "true";
+    pin.addEventListener("click", () => updateLocation(pin.dataset.location));
   });
 }
 
@@ -1737,9 +3143,13 @@ function renderSearchPage(query = "") {
   `;
 }
 
-function renderCoursesPage() {
-  const courses = [
+let supabaseCourses = [];
+let coursesLoadedFromSupabase = false;
+
+function fallbackCourses() {
+  return [
     {
+      id: "fallback-caregiver-core-training",
       title: "照服員核心訓練班",
       intro: "建立照服員上線前的基本能力。",
       date: "2026.05.20",
@@ -1748,9 +3158,11 @@ function renderCoursesPage() {
       type: "實體課",
       location: "臺北教室",
       seats: "剩餘 12 名",
-      image: "assets/homepage-batch/05-orange-polo-caregiver.png"
+      image: "assets/homepage-batch/05-orange-polo-caregiver.png",
+      isFeatured: true
     },
     {
+      id: "fallback-family-care-practical-class",
       title: "家庭照顧者實用課",
       intro: "快速學會起身、用餐、跌倒預防與照顧溝通。",
       date: "2026.05.24",
@@ -1759,9 +3171,11 @@ function renderCoursesPage() {
       type: "線上同步課",
       location: "Google Meet",
       seats: "80 人",
-      image: "assets/homepage-batch/12-community-health-class.png"
+      image: "assets/homepage-batch/12-community-health-class.png",
+      isFeatured: true
     },
     {
+      id: "fallback-dementia-communication-workshop",
       title: "失智照顧溝通工作坊",
       intro: "用情境演練理解重複提問、拒絕洗澡與情緒不安。",
       date: "2026.06.02",
@@ -1770,9 +3184,11 @@ function renderCoursesPage() {
       type: "實體課",
       location: "新北據點",
       seats: "24 人",
-      image: "assets/homepage-batch/19-health-dementia-cover.png"
+      image: "assets/homepage-batch/19-health-dementia-cover.png",
+      isFeatured: true
     },
     {
+      id: "fallback-migrant-care-skills-training",
       title: "移工照顧技能培訓",
       intro: "建立一致的安全移位、用藥提醒與紀錄回報流程。",
       date: "2026.06.08",
@@ -1781,9 +3197,11 @@ function renderCoursesPage() {
       type: "實體課",
       location: "臺北教室",
       seats: "30 人",
-      image: "assets/homepage-batch/03-supervisor-care-plan.png"
+      image: "assets/homepage-batch/03-supervisor-care-plan.png",
+      isFeatured: false
     },
     {
+      id: "fallback-supervisor-quality-management",
       title: "督導品質管理研習",
       intro: "聚焦服務媒合、異常追蹤、紀錄檢核與團隊支持。",
       date: "2026.06.15",
@@ -1792,9 +3210,11 @@ function renderCoursesPage() {
       type: "線上同步課",
       location: "Zoom",
       seats: "120 人",
-      image: "assets/homepage-batch/04-admin-team-office.png"
+      image: "assets/homepage-batch/04-admin-team-office.png",
+      isFeatured: false
     },
     {
+      id: "fallback-nursing-reablement-basic",
       title: "護理復能基礎課",
       intro: "理解復能目標、步態觀察與家屬陪伴方法。",
       date: "2026.06.22",
@@ -1803,10 +3223,73 @@ function renderCoursesPage() {
       type: "預錄課",
       location: "線上學習",
       seats: "不限人數",
-      image: "assets/homepage-batch/13-rehab-walking-practice.png"
+      image: "assets/homepage-batch/13-rehab-walking-practice.png",
+      isFeatured: false
     }
   ];
-  const importantCourses = courses.slice(0, 3);
+}
+
+function formatCourseDate(value) {
+  if (!value) return "可隨時觀看";
+  return new Intl.DateTimeFormat("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(value)).replace(/\//g, ".");
+}
+
+function formatCourseTime(start, end) {
+  if (!start) return "可隨時觀看";
+  const formatter = new Intl.DateTimeFormat("zh-TW", { hour: "2-digit", minute: "2-digit", hour12: false });
+  const startText = formatter.format(new Date(start));
+  return end ? `${startText}-${formatter.format(new Date(end))}` : startText;
+}
+
+function normalizeCourse(course) {
+  const cover = course.cover_image || course.media || {};
+  return {
+    id: course.id,
+    title: course.title,
+    intro: course.excerpt || course.subtitle || course.description || "",
+    date: formatCourseDate(course.starts_at),
+    time: formatCourseTime(course.starts_at, course.ends_at),
+    price: course.price_text || "免費",
+    type: course.course_type || "實體課",
+    location: course.location || "待公告",
+    seats: course.seats_label || (course.capacity ? `${course.capacity} 人` : "名額開放中"),
+    image: cover.public_url || "assets/homepage-batch/12-community-health-class.png",
+    isFeatured: Boolean(course.is_featured),
+    registrationStatus: course.registration_status || "open"
+  };
+}
+
+function getVisibleCourses() {
+  return coursesLoadedFromSupabase && supabaseCourses.length ? supabaseCourses.map(normalizeCourse) : fallbackCourses();
+}
+
+async function loadSupabaseCourses({ rerender = false } = {}) {
+  if (!supabase) return;
+  try {
+    const { data, error } = await supabase
+      .from("courses")
+      .select("id, title, subtitle, excerpt, description, course_type, location, starts_at, ends_at, price_text, capacity, seats_label, registration_status, is_featured, sort_order, cover_image:media!courses_cover_image_id_fkey(id, public_url, alt_text)")
+      .eq("status", "published")
+      .eq("is_enabled", true)
+      .order("is_featured", { ascending: false })
+      .order("sort_order", { ascending: true })
+      .order("starts_at", { ascending: true, nullsFirst: false });
+    if (error) throw error;
+    supabaseCourses = data || [];
+    coursesLoadedFromSupabase = true;
+    if (rerender && location.hash.slice(1).split("?")[0] === "courses") {
+      pageView.innerHTML = renderCoursesPage();
+    }
+  } catch (error) {
+    console.warn("Supabase courses unavailable.", error);
+    coursesLoadedFromSupabase = false;
+  }
+}
+
+function renderCoursesPage() {
+  const courses = getVisibleCourses();
+  const featuredCourses = courses.filter((course) => course.isFeatured);
+  const importantCourses = (featuredCourses.length ? featuredCourses : courses).slice(0, 6);
 
   return `
     <div class="courses-page">
@@ -1833,13 +3316,13 @@ function renderCoursesPage() {
         </div>
         <div class="featured-course-track" aria-label="重要課程輪播">
           ${importantCourses.map((course) => `
-            <article class="featured-course-card click-card" data-course-title="${course.title}" tabindex="0" role="button">
+            <article class="featured-course-card click-card" data-course-id="${course.id}" data-course-title="${course.title}" tabindex="0" role="button">
               <img src="${course.image}" alt="${course.title}" />
               <div>
                 <span>${course.type}</span>
                 <h3>${course.title}</h3>
                 <p>${course.intro}</p>
-                <button class="course-register" type="button" data-course-title="${course.title}">立即報名</button>
+                <button class="course-register" type="button" data-course-id="${course.id}" data-course-title="${course.title}">立即報名</button>
               </div>
             </article>
           `).join("")}
@@ -1847,7 +3330,7 @@ function renderCoursesPage() {
       </section>
       <section class="course-list">
         ${courses.map((course, index) => `
-          <article class="course-card click-card" data-course-title="${course.title}" tabindex="0" role="button">
+          <article class="course-card click-card" data-course-id="${course.id}" data-course-title="${course.title}" tabindex="0" role="button">
             <div class="course-thumb"><img src="${course.image}" alt="${course.title}" /><span>${String(index + 1).padStart(2, "0")}</span></div>
             <div class="course-body">
               <div class="course-topline"><span class="course-type">${course.type}</span><span class="course-seats">${course.seats}</span></div>
@@ -1855,7 +3338,7 @@ function renderCoursesPage() {
               <p>${course.intro}</p>
               <div class="course-info-line"><span><em>地點</em>${course.type}｜${course.location}</span><b><em>費用</em>${course.price}</b></div>
               <div class="course-info-line"><span><em>日期</em>${course.date}</span><b><em>時間</em>${course.time}</b></div>
-              <button class="course-register" type="button" data-course-title="${course.title}">立即報名</button>
+              <button class="course-register" type="button" data-course-id="${course.id}" data-course-title="${course.title}">立即報名</button>
             </div>
           </article>
         `).join("")}
@@ -1868,6 +3351,7 @@ function renderCoursesPage() {
           <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
           <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
           <label>您本次報名的課程<input name="課程" id="courseSignupTitle" type="text" readonly /></label>
+          <input name="course_id" id="courseSignupId" type="hidden" />
           <input name="_subject" type="hidden" value="歲悅長照課程報名通知" />
           <input name="_captcha" type="hidden" value="false" />
           <p class="course-confirm-text">是否要報名？</p>
@@ -4928,6 +6412,102 @@ async function loadArticlePage(slug) {
   }
 }
 
+async function fetchCareStoryPage(slug) {
+  if (careStoryPageCache.has(slug)) return careStoryPageCache.get(slug);
+  const { data, error } = await supabase
+    .from("care_stories")
+    .select("*, cover_image:media!care_stories_cover_image_id_fkey(id, public_url, alt_text), avatar_image:media!care_stories_avatar_image_id_fkey(id, public_url, alt_text)")
+    .eq("slug", slug)
+    .eq("is_enabled", true)
+    .eq("status", "published")
+    .lte("published_at", new Date().toISOString())
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const story = normalizeCareStory(data);
+  careStoryPageCache.set(slug, story);
+  return story;
+}
+
+async function fetchExpertTalkPage(slug) {
+  if (expertTalkPageCache.has(slug)) return expertTalkPageCache.get(slug);
+  const { data, error } = await supabase
+    .from("expert_talks")
+    .select("*, image:media!expert_talks_image_id_fkey(id, public_url, alt_text)")
+    .eq("slug", slug)
+    .eq("is_enabled", true)
+    .eq("status", "published")
+    .lte("published_at", new Date().toISOString())
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const talk = normalizeExpertTalk(data);
+  expertTalkPageCache.set(slug, talk);
+  return talk;
+}
+
+function renderCareStoryArticle(story) {
+  return renderArticleLayout({
+    slug: `care-story-${story.slug}`,
+    category: story.service,
+    title: story.title,
+    subtitle: `${story.name}｜${story.label}`,
+    excerpt: story.praise,
+    image: story.image,
+    author: "Suiyuecare Corps.",
+    date: story.date,
+    tags: story.tags,
+    summary: [story.praise, story.quote].filter(Boolean),
+    content: [
+      ["家屬怎麼稱讚歲悅", story.praise],
+      ["照顧故事", story.body || story.quote || story.praise]
+    ],
+    cta: "想知道家人的狀況適合哪一種照顧安排？留下需求，讓歲悅協助判斷。"
+  });
+}
+
+function renderExpertTalkArticle(talk) {
+  return renderArticleLayout({
+    slug: `master-talk-${talk.slug}`,
+    category: "名人講堂",
+    title: talk.title,
+    subtitle: `${talk.titleLabel} ${talk.speaker}${talk.organization ? `｜${talk.organization}` : ""}`,
+    excerpt: talk.summary || talk.quote,
+    image: talk.image,
+    author: talk.speaker,
+    date: talk.date,
+    tags: talk.tags,
+    summary: [talk.topic, talk.quote].filter(Boolean),
+    content: [
+      ["講者觀點", talk.quote || talk.summary],
+      ["完整分享", talk.body || talk.summary || talk.quote]
+    ],
+    cta: "想看更多照顧觀點與健康3.0內容？回到健康3.0閱讀更多文章。"
+  });
+}
+
+async function loadCareStoryPage(slug) {
+  try {
+    const story = await fetchCareStoryPage(slug);
+    if (location.hash.slice(1).split("?")[0] !== `care-story-${slug}`) return;
+    pageView.innerHTML = story ? renderCareStoryArticle(story) : renderArticleNotFoundPage();
+  } catch (error) {
+    console.warn("Care story page unavailable.", error);
+    pageView.innerHTML = renderArticleNotFoundPage();
+  }
+}
+
+async function loadExpertTalkPage(slug) {
+  try {
+    const talk = await fetchExpertTalkPage(slug);
+    if (location.hash.slice(1).split("?")[0] !== `master-talk-${slug}`) return;
+    pageView.innerHTML = talk ? renderExpertTalkArticle(talk) : renderArticleNotFoundPage();
+  } catch (error) {
+    console.warn("Expert talk page unavailable.", error);
+    pageView.innerHTML = renderArticleNotFoundPage();
+  }
+}
+
 function renderPage(slug) {
   if (!home || !pageView) return;
 
@@ -4935,9 +6515,11 @@ function renderPage(slug) {
   const [normalized, queryString = ""] = rawSlug.split("?");
   const searchParams = new URLSearchParams(queryString);
   const articleSlug = normalized.startsWith("article-") ? normalized.replace("article-", "") : null;
+  const careStorySlug = normalized.startsWith("care-story-") ? normalized.replace("care-story-", "") : null;
+  const masterTalkSlug = normalized.startsWith("master-talk-") ? normalized.replace("master-talk-", "") : null;
   const anchorTarget = normalized === "home" ? null : document.getElementById(normalized);
   const page = anchorTarget ? null : pages[normalized];
-  const isHome = !articleSlug && (normalized === "home" || Boolean(anchorTarget));
+  const isHome = !articleSlug && !careStorySlug && !masterTalkSlug && (normalized === "home" || Boolean(anchorTarget));
 
   home.classList.toggle("active", isHome);
   pageView.classList.toggle("active", !isHome);
@@ -4948,47 +6530,67 @@ function renderPage(slug) {
     pageView.classList.add("active");
     pageView.innerHTML = renderArticleLoadingPage();
     loadArticlePage(articleSlug);
+  } else if (careStorySlug) {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderArticleLoadingPage();
+    loadCareStoryPage(careStorySlug);
+  } else if (masterTalkSlug) {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderArticleLoadingPage();
+    loadExpertTalkPage(masterTalkSlug);
   } else if (normalized === "about") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderAboutPage();
+    loadSupabaseServiceTemplatePage(normalized);
   } else if (normalized === "milestones") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderMilestonesPage();
+    loadSupabaseServiceTemplatePage(normalized);
     initMilestonePage();
   } else if (normalized === "home-care") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderHomeCarePage();
+    loadSupabaseServiceTemplatePage(normalized);
   } else if (normalized === "day-care") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderDayCarePage();
+    loadSupabaseServiceTemplatePage(normalized);
   } else if (normalized === "community") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderCommunityPage();
+    loadSupabaseServiceTemplatePage(normalized);
   } else if (normalized === "nursing") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderNursingPage();
+    loadSupabaseServiceTemplatePage(normalized);
   } else if (normalized === "migrant-training") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderMigrantTrainingPage();
+    loadSupabaseServiceTemplatePage(normalized);
   } else if (normalized === "quality") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderQualityPage();
+    loadSupabaseServiceTemplatePage(normalized);
   } else if (normalized === "land") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderLandRecruitingPage();
+    loadSupabaseRecruitingPage(normalized);
   } else if (normalized === "investor-recruiting") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderInvestorRecruitingPage();
+    loadSupabaseRecruitingPage(normalized);
   } else if (normalized === "health") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -5004,26 +6606,32 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderCoursesPage();
+    loadSupabaseCourses({ rerender: true });
   } else if (normalized === "talent") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderTalentPage();
+    loadSupabaseRecruitingPage(normalized);
   } else if (normalized === "investors") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderInvestorsPage();
+    loadSupabaseInvestorPage(normalized);
   } else if (normalized === "ir-finance") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderFinancePage();
+    loadSupabaseInvestorPage(normalized);
   } else if (normalized === "ir-governance") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderGovernancePage();
+    loadSupabaseInvestorPage(normalized);
   } else if (normalized === "ir-shareholders") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderShareholdersPage();
+    loadSupabaseInvestorPage(normalized);
   } else if (page) {
     pageView.innerHTML = `
       <div class="detail-hero">
@@ -5072,7 +6680,7 @@ function renderPage(slug) {
 
   nav?.classList.remove("open");
   menuToggle?.setAttribute("aria-expanded", "false");
-  groups.forEach((group) => group.classList.remove("open"));
+  navGroups.forEach((group) => group.classList.remove("open"));
 
   if (anchorTarget && normalized !== "home") {
     anchorTarget.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -5113,20 +6721,13 @@ menuToggle?.addEventListener("click", () => {
   menuToggle.setAttribute("aria-expanded", String(Boolean(open)));
 });
 
-groups.forEach((group) => {
-  const trigger = group.querySelector(".nav-trigger");
-  trigger.addEventListener("click", () => {
-    const open = group.classList.toggle("open");
-    trigger.setAttribute("aria-expanded", String(open));
-  });
-});
+bindNavigationDropdowns();
 
-document.querySelectorAll(".location-pin").forEach((pin) => {
-  pin.addEventListener("click", () => updateLocation(pin.dataset.location));
-});
+bindLocationControls();
 
-document.querySelectorAll("[data-location-tab]").forEach((tab) => {
-  tab.addEventListener("click", () => updateLocation(tab.dataset.locationTab));
+document.querySelector("#wanhuaTabs")?.addEventListener("click", (event) => {
+  const tab = event.target.closest("[data-location-tab]");
+  if (tab) updateLocation(tab.dataset.locationTab);
 });
 
 document.querySelectorAll("[data-news-tab]").forEach((tab) => {
@@ -5139,15 +6740,17 @@ document.querySelectorAll("[data-news-tab]").forEach((tab) => {
   });
 });
 
-function openCourseSignup(courseTitle = "") {
+function openCourseSignup(courseTitle = "", courseId = "") {
   const modal = document.querySelector("#courseSignupModal");
   const form = document.querySelector("#courseSignupForm");
   const titleInput = document.querySelector("#courseSignupTitle");
+  const idInput = document.querySelector("#courseSignupId");
   const status = document.querySelector("#courseSignupStatus");
   if (!modal || !form || !titleInput || !status) return;
 
   form.reset();
   titleInput.value = courseTitle;
+  if (idInput) idInput.value = courseId;
   status.textContent = "";
   modal.hidden = false;
   document.body.classList.add("modal-open");
@@ -5156,6 +6759,38 @@ function openCourseSignup(courseTitle = "") {
 
 function closeCourseSignup() {
   const modal = document.querySelector("#courseSignupModal");
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.classList.remove("modal-open");
+}
+
+function openRecruitApply(dataset = {}) {
+  const modal = document.querySelector("#recruitApplyModal");
+  const form = document.querySelector("#recruitApplyForm");
+  const status = document.querySelector("#recruitApplyStatus");
+  if (!modal || !form) return;
+
+  form.reset();
+  form.dataset.formType = dataset.formType || "recruiting";
+  const setValue = (id, value = "") => {
+    const input = document.querySelector(id);
+    if (input) input.value = value;
+  };
+  setValue("#recruitApplyTitle", dataset.openingTitle || "");
+  setValue("#recruitApplyPage", dataset.pageSlug || "");
+  setValue("#recruitApplyDepartmentId", dataset.departmentId || "");
+  setValue("#recruitApplyDepartmentTitle", dataset.departmentTitle || "");
+  setValue("#recruitApplyOpeningId", dataset.openingId || "");
+  setValue("#recruitApplyOpeningSlug", dataset.openingSlug || "");
+  setValue("#recruitApplyOpeningTitle", dataset.openingTitle || "");
+  if (status) status.textContent = "";
+  modal.hidden = false;
+  document.body.classList.add("modal-open");
+  form.querySelector("input[name='姓名']")?.focus();
+}
+
+function closeRecruitApply() {
+  const modal = document.querySelector("#recruitApplyModal");
   if (!modal) return;
   modal.hidden = true;
   document.body.classList.remove("modal-open");
@@ -5213,6 +6848,23 @@ document.addEventListener("click", (event) => {
     }
   }
 
+  const recruitButton = event.target.closest("[data-recruit-apply]");
+  if (recruitButton) {
+    event.preventDefault();
+    event.stopPropagation();
+    trackAnalyticsEvent("reservation_click", {
+      label: recruitButton.dataset.openingTitle || recruitButton.textContent.trim(),
+      targetUrl: location.hash || "#talent"
+    });
+    openRecruitApply(recruitButton.dataset);
+    return;
+  }
+
+  if (event.target.closest("[data-recruit-close]") || event.target.id === "recruitApplyModal") {
+    closeRecruitApply();
+    return;
+  }
+
   const registerButton = event.target.closest(".course-register");
   if (registerButton) {
     event.preventDefault();
@@ -5221,14 +6873,17 @@ document.addEventListener("click", (event) => {
       label: registerButton.dataset.courseTitle || registerButton.textContent.trim(),
       targetUrl: "#courses"
     });
-    openCourseSignup(registerButton.dataset.courseTitle || registerButton.closest("[data-course-title]")?.dataset.courseTitle || "");
+    openCourseSignup(
+      registerButton.dataset.courseTitle || registerButton.closest("[data-course-title]")?.dataset.courseTitle || "",
+      registerButton.dataset.courseId || registerButton.closest("[data-course-id]")?.dataset.courseId || ""
+    );
     return;
   }
 
   const courseCard = event.target.closest(".course-card, .featured-course-card");
   if (courseCard && !event.target.closest("a, button, input, select, textarea")) {
     event.preventDefault();
-    openCourseSignup(courseCard.dataset.courseTitle || courseCard.querySelector("h3")?.textContent || "");
+    openCourseSignup(courseCard.dataset.courseTitle || courseCard.querySelector("h3")?.textContent || "", courseCard.dataset.courseId || "");
     return;
   }
 
@@ -5238,6 +6893,33 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("submit", async (event) => {
+  const recruitForm = event.target.closest("#recruitApplyForm");
+  if (recruitForm) {
+    event.preventDefault();
+    const status = document.querySelector("#recruitApplyStatus");
+    const submitButton = recruitForm.querySelector("button[type='submit']");
+    if (submitButton) submitButton.disabled = true;
+    if (status) status.textContent = "正在送出資料...";
+
+    try {
+      const result = await sendBackendForm(recruitForm, recruitForm.dataset.formType || "recruiting");
+      trackAnalyticsEvent("form_submit", {
+        label: recruitForm.dataset.formType || "招募應徵",
+        targetUrl: "generalaffairs@suiyuecare.com",
+        metadata: { form_id: "recruitApplyForm", email_sent: Boolean(result.emailSent) }
+      });
+      if (status) status.textContent = "已送出，我們會盡快與你聯繫。";
+      window.setTimeout(closeRecruitApply, 1400);
+    } catch (error) {
+      console.warn("Recruiting apply failed.", error);
+      trackFrontendError("recruit_apply_failed", { message: error.message, stack: error.stack });
+      if (status) status.textContent = error.message || "送出失敗，請稍後再試。";
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
+    return;
+  }
+
   const form = event.target.closest("#courseSignupForm");
   if (!form) return;
 
@@ -5407,8 +7089,12 @@ window.addEventListener("unhandledrejection", (event) => {
 window.addEventListener("resize", updateMilestoneProgress);
 window.addEventListener("pagehide", flushPageEngagement);
 renderPage(location.hash.slice(1));
+loadSupabaseSiteSettings();
 loadSupabasePageContent("home");
-loadWordPressContent();
+loadSupabaseHomeModules().then((loaded) => {
+  if (!loaded) loadWordPressContent();
+  loadSupabaseStoryDatabases();
+});
 
 window.setTimeout(() => {
   introLoader?.remove();

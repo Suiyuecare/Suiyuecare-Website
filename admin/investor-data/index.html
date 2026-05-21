@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>投資人資料管理｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head"><a class="admin-brand" href="/"><img src="/assets/company-logo.png" alt="" /><span><strong>歲悅長照集團</strong><small>CMS Console</small></span></a></div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a href="/admin/recruiting"><span>RC</span><strong>招募管理</strong></a>
+          <a class="active" href="/admin/investor-data"><span>IR</span><strong>投資人資料</strong></a>
+          <a href="/admin/files"><span>DL</span><strong>檔案下載</strong></a>
+          <a href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
+          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+        </nav>
+        <div class="admin-sidebar-note"><span>Investor Relations</span><strong>公告・財報・圖表</strong><p>下載檔請先到檔案下載管理上傳，再回此處建立公告或財務資料。</p></div>
+      </aside>
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title"><p class="admin-eyebrow">Investor Data</p><h1>投資人資料管理</h1><span>管理公告、財務資料列與圖表 JSON，前台投資人專區會自動讀取已發布內容。</span></div>
+          <div class="admin-topbar-actions"><a class="admin-preview-link" href="/#investors" target="_blank" rel="noopener">查看前台</a><div class="admin-userbox"><b id="adminUserInitial">S</b><span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span><button id="adminLogout" type="button">登出</button></div></div>
+        </header>
+        <div id="investorDataStatus" class="admin-data-status">正在讀取投資人資料...</div>
+
+        <section class="admin-editor-layout">
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head"><div><p class="admin-eyebrow">Notice</p><h2 id="noticeFormTitle">新增公告</h2></div><button id="newNoticeButton" type="button">清空新增</button></div>
+            <form id="noticeForm" class="admin-form-grid">
+              <input name="id" type="hidden" />
+              <label><span>類型</span><select name="notice_type"><option value="news">最新消息</option><option value="award">得標紀錄</option><option value="governance">治理公告</option><option value="shareholder">股東公告</option><option value="material">重大訊息</option><option value="progress">設立進度</option></select></label>
+              <label><span>日期標籤</span><input name="date_label" type="text" placeholder="2026.05" /></label>
+              <label class="admin-field-wide"><span>標題</span><input name="title" type="text" required /></label>
+              <label class="admin-field-wide"><span>摘要</span><textarea name="summary" rows="3"></textarea></label>
+              <label><span>連結</span><input name="link_url" type="text" placeholder="#ir-finance" /></label>
+              <label><span>排序</span><input name="sort_order" type="number" value="0" /></label>
+              <label><span>狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
+              <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>
+              <button type="submit">儲存公告</button>
+            </form>
+          </section>
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head"><div><p class="admin-eyebrow">Financial</p><h2 id="financialFormTitle">新增財務資料</h2></div><button id="newFinancialButton" type="button">清空新增</button></div>
+            <form id="financialForm" class="admin-form-grid">
+              <input name="id" type="hidden" />
+              <label><span>類型</span><select name="item_type"><option value="monthly_revenue">每月營收</option><option value="finance_analysis">財務分析</option><option value="quarterly_report">季度財報</option><option value="annual_report">股東會年報</option></select></label>
+              <label><span>期間</span><input name="period_label" type="text" required placeholder="2026.05 / 2026 Q1" /></label>
+              <label class="admin-field-wide"><span>標題</span><input name="title" type="text" required /></label>
+              <label><span>金額</span><input name="amount" type="number" step="0.01" /></label>
+              <label><span>金額標籤</span><input name="amount_label" type="text" placeholder="8.6M / PDF" /></label>
+              <label><span>成長標籤</span><input name="growth_label" type="text" placeholder="+12.4%" /></label>
+              <label class="admin-field-wide"><span>說明</span><textarea name="note" rows="3"></textarea></label>
+              <label><span>排序</span><input name="sort_order" type="number" value="0" /></label>
+              <label><span>狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
+              <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>
+              <button type="submit">儲存財務資料</button>
+            </form>
+          </section>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head"><div><p class="admin-eyebrow">Chart</p><h2 id="chartFormTitle">新增圖表資料</h2></div><button id="newChartButton" type="button">清空新增</button></div>
+          <form id="chartForm" class="admin-form-grid">
+            <input name="id" type="hidden" />
+            <label><span>頁面</span><select name="page_slug"><option value="investors">投資人首頁</option><option value="ir-finance">財務資訊</option><option value="ir-governance">公司治理</option><option value="ir-shareholders">股東專區</option></select></label>
+            <label><span>圖表 Key</span><input name="chart_key" type="text" required placeholder="monthly-revenue-trend" /></label>
+            <label><span>圖表標題</span><input name="chart_title" type="text" required /></label>
+            <label><span>圖表類型</span><select name="chart_type"><option value="bar">柱狀</option><option value="line">折線</option><option value="combo">複合</option><option value="donut">圓餅</option><option value="score">分數</option><option value="progress">進度</option></select></label>
+            <label><span>單位標籤</span><input name="unit_label" type="text" placeholder="NT$ / % / Score" /></label>
+            <label class="admin-field-wide"><span>圖表資料</span><div id="chartPointEditor" class="admin-chart-point-editor"></div></label>
+            <label class="admin-field-wide"><span>補充設定 JSON</span><textarea name="metadata" rows="4" placeholder='{"note":"資料來源：歲悅內部統計"}'></textarea></label>
+            <textarea name="data_points" hidden></textarea>
+            <label><span>排序</span><input name="sort_order" type="number" value="0" /></label>
+            <label><span>狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
+            <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>
+            <button type="submit">儲存圖表</button>
+          </form>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head"><div><p class="admin-eyebrow">Data</p><h2>目前資料</h2></div><button id="refreshInvestorDataButton" type="button">重新整理</button></div>
+          <div id="investorDataList" class="admin-section-editor-list"></div>
+        </section>
+      </main>
+    </div>
+    <div id="adminLoading" class="admin-loading"><strong>正在檢查登入狀態</strong><span>請稍候...</span></div>
+    <script type="module" src="/src/admin/investor-data.js"></script>
+  </body>
+</html>

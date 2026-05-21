@@ -23,17 +23,28 @@
         </div>
         <nav class="admin-menu" aria-label="後台選單">
           <a class="active" href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/site-settings"><span>ST</span><strong>全站設定</strong></a>
           <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/home-modules"><span>HM</span><strong>首頁模組</strong></a>
+          <a href="/admin/template-fields"><span>TF</span><strong>模板欄位</strong></a>
           <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a href="/admin/courses"><span>CS</span><strong>課程管理</strong></a>
+          <a href="/admin/files"><span>DL</span><strong>檔案下載</strong></a>
+          <a href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
+          <a href="/admin/recruiting"><span>RC</span><strong>招募管理</strong></a>
+          <a href="/admin/investor-data"><span>IR</span><strong>投資人資料</strong></a>
+          <a href="/admin/stories"><span>ST</span><strong>故事講堂</strong></a>
           <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
           <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+          <a href="/admin/governance"><span>GV</span><strong>發布與權限</strong></a>
+          <a href="/admin/users"><span>US</span><strong>使用者權限</strong></a>
           <a href="/admin/traffic"><span>AN</span><strong>網站流量中心</strong></a>
           <a href="/admin/content-health"><span>QA</span><strong>內容健康檢查</strong></a>
         </nav>
         <div class="admin-sidebar-note">
           <span>CMS Status</span>
-          <strong>Auth guard ready</strong>
-          <p>後續接上 Supabase pages、articles、media CRUD。</p>
+          <strong>CMS ready</strong>
+          <p>頁面、圖片、課程、表單、招募、投資人與故事資料已接上後台管理。</p>
         </div>
       </aside>
 
@@ -83,6 +94,41 @@
             <strong data-dashboard-count="pages">--</strong>
             <p>頁面數量</p>
           </article>
+          <article>
+            <span>Modules</span>
+            <strong data-dashboard-count="contentModules">--</strong>
+            <p>首頁內容模組</p>
+          </article>
+          <article>
+            <span>Templates</span>
+            <strong data-dashboard-count="templateFields">--</strong>
+            <p>固定模板欄位</p>
+          </article>
+          <article>
+            <span>Courses</span>
+            <strong data-dashboard-count="courses">--</strong>
+            <p>發布課程數</p>
+          </article>
+          <article>
+            <span>Forms</span>
+            <strong data-dashboard-count="forms">--</strong>
+            <p>新表單數</p>
+          </article>
+          <article>
+            <span>Recruiting</span>
+            <strong data-dashboard-count="recruiting">--</strong>
+            <p>發布招募卡片</p>
+          </article>
+          <article>
+            <span>Investor</span>
+            <strong data-dashboard-count="investor">--</strong>
+            <p>投資人公告</p>
+          </article>
+          <article>
+            <span>Stories</span>
+            <strong data-dashboard-count="stories">--</strong>
+            <p>故事與講堂</p>
+          </article>
         </section>
 
         <section class="admin-workspace-panel admin-dashboard-panel">
@@ -108,41 +154,96 @@
           <div class="admin-module-list">
             <article>
               <span>01</span>
+              <div><strong>全站設定</strong><p>管理 Header、Footer、Logo、電話、信箱、標語、主選單與網站地圖。</p></div>
+              <a href="/admin/site-settings">開啟</a>
+            </article>
+            <article>
+              <span>02</span>
               <div><strong>頁面管理</strong><p>管理首頁、關於歲悅、大記事、投資人專區與服務頁面的文案區塊。</p></div>
               <a href="/admin/pages">開啟</a>
             </article>
             <article>
-              <span>02</span>
+              <span>03</span>
+              <div><strong>首頁模組</strong><p>管理最新動態、得標紀錄、員工招募、影片、真實照顧情境與名人講堂。</p></div>
+              <a href="/admin/home-modules">開啟</a>
+            </article>
+            <article>
+              <span>04</span>
+              <div><strong>模板欄位</strong><p>管理服務頁與招募頁的固定文案欄位，讓分頁維持一致版型。</p></div>
+              <a href="/admin/template-fields">開啟</a>
+            </article>
+            <article>
+              <span>05</span>
               <div><strong>圖片管理</strong><p>管理 Supabase Storage 圖片、alt text、用途分類與前台綁定。</p></div>
               <a href="/admin/media">開啟</a>
             </article>
             <article>
-              <span>03</span>
+              <span>06</span>
+              <div><strong>課程管理</strong><p>管理課程圖片、日期、時間、地點、價格、名額與重要課程輪播。</p></div>
+              <a href="/admin/courses">開啟</a>
+            </article>
+            <article>
+              <span>07</span>
+              <div><strong>檔案下載</strong><p>管理投資人文件、財務報告、股東會資料、課程簡章與下載連結。</p></div>
+              <a href="/admin/files">開啟</a>
+            </article>
+            <article>
+              <span>08</span>
+              <div><strong>表單資料</strong><p>查看聯絡我們、課程報名、人才招募、土地合作與投資洽談送出紀錄。</p></div>
+              <a href="/admin/forms">開啟</a>
+            </article>
+            <article>
+              <span>09</span>
+              <div><strong>招募管理</strong><p>管理人才招募、土地招募、投資人招募的部門、卡片、圖片與應徵入口。</p></div>
+              <a href="/admin/recruiting">開啟</a>
+            </article>
+            <article>
+              <span>10</span>
+              <div><strong>投資人資料</strong><p>管理投資人公告、財務資料、圖表資料，並搭配檔案下載中心呈現。</p></div>
+              <a href="/admin/investor-data">開啟</a>
+            </article>
+            <article>
+              <span>11</span>
+              <div><strong>故事講堂</strong><p>管理真實照顧情境與名人講堂資料庫，首頁輪播會自動讀取精選內容。</p></div>
+              <a href="/admin/stories">開啟</a>
+            </article>
+            <article>
+              <span>12</span>
               <div><strong>文章管理</strong><p>管理最新消息、Health 3.0、真實照顧情境、名人講堂與草稿發布。</p></div>
               <a href="/admin/articles">開啟</a>
             </article>
             <article>
-              <span>04</span>
+              <span>13</span>
               <div><strong>分類管理</strong><p>管理文章分類、排序、啟用狀態與 SEO 顯示資料。</p></div>
               <a href="/admin/categories">開啟</a>
             </article>
             <article>
-              <span>05</span>
+              <span>14</span>
+              <div><strong>發布與權限</strong><p>檢視版本紀錄、待審發布、目前登入權限與後台操作紀錄。</p></div>
+              <a href="/admin/governance">開啟</a>
+            </article>
+            <article>
+              <span>15</span>
+              <div><strong>使用者權限</strong><p>管理後台員工角色、細項權限與啟用狀態。</p></div>
+              <a href="/admin/users">開啟</a>
+            </article>
+            <article>
+              <span>16</span>
               <div><strong>網站流量中心</strong><p>查看網站 PV、UV、來源、轉換、SEO、網站健康度與異常警示。</p></div>
               <a href="/admin/traffic">開啟</a>
             </article>
             <article>
-              <span>06</span>
-              <div><strong>內容健康檢查</strong><p>檢查缺圖、缺 alt、缺 SEO、未發布文章與頁面區塊狀態。</p></div>
+              <span>17</span>
+              <div><strong>內容健康檢查</strong><p>檢查缺圖、缺 alt、缺 SEO、未發布內容與新資料表狀態。</p></div>
               <a href="/admin/content-health">開啟</a>
             </article>
           </div>
         </section>
 
         <section class="admin-placeholder-panel">
-          <p class="admin-eyebrow">Auth Guard</p>
-          <h2>你已成功登入 Supabase Auth。</h2>
-          <p>這一頁目前先建立登入保護、登入狀態檢查與登出功能。下一步可以接上 pages、articles、media 的 CRUD 介面。</p>
+          <p class="admin-eyebrow">Operational Note</p>
+          <h2>後台已進入可營運版本。</h2>
+          <p>日常更新請優先使用首頁模組、模板欄位、課程管理、招募管理、投資人資料與故事講堂；上線前可先跑一次內容健康檢查。</p>
         </section>
       </main>
     </div>

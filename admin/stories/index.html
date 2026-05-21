@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>故事與名人講堂｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head"><a class="admin-brand" href="/"><img src="/assets/company-logo.png" alt="" /><span><strong>歲悅長照集團</strong><small>CMS Console</small></span></a></div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/home-modules"><span>HM</span><strong>首頁模組</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a class="active" href="/admin/stories"><span>ST</span><strong>故事講堂</strong></a>
+          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+          <a href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
+        </nav>
+        <div class="admin-sidebar-note"><span>Stories</span><strong>人物資料庫</strong><p>管理真實照顧情境與名人講堂，首頁會自動顯示精選內容。</p></div>
+      </aside>
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title"><p class="admin-eyebrow">Stories & Talks</p><h1>真實照顧情境 / 名人講堂</h1><span>比首頁模組更細，可管理人物、服務類型、完整故事、照片與發布狀態。</span></div>
+          <div class="admin-topbar-actions"><a class="admin-preview-link" href="/#home" target="_blank" rel="noopener">查看首頁</a><div class="admin-userbox"><b id="adminUserInitial">S</b><span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span><button id="adminLogout" type="button">登出</button></div></div>
+        </header>
+        <div id="storyStatus" class="admin-data-status">正在讀取資料...</div>
+        <section class="admin-editor-layout">
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head"><div><p class="admin-eyebrow">Care Story</p><h2 id="careStoryFormTitle">新增真實照顧情境</h2></div><button id="newCareStoryButton" type="button">清空新增</button></div>
+            <form id="careStoryForm" class="admin-form-grid">
+              <input name="id" type="hidden" />
+              <label><span>當事人</span><input name="person_name" type="text" required placeholder="林小姐" /></label>
+              <label><span>身分</span><input name="person_label" type="text" placeholder="家屬" /></label>
+              <label><span>服務類型</span><input name="service_type" type="text" required placeholder="居家照顧" /></label>
+              <label><span>Slug</span><input name="slug" type="text" required /></label>
+              <label class="admin-field-wide"><span>標題</span><input name="title" type="text" required /></label>
+              <label class="admin-field-wide"><span>稱讚摘要</span><textarea name="praise" rows="3"></textarea></label>
+              <label class="admin-field-wide"><span>完整故事</span><textarea name="story_body" rows="7"></textarea></label>
+              <label><span>封面圖 URL</span><input name="cover_image_url" type="text" placeholder="/assets/homepage-batch/05-orange-polo-caregiver.png" /></label>
+              <label><span>上傳封面圖</span><input name="cover_image_file" type="file" accept="image/*" /><small>建議用卡片圖比例，系統會提供 RWD 裁切預覽。</small></label>
+              <label><span>頭像 URL</span><input name="avatar_image_url" type="text" /></label>
+              <label><span>上傳頭像</span><input name="avatar_image_file" type="file" accept="image/*" /><small>會以方形頭像比例裁切。</small></label>
+              <label><span>排序</span><input name="sort_order" type="number" value="0" /></label>
+              <label><span>狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
+              <label class="admin-toggle-field"><input name="is_featured" type="checkbox" /><span>首頁精選</span></label>
+              <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>
+              <button type="submit">儲存故事</button>
+            </form>
+          </section>
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head"><div><p class="admin-eyebrow">Master Talk</p><h2 id="expertTalkFormTitle">新增名人講堂</h2></div><button id="newExpertTalkButton" type="button">清空新增</button></div>
+            <form id="expertTalkForm" class="admin-form-grid">
+              <input name="id" type="hidden" />
+              <label><span>人物姓名</span><input name="speaker_name" type="text" required placeholder="周小姐" /></label>
+              <label><span>職稱</span><input name="speaker_title" type="text" placeholder="照顧心理講師" /></label>
+              <label><span>主題</span><input name="topic" type="text" required placeholder="照顧心理" /></label>
+              <label><span>Slug</span><input name="slug" type="text" required /></label>
+              <label class="admin-field-wide"><span>標題</span><input name="title" type="text" required /></label>
+              <label class="admin-field-wide"><span>觀點摘要</span><textarea name="summary" rows="3"></textarea></label>
+              <label class="admin-field-wide"><span>完整內容</span><textarea name="body" rows="7"></textarea></label>
+              <label><span>圖片 URL</span><input name="image_url" type="text" placeholder="/assets/homepage-batch/10-family-consultation.png" /></label>
+              <label><span>上傳圖片</span><input name="image_file" type="file" accept="image/*" /><small>建議用卡片圖比例，系統會提供 RWD 裁切預覽。</small></label>
+              <label><span>排序</span><input name="sort_order" type="number" value="0" /></label>
+              <label><span>狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
+              <label class="admin-toggle-field"><input name="is_featured" type="checkbox" /><span>首頁精選</span></label>
+              <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>
+              <button type="submit">儲存講堂</button>
+            </form>
+          </section>
+        </section>
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head"><div><p class="admin-eyebrow">Data</p><h2>目前資料</h2></div><button id="refreshStoriesButton" type="button">重新整理</button></div>
+          <div id="storyDataList" class="admin-section-editor-list"></div>
+        </section>
+      </main>
+    </div>
+    <div id="adminLoading" class="admin-loading"><strong>正在檢查登入狀態</strong><span>請稍候...</span></div>
+    <script type="module" src="/src/admin/stories.js"></script>
+  </body>
+</html>
