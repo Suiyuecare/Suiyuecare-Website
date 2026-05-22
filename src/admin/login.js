@@ -11,10 +11,14 @@ const form = document.querySelector("#adminLoginForm");
 const status = document.querySelector("#loginStatus");
 const quickLoginButton = document.querySelector("#adminQuickLoginButton");
 const googleLoginButton = document.querySelector("#adminGoogleLoginButton");
+const productionAdminOrigin = "https://suiyuecare-website.vercel.app";
 
 function getAdminRedirectUrl() {
   if (window.location.protocol === "file:") {
     return null;
+  }
+  if (["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)) {
+    return `${productionAdminOrigin}${ADMIN_HOME_PATH}`;
   }
   return `${window.location.origin}${ADMIN_HOME_PATH}`;
 }
