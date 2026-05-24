@@ -13,11 +13,161 @@ const mediaStatus = document.querySelector("#adminMediaStatus");
 const mediaGrid = document.querySelector("#adminMediaGrid");
 const refreshMediaButton = document.querySelector("#adminRefreshMedia");
 
+let mediaUsageMap = new Map();
+
 function setMediaStatus(message, type = "info") {
   if (!mediaStatus) return;
   mediaStatus.hidden = !message;
   mediaStatus.textContent = message;
   mediaStatus.dataset.status = type;
+}
+
+function addUsage(usageMap, mediaId, usage) {
+  if (!mediaId) return;
+  const list = usageMap.get(mediaId) || [];
+  list.push(usage);
+  usageMap.set(mediaId, list);
+}
+
+async function safeUsageQuery(table, select, column, mediaIds, makeUsage) {
+  if (!mediaIds.length) return [];
+  const { data, error } = await supabase
+    .from(table)
+    .select(select)
+    .in(column, mediaIds);
+
+  if (error) {
+    console.warn(`Failed to read media usage from ${table}.${column}`, error);
+    return [];
+  }
+
+  return (data || []).map((row) => ({ mediaId: row[column], ...makeUsage(row) })).filter((item) => item.mediaId);
+}
+
+async function fetchMediaUsage(items) {
+  const mediaIds = items.map((item) => item.id).filter(Boolean);
+  const usageMap = new Map(mediaIds.map((id) => [id, []]));
+  if (!mediaIds.length) return usageMap;
+
+  const usageGroups = await Promise.all([
+    safeUsageQuery("pages", "id, title, slug, hero_image_id", "hero_image_id", mediaIds, (row) => ({
+      type: "頁面 Hero",
+      title: row.title || row.slug || "未命名頁面",
+      href: `/admin/pages/${encodeURIComponent(row.id)}`
+    })),
+    safeUsageQuery("pages", "id, title, slug, og_image_id", "og_image_id", mediaIds, (row) => ({
+      type: "頁面 OG 圖",
+      title: row.title || row.slug || "未命名頁面",
+      href: `/admin/pages/${encodeURIComponent(row.id)}`
+    })),
+    safeUsageQuery("page_sections", "id, page_id, section_key, title, image_id", "image_id", mediaIds, (row) => ({
+      type: "頁面區塊",
+      title: row.title || row.section_key || "未命名區塊",
+      href: row.page_id ? `/admin/pages/${encodeURIComponent(row.page_id)}` : "/admin/pages"
+    })),
+    safeUsageQuery("page_template_fields", "id, page_slug, field_label, field_key, image_id", "image_id", mediaIds, (row) => ({
+      type: "模板欄位",
+      title: `${row.page_slug || "頁面"}｜${row.field_label || row.field_key || "圖片欄位"}`,
+      href: "/admin/template-fields"
+    })),
+    safeUsageQuery("content_modules", "id, module_key, title, item_key, image_id", "image_id", mediaIds, (row) => ({
+      type: "首頁模組",
+      title: row.title || row.item_key || row.module_key || "未命名模組",
+      href: "/admin/home-modules"
+    })),
+    safeUsageQuery("articles", "id, slug, title, cover_image_id", "cover_image_id", mediaIds, (row) => ({
+      type: "文章封面",
+      title: row.title || row.slug || "未命名文章",
+      href: `/admin/articles/${encodeURIComponent(row.id)}`
+    })),
+    safeUsageQuery("articles", "id, slug, title, author_avatar_id", "author_avatar_id", mediaIds, (row) => ({
+      type: "文章作者頭像",
+      title: row.title || row.slug || "未命名文章",
+      href: `/admin/articles/${encodeURIComponent(row.id)}`
+    })),
+    safeUsageQuery("articles", "id, slug, title, og_image_id", "og_image_id", mediaIds, (row) => ({
+      type: "文章 OG 圖",
+      title: row.title || row.slug || "未命名文章",
+      href: `/admin/articles/${encodeURIComponent(row.id)}`
+    })),
+    safeUsageQuery("article_categories", "id, name, slug, image_id", "image_id", mediaIds, (row) => ({
+      type: "文章分類",
+      title: row.name || row.slug || "未命名分類",
+      href: "/admin/categories"
+    })),
+    safeUsageQuery("courses", "id, title, cover_image_id", "cover_image_id", mediaIds, (row) => ({
+      type: "課程封面",
+      title: row.title || "未命名課程",
+      href: "/admin/courses"
+    })),
+    safeUsageQuery("care_stories", "id, title, person_name, cover_image_id", "cover_image_id", mediaIds, (row) => ({
+      type: "真實照顧情境封面",
+      title: row.title || row.person_name || "未命名故事",
+      href: "/admin/stories"
+    })),
+    safeUsageQuery("care_stories", "id, title, person_name, avatar_image_id", "avatar_image_id", mediaIds, (row) => ({
+      type: "真實照顧情境頭像",
+      title: row.person_name || row.title || "未命名故事",
+      href: "/admin/stories"
+    })),
+    safeUsageQuery("expert_talks", "id, title, speaker_name, image_id", "image_id", mediaIds, (row) => ({
+      type: "名人講堂圖片",
+      title: row.title || row.speaker_name || "未命名講堂",
+      href: "/admin/stories"
+    })),
+    safeUsageQuery("recruiting_pages", "id, page_slug, title, hero_image_id", "hero_image_id", mediaIds, (row) => ({
+      type: "招募頁 Hero",
+      title: row.title || row.page_slug || "未命名招募頁",
+      href: "/admin/recruiting"
+    })),
+    safeUsageQuery("recruiting_departments", "id, page_slug, title, image_id", "image_id", mediaIds, (row) => ({
+      type: "招募部門圖片",
+      title: row.title || row.page_slug || "未命名部門",
+      href: "/admin/recruiting"
+    })),
+    safeUsageQuery("recruiting_openings", "id, page_slug, title, image_id", "image_id", mediaIds, (row) => ({
+      type: "職缺卡片圖片",
+      title: row.title || row.page_slug || "未命名職缺",
+      href: "/admin/recruiting"
+    })),
+    safeUsageQuery("site_settings", "id, setting_label, setting_key, media_id", "media_id", mediaIds, (row) => ({
+      type: "全站設定",
+      title: row.setting_label || row.setting_key || "全站圖片",
+      href: "/admin/site-settings"
+    }))
+  ]);
+
+  usageGroups.flat().forEach((usage) => addUsage(usageMap, usage.mediaId, usage));
+  return usageMap;
+}
+
+function renderUsageSummary(item) {
+  const usages = mediaUsageMap.get(item.id) || [];
+  if (!usages.length) {
+    return `
+      <div class="admin-media-usage empty">
+        <strong>使用狀態</strong>
+        <span>目前沒有偵測到前台/後台引用。</span>
+      </div>
+    `;
+  }
+
+  const visibleUsages = usages.slice(0, 4);
+  const restCount = Math.max(0, usages.length - visibleUsages.length);
+  return `
+    <div class="admin-media-usage">
+      <strong>使用中：${usages.length} 個位置</strong>
+      <ul>
+        ${visibleUsages.map((usage) => `
+          <li>
+            <a href="${escapeHTML(usage.href)}">${escapeHTML(usage.type)}</a>
+            <span>${escapeHTML(usage.title)}</span>
+          </li>
+        `).join("")}
+      </ul>
+      ${restCount ? `<em>另有 ${restCount} 個位置使用這張圖片</em>` : ""}
+    </div>
+  `;
 }
 
 function renderMedia(items) {
@@ -28,8 +178,10 @@ function renderMedia(items) {
     return;
   }
 
-  mediaGrid.innerHTML = items.map((item) => `
-    <article class="admin-media-card" data-media-id="${escapeHTML(item.id)}" data-bucket="${escapeHTML(item.bucket)}" data-path="${escapeHTML(item.storage_path)}">
+  mediaGrid.innerHTML = items.map((item) => {
+    const usages = mediaUsageMap.get(item.id) || [];
+    return `
+    <article class="admin-media-card" data-media-id="${escapeHTML(item.id)}" data-bucket="${escapeHTML(item.bucket)}" data-path="${escapeHTML(item.storage_path)}" data-usage-count="${usages.length}">
       <figure data-image-usage="${escapeHTML(item.image_usage || "card")}" data-focal-point="${escapeHTML(item.focal_point || "center")}">
         <img src="${escapeHTML(item.public_url || "")}" alt="${escapeHTML(item.alt_text || item.file_name || "媒體圖片")}" loading="lazy" />
       </figure>
@@ -38,12 +190,14 @@ function renderMedia(items) {
         <span>${escapeHTML(item.alt_text || "尚未填寫 alt text")}</span>
         <span>用途：${escapeHTML(getImageUsageOption(item.image_usage)?.label || "卡片縮圖")} · 焦點：${escapeHTML(getFocalPointOption(item.focal_point)?.label || "置中")}</span>
         <span>${item.width && item.height ? `${item.width} × ${item.height}` : "尺寸未記錄"}</span>
+        ${renderUsageSummary(item)}
         <code>${escapeHTML(item.public_url || "")}</code>
         <time>上傳時間：${formatUpdatedAt(item.created_at)}</time>
         <button type="button" data-delete-media>刪除圖片</button>
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
 }
 
 async function loadMedia() {
@@ -53,6 +207,8 @@ async function loadMedia() {
 
   try {
     const data = await fetchMediaImages();
+    setMediaStatus("正在比對圖片使用位置...", "info");
+    mediaUsageMap = await fetchMediaUsage(data);
     renderMedia(data);
     setMediaStatus("", "success");
   } catch (error) {
@@ -114,7 +270,11 @@ async function deleteMedia(card) {
   const bucket = card.dataset.bucket;
   const storagePath = card.dataset.path;
   if (!mediaId || !bucket || !storagePath) return;
-  if (!window.confirm("確定要刪除這張圖片嗎？此動作會刪除 Storage 檔案與 media 資料。")) return;
+  const usages = mediaUsageMap.get(mediaId) || [];
+  const usageText = usages.length
+    ? `\n\n這張圖片目前被 ${usages.length} 個位置使用：\n${usages.slice(0, 6).map((usage) => `- ${usage.type}：${usage.title}`).join("\n")}\n\n刪除後相關頁面可能會缺圖，建議先到對應位置更換圖片。`
+    : "";
+  if (!window.confirm(`確定要刪除這張圖片嗎？此動作會刪除 Storage 檔案與 media 資料。${usageText}`)) return;
 
   setMediaStatus("正在刪除圖片...", "info");
 

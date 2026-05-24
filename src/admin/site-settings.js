@@ -54,7 +54,7 @@ function getSetting(key) {
 
 function getJsonString(key) {
   const value = getSetting(key)?.value_json;
-  return JSON.stringify(Array.isArray(value) ? value : [], null, 2);
+  return JSON.stringify(value && typeof value === "object" ? value : [], null, 2);
 }
 
 function fillForm() {

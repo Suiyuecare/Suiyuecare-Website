@@ -1,6 +1,3 @@
-const DEFAULT_SUPABASE_URL = "https://ussnmxdpxeoshlrdchov.supabase.co";
-const DEFAULT_SUPABASE_ANON_KEY = "sb_publishable_2Qzte6W7e6iAssOyTVRuZA__MNdKR1x";
-
 function sendJson(response, statusCode, payload) {
   response.statusCode = statusCode;
   response.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -9,8 +6,11 @@ function sendJson(response, statusCode, payload) {
 }
 
 async function supabaseFetch(path, options = {}) {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Server is missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
+  }
   const response = await fetch(`${supabaseUrl}${path}`, {
     ...options,
     headers: {
@@ -50,7 +50,7 @@ module.exports = async function handler(request, response) {
       body: JSON.stringify({ expiresIn: 120, download: file.file_name || true })
     });
     const signed = await signedResponse.json();
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const signedUrl = signed.signedURL?.startsWith("http") ? signed.signedURL : `${supabaseUrl}/storage/v1${signed.signedURL}`;
     response.statusCode = 302;
     response.setHeader("Location", signedUrl);

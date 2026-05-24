@@ -1,5 +1,3 @@
-const DEFAULT_SUPABASE_URL = "https://ussnmxdpxeoshlrdchov.supabase.co";
-
 function json(response, statusCode, payload) {
   response.statusCode = statusCode;
   response.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -16,9 +14,9 @@ function startDateFor(type) {
 }
 
 async function supabaseSelect(path) {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!key) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY.");
+  if (!supabaseUrl || !key) throw new Error("Missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
 
   const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
     headers: {
@@ -31,9 +29,9 @@ async function supabaseSelect(path) {
 }
 
 async function supabasePatch(path, payload) {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!key) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY.");
+  if (!supabaseUrl || !key) throw new Error("Missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
 
   const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
     method: "PATCH",

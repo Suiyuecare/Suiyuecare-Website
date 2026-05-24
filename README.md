@@ -319,7 +319,7 @@ git diff --check
 - 圖片刪除流程會刪除 Storage object 與 `media` 資料
 - 頁面內容編輯器可選擇既有 media 圖片，也可直接上傳新圖片並寫入 `page_sections.image_id` / `content_json.image_url`
 - `/admin/traffic` 是網站流量中心，讀取 `analytics_page_views`、`analytics_events`、`analytics_alerts`、`analytics_health_checks`、`analytics_report_schedules`，顯示流量、來源、頁面表現、轉換、SEO、網站健康度、警示與報表匯出。
-- 前台 `app.js` 會匿名寫入頁面瀏覽與轉換事件，包含表單送出、LINE 點擊、電話點擊、Email 點擊、Google Maps 點擊、PDF 下載、預約/CTA 點擊與加入 LINE。
+- 前台 `app.js` 會將頁面瀏覽與轉換事件送到 `/api/analytics`，再由 Vercel server 使用 `SUPABASE_SERVICE_ROLE_KEY` 寫入 Supabase，包含表單送出、LINE 點擊、電話點擊、Email 點擊、Google Maps 點擊、PDF 下載、預約/CTA 點擊與加入 LINE。
 - `/api/site-health-check` 可由 Vercel Cron 執行，會檢查首頁、Supabase API、表單端點、SSL 與近 24 小時流量/錯誤，並寫入健康檢查與異常警示。
 - 頁面文案可更新 `pages` 與 `page_sections`
 - 文章列表 `/admin/articles` 可讀取、顯示、刪除文章
@@ -381,9 +381,11 @@ npm run build
 前台聯絡表單與課程報名已改走 Vercel Serverless Function：
 
 - `POST /api/send-email`
+- `GET /api/email-status`
 - 先寫入 Supabase `form_submissions`
 - 再使用 Resend 寄信
 - 若 `RESEND_API_KEY` 尚未設定，API 會回傳 `202`，資料仍會留存在後台，避免名單遺失
+- `/api/email-status` 會回報正式環境是否已設定 `RESEND_API_KEY` 與 `MAIL_FROM`，不會洩漏金鑰內容
 
 Vercel 需要設定：
 
@@ -394,11 +396,22 @@ RESEND_API_KEY=...
 MAIL_FROM="Suiyuecare Website <noreply@suiyuecare.com>"
 CONTACT_NOTIFY_EMAIL=generalaffairs@suiyuecare.com
 COURSE_NOTIFY_EMAIL=edu.control@suiyuecare.com
+INVESTOR_NOTIFY_EMAIL=generalaffairs@suiyuecare.com
+LAND_NOTIFY_EMAIL=generalaffairs@suiyuecare.com
+RECRUITING_NOTIFY_EMAIL=generalaffairs@suiyuecare.com
 REPORT_FALLBACK_EMAIL=generalaffairs@suiyuecare.com
 REPORT_CRON_SECRET=...
 SUPABASE_STORAGE_BUCKET_INVESTOR_FILES=investor-files
 VITE_SUPABASE_STORAGE_BUCKET_COURSE_IMAGES=course-images
 ```
+
+設定完成後請重新部署，再檢查：
+
+```bash
+curl https://suiyuecare-website.vercel.app/api/email-status
+```
+
+若回傳 `ok: true`，代表表單寄信服務已啟用；若 `ok: false`，前台仍會留存表單到後台，但不會寄出通知信。
 
 ### 第一優先後台模組
 
@@ -492,7 +505,7 @@ supabase/migrations/20260521000300_add_versions_publish_workflow_permissions.sql
 
 - 新增 `404.html`
 - 前台未知 hash route 會顯示 404 區塊
-- 前台 `window.error` 與 `unhandledrejection` 會寫入 `analytics_events`，事件類型為 `frontend_error`
+- 前台 `window.error` 與 `unhandledrejection` 會透過 `/api/analytics` 寫入 `analytics_events`，事件類型為 `frontend_error`
 - 找不到頁面會寫入 `error_404`
 
 ### SEO

@@ -1,6 +1,5 @@
 const tls = require("tls");
 
-const DEFAULT_SUPABASE_URL = "https://ussnmxdpxeoshlrdchov.supabase.co";
 const DEFAULT_SITE_URL = "https://suiyuecare.com";
 
 function json(response, statusCode, payload) {
@@ -11,9 +10,9 @@ function json(response, statusCode, payload) {
 }
 
 function supabaseConfig() {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!key) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY.");
+  if (!supabaseUrl || !key) throw new Error("Missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
   return { supabaseUrl, key };
 }
 

@@ -14,6 +14,31 @@ const categoriesTableBody = document.querySelector("#adminCategoriesTableBody");
 const refreshCategoriesButton = document.querySelector("#adminRefreshCategories");
 
 let categories = [];
+let mediaImages = [];
+
+function toCsvList(value = []) {
+  return Array.isArray(value) ? value.join(", ") : "";
+}
+
+function fromCsvList(value = "") {
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function renderTypeLabel(value = "article") {
+  const labels = {
+    article: "一般文章",
+    lazy_pack: "懶人包",
+    event: "活動",
+    video: "影音",
+    short_video: "短影片",
+    interview: "名人講堂",
+    story: "真實照顧情境"
+  };
+  return labels[value] || value || "一般文章";
+}
 
 function setCategoriesStatus(message, type = "info") {
   if (!categoriesStatus) return;
@@ -33,9 +58,45 @@ function slugify(value = "") {
 function resetCategoryForm() {
   categoryForm.reset();
   categoryForm.elements.id.value = "";
+  categoryForm.elements.parent_id.value = "";
+  categoryForm.elements.type.value = "article";
+  categoryForm.elements.section_key.value = "health";
+  categoryForm.elements.display_label.value = "";
   categoryForm.elements.sort_order.value = "0";
+  categoryForm.elements.color.value = "";
+  categoryForm.elements.icon.value = "";
+  categoryForm.elements.audience.value = "";
+  categoryForm.elements.seo_keywords.value = "";
+  categoryForm.elements.image_id.value = "";
   categoryForm.elements.is_enabled.checked = true;
+  categoryForm.elements.show_in_nav.checked = true;
+  categoryForm.elements.is_featured.checked = false;
+  categoryForm.elements.seo_title.value = "";
+  categoryForm.elements.seo_description.value = "";
   categoryFormTitle.textContent = "新增分類";
+  renderParentOptions();
+  renderMediaOptions();
+}
+
+function renderParentOptions(selectedId = "") {
+  const currentId = categoryForm.elements.id.value;
+  const options = ['<option value="">無上層分類</option>'];
+  categories
+    .filter((category) => category.id !== currentId)
+    .forEach((category) => {
+      const selected = category.id === selectedId ? "selected" : "";
+      options.push(`<option value="${escapeHTML(category.id)}" ${selected}>${escapeHTML(category.name || "未命名分類")}</option>`);
+    });
+  categoryForm.elements.parent_id.innerHTML = options.join("");
+}
+
+function renderMediaOptions(selectedId = "") {
+  const options = ['<option value="">不設定分類圖片</option>'];
+  mediaImages.forEach((media) => {
+    const selected = media.id === selectedId ? "selected" : "";
+    options.push(`<option value="${escapeHTML(media.id)}" ${selected}>${escapeHTML(media.file_name || media.alt_text || "未命名圖片")}</option>`);
+  });
+  categoryForm.elements.image_id.innerHTML = options.join("");
 }
 
 function renderCategories() {
@@ -44,7 +105,7 @@ function renderCategories() {
   if (!categories.length) {
     categoriesTableBody.innerHTML = `
       <tr>
-        <td colspan="5">
+        <td colspan="6">
           <div class="admin-empty-state">目前沒有分類資料。</div>
         </td>
       </tr>
@@ -56,7 +117,11 @@ function renderCategories() {
     <tr>
       <td>
         <strong>${escapeHTML(category.name || "未命名分類")}</strong>
-        <small>${escapeHTML(category.description || "尚無描述")}</small>
+        <small>${escapeHTML(category.parent?.name ? `上層：${category.parent.name}` : category.description || "尚無描述")}</small>
+      </td>
+      <td>
+        <strong>${escapeHTML(renderTypeLabel(category.type))}</strong>
+        <small>${escapeHTML(category.section_key || "health")}${category.show_in_nav ? " · 顯示於分類列" : " · 不顯示於分類列"}</small>
       </td>
       <td><code>/${escapeHTML(category.slug || "")}</code></td>
       <td>${Number(category.sort_order || 0)}</td>
@@ -77,15 +142,52 @@ async function loadCategories() {
   setCategoriesStatus("正在讀取文章分類...", "info");
 
   try {
-    const { data, error } = await supabase
-      .from("article_categories")
-      .select("id, name, slug, description, sort_order, is_enabled")
-      .order("sort_order", { ascending: true })
-      .order("name", { ascending: true });
+    const [categoryResult, mediaResult] = await Promise.all([
+      supabase
+        .from("article_categories")
+        .select(`
+          id,
+          parent_id,
+          name,
+          slug,
+          description,
+          type,
+          section_key,
+          display_label,
+          color,
+          icon,
+          audience,
+          show_in_nav,
+          is_featured,
+          image_id,
+          sort_order,
+          is_enabled,
+          seo_title,
+          seo_description,
+          seo_keywords,
+          parent:article_categories!article_categories_parent_id_fkey (
+            id,
+            name,
+            slug
+          )
+        `)
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true }),
+      supabase
+        .from("media")
+        .select("id, public_url, file_name, alt_text, image_usage")
+        .eq("is_enabled", true)
+        .order("created_at", { ascending: false })
+        .limit(200)
+    ]);
 
-    if (error) throw error;
+    if (categoryResult.error) throw categoryResult.error;
+    if (mediaResult.error) throw mediaResult.error;
 
-    categories = data || [];
+    categories = categoryResult.data || [];
+    mediaImages = mediaResult.data || [];
+    renderParentOptions();
+    renderMediaOptions();
     renderCategories();
     setCategoriesStatus("", "success");
   } catch (error) {
@@ -108,10 +210,22 @@ async function saveCategory(event) {
   const payload = {
     name: categoryForm.elements.name.value.trim(),
     slug: slugify(categoryForm.elements.slug.value),
+    parent_id: categoryForm.elements.parent_id.value || null,
     description: categoryForm.elements.description.value.trim() || null,
+    type: categoryForm.elements.type.value || "article",
+    section_key: categoryForm.elements.section_key.value || "health",
+    display_label: categoryForm.elements.display_label.value.trim() || null,
+    color: categoryForm.elements.color.value.trim() || null,
+    icon: categoryForm.elements.icon.value.trim() || null,
+    audience: categoryForm.elements.audience.value.trim() || null,
+    image_id: categoryForm.elements.image_id.value || null,
     sort_order: Number(categoryForm.elements.sort_order.value || 0),
     is_enabled: categoryForm.elements.is_enabled.checked,
-    type: "article"
+    show_in_nav: categoryForm.elements.show_in_nav.checked,
+    is_featured: categoryForm.elements.is_featured.checked,
+    seo_title: categoryForm.elements.seo_title.value.trim() || null,
+    seo_description: categoryForm.elements.seo_description.value.trim() || null,
+    seo_keywords: fromCsvList(categoryForm.elements.seo_keywords.value)
   };
 
   try {
@@ -139,11 +253,26 @@ function editCategory(id) {
   if (!category) return;
 
   categoryForm.elements.id.value = category.id;
+  renderParentOptions(category.parent_id || "");
+  renderMediaOptions(category.image_id || "");
   categoryForm.elements.name.value = category.name || "";
   categoryForm.elements.slug.value = category.slug || "";
+  categoryForm.elements.parent_id.value = category.parent_id || "";
+  categoryForm.elements.type.value = category.type || "article";
+  categoryForm.elements.section_key.value = category.section_key || "health";
+  categoryForm.elements.display_label.value = category.display_label || "";
   categoryForm.elements.description.value = category.description || "";
+  categoryForm.elements.color.value = category.color || "";
+  categoryForm.elements.icon.value = category.icon || "";
+  categoryForm.elements.audience.value = category.audience || "";
+  categoryForm.elements.seo_keywords.value = toCsvList(category.seo_keywords);
+  categoryForm.elements.image_id.value = category.image_id || "";
   categoryForm.elements.sort_order.value = Number(category.sort_order || 0);
   categoryForm.elements.is_enabled.checked = Boolean(category.is_enabled);
+  categoryForm.elements.show_in_nav.checked = category.show_in_nav !== false;
+  categoryForm.elements.is_featured.checked = Boolean(category.is_featured);
+  categoryForm.elements.seo_title.value = category.seo_title || "";
+  categoryForm.elements.seo_description.value = category.seo_description || "";
   categoryFormTitle.textContent = "編輯分類";
   categoryForm.scrollIntoView({ behavior: "smooth", block: "start" });
 }

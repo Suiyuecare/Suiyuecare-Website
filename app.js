@@ -57,6 +57,13 @@ const pages = {
     focus: ["教育訓練", "服務稽核", "品質改善"],
     features: ["新人與在職訓練", "督導回饋機制", "照顧紀錄與改善追蹤"]
   },
+  software: {
+    eyebrow: "Software",
+    title: "軟體系統",
+    intro: "歲悅把長照營運、行政管理與數位工具整合成可客製化的系統服務，協助單位把會計、人資、公文、專案、PDF 文件與居家/日照業務流程串成同一套工作節奏。",
+    focus: ["客製化系統開發", "長照營運流程數位化", "行政與文件工具整合"],
+    features: ["會計與人資系統", "電子公文交換與專案管理", "居家/日照業務系統"]
+  },
   talent: {
     eyebrow: "Recruiting",
     title: "人才招募",
@@ -118,6 +125,179 @@ const introLoader = document.querySelector(".intro-loader");
 const COURSE_NOTIFY_EMAIL = "edu.control@suiyuecare.com";
 const COURSE_LINE_URL = "https://lin.ee/oaPkGiq";
 let siteSettings = {};
+let siteSettingsLoaded = false;
+let siteSettingsPromise = null;
+
+const SITE_ORIGIN = "https://suiyuecare.com";
+const DEFAULT_SEO = {
+  title: "歲悅長照集團｜Suiyuecare Corps.",
+  description: "歲悅長照集團整合居家照顧、日間照顧、社區據點、護理復能、移工培訓與教育品管，讓照顧變成家人看得懂、也放得下心的日常系統。",
+  image: "assets/hero-care.png",
+  imageAlt: "歲悅長照照顧服務形象照",
+  type: "website"
+};
+
+const routeSeoMap = {
+  home: DEFAULT_SEO,
+  about: {
+    title: "關於歲悅｜歲悅長照集團",
+    description: "認識歲悅長照集團的品牌理念、照顧系統、服務網絡與專業團隊。"
+  },
+  milestones: {
+    title: "大記事｜歲悅長照集團",
+    description: "查看歲悅長照集團的重要里程碑、服務擴張、據點成立與合作紀錄。"
+  },
+  "home-care": {
+    title: "居家照顧｜歲悅長照集團",
+    description: "歲悅居家照顧提供到宅照顧、生活協助、家屬溝通與服務紀錄，支持長輩在家安心生活。"
+  },
+  "day-care": {
+    title: "日間照顧｜歲悅長照集團",
+    description: "歲悅日間照顧以活動設計、餐食、復能與社交支持，降低家庭照顧壓力。"
+  },
+  community: {
+    title: "社區據點｜歲悅長照集團",
+    description: "歲悅社區據點提供健康促進、共餐活動、預防延緩失能與在地照顧支持。"
+  },
+  nursing: {
+    title: "護理復能｜歲悅長照集團",
+    description: "結合護理評估、復能目標與健康監測，協助長輩恢復生活能力並降低照顧風險。"
+  },
+  "migrant-training": {
+    title: "移工培訓｜歲悅長照集團",
+    description: "歲悅移工培訓提供照顧技能、家庭溝通、衛教與安全實作訓練，提升家庭照顧品質。"
+  },
+  quality: {
+    title: "教育品管｜歲悅長照集團",
+    description: "歲悅教育品管以標準化教材、督導制度、服務稽核與持續改善守住照顧品質。"
+  },
+  software: {
+    title: "軟體系統｜歲悅長照集團",
+    description: "歲悅提供可客製化軟體系統，包含會計、人資、電子公文交換、專案管理、PDF 工具，以及居家與日照業務系統。"
+  },
+  talent: {
+    title: "人才招募｜歲悅長照集團",
+    description: "加入歲悅長照團隊，探索照顧服務員、督導、日照、教學品管與行政職涯機會。"
+  },
+  land: {
+    title: "土地招募｜歲悅長照集團",
+    description: "歲悅尋找適合日照、社區據點與複合式長照服務的土地或空間合作機會。"
+  },
+  "investor-recruiting": {
+    title: "投資人招募｜歲悅長照集團",
+    description: "了解歲悅長照集團的展店模型、產業策略與投資合作機會。"
+  },
+  health: {
+    title: "健康3.0｜歲悅長照照顧知識",
+    description: "健康3.0整理長照申請、居家照顧、日照、復能、營養、失智與家屬支持文章。"
+  },
+  search: {
+    title: "搜尋照顧知識｜健康3.0",
+    description: "搜尋歲悅健康3.0照顧知識文章、影音與照顧指南。",
+    robots: "noindex, follow"
+  },
+  courses: {
+    title: "課程報名｜歲悅長照集團",
+    description: "查看歲悅照顧課程、移工培訓、家屬課程與專業研習，線上送出報名資訊。"
+  },
+  investors: {
+    title: "投資人專區｜歲悅長照集團",
+    description: "歲悅投資人專區提供最新動態、營運進度、財務資訊、公司治理與股東專區資料。"
+  },
+  "ir-finance": {
+    title: "財務資訊｜歲悅長照投資人專區",
+    description: "查看歲悅長照每月營收、財務分析、季度財報、年報與可下載文件。"
+  },
+  "ir-governance": {
+    title: "公司治理｜歲悅長照投資人專區",
+    description: "查看歲悅長照重要訊息、治理運作、管理階層、稽核、風險管理與誠信經營。"
+  },
+  "ir-shareholders": {
+    title: "股東專區｜歲悅長照投資人專區",
+    description: "查看歲悅長照股務資訊、股東會、法說會、常見問答與股東文件下載。"
+  },
+  contact: {
+    title: "聯絡我們｜歲悅長照集團",
+    description: "聯絡歲悅長照集團，預約服務諮詢、課程合作、招募合作、投資洽談或一般客服。"
+  }
+};
+
+function absoluteSiteUrl(path = "") {
+  if (/^https?:\/\//i.test(path)) return path;
+  const normalized = String(path || "").startsWith("/") ? path : `/${path || ""}`;
+  return `${SITE_ORIGIN}${normalized}`;
+}
+
+function routeCanonical(slug = "home") {
+  const normalized = slug && slug !== "home" ? `/#${slug}` : "/";
+  return absoluteSiteUrl(normalized);
+}
+
+function absoluteImageUrl(image = DEFAULT_SEO.image) {
+  try {
+    return new URL(image || DEFAULT_SEO.image, SITE_ORIGIN).href;
+  } catch {
+    return absoluteSiteUrl(DEFAULT_SEO.image);
+  }
+}
+
+function ensureMeta(selector, createConfig) {
+  let element = document.head.querySelector(selector);
+  if (element) return element;
+  element = document.createElement("meta");
+  Object.entries(createConfig).forEach(([key, value]) => element.setAttribute(key, value));
+  document.head.appendChild(element);
+  return element;
+}
+
+function setMetaName(name, content) {
+  if (!content) return;
+  ensureMeta(`meta[name="${name}"]`, { name }).setAttribute("content", content);
+}
+
+function setMetaProperty(property, content) {
+  if (!content) return;
+  ensureMeta(`meta[property="${property}"]`, { property }).setAttribute("content", content);
+}
+
+function setCanonicalUrl(url) {
+  let canonical = document.head.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement("link");
+    canonical.setAttribute("rel", "canonical");
+    document.head.appendChild(canonical);
+  }
+  canonical.setAttribute("href", url);
+}
+
+function setRouteSeo(slug = "home", overrides = {}) {
+  const normalized = (slug || "home").split("?")[0] || "home";
+  const base = routeSeoMap[normalized] || DEFAULT_SEO;
+  const seo = { ...DEFAULT_SEO, ...base, ...overrides };
+  const title = seo.title || DEFAULT_SEO.title;
+  const description = seo.description || DEFAULT_SEO.description;
+  const canonical = seo.canonical || routeCanonical(normalized);
+  const image = absoluteImageUrl(seo.image);
+  const robots = seo.robots || "index, follow";
+
+  document.title = title;
+  setMetaName("description", description);
+  setMetaName("robots", robots);
+  setCanonicalUrl(canonical);
+  setMetaProperty("og:site_name", "歲悅長照集團");
+  setMetaProperty("og:locale", "zh_TW");
+  setMetaProperty("og:type", seo.type || "website");
+  setMetaProperty("og:title", title);
+  setMetaProperty("og:description", description);
+  setMetaProperty("og:url", canonical);
+  setMetaProperty("og:image", image);
+  setMetaProperty("og:image:alt", seo.imageAlt || DEFAULT_SEO.imageAlt);
+  setMetaName("twitter:card", "summary_large_image");
+  setMetaName("twitter:title", title);
+  setMetaName("twitter:description", description);
+  setMetaName("twitter:image", image);
+  setMetaName("twitter:image:alt", seo.imageAlt || DEFAULT_SEO.imageAlt);
+}
 
 const analyticsState = {
   currentPath: "",
@@ -203,10 +383,23 @@ function analyticsBasePayload() {
 }
 
 function insertAnalyticsRow(table, payload) {
-  if (!supabase) return;
-  const rpcName = table === "analytics_page_views" ? "track_page_view" : "track_analytics_event";
-  supabase.rpc(rpcName, { payload }).then(({ error }) => {
-    if (error) console.warn(`Analytics insert failed for ${table}.`, error);
+  if (location.protocol === "file:") return;
+  const type = table === "analytics_page_views" ? "page_view" : "event";
+  const body = JSON.stringify({ type, ...payload });
+  const endpoint = "/api/analytics";
+
+  if (navigator.sendBeacon) {
+    const blob = new Blob([body], { type: "application/json" });
+    if (navigator.sendBeacon(endpoint, blob)) return;
+  }
+
+  fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body,
+    keepalive: true
+  }).catch((error) => {
+    console.warn(`Analytics insert failed for ${table}.`, error);
   });
 }
 
@@ -278,6 +471,8 @@ async function sendBackendForm(form, formType = "contact") {
     opening_id: formDataValue(formData, ["opening_id"]),
     opening_title: formDataValue(formData, ["opening_title"]),
     opening_slug: formDataValue(formData, ["opening_slug"]),
+    privacy_consent: formData.get("privacy_consent") === "on",
+    _honey: formDataValue(formData, ["_honey"]),
     source_path: location.hash || "#home",
     page_title: document.title,
     user_agent: navigator.userAgent
@@ -814,6 +1009,35 @@ function normalizeYouTubeEmbedUrl(value = "") {
   }
 }
 
+function getArticleVideoData(contentJson = {}) {
+  const source = contentJson && typeof contentJson === "object" ? contentJson : {};
+  const nested = source.video && typeof source.video === "object" ? source.video : {};
+  const url = source.video_url || nested.url || "";
+  const provider = source.video_provider || nested.provider || (String(url).includes("youtu") ? "youtube" : "direct");
+  const type = source.video_type || nested.type || "";
+  let embedUrl = url;
+  if (provider === "youtube") {
+    embedUrl = normalizeYouTubeEmbedUrl(url);
+  } else if (provider === "vimeo") {
+    try {
+      const parsedUrl = new URL(url);
+      const videoId = parsedUrl.pathname.split("/").filter(Boolean).pop();
+      embedUrl = videoId ? `https://player.vimeo.com/video/${encodeURIComponent(videoId)}` : url;
+    } catch {
+      embedUrl = url;
+    }
+  }
+  return {
+    url,
+    embedUrl,
+    provider,
+    type,
+    duration: source.video_duration || nested.duration || "",
+    label: source.video_label || nested.label || "",
+    caption: source.video_caption || nested.caption || ""
+  };
+}
+
 function formatArticleDate(dateValue) {
   const date = new Date(dateValue);
   if (Number.isNaN(date.getTime())) return "";
@@ -840,31 +1064,53 @@ function getHealthCategoryList() {
 
 function normalizeSupabaseArticle(article, mediaById, categoriesById) {
   const categoryData = categoriesById.get(article.category_id);
-  const category = categoryData?.name || "照顧知識";
+  const category = categoryData?.display_label || categoryData?.name || "照顧知識";
   const slug = categoryData?.slug || categorySlug(category);
   const cover = mediaById.get(article.cover_image_id);
   const image = cover?.public_url || "assets/homepage-batch/10-family-consultation.png";
   const subtitle = article.subtitle || article.excerpt || "";
   const excerpt = article.excerpt || article.subtitle || stripHTML(article.content || "").slice(0, 88);
   const publishedAt = article.published_at || article.updated_at;
-  const tags = Array.isArray(article.tags) ? article.tags.join(" ") : "";
+  const tagList = Array.isArray(article.tags) ? article.tags : [];
+  const tags = tagList.join(" ");
+  const video = getArticleVideoData(article.content_json || {});
 
   return {
     href: `#article-${article.slug}`,
     slug: article.slug,
     category,
     categorySlug: slug,
+    categoryType: categoryData?.type || "article",
+    categorySection: categoryData?.section_key || "health",
+    contentType: article.content_type || article.content_json?.content_type || categoryData?.type || "article",
     title: article.title || "未命名文章",
     subtitle,
     excerpt,
     image,
     imageUsage: cover?.image_usage || "article_cover",
     focalPoint: cover?.focal_point || "center",
+    videoUrl: video.url,
+    videoEmbedUrl: video.embedUrl,
+    videoProvider: video.provider,
+    videoType: video.type,
+    videoDuration: video.duration,
+    videoLabel: video.label,
+    videoCaption: video.caption,
     author: article.author_name || "歲悅照顧編輯部",
     date: formatArticleDate(publishedAt),
     publishedAt,
+    readingMinutes: article.reading_minutes,
+    difficulty: article.difficulty || "",
+    targetAudience: article.target_audience || "",
+    relatedService: article.related_service || "",
+    recommendedSlots: Array.isArray(article.recommended_slots) ? article.recommended_slots : [],
+    summaryPoints: Array.isArray(article.summary_points) ? article.summary_points : [],
+    relatedSlugs: Array.isArray(article.content_json?.related_slugs) ? article.content_json.related_slugs : [],
+    ctaText: article.cta_text || article.content_json?.cta_text || "",
+    ctaUrl: article.cta_url || article.content_json?.cta_url || "",
     isFeatured: Boolean(article.is_featured),
-    keywords: `${article.title || ""} ${subtitle} ${excerpt} ${category} ${tags}`
+    tags: tagList,
+    keywords: `${article.title || ""} ${subtitle} ${excerpt} ${category} ${tags} ${article.target_audience || ""} ${article.related_service || ""}`
   };
 }
 
@@ -880,16 +1126,19 @@ async function fetchSupabaseArticleCategories() {
 
   const { data, error } = await supabase
     .from("article_categories")
-    .select("id, name, slug, sort_order, is_enabled")
+    .select("id, name, slug, display_label, type, section_key, show_in_nav, sort_order, is_enabled")
     .eq("is_enabled", true)
+    .eq("show_in_nav", true)
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
 
   if (error) throw error;
   return (data || []).map((category) => ({
     id: category.id,
-    name: category.name,
-    slug: category.slug || categorySlug(category.name)
+    name: category.display_label || category.name,
+    slug: category.slug || categorySlug(category.name),
+    type: category.type || "article",
+    sectionKey: category.section_key || "health"
   }));
 }
 
@@ -930,10 +1179,21 @@ async function fetchSupabaseHealthArticles() {
       subtitle,
       excerpt,
       content,
+      content_json,
+      content_type,
       cover_image_id,
       author_name,
       tags,
+      recommended_slots,
+      summary_points,
+      reading_minutes,
+      difficulty,
+      target_audience,
+      related_service,
+      cta_text,
+      cta_url,
       is_featured,
+      sort_order,
       published_at,
       updated_at
     `)
@@ -953,7 +1213,7 @@ async function fetchSupabaseHealthArticles() {
       ? supabase.from("media").select("id, public_url, alt_text, file_name, image_usage, focal_point").in("id", mediaIds)
       : Promise.resolve({ data: [], error: null }),
     categoryIds.length
-      ? supabase.from("article_categories").select("id, name, slug").in("id", categoryIds)
+      ? supabase.from("article_categories").select("id, name, display_label, slug, type, section_key").in("id", categoryIds)
       : Promise.resolve({ data: [], error: null })
   ]);
 
@@ -1047,9 +1307,10 @@ function renderMarkdownContent(content = "") {
 
 function normalizeSupabaseArticlePage(article, category, cover) {
   const publishedAt = article.published_at || article.updated_at;
+  const video = getArticleVideoData(article.content_json || {});
   return {
     slug: article.slug,
-    category: category?.name || "照顧知識",
+    category: category?.display_label || category?.name || "照顧知識",
     categorySlug: category?.slug || categorySlug(category?.name || "照顧知識"),
     title: article.title || "未命名文章",
     subtitle: article.subtitle || article.excerpt || "",
@@ -1057,9 +1318,27 @@ function normalizeSupabaseArticlePage(article, category, cover) {
     image: cover?.public_url || "assets/homepage-batch/10-family-consultation.png",
     imageUsage: cover?.image_usage || "article_cover",
     focalPoint: cover?.focal_point || "center",
+    videoUrl: video.url,
+    videoEmbedUrl: video.embedUrl,
+    videoProvider: video.provider,
+    videoType: video.type,
+    videoDuration: video.duration,
+    videoLabel: video.label,
+    videoCaption: video.caption,
     author: article.author_name || "歲悅照顧編輯部",
     date: formatArticleDate(publishedAt),
     tags: Array.isArray(article.tags) ? article.tags : [],
+    summary: Array.isArray(article.summary_points) ? article.summary_points : [],
+    readingMinutes: article.reading_minutes,
+    difficulty: article.difficulty || "",
+    targetAudience: article.target_audience || "",
+    relatedService: article.related_service || "",
+    ctaText: article.cta_text || article.content_json?.cta_text || "",
+    ctaUrl: article.cta_url || article.content_json?.cta_url || "",
+    sourceName: article.source_name || article.content_json?.source_name || "",
+    sourceUrl: article.source_url || article.content_json?.source_url || "",
+    faq: Array.isArray(article.faq_json) ? article.faq_json : [],
+    relatedSlugs: Array.isArray(article.content_json?.related_slugs) ? article.content_json.related_slugs : [],
     content: article.content || "",
     seoTitle: article.seo_title || "",
     seoDescription: article.seo_description || ""
@@ -1080,9 +1359,22 @@ async function fetchSupabaseArticlePage(slug) {
       subtitle,
       excerpt,
       content,
+      content_json,
+      content_type,
       cover_image_id,
       author_name,
       tags,
+      summary_points,
+      reading_minutes,
+      difficulty,
+      target_audience,
+      related_service,
+      source_name,
+      source_url,
+      canonical_url,
+      faq_json,
+      cta_text,
+      cta_url,
       status,
       is_enabled,
       published_at,
@@ -1105,7 +1397,7 @@ async function fetchSupabaseArticlePage(slug) {
     article.category_id
       ? supabase
           .from("article_categories")
-          .select("id, name, slug")
+          .select("id, name, display_label, slug, type, section_key")
           .eq("id", article.category_id)
           .eq("is_enabled", true)
           .maybeSingle()
@@ -1199,9 +1491,10 @@ function applyCmsSection(section) {
 }
 
 function applyCmsPage(page, sections) {
-  if (page.seo_title || page.title) document.title = page.seo_title || `${page.title}｜Suiyuecare Corps.`;
-  const seoDescription = document.querySelector('meta[name="description"]');
-  if (seoDescription && page.seo_description) seoDescription.setAttribute("content", page.seo_description);
+  setRouteSeo(page.slug || "home", {
+    title: page.seo_title || (page.title ? `${page.title}｜歲悅長照集團` : undefined),
+    description: page.seo_description || undefined
+  });
 
   const pageContent = getSectionContent(page);
   const managedSections = Array.isArray(pageContent.managed_sections) ? pageContent.managed_sections : [];
@@ -1324,9 +1617,10 @@ async function loadSupabaseDetailPage(slug) {
     const shouldOverride = pageContent.cms_mode === true || (sections || []).length > 0;
     if (!shouldOverride || location.hash.slice(1).split("?")[0] !== slug) return;
 
-    document.title = page.seo_title || `${page.title}｜Suiyuecare Corps.`;
-    const seoDescription = document.querySelector('meta[name="description"]');
-    if (seoDescription && page.seo_description) seoDescription.setAttribute("content", page.seo_description);
+    setRouteSeo(page.slug || slug, {
+      title: page.seo_title || (page.title ? `${page.title}｜歲悅長照集團` : undefined),
+      description: page.seo_description || undefined
+    });
     pageView.innerHTML = renderCmsDetailPage(page, sections || []);
   } catch (error) {
     console.warn(`Supabase detail page unavailable for ${slug}.`, error);
@@ -1341,7 +1635,8 @@ const serviceTemplateSlugs = new Set([
   "community",
   "nursing",
   "migrant-training",
-  "quality"
+  "quality",
+  "software"
 ]);
 
 function getTemplateFieldValue(field) {
@@ -1511,6 +1806,15 @@ async function loadSupabaseServiceTemplatePage(slug) {
     if (error) throw error;
     if (!data?.some((field) => field.field_key === "hero_title")) return;
     if (location.hash.slice(1).split("?")[0] !== slug) return;
+    const fieldMap = mapTemplateFields(data);
+    const title = getTemplateText(fieldMap, "hero_title", routeSeoMap[slug]?.title || pages[slug]?.title || "歲悅服務");
+    const body = getTemplateText(fieldMap, "hero_body", routeSeoMap[slug]?.description || pages[slug]?.intro || DEFAULT_SEO.description);
+    const image = getTemplateText(fieldMap, "hero_image", DEFAULT_SEO.image);
+    setRouteSeo(slug, {
+      title: title.includes("歲悅") ? title : `${title}｜歲悅長照集團`,
+      description: body,
+      image
+    });
     pageView.innerHTML = renderFixedServiceTemplate(slug, data);
   } catch (error) {
     console.warn(`Supabase service template unavailable for ${slug}.`, error);
@@ -1732,6 +2036,7 @@ function renderRecruitingApplicationModal(page) {
           <input name="opening_id" id="recruitApplyOpeningId" type="hidden" />
           <input name="opening_slug" id="recruitApplyOpeningSlug" type="hidden" />
           <input name="opening_title" id="recruitApplyOpeningTitle" type="hidden" />
+          <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為應徵、合作洽談與後續聯繫目的，使用我填寫的個人資料。</label>
           <p class="course-confirm-text">送出後，資料會寄到歲悅窗口並留存在後台表單資料。</p>
           <button class="primary-button" type="submit">確認送出</button>
           <span id="recruitApplyStatus"></span>
@@ -1806,6 +2111,15 @@ function fileHref(file) {
   if (file.public_url) return file.public_url;
   if (file.id) return `/api/download-file?id=${encodeURIComponent(file.id)}`;
   return "#contact";
+}
+
+function hasDownloadFile(file) {
+  return Boolean(file?.public_url || file?.id);
+}
+
+function renderInvestorDownloadCell(file, label = "下載") {
+  if (!hasDownloadFile(file)) return `<span class="ir-muted-action">待上架</span>`;
+  return `<a href="${escapeHTML(fileHref(file))}" target="_blank" rel="noopener">${escapeHTML(label)}</a>`;
 }
 
 function groupByKey(items = [], key) {
@@ -1935,9 +2249,50 @@ function renderCmsChartGrid(charts = []) {
   return `<div class="cms-chart-grid">${charts.map((chart, index) => renderCmsChartCard(chart, index % 3 === 0 ? "wide" : "")).join("")}</div>`;
 }
 
+function getInvestorConfig(pageSlug) {
+  const configs = getSiteObject("investor_pages", {});
+  return configs[pageSlug] || {};
+}
+
+function renderInvestorHeroActions(config = {}, fallbackPrimaryHref = "#contact", fallbackSecondaryHref = "#investor-downloads") {
+  const primaryText = config.primary_cta_text || "聯絡投資人窗口";
+  const primaryHref = config.primary_cta_url || fallbackPrimaryHref;
+  const secondaryText = config.secondary_cta_text || "下載資料";
+  const secondaryHref = config.secondary_cta_url || fallbackSecondaryHref;
+  return `<div class="investor-hero-actions"><a class="primary-button" href="${escapeHTML(primaryHref)}">${escapeHTML(primaryText)}</a><a class="secondary-button" href="${escapeHTML(secondaryHref)}">${escapeHTML(secondaryText)}</a></div>`;
+}
+
+function renderInvestorKpis(kpis = []) {
+  if (!Array.isArray(kpis) || !kpis.length) return "";
+  return `
+    <section class="ir-kpi-strip">
+      ${kpis.map((kpi) => `<article><span>${escapeHTML(kpi.label || "")}</span><strong>${escapeHTML(kpi.value || "")}</strong><em>${escapeHTML(kpi.note || "")}</em></article>`).join("")}
+    </section>
+  `;
+}
+
+function renderInvestorSnapshot(config = {}) {
+  const snapshot = Array.isArray(config.snapshot) ? config.snapshot : [];
+  const title = config.snapshot_title || "照顧服務網絡持續擴張";
+  return `
+    <aside class="investor-snapshot">
+      <span>${escapeHTML(config.snapshot_label || "Suiyuecare Corps.")}</span>
+      <strong>${escapeHTML(title)}</strong>
+      ${snapshot.length ? `<div>${snapshot.map((item) => `<p><b>${escapeHTML(item.value || "")}</b>${escapeHTML(item.label || "")}</p>`).join("")}</div>` : ""}
+    </aside>
+  `;
+}
+
+function renderInvestorFaq(config = {}) {
+  const faqs = Array.isArray(config.faqs) ? config.faqs : [];
+  if (!faqs.length) return `<div class="health-empty-state"><h2>尚未建立常見問答</h2><p>請到後台投資人資料管理的頁面文案設定新增 FAQ。</p></div>`;
+  return `<div class="shareholder-faq">${faqs.map((item, index) => `<details ${index === 0 ? "open" : ""}><summary>${escapeHTML(item.question || "")}</summary><p>${escapeHTML(item.answer || "")}</p></details>`).join("")}</div>`;
+}
+
 async function fetchSupabaseInvestorData(pageSlug = "investors") {
   const cacheKey = pageSlug;
   if (supabaseInvestorCache.has(cacheKey)) return supabaseInvestorCache.get(cacheKey);
+  await loadSupabaseSiteSettings();
 
   const now = new Date().toISOString();
   const [{ data: notices, error: noticeError }, { data: financials, error: financialError }, { data: charts, error: chartError }, { data: files, error: fileError }] = await Promise.all([
@@ -1997,16 +2352,17 @@ function renderCmsInvestorsPage(data) {
   const progressChart = data.chartsByKey["establishment-progress"]?.[0];
   const news = data.noticesByType.news || [];
   const awards = data.noticesByType.award || [];
+  const config = getInvestorConfig("investors");
   return `
     <div class="investor-page">
       <section class="investor-hero">
         <div>
-          <p class="eyebrow">Investor Relations</p>
-          <h1>投資人專區</h1>
-          <p>以清楚、穩定、可信任的資訊揭露，讓投資人理解歲悅長照集團的服務網絡、治理節奏與成長策略。</p>
-          <div class="investor-hero-actions"><a class="primary-button" href="#contact">聯絡投資人窗口</a><a class="secondary-button" href="#investor-downloads">下載資料</a></div>
+          <p class="eyebrow">${escapeHTML(config.eyebrow || "Investor Relations")}</p>
+          <h1>${escapeHTML(config.title || "投資人專區")}</h1>
+          <p>${escapeHTML(config.body || "以清楚、穩定、可信任的資訊揭露，讓投資人理解歲悅長照集團的服務網絡、治理節奏與成長策略。")}</p>
+          ${renderInvestorHeroActions(config)}
         </div>
-        <aside class="investor-snapshot"><span>Suiyuecare Corps.</span><strong>照顧服務網絡持續擴張</strong><div><p><b>3</b>核心縣市</p><p><b>6</b>服務事業</p><p><b>95%</b>服務滿意度</p></div></aside>
+        ${renderInvestorSnapshot(config)}
       </section>
       <nav class="investor-directory" aria-label="投資人專區主要分類">
         <a href="#ir-finance"><span>Financials</span><strong>財務資訊</strong><em>每月營收、財務分析、季報與年報</em></a>
@@ -2036,14 +2392,15 @@ function renderCmsFinancePage(data) {
   const revenueChart = data.chartsByKey["monthly-revenue-trend"]?.[0];
   const serviceMix = data.chartsByKey["service-mix"]?.[0];
   const latest = revenueRows[0];
+  const config = getInvestorConfig("ir-finance");
   return `
     <div class="investor-page finance-page">
-      <section class="ir-sub-hero finance-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">Financial Information</p><h1>財務資訊</h1><p>財務資料來自後台投資人資料中心，月營收、財報與下載檔可獨立更新。</p></div><aside class="finance-hero-chart"><span>Revenue Trend</span><strong>${escapeHTML(latest?.amount_label || "更新中")}</strong><p>${escapeHTML(latest?.growth_label || "最近月營收")}</p></aside></section>
+      <section class="ir-sub-hero finance-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">${escapeHTML(config.eyebrow || "Financial Information")}</p><h1>${escapeHTML(config.title || "財務資訊")}</h1><p>${escapeHTML(config.body || "財務資料來自後台投資人資料中心，月營收、財報與下載檔可獨立更新。")}</p></div><aside class="finance-hero-chart"><span>${escapeHTML(config.snapshot_label || "Revenue Trend")}</span><strong>${escapeHTML(latest?.amount_label || config.snapshot_value || "更新中")}</strong><p>${escapeHTML(latest?.growth_label || config.snapshot_note || "最近月營收")}</p></aside></section>
       <nav class="investor-tabs ir-finance-tabs" aria-label="財務資訊分頁"><button class="active" type="button" data-ir-tab="monthly-revenue">每月營收</button><button type="button" data-ir-tab="finance-analysis">財務資訊分析</button><button type="button" data-ir-tab="quarterly-reports">季度財報</button><button type="button" data-ir-tab="annual-reports">股東會年報</button></nav>
-      <section class="ir-kpi-strip"><article><span>Monthly Revenue</span><strong>${escapeHTML(latest?.amount_label || "--")}</strong><em>最近月營收</em></article><article><span>Growth</span><strong>${escapeHTML(latest?.growth_label || "--")}</strong><em>成長率</em></article><article><span>Reports</span><strong>${quarterly.length}</strong><em>季度財報</em></article><article><span>Files</span><strong>${data.files.length}</strong><em>下載檔</em></article></section>
-      <section class="ir-tab-panel active" data-ir-panel="monthly-revenue"><div class="investor-section-head"><p class="eyebrow">Monthly Revenue</p><h2>每月營收</h2><span>月營收表格與圖表皆可由後台資料更新。</span></div><div class="finance-dashboard">${renderCmsChartCard(revenueChart, "wide") || `<article class="chart-card wide"><div class="chart-card-head"><span>月營收趨勢</span><strong>${escapeHTML(latest?.amount_label || "--")}</strong></div>${renderCmsBarChart([])}</article>`}${renderCmsChartCard(serviceMix) || `<article class="chart-card"><div class="chart-card-head"><span>服務收入組成</span><strong>100%</strong></div>${renderCmsDonutChart([], "Revenue")}</article>`}</div><div class="investor-table-card"><div class="table-title"><h3>月營收公告</h3><a href="#contact">訂閱財務通知</a></div><table><thead><tr><th>月份</th><th>營收</th><th>成長</th><th>說明</th><th>下載</th></tr></thead><tbody>${revenueRows.map((row) => `<tr><td>${escapeHTML(row.period_label)}</td><td>${escapeHTML(row.amount_label || "")}</td><td>${escapeHTML(row.growth_label || "")}</td><td>${escapeHTML(row.note || "")}</td><td><a href="${escapeHTML(fileHref(row.file))}">PDF</a></td></tr>`).join("")}</tbody></table></div></section>
+      ${renderInvestorKpis(config.kpis || [{ label: "Monthly Revenue", value: latest?.amount_label || "--", note: "最近月營收" }, { label: "Growth", value: latest?.growth_label || "--", note: "成長率" }, { label: "Reports", value: String(quarterly.length), note: "季度財報" }, { label: "Files", value: String(data.files.length), note: "下載檔" }])}
+      <section class="ir-tab-panel active" data-ir-panel="monthly-revenue"><div class="investor-section-head"><p class="eyebrow">Monthly Revenue</p><h2>每月營收</h2><span>月營收表格與圖表皆可由後台資料更新。</span></div><div class="finance-dashboard">${renderCmsChartCard(revenueChart, "wide") || `<article class="chart-card wide"><div class="chart-card-head"><span>月營收趨勢</span><strong>${escapeHTML(latest?.amount_label || "--")}</strong></div>${renderCmsBarChart([])}</article>`}${renderCmsChartCard(serviceMix) || `<article class="chart-card"><div class="chart-card-head"><span>服務收入組成</span><strong>100%</strong></div>${renderCmsDonutChart([], "Revenue")}</article>`}</div><div class="investor-table-card"><div class="table-title"><h3>月營收公告</h3><a href="#contact">訂閱財務通知</a></div><table><thead><tr><th>月份</th><th>營收</th><th>成長</th><th>說明</th><th>下載</th></tr></thead><tbody>${revenueRows.map((row) => `<tr><td>${escapeHTML(row.period_label)}</td><td>${escapeHTML(row.amount_label || "")}</td><td>${escapeHTML(row.growth_label || "")}</td><td>${escapeHTML(row.note || "")}</td><td>${renderInvestorDownloadCell(row.file, "PDF")}</td></tr>`).join("")}</tbody></table></div></section>
       <section class="ir-tab-panel" data-ir-panel="finance-analysis"><div class="investor-section-head"><p class="eyebrow">Analysis</p><h2>財務資訊分析</h2><span>可用投資人公告或下載檔補充管理層討論與分析。</span></div>${renderCmsDownloadGrid(data.filesByCategory.finance || data.files)}</section>
-      <section class="ir-tab-panel" data-ir-panel="quarterly-reports"><div class="investor-section-head"><p class="eyebrow">Quarterly Reports</p><h2>季度財報</h2><span>季度財報資料由後台財務項目與下載檔連動。</span></div><div class="investor-table-card compact-table"><table><thead><tr><th>文件</th><th>期間</th><th>說明</th><th>下載</th></tr></thead><tbody>${quarterly.map((row) => `<tr><td>${escapeHTML(row.title)}</td><td>${escapeHTML(row.period_label)}</td><td>${escapeHTML(row.note || "")}</td><td><a href="${escapeHTML(fileHref(row.file))}">下載</a></td></tr>`).join("")}</tbody></table></div></section>
+      <section class="ir-tab-panel" data-ir-panel="quarterly-reports"><div class="investor-section-head"><p class="eyebrow">Quarterly Reports</p><h2>季度財報</h2><span>季度財報資料由後台財務項目與下載檔連動。</span></div><div class="investor-table-card compact-table"><table><thead><tr><th>文件</th><th>期間</th><th>說明</th><th>下載</th></tr></thead><tbody>${quarterly.map((row) => `<tr><td>${escapeHTML(row.title)}</td><td>${escapeHTML(row.period_label)}</td><td>${escapeHTML(row.note || "")}</td><td>${renderInvestorDownloadCell(row.file)}</td></tr>`).join("")}</tbody></table></div></section>
       <section class="ir-tab-panel" data-ir-panel="annual-reports"><div class="investor-section-head"><p class="eyebrow">Annual Reports</p><h2>股東會年報</h2><span>年度報告、議事手冊與附件集中管理。</span></div>${renderCmsDownloadGrid((data.filesByCategory.annual_report || []).concat(annual.map((item) => item.file).filter(Boolean)))}</section>
     </div>
   `;
@@ -2053,11 +2410,12 @@ function renderCmsGovernancePage(data) {
   const notices = data.noticesByType.governance || [];
   const files = data.filesByCategory.governance || [];
   const charts = data.charts.filter((chart) => chart.page_slug === "ir-governance");
+  const config = getInvestorConfig("ir-governance");
   return `
     <div class="investor-page governance-page">
-      <section class="ir-sub-hero governance-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">Corporate Governance</p><h1>公司治理</h1><p>治理公告、制度文件與下載檔改由後台管理。</p></div><aside class="governance-hero-card"><span>Governance</span><div class="score-ring governance-score"><b>91</b><span>Index</span></div><p>治理成熟度示意</p></aside></section>
+      <section class="ir-sub-hero governance-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">${escapeHTML(config.eyebrow || "Corporate Governance")}</p><h1>${escapeHTML(config.title || "公司治理")}</h1><p>${escapeHTML(config.body || "治理公告、制度文件與下載檔改由後台管理。")}</p></div><aside class="governance-hero-card"><span>${escapeHTML(config.snapshot_label || "Governance")}</span><div class="score-ring governance-score"><b>${escapeHTML(config.snapshot_value || "91")}</b><span>${escapeHTML(config.snapshot_unit || "Index")}</span></div><p>${escapeHTML(config.snapshot_note || "治理成熟度示意")}</p></aside></section>
       <nav class="investor-tabs governance-tabs" aria-label="公司治理分頁"><button class="active" type="button" data-ir-tab="governance-news">重要訊息</button><button type="button" data-ir-tab="governance-operation">治理文件</button><button type="button" data-ir-tab="risk-management">風險管理</button></nav>
-      <section class="ir-kpi-strip governance-kpis"><article><span>Notices</span><strong>${notices.length}</strong><em>治理公告</em></article><article><span>Files</span><strong>${files.length}</strong><em>治理下載</em></article><article><span>Audit</span><strong>92%</strong><em>稽核完成率</em></article><article><span>Cases</span><strong>0</strong><em>重大未結</em></article></section>
+      ${renderInvestorKpis(config.kpis || [{ label: "Notices", value: String(notices.length), note: "治理公告" }, { label: "Files", value: String(files.length), note: "治理下載" }, { label: "Audit", value: "92%", note: "稽核完成率" }, { label: "Cases", value: "0", note: "重大未結" }])}
       ${renderCmsChartGrid(charts)}
       <section class="ir-tab-panel active" data-ir-panel="governance-news"><div class="investor-section-head"><p class="eyebrow">Material Information</p><h2>重要訊息</h2><span>治理公告由後台公告資料表管理。</span></div><div class="ir-update-card">${renderCmsNoticeLinks(notices, "#ir-governance")}</div></section>
       <section class="ir-tab-panel" data-ir-panel="governance-operation"><div class="investor-section-head"><p class="eyebrow">Documents</p><h2>治理文件</h2><span>公司治理、誠信經營、稽核與風險文件從下載檔管理。</span></div>${renderCmsDownloadGrid(files)}</section>
@@ -2070,16 +2428,17 @@ function renderCmsShareholdersPage(data) {
   const notices = data.noticesByType.shareholder || [];
   const files = (data.filesByCategory.shareholder || []).concat(data.filesByCategory.annual_report || []);
   const charts = data.charts.filter((chart) => chart.page_slug === "ir-shareholders");
+  const config = getInvestorConfig("ir-shareholders");
   return `
     <div class="investor-page shareholders-page">
-      <section class="ir-sub-hero shareholders-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">Shareholders</p><h1>股東專區</h1><p>股務資訊、股東會、法說會與常見問答可逐步資料化。</p></div><aside class="shareholder-hero-card"><span>Shareholder Service</span><strong>${files.length}</strong><p>已上架股東文件</p></aside></section>
+      <section class="ir-sub-hero shareholders-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">${escapeHTML(config.eyebrow || "Shareholders")}</p><h1>${escapeHTML(config.title || "股東專區")}</h1><p>${escapeHTML(config.body || "股務資訊、股東會、法說會與常見問答由後台管理。")}</p></div><aside class="shareholder-hero-card"><span>${escapeHTML(config.snapshot_label || "Shareholder Service")}</span><strong>${escapeHTML(config.snapshot_value || String(files.length))}</strong><p>${escapeHTML(config.snapshot_note || "已上架股東文件")}</p></aside></section>
       <nav class="investor-tabs shareholder-tabs" aria-label="股東專區分頁"><button class="active" type="button" data-ir-tab="stock-affairs">股務資訊</button><button type="button" data-ir-tab="shareholder-meeting">股東會</button><button type="button" data-ir-tab="investor-conference">法說會</button><button type="button" data-ir-tab="shareholder-faq">常見問答</button></nav>
-      <section class="ir-kpi-strip shareholder-kpis"><article><span>Notices</span><strong>${notices.length}</strong><em>股東公告</em></article><article><span>Files</span><strong>${files.length}</strong><em>股東文件</em></article><article><span>Contact</span><strong>IR</strong><em>投資人窗口</em></article><article><span>FAQ</span><strong>Online</strong><em>常見問答</em></article></section>
+      ${renderInvestorKpis(config.kpis || [{ label: "Notices", value: String(notices.length), note: "股東公告" }, { label: "Files", value: String(files.length), note: "股東文件" }, { label: "Contact", value: "IR", note: "投資人窗口" }, { label: "FAQ", value: "Online", note: "常見問答" }])}
       ${renderCmsChartGrid(charts)}
       <section class="ir-tab-panel active" data-ir-panel="stock-affairs"><div class="investor-section-head"><p class="eyebrow">Stock Affairs</p><h2>股務資訊</h2><span>股東相關公告由後台資料表管理。</span></div><div class="ir-update-card">${renderCmsNoticeLinks(notices, "#ir-shareholders")}</div></section>
       <section class="ir-tab-panel" data-ir-panel="shareholder-meeting"><div class="investor-section-head"><p class="eyebrow">Meeting</p><h2>股東會</h2><span>股東會年報、議事手冊與附件由檔案下載管理。</span></div>${renderCmsDownloadGrid(files)}</section>
       <section class="ir-tab-panel" data-ir-panel="investor-conference"><div class="investor-section-head"><p class="eyebrow">Conference</p><h2>法說會</h2><span>未來可新增法說會簡報與影音連結。</span></div>${renderCmsDownloadGrid(data.filesByCategory.investor || [])}</section>
-      <section class="ir-tab-panel" data-ir-panel="shareholder-faq"><div class="investor-section-head"><p class="eyebrow">FAQ</p><h2>常見問答</h2><span>股東問題可先以公告與下載檔補充，之後可擴充 FAQ 資料表。</span></div><div class="shareholder-faq"><details open><summary>股東文件在哪裡下載？</summary><p>請在股東會或下載檔區塊查看已發布文件。</p></details><details><summary>如何聯絡投資人窗口？</summary><p>可由聯絡我們表單選擇投資洽談。</p></details></div></section>
+      <section class="ir-tab-panel" data-ir-panel="shareholder-faq"><div class="investor-section-head"><p class="eyebrow">FAQ</p><h2>常見問答</h2><span>${escapeHTML(config.faq_intro || "股東問題由後台全站設定管理。")}</span></div>${renderInvestorFaq(config)}</section>
     </div>
   `;
 }
@@ -2089,6 +2448,7 @@ async function loadSupabaseInvestorPage(slug) {
   try {
     const data = await fetchSupabaseInvestorData(slug);
     if (location.hash.slice(1).split("?")[0] !== slug) return;
+    setRouteSeo(slug);
     if (slug === "investors") pageView.innerHTML = renderCmsInvestorsPage(data);
     if (slug === "ir-finance") pageView.innerHTML = renderCmsFinancePage(data);
     if (slug === "ir-governance") pageView.innerHTML = renderCmsGovernancePage(data);
@@ -2458,7 +2818,8 @@ const defaultPrimaryNav = [
     { label: "關於歲悅", href: "#about" }, { label: "大記事", href: "#milestones" },
     { label: "居家照顧", href: "#home-care" }, { label: "日間照顧", href: "#day-care" },
     { label: "社區據點", href: "#community" }, { label: "護理復能", href: "#nursing" },
-    { label: "移工培訓", href: "#migrant-training" }, { label: "教育品管", href: "#quality" }
+    { label: "移工培訓", href: "#migrant-training" }, { label: "教育品管", href: "#quality" },
+    { label: "軟體系統", href: "#software" }
   ] },
   { type: "group", label: "招募與合作", items: [
     { label: "人才招募", href: "#talent" }, { label: "土地招募", href: "#land" }, { label: "投資人招募", href: "#investor-recruiting" }
@@ -2475,7 +2836,8 @@ const defaultPrimaryNav = [
 const defaultFooterColumns = [
   { title: "營業項目", items: [
     { label: "居家照顧", href: "#home-care" }, { label: "日間照顧", href: "#day-care" },
-    { label: "社區據點", href: "#community" }, { label: "護理復能", href: "#nursing" }
+    { label: "社區據點", href: "#community" }, { label: "護理復能", href: "#nursing" },
+    { label: "軟體系統", href: "#software" }
   ] },
   { title: "合作入口", items: [
     { label: "人才招募", href: "#talent" }, { label: "土地招募", href: "#land" },
@@ -2497,12 +2859,22 @@ function getSiteJson(key, fallback = []) {
   return Array.isArray(value) ? value : fallback;
 }
 
+function getSiteObject(key, fallback = {}) {
+  const value = siteSettings[key]?.value_json;
+  return value && typeof value === "object" && !Array.isArray(value) ? value : fallback;
+}
+
 function bindNavigationDropdowns() {
   navGroups = document.querySelectorAll(".nav-group");
   navGroups.forEach((group) => {
     const trigger = group.querySelector(".nav-trigger");
     if (!trigger) return;
     trigger.onclick = () => {
+      navGroups.forEach((otherGroup) => {
+        if (otherGroup === group) return;
+        otherGroup.classList.remove("open");
+        otherGroup.querySelector(".nav-trigger")?.setAttribute("aria-expanded", "false");
+      });
       const open = group.classList.toggle("open");
       trigger.setAttribute("aria-expanded", String(open));
     };
@@ -2595,6 +2967,9 @@ function applySiteSettings() {
 
 async function loadSupabaseSiteSettings() {
   if (!supabase) return false;
+  if (siteSettingsLoaded) return true;
+  if (siteSettingsPromise) return siteSettingsPromise;
+  siteSettingsPromise = (async () => {
   try {
     const { data, error } = await supabase
       .from("site_settings")
@@ -2606,12 +2981,17 @@ async function loadSupabaseSiteSettings() {
       acc[item.setting_key] = item;
       return acc;
     }, {});
+    siteSettingsLoaded = true;
     applySiteSettings();
     return true;
   } catch (error) {
     console.warn("Supabase site settings unavailable, using static global settings.", error);
     return false;
+  } finally {
+    siteSettingsPromise = null;
   }
+  })();
+  return siteSettingsPromise;
 }
 
 async function loadSupabaseHomeModules() {
@@ -2639,8 +3019,6 @@ async function loadSupabaseHomeModules() {
     renderSupabaseVideo(groups.video);
     renderSupabaseServices(groups.service_item);
     renderSupabaseLocations(groups.location);
-    renderSupabaseStories(groups.care_story);
-    renderSupabaseMasterTalk(groups.master_talk);
     renderSupabasePartners(groups.partner);
 
     homeModulesLoadedFromSupabase = true;
@@ -2939,6 +3317,63 @@ function bindLocationControls() {
   });
 }
 
+const healthSectionCategorySlugs = {
+  lazyPack: ["lazy-pack", "guide", "懶人包"],
+  activity: ["activity", "event", "活動專區"],
+  video: ["video", "影音", "影片"],
+  shortVideo: ["short-video", "shorts", "短影片"]
+};
+
+function articleMatchesHealthSection(article, slugs = []) {
+  const normalizedSlugs = slugs.map((slug) => categorySlug(slug));
+  const tagText = (article.tags || []).map(categorySlug).join(" ");
+  const typeText = [article.contentType, article.categoryType, article.categorySection].map(categorySlug).join(" ");
+  return normalizedSlugs.includes(article.categorySlug) || normalizedSlugs.some((slug) => tagText.includes(slug) || typeText.includes(slug));
+}
+
+function getHealthSectionArticles(sectionKey, fallbackSlugs = []) {
+  const allArticles = getHealthArticleList();
+  const slugs = healthSectionCategorySlugs[sectionKey] || [];
+  const matched = allArticles.filter((article) => articleMatchesHealthSection(article, slugs));
+  if (matched.length) return matched;
+  return fallbackSlugs
+    .map((slug) => allArticles.find((article) => article.slug === slug))
+    .filter(Boolean);
+}
+
+function renderHealthMiniCard(article, label = article.category) {
+  return `
+    <article class="health-pack-card click-card" data-href="${escapeHTML(article.href)}" tabindex="0" role="link">
+      <img src="${escapeHTML(article.image)}" alt="${escapeHTML(article.title)}"${imageStyleAttr({ usage: "card", focalPoint: article.focalPoint })} />
+      <div><span>${escapeHTML(label)}</span><h3>${escapeHTML(article.title)}</h3><p>${escapeHTML(article.subtitle || article.excerpt || "")}</p></div>
+    </article>
+  `;
+}
+
+function renderHealthEventCard(article) {
+  return `
+    <article class="health-event-card click-card" data-href="${escapeHTML(article.href)}" tabindex="0" role="link">
+      <img src="${escapeHTML(article.image)}" alt="${escapeHTML(article.title)}"${imageStyleAttr({ usage: "card", focalPoint: article.focalPoint })} />
+      <div><time>${escapeHTML(article.date || "近期")}</time><h3>${escapeHTML(article.title)}</h3><p>${escapeHTML(article.subtitle || article.excerpt || "")}</p></div>
+    </article>
+  `;
+}
+
+function renderHealthVideoCard(article, label = article.category) {
+  const displayLabel = article.videoLabel || label;
+  const media = article.videoEmbedUrl
+    ? article.videoProvider === "youtube" || article.videoProvider === "vimeo"
+      ? `<iframe src="${escapeHTML(article.videoEmbedUrl)}" title="${escapeHTML(article.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
+      : `<video src="${escapeHTML(article.videoEmbedUrl)}" controls preload="metadata" poster="${escapeHTML(article.image)}"></video>`
+    : `<img src="${escapeHTML(article.image)}" alt="${escapeHTML(article.title)}"${imageStyleAttr({ usage: "card", focalPoint: article.focalPoint })} />`;
+  return `
+    <article class="health-video-card ${article.videoEmbedUrl ? "has-video" : "click-card"}" ${article.videoEmbedUrl ? "" : `data-href="${escapeHTML(article.href)}" tabindex="0" role="link"`}>
+      ${media}
+      <div><span>${escapeHTML(displayLabel)}${article.videoDuration ? ` · ${escapeHTML(article.videoDuration)}` : ""}</span><h3>${escapeHTML(article.title)}</h3>${article.videoCaption ? `<p>${escapeHTML(article.videoCaption)}</p>` : ""}</div>
+    </article>
+  `;
+}
+
 function renderHealthPage(selectedCategorySlug = "") {
   const allArticles = getHealthArticleList();
   const categories = getHealthCategoryList();
@@ -2949,22 +3384,10 @@ function renderHealthPage(selectedCategorySlug = "") {
   const feature = articles[0];
   const quickCards = articles.slice(1, 5);
   const latestCards = articles.slice(0, 10);
-  const lazyPacks = [
-    ["長照申請懶人包", "從評估、補助、服務媒合到第一次到宅，照著順序看就懂。", "assets/homepage-batch/10-family-consultation.png", "#article-longterm-care-apply"],
-    ["出院返家照顧包", "把返家前準備、移位、用餐與每日觀察整理成家屬清單。", "assets/homepage-batch/01-care-home-greeting.png", "#article-family-care-story"],
-    ["失智陪伴懶人包", "重複提問、情緒不安與日常安全，用簡單方法降低摩擦。", "assets/homepage-batch/19-health-dementia-cover.png", "#article-dementia-response"]
-  ];
-  const eventCards = [
-    ["家屬照顧技巧課", "移位、用餐、跌倒預防與照顧溝通", "5/28", "assets/homepage-batch/12-community-health-class.png", "#article-family-care-course"],
-    ["日照體驗參觀日", "認識日間照顧流程與家庭喘息安排", "6/05", "assets/homepage-batch/02-daycare-group-exercise.png", "#article-day-care-respite"],
-    ["復能照顧工作坊", "讓長輩一步一步恢復生活能力", "6/12", "assets/homepage-batch/13-rehab-walking-practice.png", "#article-reablement-workshop"]
-  ];
-  const videoCards = [
-    ["影片", "三分鐘理解居家照顧安排流程", "assets/homepage-batch/15-phone-consultation.png", "#article-master-talk-care-psychology"],
-    ["影片", "日間照顧如何讓家庭喘息", "assets/homepage-batch/12-community-health-class.png", "#article-master-talk-care-psychology"],
-    ["短影片", "跌倒後 24 小時觀察重點", "assets/homepage-batch/14-care-notes.png", "#article-fall-observation"],
-    ["短影片", "浴室安全的快速檢查", "assets/homepage-batch/08-orange-apron-walking.png", "#article-bathroom-safety"]
-  ];
+  const lazyPacks = getHealthSectionArticles("lazyPack", ["longterm-care-apply", "family-care-story", "dementia-response"]).slice(0, 6);
+  const eventCards = getHealthSectionArticles("activity", ["family-care-course", "day-care-respite", "reablement-workshop"]).slice(0, 6);
+  const videoCards = getHealthSectionArticles("video", ["home-care-video-guide", "day-care-video-guide", "master-talk-care-psychology"]).slice(0, 6);
+  const shortVideoCards = getHealthSectionArticles("shortVideo", ["fall-observation", "bathroom-safety"]).slice(0, 6);
 
   return `
     <div class="health-page">
@@ -3038,12 +3461,7 @@ function renderHealthPage(selectedCategorySlug = "") {
           <a href="#search?q=${encodeURIComponent("懶人包")}">更多懶人包</a>
         </div>
         <div class="health-pack-grid">
-          ${lazyPacks.map(([title, desc, image, href]) => `
-            <article class="health-pack-card click-card" data-href="${href}" tabindex="0" role="link">
-              <img src="${image}" alt="${title}" />
-              <div><span>懶人包</span><h3>${title}</h3><p>${desc}</p></div>
-            </article>
-          `).join("")}
+          ${lazyPacks.map((article) => renderHealthMiniCard(article, "懶人包")).join("") || `<div class="health-empty-state"><h2>尚未建立懶人包文章</h2><p>請在後台文章管理新增分類為「懶人包」的文章。</p></div>`}
         </div>
       </section>
 
@@ -3073,12 +3491,7 @@ function renderHealthPage(selectedCategorySlug = "") {
           <a href="#courses">課程報名</a>
         </div>
         <div class="health-event-grid">
-          ${eventCards.map(([title, desc, date, image, href]) => `
-            <article class="health-event-card click-card" data-href="${href}" tabindex="0" role="link">
-              <img src="${image}" alt="${title}" />
-              <div><time>${date}</time><h3>${title}</h3><p>${desc}</p></div>
-            </article>
-          `).join("")}
+          ${eventCards.map(renderHealthEventCard).join("") || `<div class="health-empty-state"><h2>尚未建立活動文章</h2><p>請在後台文章管理新增分類為「活動專區」的文章。</p></div>`}
         </div>
       </section>
 
@@ -3088,12 +3501,9 @@ function renderHealthPage(selectedCategorySlug = "") {
           <a href="#search?q=${encodeURIComponent("影片")}">更多影音</a>
         </div>
         <div class="health-media-grid">
-          ${videoCards.map(([type, title, image, href]) => `
-            <article class="health-video-card click-card" data-href="${href}" tabindex="0" role="link">
-              <img src="${image}" alt="${title}" />
-              <div><span>${type}</span><h3>${title}</h3></div>
-            </article>
-          `).join("")}
+          ${videoCards.map((article) => renderHealthVideoCard(article, "影片")).join("")}
+          ${shortVideoCards.map((article) => renderHealthVideoCard(article, "短影片")).join("")}
+          ${!videoCards.length && !shortVideoCards.length ? `<div class="health-empty-state"><h2>尚未建立影音文章</h2><p>請在後台文章管理新增分類為「影音」或「短影片」的文章。</p></div>` : ""}
         </div>
       </section>
     </div>
@@ -3354,6 +3764,7 @@ function renderCoursesPage() {
           <input name="course_id" id="courseSignupId" type="hidden" />
           <input name="_subject" type="hidden" value="歲悅長照課程報名通知" />
           <input name="_captcha" type="hidden" value="false" />
+          <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為課程報名、通知與後續聯繫目的，使用我填寫的個人資料。</label>
           <p class="course-confirm-text">是否要報名？</p>
           <div class="course-modal-actions">
             <button type="button" data-course-close>否</button>
@@ -5334,6 +5745,150 @@ function renderShareholdersPage() {
   `;
 }
 
+function renderSystemScreen(title, subtitle, stats = [], rows = [], accent = "orange") {
+  return `
+    <article class="software-screen-card" data-accent="${escapeHTML(accent)}">
+      <header>
+        <span></span><span></span><span></span>
+        <strong>${escapeHTML(title)}</strong>
+      </header>
+      <div class="software-screen-body">
+        <div>
+          <b>${escapeHTML(subtitle)}</b>
+          <small>Suiyuecare System Suite</small>
+        </div>
+        <div class="software-screen-stats">
+          ${stats.map(([label, value]) => `<em><strong>${escapeHTML(value)}</strong><span>${escapeHTML(label)}</span></em>`).join("")}
+        </div>
+        <div class="software-screen-table">
+          ${rows.map(([label, value, status]) => `
+            <p>
+              <span>${escapeHTML(label)}</span>
+              <b>${escapeHTML(value)}</b>
+              <i>${escapeHTML(status)}</i>
+            </p>
+          `).join("")}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderSoftwarePage() {
+  const systems = [
+    ["會計系統", "收入、支出、請款、憑證與月結流程整合，讓財務資料不再散落在表格與訊息中。", "請款批次、收支分類、月報匯出、權限簽核"],
+    ["人資系統", "員工資料、排班、出勤、訓練、證照與績效紀錄集中管理，支援長照單位人力調度。", "員工主檔、證照效期、排班出勤、教育訓練"],
+    ["電子公文交換系統", "收文、發文、簽核、附件、追蹤與歸檔流程電子化，降低公文遺漏與版本混亂。", "收發文號、線上簽核、附件控管、進度追蹤"],
+    ["專案管理", "把展店、標案、課程、稽核與跨部門任務拆成看板、時程與負責人，讓進度透明。", "任務看板、里程碑、負責人、逾期提醒"],
+    ["PDF 工具", "支援 PDF 合併、拆分、壓縮、浮水印、簽核頁與文件歸檔，讓行政文件處理更快。", "合併拆分、壓縮轉檔、浮水印、簽核紀錄"],
+    ["居家業務系統", "從個案建檔、服務媒合、派案、照顧紀錄、督導訪視到家屬回報，建立完整居服流程。", "個案管理、派案排程、服務紀錄、督導追蹤"],
+    ["日照業務系統", "整合出席、接送、餐食、活動、量測、照顧紀錄與家屬回報，支援日照中心每日營運。", "出席接送、餐食活動、健康量測、家屬回報"]
+  ];
+  const screens = [
+    {
+      title: "居家業務系統",
+      subtitle: "個案服務儀表板",
+      stats: [["本月服務", "1,284"], ["待派案", "36"], ["回報完成", "98%"]],
+      rows: [["士林個案 A", "今日 09:00", "已排班"], ["萬華個案 B", "督導回訪", "處理中"], ["新店個案 C", "服務紀錄", "已完成"]],
+      accent: "orange"
+    },
+    {
+      title: "日照業務系統",
+      subtitle: "中心每日營運",
+      stats: [["今日出席", "42"], ["活動完成", "6"], ["餐食回報", "100%"]],
+      rows: [["晨間量測", "血壓/體溫", "完成"], ["團體活動", "椅上律動", "進行中"], ["家屬回報", "LINE 摘要", "待送出"]],
+      accent: "blue"
+    },
+    {
+      title: "行政整合系統",
+      subtitle: "會計、人資、公文與專案",
+      stats: [["待簽核", "18"], ["到期證照", "5"], ["本週任務", "73%"]],
+      rows: [["會計月結", "四月營收", "覆核中"], ["人資證照", "照服員證照", "提醒"], ["電子公文", "北市府來文", "待承辦"]],
+      accent: "brown"
+    }
+  ];
+  const flow = [
+    ["01", "流程盤點", "先理解單位現有表單、角色權限、審核節點與最容易卡住的作業。"],
+    ["02", "模組規劃", "依照會計、人資、公文、專案或長照業務需求拆成可上線的功能模組。"],
+    ["03", "介面與資料設計", "規劃欄位、清單、儀表板、下載檔、權限與手機/平板使用情境。"],
+    ["04", "導入與迭代", "先以核心流程上線，再依使用者回饋持續調整報表、權限與操作細節。"]
+  ];
+
+  return `
+    <div class="service-detail-page software-page">
+      <section class="service-detail-hero software-hero">
+        <div class="service-detail-copy">
+          <p class="eyebrow">Software System</p>
+          <h1>軟體系統</h1>
+          <p>歲悅不只做長照服務，也把營運現場需要的後台工具整理成可客製化的系統。從會計、人資、電子公文、專案管理、PDF 文件工具，到居家與日照業務系統，都能依單位流程調整。</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#contact">洽詢系統客製</a>
+            <a class="secondary-button" href="#quality">了解教育品管</a>
+          </div>
+        </div>
+        <aside class="software-hero-board" aria-label="歲悅軟體系統畫面">
+          ${renderSystemScreen(screens[0].title, screens[0].subtitle, screens[0].stats, screens[0].rows, screens[0].accent)}
+        </aside>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">System Modules</p>
+          <h2>我們可以協助單位客製的系統</h2>
+          <span>不是把別人的套裝軟體硬塞進單位，而是把實際工作流程、權限、報表與文件管理做成可以被使用的系統。</span>
+        </div>
+        <div class="software-module-grid">
+          ${systems.map(([title, copy, tags], index) => `
+            <article>
+              <span>${String(index + 1).padStart(2, "0")}</span>
+              <h3>${escapeHTML(title)}</h3>
+              <p>${escapeHTML(copy)}</p>
+              <small>${escapeHTML(tags)}</small>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">System Screens</p>
+          <h2>系統畫面佐證</h2>
+          <span>以下以歲悅系統介面風格呈現實際營運會用到的儀表板、清單與進度狀態，方便單位快速理解導入後的使用情境。</span>
+        </div>
+        <div class="software-screen-grid">
+          ${screens.map((screen) => renderSystemScreen(screen.title, screen.subtitle, screen.stats, screen.rows, screen.accent)).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Customization Flow</p>
+          <h2>客製化導入方式</h2>
+          <span>我們會先把流程釐清，再做功能分期，避免一次做太大、使用者反而不會用。</span>
+        </div>
+        <div class="service-flow-track">
+          ${flow.map(([step, title, copy]) => `
+            <article>
+              <b>${step}</b>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel">
+        <div>
+          <p class="eyebrow">Digital Transformation</p>
+          <h2>想把單位流程從 Excel、紙本與群組訊息中整理出來嗎？</h2>
+          <p>留下需求後，歲悅可以協助盤點流程，評估適合先做會計、人資、公文、專案、PDF 工具，或居家/日照業務系統。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡我們</a>
+      </section>
+    </div>
+  `;
+}
+
 function renderTalentPage() {
   const openings = [
     ["居家照顧服務員", "居家照顧部門", "到宅身體照顧、生活支持、陪伴與服務紀錄。", "assets/homepage-batch/05-orange-polo-caregiver.png"],
@@ -6278,6 +6833,20 @@ function renderNotFoundPage(slug = "") {
 }
 
 function getRelatedArticles(slug) {
+  const current = getHealthArticleList().find((item) => item.slug === slug || item.href === `#article-${slug}`);
+  const relatedSlugs = Array.isArray(current?.relatedSlugs) ? current.relatedSlugs : [];
+  const curatedRelated = relatedSlugs
+    .map((relatedSlug) => getHealthArticleList().find((item) => item.slug === relatedSlug || item.href === `#article-${relatedSlug}`))
+    .filter(Boolean)
+    .map((item) => ({
+      href: item.href,
+      image: item.image,
+      category: item.category,
+      title: item.title,
+      focalPoint: item.focalPoint
+    }));
+  if (curatedRelated.length) return curatedRelated.slice(0, 7);
+
   const cmsRelated = getHealthArticleList()
     .filter((item) => item.slug !== slug && item.href !== `#article-${slug}`)
     .slice(0, 7)
@@ -6319,8 +6888,19 @@ function renderArticleLayout(article) {
           <div class="article-meta">
             <span class="meta-editor">編輯人｜${escapeHTML(article.author)}</span>
             <span class="meta-date">${escapeHTML(article.date)}</span>
+            ${article.readingMinutes ? `<span class="meta-editor">閱讀時間｜${Number(article.readingMinutes)} 分鐘</span>` : ""}
+            ${article.targetAudience ? `<span class="meta-editor">適合｜${escapeHTML(article.targetAudience)}</span>` : ""}
             ${(article.tags || []).map((tag) => `<span class="meta-tag"># ${escapeHTML(tag)}</span>`).join("")}
           </div>
+
+          ${article.videoEmbedUrl ? `
+            <section class="article-video-block">
+              ${article.videoProvider === "youtube" || article.videoProvider === "vimeo"
+                ? `<iframe src="${escapeHTML(article.videoEmbedUrl)}" title="${escapeHTML(article.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
+                : `<video src="${escapeHTML(article.videoEmbedUrl)}" controls preload="metadata" poster="${escapeHTML(article.image)}"></video>`}
+              <div><span>${escapeHTML(article.videoLabel || article.category)}${article.videoDuration ? ` · ${escapeHTML(article.videoDuration)}` : ""}</span><p>${escapeHTML(article.videoCaption || article.subtitle || "")}</p></div>
+            </section>
+          ` : ""}
 
           ${article.summary?.length ? `
             <div class="article-summary">
@@ -6336,10 +6916,24 @@ function renderArticleLayout(article) {
                 <p>${escapeHTML(body)}</p>
               </section>
             `).join("") : renderMarkdownContent(article.content)}
+            ${Array.isArray(article.faq) && article.faq.length ? `
+              <section class="article-faq">
+                <h2>常見問題</h2>
+                ${article.faq.map((item) => `
+                  <details>
+                    <summary>${escapeHTML(item.question || "")}</summary>
+                    <p>${escapeHTML(item.answer || "")}</p>
+                  </details>
+                `).join("")}
+              </section>
+            ` : ""}
             <div class="article-cta">
               <p>${escapeHTML(article.cta || "不確定下一步怎麼安排？留下需求，讓歲悅協助判斷。")}</p>
-              <a href="#contact">預約照顧諮詢</a>
+              <a href="${escapeHTML(article.ctaUrl || "#contact")}">${escapeHTML(article.ctaText || "預約照顧諮詢")}</a>
             </div>
+            ${article.sourceName || article.sourceUrl ? `
+              <p class="article-source">資料來源：${article.sourceUrl ? `<a href="${escapeHTML(article.sourceUrl)}" target="_blank" rel="noopener">${escapeHTML(article.sourceName || article.sourceUrl)}</a>` : escapeHTML(article.sourceName)}</p>
+            ` : ""}
           </div>
 
           <section class="article-related">
@@ -6404,10 +6998,45 @@ async function loadArticlePage(slug) {
   try {
     const article = await fetchSupabaseArticlePage(slug);
     if (location.hash.slice(1).split("?")[0] !== `article-${slug}`) return;
+    if (article) {
+      setRouteSeo(`article-${slug}`, {
+        title: article.seoTitle || `${article.title}｜健康3.0`,
+        description: article.seoDescription || article.excerpt || article.subtitle || DEFAULT_SEO.description,
+        image: article.image,
+        imageAlt: article.title,
+        type: "article",
+        canonical: routeCanonical(`article-${slug}`)
+      });
+    } else {
+      setRouteSeo("health", {
+        title: "文章尚未發布｜健康3.0",
+        description: "這篇文章目前尚未發布或不存在。",
+        robots: "noindex, follow",
+        canonical: routeCanonical("health")
+      });
+    }
     pageView.innerHTML = article ? renderArticleLayout(article) : renderArticleNotFoundPage();
   } catch (error) {
     console.warn("Supabase article page unavailable.", error);
     if (location.hash.slice(1).split("?")[0] !== `article-${slug}`) return;
+    if (!supabase && articlePages[slug]) {
+      const fallback = articlePages[slug];
+      setRouteSeo(`article-${slug}`, {
+        title: `${fallback.title}｜健康3.0`,
+        description: fallback.dek || DEFAULT_SEO.description,
+        image: fallback.image,
+        imageAlt: fallback.title,
+        type: "article",
+        canonical: routeCanonical(`article-${slug}`)
+      });
+    } else {
+      setRouteSeo("health", {
+        title: "文章尚未發布｜健康3.0",
+        description: "這篇文章目前尚未發布或不存在。",
+        robots: "noindex, follow",
+        canonical: routeCanonical("health")
+      });
+    }
     pageView.innerHTML = supabase ? renderArticleNotFoundPage() : renderStaticArticlePage(slug);
   }
 }
@@ -6490,9 +7119,22 @@ async function loadCareStoryPage(slug) {
   try {
     const story = await fetchCareStoryPage(slug);
     if (location.hash.slice(1).split("?")[0] !== `care-story-${slug}`) return;
+    if (story) {
+      setRouteSeo(`care-story-${slug}`, {
+        title: `${story.title}｜真實照顧情境`,
+        description: story.praise || story.quote || DEFAULT_SEO.description,
+        image: story.image,
+        imageAlt: story.title,
+        type: "article",
+        canonical: routeCanonical(`care-story-${slug}`)
+      });
+    } else {
+      setRouteSeo("health", { title: "故事尚未發布｜歲悅長照集團", robots: "noindex, follow", canonical: routeCanonical("health") });
+    }
     pageView.innerHTML = story ? renderCareStoryArticle(story) : renderArticleNotFoundPage();
   } catch (error) {
     console.warn("Care story page unavailable.", error);
+    setRouteSeo("health", { title: "故事尚未發布｜歲悅長照集團", robots: "noindex, follow", canonical: routeCanonical("health") });
     pageView.innerHTML = renderArticleNotFoundPage();
   }
 }
@@ -6501,9 +7143,22 @@ async function loadExpertTalkPage(slug) {
   try {
     const talk = await fetchExpertTalkPage(slug);
     if (location.hash.slice(1).split("?")[0] !== `master-talk-${slug}`) return;
+    if (talk) {
+      setRouteSeo(`master-talk-${slug}`, {
+        title: `${talk.title}｜名人講堂`,
+        description: talk.summary || talk.quote || DEFAULT_SEO.description,
+        image: talk.image,
+        imageAlt: talk.title,
+        type: "article",
+        canonical: routeCanonical(`master-talk-${slug}`)
+      });
+    } else {
+      setRouteSeo("health", { title: "名人講堂尚未發布｜健康3.0", robots: "noindex, follow", canonical: routeCanonical("health") });
+    }
     pageView.innerHTML = talk ? renderExpertTalkArticle(talk) : renderArticleNotFoundPage();
   } catch (error) {
     console.warn("Expert talk page unavailable.", error);
+    setRouteSeo("health", { title: "名人講堂尚未發布｜健康3.0", robots: "noindex, follow", canonical: routeCanonical("health") });
     pageView.innerHTML = renderArticleNotFoundPage();
   }
 }
@@ -6520,6 +7175,20 @@ function renderPage(slug) {
   const anchorTarget = normalized === "home" ? null : document.getElementById(normalized);
   const page = anchorTarget ? null : pages[normalized];
   const isHome = !articleSlug && !careStorySlug && !masterTalkSlug && (normalized === "home" || Boolean(anchorTarget));
+  const handledBySpecialCms =
+    serviceTemplateSlugs.has(normalized) ||
+    recruitingTemplateSlugs.has(normalized) ||
+    ["investors", "ir-finance", "ir-governance", "ir-shareholders"].includes(normalized);
+
+  if (articleSlug) {
+    setRouteSeo(`article-${articleSlug}`, { title: "文章載入中｜健康3.0", canonical: routeCanonical(`article-${articleSlug}`) });
+  } else if (careStorySlug) {
+    setRouteSeo(`care-story-${careStorySlug}`, { title: "故事載入中｜真實照顧情境", canonical: routeCanonical(`care-story-${careStorySlug}`) });
+  } else if (masterTalkSlug) {
+    setRouteSeo(`master-talk-${masterTalkSlug}`, { title: "名人講堂載入中｜健康3.0", canonical: routeCanonical(`master-talk-${masterTalkSlug}`) });
+  } else {
+    setRouteSeo(normalized || "home");
+  }
 
   home.classList.toggle("active", isHome);
   pageView.classList.toggle("active", !isHome);
@@ -6580,6 +7249,11 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderQualityPage();
+    loadSupabaseServiceTemplatePage(normalized);
+  } else if (normalized === "software") {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    pageView.innerHTML = renderSoftwarePage();
     loadSupabaseServiceTemplatePage(normalized);
   } else if (normalized === "land") {
     home.classList.remove("active");
@@ -6666,6 +7340,12 @@ function renderPage(slug) {
   } else if (!articleSlug && normalized !== "home" && !anchorTarget && !page) {
     home.classList.remove("active");
     pageView.classList.add("active");
+    setRouteSeo(normalized, {
+      title: "找不到頁面｜歲悅長照集團",
+      description: "這個頁面目前不存在或尚未發布。",
+      robots: "noindex, follow",
+      canonical: absoluteSiteUrl("/404")
+    });
     pageView.innerHTML = renderNotFoundPage(rawSlug);
     trackAnalyticsEvent("error_404", {
       label: rawSlug,
@@ -6679,8 +7359,11 @@ function renderPage(slug) {
   });
 
   nav?.classList.remove("open");
+  document.body.classList.remove("nav-open");
   menuToggle?.setAttribute("aria-expanded", "false");
+  menuToggle?.setAttribute("aria-label", "開啟主選單");
   navGroups.forEach((group) => group.classList.remove("open"));
+  navGroups.forEach((group) => group.querySelector(".nav-trigger")?.setAttribute("aria-expanded", "false"));
 
   if (anchorTarget && normalized !== "home") {
     anchorTarget.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -6688,7 +7371,7 @@ function renderPage(slug) {
     window.scrollTo({ top: 0, behavior: "auto" });
   }
 
-  if (!isHome && !articleSlug && !["health", "search"].includes(normalized)) {
+  if (!isHome && !articleSlug && !careStorySlug && !masterTalkSlug && !handledBySpecialCms && !["health", "search"].includes(normalized)) {
     loadSupabaseDetailPage(normalized);
   }
 
@@ -6718,7 +7401,15 @@ window.setTimeout(() => {
 
 menuToggle?.addEventListener("click", () => {
   const open = nav?.classList.toggle("open");
+  document.body.classList.toggle("nav-open", Boolean(open));
   menuToggle.setAttribute("aria-expanded", String(Boolean(open)));
+  menuToggle.setAttribute("aria-label", open ? "關閉主選單" : "開啟主選單");
+  if (!open) {
+    navGroups.forEach((group) => {
+      group.classList.remove("open");
+      group.querySelector(".nav-trigger")?.setAttribute("aria-expanded", "false");
+    });
+  }
 });
 
 bindNavigationDropdowns();
@@ -6908,7 +7599,11 @@ document.addEventListener("submit", async (event) => {
         targetUrl: "generalaffairs@suiyuecare.com",
         metadata: { form_id: "recruitApplyForm", email_sent: Boolean(result.emailSent) }
       });
-      if (status) status.textContent = "已送出，我們會盡快與你聯繫。";
+      if (status) {
+        status.textContent = result.emailSent
+          ? "已送出，我們會盡快與你聯繫。"
+          : "資料已留存在後台；寄信尚未完成設定，請通知管理者。";
+      }
       window.setTimeout(closeRecruitApply, 1400);
     } catch (error) {
       console.warn("Recruiting apply failed.", error);
@@ -6931,8 +7626,9 @@ document.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
   status.textContent = "正在送出報名資訊...";
 
+  let result;
   try {
-    const result = await sendBackendForm(form, "course_signup");
+    result = await sendBackendForm(form, "course_signup");
     trackAnalyticsEvent("form_submit", {
       label: "課程報名",
       targetUrl: COURSE_NOTIFY_EMAIL,
@@ -6947,7 +7643,9 @@ document.addEventListener("submit", async (event) => {
   }
 
   let seconds = 2;
-  status.textContent = `報名資訊已送出，${seconds} 秒後前往 LINE@。`;
+  status.textContent = result.emailSent
+    ? `報名資訊已寄出，${seconds} 秒後前往 LINE@。`
+    : `報名資訊已留存在後台，但寄信尚未設定，${seconds} 秒後前往 LINE@。`;
   const countdown = window.setInterval(() => {
     seconds -= 1;
     if (seconds <= 0) {
@@ -6955,7 +7653,9 @@ document.addEventListener("submit", async (event) => {
       trackAnalyticsEvent("join_line_click", { label: "課程報名完成後前往 LINE@", targetUrl: COURSE_LINE_URL });
       window.location.assign(COURSE_LINE_URL);
     } else {
-      status.textContent = `報名資訊已送出，${seconds} 秒後前往 LINE@。`;
+      status.textContent = result.emailSent
+        ? `報名資訊已寄出，${seconds} 秒後前往 LINE@。`
+        : `報名資訊已留存在後台，但寄信尚未設定，${seconds} 秒後前往 LINE@。`;
     }
   }, 1000);
 });
@@ -6976,7 +7676,11 @@ document.addEventListener("submit", (event) => {
         metadata: { form_class: "contact-form", email_sent: Boolean(result.emailSent) }
       });
       form.reset();
-      if (submitButton) submitButton.textContent = "已送出，我們會盡快聯絡";
+      if (submitButton) {
+        submitButton.textContent = result.emailSent
+          ? "已送出，我們會盡快聯絡"
+          : "已留存後台，寄信尚未設定";
+      }
     }).catch((error) => {
       console.warn("Contact form failed.", error);
       trackFrontendError("contact_form_failed", { message: error.message, stack: error.stack });

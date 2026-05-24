@@ -116,7 +116,7 @@ async function loadModules() {
       .order("module_key", { ascending: true })
       .order("sort_order", { ascending: true });
     if (error) throw error;
-    modules = data || [];
+    modules = (data || []).filter((item) => !["care_story", "master_talk"].includes(item.module_key));
     renderModules();
     setStatus("", "success");
   } catch (error) {

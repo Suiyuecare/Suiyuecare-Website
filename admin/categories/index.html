@@ -76,16 +76,88 @@
               <input type="text" name="slug" required placeholder="例如：health-30" />
             </label>
             <label>
+              <span>上層分類</span>
+              <select name="parent_id">
+                <option value="">無上層分類</option>
+              </select>
+            </label>
+            <label>
+              <span>分類用途</span>
+              <select name="type">
+                <option value="article">一般文章</option>
+                <option value="lazy_pack">懶人包</option>
+                <option value="event">活動專區</option>
+                <option value="video">影音</option>
+                <option value="short_video">短影片</option>
+                <option value="interview">名人講堂</option>
+                <option value="story">真實照顧情境</option>
+              </select>
+            </label>
+            <label>
+              <span>前台區塊</span>
+              <select name="section_key">
+                <option value="health">健康3.0 一般文章</option>
+                <option value="lazy_pack">懶人包</option>
+                <option value="activity">活動專區</option>
+                <option value="video">影音</option>
+                <option value="short_video">短影片</option>
+                <option value="master_talk">名人講堂</option>
+                <option value="care_story">真實照顧情境</option>
+              </select>
+            </label>
+            <label>
+              <span>前台顯示名稱</span>
+              <input type="text" name="display_label" placeholder="不填則使用分類名稱" />
+            </label>
+            <label>
               <span>排序</span>
               <input type="number" name="sort_order" min="0" value="0" />
+            </label>
+            <label>
+              <span>代表色</span>
+              <input type="text" name="color" placeholder="#f08a24" />
+            </label>
+            <label>
+              <span>圖示 / 短代號</span>
+              <input type="text" name="icon" placeholder="例：Guide / 影音 / ★" />
+            </label>
+            <label>
+              <span>讀者對象</span>
+              <input type="text" name="audience" placeholder="例：家屬、照服員、投資人" />
+            </label>
+            <label>
+              <span>SEO 關鍵字</span>
+              <input type="text" name="seo_keywords" placeholder="用逗號分隔，例如：長照申請,居家照顧" />
+            </label>
+            <label>
+              <span>分類圖片</span>
+              <select name="image_id">
+                <option value="">不設定分類圖片</option>
+              </select>
             </label>
             <label class="admin-toggle-field">
               <input type="checkbox" name="is_enabled" checked />
               <span>啟用此分類</span>
             </label>
+            <label class="admin-toggle-field">
+              <input type="checkbox" name="show_in_nav" checked />
+              <span>顯示在前台分類列</span>
+            </label>
+            <label class="admin-toggle-field">
+              <input type="checkbox" name="is_featured" />
+              <span>設為重點分類</span>
+            </label>
             <label class="admin-field-wide">
               <span>描述</span>
               <textarea name="description" rows="4" placeholder="分類介紹，可用於前台或 SEO。"></textarea>
+            </label>
+            <label>
+              <span>SEO 標題</span>
+              <input type="text" name="seo_title" />
+            </label>
+            <label>
+              <span>SEO 描述</span>
+              <textarea name="seo_description" rows="3"></textarea>
             </label>
           </form>
           <div id="adminCategoriesStatus" class="admin-data-status">正在讀取分類資料...</div>
@@ -104,6 +176,7 @@
               <thead>
                 <tr>
                   <th>分類名稱</th>
+                  <th>用途 / 區塊</th>
                   <th>Slug</th>
                   <th>排序</th>
                   <th>啟用狀態</th>

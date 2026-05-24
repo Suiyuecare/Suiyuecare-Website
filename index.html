@@ -7,6 +7,9 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://suiyuecare.com/" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="歲悅長照集團" />
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="og:url" content="https://suiyuecare.com/" />
     <meta property="og:title" content="歲悅長照集團｜Suiyuecare Corps." />
     <meta property="og:description" content="照顧就像去超商，買牛奶一樣簡單。整合居家照顧、日間照顧、社區據點、護理復能、移工培訓與教育品管。" />
     <meta property="og:image" content="https://suiyuecare.com/assets/hero-care.png" />
@@ -15,12 +18,31 @@
     <meta name="twitter:title" content="歲悅長照集團｜Suiyuecare Corps." />
     <meta name="twitter:description" content="照顧就像去超商，買牛奶一樣簡單。" />
     <meta name="twitter:image" content="https://suiyuecare.com/assets/hero-care.png" />
+    <meta name="twitter:image:alt" content="歲悅長照照顧服務形象照" />
+    <link rel="alternate" hreflang="zh-Hant-TW" href="https://suiyuecare.com/" />
     <meta name="deployment-version" content="assets-public-20260519" />
     <title>歲悅長照集團｜Suiyuecare Corps.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": ["Organization", "LocalBusiness"],
+        "name": "歲悅長照集團",
+        "alternateName": "Suiyuecare Corps.",
+        "url": "https://suiyuecare.com/",
+        "logo": "https://suiyuecare.com/assets/company-logo.png",
+        "image": "https://suiyuecare.com/assets/hero-care.png",
+        "telephone": "+886-2-6604-5432",
+        "email": "generalaffairs@suiyuecare.com",
+        "slogan": "照顧就像去超商 買牛奶一樣簡單",
+        "areaServed": ["臺北市", "新北市", "桃園市"],
+        "knowsAbout": ["居家照顧", "日間照顧", "社區據點", "護理復能", "移工培訓", "教育品管"],
+        "sameAs": ["https://lin.ee/oaPkGiq"]
+      }
+    </script>
   </head>
   <body>
     <div class="intro-loader" aria-hidden="true">
@@ -40,7 +62,7 @@
           <small>Suiyuecare Corps.</small>
         </span>
       </a>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primaryNav"><span></span><span></span><span></span></button>
+      <button class="menu-toggle" type="button" aria-label="開啟主選單" aria-expanded="false" aria-controls="primaryNav"><span></span><span></span><span></span></button>
       <nav class="primary-nav" id="primaryNav" aria-label="主要導覽">
         <div class="nav-group">
           <button class="nav-trigger" type="button" aria-expanded="false">服務項目</button>
@@ -49,6 +71,7 @@
             <a href="#home-care">居家照顧</a><a href="#day-care">日間照顧</a>
             <a href="#community">社區據點</a><a href="#nursing">護理復能</a>
             <a href="#migrant-training">移工培訓</a><a href="#quality">教育品管</a>
+            <a href="#software">軟體系統</a>
           </div>
         </div>
         <div class="nav-group">
@@ -257,6 +280,7 @@
             <a href="#nursing"><img src="assets/homepage-batch/09-nurse-blood-pressure.png" alt="護理復能服務情境" /><span>04</span><strong>護理復能</strong><p>護理評估、復能目標、健康追蹤。</p></a>
             <a href="#migrant-training"><img src="assets/homepage-batch/10-family-consultation.png" alt="移工培訓課程情境" /><span>05</span><strong>移工培訓</strong><p>照顧技能、家庭溝通、安全衛教。</p></a>
             <a href="#quality"><img src="assets/homepage-batch/14-care-notes.png" alt="教育品管紀錄情境" /><span>06</span><strong>教育品管</strong><p>標準教材、督導稽核、持續改善。</p></a>
+            <a href="#software"><img src="assets/admin-recruit-02-operations.png" alt="軟體系統營運儀表板情境" /><span>07</span><strong>軟體系統</strong><p>會計、人資、公文、專案、PDF 與長照業務系統。</p></a>
           </div>
         </section>
 
@@ -349,6 +373,7 @@
             <label>電話<input type="tel" name="電話" placeholder="請輸入聯絡電話" required /></label>
             <label>需求<select name="需求" required><option>長照服務諮詢</option><option>課程報名</option><option>人才招募</option><option>土地合作</option><option>投資洽談</option></select></label>
             <label>說明<textarea name="說明" rows="4" placeholder="請簡單描述目前遇到的照顧情境" required></textarea></label>
+            <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為回覆諮詢、服務安排與後續聯繫目的，使用我填寫的個人資料。</label>
             <button type="submit">送出諮詢</button>
           </form>
         </section>
@@ -398,7 +423,7 @@
           <p>服務諮詢、課程報名、人才合作與投資洽談</p>
         </div>
         <div class="footer-sitemap">
-          <div><h3>營業項目</h3><a href="#home-care">居家照顧</a><a href="#day-care">日間照顧</a><a href="#community">社區據點</a><a href="#nursing">護理復能</a></div>
+          <div><h3>營業項目</h3><a href="#home-care">居家照顧</a><a href="#day-care">日間照顧</a><a href="#community">社區據點</a><a href="#nursing">護理復能</a><a href="#software">軟體系統</a></div>
           <div><h3>合作入口</h3><a href="#talent">人才招募</a><a href="#land">土地招募</a><a href="#investor-recruiting">投資人招募</a><a href="#quality">教育品管</a></div>
           <div><h3>資訊內容</h3><a href="#health">健康3.0</a><a href="#courses">課程報名</a><a href="#investors">投資人專區</a><a href="#ir-finance">財務資訊</a><a href="#contact">聯絡我們</a></div>
         </div>

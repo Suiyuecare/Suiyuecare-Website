@@ -28,10 +28,49 @@
       </aside>
       <main class="admin-main">
         <header class="admin-topbar">
-          <div class="admin-topbar-title"><p class="admin-eyebrow">Investor Data</p><h1>投資人資料管理</h1><span>管理公告、財務資料列與圖表 JSON，前台投資人專區會自動讀取已發布內容。</span></div>
+          <div class="admin-topbar-title"><p class="admin-eyebrow">Investor Data</p><h1>投資人資料管理</h1><span>管理頁面文案、公告、財務資料與圖表，前台投資人專區會自動讀取已發布內容。</span></div>
           <div class="admin-topbar-actions"><a class="admin-preview-link" href="/#investors" target="_blank" rel="noopener">查看前台</a><div class="admin-userbox"><b id="adminUserInitial">S</b><span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span><button id="adminLogout" type="button">登出</button></div></div>
         </header>
         <div id="investorDataStatus" class="admin-data-status">正在讀取投資人資料...</div>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">Page Copy</p><h2>投資人頁面文案設定</h2></div>
+            <button type="submit" form="investorPageSettingsForm">儲存頁面設定</button>
+          </div>
+          <form id="investorPageSettingsForm" class="admin-form-grid">
+            <label>
+              <span>要編輯的頁面</span>
+              <select id="investorPageSettingsSelect" name="page_slug">
+                <option value="investors">投資人首頁</option>
+                <option value="ir-finance">財務資訊</option>
+                <option value="ir-governance">公司治理</option>
+                <option value="ir-shareholders">股東專區</option>
+              </select>
+            </label>
+            <label><span>英文小標</span><input name="eyebrow" type="text" placeholder="INVESTOR RELATIONS" /></label>
+            <label class="admin-field-wide"><span>頁面大標</span><input name="title" type="text" required /></label>
+            <label class="admin-field-wide"><span>主文案</span><textarea name="body" rows="4" placeholder="這段文字會出現在投資人頁面的 Hero 區塊。"></textarea></label>
+            <label><span>主要按鈕文字</span><input name="primary_cta_text" type="text" placeholder="查看財務資訊" /></label>
+            <label><span>主要按鈕連結</span><input name="primary_cta_url" type="text" placeholder="#ir-finance" /></label>
+            <label><span>次要按鈕文字</span><input name="secondary_cta_text" type="text" placeholder="股東專區" /></label>
+            <label><span>次要按鈕連結</span><input name="secondary_cta_url" type="text" placeholder="#ir-shareholders" /></label>
+            <label><span>快照標籤</span><input name="snapshot_label" type="text" placeholder="營運快照" /></label>
+            <label><span>快照標題</span><input name="snapshot_title" type="text" placeholder="北北桃服務網絡" /></label>
+            <label><span>快照數字</span><input name="snapshot_value" type="text" placeholder="11" /></label>
+            <label><span>快照單位</span><input name="snapshot_unit" type="text" placeholder="區域" /></label>
+            <label class="admin-field-wide"><span>快照備註</span><input name="snapshot_note" type="text" placeholder="服務區域與設立進度會依公告更新。" /></label>
+            <label class="admin-field-wide">
+              <span>KPI 指標卡</span>
+              <div id="investorKpiEditor" class="admin-repeat-card-editor"></div>
+            </label>
+            <label class="admin-field-wide">
+              <span>常見問答</span>
+              <div id="investorFaqEditor" class="admin-repeat-card-editor"></div>
+              <small>沒有 FAQ 的頁面可以留空，前台會自動隱藏。</small>
+            </label>
+          </form>
+        </section>
 
         <section class="admin-editor-layout">
           <section class="admin-workspace-panel">
@@ -42,7 +81,9 @@
               <label><span>日期標籤</span><input name="date_label" type="text" placeholder="2026.05" /></label>
               <label class="admin-field-wide"><span>標題</span><input name="title" type="text" required /></label>
               <label class="admin-field-wide"><span>摘要</span><textarea name="summary" rows="3"></textarea></label>
+              <label class="admin-field-wide"><span>內文</span><textarea name="body" rows="5" placeholder="可放較完整的公告內容，前台摘要列表仍會保持簡潔。"></textarea></label>
               <label><span>連結</span><input name="link_url" type="text" placeholder="#ir-finance" /></label>
+              <label><span>下載檔案</span><select name="file_id" data-investor-file-select><option value="">不綁定檔案</option></select></label>
               <label><span>排序</span><input name="sort_order" type="number" value="0" /></label>
               <label><span>狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
               <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>
@@ -60,6 +101,7 @@
               <label><span>金額標籤</span><input name="amount_label" type="text" placeholder="8.6M / PDF" /></label>
               <label><span>成長標籤</span><input name="growth_label" type="text" placeholder="+12.4%" /></label>
               <label class="admin-field-wide"><span>說明</span><textarea name="note" rows="3"></textarea></label>
+              <label><span>下載檔案</span><select name="file_id" data-investor-file-select><option value="">不綁定檔案</option></select></label>
               <label><span>排序</span><input name="sort_order" type="number" value="0" /></label>
               <label><span>狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
               <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>
@@ -77,9 +119,13 @@
             <label><span>圖表標題</span><input name="chart_title" type="text" required /></label>
             <label><span>圖表類型</span><select name="chart_type"><option value="bar">柱狀</option><option value="line">折線</option><option value="combo">複合</option><option value="donut">圓餅</option><option value="score">分數</option><option value="progress">進度</option></select></label>
             <label><span>單位標籤</span><input name="unit_label" type="text" placeholder="NT$ / % / Score" /></label>
-            <label class="admin-field-wide"><span>圖表資料</span><div id="chartPointEditor" class="admin-chart-point-editor"></div></label>
-            <label class="admin-field-wide"><span>補充設定 JSON</span><textarea name="metadata" rows="4" placeholder='{"note":"資料來源：歲悅內部統計"}'></textarea></label>
-            <textarea name="data_points" hidden></textarea>
+            <label class="admin-field-wide">
+              <span>圖表資料</span>
+              <div id="chartPointEditor" class="admin-chart-point-editor"></div>
+              <small>用新增資料列管理圖表，不需要貼程式碼或資料格式。</small>
+            </label>
+            <label><span>資料來源</span><input name="metadata_source" type="text" placeholder="例：歲悅內部統計" /></label>
+            <label class="admin-field-wide"><span>補充說明</span><textarea name="metadata_note" rows="3" placeholder="例：正式數字以公告為準。"></textarea></label>
             <label><span>排序</span><input name="sort_order" type="number" value="0" /></label>
             <label><span>狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
             <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>

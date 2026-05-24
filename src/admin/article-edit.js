@@ -25,6 +25,7 @@ let articleId = null;
 let isNewArticle = true;
 let categories = [];
 let selectedCoverMedia = null;
+let currentContentJson = {};
 
 function getArticleIdFromLocation() {
   const queryId = new URLSearchParams(window.location.search).get("id");
@@ -58,6 +59,44 @@ function toTags(value = "") {
     .filter(Boolean);
 }
 
+function toLines(value = "") {
+  return value
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function toFaqItems(value = "") {
+  return toLines(value)
+    .map((line) => {
+      const [question, ...answerParts] = line.split(/[|｜]/);
+      return {
+        question: (question || "").trim(),
+        answer: answerParts.join("｜").trim()
+      };
+    })
+    .filter((item) => item.question && item.answer);
+}
+
+function fromFaqItems(value = []) {
+  return Array.isArray(value)
+    ? value.map((item) => `${item.question || ""}｜${item.answer || ""}`.trim()).filter((line) => line !== "｜").join("\n")
+    : "";
+}
+
+function getVideoContent(contentJson = {}) {
+  const source = contentJson && typeof contentJson === "object" ? contentJson : {};
+  const nested = source.video && typeof source.video === "object" ? source.video : {};
+  return {
+    video_type: source.video_type || nested.type || "",
+    video_provider: source.video_provider || nested.provider || "youtube",
+    video_url: source.video_url || nested.url || "",
+    video_duration: source.video_duration || nested.duration || "",
+    video_label: source.video_label || nested.label || "",
+    video_caption: source.video_caption || nested.caption || ""
+  };
+}
+
 function toLocalDateTimeInput(value) {
   if (!value) return "";
   const date = new Date(value);
@@ -79,7 +118,8 @@ function renderCategoryOptions(selectedId = "") {
     '<option value="">未分類</option>',
     ...categories.map((category) => {
       const selected = category.id === selectedId ? "selected" : "";
-      return `<option value="${escapeHTML(category.id)}" ${selected}>${escapeHTML(category.name)}</option>`;
+      const section = category.section_key ? ` / ${category.section_key}` : "";
+      return `<option value="${escapeHTML(category.id)}" ${selected}>${escapeHTML(category.name)}${escapeHTML(section)}</option>`;
     })
   ];
   form.elements.category_id.innerHTML = options.join("");
@@ -101,12 +141,18 @@ function renderCoverImage() {
 }
 
 function fillForm(article) {
+  currentContentJson = article.content_json && typeof article.content_json === "object" ? article.content_json : {};
   form.elements.title.value = article.title || "";
   form.elements.slug.value = article.slug || "";
   form.elements.category_id.value = article.category_id || "";
+  form.elements.content_type.value = article.content_type || currentContentJson.content_type || "article";
   form.elements.status.value = article.status || "draft";
   form.elements.published_at.value = toLocalDateTimeInput(article.published_at);
   form.elements.sort_order.value = Number(article.sort_order || 0);
+  form.elements.reading_minutes.value = article.reading_minutes || "";
+  form.elements.difficulty.value = article.difficulty || "";
+  form.elements.target_audience.value = article.target_audience || "";
+  form.elements.related_service.value = article.related_service || "";
   form.elements.is_featured.checked = Boolean(article.is_featured);
   form.elements.is_enabled.checked = article.is_enabled !== false;
   form.elements.subtitle.value = article.subtitle || "";
@@ -114,23 +160,104 @@ function fillForm(article) {
   form.elements.author_name.value = article.author_name || "";
   form.elements.author_title.value = article.author_title || "";
   form.elements.tags.value = Array.isArray(article.tags) ? article.tags.join(", ") : "";
+  form.elements.recommended_slots.value = Array.isArray(article.recommended_slots) ? article.recommended_slots.join(", ") : "";
+  form.elements.summary_points.value = Array.isArray(article.summary_points) ? article.summary_points.join("\n") : "";
+  form.elements.cta_text.value = article.cta_text || currentContentJson.cta_text || "";
+  form.elements.cta_url.value = article.cta_url || currentContentJson.cta_url || "";
+  form.elements.source_name.value = article.source_name || currentContentJson.source_name || "";
+  form.elements.source_url.value = article.source_url || currentContentJson.source_url || "";
+  form.elements.related_slugs.value = Array.isArray(currentContentJson.related_slugs) ? currentContentJson.related_slugs.join(", ") : "";
   form.elements.content.value = article.content || "";
+  const video = getVideoContent(currentContentJson);
+  form.elements.video_type.value = video.video_type;
+  form.elements.video_provider.value = video.video_provider;
+  form.elements.video_url.value = video.video_url;
+  form.elements.video_duration.value = video.video_duration;
+  form.elements.video_label.value = video.video_label;
+  form.elements.video_caption.value = video.video_caption;
   form.elements.seo_title.value = article.seo_title || "";
   form.elements.seo_description.value = article.seo_description || "";
+  form.elements.seo_keywords.value = Array.isArray(article.seo_keywords) ? article.seo_keywords.join(", ") : "";
+  form.elements.canonical_url.value = article.canonical_url || currentContentJson.canonical_url || "";
+  form.elements.faq_text.value = fromFaqItems(article.faq_json || currentContentJson.faq || []);
 }
 
 function buildPayload() {
   let publishedAt = fromLocalDateTimeInput(form.elements.published_at.value);
   const status = form.elements.status.value;
   if (status === "published" && !publishedAt) publishedAt = new Date().toISOString();
+  const videoUrl = form.elements.video_url.value.trim();
+  const videoType = form.elements.video_type.value;
+  const videoProvider = form.elements.video_provider.value || "youtube";
+  const videoDuration = form.elements.video_duration.value.trim();
+  const videoLabel = form.elements.video_label.value.trim();
+  const videoCaption = form.elements.video_caption.value.trim();
+  const contentJson = { ...currentContentJson };
+  const relatedSlugs = toTags(form.elements.related_slugs.value);
+  if (relatedSlugs.length) {
+    contentJson.related_slugs = relatedSlugs;
+  } else {
+    delete contentJson.related_slugs;
+  }
+  contentJson.content_type = form.elements.content_type.value || "article";
+  if (form.elements.cta_text.value.trim() || form.elements.cta_url.value.trim()) {
+    contentJson.cta_text = form.elements.cta_text.value.trim();
+    contentJson.cta_url = form.elements.cta_url.value.trim();
+  } else {
+    delete contentJson.cta_text;
+    delete contentJson.cta_url;
+  }
+  if (form.elements.source_name.value.trim() || form.elements.source_url.value.trim()) {
+    contentJson.source_name = form.elements.source_name.value.trim();
+    contentJson.source_url = form.elements.source_url.value.trim();
+  } else {
+    delete contentJson.source_name;
+    delete contentJson.source_url;
+  }
+  if (form.elements.canonical_url.value.trim()) {
+    contentJson.canonical_url = form.elements.canonical_url.value.trim();
+  } else {
+    delete contentJson.canonical_url;
+  }
+  if (videoUrl) {
+    Object.assign(contentJson, {
+        video_type: videoType || "video",
+        video_provider: videoProvider,
+        video_url: videoUrl,
+        video_duration: videoDuration,
+        video_label: videoLabel,
+        video_caption: videoCaption,
+        video: {
+          type: videoType || "video",
+          provider: videoProvider,
+          url: videoUrl,
+          duration: videoDuration,
+          label: videoLabel,
+          caption: videoCaption
+        }
+      });
+  } else {
+    delete contentJson.video_type;
+    delete contentJson.video_provider;
+    delete contentJson.video_url;
+    delete contentJson.video_duration;
+    delete contentJson.video_label;
+    delete contentJson.video_caption;
+    delete contentJson.video;
+  }
 
   return {
     title: form.elements.title.value.trim(),
     slug: slugify(form.elements.slug.value),
     category_id: form.elements.category_id.value || null,
+    content_type: form.elements.content_type.value || "article",
     status,
     published_at: publishedAt,
     sort_order: Number(form.elements.sort_order.value || 0),
+    reading_minutes: form.elements.reading_minutes.value ? Number(form.elements.reading_minutes.value) : null,
+    difficulty: form.elements.difficulty.value || null,
+    target_audience: form.elements.target_audience.value.trim() || null,
+    related_service: form.elements.related_service.value || null,
     is_featured: form.elements.is_featured.checked,
     is_enabled: form.elements.is_enabled.checked,
     subtitle: form.elements.subtitle.value.trim() || null,
@@ -139,16 +266,26 @@ function buildPayload() {
     author_name: form.elements.author_name.value.trim() || null,
     author_title: form.elements.author_title.value.trim() || null,
     tags: toTags(form.elements.tags.value),
+    recommended_slots: toTags(form.elements.recommended_slots.value),
+    summary_points: toLines(form.elements.summary_points.value),
+    cta_text: form.elements.cta_text.value.trim() || null,
+    cta_url: form.elements.cta_url.value.trim() || null,
+    source_name: form.elements.source_name.value.trim() || null,
+    source_url: form.elements.source_url.value.trim() || null,
+    canonical_url: form.elements.canonical_url.value.trim() || null,
+    faq_json: toFaqItems(form.elements.faq_text.value),
     content: form.elements.content.value.trim() || null,
+    content_json: contentJson,
     seo_title: form.elements.seo_title.value.trim() || null,
-    seo_description: form.elements.seo_description.value.trim() || null
+    seo_description: form.elements.seo_description.value.trim() || null,
+    seo_keywords: toTags(form.elements.seo_keywords.value)
   };
 }
 
 async function loadCategories() {
   const { data, error } = await supabase
     .from("article_categories")
-    .select("id, name, slug, sort_order, is_enabled")
+    .select("id, name, slug, section_key, sort_order, is_enabled")
     .eq("is_enabled", true)
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
@@ -188,6 +325,7 @@ async function loadArticleEditor() {
     editorMeta.textContent = "建立新的文章草稿，儲存後可在列表中管理。";
     form.elements.status.value = "draft";
     form.elements.is_enabled.checked = true;
+    currentContentJson = {};
     selectedCoverMedia = null;
     renderCoverImage();
     setEditorStatus("", "success");
@@ -199,15 +337,29 @@ async function loadArticleEditor() {
     .select(`
       id,
       category_id,
+      content_type,
       slug,
       title,
       subtitle,
       excerpt,
       content,
+      content_json,
       cover_image_id,
       author_name,
       author_title,
       tags,
+      recommended_slots,
+      summary_points,
+      reading_minutes,
+      difficulty,
+      target_audience,
+      related_service,
+      source_name,
+      source_url,
+      canonical_url,
+      faq_json,
+      cta_text,
+      cta_url,
       sort_order,
       is_featured,
       is_enabled,
@@ -215,6 +367,7 @@ async function loadArticleEditor() {
       published_at,
       seo_title,
       seo_description,
+      seo_keywords,
       updated_at
     `)
     .eq("id", articleId)

@@ -1,6 +1,3 @@
-const DEFAULT_SUPABASE_URL = "https://ussnmxdpxeoshlrdchov.supabase.co";
-const DEFAULT_SUPABASE_ANON_KEY = "sb_publishable_2Qzte6W7e6iAssOyTVRuZA__MNdKR1x";
-
 const FORM_RECIPIENTS = {
   contact: process.env.CONTACT_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
   course_signup: process.env.COURSE_NOTIFY_EMAIL || "edu.control@suiyuecare.com",
@@ -33,6 +30,7 @@ function buildSubmissionPayload(body) {
     recipient_email: FORM_RECIPIENTS[formType] || FORM_RECIPIENTS.contact,
     email_sent: false,
     metadata: {
+      privacy_consent: body.privacy_consent === true || body.privacy_consent === "on",
       course_title: sanitize(body.course_title || body["課程"] || body["您本次報名的課程"], 220),
       course_id: sanitize(body.course_id, 120),
       recruiting_page: sanitize(body.recruiting_page, 120),
@@ -49,8 +47,11 @@ function buildSubmissionPayload(body) {
 }
 
 async function saveToSupabase(payload) {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Server is missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
+  }
 
   const response = await fetch(`${supabaseUrl}/rest/v1/rpc/submit_form_submission`, {
     method: "POST",
@@ -72,8 +73,9 @@ async function saveToSupabase(payload) {
 
 async function updateSubmissionEmailStatus(submissionId, emailSent) {
   if (!submissionId) return;
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseKey) return;
 
   await fetch(`${supabaseUrl}/rest/v1/form_submissions?id=eq.${encodeURIComponent(String(submissionId).replace(/^"|"$/g, ""))}`, {
     method: "PATCH",
@@ -118,7 +120,7 @@ function renderEmailHtml(payload) {
 
 async function sendEmail(payload) {
   if (!process.env.RESEND_API_KEY) {
-    return { skipped: true, reason: "Missing RESEND_API_KEY" };
+    return { skipped: true, reason: "Missing RESEND_API_KEY", setupRequired: true };
   }
 
   const recipient = payload.recipient_email || FORM_RECIPIENTS[payload.form_type] || FORM_RECIPIENTS.contact;
@@ -152,8 +154,14 @@ module.exports = async function handler(request, response) {
 
   try {
     const payload = buildSubmissionPayload(request.body || {});
+    if (sanitize(request.body?._honey, 120)) {
+      return json(response, 200, { ok: true, message: "資料已送出。" });
+    }
     if (!payload.name || !payload.phone) {
       return json(response, 400, { ok: false, message: "請填寫姓名與電話。" });
+    }
+    if (request.body?.privacy_consent !== true && request.body?.privacy_consent !== "on") {
+      return json(response, 400, { ok: false, message: "請先同意個人資料使用告知。" });
     }
 
     const submissionId = await saveToSupabase(payload);
@@ -170,8 +178,18 @@ module.exports = async function handler(request, response) {
       });
     }
 
-    await updateSubmissionEmailStatus(submissionId, !email?.skipped);
-    return json(response, 200, { ok: true, submissionId, emailSent: !email?.skipped, email });
+    const emailSent = !email?.skipped;
+    await updateSubmissionEmailStatus(submissionId, emailSent);
+    return json(response, emailSent ? 200 : 202, {
+      ok: true,
+      submissionId,
+      emailSent,
+      emailSetupRequired: Boolean(email?.setupRequired),
+      message: emailSent
+        ? "資料已留存後台並已寄出通知信。"
+        : "資料已留存後台，但寄信服務尚未設定 RESEND_API_KEY。",
+      email
+    });
   } catch (error) {
     console.error(error);
     return json(response, 500, { ok: false, message: error.message || "表單送出失敗。" });

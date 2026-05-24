@@ -67,21 +67,34 @@
           </div>
           <p id="contentHealthStatus" class="admin-data-status">正在讀取內容資料...</p>
           <div id="contentHealthKpis" class="traffic-kpi-grid compact"></div>
+          <div id="contentHealthReadiness" class="content-health-readiness"></div>
         </section>
 
-        <section class="traffic-tabs content-health-tabs" aria-label="內容健康檢查分類">
-          <button type="button" class="active" data-health-filter="all">全部問題</button>
-          <button type="button" data-health-filter="critical">Critical</button>
-          <button type="button" data-health-filter="warning">Warning</button>
-          <button type="button" data-health-filter="site">全站</button>
-          <button type="button" data-health-filter="home">首頁</button>
-          <button type="button" data-health-filter="page">頁面</button>
-          <button type="button" data-health-filter="service">服務頁</button>
-          <button type="button" data-health-filter="article">文章</button>
-          <button type="button" data-health-filter="media">圖片</button>
-          <button type="button" data-health-filter="recruiting">招募</button>
-          <button type="button" data-health-filter="investor">投資人</button>
-          <button type="button" data-health-filter="story">故事講堂</button>
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div>
+              <p class="admin-eyebrow">Triage</p>
+              <h2>篩選與優先處理</h2>
+            </div>
+            <label class="content-health-search"><span>搜尋問題</span><input id="contentHealthSearch" type="search" placeholder="輸入頁面、文章、圖片、SEO、alt..." /></label>
+          </div>
+          <div class="traffic-tabs content-health-tabs" aria-label="內容健康檢查分類">
+            <button type="button" class="active" data-health-filter="all">全部問題</button>
+            <button type="button" data-health-filter="critical">Critical</button>
+            <button type="button" data-health-filter="warning">Warning</button>
+            <button type="button" data-health-filter="info">Info</button>
+            <button type="button" data-health-filter="site">全站</button>
+            <button type="button" data-health-filter="home">首頁</button>
+            <button type="button" data-health-filter="page">頁面</button>
+            <button type="button" data-health-filter="service">服務頁</button>
+            <button type="button" data-health-filter="article">文章</button>
+            <button type="button" data-health-filter="category">分類</button>
+            <button type="button" data-health-filter="course">課程</button>
+            <button type="button" data-health-filter="media">圖片</button>
+            <button type="button" data-health-filter="recruiting">招募</button>
+            <button type="button" data-health-filter="investor">投資人</button>
+            <button type="button" data-health-filter="story">故事講堂</button>
+          </div>
         </section>
 
         <section class="admin-workspace-panel">

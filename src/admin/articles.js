@@ -36,13 +36,26 @@ function renderFeaturedBadge(isFeatured) {
   return `<span class="admin-state-badge" data-state="${state}">${label}</span>`;
 }
 
+function renderContentType(value = "article") {
+  const labels = {
+    article: "一般文章",
+    lazy_pack: "懶人包",
+    event: "活動",
+    video: "影音",
+    short_video: "短影片",
+    interview: "名人講堂",
+    news: "最新動態"
+  };
+  return labels[value] || value || "一般文章";
+}
+
 function renderArticles() {
   if (!articlesTableBody) return;
 
   if (!articles.length) {
     articlesTableBody.innerHTML = `
       <tr>
-        <td colspan="7">
+        <td colspan="8">
           <div class="admin-empty-state">目前沒有文章資料。</div>
         </td>
       </tr>
@@ -59,6 +72,10 @@ function renderArticles() {
           <small>${escapeHTML(article.subtitle || article.slug || "尚無副標題")}</small>
         </td>
         <td>${escapeHTML(categoryName)}</td>
+        <td>
+          <strong>${escapeHTML(renderContentType(article.content_type))}</strong>
+          <small>${escapeHTML(article.related_service || article.target_audience || "未設定")}${article.reading_minutes ? ` · ${Number(article.reading_minutes)} 分鐘` : ""}</small>
+        </td>
         <td>${renderPublishBadge(article.status)}</td>
         <td>${renderFeaturedBadge(Boolean(article.is_featured))}</td>
         <td><time>${article.published_at ? formatUpdatedAt(article.published_at) : "尚未發布"}</time></td>
@@ -87,7 +104,11 @@ async function loadArticles() {
         title,
         subtitle,
         slug,
+        content_type,
         status,
+        reading_minutes,
+        target_audience,
+        related_service,
         is_featured,
         published_at,
         updated_at,

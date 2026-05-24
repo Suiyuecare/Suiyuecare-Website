@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>備份與還原｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/">
+            <img src="/assets/company-logo.png" alt="" />
+            <span><strong>歲悅長照集團</strong><small>CMS Console</small></span>
+          </a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/site-settings"><span>ST</span><strong>全站設定</strong></a>
+          <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a href="/admin/home-modules"><span>HM</span><strong>首頁模組</strong></a>
+          <a href="/admin/template-fields"><span>TF</span><strong>模板欄位</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a href="/admin/courses"><span>CS</span><strong>課程管理</strong></a>
+          <a href="/admin/files"><span>DL</span><strong>檔案下載</strong></a>
+          <a href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
+          <a href="/admin/recruiting"><span>RC</span><strong>招募管理</strong></a>
+          <a href="/admin/investor-data"><span>IR</span><strong>投資人資料</strong></a>
+          <a href="/admin/stories"><span>ST</span><strong>故事講堂</strong></a>
+          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+          <a href="/admin/governance"><span>GV</span><strong>發布與權限</strong></a>
+          <a href="/admin/users"><span>US</span><strong>使用者權限</strong></a>
+          <a href="/admin/traffic"><span>AN</span><strong>網站流量中心</strong></a>
+          <a href="/admin/content-health"><span>QA</span><strong>內容健康檢查</strong></a>
+          <a class="active" href="/admin/backups"><span>BK</span><strong>備份與還原</strong></a>
+        </nav>
+        <div class="admin-sidebar-note">
+          <span>Backup Center</span>
+          <strong>營運保險箱</strong>
+          <p>匯出 CMS 內容備份、預覽備份檔、以安全合併方式還原內容。</p>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Backup & Restore</p>
+            <h1>備份與還原中心</h1>
+            <span>正式上線前、重大改版前、批次匯入前，請先建立一份可下載的 CMS 備份。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="admin-preview-link" href="/" target="_blank" rel="noopener">查看前台</a>
+            <div class="admin-userbox">
+              <b id="adminUserInitial">S</b>
+              <span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span>
+              <button id="adminLogout" type="button">登出</button>
+            </div>
+          </div>
+        </header>
+
+        <div id="backupStatus" class="admin-data-status">正在準備備份工具...</div>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">Go-Live Readiness</p><h2>正式上線檢查</h2></div>
+            <button type="button" id="refreshLaunchCheckButton">重新檢查</button>
+          </div>
+          <div id="launchReadinessSummary" class="backup-launch-summary"></div>
+          <div class="backup-launch-actions">
+            <button type="button" id="createPreDeployBackupButton">建立上線前備份</button>
+            <a href="/admin/content-health">打開內容健康檢查</a>
+            <a href="/" target="_blank" rel="noopener">前台人工走查</a>
+          </div>
+          <div id="launchChecklist" class="backup-launch-checklist"></div>
+        </section>
+
+        <section class="backup-workflow-grid">
+          <article class="admin-workspace-panel">
+            <div class="admin-workspace-head">
+              <div><p class="admin-eyebrow">Step 01</p><h2>建立正式備份</h2></div>
+              <button type="button" id="createBackupButton">產生並下載備份</button>
+            </div>
+            <p class="admin-soft-note">備份會包含頁面、首頁模組、服務模板、圖片資料、文章分類、課程、檔案、招募、投資人資料、故事講堂與全站設定。表單個資不會放進備份檔。</p>
+            <label class="admin-field-wide"><span>備份備註</span><textarea id="backupNotes" rows="4" placeholder="例：上線前備份、修改首頁前備份、投資人資料批次更新前備份"></textarea></label>
+            <div id="backupTableSummary" class="backup-table-summary"></div>
+          </article>
+
+          <article class="admin-workspace-panel">
+            <div class="admin-workspace-head">
+              <div><p class="admin-eyebrow">Step 02</p><h2>預覽與安全還原</h2></div>
+              <button type="button" id="restoreBackupButton" disabled>安全還原</button>
+            </div>
+            <label class="admin-field-wide"><span>選擇備份 JSON</span><input id="restoreFileInput" type="file" accept="application/json,.json" /></label>
+            <div id="restorePreview" class="backup-restore-preview">
+              <strong>尚未選擇備份檔</strong>
+              <span>選擇檔案後會先列出版本、建立時間、資料表與筆數，不會立刻寫入資料庫。</span>
+            </div>
+            <label class="admin-toggle-field"><input id="restoreConfirmCheck" type="checkbox" /><span>我理解還原會用備份檔覆寫相同 ID 的 CMS 內容，但不會刪除現有資料。</span></label>
+            <p class="admin-soft-note">還原前系統會驗證備份檔格式與 checksum。還原完成後，請重新跑內容健康檢查並人工確認首頁、Health 3.0、課程、服務頁與投資人專區。</p>
+          </article>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">History</p><h2>備份與還原紀錄</h2></div>
+            <button type="button" id="refreshBackupsButton">重新整理</button>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-data-table admin-article-table">
+              <thead><tr><th>時間</th><th>類型</th><th>狀態</th><th>資料表</th><th>Checksum</th><th>備註</th></tr></thead>
+              <tbody id="backupHistoryBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="adminLoading" class="admin-loading">
+      <strong>正在檢查登入狀態</strong>
+      <span>請稍候...</span>
+    </div>
+
+    <script type="module" src="/src/admin/backups.js"></script>
+  </body>
+</html>

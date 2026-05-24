@@ -11,24 +11,118 @@ const refreshButton = document.querySelector("#refreshUsersButton");
 const statusBox = document.querySelector("#usersStatus");
 const usersList = document.querySelector("#usersList");
 
-const permissionFields = [
-  ["can_manage_users", "管理使用者"],
-  ["can_publish", "發布內容"],
-  ["can_review_publish", "審核發布"],
-  ["can_manage_media", "圖片管理"],
-  ["can_edit_pages", "頁面/首頁/招募/投資人"],
-  ["can_edit_articles", "文章/分類/故事講堂"],
-  ["can_edit_courses", "課程管理"],
-  ["can_manage_files", "檔案下載"],
-  ["can_view_forms", "表單資料"],
-  ["can_view_analytics", "網站流量"]
+const permissionGroups = [
+  {
+    title: "系統與發布",
+    hint: "適合主管、網站負責人與內容審核者。",
+    fields: [
+      ["can_manage_users", "管理使用者"],
+      ["can_edit_site_settings", "全站設定"],
+      ["can_publish", "正式發布"],
+      ["can_review_publish", "審核發布"]
+    ]
+  },
+  {
+    title: "頁面與首頁",
+    hint: "控制首頁模組、固定頁面與模板欄位。",
+    fields: [
+      ["can_view_pages", "檢視頁面"],
+      ["can_edit_pages", "新增/編輯頁面"],
+      ["can_delete_pages", "刪除頁面卡片"]
+    ]
+  },
+  {
+    title: "文章、故事與講堂",
+    hint: "控制 Health 3.0、真實照顧情境與名人講堂。",
+    fields: [
+      ["can_view_articles", "檢視內容"],
+      ["can_edit_articles", "新增/編輯內容"],
+      ["can_delete_articles", "刪除內容"]
+    ]
+  },
+  {
+    title: "圖片素材",
+    hint: "控制媒體庫、圖片上傳與圖片刪除。",
+    fields: [
+      ["can_view_media", "檢視圖片"],
+      ["can_manage_media", "上傳/編輯圖片"],
+      ["can_delete_media", "刪除圖片"]
+    ]
+  },
+  {
+    title: "課程與檔案",
+    hint: "控制課程報名、投資人檔案與下載資料。",
+    fields: [
+      ["can_view_courses", "檢視課程"],
+      ["can_edit_courses", "新增/編輯課程"],
+      ["can_delete_courses", "刪除課程"],
+      ["can_view_files", "檢視檔案"],
+      ["can_manage_files", "新增/編輯檔案"],
+      ["can_delete_files", "刪除檔案"]
+    ]
+  },
+  {
+    title: "表單與客服",
+    hint: "控制聯絡、課程、招募等表單資料處理。",
+    fields: [
+      ["can_view_forms", "檢視表單"],
+      ["can_edit_forms", "處理表單"],
+      ["can_export_forms", "匯出表單"]
+    ]
+  },
+  {
+    title: "招募與投資人",
+    hint: "控制招募頁、職缺、投資人公告與圖表資料。",
+    fields: [
+      ["can_view_recruiting", "檢視招募"],
+      ["can_edit_recruiting", "編輯招募"],
+      ["can_delete_recruiting", "刪除招募"],
+      ["can_view_investor", "檢視投資人資料"],
+      ["can_edit_investor", "編輯投資人資料"],
+      ["can_delete_investor", "刪除投資人資料"]
+    ]
+  },
+  {
+    title: "數據與品質",
+    hint: "控制網站流量、報表匯出與內容健康檢查。",
+    fields: [
+      ["can_view_analytics", "檢視流量"],
+      ["can_export_analytics", "匯出流量報表"],
+      ["can_view_content_health", "內容健康檢查"],
+      ["can_manage_backups", "備份與還原"]
+    ]
+  }
 ];
+
+const permissionFields = permissionGroups.flatMap((group) => group.fields);
 
 const roleDefaults = {
   owner: {
     can_manage_users: true,
     can_publish: true,
     can_review_publish: true,
+    can_edit_site_settings: true,
+    can_view_pages: true,
+    can_delete_pages: true,
+    can_view_articles: true,
+    can_delete_articles: true,
+    can_view_media: true,
+    can_delete_media: true,
+    can_view_courses: true,
+    can_delete_courses: true,
+    can_view_files: true,
+    can_delete_files: true,
+    can_edit_forms: true,
+    can_export_forms: true,
+    can_view_recruiting: true,
+    can_edit_recruiting: true,
+    can_delete_recruiting: true,
+    can_view_investor: true,
+    can_edit_investor: true,
+    can_delete_investor: true,
+    can_export_analytics: true,
+    can_view_content_health: true,
+    can_manage_backups: true,
     can_manage_media: true,
     can_edit_pages: true,
     can_edit_articles: true,
@@ -41,6 +135,28 @@ const roleDefaults = {
     can_manage_users: true,
     can_publish: true,
     can_review_publish: true,
+    can_edit_site_settings: true,
+    can_view_pages: true,
+    can_delete_pages: true,
+    can_view_articles: true,
+    can_delete_articles: true,
+    can_view_media: true,
+    can_delete_media: true,
+    can_view_courses: true,
+    can_delete_courses: true,
+    can_view_files: true,
+    can_delete_files: true,
+    can_edit_forms: true,
+    can_export_forms: true,
+    can_view_recruiting: true,
+    can_edit_recruiting: true,
+    can_delete_recruiting: true,
+    can_view_investor: true,
+    can_edit_investor: true,
+    can_delete_investor: true,
+    can_export_analytics: true,
+    can_view_content_health: true,
+    can_manage_backups: true,
     can_manage_media: true,
     can_edit_pages: true,
     can_edit_articles: true,
@@ -53,6 +169,28 @@ const roleDefaults = {
     can_manage_users: false,
     can_publish: false,
     can_review_publish: false,
+    can_edit_site_settings: false,
+    can_view_pages: true,
+    can_delete_pages: false,
+    can_view_articles: true,
+    can_delete_articles: false,
+    can_view_media: true,
+    can_delete_media: false,
+    can_view_courses: true,
+    can_delete_courses: false,
+    can_view_files: true,
+    can_delete_files: false,
+    can_edit_forms: true,
+    can_export_forms: false,
+    can_view_recruiting: true,
+    can_edit_recruiting: true,
+    can_delete_recruiting: false,
+    can_view_investor: true,
+    can_edit_investor: true,
+    can_delete_investor: false,
+    can_export_analytics: false,
+    can_view_content_health: true,
+    can_manage_backups: false,
     can_manage_media: true,
     can_edit_pages: true,
     can_edit_articles: true,
@@ -65,6 +203,28 @@ const roleDefaults = {
     can_manage_users: false,
     can_publish: false,
     can_review_publish: false,
+    can_edit_site_settings: false,
+    can_view_pages: true,
+    can_delete_pages: false,
+    can_view_articles: true,
+    can_delete_articles: false,
+    can_view_media: true,
+    can_delete_media: false,
+    can_view_courses: true,
+    can_delete_courses: false,
+    can_view_files: true,
+    can_delete_files: false,
+    can_edit_forms: false,
+    can_export_forms: false,
+    can_view_recruiting: true,
+    can_edit_recruiting: false,
+    can_delete_recruiting: false,
+    can_view_investor: true,
+    can_edit_investor: false,
+    can_delete_investor: false,
+    can_export_analytics: false,
+    can_view_content_health: true,
+    can_manage_backups: false,
     can_manage_media: false,
     can_edit_pages: false,
     can_edit_articles: false,
@@ -87,6 +247,22 @@ function setStatus(message, type = "info") {
 function mergedAdmin(profile) {
   const admin = admins.find((item) => item.profile_id === profile.id) || {};
   return { ...roleDefaults[profile.role || "viewer"], ...admin };
+}
+
+function renderPermissionGroups(admin) {
+  return permissionGroups.map((group) => `
+    <section class="permission-group-card">
+      <header>
+        <strong>${escapeHTML(group.title)}</strong>
+        <span>${escapeHTML(group.hint)}</span>
+      </header>
+      <div class="permission-check-grid">
+        ${group.fields.map(([field, label]) => `
+          <label class="admin-toggle-field compact"><input name="${field}" type="checkbox" ${admin[field] ? "checked" : ""} /><span>${escapeHTML(label)}</span></label>
+        `).join("")}
+      </div>
+    </section>
+  `).join("");
 }
 
 function renderUsers() {
@@ -113,10 +289,8 @@ function renderUsers() {
           </select></label>
           <label><span>顯示名稱</span><input name="display_name" type="text" value="${escapeHTML(profile.display_name || "")}" /></label>
           <label><span>Email</span><input name="email" type="email" value="${escapeHTML(profile.email || "")}" /></label>
-          <div class="admin-field-wide permission-check-grid">
-            ${permissionFields.map(([field, label]) => `
-              <label class="admin-toggle-field"><input name="${field}" type="checkbox" ${admin[field] ? "checked" : ""} /><span>${escapeHTML(label)}</span></label>
-            `).join("")}
+          <div class="admin-field-wide permission-group-grid">
+            ${renderPermissionGroups(admin)}
           </div>
           <button type="submit">儲存權限</button>
         </form>
@@ -172,6 +346,13 @@ async function saveUser(card, form) {
   permissionFields.forEach(([field]) => {
     adminPayload[field] = Boolean(form.elements[field]?.checked);
   });
+  adminPayload.can_edit_pages = adminPayload.can_edit_pages || adminPayload.can_edit_recruiting || adminPayload.can_edit_investor;
+  adminPayload.can_edit_articles = Boolean(adminPayload.can_edit_articles);
+  adminPayload.can_manage_media = adminPayload.can_manage_media || adminPayload.can_delete_media;
+  adminPayload.can_edit_courses = Boolean(adminPayload.can_edit_courses);
+  adminPayload.can_manage_files = adminPayload.can_manage_files || adminPayload.can_delete_files;
+  adminPayload.can_view_forms = adminPayload.can_view_forms || adminPayload.can_edit_forms || adminPayload.can_export_forms;
+  adminPayload.can_view_analytics = adminPayload.can_view_analytics || adminPayload.can_export_analytics;
 
   setStatus("正在儲存使用者權限...", "info");
   const profileResult = await supabase.from("profiles").update(profilePayload).eq("id", profileId);

@@ -13,6 +13,8 @@ const permissionGrid = document.querySelector("#permissionGrid");
 const publishRequestsList = document.querySelector("#publishRequestsList");
 const contentVersionsList = document.querySelector("#contentVersionsList");
 const activityLogList = document.querySelector("#activityLogList");
+const pendingPublishCount = document.querySelector("#pendingPublishCount");
+const reviewPermissionHint = document.querySelector("#reviewPermissionHint");
 
 let permissions = {};
 
@@ -23,6 +25,20 @@ const tableLabels = {
   courses: "課程",
   downloadable_files: "檔案",
   content_modules: "首頁模組"
+};
+
+const requestStatusLabels = {
+  pending: "待審",
+  approved: "已核准",
+  rejected: "已退回",
+  cancelled: "已取消"
+};
+
+const requestStatusNotes = {
+  pending: "下一步：請具審核權限者檢查內容後核准或退回。",
+  approved: "已完成：內容已切換為已發布，前台可讀取。",
+  rejected: "需修改：請回到編輯頁修正後重新送審。",
+  cancelled: "已取消：此送審單不會影響前台。"
 };
 
 function setStatus(message, type = "info") {
@@ -58,24 +74,38 @@ function renderPermissions() {
       <p>${enabled ? "目前帳號具備此權限" : "目前帳號不具備此權限"}</p>
     </article>
   `).join("");
+  if (reviewPermissionHint) {
+    reviewPermissionHint.textContent = permissions.can_review_publish
+      ? "你可以審核發布"
+      : "你可以送審，但不能核准";
+    reviewPermissionHint.dataset.state = permissions.can_review_publish ? "enabled" : "disabled";
+  }
 }
 
 function renderPublishRequests(items = []) {
   if (!items.length) {
-    publishRequestsList.innerHTML = '<div class="admin-empty-state">目前沒有待審發布。</div>';
+    publishRequestsList.innerHTML = '<div class="admin-empty-state">目前沒有發布送審紀錄。內容編輯完成後，可從文章或頁面編輯器按「送審發布」。</div>';
+    if (pendingPublishCount) pendingPublishCount.textContent = "待審 0 筆";
     return;
   }
 
+  const pendingCount = items.filter((item) => item.status === "pending").length;
+  if (pendingPublishCount) pendingPublishCount.textContent = `待審 ${pendingCount} 筆`;
+
   publishRequestsList.innerHTML = items.map((item) => `
-    <article data-request-id="${escapeHTML(item.id)}">
+    <article data-request-id="${escapeHTML(item.id)}" data-status="${escapeHTML(item.status)}">
       <div>
-        <span>${escapeHTML(tableLabels[item.entity_table] || item.entity_table)} · ${escapeHTML(item.status)}</span>
+        <span>${escapeHTML(tableLabels[item.entity_table] || item.entity_table)} · ${escapeHTML(requestStatusLabels[item.status] || item.status)}</span>
         <strong>${escapeHTML(item.entity_title || item.entity_id)}</strong>
         <p>${escapeHTML(item.request_note || "沒有送審備註。")}</p>
+        <p class="governance-next-step">${escapeHTML(requestStatusNotes[item.status] || "請依狀態處理。")}</p>
         <small>送審時間：${formatUpdatedAt(item.requested_at)}</small>
+        ${item.review_note ? `<small>審核備註：${escapeHTML(item.review_note)}</small>` : ""}
       </div>
       <div class="admin-table-actions">
-        ${permissions.can_review_publish ? `<button type="button" data-review-status="approved">核准發布</button><button type="button" data-review-status="rejected">退回</button>` : `<em>等待具審核權限者處理</em>`}
+        ${item.status === "pending" && permissions.can_review_publish ? `<button type="button" data-review-status="approved">核准發布</button><button type="button" data-review-status="rejected">退回修改</button>` : ""}
+        ${item.status === "pending" && !permissions.can_review_publish ? `<em>等待具審核權限者處理</em>` : ""}
+        ${item.status !== "pending" ? `<em>${escapeHTML(requestStatusLabels[item.status] || item.status)}</em>` : ""}
       </div>
     </article>
   `).join("");
@@ -135,9 +165,9 @@ async function loadGovernanceData() {
     const [requestsResult, versionsResult, logsResult] = await Promise.all([
       supabase
         .from("publish_requests")
-        .select("id, entity_table, entity_id, entity_title, status, request_note, requested_at")
-        .eq("status", "pending")
-        .order("requested_at", { ascending: true })
+        .select("id, entity_table, entity_id, entity_title, status, request_note, review_note, requested_at, reviewed_at")
+        .order("status", { ascending: false })
+        .order("requested_at", { ascending: false })
         .limit(50),
       supabase
         .from("content_versions")
