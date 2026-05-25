@@ -15,14 +15,44 @@ const refreshButton = document.querySelector("#refreshCoursesButton");
 const newButton = document.querySelector("#newCourseButton");
 const formTitle = document.querySelector("#courseFormTitle");
 const coverPreview = document.querySelector("#courseCoverPreview");
+const signupStatusBox = document.querySelector("#courseSignupsStatus");
+const signupRefreshButton = document.querySelector("#refreshCourseSignupsButton");
+const signupStatusFilter = document.querySelector("#courseSignupStatusFilter");
+const signupTableBody = document.querySelector("#courseSignupsTableBody");
+const signupProcessForm = document.querySelector("#courseSignupProcessForm");
+const signupDetailTitle = document.querySelector("#courseSignupDetailTitle");
+const signupDetailBox = document.querySelector("#courseSignupDetailBox");
+const signupTimeline = document.querySelector("#courseSignupTimeline");
+const courseCountTargets = {
+  published: document.querySelector('[data-course-count="published"]'),
+  featured: document.querySelector('[data-course-count="featured"]'),
+  draft: document.querySelector('[data-course-count="draft"]'),
+  total: document.querySelector('[data-course-count="total"]')
+};
 
 let courses = [];
+let courseSignups = [];
+let selectedCourseSignup = null;
+
+const signupStatusLabels = {
+  new: "未處理",
+  contacted: "已聯絡",
+  closed: "已完成",
+  spam: "取消/無效"
+};
 
 function setStatus(message, type = "info") {
   if (!statusBox) return;
   statusBox.hidden = !message;
   statusBox.textContent = message;
   statusBox.dataset.status = type;
+}
+
+function setSignupStatus(message, type = "info") {
+  if (!signupStatusBox) return;
+  signupStatusBox.hidden = !message;
+  signupStatusBox.textContent = message;
+  signupStatusBox.dataset.status = type;
 }
 
 function slugify(value = "") {
@@ -47,9 +77,31 @@ function toIsoOrNull(value) {
   return value ? new Date(value).toISOString() : null;
 }
 
+function fromLocalDateTimeInput(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+}
+
 function renderStatusBadge(status) {
   const labels = { draft: "草稿", published: "已發布", scheduled: "排程", archived: "封存" };
   return `<span class="admin-publish-badge" data-status="${escapeHTML(status || "draft")}">${escapeHTML(labels[status] || status || "草稿")}</span>`;
+}
+
+function renderSignupStatusBadge(status) {
+  return `<span class="admin-publish-badge" data-status="${escapeHTML(status || "new")}">${escapeHTML(signupStatusLabels[status] || status || "未處理")}</span>`;
+}
+
+function getSignupMeta(item = {}) {
+  const metadata = item.metadata && typeof item.metadata === "object" ? item.metadata : {};
+  return {
+    course_title: metadata.course_title || item.subject || "",
+    course_id: metadata.course_id || "",
+    priority: metadata.priority || "normal",
+    next_action: metadata.next_action || "",
+    next_follow_up_at: metadata.next_follow_up_at || "",
+    process_history: Array.isArray(metadata.process_history) ? metadata.process_history : []
+  };
 }
 
 function getCover(course) {
@@ -72,8 +124,16 @@ function renderCoverPreview(course = null) {
 
 function renderCourses() {
   if (!tableBody) return;
+  const published = courses.filter((course) => course.status === "published" && course.is_enabled).length;
+  const featured = courses.filter((course) => course.is_featured && course.status === "published" && course.is_enabled).length;
+  const draft = courses.filter((course) => course.status !== "published" || !course.is_enabled).length;
+  if (courseCountTargets.published) courseCountTargets.published.textContent = published;
+  if (courseCountTargets.featured) courseCountTargets.featured.textContent = featured;
+  if (courseCountTargets.draft) courseCountTargets.draft.textContent = draft;
+  if (courseCountTargets.total) courseCountTargets.total.textContent = courses.length;
+
   if (!courses.length) {
-    tableBody.innerHTML = `<tr><td colspan="6"><div class="admin-empty-state">目前沒有課程。</div></td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="6"><div class="admin-empty-state">目前沒有課程。請在左側填寫課程名稱、日期、地點、價格與封面圖，儲存為「已發布」後前台會自動出現。</div></td></tr>`;
     return;
   }
 
@@ -92,6 +152,102 @@ function renderCourses() {
       </td>
     </tr>
   `).join("");
+}
+
+function renderSignupCounts() {
+  const counts = { new: 0, contacted: 0, closed: 0, spam: 0 };
+  courseSignups.forEach((item) => {
+    const key = item.status || "new";
+    if (counts[key] !== undefined) counts[key] += 1;
+  });
+  Object.entries(counts).forEach(([key, value]) => {
+    const target = document.querySelector(`[data-course-signup-count="${key}"]`);
+    if (target) target.textContent = `${value} 筆`;
+  });
+}
+
+function renderSignupTimeline(item) {
+  if (!signupTimeline) return;
+  if (!item) {
+    signupTimeline.innerHTML = "";
+    return;
+  }
+  const history = getSignupMeta(item).process_history;
+  signupTimeline.innerHTML = `
+    <strong>處理紀錄</strong>
+    ${history.length ? `
+      <ol>
+        ${history.slice().reverse().map((entry) => `
+          <li>
+            <span>${escapeHTML(entry.status_label || entry.status || "更新")}</span>
+            <p>${escapeHTML(entry.note || "狀態已更新。")}</p>
+            <small>${escapeHTML(entry.actor || "後台使用者")}｜${formatUpdatedAt(entry.at)}</small>
+          </li>
+        `).join("")}
+      </ol>
+    ` : `<p>尚無處理紀錄。儲存狀態後會自動留下紀錄。</p>`}
+  `;
+}
+
+function renderCourseSignups() {
+  if (!signupTableBody) return;
+  if (!courseSignups.length) {
+    signupTableBody.innerHTML = `<tr><td colspan="6"><div class="admin-empty-state">目前沒有課程報名資料。</div></td></tr>`;
+    return;
+  }
+
+  signupTableBody.innerHTML = courseSignups.map((item) => {
+    const meta = getSignupMeta(item);
+    return `
+      <tr>
+        <td><strong>${escapeHTML(item.name || "未填姓名")}</strong><small>${escapeHTML(item.email || "-")}</small></td>
+        <td><strong>${escapeHTML(meta.course_title || item.subject || "未指定課程")}</strong><small>${escapeHTML(meta.next_action || "尚未設定下一步")}</small></td>
+        <td>${escapeHTML(item.phone || "-")}</td>
+        <td>${renderSignupStatusBadge(item.status)}</td>
+        <td><time>${formatUpdatedAt(item.created_at)}</time></td>
+        <td><div class="admin-table-actions"><button type="button" data-view-course-signup="${escapeHTML(item.id)}">查看</button></div></td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderSignupDetail(item) {
+  selectedCourseSignup = item || null;
+  if (!signupProcessForm || !signupDetailBox || !signupDetailTitle) return;
+  if (!item) {
+    signupProcessForm.elements.id.value = "";
+    signupDetailTitle.textContent = "報名詳細資料";
+    signupDetailBox.className = "admin-empty-state admin-field-wide";
+    signupDetailBox.textContent = "請從左側選擇一筆課程報名。";
+    renderSignupTimeline(null);
+    return;
+  }
+
+  const meta = getSignupMeta(item);
+  signupProcessForm.elements.id.value = item.id;
+  signupProcessForm.elements.status.value = item.status || "new";
+  signupProcessForm.elements.priority.value = meta.priority;
+  signupProcessForm.elements.next_action.value = meta.next_action;
+  signupProcessForm.elements.next_follow_up_at.value = toDatetimeLocal(meta.next_follow_up_at);
+  signupProcessForm.elements.internal_note.value = item.internal_note || "";
+  signupDetailTitle.textContent = `${meta.course_title || item.subject || "課程報名"}｜${item.name || "未填姓名"}`;
+  signupDetailBox.className = "admin-form-readonly admin-field-wide";
+  signupDetailBox.innerHTML = `
+    <dl>
+      <div><dt>姓名</dt><dd>${escapeHTML(item.name || "-")}</dd></div>
+      <div><dt>電話</dt><dd>${escapeHTML(item.phone || "-")}</dd></div>
+      <div><dt>Email</dt><dd>${escapeHTML(item.email || "-")}</dd></div>
+      <div><dt>報名課程</dt><dd>${escapeHTML(meta.course_title || item.subject || "-")}</dd></div>
+      <div><dt>課程 ID</dt><dd>${escapeHTML(meta.course_id || "-")}</dd></div>
+      <div><dt>來源頁</dt><dd>${escapeHTML(item.source_path || "-")}</dd></div>
+      <div><dt>收件信箱</dt><dd>${escapeHTML(item.recipient_email || "-")}</dd></div>
+      <div><dt>寄信狀態</dt><dd>${item.email_sent ? "已寄出" : "未確認 / 未寄出"}</dd></div>
+      <div><dt>送出時間</dt><dd>${formatUpdatedAt(item.created_at)}</dd></div>
+      <div><dt>下一步</dt><dd>${escapeHTML(meta.next_action || "-")}</dd></div>
+      <div><dt>下次追蹤</dt><dd>${meta.next_follow_up_at ? formatUpdatedAt(meta.next_follow_up_at) : "-"}</dd></div>
+    </dl>
+  `;
+  renderSignupTimeline(item);
 }
 
 function resetForm() {
@@ -150,6 +306,38 @@ async function loadCourses() {
     renderCourses();
   } finally {
     refreshButton?.removeAttribute("disabled");
+  }
+}
+
+async function loadCourseSignups() {
+  if (!signupTableBody) return;
+  setSignupStatus("正在讀取課程報名資料...", "info");
+  signupRefreshButton?.setAttribute("disabled", "true");
+  try {
+    let query = supabase
+      .from("form_submissions")
+      .select("*")
+      .eq("form_type", "course_signup")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (signupStatusFilter?.value) query = query.eq("status", signupStatusFilter.value);
+    const { data, error } = await query;
+    if (error) throw error;
+    courseSignups = data || [];
+    renderCourseSignups();
+    renderSignupCounts();
+    setSignupStatus("", "success");
+    if (selectedCourseSignup) {
+      renderSignupDetail(courseSignups.find((item) => item.id === selectedCourseSignup.id) || null);
+    }
+  } catch (error) {
+    console.error("Failed to load course signups", error);
+    setSignupStatus(`讀取課程報名失敗：${error.message}`, "error");
+    courseSignups = [];
+    renderCourseSignups();
+    renderSignupCounts();
+  } finally {
+    signupRefreshButton?.removeAttribute("disabled");
   }
 }
 
@@ -236,9 +424,78 @@ async function deleteCourse(id) {
   }
 }
 
+function signupStatusLabel(status) {
+  return signupStatusLabels[status] || status || "未處理";
+}
+
+async function saveCourseSignupProcess(event) {
+  event.preventDefault();
+  if (!signupProcessForm) return;
+  const id = signupProcessForm.elements.id.value;
+  if (!id) {
+    setSignupStatus("請先選擇一筆課程報名。", "error");
+    return;
+  }
+
+  const submitButton = signupProcessForm.querySelector('button[type="submit"]');
+  submitButton?.setAttribute("disabled", "true");
+  setSignupStatus("正在儲存課程報名處理紀錄...", "info");
+
+  try {
+    const current = courseSignups.find((item) => item.id === id) || selectedCourseSignup || {};
+    const metadata = current.metadata && typeof current.metadata === "object" ? { ...current.metadata } : {};
+    const nextStatus = signupProcessForm.elements.status.value;
+    const nextFollowUp = fromLocalDateTimeInput(signupProcessForm.elements.next_follow_up_at.value);
+    const nextAction = signupProcessForm.elements.next_action.value.trim();
+    const note = signupProcessForm.elements.internal_note.value.trim();
+    const history = Array.isArray(metadata.process_history) ? metadata.process_history : [];
+    const statusChanged = current.status !== nextStatus;
+    const processChanged = metadata.next_action !== nextAction
+      || metadata.next_follow_up_at !== nextFollowUp
+      || metadata.priority !== signupProcessForm.elements.priority.value;
+
+    if (statusChanged || processChanged || note !== (current.internal_note || "")) {
+      history.push({
+        at: new Date().toISOString(),
+        actor: userEmail?.textContent || "後台使用者",
+        status: nextStatus,
+        status_label: signupStatusLabel(nextStatus),
+        note: note || nextAction || "課程報名處理流程已更新。"
+      });
+    }
+
+    metadata.priority = signupProcessForm.elements.priority.value;
+    metadata.next_action = nextAction;
+    metadata.next_follow_up_at = nextFollowUp || null;
+    metadata.process_history = history.slice(-30);
+
+    const { error } = await supabase
+      .from("form_submissions")
+      .update({
+        status: nextStatus,
+        internal_note: note || null,
+        metadata,
+        handled_at: ["contacted", "closed"].includes(nextStatus) ? new Date().toISOString() : null
+      })
+      .eq("id", id);
+    if (error) throw error;
+
+    setSignupStatus("課程報名處理紀錄已儲存。", "success");
+    await loadCourseSignups();
+  } catch (error) {
+    console.error("Failed to save course signup process", error);
+    setSignupStatus(`儲存課程報名失敗：${error.message}`, "error");
+  } finally {
+    submitButton?.removeAttribute("disabled");
+  }
+}
+
 form?.addEventListener("submit", saveCourse);
+signupProcessForm?.addEventListener("submit", saveCourseSignupProcess);
 newButton?.addEventListener("click", resetForm);
 refreshButton?.addEventListener("click", loadCourses);
+signupRefreshButton?.addEventListener("click", loadCourseSignups);
+signupStatusFilter?.addEventListener("change", loadCourseSignups);
 form?.elements.title?.addEventListener("input", () => {
   if (!form.elements.id.value && !form.elements.slug.value) form.elements.slug.value = slugify(form.elements.title.value);
 });
@@ -247,6 +504,24 @@ tableBody?.addEventListener("click", (event) => {
   const deleteButton = event.target.closest("[data-delete-course]");
   if (editButton) fillForm(courses.find((course) => course.id === editButton.dataset.editCourse));
   if (deleteButton) deleteCourse(deleteButton.dataset.deleteCourse);
+});
+signupProcessForm?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-course-quick-status]");
+  if (!button || !signupProcessForm.elements.id.value) return;
+  signupProcessForm.elements.status.value = button.dataset.courseQuickStatus;
+  if (button.dataset.courseQuickStatus === "contacted" && !signupProcessForm.elements.next_action.value.trim()) {
+    signupProcessForm.elements.next_action.value = "已完成第一次聯絡，等待學員回覆或確認上課資訊。";
+  }
+  if (button.dataset.courseQuickStatus === "closed" && !signupProcessForm.elements.next_action.value.trim()) {
+    signupProcessForm.elements.next_action.value = "報名已完成確認，課前通知已安排。";
+  }
+  if (button.dataset.courseQuickStatus === "spam" && !signupProcessForm.elements.next_action.value.trim()) {
+    signupProcessForm.elements.next_action.value = "此筆報名已取消或判定為無效資料。";
+  }
+});
+signupTableBody?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-view-course-signup]");
+  if (button) renderSignupDetail(courseSignups.find((item) => item.id === button.dataset.viewCourseSignup));
 });
 bindAdminLogout(logoutButton);
 
@@ -258,6 +533,7 @@ bootProtectedAdminPage({
   logoutButton,
   onReady: async () => {
     resetForm();
-    await loadCourses();
+    renderSignupDetail(null);
+    await Promise.all([loadCourses(), loadCourseSignups()]);
   }
 }).catch((error) => reportAdminBootError(loading, error));

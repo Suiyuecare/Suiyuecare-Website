@@ -173,8 +173,8 @@ export async function getAdminPermissions() {
     display_name: profile.display_name,
     email: profile.email,
     can_manage_users: ["owner", "admin"].includes(profile.role),
-    can_publish: ["owner", "admin"].includes(profile.role),
-    can_review_publish: ["owner", "admin"].includes(profile.role),
+    can_publish: profile.role === "owner",
+    can_review_publish: profile.role === "owner",
     can_edit_site_settings: ["owner", "admin"].includes(profile.role),
     can_view_pages: ["owner", "admin", "editor", "viewer"].includes(profile.role),
     can_manage_media: ["owner", "admin", "editor"].includes(profile.role),
@@ -241,7 +241,7 @@ function ensurePublishHint(statusSelect, message) {
 }
 
 export function applyPublishStatusUi(permissions = {}) {
-  const canPublish = hasAdminPermission(permissions, "can_publish") || hasAdminPermission(permissions, "can_review_publish");
+  const canPublish = hasAdminPermission(permissions, "can_publish");
   document.querySelectorAll('select[name="status"]').forEach((statusSelect) => {
     const publishOption = [...statusSelect.options].find((option) => option.value === "published");
     if (!publishOption) return;
@@ -249,7 +249,7 @@ export function applyPublishStatusUi(permissions = {}) {
     if (canPublish) {
       publishOption.disabled = false;
       statusSelect.dataset.publishLocked = "false";
-      ensurePublishHint(statusSelect, "此帳號可以直接發布；若需要雙人覆核，請改用送審發布。");
+      ensurePublishHint(statusSelect, "執行長帳號可以直接發布。");
       return;
     }
 
@@ -257,7 +257,7 @@ export function applyPublishStatusUi(permissions = {}) {
       publishOption.disabled = true;
     }
     statusSelect.dataset.publishLocked = "true";
-    ensurePublishHint(statusSelect, "此帳號不能直接發布。請先儲存草稿，再使用「送審發布」。");
+    ensurePublishHint(statusSelect, "此帳號需先儲存草稿，再使用「送審發布」；只有執行長可以直接發布。");
   });
 }
 

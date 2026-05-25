@@ -5,12 +5,26 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "login.suiyuecare.com"
+        }
+      ],
+      "destination": "/portal/"
+    },
+    {
       "source": "/admin/pages/:id",
       "destination": "/admin/pages/[id]"
     },
     {
       "source": "/admin/articles/:id",
       "destination": "/admin/articles/[id]"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/admin/404/"
     }
   ],
   "crons": [

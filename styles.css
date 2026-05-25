@@ -11,13 +11,15 @@
   --sky: #168fab;
   --green: #758d62;
   --shadow: 0 30px 90px rgba(83, 43, 11, 0.16);
+  --header-height: 96px;
 }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { scroll-behavior: smooth; overflow-x: hidden; }
+html { scroll-behavior: smooth; overflow-x: hidden; scroll-padding-top: calc(var(--header-height) + 18px); }
 body {
   margin: 0;
+  padding-top: var(--header-height);
   overflow-x: hidden;
   background: var(--cream);
   color: var(--text);
@@ -131,14 +133,16 @@ div {
 @keyframes intro-out { to { visibility: hidden; pointer-events: none; } }
 
 .site-header {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 80;
+  left: 0;
+  right: 0;
+  z-index: 220;
   display: grid;
   grid-template-columns: minmax(250px, .54fr) minmax(680px, 1.46fr);
   align-items: center;
   gap: 34px;
-  min-height: 96px;
+  min-height: var(--header-height);
   padding: 0 clamp(22px, 4vw, 86px);
   border-bottom: 1px solid rgba(63, 33, 13, 0.12);
   background: rgba(255, 253, 248, 0.94);
@@ -241,10 +245,9 @@ div {
 .hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(620px, 0.95fr) minmax(280px, 0.48fr);
-  grid-template-rows: 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 22px;
-  align-items: end;
+  align-items: center;
   min-height: calc(100vh - 80px);
   padding: clamp(56px, 6vw, 92px) clamp(32px, 5vw, 86px);
   overflow: hidden;
@@ -254,7 +257,7 @@ div {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(28, 12, 4, 0.9) 0%, rgba(28, 12, 4, 0.7) 36%, rgba(28, 12, 4, 0.18) 76%),
+    linear-gradient(90deg, rgba(28, 12, 4, 0.9) 0%, rgba(28, 12, 4, 0.7) 38%, rgba(28, 12, 4, 0.22) 68%, rgba(28, 12, 4, 0.04) 100%),
     linear-gradient(180deg, rgba(28, 12, 4, 0.16), rgba(28, 12, 4, 0.7)),
     url("assets/homepage-batch/01-care-home-greeting.png") center / cover;
   transform: scale(1.03);
@@ -266,7 +269,7 @@ div {
   grid-row: 1;
   align-self: center;
   max-width: 920px;
-  padding-right: 26px;
+  padding-right: 0;
 }
 .eyebrow {
   margin: 0 0 14px;
@@ -292,24 +295,25 @@ h2 {
   font-weight: 900;
   line-height: 1.12;
 }
-.hero .eyebrow { color: #ffd3a1; }
-.hero h1 { color: #fff; text-shadow: 0 18px 50px rgba(0,0,0,.42), 0 3px 16px rgba(63,33,13,.42); }
+.hero .eyebrow { color: #c45c10; }
+.hero h1 { color: #fff; text-shadow: 0 22px 58px rgba(0,0,0,.54), 0 4px 18px rgba(63,33,13,.58); }
 .hero-copy > p:not(.eyebrow), .care-layout p, .section-head > p, .wall-side p, .service-grid p, .health-stack span, .contact-section p {
   color: var(--muted);
   line-height: 1.9;
 }
-.hero-copy > p:not(.eyebrow) { max-width: 680px; color: rgba(255,255,255,.82); font-size: 20px; }
+.hero-copy > p:not(.eyebrow) { max-width: 680px; color: rgba(126,102,87,.92); font-size: 20px; text-shadow: none; }
 .hero-slogan {
   display: inline-flex;
   margin: 0 0 18px;
-  padding: 10px 16px;
-  border: 1px solid rgba(255,255,255,.28);
+  padding: 10px 18px;
+  border: 1px solid rgba(196,92,16,.18);
   border-radius: 999px;
-  background: rgba(255,255,255,.12);
+  background: var(--orange);
   color: #fff !important;
   font-size: 18px !important;
   font-weight: 900;
-  backdrop-filter: blur(10px);
+  box-shadow: 0 14px 30px rgba(240,138,36,.26);
+  backdrop-filter: none;
 }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
 .primary-button, .ghost-button, .secondary-button, .contact-form button {
@@ -337,11 +341,19 @@ h2 {
   z-index: 1;
   grid-column: 2;
   grid-row: 1;
+  align-self: end;
+  justify-self: end;
   display: grid;
   align-content: space-between;
-  padding: 26px;
-  min-height: 340px;
-  backdrop-filter: blur(16px);
+  width: min(100%, 460px);
+  padding: 22px;
+  min-height: 292px;
+  margin-right: clamp(-34px, -2vw, -16px);
+  margin-bottom: clamp(-6px, 1vw, 18px);
+  background: rgba(255,253,248,.82);
+  box-shadow: 0 16px 36px rgba(83,43,11,.07);
+  transform: translateX(clamp(12px, 2.4vw, 42px));
+  backdrop-filter: blur(18px);
 }
 .dash-title span, .wall-side span, .service-grid span {
   color: var(--orange-dark);
@@ -349,11 +361,11 @@ h2 {
   font-weight: 900;
   letter-spacing: .08em;
 }
-.dash-title strong { display: block; margin-top: 9px; color: var(--brown); font-size: 27px; }
-.dash-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 22px; }
-.dash-stats article { display: grid; gap: 4px; padding: 14px; border-radius: 18px; background: rgba(246,233,217,.62); color: var(--muted); }
-.dash-stats strong { color: var(--brown); font-size: 28px; line-height: 1; }
-.dash-stats span { font-size: 13px; font-weight: 800; }
+.dash-title strong { display: block; margin-top: 9px; color: var(--brown); font-size: 24px; }
+.dash-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.dash-stats article { display: grid; gap: 4px; padding: 12px; border-radius: 16px; background: rgba(246,233,217,.58); color: var(--muted); }
+.dash-stats strong { color: var(--brown); font-size: 25px; line-height: 1; }
+.dash-stats span { font-size: 12px; font-weight: 800; }
 .section { padding: clamp(58px, 5.8vw, 94px) clamp(32px, 5vw, 86px); }
 .section-tight-top { padding-top: clamp(24px, 2.8vw, 44px); }
 .section-tight-bottom { padding-bottom: clamp(24px, 2.8vw, 44px); }
@@ -503,14 +515,14 @@ h2 {
 .recruit-panel {
   display: grid;
   align-content: start;
-  padding: 0;
+  padding: 0 0 0 22px;
   border: 0;
   background: transparent;
   box-shadow: none;
 }
 .recruit-panel > .eyebrow,
 .recruit-panel > h2 {
-  padding-inline: 2px;
+  padding-inline: 0;
 }
 .recruit-list {
   display: flex;
@@ -1215,6 +1227,9 @@ h2 {
   }
   .hero-dashboard {
     min-height: auto;
+    width: 100%;
+    margin-bottom: 0;
+    transform: none;
   }
   .service-grid a:nth-child(7):last-child {
     grid-column: 1 / -1;
@@ -2267,8 +2282,94 @@ h2 {
 }
 .about-belief,
 .about-system,
-.about-method {
+.about-method,
+.about-story,
+.about-principles,
+.about-problem-section,
+.about-operating-section,
+.about-stakeholder-section,
+.about-team-section,
+.about-standard-section,
+.about-quality-section,
+.about-future,
+.about-promise-section,
+.about-faq-section {
   padding: 42px clamp(32px,5vw,86px);
+}
+.about-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(340px, .75fr);
+  gap: 18px;
+  align-items: stretch;
+}
+.about-story-card,
+.about-story-notes article,
+.about-principle-grid article,
+.about-problem-grid article,
+.about-operating-grid article,
+.about-stakeholder-board article,
+.about-team-grid article,
+.about-standard-grid article,
+.about-quality-board,
+.about-quality-grid article,
+.about-future-grid article,
+.about-promise-grid article,
+.about-faq-list details {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(83,43,11,.065);
+}
+.about-story-card {
+  padding: clamp(30px, 4vw, 54px);
+}
+.about-story-card h2 {
+  max-width: 980px;
+  margin: 8px 0 22px;
+  color: var(--brown);
+  font-size: clamp(34px, 4.6vw, 66px);
+  line-height: 1.12;
+}
+.about-story-card p {
+  max-width: 960px;
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.9;
+}
+.about-story-card p:last-child {
+  margin-bottom: 0;
+}
+.about-story-notes {
+  display: grid;
+  gap: 18px;
+}
+.about-story-notes article {
+  padding: 26px;
+  background: linear-gradient(135deg, #fff, #fff8ef);
+}
+.about-story-notes b,
+.about-principle-grid b {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--orange-dark);
+  font-size: 18px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+}
+.about-story-notes span {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--brown);
+  font-size: 24px;
+  font-weight: 1000;
+  line-height: 1.25;
+}
+.about-story-notes p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.7;
 }
 .about-section-head {
   display: grid;
@@ -2325,7 +2426,15 @@ h2 {
 }
 .about-value-grid h3,
 .about-system-grid h3,
-.about-step-grid h3 {
+.about-step-grid h3,
+.about-principle-grid h3,
+.about-problem-grid h3,
+.about-operating-grid h3,
+.about-stakeholder-board h3,
+.about-team-grid h3,
+.about-standard-grid h3,
+.about-quality-grid h3,
+.about-future-grid h3 {
   margin: 0 0 12px;
   color: var(--brown);
   font-size: 30px;
@@ -2334,11 +2443,99 @@ h2 {
 .about-value-grid p,
 .about-system-copy p,
 .about-system-grid p,
-.about-step-grid p {
+.about-step-grid p,
+.about-principle-grid p,
+.about-problem-grid p,
+.about-operating-grid p,
+.about-stakeholder-board p,
+.about-team-grid p,
+.about-standard-grid p,
+.about-quality-grid p,
+.about-future-grid p,
+.about-promise-grid p,
+.about-faq-list p {
   margin: 0;
   color: var(--muted);
   font-weight: 820;
   line-height: 1.8;
+}
+.about-principle-grid,
+.about-problem-grid,
+.about-team-grid,
+.about-standard-grid,
+.about-future-grid,
+.about-promise-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.about-principle-grid article,
+.about-problem-grid article,
+.about-team-grid article,
+.about-standard-grid article,
+.about-future-grid article,
+.about-promise-grid article {
+  min-height: 250px;
+  padding: 28px;
+}
+.about-operating-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+}
+.about-operating-grid article {
+  min-height: 280px;
+  padding: 24px;
+}
+.about-operating-grid b,
+.about-stakeholder-board b {
+  display: block;
+  margin-bottom: 22px;
+  color: var(--orange-dark);
+  font-size: 20px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+}
+.about-stakeholder-board {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+.about-stakeholder-board article {
+  min-height: 300px;
+  padding: 24px;
+}
+.about-promise-grid article {
+  display: grid;
+  gap: 12px;
+  min-height: 190px;
+  background: linear-gradient(135deg, #fff, #fff7eb);
+}
+.about-promise-grid strong {
+  color: var(--orange-dark);
+  font-size: 34px;
+  line-height: 1;
+}
+.about-faq-list {
+  display: grid;
+  gap: 14px;
+}
+.about-faq-list details {
+  padding: 22px 26px;
+}
+.about-faq-list summary {
+  cursor: pointer;
+  color: var(--brown);
+  font-size: 22px;
+  font-weight: 1000;
+  line-height: 1.35;
+}
+.about-faq-list p {
+  margin-top: 14px;
+}
+.about-cta-panel {
+  margin-top: 22px;
+  margin-bottom: 86px;
 }
 .about-system {
   display: grid;
@@ -2415,6 +2612,38 @@ h2 {
   color: var(--orange-dark);
   font-size: 20px;
   letter-spacing: .12em;
+}
+.about-quality-board {
+  display: grid;
+  grid-template-columns: minmax(360px, .54fr) minmax(0, 1fr);
+  gap: 22px;
+  padding: clamp(28px, 4vw, 48px);
+  background: linear-gradient(135deg, #fff, #fff6eb);
+}
+.about-quality-board > div:first-child {
+  display: grid;
+  align-content: center;
+}
+.about-quality-board h2 {
+  margin: 8px 0 18px;
+  color: var(--brown);
+  font-size: clamp(34px, 4.5vw, 64px);
+  line-height: 1.1;
+}
+.about-quality-board > div:first-child p:not(.eyebrow) {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.85;
+}
+.about-quality-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.about-quality-grid article {
+  padding: 22px;
+  box-shadow: none;
 }
 .milestones-page {
   background: #fffaf2;
@@ -2600,14 +2829,45 @@ h2 {
 }
 .milestone-list {
   display: grid;
-  gap: 24px;
+  gap: 34px;
+}
+.milestone-year-group {
+  display: grid;
+  gap: 18px;
+}
+.milestone-year-heading {
+  position: sticky;
+  top: 92px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px;
+  align-items: end;
+  padding: 10px 4px 12px;
+  backdrop-filter: blur(16px);
+  background: linear-gradient(180deg, rgba(255,250,242,.96), rgba(255,250,242,.72));
+}
+.milestone-year-heading span {
+  color: var(--orange-dark);
+  font-size: clamp(52px, 5vw, 86px);
+  font-weight: 1000;
+  line-height: .9;
+}
+.milestone-year-heading p {
+  max-width: 720px;
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 17px;
+  font-weight: 850;
+  line-height: 1.75;
 }
 .milestone-card {
+  position: relative;
   display: grid;
-  grid-template-columns: 104px minmax(240px, .38fr) minmax(0, 1fr);
+  grid-template-columns: 120px minmax(220px, .34fr) minmax(0, 1fr);
   gap: 18px;
   align-items: stretch;
-  min-height: 280px;
+  min-height: 240px;
   padding: 14px;
   border: 1px solid rgba(230,190,142,.8);
   border-radius: 28px;
@@ -2617,12 +2877,37 @@ h2 {
   transform: translateY(10px) scale(.99);
   transition: opacity .35s ease, transform .35s ease, box-shadow .35s ease, border-color .35s ease, background .35s ease;
 }
+.milestone-card::before {
+  content: "";
+  position: absolute;
+  top: 34px;
+  left: -35px;
+  width: 15px;
+  height: 15px;
+  border: 4px solid #fffaf2;
+  border-radius: 999px;
+  background: rgba(198,100,18,.42);
+  box-shadow: 0 0 0 1px rgba(198,100,18,.18), 0 8px 22px rgba(198,100,18,.16);
+  transition: transform .35s ease, background .35s ease, box-shadow .35s ease;
+}
 .milestone-card.active {
   opacity: 1;
   transform: translateY(0) scale(1);
   border-color: rgba(240,138,36,.9);
   background: #fff;
   box-shadow: 0 20px 52px rgba(83,43,11,.1);
+}
+.milestone-card:hover {
+  opacity: 1;
+  transform: translateY(-4px) scale(1.006);
+  border-color: rgba(240,138,36,.78);
+  box-shadow: 0 24px 58px rgba(83,43,11,.12);
+}
+.milestone-card.active::before,
+.milestone-card:hover::before {
+  background: var(--orange);
+  box-shadow: 0 0 0 8px rgba(240,138,36,.12), 0 10px 26px rgba(198,100,18,.24);
+  transform: scale(1.15);
 }
 .milestone-year {
   display: grid;
@@ -2631,14 +2916,13 @@ h2 {
 }
 .milestone-year span {
   color: var(--orange-dark);
-  font-size: 34px;
+  font-size: 36px;
   font-weight: 1000;
   line-height: 1;
-  writing-mode: vertical-rl;
 }
 .milestone-year b {
   color: rgba(83,43,11,.28);
-  font-size: 18px;
+  font-size: 17px;
   letter-spacing: .14em;
 }
 .milestone-card figure {
@@ -2650,7 +2934,7 @@ h2 {
 .milestone-card img {
   width: 100%;
   height: 100%;
-  min-height: 240px;
+  min-height: 210px;
   object-fit: cover;
   filter: saturate(.9);
   transform: scale(1.03);
@@ -2666,16 +2950,44 @@ h2 {
   padding: 18px 18px 18px 6px;
 }
 .milestone-copy small {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
   color: var(--orange-dark);
   font-size: 13px;
   font-weight: 1000;
   letter-spacing: .12em;
   text-transform: uppercase;
 }
+.milestone-copy small em {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #fff1df;
+  color: var(--orange-dark);
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: .06em;
+}
+.milestone-copy small i {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--orange);
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: .08em;
+}
 .milestone-copy h3 {
   margin: 12px 0 16px;
   color: var(--brown);
-  font-size: clamp(28px, 3vw, 44px);
+  font-size: clamp(26px, 2.5vw, 38px);
   line-height: 1.12;
 }
 .milestone-copy p {
@@ -2741,6 +3053,33 @@ h2 {
   font-size: 18px;
   font-weight: 800;
   line-height: 1.9;
+}
+.homecare-hero-points {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 960px;
+  margin-top: 6px;
+}
+.homecare-hero-points article {
+  display: grid;
+  gap: 8px;
+  min-height: 132px;
+  padding: 18px;
+  border: 1px solid rgba(234,211,179,.86);
+  border-radius: 20px;
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 12px 30px rgba(83,43,11,.055);
+}
+.homecare-hero-points span {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+}
+.homecare-hero-points strong {
+  color: var(--brown);
+  font-size: 15px;
+  line-height: 1.6;
 }
 .service-hero-card {
   position: relative;
@@ -2959,6 +3298,153 @@ h2 {
   font-weight: 1000;
   line-height: 1.6;
 }
+.software-positioning {
+  background: linear-gradient(180deg, #fffaf4, #fff);
+}
+.software-problem-grid,
+.software-scenario-grid,
+.software-package-grid,
+.software-control-grid {
+  display: grid;
+  gap: 16px;
+}
+.software-problem-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.software-scenario-grid,
+.software-package-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.software-control-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.software-problem-grid article,
+.software-scenario-grid article,
+.software-package-grid article,
+.software-control-grid article,
+.software-role-board article,
+.software-faq-list details {
+  border: 1px solid rgba(234,211,179,.9);
+  border-radius: 20px;
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 14px 34px rgba(83,43,11,.055);
+}
+.software-problem-grid article,
+.software-scenario-grid article,
+.software-package-grid article,
+.software-control-grid article {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-height: 210px;
+  padding: 24px;
+}
+.software-problem-grid h3,
+.software-scenario-grid h3,
+.software-package-grid h3,
+.software-control-grid h3,
+.software-role-board h3 {
+  color: var(--brown);
+  font-size: 24px;
+  line-height: 1.25;
+}
+.software-problem-grid p,
+.software-scenario-grid p,
+.software-package-grid p,
+.software-control-grid p,
+.software-role-board p,
+.software-faq-list p {
+  color: var(--muted);
+  font-weight: 800;
+  line-height: 1.85;
+}
+.software-scenario-grid small,
+.software-package-grid strong {
+  align-self: end;
+  display: block;
+  color: var(--orange-dark);
+  font-weight: 1000;
+  line-height: 1.6;
+}
+.software-role-board {
+  display: grid;
+  grid-template-columns: 1.15fr .92fr .92fr;
+  gap: 16px;
+}
+.software-role-board article {
+  display: grid;
+  gap: 14px;
+  min-height: 250px;
+  padding: 24px;
+}
+.software-role-board article:first-child {
+  grid-row: span 2;
+  min-height: 516px;
+  align-content: center;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(240,138,36,.16), transparent 34%),
+    #fffaf4;
+}
+.software-role-board b {
+  display: inline-grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--orange);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 1000;
+}
+.software-role-board article:first-child h3 {
+  font-size: clamp(34px, 4vw, 54px);
+}
+.software-package-grid article {
+  min-height: 260px;
+  background:
+    linear-gradient(180deg, rgba(255,246,235,.75), rgba(255,255,255,.96));
+}
+.software-package-grid h3 {
+  font-size: clamp(26px, 2.4vw, 38px);
+}
+.software-control-section {
+  background: #fffaf4;
+}
+.software-control-grid article {
+  min-height: 190px;
+  box-shadow: none;
+}
+.software-faq-list {
+  display: grid;
+  gap: 12px;
+}
+.software-faq-list details {
+  padding: 0;
+  overflow: hidden;
+}
+.software-faq-list summary {
+  cursor: pointer;
+  padding: 20px 24px;
+  color: var(--brown);
+  font-size: 20px;
+  font-weight: 1000;
+  list-style: none;
+}
+.software-faq-list summary::-webkit-details-marker {
+  display: none;
+}
+.software-faq-list summary::after {
+  content: "+";
+  float: right;
+  color: var(--orange);
+}
+.software-faq-list details[open] summary::after {
+  content: "-";
+}
+.software-faq-list p {
+  margin: 0;
+  padding: 0 24px 22px;
+}
 .service-detail-section {
   padding: clamp(34px, 4.2vw, 52px) clamp(28px, 6vw, 92px);
 }
@@ -3089,6 +3575,109 @@ h2 {
   background: #fff1df;
   color: var(--orange-dark);
   font-size: 13px;
+  font-weight: 1000;
+}
+.homecare-positioning,
+.homecare-quality-section {
+  background: linear-gradient(180deg, #fffaf4, #fff);
+}
+.homecare-problem-grid,
+.homecare-scenario-grid,
+.homecare-quality-grid,
+.homecare-family-board {
+  display: grid;
+  gap: 16px;
+}
+.homecare-problem-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.homecare-scenario-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.homecare-quality-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.homecare-problem-grid article,
+.homecare-scenario-grid article,
+.homecare-quality-grid article,
+.homecare-family-board article {
+  border: 1px solid rgba(234,211,179,.9);
+  border-radius: 20px;
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 14px 34px rgba(83,43,11,.055);
+}
+.homecare-problem-grid article,
+.homecare-scenario-grid article,
+.homecare-quality-grid article {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-height: 220px;
+  padding: 24px;
+}
+.homecare-scenario-grid article {
+  min-height: 280px;
+  background: linear-gradient(180deg, rgba(255,246,235,.72), rgba(255,255,255,.96));
+}
+.homecare-problem-grid h3,
+.homecare-scenario-grid h3,
+.homecare-quality-grid h3,
+.homecare-family-board h3 {
+  color: var(--brown);
+  font-size: 24px;
+  line-height: 1.25;
+}
+.homecare-problem-grid p,
+.homecare-scenario-grid p,
+.homecare-quality-grid p,
+.homecare-family-board p {
+  color: var(--muted);
+  font-weight: 800;
+  line-height: 1.85;
+}
+.homecare-scenario-grid small {
+  align-self: end;
+  color: var(--orange-dark);
+  font-weight: 1000;
+  line-height: 1.6;
+}
+.homecare-quality-grid article {
+  min-height: 190px;
+  box-shadow: none;
+}
+.homecare-family-board {
+  grid-template-columns: 1.15fr .92fr .92fr;
+}
+.homecare-family-board article {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-height: 250px;
+  padding: 24px;
+}
+.homecare-family-board article:first-child {
+  grid-row: span 2;
+  align-content: center;
+  min-height: 516px;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(240,138,36,.16), transparent 34%),
+    #fffaf4;
+}
+.homecare-family-board article:first-child h2 {
+  margin: 0;
+  color: var(--brown);
+  font-size: clamp(34px, 4vw, 54px);
+  line-height: 1.08;
+}
+.homecare-family-board b {
+  display: inline-grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--orange);
+  color: #fff;
+  font-size: 15px;
   font-weight: 1000;
 }
 .land-site-grid article {
@@ -4806,6 +5395,24 @@ h2 {
   grid-template-columns: 1.25fr repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
+.home-care-page .homecare-gallery {
+  grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
+}
+.day-care-page .homecare-gallery {
+  grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
+}
+.community-page .homecare-gallery {
+  grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
+}
+.nursing-page .homecare-gallery {
+  grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
+}
+.migrant-training-page .homecare-gallery {
+  grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
+}
+.quality-page .homecare-gallery {
+  grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
+}
 .homecare-gallery figure {
   position: relative;
   min-height: 260px;
@@ -5385,6 +5992,25 @@ h2 {
   gap: 18px;
   padding: 36px clamp(32px,5vw,86px) 86px;
 }
+.course-empty-state {
+  grid-column: 1 / -1;
+  padding: clamp(30px, 5vw, 58px);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fffdf8;
+  box-shadow: 0 18px 48px rgba(83,43,11,.08);
+}
+.course-empty-state h2 {
+  margin: 0 0 12px;
+  color: var(--brown);
+}
+.course-empty-state p {
+  max-width: 720px;
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-weight: 800;
+  line-height: 1.8;
+}
 .course-card {
   display: grid;
   grid-template-rows: 230px 1fr;
@@ -5761,8 +6387,9 @@ h2 {
 }
 .article-hero figure {
   position: relative;
-  height: clamp(100px, 10vw, 125px);
-  min-height: clamp(100px, 10vw, 125px);
+  aspect-ratio: 2 / 1;
+  height: auto;
+  min-height: 0;
   margin: 0 clamp(32px,5vw,86px);
   overflow: hidden;
   border-radius: 28px;
@@ -5778,10 +6405,12 @@ h2 {
     linear-gradient(180deg, transparent 48%, rgba(45,22,8,.72) 100%);
 }
 .article-hero img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   max-height: 100%;
-  min-height: clamp(100px, 10vw, 125px);
+  min-height: 0;
   display: block;
   object-fit: cover;
 }
@@ -6121,6 +6750,7 @@ h2 {
 }
 
 @media (max-width: 1180px) {
+  :root { --header-height: 82px; }
   .site-header { display: flex; justify-content: space-between; min-height: 82px; padding-inline: 22px; }
   .brand-mark { width: 58px; height: 58px; }
   .brand small { display: none; }
@@ -6128,8 +6758,36 @@ h2 {
   .primary-nav { gap: 16px; font-size: 14px; letter-spacing: .06em; }
   .primary-nav > a, .nav-trigger { padding-inline: 8px; }
   .nav-cta { min-height: 48px !important; padding: 10px 16px !important; }
-  .hero, .news-service-layout, .care-layout, .content-wall, .care-values, .network-board, .redesigned-network, .video-section, .contact-section, .footer-main, .courses-hero, .article-row, .celebrity-row, .article-hero, .article-layout, .investor-hero, .finance-grid, .shareholder-grid, .investor-section-head, .ir-sub-hero, .finance-dashboard, .cms-chart-grid, .analysis-grid, .report-layout, .annual-grid, .governance-news-grid, .whistle-layout, .risk-layout, .integrity-layout, .shareholder-info-grid, .meeting-layout, .conference-layout, .faq-layout, .career-hero, .career-section-head, .career-dept-layout, .about-hero, .about-section-head, .about-system, .milestone-hero, .milestone-journey, .service-detail-hero, .service-section-head, .land-evaluation-section, .land-area-board, .investor-growth-section, .software-screen-grid { grid-template-columns: 1fr; }
-  .software-module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero, .news-service-layout, .care-layout, .content-wall, .care-values, .network-board, .redesigned-network, .video-section, .contact-section, .footer-main, .courses-hero, .article-row, .celebrity-row, .article-hero, .article-layout, .investor-hero, .finance-grid, .shareholder-grid, .investor-section-head, .ir-sub-hero, .finance-dashboard, .cms-chart-grid, .analysis-grid, .report-layout, .annual-grid, .governance-news-grid, .whistle-layout, .risk-layout, .integrity-layout, .shareholder-info-grid, .meeting-layout, .conference-layout, .faq-layout, .career-hero, .career-section-head, .career-dept-layout, .about-hero, .about-section-head, .about-story, .about-system, .about-quality-board, .milestone-hero, .milestone-journey, .service-detail-hero, .service-section-head, .land-evaluation-section, .land-area-board, .investor-growth-section, .software-screen-grid { grid-template-columns: 1fr; }
+  .about-operating-grid,
+  .about-stakeholder-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .software-module-grid,
+  .software-problem-grid,
+  .software-scenario-grid,
+  .software-package-grid,
+  .software-control-grid,
+  .homecare-hero-points,
+  .homecare-problem-grid,
+  .homecare-scenario-grid,
+  .homecare-quality-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .software-role-board {
+    grid-template-columns: 1fr 1fr;
+  }
+  .software-role-board article:first-child {
+    grid-row: auto;
+    min-height: 250px;
+  }
+  .homecare-family-board {
+    grid-template-columns: 1fr 1fr;
+  }
+  .homecare-family-board article:first-child {
+    grid-row: auto;
+    min-height: 250px;
+  }
   .homecare-intro {
     grid-template-columns: 1fr;
   }
@@ -6204,8 +6862,8 @@ h2 {
   .health-preview.feature img { height: 260px; }
   .article-hero figure,
   .article-hero img {
-    height: 125px;
-    min-height: 125px;
+    height: auto;
+    min-height: 0;
   }
   .article-ads {
     position: static;
@@ -6228,9 +6886,16 @@ h2 {
   .ir-updates-grid,
   .ir-progress-grid,
   .about-value-grid,
+  .about-principle-grid,
+  .about-problem-grid,
   .about-system-grid,
   .about-stats,
   .about-step-grid,
+  .about-team-grid,
+  .about-standard-grid,
+  .about-quality-grid,
+  .about-future-grid,
+  .about-promise-grid,
   .milestone-stats,
   .download-grid,
   .executive-grid,
@@ -6264,6 +6929,10 @@ h2 {
   .milestone-intro {
     position: static;
     min-height: 0;
+  }
+  .milestone-year-heading {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
   .milestone-card {
     grid-template-columns: 112px minmax(260px, .45fr) minmax(0, 1fr);
@@ -6300,7 +6969,7 @@ h2 {
     z-index: 120;
     width: 100%;
     max-width: 100vw;
-    min-height: 80px;
+    min-height: var(--header-height);
     padding: 0 82px 0 18px;
   }
   .brand { min-width: 0; max-width: 100%; }
@@ -6331,7 +7000,7 @@ h2 {
   .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(10px) rotate(45deg); }
   .menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
   .menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
-  .primary-nav { position: fixed; top: 80px; right: 0; left: 0; z-index: 110; display: none; width: 100%; max-width: 100vw; max-height: calc(100vh - 80px); padding: 16px 22px 26px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; border-bottom: 1px solid var(--line); background: rgba(255,248,238,.98); box-shadow: 0 22px 48px rgba(83,43,11,.14); white-space: normal; }
+  .primary-nav { position: fixed; top: var(--header-height); right: 0; left: 0; z-index: 210; display: none; width: 100%; max-width: 100vw; max-height: calc(100vh - var(--header-height)); padding: 16px 22px 26px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; border-bottom: 1px solid var(--line); background: rgba(255,248,238,.98); box-shadow: 0 22px 48px rgba(83,43,11,.14); white-space: normal; }
   .primary-nav.open { display: block; }
   .primary-nav > a, .nav-trigger { width: 100%; justify-content: flex-start; min-height: 50px; padding: 14px; border-radius: 16px; text-align: left; white-space: normal; }
   .nav-group { width: 100%; }
@@ -6370,6 +7039,9 @@ h2 {
     overflow-x: auto;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
+  }
+  .recruit-panel {
+    padding-left: 0;
   }
   .partners-strip { max-width: 100vw; overflow: hidden; }
   .partners-track { will-change: transform; }
@@ -6416,9 +7088,18 @@ h2 {
   .ir-updates-grid,
   .ir-progress-grid,
   .about-value-grid,
+  .about-principle-grid,
+  .about-problem-grid,
+  .about-operating-grid,
+  .about-stakeholder-board,
   .about-system-grid,
   .about-stats,
   .about-step-grid,
+  .about-team-grid,
+  .about-standard-grid,
+  .about-quality-grid,
+  .about-future-grid,
+  .about-promise-grid,
   .milestone-stats,
   .download-grid,
   .executive-grid,
@@ -6487,14 +7168,17 @@ h2 {
     grid-template-columns: 1fr;
     min-height: 0;
   }
+  .milestone-card::before {
+    display: none;
+  }
+  .milestone-year-heading span {
+    font-size: 48px;
+  }
   .milestone-year {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 10px 12px 0;
-  }
-  .milestone-year span {
-    writing-mode: horizontal-tb;
   }
   .milestone-card img {
     min-height: 260px;
@@ -6530,14 +7214,15 @@ h2 {
   }
 }
 @media (max-width: 640px) {
-  .site-header { min-height: 72px; padding: 0 76px 0 16px; }
-  .primary-nav { top: 72px; }
+  :root { --header-height: 72px; }
+  .site-header { min-height: var(--header-height); padding: 0 76px 0 16px; }
+  .primary-nav { top: var(--header-height); max-height: calc(100vh - var(--header-height)); }
   .brand-mark { width: 48px; height: 48px; }
   .brand { gap: 8px; }
   .brand strong { max-width: calc(100vw - 148px); font-size: 18px; }
   h1 { font-size: clamp(34px, 9.6vw, 40px); line-height: 1.12; }
   h2 { font-size: clamp(30px, 8.6vw, 38px); }
-  .hero, .section, .detail-hero, .detail-content, .site-footer, .health-hero, .health-grid, .courses-hero, .course-list, .article-topbar, .article-layout, .investor-hero, .investor-panel, .ir-sub-hero, .ir-tab-panel, .career-hero, .career-tab-panel, .career-openings, .about-hero, .about-belief, .about-system, .about-method, .about-stats, .milestone-hero, .milestone-stats, .milestone-journey, .service-detail-hero, .service-detail-section { padding-inline: 20px; }
+  .hero, .section, .detail-hero, .detail-content, .site-footer, .health-hero, .health-grid, .courses-hero, .course-list, .article-topbar, .article-layout, .investor-hero, .investor-panel, .ir-sub-hero, .ir-tab-panel, .career-hero, .career-tab-panel, .career-openings, .about-hero, .about-story, .about-belief, .about-principles, .about-system, .about-team-section, .about-method, .about-quality-section, .about-future, .about-stats, .milestone-hero, .milestone-stats, .milestone-journey, .service-detail-hero, .service-detail-section { padding-inline: 20px; }
   .hero { min-height: auto; padding-top: 74px; overflow-x: clip; }
   .hero-copy {
     max-width: 100%;
@@ -6550,6 +7235,9 @@ h2 {
   .hero-dashboard {
     min-height: auto;
     padding: 22px;
+    width: 100%;
+    margin-bottom: 0;
+    transform: none;
   }
   .dash-stats {
     grid-template-columns: 1fr;
@@ -6580,7 +7268,7 @@ h2 {
   }
   .wall-main, .video-panel { min-height: 360px; border-radius: 24px; }
   .north-map { min-height: 0; border-radius: 24px; }
-  .care-flow, .service-grid, .contact-form, .detail-content, .footer-sitemap, .health-grid, .course-list, .course-search, .footer-main, .mini-article-grid, .media-row, .health-board, .health-quick-grid, .health-latest-grid, .health-media-grid, .health-pack-grid, .health-event-grid, .investor-snapshot div, .career-growth-board, .career-role-grid, .software-module-grid, .software-screen-stats, .software-screen-table p { grid-template-columns: 1fr; }
+  .care-flow, .service-grid, .contact-form, .detail-content, .footer-sitemap, .health-grid, .course-list, .course-search, .footer-main, .mini-article-grid, .media-row, .health-board, .health-quick-grid, .health-latest-grid, .health-media-grid, .health-pack-grid, .health-event-grid, .investor-snapshot div, .career-growth-board, .career-role-grid, .software-module-grid, .software-screen-stats, .software-screen-table p, .software-problem-grid, .software-scenario-grid, .software-role-board, .software-package-grid, .software-control-grid, .homecare-hero-points, .homecare-problem-grid, .homecare-scenario-grid, .homecare-quality-grid, .homecare-family-board { grid-template-columns: 1fr; }
   .ir-step-list div {
     grid-template-columns: 82px minmax(0, 1fr) 38px;
   }
@@ -6815,8 +7503,8 @@ h2 {
   }
   .article-hero figure,
   .article-hero img {
-    height: 110px;
-    min-height: 110px;
+    height: auto;
+    min-height: 0;
     border-radius: 20px;
   }
   .article-hero figcaption {

@@ -14,14 +14,22 @@
     <meta property="og:description" content="照顧就像去超商，買牛奶一樣簡單。整合居家照顧、日間照顧、社區據點、護理復能、移工培訓與教育品管。" />
     <meta property="og:image" content="https://suiyuecare.com/assets/hero-care.png" />
     <meta property="og:image:alt" content="歲悅長照照顧服務形象照" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="歲悅長照集團｜Suiyuecare Corps." />
     <meta name="twitter:description" content="照顧就像去超商，買牛奶一樣簡單。" />
     <meta name="twitter:image" content="https://suiyuecare.com/assets/hero-care.png" />
     <meta name="twitter:image:alt" content="歲悅長照照顧服務形象照" />
     <link rel="alternate" hreflang="zh-Hant-TW" href="https://suiyuecare.com/" />
+    <meta name="theme-color" content="#f08a24" />
     <meta name="deployment-version" content="assets-public-20260519" />
     <title>歲悅長照集團｜Suiyuecare Corps.</title>
+    <script>
+      if (window.location.hostname === "login.suiyuecare.com" && window.location.pathname === "/") {
+        window.location.replace(`/portal/${window.location.search}${window.location.hash}`);
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
@@ -67,7 +75,7 @@
         <div class="nav-group">
           <button class="nav-trigger" type="button" aria-expanded="false">服務項目</button>
           <div class="dropdown service-menu">
-            <a href="#about">關於歲悅</a><a href="#milestones">大記事</a>
+            <a href="#about">關於歲悅</a><a href="#milestones">大事記</a>
             <a href="#home-care">居家照顧</a><a href="#day-care">日間照顧</a>
             <a href="#community">社區據點</a><a href="#nursing">護理復能</a>
             <a href="#migrant-training">移工培訓</a><a href="#quality">教育品管</a>
@@ -107,20 +115,6 @@
               <a class="ghost-button" data-cms-button="secondary" href="#care-system">觀看照顧系統</a>
             </div>
           </div>
-
-          <aside class="hero-dashboard reveal">
-            <div class="dash-title">
-              <span>Suiyuecare Corps. STATUS</span>
-              <strong>營運服務概況</strong>
-            </div>
-            <div class="dash-stats">
-              <article><strong>18,600+</strong><span>累積服務人次</span></article>
-              <article><strong>1,280+</strong><span>服務人數</span></article>
-              <article><strong>3</strong><span>服務區域</span></article>
-              <article><strong>97%</strong><span>家屬滿意度</span></article>
-            </div>
-          </aside>
-
         </section>
 
         <section class="news-service-section section section-tight-both reveal" data-cms-section="updates">
@@ -371,6 +365,7 @@
             <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
             <label>姓名<input type="text" name="姓名" placeholder="請輸入姓名" required /></label>
             <label>電話<input type="tel" name="電話" placeholder="請輸入聯絡電話" required /></label>
+            <label>Email<input type="email" name="Email" placeholder="請輸入 Email" required /></label>
             <label>需求<select name="需求" required><option>長照服務諮詢</option><option>課程報名</option><option>人才招募</option><option>土地合作</option><option>投資洽談</option></select></label>
             <label>說明<textarea name="說明" rows="4" placeholder="請簡單描述目前遇到的照顧情境" required></textarea></label>
             <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為回覆諮詢、服務安排與後續聯繫目的，使用我填寫的個人資料。</label>

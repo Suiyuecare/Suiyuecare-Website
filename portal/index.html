@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f08a24" />
+    <link rel="canonical" href="https://login.suiyuecare.com/" />
+    <title>歲悅入口網｜帳號登入</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/portal/portal.css" />
+  </head>
+  <body>
+    <main class="portal-shell">
+      <section class="login-page" data-auth-view="signed-out" aria-labelledby="loginTitle">
+        <aside class="login-aside">
+          <a class="portal-brand" href="/portal/" aria-label="歲悅入口網首頁">
+            <img src="/assets/company-logo.png" alt="" />
+            <span>
+              <strong>歲悅長照集團</strong>
+              <small>Suiyuecare Portal</small>
+            </span>
+          </a>
+
+          <div class="login-message">
+            <p class="portal-kicker">Internal Access</p>
+            <h1>歲悅內部工作台</h1>
+            <p>登入後依職等、角色、組織節點與資料範圍，載入可使用的模組與操作權限。</p>
+          </div>
+
+          <dl class="security-list" aria-label="入口權限摘要">
+            <div>
+              <dt>登入方式</dt>
+              <dd>Email / Password</dd>
+            </div>
+            <div>
+              <dt>權限模型</dt>
+              <dd>RBAC + Data Scope</dd>
+            </div>
+            <div>
+              <dt>模組規劃</dt>
+              <dd>依組織圖控管</dd>
+            </div>
+          </dl>
+        </aside>
+
+        <section class="login-card">
+          <div class="login-card-head">
+            <p class="portal-kicker">Sign In</p>
+            <h2 id="loginTitle">帳號登入</h2>
+            <p>請輸入公司核發的帳號密碼。</p>
+          </div>
+
+          <form class="login-form" id="portalLoginForm">
+            <label>
+              <span>帳號 Email</span>
+              <input id="loginEmail" name="email" type="email" autocomplete="username" placeholder="name@suiyuecare.com" required />
+            </label>
+            <label>
+              <span>密碼</span>
+              <input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" required />
+            </label>
+            <button class="primary-login-button" type="submit">登入工作台</button>
+          </form>
+
+          <details class="demo-login-panel">
+            <summary>測試帳號</summary>
+            <p class="demo-hint">測試密碼皆為 <b>suiyuecare</b>。點選角色後會自動帶入帳密，仍需按登入。</p>
+            <div class="quick-login-tabs" id="quickLoginTabs" role="tablist" aria-label="角色分類"></div>
+            <div class="quick-login-grid" id="quickLoginGrid" aria-label="快速登入角色"></div>
+          </details>
+        </section>
+      </section>
+
+      <section class="module-portal" data-auth-view="signed-in" hidden>
+        <header class="module-topbar">
+          <div>
+            <p class="portal-kicker">工作區</p>
+            <h2 id="moduleTitle">選擇工作區</h2>
+            <p id="userSummary">正在讀取帳號資訊...</p>
+          </div>
+          <button class="text-button" type="button" id="signOutButton">登出</button>
+        </header>
+
+        <div class="module-view active" id="moduleLevelOne" aria-labelledby="moduleTitle">
+          <div class="module-grid" id="moduleLevelOneGrid"></div>
+        </div>
+
+        <div class="module-view" id="moduleLevelTwo" aria-labelledby="moduleTitle" hidden>
+          <button class="back-button" type="button" id="backToLevelOneButton">返回工作區</button>
+          <div class="module-grid submodule-grid" id="moduleLevelTwoGrid"></div>
+        </div>
+      </section>
+
+      <p class="login-status" id="loginStatus" role="status"></p>
+    </main>
+
+    <script type="module" src="/src/portal/login.js"></script>
+  </body>
+</html>

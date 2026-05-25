@@ -17,10 +17,7 @@ const countTargets = {
   draftArticles: document.querySelector('[data-dashboard-count="draftArticles"]'),
   categories: document.querySelector('[data-dashboard-count="categories"]'),
   pages: document.querySelector('[data-dashboard-count="pages"]'),
-  contentModules: document.querySelector('[data-dashboard-count="contentModules"]'),
-  templateFields: document.querySelector('[data-dashboard-count="templateFields"]'),
   courses: document.querySelector('[data-dashboard-count="courses"]'),
-  forms: document.querySelector('[data-dashboard-count="forms"]'),
   recruiting: document.querySelector('[data-dashboard-count="recruiting"]'),
   investor: document.querySelector('[data-dashboard-count="investor"]'),
   stories: document.querySelector('[data-dashboard-count="stories"]')
@@ -133,16 +130,13 @@ async function loadDashboardData() {
   setDashboardStatus("正在讀取 Supabase 資料...", "info");
 
   try {
-    const [articles, publishedArticles, draftArticles, categories, pages, contentModules, templateFields, courses, forms, recruiting, investor, careStories, expertTalks, updates] = await Promise.all([
+    const [articles, publishedArticles, draftArticles, categories, pages, courses, recruiting, investor, careStories, expertTalks, updates] = await Promise.all([
       getTableCount("articles"),
       getTableCount("articles", (query) => query.eq("status", "published")),
       getTableCount("articles", (query) => query.eq("status", "draft")),
       getTableCount("article_categories"),
       getTableCount("pages"),
-      getTableCount("content_modules", (query) => query.eq("target_slug", "home").eq("is_enabled", true)),
-      getTableCount("page_template_fields", (query) => query.eq("is_enabled", true)),
       getTableCount("courses", (query) => query.eq("status", "published").eq("is_enabled", true)),
-      getTableCount("form_submissions", (query) => query.eq("status", "new")),
       getTableCount("recruiting_openings", (query) => query.eq("status", "published").eq("is_enabled", true)),
       getTableCount("investor_notices", (query) => query.eq("status", "published").eq("is_enabled", true)),
       getTableCount("care_stories", (query) => query.eq("status", "published").eq("is_enabled", true)),
@@ -155,10 +149,7 @@ async function loadDashboardData() {
     if (countTargets.draftArticles) countTargets.draftArticles.textContent = formatCount(draftArticles);
     if (countTargets.categories) countTargets.categories.textContent = formatCount(categories);
     if (countTargets.pages) countTargets.pages.textContent = formatCount(pages);
-    if (countTargets.contentModules) countTargets.contentModules.textContent = formatCount(contentModules);
-    if (countTargets.templateFields) countTargets.templateFields.textContent = formatCount(templateFields);
     if (countTargets.courses) countTargets.courses.textContent = formatCount(courses);
-    if (countTargets.forms) countTargets.forms.textContent = formatCount(forms);
     if (countTargets.recruiting) countTargets.recruiting.textContent = formatCount(recruiting);
     if (countTargets.investor) countTargets.investor.textContent = formatCount(investor);
     if (countTargets.stories) countTargets.stories.textContent = formatCount(careStories + expertTalks);

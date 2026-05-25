@@ -23,8 +23,9 @@ const tableLabels = {
   page_sections: "頁面區塊",
   articles: "文章",
   courses: "課程",
-  downloadable_files: "檔案",
-  content_modules: "首頁模組"
+  investor_notices: "投資人公告",
+  investor_financial_items: "投資人財務資料",
+  investor_chart_datasets: "投資人圖表資料"
 };
 
 const requestStatusLabels = {
@@ -62,8 +63,8 @@ function renderPermissions() {
     ["頁面內容", boolLabel(permissions.can_edit_pages), permissions.can_edit_pages],
     ["文章內容", boolLabel(permissions.can_edit_articles), permissions.can_edit_articles],
     ["課程資料", boolLabel(permissions.can_edit_courses), permissions.can_edit_courses],
-    ["檔案下載", boolLabel(permissions.can_manage_files), permissions.can_manage_files],
-    ["表單資料", boolLabel(permissions.can_view_forms), permissions.can_view_forms],
+    ["招募資料", boolLabel(permissions.can_edit_recruiting), permissions.can_edit_recruiting],
+    ["投資人資料", boolLabel(permissions.can_edit_investor), permissions.can_edit_investor],
     ["網站流量", boolLabel(permissions.can_view_analytics), permissions.can_view_analytics]
   ];
 
@@ -150,19 +151,24 @@ function renderActivity(items = []) {
   `).join("");
 }
 
-async function loadPermissions() {
-  const { data, error } = await supabase.rpc("get_current_admin_permissions");
-  if (error) throw error;
-  permissions = data || {};
+async function loadPermissions(fallbackPermissions = {}) {
+  permissions = fallbackPermissions || {};
+  try {
+    const { data, error } = await supabase.rpc("get_current_admin_permissions");
+    if (error) throw error;
+    permissions = data && Object.keys(data).length ? data : permissions;
+  } catch (error) {
+    console.warn("Using fallback governance permissions", error);
+  }
   renderPermissions();
 }
 
-async function loadGovernanceData() {
+async function loadGovernanceData(fallbackPermissions = {}) {
   setStatus("正在讀取發布流程資料...", "info");
   refreshButton?.setAttribute("disabled", "true");
   try {
-    await loadPermissions();
-    const [requestsResult, versionsResult, logsResult] = await Promise.all([
+    await loadPermissions(fallbackPermissions);
+    const [requestsResult, versionsResult, logsResult] = await Promise.allSettled([
       supabase
         .from("publish_requests")
         .select("id, entity_table, entity_id, entity_title, status, request_note, review_note, requested_at, reviewed_at")
@@ -181,13 +187,19 @@ async function loadGovernanceData() {
         .limit(20)
     ]);
 
-    if (requestsResult.error) throw requestsResult.error;
-    if (versionsResult.error) throw versionsResult.error;
-    if (logsResult.error) throw logsResult.error;
+    const publishRequests = requestsResult.status === "fulfilled" && !requestsResult.value.error
+      ? requestsResult.value.data || []
+      : [];
+    const contentVersions = versionsResult.status === "fulfilled" && !versionsResult.value.error
+      ? versionsResult.value.data || []
+      : [];
+    const activityLogs = logsResult.status === "fulfilled" && !logsResult.value.error
+      ? logsResult.value.data || []
+      : [];
 
-    renderPublishRequests(requestsResult.data || []);
-    renderVersions(versionsResult.data || []);
-    renderActivity(logsResult.data || []);
+    renderPublishRequests(publishRequests);
+    renderVersions(contentVersions);
+    renderActivity(activityLogs);
     setStatus("", "success");
   } catch (error) {
     console.error("Failed to load governance data", error);
@@ -238,5 +250,5 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadGovernanceData
+  onReady: (_session, readyPermissions) => loadGovernanceData(readyPermissions)
 }).catch((error) => reportAdminBootError(loading, error));

@@ -17,20 +17,30 @@
           <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
           <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
           <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a href="/admin/courses"><span>CS</span><strong>課程管理</strong></a>
           <a href="/admin/recruiting"><span>RC</span><strong>招募管理</strong></a>
           <a class="active" href="/admin/investor-data"><span>IR</span><strong>投資人資料</strong></a>
-          <a href="/admin/files"><span>DL</span><strong>檔案下載</strong></a>
-          <a href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
           <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
           <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+          <a href="/admin/governance"><span>GV</span><strong>發布與權限</strong></a>
+          <a href="/admin/users"><span>US</span><strong>使用者權限</strong></a>
+          <a href="/admin/traffic"><span>AN</span><strong>網站流量中心</strong></a>
+          <a href="/admin/content-health"><span>QA</span><strong>內容健康檢查</strong></a>
+          <a href="/admin/backups"><span>BK</span><strong>備份與還原</strong></a>
         </nav>
-        <div class="admin-sidebar-note"><span>Investor Relations</span><strong>公告・財報・圖表</strong><p>下載檔請先到檔案下載管理上傳，再回此處建立公告或財務資料。</p></div>
+        <div class="admin-sidebar-note"><span>Investor Relations</span><strong>公告・財報・圖表</strong><p>管理投資人公告、財務資料、圖表資料；若有正式 PDF 可在下載檔案欄位綁定既有檔案。</p></div>
       </aside>
       <main class="admin-main">
         <header class="admin-topbar">
           <div class="admin-topbar-title"><p class="admin-eyebrow">Investor Data</p><h1>投資人資料管理</h1><span>管理頁面文案、公告、財務資料與圖表，前台投資人專區會自動讀取已發布內容。</span></div>
           <div class="admin-topbar-actions"><a class="admin-preview-link" href="/#investors" target="_blank" rel="noopener">查看前台</a><div class="admin-userbox"><b id="adminUserInitial">S</b><span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span><button id="adminLogout" type="button">登出</button></div></div>
         </header>
+        <section class="admin-dashboard-grid compact" aria-label="投資人資料摘要">
+          <article><span>Notice</span><strong data-investor-count="notices">--</strong><p>投資人公告</p></article>
+          <article><span>Finance</span><strong data-investor-count="financials">--</strong><p>財務資料列</p></article>
+          <article><span>Charts</span><strong data-investor-count="charts">--</strong><p>圖表資料</p></article>
+          <article><span>Files</span><strong data-investor-count="files">--</strong><p>可綁定下載檔</p></article>
+        </section>
         <div id="investorDataStatus" class="admin-data-status">正在讀取投資人資料...</div>
 
         <section class="admin-workspace-panel">

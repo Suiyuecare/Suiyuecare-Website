@@ -25,8 +25,56 @@ function setMediaStatus(message, type = "info") {
 function addUsage(usageMap, mediaId, usage) {
   if (!mediaId) return;
   const list = usageMap.get(mediaId) || [];
-  list.push(usage);
+  const key = `${usage.type}|${usage.title}|${usage.href}`;
+  if (!list.some((item) => `${item.type}|${item.title}|${item.href}` === key)) {
+    list.push(usage);
+  }
   usageMap.set(mediaId, list);
+}
+
+function normalizeMediaReference(value) {
+  if (!value || typeof value !== "string") return "";
+  return value
+    .trim()
+    .replace(/^https?:\/\/[^/]+/i, "")
+    .replace(/^\/+/, "")
+    .split("?")[0]
+    .split("#")[0];
+}
+
+function collectStringValues(value, values = []) {
+  if (!value) return values;
+  if (typeof value === "string") {
+    values.push(value);
+    return values;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectStringValues(item, values));
+    return values;
+  }
+  if (typeof value === "object") {
+    Object.values(value).forEach((item) => collectStringValues(item, values));
+  }
+  return values;
+}
+
+function createMediaReferenceMap(items) {
+  const lookup = new Map();
+  items.forEach((item) => {
+    [
+      item.public_url,
+      item.storage_path,
+      item.storage_path ? `/${item.storage_path}` : "",
+      item.storage_path ? `assets/${item.storage_path.split("/").pop()}` : ""
+    ].forEach((reference) => {
+      const normalized = normalizeMediaReference(reference);
+      if (!normalized) return;
+      const ids = lookup.get(normalized) || new Set();
+      ids.add(item.id);
+      lookup.set(normalized, ids);
+    });
+  });
+  return lookup;
 }
 
 async function safeUsageQuery(table, select, column, mediaIds, makeUsage) {
@@ -44,9 +92,34 @@ async function safeUsageQuery(table, select, column, mediaIds, makeUsage) {
   return (data || []).map((row) => ({ mediaId: row[column], ...makeUsage(row) })).filter((item) => item.mediaId);
 }
 
+async function safeUrlUsageQuery(table, select, mediaReferenceMap, getReferences, makeUsage) {
+  if (!mediaReferenceMap.size) return [];
+  const { data, error } = await supabase
+    .from(table)
+    .select(select)
+    .limit(1000);
+
+  if (error) {
+    console.warn(`Failed to read media URL usage from ${table}`, error);
+    return [];
+  }
+
+  const usages = [];
+  (data || []).forEach((row) => {
+    const references = getReferences(row).map(normalizeMediaReference).filter(Boolean);
+    references.forEach((reference) => {
+      const mediaIds = mediaReferenceMap.get(reference);
+      if (!mediaIds) return;
+      mediaIds.forEach((mediaId) => usages.push({ mediaId, ...makeUsage(row) }));
+    });
+  });
+  return usages;
+}
+
 async function fetchMediaUsage(items) {
   const mediaIds = items.map((item) => item.id).filter(Boolean);
   const usageMap = new Map(mediaIds.map((id) => [id, []]));
+  const mediaReferenceMap = createMediaReferenceMap(items);
   if (!mediaIds.length) return usageMap;
 
   const usageGroups = await Promise.all([
@@ -66,14 +139,14 @@ async function fetchMediaUsage(items) {
       href: row.page_id ? `/admin/pages/${encodeURIComponent(row.page_id)}` : "/admin/pages"
     })),
     safeUsageQuery("page_template_fields", "id, page_slug, field_label, field_key, image_id", "image_id", mediaIds, (row) => ({
-      type: "模板欄位",
+      type: "服務頁固定內容",
       title: `${row.page_slug || "頁面"}｜${row.field_label || row.field_key || "圖片欄位"}`,
-      href: "/admin/template-fields"
+      href: "/admin/pages"
     })),
     safeUsageQuery("content_modules", "id, module_key, title, item_key, image_id", "image_id", mediaIds, (row) => ({
-      type: "首頁模組",
+      type: "首頁固定內容",
       title: row.title || row.item_key || row.module_key || "未命名模組",
-      href: "/admin/home-modules"
+      href: "/admin/pages"
     })),
     safeUsageQuery("articles", "id, slug, title, cover_image_id", "cover_image_id", mediaIds, (row) => ({
       type: "文章封面",
@@ -103,17 +176,17 @@ async function fetchMediaUsage(items) {
     safeUsageQuery("care_stories", "id, title, person_name, cover_image_id", "cover_image_id", mediaIds, (row) => ({
       type: "真實照顧情境封面",
       title: row.title || row.person_name || "未命名故事",
-      href: "/admin/stories"
+      href: "/admin/articles"
     })),
     safeUsageQuery("care_stories", "id, title, person_name, avatar_image_id", "avatar_image_id", mediaIds, (row) => ({
       type: "真實照顧情境頭像",
       title: row.person_name || row.title || "未命名故事",
-      href: "/admin/stories"
+      href: "/admin/articles"
     })),
     safeUsageQuery("expert_talks", "id, title, speaker_name, image_id", "image_id", mediaIds, (row) => ({
       type: "名人講堂圖片",
       title: row.title || row.speaker_name || "未命名講堂",
-      href: "/admin/stories"
+      href: "/admin/articles"
     })),
     safeUsageQuery("recruiting_pages", "id, page_slug, title, hero_image_id", "hero_image_id", mediaIds, (row) => ({
       type: "招募頁 Hero",
@@ -131,9 +204,49 @@ async function fetchMediaUsage(items) {
       href: "/admin/recruiting"
     })),
     safeUsageQuery("site_settings", "id, setting_label, setting_key, media_id", "media_id", mediaIds, (row) => ({
-      type: "全站設定",
+      type: "全站固定內容",
       title: row.setting_label || row.setting_key || "全站圖片",
-      href: "/admin/site-settings"
+      href: "/admin/pages"
+    })),
+    safeUrlUsageQuery("pages", "id, title, slug, content_json", mediaReferenceMap, (row) => collectStringValues(row.content_json), (row) => ({
+      type: "頁面內容圖片 URL",
+      title: row.title || row.slug || "未命名頁面",
+      href: `/admin/pages/${encodeURIComponent(row.id)}`
+    })),
+    safeUrlUsageQuery("page_sections", "id, page_id, section_key, title, content_json", mediaReferenceMap, (row) => collectStringValues(row.content_json), (row) => ({
+      type: "頁面區塊圖片 URL",
+      title: row.title || row.section_key || "未命名區塊",
+      href: row.page_id ? `/admin/pages/${encodeURIComponent(row.page_id)}` : "/admin/pages"
+    })),
+    safeUrlUsageQuery("content_modules", "id, module_key, title, item_key, metadata", mediaReferenceMap, (row) => collectStringValues(row.metadata), (row) => ({
+      type: "首頁模組圖片 URL",
+      title: row.title || row.item_key || row.module_key || "未命名模組",
+      href: "/admin/pages"
+    })),
+    safeUrlUsageQuery("care_stories", "id, title, person_name, cover_image_url, avatar_image_url", mediaReferenceMap, (row) => [row.cover_image_url, row.avatar_image_url], (row) => ({
+      type: "真實照顧情境圖片 URL",
+      title: row.title || row.person_name || "未命名故事",
+      href: "/admin/articles"
+    })),
+    safeUrlUsageQuery("expert_talks", "id, title, speaker_name, image_url", mediaReferenceMap, (row) => [row.image_url], (row) => ({
+      type: "名人講堂圖片 URL",
+      title: row.title || row.speaker_name || "未命名講堂",
+      href: "/admin/articles"
+    })),
+    safeUrlUsageQuery("recruiting_pages", "id, page_slug, title, hero_image_url", mediaReferenceMap, (row) => [row.hero_image_url], (row) => ({
+      type: "招募頁 Hero URL",
+      title: row.title || row.page_slug || "未命名招募頁",
+      href: "/admin/recruiting"
+    })),
+    safeUrlUsageQuery("recruiting_departments", "id, page_slug, title, image_url, gallery", mediaReferenceMap, (row) => [row.image_url, ...collectStringValues(row.gallery)], (row) => ({
+      type: "招募部門圖片 URL",
+      title: row.title || row.page_slug || "未命名部門",
+      href: "/admin/recruiting"
+    })),
+    safeUrlUsageQuery("recruiting_openings", "id, page_slug, title, image_url", mediaReferenceMap, (row) => [row.image_url], (row) => ({
+      type: "職缺圖片 URL",
+      title: row.title || row.page_slug || "未命名職缺",
+      href: "/admin/recruiting"
     }))
   ]);
 
@@ -147,7 +260,7 @@ function renderUsageSummary(item) {
     return `
       <div class="admin-media-usage empty">
         <strong>使用狀態</strong>
-        <span>目前沒有偵測到前台/後台引用。</span>
+        <span>目前沒有偵測到前台/後台引用，可安全整理；若是手動貼在內文中的外部 URL，仍建議再確認一次。</span>
       </div>
     `;
   }
@@ -157,6 +270,7 @@ function renderUsageSummary(item) {
   return `
     <div class="admin-media-usage">
       <strong>使用中：${usages.length} 個位置</strong>
+      <span>刪除前請先到下列位置更換圖片，避免前台破圖。</span>
       <ul>
         ${visibleUsages.map((usage) => `
           <li>
@@ -193,7 +307,7 @@ function renderMedia(items) {
         ${renderUsageSummary(item)}
         <code>${escapeHTML(item.public_url || "")}</code>
         <time>上傳時間：${formatUpdatedAt(item.created_at)}</time>
-        <button type="button" data-delete-media>刪除圖片</button>
+        <button type="button" data-delete-media data-has-usage="${usages.length ? "true" : "false"}">${usages.length ? "已使用，仍要刪除" : "刪除圖片"}</button>
       </div>
     </article>
   `;

@@ -54,8 +54,12 @@ const scopeLabels = {
   media: "圖片",
   recruiting: "招募",
   investor: "投資人",
-  story: "故事講堂"
+  story: "文章管理",
+  form: "表單",
+  launch: "上線檢查"
 };
+
+const placeholderPattern = /待上架|示意資料|示意|測試資料|假資料|placeholder|lorem|todo|TBD|未定|coming soon/i;
 
 function issuePreset(issue) {
   const text = `${issue.title} ${issue.detail}`.toLowerCase();
@@ -108,6 +112,37 @@ function hasUrl(value) {
   return typeof value === "string" && /^(https?:\/\/|\/|#)/i.test(value.trim());
 }
 
+function flattenTextValues(value, values = []) {
+  if (value == null) return values;
+  if (typeof value === "string" || typeof value === "number") {
+    values.push(String(value));
+    return values;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item) => flattenTextValues(item, values));
+    return values;
+  }
+  if (typeof value === "object") {
+    Object.values(value).forEach((item) => flattenTextValues(item, values));
+  }
+  return values;
+}
+
+function hasPlaceholderText(...values) {
+  return flattenTextValues(values).some((value) => placeholderPattern.test(value));
+}
+
+function imageRatio(item) {
+  if (!item?.width || !item?.height) return null;
+  return Number(item.width) / Number(item.height);
+}
+
+function isRatioOutside(item, target, tolerance = 0.28) {
+  const ratio = imageRatio(item);
+  if (!ratio) return false;
+  return Math.abs(ratio - target) > tolerance;
+}
+
 function isPublishedEnabled(record = {}) {
   return record.status === "published" && record.is_enabled !== false;
 }
@@ -122,8 +157,20 @@ function imageRecordIssues(item, issues, scope = "media", editUrl = "/admin/medi
   if (item.image_usage === "hero" || item.image_usage === "service_hero") {
     if (item.width && item.width < 1200) addIssue(issues, { severity: "warning", scope, title: `Hero 圖片寬度偏小：${item.file_name || item.id}`, detail: `${item.width}x${item.height || "?"}，建議桌機 Hero 至少 1200px 寬。`, editUrl, updatedAt: item.updated_at || item.created_at });
   }
+  if (item.image_usage === "hero" && isRatioOutside(item, 16 / 9, 0.45)) {
+    addIssue(issues, { severity: "warning", scope, title: `首頁 Hero 圖片比例可能不穩：${item.file_name || item.id}`, detail: `${item.width}x${item.height}，建議接近 16:9 或更寬，並設定手機裁切焦點。`, editUrl, updatedAt: item.updated_at || item.created_at });
+  }
+  if (item.image_usage === "service_hero" && isRatioOutside(item, 4 / 3, 0.45)) {
+    addIssue(issues, { severity: "info", scope, title: `服務頁 Hero 圖片比例需人工確認：${item.file_name || item.id}`, detail: `${item.width}x${item.height}，服務頁右側圖建議接近 4:3 或 3:2，避免人物被切。`, editUrl, updatedAt: item.updated_at || item.created_at });
+  }
   if (item.image_usage === "article_cover" && item.width && item.height && item.width < item.height) {
     addIssue(issues, { severity: "info", scope, title: `文章封面可能過直：${item.file_name || item.id}`, detail: `${item.width}x${item.height}，文章卡片通常較適合橫圖。`, editUrl, updatedAt: item.updated_at || item.created_at });
+  }
+  if (item.image_usage === "article_cover" && isRatioOutside(item, 2 / 1, 0.45)) {
+    addIssue(issues, { severity: "info", scope, title: `文章 Hero 封面比例需確認：${item.file_name || item.id}`, detail: `${item.width}x${item.height}，目前文章內頁設定為寬:高約 2:1。`, editUrl, updatedAt: item.updated_at || item.created_at });
+  }
+  if (["avatar", "partner_logo"].includes(item.image_usage) && isRatioOutside(item, 1, 0.2)) {
+    addIssue(issues, { severity: "info", scope, title: `方形/頭像圖片比例需確認：${item.file_name || item.id}`, detail: `${item.width}x${item.height}，頭像與 Logo 區塊較適合接近 1:1 或透明 PNG。`, editUrl, updatedAt: item.updated_at || item.created_at });
   }
   if (item.is_enabled === false) addIssue(issues, { severity: "warning", scope, title: `圖片已停用：${item.file_name || item.id}`, detail: "若前台仍使用此圖，可能會造成維護混亂。", editUrl, updatedAt: item.updated_at || item.created_at });
 }
@@ -139,6 +186,7 @@ function auditPages(pages, sections, issues) {
     if (!page.title) addIssue(issues, { severity: "critical", scope: "page", title: `頁面缺標題：${page.slug}`, detail: page.slug, editUrl: `/admin/pages/${page.id}`, updatedAt: page.updated_at });
     if (!page.seo_title) addIssue(issues, { severity: "warning", scope: "page", title: `頁面缺 SEO title：${page.title}`, detail: page.slug, editUrl: `/admin/pages/${page.id}`, updatedAt: page.updated_at });
     if (!page.seo_description) addIssue(issues, { severity: "warning", scope: "page", title: `頁面缺 SEO description：${page.title}`, detail: page.slug, editUrl: `/admin/pages/${page.id}`, updatedAt: page.updated_at });
+    if (hasPlaceholderText(page.title, page.seo_title, page.seo_description)) addIssue(issues, { severity: "critical", scope: "launch", title: `頁面含待上架/示意文字：${page.title || page.slug}`, detail: page.slug, editUrl: `/admin/pages/${page.id}`, updatedAt: page.updated_at });
     if (!page.is_enabled || page.status !== "published") addIssue(issues, { severity: "critical", scope: "page", title: `頁面尚未發布或未啟用：${page.title}`, detail: `${page.status} / ${page.is_enabled ? "enabled" : "disabled"}`, editUrl: `/admin/pages/${page.id}`, updatedAt: page.updated_at });
   });
 
@@ -156,6 +204,9 @@ function auditPages(pages, sections, issues) {
     }
     if ((section.title || section.body || imageUrl) && !section.section_key) {
       addIssue(issues, { severity: "warning", scope: "page", title: "區塊缺 section key", detail: section.title || section.id, editUrl: `/admin/pages/${section.page_id}`, updatedAt: section.updated_at });
+    }
+    if (hasPlaceholderText(section.title, section.body, section.content_json)) {
+      addIssue(issues, { severity: "critical", scope: "launch", title: `區塊含待上架/示意文字：${section.title || section.section_key}`, detail: section.section_key, editUrl: `/admin/pages/${section.page_id}`, updatedAt: section.updated_at });
     }
     if (!section.is_enabled || section.status !== "published") {
       addIssue(issues, { severity: "info", scope: "page", title: `區塊未發布或隱藏：${section.title || section.section_key}`, detail: `${section.status} / ${section.is_enabled ? "enabled" : "hidden"}`, editUrl: `/admin/pages/${section.page_id}`, updatedAt: section.updated_at });
@@ -176,6 +227,34 @@ function auditCategories(categories, issues) {
   });
 }
 
+function auditHealthCategoryCoverage(categories, articles, issues) {
+  const expected = [
+    { key: "latest", label: "最新照顧文章", minimum: 6 },
+    { key: "lazy_pack", label: "懶人包", minimum: 6 },
+    { key: "event", label: "活動專區", minimum: 3 },
+    { key: "video", label: "影音", minimum: 2 },
+    { key: "short_video", label: "短影片", minimum: 2 },
+    { key: "master_talk", label: "名人講堂", minimum: 4 }
+  ];
+  const enabledCategories = categories.filter((category) => category.is_enabled !== false);
+  const categoryById = new Map(enabledCategories.map((category) => [category.id, category]));
+  expected.forEach(({ key, label, minimum }) => {
+    const matchedCategories = enabledCategories.filter((category) => category.section_key === key || category.slug === key || category.type === key);
+    if (!matchedCategories.length) {
+      addIssue(issues, { severity: "critical", scope: "category", title: `Health 3.0 缺分類：${label}`, detail: `section_key 建議設定為 ${key}`, editUrl: "/admin/categories", updatedAt: null });
+      return;
+    }
+    const categoryIds = new Set(matchedCategories.map((category) => category.id));
+    const publishedCount = articles.filter((article) => {
+      const category = categoryById.get(article.category_id);
+      return article.status === "published" && article.is_enabled !== false && (categoryIds.has(article.category_id) || article.content_type === key || category?.section_key === key);
+    }).length;
+    if (publishedCount < minimum) {
+      addIssue(issues, { severity: "warning", scope: "article", title: `Health 3.0「${label}」已發布內容不足`, detail: `目前 ${publishedCount} 篇，建議至少 ${minimum} 篇，前台才不會看起來太空。`, editUrl: "/admin/articles", updatedAt: null });
+    }
+  });
+}
+
 function auditArticles(articles, categories, issues) {
   const categoryById = new Map(categories.map((category) => [category.id, category]));
   articles.forEach((article) => {
@@ -187,6 +266,7 @@ function auditArticles(articles, categories, issues) {
     if (!article.excerpt && !article.subtitle) addIssue(issues, { severity: "warning", scope: "article", title: `文章缺摘要：${article.title}`, detail: article.slug, editUrl: `/admin/articles/${article.id}`, updatedAt: article.updated_at });
     if (!article.author_name) addIssue(issues, { severity: "info", scope: "article", title: `文章缺作者：${article.title}`, detail: article.slug, editUrl: `/admin/articles/${article.id}`, updatedAt: article.updated_at });
     if (!article.content) addIssue(issues, { severity: "warning", scope: "article", title: `文章缺內文：${article.title}`, detail: article.slug, editUrl: `/admin/articles/${article.id}`, updatedAt: article.updated_at });
+    if (hasPlaceholderText(article.title, article.subtitle, article.excerpt, article.content, article.content_json, article.seo_title, article.seo_description)) addIssue(issues, { severity: "critical", scope: "launch", title: `文章含待上架/示意文字：${article.title || article.slug}`, detail: article.slug, editUrl: `/admin/articles/${article.id}`, updatedAt: article.updated_at });
     if (["video", "short_video"].includes(article.content_type) && !article.content_json?.video_url && !article.content_json?.video?.url) addIssue(issues, { severity: "warning", scope: "article", title: `影音文章缺影片連結：${article.title}`, detail: article.content_type, editUrl: `/admin/articles/${article.id}`, updatedAt: article.updated_at });
     if (article.status !== "published") addIssue(issues, { severity: "info", scope: "article", title: `文章尚未發布：${article.title}`, detail: article.status, editUrl: `/admin/articles/${article.id}`, updatedAt: article.updated_at });
     if (!article.is_enabled) addIssue(issues, { severity: "info", scope: "article", title: `文章已停用：${article.title}`, detail: "前台不會顯示此文章。", editUrl: `/admin/articles/${article.id}`, updatedAt: article.updated_at });
@@ -271,7 +351,49 @@ function auditCourses(courses, issues) {
     if (course.registration_status === "open" && !course.registration_url && !course.metadata?.signup_email) addIssue(issues, { severity: "info", scope: "course", title: `課程開放報名但缺外部報名設定：${course.title || "未命名"}`, detail: "若使用站內彈窗報名可忽略；若有外部表單請補連結。", editUrl: "/admin/courses", updatedAt: course.updated_at });
     if (!course.seo_title) addIssue(issues, { severity: "info", scope: "course", title: `課程缺 SEO title：${course.title || "未命名"}`, detail: course.slug, editUrl: "/admin/courses", updatedAt: course.updated_at });
     if (!course.seo_description) addIssue(issues, { severity: "info", scope: "course", title: `課程缺 SEO description：${course.title || "未命名"}`, detail: course.slug, editUrl: "/admin/courses", updatedAt: course.updated_at });
+    if (hasPlaceholderText(course.title, course.subtitle, course.excerpt, course.description, course.metadata, course.seo_title, course.seo_description)) addIssue(issues, { severity: "critical", scope: "launch", title: `課程含待上架/示意文字：${course.title || "未命名"}`, detail: course.slug, editUrl: "/admin/courses", updatedAt: course.updated_at });
     if (!isPublishedEnabled(course)) addIssue(issues, { severity: "info", scope: "course", title: `課程未發布或停用：${course.title || "未命名"}`, detail: `${course.status} / ${course.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/courses", updatedAt: course.updated_at });
+  });
+}
+
+function auditFormSubmissions(submissions, issues) {
+  const staleLine = Date.now() - 24 * 60 * 60 * 1000;
+  const routeByType = {
+    course_signup: "/admin/courses",
+    recruiting_application: "/admin/recruiting",
+    land_recruit: "/admin/recruiting",
+    investor_recruit: "/admin/investor-data",
+    contact: "/admin/content-health"
+  };
+  const labelByType = {
+    course_signup: "課程報名",
+    recruiting_application: "人才應徵",
+    land_recruit: "土地招募",
+    investor_recruit: "投資人招募",
+    contact: "聯絡我們"
+  };
+
+  submissions.forEach((item) => {
+    const typeLabel = labelByType[item.form_type] || item.form_type || "表單";
+    const editUrl = routeByType[item.form_type] || "/admin/content-health";
+    const metadata = item.metadata || {};
+    const createdAt = item.created_at ? new Date(item.created_at).getTime() : Date.now();
+    const isOpen = !["closed", "completed", "resolved", "spam", "cancelled"].includes(String(item.status || "").toLowerCase());
+    if (isOpen && createdAt < staleLine) {
+      addIssue(issues, { severity: "warning", scope: "form", title: `${typeLabel} 超過 24 小時未結案`, detail: `${item.name || "未留姓名"}｜${item.phone || item.email || "缺聯絡方式"}`, editUrl, updatedAt: item.updated_at || item.created_at });
+    }
+    if (item.email_sent === false) {
+      addIssue(issues, { severity: "critical", scope: "form", title: `${typeLabel} 留存成功但寄信失敗`, detail: `${item.name || "未留姓名"}｜請確認 RESEND_API_KEY、MAIL_FROM 與收件信箱。`, editUrl, updatedAt: item.updated_at || item.created_at });
+    }
+    if (!item.name || (!item.phone && !item.email)) {
+      addIssue(issues, { severity: "warning", scope: "form", title: `${typeLabel} 缺必要聯絡資料`, detail: `姓名：${item.name || "缺"}，電話/Email：${item.phone || item.email || "缺"}`, editUrl, updatedAt: item.updated_at || item.created_at });
+    }
+    if (item.form_type === "course_signup" && !metadata.course_title && !item.subject) {
+      addIssue(issues, { severity: "warning", scope: "form", title: "課程報名缺課程名稱", detail: `${item.name || "未留姓名"} 的報名資料無法判斷課程。`, editUrl, updatedAt: item.updated_at || item.created_at });
+    }
+    if (!item.recipient_email && item.email_sent !== false) {
+      addIssue(issues, { severity: "info", scope: "form", title: `${typeLabel} 缺收件信箱紀錄`, detail: "建議表單 API 留存 recipient_email，日後追查會更清楚。", editUrl, updatedAt: item.updated_at || item.created_at });
+    }
   });
 }
 
@@ -281,6 +403,7 @@ function auditRecruiting(pages, departments, openings, issues) {
     if (!item.body && !item.subtitle) addIssue(issues, { severity: "warning", scope: "recruiting", title: `招募頁 Hero 缺內文：${item.title || item.page_slug}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (!item.hero_image_id && !item.hero_image_url) addIssue(issues, { severity: "warning", scope: "recruiting", title: `招募頁 Hero 缺圖片：${item.title || item.page_slug}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (!item.primary_cta_text || !item.primary_cta_url) addIssue(issues, { severity: "info", scope: "recruiting", title: `招募頁 Hero 缺主要 CTA：${item.title || item.page_slug}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
+    if (hasPlaceholderText(item.title, item.subtitle, item.body)) addIssue(issues, { severity: "critical", scope: "launch", title: `招募頁含待上架/示意文字：${item.title || item.page_slug}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (!item.is_enabled || item.status !== "published") addIssue(issues, { severity: "critical", scope: "recruiting", title: `招募頁未發布或停用：${item.title || item.page_slug}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
   });
   departments.forEach((item) => {
@@ -288,6 +411,7 @@ function auditRecruiting(pages, departments, openings, issues) {
     if (!item.department_slug) addIssue(issues, { severity: "warning", scope: "recruiting", title: `招募部門缺 slug：${item.title || "未命名"}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (!item.description) addIssue(issues, { severity: "warning", scope: "recruiting", title: `招募部門缺描述：${item.title || "未命名"}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (!item.image_id && !item.image_url) addIssue(issues, { severity: "warning", scope: "recruiting", title: `招募部門缺圖片：${item.title || "未命名"}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
+    if (hasPlaceholderText(item.title, item.description)) addIssue(issues, { severity: "critical", scope: "launch", title: `招募部門含待上架/示意文字：${item.title || "未命名"}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (!item.is_enabled || item.status !== "published") addIssue(issues, { severity: "info", scope: "recruiting", title: `招募部門未發布或停用：${item.title || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
   });
 
@@ -296,6 +420,7 @@ function auditRecruiting(pages, departments, openings, issues) {
     if (!item.summary) addIssue(issues, { severity: "warning", scope: "recruiting", title: `招募卡片缺摘要：${item.title || "未命名"}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (!item.image_id && !item.image_url) addIssue(issues, { severity: "warning", scope: "recruiting", title: `招募卡片缺圖片：${item.title || "未命名"}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (!item.department_id) addIssue(issues, { severity: "warning", scope: "recruiting", title: `招募卡片未綁定部門：${item.title || "未命名"}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
+    if (hasPlaceholderText(item.title, item.summary)) addIssue(issues, { severity: "critical", scope: "launch", title: `招募卡片含待上架/示意文字：${item.title || "未命名"}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (!item.is_enabled || item.status !== "published") addIssue(issues, { severity: "info", scope: "recruiting", title: `招募卡片未發布或停用：${item.title || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
   });
 }
@@ -306,19 +431,22 @@ function auditInvestor(notices, financialItems, files, charts, issues) {
     if (!item.date_label && !item.published_on) addIssue(issues, { severity: "warning", scope: "investor", title: `投資人公告缺日期：${item.title || "未命名"}`, detail: item.notice_type, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
     if (!item.summary && !item.body) addIssue(issues, { severity: "warning", scope: "investor", title: `投資人公告缺摘要/內文：${item.title || "未命名"}`, detail: item.notice_type, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
     if (["material", "shareholder", "governance"].includes(item.notice_type) && !item.link_url && !item.file_id) addIssue(issues, { severity: "warning", scope: "investor", title: `重要投資人公告缺連結或檔案：${item.title || "未命名"}`, detail: item.notice_type, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
+    if (hasPlaceholderText(item.title, item.summary, item.body, item.date_label)) addIssue(issues, { severity: "critical", scope: "launch", title: `投資人公告含待上架/示意文字：${item.title || "未命名"}`, detail: item.notice_type, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
     if (!item.is_enabled || item.status !== "published") addIssue(issues, { severity: "info", scope: "investor", title: `投資人公告未發布或停用：${item.title || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
   });
   financialItems.forEach((item) => {
     if (!item.title) addIssue(issues, { severity: "critical", scope: "investor", title: "財務資料缺標題", detail: item.item_type || item.id, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
     if (!item.period_label) addIssue(issues, { severity: "warning", scope: "investor", title: `財務資料缺期間：${item.title || "未命名"}`, detail: item.item_type, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
     if (["quarterly_report", "annual_report"].includes(item.item_type) && !item.file_id) addIssue(issues, { severity: "warning", scope: "investor", title: `財報/年報尚未綁定下載檔：${item.title || "未命名"}`, detail: item.period_label, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
+    if (hasPlaceholderText(item.title, item.period_label)) addIssue(issues, { severity: "critical", scope: "launch", title: `財務資料含待上架/示意文字：${item.title || "未命名"}`, detail: item.item_type, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
     if (!isPublishedEnabled(item)) addIssue(issues, { severity: "info", scope: "investor", title: `財務資料未發布或停用：${item.title || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
   });
   files.forEach((item) => {
-    if (!item.public_url && !item.storage_path) addIssue(issues, { severity: "critical", scope: "investor", title: `下載檔缺連結：${item.title || item.file_name || "未命名"}`, detail: item.file_type || item.category, editUrl: "/admin/files", updatedAt: item.updated_at });
-    if (!item.file_name) addIssue(issues, { severity: "warning", scope: "investor", title: `下載檔缺檔名：${item.title || "未命名"}`, detail: item.category, editUrl: "/admin/files", updatedAt: item.updated_at });
-    if (!item.is_public && item.status === "published") addIssue(issues, { severity: "warning", scope: "investor", title: `已發布下載檔不是公開檔：${item.title || item.file_name || "未命名"}`, detail: "前台使用者可能無法下載。", editUrl: "/admin/files", updatedAt: item.updated_at });
-    if (!isPublishedEnabled(item)) addIssue(issues, { severity: "info", scope: "investor", title: `下載檔未發布或停用：${item.title || item.file_name || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/files", updatedAt: item.updated_at });
+    if (!item.public_url && !item.storage_path) addIssue(issues, { severity: "critical", scope: "investor", title: `下載檔缺連結：${item.title || item.file_name || "未命名"}`, detail: item.file_type || item.category, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
+    if (!item.file_name) addIssue(issues, { severity: "warning", scope: "investor", title: `下載檔缺檔名：${item.title || "未命名"}`, detail: item.category, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
+    if (!item.is_public && item.status === "published") addIssue(issues, { severity: "warning", scope: "investor", title: `已發布下載檔不是公開檔：${item.title || item.file_name || "未命名"}`, detail: "前台使用者可能無法下載。", editUrl: "/admin/investor-data", updatedAt: item.updated_at });
+    if (hasPlaceholderText(item.title, item.file_name, item.category)) addIssue(issues, { severity: "critical", scope: "launch", title: `下載檔含待上架/示意文字：${item.title || item.file_name || "未命名"}`, detail: item.category, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
+    if (!isPublishedEnabled(item)) addIssue(issues, { severity: "info", scope: "investor", title: `下載檔未發布或停用：${item.title || item.file_name || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
   });
   charts.forEach((item) => {
     if (!item.chart_title) addIssue(issues, { severity: "warning", scope: "investor", title: "圖表資料缺標題", detail: item.chart_key || item.id, editUrl: "/admin/investor-data", updatedAt: item.updated_at });
@@ -330,19 +458,47 @@ function auditInvestor(notices, financialItems, files, charts, issues) {
 
 function auditStories(stories, talks, issues) {
   stories.forEach((item) => {
-    if (!item.title) addIssue(issues, { severity: "critical", scope: "story", title: "真實照顧情境缺標題", detail: item.slug || item.id, editUrl: "/admin/stories", updatedAt: item.updated_at });
-    if (!item.person_name) addIssue(issues, { severity: "warning", scope: "story", title: `真實照顧情境缺人物：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/stories", updatedAt: item.updated_at });
-    if (!item.cover_image_url) addIssue(issues, { severity: "warning", scope: "story", title: `真實照顧情境缺封面：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/stories", updatedAt: item.updated_at });
-    if (!item.avatar_image_url) addIssue(issues, { severity: "info", scope: "story", title: `真實照顧情境缺頭像：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/stories", updatedAt: item.updated_at });
-    if (!item.is_enabled || item.status !== "published") addIssue(issues, { severity: "info", scope: "story", title: `真實照顧情境未發布或停用：${item.title || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/stories", updatedAt: item.updated_at });
+    if (!item.title) addIssue(issues, { severity: "critical", scope: "story", title: "真實照顧情境缺標題", detail: item.slug || item.id, editUrl: "/admin/articles", updatedAt: item.updated_at });
+    if (!item.person_name) addIssue(issues, { severity: "warning", scope: "story", title: `真實照顧情境缺人物：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/articles", updatedAt: item.updated_at });
+    if (!item.cover_image_url) addIssue(issues, { severity: "warning", scope: "story", title: `真實照顧情境缺封面：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/articles", updatedAt: item.updated_at });
+    if (!item.avatar_image_url) addIssue(issues, { severity: "info", scope: "story", title: `真實照顧情境缺頭像：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/articles", updatedAt: item.updated_at });
+    if (!item.is_enabled || item.status !== "published") addIssue(issues, { severity: "info", scope: "story", title: `真實照顧情境未發布或停用：${item.title || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/articles", updatedAt: item.updated_at });
   });
   talks.forEach((item) => {
-    if (!item.title) addIssue(issues, { severity: "critical", scope: "story", title: "名人講堂缺標題", detail: item.slug || item.id, editUrl: "/admin/stories", updatedAt: item.updated_at });
-    if (!item.speaker_name) addIssue(issues, { severity: "warning", scope: "story", title: `名人講堂缺人物：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/stories", updatedAt: item.updated_at });
-    if (!item.image_url) addIssue(issues, { severity: "warning", scope: "story", title: `名人講堂缺圖片：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/stories", updatedAt: item.updated_at });
-    if (!item.summary) addIssue(issues, { severity: "warning", scope: "story", title: `名人講堂缺摘要：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/stories", updatedAt: item.updated_at });
-    if (!item.is_enabled || item.status !== "published") addIssue(issues, { severity: "info", scope: "story", title: `名人講堂未發布或停用：${item.title || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/stories", updatedAt: item.updated_at });
+    if (!item.title) addIssue(issues, { severity: "critical", scope: "story", title: "名人講堂缺標題", detail: item.slug || item.id, editUrl: "/admin/articles", updatedAt: item.updated_at });
+    if (!item.speaker_name) addIssue(issues, { severity: "warning", scope: "story", title: `名人講堂缺人物：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/articles", updatedAt: item.updated_at });
+    if (!item.image_url) addIssue(issues, { severity: "warning", scope: "story", title: `名人講堂缺圖片：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/articles", updatedAt: item.updated_at });
+    if (!item.summary) addIssue(issues, { severity: "warning", scope: "story", title: `名人講堂缺摘要：${item.title || "未命名"}`, detail: item.slug, editUrl: "/admin/articles", updatedAt: item.updated_at });
+    if (!item.is_enabled || item.status !== "published") addIssue(issues, { severity: "info", scope: "story", title: `名人講堂未發布或停用：${item.title || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/articles", updatedAt: item.updated_at });
   });
+}
+
+function auditLaunchReadiness({ settings, pages, articles, courses, forms }, issues) {
+  const settingByKey = new Map(settings.map((item) => [item.setting_key, item]));
+  const email = settingByKey.get("email")?.value_text;
+  const phone = settingByKey.get("phone")?.value_text;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    addIssue(issues, { severity: "critical", scope: "launch", title: "正式上線缺有效客服信箱", detail: email || "site_settings.email 尚未設定", editUrl: "/admin/content-health", updatedAt: settingByKey.get("email")?.updated_at });
+  }
+  if (!phone || !/[0-9]{2,}/.test(phone)) {
+    addIssue(issues, { severity: "critical", scope: "launch", title: "正式上線缺有效電話", detail: phone || "site_settings.phone 尚未設定", editUrl: "/admin/content-health", updatedAt: settingByKey.get("phone")?.updated_at });
+  }
+  const publishedPages = pages.filter((page) => page.status === "published" && page.is_enabled !== false).length;
+  if (publishedPages < 18) {
+    addIssue(issues, { severity: "warning", scope: "launch", title: "已發布頁面數偏少", detail: `目前 ${publishedPages} 頁，請確認首頁、服務頁、招募、投資人、課程與聯絡頁都已發布。`, editUrl: "/admin/pages", updatedAt: null });
+  }
+  const publishedArticles = articles.filter((article) => article.status === "published" && article.is_enabled !== false).length;
+  if (publishedArticles < 10) {
+    addIssue(issues, { severity: "warning", scope: "launch", title: "已發布文章數偏少", detail: `目前 ${publishedArticles} 篇，Health 3.0 首頁可能不夠飽滿。`, editUrl: "/admin/articles", updatedAt: null });
+  }
+  const openCourses = courses.filter((course) => course.status === "published" && course.is_enabled !== false && course.registration_status === "open").length;
+  if (!openCourses) {
+    addIssue(issues, { severity: "warning", scope: "launch", title: "目前沒有開放報名課程", detail: "課程報名頁會較像展示頁，建議至少保留一門可報名課程。", editUrl: "/admin/courses", updatedAt: null });
+  }
+  const recentForms = forms.filter((item) => item.created_at && Date.now() - new Date(item.created_at).getTime() < 7 * 24 * 60 * 60 * 1000).length;
+  if (!recentForms) {
+    addIssue(issues, { severity: "info", scope: "form", title: "最近 7 天沒有表單留存資料", detail: "正式上線前建議測一次聯絡我們與課程報名，確認 Supabase 留存與寄信都正常。", editUrl: "/admin/content-health", updatedAt: null });
+  }
 }
 
 function renderKpis(issues) {
@@ -426,7 +582,7 @@ function renderIssues() {
 async function loadContentHealth() {
   if (!supabase) return;
   refreshButton?.setAttribute("disabled", "true");
-  setStatus("正在檢查全站設定、pages、page_sections、articles、categories、courses、media、招募、投資人、故事講堂...", "info");
+  setStatus("正在檢查全站設定、頁面、文章、課程、圖片、招募、投資人、表單與上線前風險...", "info");
 
   try {
     const [
@@ -447,7 +603,8 @@ async function loadContentHealth() {
       fileResult,
       chartResult,
       storyResult,
-      talkResult
+      talkResult,
+      formResult
     ] = await Promise.all([
       supabase.from("site_settings").select("id,setting_key,setting_label,value_text,value_json,is_enabled,updated_at").order("sort_order", { ascending: true }),
       supabase.from("content_modules").select("id,module_key,item_key,title,metadata,status,is_enabled,updated_at").eq("target_slug", "home").order("module_key", { ascending: true }),
@@ -466,7 +623,8 @@ async function loadContentHealth() {
       supabase.from("downloadable_files").select("id,title,file_name,file_type,category,public_url,storage_path,status,is_enabled,is_public,updated_at").order("updated_at", { ascending: false }).limit(500),
       supabase.from("investor_chart_datasets").select("id,chart_title,chart_key,chart_type,unit_label,data_points,status,is_enabled,updated_at").order("updated_at", { ascending: false }).limit(500),
       supabase.from("care_stories").select("id,title,slug,person_name,cover_image_url,avatar_image_url,status,is_enabled,updated_at").order("updated_at", { ascending: false }).limit(500),
-      supabase.from("expert_talks").select("id,title,slug,speaker_name,summary,image_url,status,is_enabled,updated_at").order("updated_at", { ascending: false }).limit(500)
+      supabase.from("expert_talks").select("id,title,slug,speaker_name,summary,image_url,status,is_enabled,updated_at").order("updated_at", { ascending: false }).limit(500),
+      supabase.from("form_submissions").select("id,form_type,name,phone,email,subject,status,email_sent,recipient_email,metadata,created_at,updated_at,handled_at").order("created_at", { ascending: false }).limit(300)
     ]);
 
     [
@@ -487,7 +645,8 @@ async function loadContentHealth() {
       fileResult,
       chartResult,
       storyResult,
-      talkResult
+      talkResult,
+      formResult
     ].forEach((result) => {
       if (result.error) throw result.error;
     });
@@ -499,11 +658,20 @@ async function loadContentHealth() {
     auditServiceTemplateFields(templateFieldResult.data || [], issues);
     auditCategories(categoriesResult.data || [], issues);
     auditArticles(articlesResult.data || [], categoriesResult.data || [], issues);
+    auditHealthCategoryCoverage(categoriesResult.data || [], articlesResult.data || [], issues);
     auditCourses(coursesResult.data || [], issues);
+    auditFormSubmissions(formResult.data || [], issues);
     auditMedia(mediaResult.data || [], issues);
     auditRecruiting(recruitingPageResult.data || [], departmentResult.data || [], openingResult.data || [], issues);
     auditInvestor(noticeResult.data || [], financialResult.data || [], fileResult.data || [], chartResult.data || [], issues);
     auditStories(storyResult.data || [], talkResult.data || [], issues);
+    auditLaunchReadiness({
+      settings: settingsResult.data || [],
+      pages: pagesResult.data || [],
+      articles: articlesResult.data || [],
+      courses: coursesResult.data || [],
+      forms: formResult.data || []
+    }, issues);
     currentIssues = issues.sort((a, b) => {
       const severityWeight = { critical: 0, warning: 1, info: 2 };
       return severityWeight[a.severity] - severityWeight[b.severity];

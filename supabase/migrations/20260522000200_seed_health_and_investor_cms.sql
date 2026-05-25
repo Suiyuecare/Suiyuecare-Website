@@ -127,7 +127,7 @@ values (
       "snapshot_label": "Governance",
       "snapshot_value": "91",
       "snapshot_unit": "Index",
-      "snapshot_note": "治理成熟度示意",
+      "snapshot_note": "治理成熟度",
       "kpis": [
         { "label": "Notices", "value": "0", "note": "治理公告" },
         { "label": "Files", "value": "0", "note": "治理下載" },

@@ -23,12 +23,15 @@
           <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
           <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
           <a class="active" href="/admin/courses"><span>CS</span><strong>課程管理</strong></a>
-          <a href="/admin/files"><span>DL</span><strong>檔案下載</strong></a>
-          <a href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
+          <a href="/admin/recruiting"><span>RC</span><strong>招募管理</strong></a>
+          <a href="/admin/investor-data"><span>IR</span><strong>投資人資料</strong></a>
           <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
           <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+          <a href="/admin/governance"><span>GV</span><strong>發布與權限</strong></a>
+          <a href="/admin/users"><span>US</span><strong>使用者權限</strong></a>
           <a href="/admin/traffic"><span>AN</span><strong>網站流量中心</strong></a>
           <a href="/admin/content-health"><span>QA</span><strong>內容健康檢查</strong></a>
+          <a href="/admin/backups"><span>BK</span><strong>備份與還原</strong></a>
         </nav>
         <div class="admin-sidebar-note">
           <span>Courses</span>
@@ -53,6 +56,13 @@
             </div>
           </div>
         </header>
+
+        <section class="admin-dashboard-grid compact" aria-label="課程管理摘要">
+          <article><span>Published</span><strong data-course-count="published">--</strong><p>前台顯示課程</p></article>
+          <article><span>Featured</span><strong data-course-count="featured">--</strong><p>重要課程輪播</p></article>
+          <article><span>Draft</span><strong data-course-count="draft">--</strong><p>草稿/未上架</p></article>
+          <article><span>Total</span><strong data-course-count="total">--</strong><p>後台課程總數</p></article>
+        </section>
 
         <div id="adminCoursesStatus" class="admin-data-status">正在讀取課程資料...</div>
 
@@ -83,7 +93,7 @@
               <label><span>發布狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
               <label class="admin-toggle-field"><input name="is_featured" type="checkbox" /><span>重要課程輪播</span></label>
               <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>
-              <label class="admin-field-wide"><span>課程封面圖</span><input name="cover_file" type="file" accept="image/*" /></label>
+              <label class="admin-field-wide"><span>課程封面圖</span><input name="cover_file" type="file" accept="image/*" /><small>上傳時會開啟裁切器，請確認桌機、平板、手機預覽都沒有切到主體。</small></label>
               <div id="courseCoverPreview" class="admin-section-image-tools admin-field-wide"></div>
               <button type="submit">儲存課程</button>
             </form>
@@ -101,6 +111,58 @@
               </table>
             </div>
           </section>
+        </section>
+
+        <section class="admin-workspace-panel course-registration-panel">
+          <div class="admin-workspace-head">
+            <div>
+              <p class="admin-eyebrow">Registration Flow</p>
+              <h2>課程報名資料</h2>
+            </div>
+            <button type="button" id="refreshCourseSignupsButton">重新整理報名</button>
+          </div>
+          <div class="forms-workflow-board course-workflow-board" aria-label="課程報名處理流程">
+            <article data-state="new"><span>01</span><strong>未處理</strong><p>剛送出的課程報名，需由教育品管或行政同仁聯絡確認。</p><em data-course-signup-count="new">0 筆</em></article>
+            <article data-state="contacted"><span>02</span><strong>已聯絡</strong><p>已完成第一次電話或 LINE 聯繫，等待學員回覆或補件。</p><em data-course-signup-count="contacted">0 筆</em></article>
+            <article data-state="closed"><span>03</span><strong>已完成</strong><p>已完成報名確認、付款或課前通知，可結案留存。</p><em data-course-signup-count="closed">0 筆</em></article>
+            <article data-state="spam"><span>04</span><strong>取消/無效</strong><p>重複、測試、取消或無效資料，保留紀錄但不需追蹤。</p><em data-course-signup-count="spam">0 筆</em></article>
+          </div>
+          <div id="courseSignupsStatus" class="admin-data-status">正在讀取課程報名資料...</div>
+          <div class="admin-editor-layout course-registration-layout">
+            <section class="admin-workspace-panel nested-panel">
+              <div class="admin-workspace-head">
+                <div><p class="admin-eyebrow">Inbox</p><h2>報名列表</h2></div>
+                <label class="admin-inline-filter"><span>狀態</span><select id="courseSignupStatusFilter"><option value="">全部</option><option value="new">未處理</option><option value="contacted">已聯絡</option><option value="closed">已完成</option><option value="spam">取消/無效</option></select></label>
+              </div>
+              <div class="admin-table-wrap">
+                <table class="admin-data-table admin-article-table">
+                  <thead><tr><th>報名者</th><th>課程</th><th>電話</th><th>狀態</th><th>送出時間</th><th>操作</th></tr></thead>
+                  <tbody id="courseSignupsTableBody"></tbody>
+                </table>
+              </div>
+            </section>
+            <section class="admin-workspace-panel nested-panel">
+              <div class="admin-workspace-head">
+                <div><p class="admin-eyebrow">Process</p><h2 id="courseSignupDetailTitle">報名詳細資料</h2></div>
+              </div>
+              <form id="courseSignupProcessForm" class="admin-form-grid compact">
+                <input type="hidden" name="id" />
+                <div id="courseSignupDetailBox" class="admin-empty-state admin-field-wide">請從左側選擇一筆課程報名。</div>
+                <label><span>處理狀態</span><select name="status"><option value="new">未處理</option><option value="contacted">已聯絡</option><option value="closed">已完成</option><option value="spam">取消/無效</option></select></label>
+                <label><span>優先度</span><select name="priority"><option value="normal">一般</option><option value="high">高</option><option value="urgent">緊急</option><option value="low">低</option></select></label>
+                <label class="admin-field-wide"><span>下一步</span><input name="next_action" type="text" placeholder="例如：明天下午電話確認付款與上課方式" /></label>
+                <label><span>下次追蹤時間</span><input name="next_follow_up_at" type="datetime-local" /></label>
+                <label class="admin-field-wide"><span>內部備註</span><textarea name="internal_note" rows="4" placeholder="此欄只給後台管理者看，不會出現在前台。"></textarea></label>
+                <div class="forms-quick-actions admin-field-wide">
+                  <button type="button" data-course-quick-status="contacted">標記已聯絡</button>
+                  <button type="button" data-course-quick-status="closed">標記已完成</button>
+                  <button type="button" data-course-quick-status="spam">標記取消/無效</button>
+                </div>
+                <div id="courseSignupTimeline" class="forms-process-timeline admin-field-wide"></div>
+                <button type="submit">儲存處理紀錄</button>
+              </form>
+            </section>
+          </div>
         </section>
       </main>
     </div>

@@ -18,15 +18,17 @@
         <nav class="admin-menu" aria-label="後台選單">
           <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
           <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
-          <a href="/admin/home-modules"><span>HM</span><strong>首頁模組</strong></a>
-          <a href="/admin/template-fields"><span>TF</span><strong>模板欄位</strong></a>
           <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
-          <a class="active" href="/admin/recruiting"><span>RC</span><strong>招募管理</strong></a>
           <a href="/admin/courses"><span>CS</span><strong>課程管理</strong></a>
-          <a href="/admin/files"><span>DL</span><strong>檔案下載</strong></a>
-          <a href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
+          <a class="active" href="/admin/recruiting"><span>RC</span><strong>招募管理</strong></a>
+          <a href="/admin/investor-data"><span>IR</span><strong>投資人資料</strong></a>
           <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
           <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+          <a href="/admin/governance"><span>GV</span><strong>發布與權限</strong></a>
+          <a href="/admin/users"><span>US</span><strong>使用者權限</strong></a>
+          <a href="/admin/traffic"><span>AN</span><strong>網站流量中心</strong></a>
+          <a href="/admin/content-health"><span>QA</span><strong>內容健康檢查</strong></a>
+          <a href="/admin/backups"><span>BK</span><strong>備份與還原</strong></a>
         </nav>
         <div class="admin-sidebar-note"><span>Recruiting</span><strong>固定卡片資料</strong><p>管理人才招募、土地招募、投資人招募的部門、卡片與圖片。</p></div>
       </aside>
@@ -36,6 +38,13 @@
           <div class="admin-topbar-title"><p class="admin-eyebrow">Recruiting CMS</p><h1>招募與合作管理</h1><span>前台版型固定，只管理頁面文案、部門分類、職缺/合作卡片與圖片。</span></div>
           <div class="admin-topbar-actions"><a class="admin-preview-link" href="/#talent" target="_blank" rel="noopener">查看前台</a><div class="admin-userbox"><b id="adminUserInitial">S</b><span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span><button id="adminLogout" type="button">登出</button></div></div>
         </header>
+
+        <section class="admin-dashboard-grid compact" aria-label="招募管理摘要">
+          <article><span>Pages</span><strong data-recruiting-count="pages">3</strong><p>人才 / 土地 / 投資人</p></article>
+          <article><span>Departments</span><strong data-recruiting-count="departments">--</strong><p>目前頁面分類</p></article>
+          <article><span>Cards</span><strong data-recruiting-count="openings">--</strong><p>職缺/合作卡片</p></article>
+          <article><span>Published</span><strong data-recruiting-count="published">--</strong><p>前台顯示卡片</p></article>
+        </section>
 
         <div id="adminRecruitingStatus" class="admin-data-status">正在讀取招募資料...</div>
 

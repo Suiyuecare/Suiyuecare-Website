@@ -20,6 +20,11 @@ const openingTitle = document.querySelector("#openingFormTitle");
 const newDepartmentButton = document.querySelector("#newDepartmentButton");
 const newOpeningButton = document.querySelector("#newOpeningButton");
 const dataList = document.querySelector("#recruitingDataList");
+const recruitingCountTargets = {
+  departments: document.querySelector('[data-recruiting-count="departments"]'),
+  openings: document.querySelector('[data-recruiting-count="openings"]'),
+  published: document.querySelector('[data-recruiting-count="published"]')
+};
 
 let departments = [];
 let openings = [];
@@ -157,8 +162,14 @@ function renderDepartmentOptions() {
 }
 
 function renderDataList() {
+  if (recruitingCountTargets.departments) recruitingCountTargets.departments.textContent = departments.length;
+  if (recruitingCountTargets.openings) recruitingCountTargets.openings.textContent = openings.length;
+  if (recruitingCountTargets.published) {
+    recruitingCountTargets.published.textContent = openings.filter((opening) => opening.status === "published" && opening.is_enabled).length;
+  }
+
   if (!departments.length && !openings.length) {
-    dataList.innerHTML = `<div class="admin-empty-state">目前沒有招募資料。</div>`;
+    dataList.innerHTML = `<div class="admin-empty-state">目前沒有招募資料。請先建立部門/分類，再新增職缺或合作卡片；儲存為「已發布」後前台會自動出現。</div>`;
     return;
   }
 

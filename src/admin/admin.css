@@ -1028,6 +1028,12 @@ img[data-image-usage="map"],
   cursor: pointer;
 }
 
+.admin-media-card button[data-has-usage="true"] {
+  border: 1px solid rgba(180, 35, 24, 0.24);
+  background: #fff7ed;
+  color: #c2410c;
+}
+
 .admin-editor-layout {
   display: grid;
   gap: 20px;
@@ -1780,6 +1786,38 @@ img[data-image-usage="map"],
   background: #fffaf5;
 }
 
+.admin-quick-link-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.admin-quick-link-grid a {
+  display: grid;
+  gap: 8px;
+  min-height: 118px;
+  padding: 18px;
+  border: 1px solid rgba(219, 132, 42, .2);
+  border-radius: 18px;
+  background: #fffaf5;
+  color: var(--admin-brown);
+  text-decoration: none;
+}
+
+.admin-quick-link-grid strong {
+  color: var(--admin-orange-dark);
+  font-size: 16px;
+  font-weight: 1000;
+}
+
+.admin-quick-link-grid span {
+  color: var(--admin-muted);
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.6;
+}
+
 .admin-publish-help {
   align-items: center;
   background: #fff7ed;
@@ -1902,6 +1940,41 @@ img[data-image-usage="map"],
   font-weight: 1000;
   min-height: 40px;
   padding: 10px 14px;
+}
+
+.course-registration-panel {
+  margin-top: 20px;
+}
+
+.course-registration-layout {
+  grid-template-columns: minmax(0, 1.12fr) minmax(360px, .88fr);
+}
+
+.nested-panel {
+  background: rgba(255, 250, 245, .72);
+}
+
+.admin-inline-filter {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.admin-inline-filter span {
+  color: var(--admin-muted);
+  font-size: 13px;
+  font-weight: 1000;
+}
+
+.admin-inline-filter select {
+  min-height: 42px;
+  min-width: 140px;
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--admin-brown);
+  font-weight: 900;
+  padding: 0 14px;
 }
 
 .forms-process-timeline {
@@ -2986,7 +3059,9 @@ img[data-image-usage="map"],
   }
 
   .admin-section-image-tools,
-  .admin-picker-grid {
+  .admin-picker-grid,
+  .course-registration-layout,
+  .admin-quick-link-grid {
     grid-template-columns: 1fr;
   }
 

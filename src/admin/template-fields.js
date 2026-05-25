@@ -55,6 +55,66 @@ function getJsonCardConfig(field) {
         { key: "answer", label: "回答", textarea: true, placeholder: "請輸入回答內容。" }
       ],
       empty: { question: "", answer: "" }
+    },
+    hero_points: {
+      label: "Hero 重點",
+      fields: [
+        { key: "label", label: "標頭", placeholder: "服務範圍" },
+        { key: "body", label: "內容", textarea: true, placeholder: "士林、北投、大同..." }
+      ],
+      empty: { label: "", body: "" }
+    },
+    pain_points: {
+      label: "痛點卡",
+      fields: [
+        { key: "title", label: "標題", placeholder: "剛出院返家" },
+        { key: "body", label: "內容", textarea: true, placeholder: "說明這個痛點。" }
+      ],
+      empty: { title: "", body: "" }
+    },
+    scene_cards: {
+      label: "情境圖卡",
+      fields: [
+        { key: "image", label: "圖片路徑 / URL", placeholder: "assets/homecare-detail-01-greeting.png" },
+        { key: "title", label: "標題", placeholder: "進門先看見人" },
+        { key: "body", label: "內容", textarea: true, placeholder: "說明這張圖片的情境。" }
+      ],
+      empty: { image: "", title: "", body: "" }
+    },
+    service_items: {
+      label: "服務內容",
+      fields: [
+        { key: "title", label: "標題", placeholder: "身體照顧" },
+        { key: "body", label: "內容", textarea: true, placeholder: "沐浴、穿脫衣物..." },
+        { key: "fit", label: "適合對象 / 備註", textarea: true, placeholder: "適合出院返家..." }
+      ],
+      empty: { title: "", body: "", fit: "" }
+    },
+    scenario_cards: {
+      label: "情境卡",
+      fields: [
+        { key: "title", label: "標題", placeholder: "出院返家第一週" },
+        { key: "body", label: "內容", textarea: true, placeholder: "說明情境。" },
+        { key: "tag", label: "重點標籤", placeholder: "重點：安全動線、照顧教學" }
+      ],
+      empty: { title: "", body: "", tag: "" }
+    },
+    quality_cards: {
+      label: "品質卡",
+      fields: [
+        { key: "title", label: "標題", placeholder: "服務前有交代" },
+        { key: "body", label: "內容", textarea: true, placeholder: "說明品質重點。" }
+      ],
+      empty: { title: "", body: "" }
+    },
+    family_board: {
+      label: "理念板卡",
+      fields: [
+        { key: "label", label: "小標 / 編號", placeholder: "01" },
+        { key: "title", label: "標題", placeholder: "服務前確認" },
+        { key: "body", label: "內容", textarea: true, placeholder: "說明這張理念卡。" }
+      ],
+      empty: { label: "", title: "", body: "" }
     }
   };
   return configs[field.field_key] || null;

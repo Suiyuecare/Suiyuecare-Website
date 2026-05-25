@@ -10,7 +10,7 @@ const pages = {
   },
   milestones: {
     eyebrow: "Milestones",
-    title: "大記事",
+    title: "大事記",
     intro: "整理歲悅長照的發展節點、服務擴張、據點成立與重要合作，讓外部夥伴快速理解集團脈絡。",
     focus: ["年度里程碑", "據點與服務擴張", "重要合作紀錄"],
     features: ["用時間軸呈現成長", "保留品牌與營運記憶", "支援投資人與合作夥伴認識集團"]
@@ -144,7 +144,7 @@ const routeSeoMap = {
     description: "認識歲悅長照集團的品牌理念、照顧系統、服務網絡與專業團隊。"
   },
   milestones: {
-    title: "大記事｜歲悅長照集團",
+    title: "大事記｜歲悅長照集團",
     description: "查看歲悅長照集團的重要里程碑、服務擴張、據點成立與合作紀錄。"
   },
   "home-care": {
@@ -292,6 +292,8 @@ function setRouteSeo(slug = "home", overrides = {}) {
   setMetaProperty("og:url", canonical);
   setMetaProperty("og:image", image);
   setMetaProperty("og:image:alt", seo.imageAlt || DEFAULT_SEO.imageAlt);
+  setMetaProperty("og:image:width", seo.imageWidth || "1200");
+  setMetaProperty("og:image:height", seo.imageHeight || "630");
   setMetaName("twitter:card", "summary_large_image");
   setMetaName("twitter:title", title);
   setMetaName("twitter:description", description);
@@ -1199,6 +1201,7 @@ async function fetchSupabaseHealthArticles() {
     `)
     .eq("status", "published")
     .eq("is_enabled", true)
+    .lte("published_at", new Date().toISOString())
     .order("is_featured", { ascending: false })
     .order("published_at", { ascending: false, nullsFirst: false })
     .limit(48);
@@ -1628,16 +1631,19 @@ async function loadSupabaseDetailPage(slug) {
 }
 
 const serviceTemplateSlugs = new Set([
-  "about",
-  "milestones",
+  "software"
+]);
+
+const cmsEnhancedServiceSlugs = new Set([
   "home-care",
   "day-care",
   "community",
   "nursing",
   "migrant-training",
-  "quality",
-  "software"
+  "quality"
 ]);
+
+const supabaseServiceFieldCache = new Map();
 
 function getTemplateFieldValue(field) {
   if (!field) return "";
@@ -1792,8 +1798,292 @@ function renderFixedServiceTemplate(slug, fields = []) {
   `;
 }
 
+async function fetchSupabaseServiceFields(slug) {
+  if (!supabase || !cmsEnhancedServiceSlugs.has(slug)) return [];
+  if (supabaseServiceFieldCache.has(slug)) return supabaseServiceFieldCache.get(slug);
+  const { data, error } = await supabase
+    .from("page_template_fields")
+    .select("template_key, field_key, field_label, field_type, text_value, number_value, boolean_value, json_value, sort_order, image:media!page_template_fields_image_id_fkey(id, public_url, alt_text, file_name)")
+    .eq("page_slug", slug)
+    .eq("is_enabled", true)
+    .order("sort_order", { ascending: true });
+  if (error) throw error;
+  const fields = data || [];
+  supabaseServiceFieldCache.set(slug, fields);
+  return fields;
+}
+
+function getCmsItemValue(item, keys = [], fallback = "") {
+  if (Array.isArray(item)) {
+    const indexMap = {
+      label: 0,
+      step: 0,
+      number: 0,
+      image: 0,
+      title: 1,
+      body: 2,
+      copy: 2,
+      description: 2,
+      note: 2,
+      fit: 2,
+      answer: 1,
+      question: 0
+    };
+    for (const key of keys) {
+      const index = indexMap[key];
+      if (index !== undefined && item[index] !== undefined) return item[index];
+    }
+    return fallback;
+  }
+  if (!item || typeof item !== "object") return fallback;
+  for (const key of keys) {
+    if (item[key] !== undefined && item[key] !== null && item[key] !== "") return item[key];
+  }
+  return fallback;
+}
+
+function setNodeText(root, selector, value) {
+  if (value === "" || value === null || value === undefined) return;
+  const node = root.querySelector(selector);
+  if (node) node.textContent = value;
+}
+
+function setNodeHref(root, selector, value) {
+  if (value === "" || value === null || value === undefined) return;
+  const node = root.querySelector(selector);
+  if (node) node.setAttribute("href", value);
+}
+
+function applyServiceSectionHead(root, gridSelector, fieldMap, prefix) {
+  const section = root.querySelector(gridSelector)?.closest(".service-detail-section");
+  if (!section) return;
+  setNodeText(section, ".service-section-head .eyebrow", getTemplateText(fieldMap, `${prefix}_eyebrow`, ""));
+  setNodeText(section, ".service-section-head h2", getTemplateText(fieldMap, `${prefix}_title`, ""));
+  setNodeText(section, ".service-section-head span", getTemplateText(fieldMap, `${prefix}_body`, ""));
+}
+
+function renderCmsHighlightGrid(items) {
+  return items.map((item, index) => `
+    <article>
+      <span>${escapeHTML(getCmsItemValue(item, ["label", "step", "number"], String(index + 1).padStart(2, "0")))}</span>
+      <h3>${escapeHTML(getCmsItemValue(item, ["title"], ""))}</h3>
+      <p>${escapeHTML(getCmsItemValue(item, ["body", "copy", "description"], ""))}</p>
+    </article>
+  `).join("");
+}
+
+function renderCmsProblemGrid(items) {
+  return items.map((item) => `
+    <article>
+      <h3>${escapeHTML(getCmsItemValue(item, ["title"], ""))}</h3>
+      <p>${escapeHTML(getCmsItemValue(item, ["body", "copy", "description"], ""))}</p>
+    </article>
+  `).join("");
+}
+
+function renderCmsGallery(items) {
+  return items.map((item) => {
+    const image = getCmsItemValue(item, ["image", "image_url", "url"], "assets/homepage-batch/01-care-home-greeting.png");
+    const title = getCmsItemValue(item, ["title"], "");
+    return `
+      <figure>
+        <img src="${escapeHTML(image)}" alt="${escapeHTML(getCmsItemValue(item, ["alt", "image_alt"], title))}"${imageStyleAttr({ usage: "card", focalPoint: getCmsItemValue(item, ["focal_point"], "center") })} />
+        <figcaption>
+          <strong>${escapeHTML(title)}</strong>
+          <span>${escapeHTML(getCmsItemValue(item, ["body", "copy", "description"], ""))}</span>
+        </figcaption>
+      </figure>
+    `;
+  }).join("");
+}
+
+function renderCmsProgramGrid(items) {
+  return items.map((item) => `
+    <article>
+      <h3>${escapeHTML(getCmsItemValue(item, ["title"], ""))}</h3>
+      <p>${escapeHTML(getCmsItemValue(item, ["body", "items", "copy", "description"], ""))}</p>
+      <span>${escapeHTML(getCmsItemValue(item, ["fit", "note", "tag"], ""))}</span>
+    </article>
+  `).join("");
+}
+
+function renderCmsScenarioGrid(items) {
+  return items.map((item) => `
+    <article>
+      <h3>${escapeHTML(getCmsItemValue(item, ["title"], ""))}</h3>
+      <p>${escapeHTML(getCmsItemValue(item, ["body", "copy", "description"], ""))}</p>
+      <small>${escapeHTML(getCmsItemValue(item, ["tag", "note", "fit"], ""))}</small>
+    </article>
+  `).join("");
+}
+
+function renderCmsFlowTrack(items) {
+  return items.map((item, index) => `
+    <article>
+      <b>${escapeHTML(getCmsItemValue(item, ["step", "label", "number"], String(index + 1).padStart(2, "0")))}</b>
+      <h3>${escapeHTML(getCmsItemValue(item, ["title"], ""))}</h3>
+      <p>${escapeHTML(getCmsItemValue(item, ["body", "copy", "description"], ""))}</p>
+    </article>
+  `).join("");
+}
+
+function renderCmsFamilyBoard(items) {
+  return items.map((item, index) => {
+    if (index === 0) {
+      return `
+        <article>
+          <p class="eyebrow">${escapeHTML(getCmsItemValue(item, ["eyebrow", "label"], "Family Communication"))}</p>
+          <h2>${escapeHTML(getCmsItemValue(item, ["title"], ""))}</h2>
+          <p>${escapeHTML(getCmsItemValue(item, ["body", "copy", "description"], ""))}</p>
+        </article>
+      `;
+    }
+    return `
+      <article>
+        <b>${escapeHTML(getCmsItemValue(item, ["label", "step", "number"], String(index).padStart(2, "0")))}</b>
+        <h3>${escapeHTML(getCmsItemValue(item, ["title"], ""))}</h3>
+        <p>${escapeHTML(getCmsItemValue(item, ["body", "copy", "description"], ""))}</p>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderCmsFaqList(items) {
+  return items.map((item) => `
+    <details>
+      <summary>${escapeHTML(getCmsItemValue(item, ["question", "title"], ""))}</summary>
+      <p>${escapeHTML(getCmsItemValue(item, ["answer", "body", "copy"], ""))}</p>
+    </details>
+  `).join("");
+}
+
+function applyCmsEnhancedServicePage(html, slug, fields = []) {
+  if (!fields.length) return html;
+  const fieldMap = mapTemplateFields(fields);
+  const template = document.createElement("template");
+  template.innerHTML = html.trim();
+  const root = template.content;
+
+  const title = getTemplateText(fieldMap, "hero_title", "");
+  const body = getTemplateText(fieldMap, "hero_body", "");
+  setNodeText(root, ".service-detail-hero .service-detail-copy .eyebrow", getTemplateText(fieldMap, "hero_eyebrow", ""));
+  setNodeText(root, ".service-detail-hero .service-detail-copy h1", title);
+  setNodeText(root, ".service-detail-hero .service-detail-copy > p:not(.eyebrow)", body);
+  setNodeText(root, ".hero-actions .primary-button", getTemplateText(fieldMap, "primary_cta_text", ""));
+  setNodeHref(root, ".hero-actions .primary-button", getTemplateText(fieldMap, "primary_cta_url", ""));
+  setNodeText(root, ".hero-actions .secondary-button", getTemplateText(fieldMap, "secondary_cta_text", ""));
+  setNodeHref(root, ".hero-actions .secondary-button", getTemplateText(fieldMap, "secondary_cta_url", ""));
+  setNodeText(root, ".service-hero-card span", getTemplateText(fieldMap, "hero_badge", ""));
+  setNodeText(root, ".service-hero-card strong", getTemplateText(fieldMap, "hero_card_title", ""));
+  const heroImage = getTemplateText(fieldMap, "hero_image", "");
+  const heroImageNode = root.querySelector(".service-hero-card img");
+  if (heroImage && heroImageNode) {
+    heroImageNode.setAttribute("src", heroImage);
+    heroImageNode.setAttribute("alt", getTemplateText(fieldMap, "hero_image_alt", title || heroImageNode.getAttribute("alt") || ""));
+    heroImageNode.setAttribute("style", `object-position:${getTemplateText(fieldMap, "hero_focal_point", "center")};`);
+  }
+
+  const heroPoints = getTemplateArray(fieldMap, "hero_points");
+  const heroPointsNode = root.querySelector(".homecare-hero-points");
+  if (heroPoints.length && heroPointsNode) {
+    heroPointsNode.innerHTML = heroPoints.map((item) => `
+      <article><span>${escapeHTML(getCmsItemValue(item, ["label", "title"], ""))}</span><strong>${escapeHTML(getCmsItemValue(item, ["body", "copy", "description"], ""))}</strong></article>
+    `).join("");
+  }
+
+  const featureCards = getTemplateArray(fieldMap, "feature_cards");
+  if (featureCards.length) {
+    const node = root.querySelector(".service-highlight-grid");
+    if (node) node.innerHTML = renderCmsHighlightGrid(featureCards);
+  }
+  applyServiceSectionHead(root, ".service-highlight-grid", fieldMap, "feature");
+
+  const painPoints = getTemplateArray(fieldMap, "pain_points");
+  if (painPoints.length) {
+    const node = root.querySelector(".homecare-problem-grid");
+    if (node) node.innerHTML = renderCmsProblemGrid(painPoints);
+  }
+  applyServiceSectionHead(root, ".homecare-problem-grid", fieldMap, "pain");
+
+  const sceneCards = getTemplateArray(fieldMap, "scene_cards");
+  if (sceneCards.length) {
+    const node = root.querySelector(".homecare-gallery");
+    if (node) node.innerHTML = renderCmsGallery(sceneCards);
+  }
+  applyServiceSectionHead(root, ".homecare-gallery", fieldMap, "scene");
+
+  const serviceItems = getTemplateArray(fieldMap, "service_items");
+  if (serviceItems.length) {
+    const node = root.querySelector(".community-program-grid");
+    if (node) node.innerHTML = renderCmsProgramGrid(serviceItems);
+  }
+  applyServiceSectionHead(root, ".community-program-grid", fieldMap, "service");
+
+  const scenarioCards = getTemplateArray(fieldMap, "scenario_cards");
+  if (scenarioCards.length) {
+    const node = root.querySelector(".homecare-scenario-grid");
+    if (node) node.innerHTML = renderCmsScenarioGrid(scenarioCards);
+  }
+  applyServiceSectionHead(root, ".homecare-scenario-grid", fieldMap, "scenario");
+
+  const flowCards = getTemplateArray(fieldMap, "flow_cards");
+  if (flowCards.length) {
+    const node = root.querySelector(".service-flow-track");
+    if (node) node.innerHTML = renderCmsFlowTrack(flowCards);
+  }
+  applyServiceSectionHead(root, ".service-flow-track", fieldMap, "flow");
+
+  const qualityCards = getTemplateArray(fieldMap, "quality_cards");
+  if (qualityCards.length) {
+    const node = root.querySelector(".homecare-quality-grid");
+    if (node) node.innerHTML = renderCmsProblemGrid(qualityCards);
+  }
+  applyServiceSectionHead(root, ".homecare-quality-grid", fieldMap, "quality");
+
+  const familyBoard = getTemplateArray(fieldMap, "family_board");
+  if (familyBoard.length) {
+    const node = root.querySelector(".homecare-family-board");
+    if (node) node.innerHTML = renderCmsFamilyBoard(familyBoard);
+  }
+
+  const faqItems = getTemplateArray(fieldMap, "faq_items");
+  if (faqItems.length) {
+    const node = root.querySelector(".software-faq-list");
+    if (node) node.innerHTML = renderCmsFaqList(faqItems);
+  }
+  applyServiceSectionHead(root, ".software-faq-list", fieldMap, "faq");
+
+  setNodeText(root, ".service-cta-panel .eyebrow", getTemplateText(fieldMap, "cta_eyebrow", ""));
+  setNodeText(root, ".service-cta-panel h2", getTemplateText(fieldMap, "cta_title", ""));
+  setNodeText(root, ".service-cta-panel p:not(.eyebrow)", getTemplateText(fieldMap, "cta_body", ""));
+  setNodeText(root, ".service-cta-panel .primary-button", getTemplateText(fieldMap, "cta_button_text", ""));
+  setNodeHref(root, ".service-cta-panel .primary-button", getTemplateText(fieldMap, "cta_button_url", ""));
+
+  if (title || body || heroImage) {
+    setRouteSeo(slug, {
+      title: title ? (title.includes("歲悅") ? title : `${title}｜歲悅長照集團`) : undefined,
+      description: body || undefined,
+      image: heroImage || undefined
+    });
+  }
+
+  return template.innerHTML;
+}
+
+async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
+  const fallbackHtml = fallbackRenderer();
+  pageView.innerHTML = fallbackHtml;
+  try {
+    const fields = await fetchSupabaseServiceFields(slug);
+    if (location.hash.slice(1).split("?")[0] !== slug) return;
+    pageView.innerHTML = applyCmsEnhancedServicePage(fallbackHtml, slug, fields);
+  } catch (error) {
+    console.warn(`Supabase enhanced service page unavailable for ${slug}.`, error);
+  }
+}
+
 async function loadSupabaseServiceTemplatePage(slug) {
-  if (!supabase || !serviceTemplateSlugs.has(slug)) return;
+  if (!supabase || !serviceTemplateSlugs.has(slug)) return false;
 
   try {
     const { data, error } = await supabase
@@ -1804,8 +2094,8 @@ async function loadSupabaseServiceTemplatePage(slug) {
       .order("sort_order", { ascending: true });
 
     if (error) throw error;
-    if (!data?.some((field) => field.field_key === "hero_title")) return;
-    if (location.hash.slice(1).split("?")[0] !== slug) return;
+    if (!data?.some((field) => field.field_key === "hero_title")) return false;
+    if (location.hash.slice(1).split("?")[0] !== slug) return true;
     const fieldMap = mapTemplateFields(data);
     const title = getTemplateText(fieldMap, "hero_title", routeSeoMap[slug]?.title || pages[slug]?.title || "歲悅服務");
     const body = getTemplateText(fieldMap, "hero_body", routeSeoMap[slug]?.description || pages[slug]?.intro || DEFAULT_SEO.description);
@@ -1816,8 +2106,10 @@ async function loadSupabaseServiceTemplatePage(slug) {
       image
     });
     pageView.innerHTML = renderFixedServiceTemplate(slug, data);
+    return true;
   } catch (error) {
     console.warn(`Supabase service template unavailable for ${slug}.`, error);
+    return false;
   }
 }
 
@@ -2027,7 +2319,7 @@ function renderRecruitingApplicationModal(page) {
         <form id="recruitApplyForm">
           <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
           <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
-          <label>Email<input name="Email" type="email" placeholder="請輸入 Email" /></label>
+          <label>Email<input name="Email" type="email" required placeholder="請輸入 Email" /></label>
           <label>申請項目<input name="subject" id="recruitApplyTitle" type="text" readonly /></label>
           <label>補充說明<textarea name="說明" rows="4" placeholder="可填寫可聯絡時間、經歷、場域資料或合作想法"></textarea></label>
           <input name="recruiting_page" id="recruitApplyPage" type="hidden" />
@@ -2118,7 +2410,7 @@ function hasDownloadFile(file) {
 }
 
 function renderInvestorDownloadCell(file, label = "下載") {
-  if (!hasDownloadFile(file)) return `<span class="ir-muted-action">待上架</span>`;
+  if (!hasDownloadFile(file)) return `<span class="ir-muted-action" aria-label="未提供公開下載檔案">—</span>`;
   return `<a href="${escapeHTML(fileHref(file))}" target="_blank" rel="noopener">${escapeHTML(label)}</a>`;
 }
 
@@ -2141,11 +2433,12 @@ function renderCmsNoticeLinks(items, fallbackHref = "#investors") {
   `).join("");
 }
 
-function renderCmsDownloadGrid(files, emptyText = "目前尚未上架檔案") {
-  if (!files?.length) return `<div class="health-empty-state"><h2>${escapeHTML(emptyText)}</h2><p>請到後台檔案下載管理新增投資人文件。</p></div>`;
+function renderCmsDownloadGrid(files, emptyText = "目前暫無公開下載檔案") {
+  const downloadableFiles = (files || []).filter(hasDownloadFile);
+  if (!downloadableFiles.length) return `<div class="health-empty-state"><h2>${escapeHTML(emptyText)}</h2><p>相關文件將依公司公告時程更新。</p></div>`;
   return `
     <div class="download-grid">
-      ${files.map((file) => `
+      ${downloadableFiles.map((file) => `
         <a href="${escapeHTML(fileHref(file))}" target="${file.public_url && file.public_url.startsWith("#") ? "" : "_blank"}" rel="noopener">
           <span>${escapeHTML(file.file_type || "PDF")}</span>
           <strong>${escapeHTML(file.title)}</strong>
@@ -2413,7 +2706,7 @@ function renderCmsGovernancePage(data) {
   const config = getInvestorConfig("ir-governance");
   return `
     <div class="investor-page governance-page">
-      <section class="ir-sub-hero governance-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">${escapeHTML(config.eyebrow || "Corporate Governance")}</p><h1>${escapeHTML(config.title || "公司治理")}</h1><p>${escapeHTML(config.body || "治理公告、制度文件與下載檔改由後台管理。")}</p></div><aside class="governance-hero-card"><span>${escapeHTML(config.snapshot_label || "Governance")}</span><div class="score-ring governance-score"><b>${escapeHTML(config.snapshot_value || "91")}</b><span>${escapeHTML(config.snapshot_unit || "Index")}</span></div><p>${escapeHTML(config.snapshot_note || "治理成熟度示意")}</p></aside></section>
+      <section class="ir-sub-hero governance-visual"><div><a class="search-back" href="#investors">返回投資人專區</a><p class="eyebrow">${escapeHTML(config.eyebrow || "Corporate Governance")}</p><h1>${escapeHTML(config.title || "公司治理")}</h1><p>${escapeHTML(config.body || "治理公告、制度文件與下載檔改由後台管理。")}</p></div><aside class="governance-hero-card"><span>${escapeHTML(config.snapshot_label || "Governance")}</span><div class="score-ring governance-score"><b>${escapeHTML(config.snapshot_value || "91")}</b><span>${escapeHTML(config.snapshot_unit || "Index")}</span></div><p>${escapeHTML(config.snapshot_note || "治理成熟度")}</p></aside></section>
       <nav class="investor-tabs governance-tabs" aria-label="公司治理分頁"><button class="active" type="button" data-ir-tab="governance-news">重要訊息</button><button type="button" data-ir-tab="governance-operation">治理文件</button><button type="button" data-ir-tab="risk-management">風險管理</button></nav>
       ${renderInvestorKpis(config.kpis || [{ label: "Notices", value: String(notices.length), note: "治理公告" }, { label: "Files", value: String(files.length), note: "治理下載" }, { label: "Audit", value: "92%", note: "稽核完成率" }, { label: "Cases", value: "0", note: "重大未結" }])}
       ${renderCmsChartGrid(charts)}
@@ -2444,17 +2737,27 @@ function renderCmsShareholdersPage(data) {
 }
 
 async function loadSupabaseInvestorPage(slug) {
-  if (!supabase || !["investors", "ir-finance", "ir-governance", "ir-shareholders"].includes(slug)) return;
+  if (!supabase || !["investors", "ir-finance", "ir-governance", "ir-shareholders"].includes(slug)) return false;
   try {
     const data = await fetchSupabaseInvestorData(slug);
-    if (location.hash.slice(1).split("?")[0] !== slug) return;
+    if (location.hash.slice(1).split("?")[0] !== slug) return true;
     setRouteSeo(slug);
     if (slug === "investors") pageView.innerHTML = renderCmsInvestorsPage(data);
     if (slug === "ir-finance") pageView.innerHTML = renderCmsFinancePage(data);
     if (slug === "ir-governance") pageView.innerHTML = renderCmsGovernancePage(data);
     if (slug === "ir-shareholders") pageView.innerHTML = renderCmsShareholdersPage(data);
+    return true;
   } catch (error) {
     console.warn(`Supabase investor data unavailable for ${slug}.`, error);
+    return false;
+  }
+}
+
+async function renderInvestorPageOnce(slug, fallbackRenderer) {
+  const loaded = await loadSupabaseInvestorPage(slug);
+  if (location.hash.slice(1).split("?")[0] !== slug) return;
+  if (!loaded) {
+    pageView.innerHTML = fallbackRenderer();
   }
 }
 
@@ -2650,8 +2953,8 @@ function renderSupabaseHero(items) {
   const background = hero.querySelector(".hero-bg");
   if (background) {
     background.style.background = `
-      linear-gradient(90deg, rgba(28, 12, 4, 0.78) 0%, rgba(28, 12, 4, 0.56) 34%, rgba(28, 12, 4, 0.18) 72%),
-      linear-gradient(180deg, rgba(28, 12, 4, 0.08), rgba(28, 12, 4, 0.64)),
+      linear-gradient(90deg, rgba(28, 12, 4, 0.88) 0%, rgba(28, 12, 4, 0.68) 38%, rgba(28, 12, 4, 0.22) 68%, rgba(28, 12, 4, 0.04) 100%),
+      linear-gradient(180deg, rgba(28, 12, 4, 0.14), rgba(28, 12, 4, 0.68)),
       url("${image}") ${item.metadata?.image_position || "center"} / cover
     `;
   }
@@ -2815,7 +3118,7 @@ function renderSupabaseSectionSettings(items) {
 
 const defaultPrimaryNav = [
   { type: "group", label: "服務項目", items: [
-    { label: "關於歲悅", href: "#about" }, { label: "大記事", href: "#milestones" },
+    { label: "關於歲悅", href: "#about" }, { label: "大事記", href: "#milestones" },
     { label: "居家照顧", href: "#home-care" }, { label: "日間照顧", href: "#day-care" },
     { label: "社區據點", href: "#community" }, { label: "護理復能", href: "#nursing" },
     { label: "移工培訓", href: "#migrant-training" }, { label: "教育品管", href: "#quality" },
@@ -3331,14 +3634,46 @@ function articleMatchesHealthSection(article, slugs = []) {
   return normalizedSlugs.includes(article.categorySlug) || normalizedSlugs.some((slug) => tagText.includes(slug) || typeText.includes(slug));
 }
 
+function getArticleSortTime(article) {
+  const rawDate = article.publishedAt || article.date || "";
+  const normalized = String(rawDate).replace(/\./g, "-");
+  const time = new Date(normalized).getTime();
+  return Number.isNaN(time) ? 0 : time;
+}
+
+function sortHealthArticlesLatest(list = []) {
+  return [...list].sort((a, b) => getArticleSortTime(b) - getArticleSortTime(a));
+}
+
+function uniqueHealthArticles(list = []) {
+  const seen = new Set();
+  return list.filter((article) => {
+    const key = article.slug || article.href || article.title;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function getHealthSectionArticles(sectionKey, fallbackSlugs = []) {
   const allArticles = getHealthArticleList();
   const slugs = healthSectionCategorySlugs[sectionKey] || [];
   const matched = allArticles.filter((article) => articleMatchesHealthSection(article, slugs));
-  if (matched.length) return matched;
+  if (matched.length) return sortHealthArticlesLatest(matched);
   return fallbackSlugs
     .map((slug) => allArticles.find((article) => article.slug === slug))
     .filter(Boolean);
+}
+
+function getLatestCareArticles(sourceArticles = []) {
+  const specialSections = [
+    ...healthSectionCategorySlugs.lazyPack,
+    ...healthSectionCategorySlugs.activity,
+    ...healthSectionCategorySlugs.video,
+    ...healthSectionCategorySlugs.shortVideo
+  ];
+  const filtered = sourceArticles.filter((article) => !articleMatchesHealthSection(article, specialSections));
+  return sortHealthArticlesLatest(filtered.length ? filtered : sourceArticles).slice(0, 6);
 }
 
 function renderHealthMiniCard(article, label = article.category) {
@@ -3381,13 +3716,16 @@ function renderHealthPage(selectedCategorySlug = "") {
   const articles = activeCategory
     ? allArticles.filter((article) => article.categorySlug === activeCategory)
     : allArticles;
+  const isCategoryView = Boolean(activeCategory);
   const feature = articles[0];
   const quickCards = articles.slice(1, 5);
-  const latestCards = articles.slice(0, 10);
+  const latestCards = getLatestCareArticles(articles);
   const lazyPacks = getHealthSectionArticles("lazyPack", ["longterm-care-apply", "family-care-story", "dementia-response"]).slice(0, 6);
-  const eventCards = getHealthSectionArticles("activity", ["family-care-course", "day-care-respite", "reablement-workshop"]).slice(0, 6);
-  const videoCards = getHealthSectionArticles("video", ["home-care-video-guide", "day-care-video-guide", "master-talk-care-psychology"]).slice(0, 6);
-  const shortVideoCards = getHealthSectionArticles("shortVideo", ["fall-observation", "bathroom-safety"]).slice(0, 6);
+  const eventCards = getHealthSectionArticles("activity", ["family-care-course", "day-care-respite", "reablement-workshop"]).slice(0, 3);
+  const mediaCards = uniqueHealthArticles([
+    ...getHealthSectionArticles("video", ["home-care-video-guide", "day-care-video-guide", "master-talk-care-psychology"]),
+    ...getHealthSectionArticles("shortVideo", ["fall-observation", "bathroom-safety"])
+  ]).sort((a, b) => getArticleSortTime(b) - getArticleSortTime(a)).slice(0, 4);
 
   return `
     <div class="health-page">
@@ -3455,16 +3793,7 @@ function renderHealthPage(selectedCategorySlug = "") {
         ${["長照2.0", "出院返家", "跌倒預防", "營養補充", "失智陪伴", "日間照顧", "復能訓練", "喘息服務"].map((keyword) => `<a href="#search?q=${encodeURIComponent(keyword)}"># ${keyword}</a>`).join("")}
       </section>
 
-      <section class="health-pack-section">
-        <div class="health-section-head">
-          <div><p class="eyebrow">Guides</p><h2>懶人包</h2></div>
-          <a href="#search?q=${encodeURIComponent("懶人包")}">更多懶人包</a>
-        </div>
-        <div class="health-pack-grid">
-          ${lazyPacks.map((article) => renderHealthMiniCard(article, "懶人包")).join("") || `<div class="health-empty-state"><h2>尚未建立懶人包文章</h2><p>請在後台文章管理新增分類為「懶人包」的文章。</p></div>`}
-        </div>
-      </section>
-
+      ${isCategoryView ? "" : `
       <section class="health-latest">
         <div class="health-section-head">
           <div><p class="eyebrow">Latest</p><h2>最新照顧文章</h2></div>
@@ -3485,6 +3814,16 @@ function renderHealthPage(selectedCategorySlug = "") {
         </div>
       </section>
 
+      <section class="health-pack-section">
+        <div class="health-section-head">
+          <div><p class="eyebrow">Guides</p><h2>懶人包</h2></div>
+          <a href="#search?q=${encodeURIComponent("懶人包")}">更多懶人包</a>
+        </div>
+        <div class="health-pack-grid">
+          ${lazyPacks.map((article) => renderHealthMiniCard(article, "懶人包")).join("") || `<div class="health-empty-state"><h2>尚未建立懶人包文章</h2><p>請在後台文章管理新增分類為「懶人包」的文章。</p></div>`}
+        </div>
+      </section>
+
       <section class="health-event-section">
         <div class="health-section-head">
           <div><p class="eyebrow">Events</p><h2>活動專區</h2></div>
@@ -3501,11 +3840,11 @@ function renderHealthPage(selectedCategorySlug = "") {
           <a href="#search?q=${encodeURIComponent("影片")}">更多影音</a>
         </div>
         <div class="health-media-grid">
-          ${videoCards.map((article) => renderHealthVideoCard(article, "影片")).join("")}
-          ${shortVideoCards.map((article) => renderHealthVideoCard(article, "短影片")).join("")}
-          ${!videoCards.length && !shortVideoCards.length ? `<div class="health-empty-state"><h2>尚未建立影音文章</h2><p>請在後台文章管理新增分類為「影音」或「短影片」的文章。</p></div>` : ""}
+          ${mediaCards.map((article) => renderHealthVideoCard(article, articleMatchesHealthSection(article, healthSectionCategorySlugs.shortVideo) ? "短影片" : "影片")).join("")}
+          ${!mediaCards.length ? `<div class="health-empty-state"><h2>尚未建立影音文章</h2><p>請在後台文章管理新增分類為「影音」或「短影片」的文章。</p></div>` : ""}
         </div>
       </section>
+      `}
     </div>
   `;
 }
@@ -3555,6 +3894,8 @@ function renderSearchPage(query = "") {
 
 let supabaseCourses = [];
 let coursesLoadedFromSupabase = false;
+let coursesLoadFailed = false;
+let coursesLoadPromise = null;
 
 function fallbackCourses() {
   return [
@@ -3670,15 +4011,22 @@ function normalizeCourse(course) {
 }
 
 function getVisibleCourses() {
-  return coursesLoadedFromSupabase && supabaseCourses.length ? supabaseCourses.map(normalizeCourse) : fallbackCourses();
+  if (coursesLoadedFromSupabase) return supabaseCourses.map(normalizeCourse);
+  if (coursesLoadFailed) return fallbackCourses();
+  return [];
 }
 
 async function loadSupabaseCourses({ rerender = false } = {}) {
-  if (!supabase) return;
+  if (!supabase) {
+    coursesLoadFailed = true;
+    return [];
+  }
+  if (coursesLoadPromise) return coursesLoadPromise;
+  coursesLoadPromise = (async () => {
   try {
     const { data, error } = await supabase
       .from("courses")
-      .select("id, title, subtitle, excerpt, description, course_type, location, starts_at, ends_at, price_text, capacity, seats_label, registration_status, is_featured, sort_order, cover_image:media!courses_cover_image_id_fkey(id, public_url, alt_text)")
+      .select("id, title, subtitle, excerpt, description, course_type, location, location_detail, starts_at, ends_at, price_text, capacity, seats_label, registration_status, registration_url, is_featured, sort_order, cover_image:media!courses_cover_image_id_fkey(id, public_url, alt_text)")
       .eq("status", "published")
       .eq("is_enabled", true)
       .order("is_featured", { ascending: false })
@@ -3687,12 +4035,42 @@ async function loadSupabaseCourses({ rerender = false } = {}) {
     if (error) throw error;
     supabaseCourses = data || [];
     coursesLoadedFromSupabase = true;
+    coursesLoadFailed = false;
     if (rerender && location.hash.slice(1).split("?")[0] === "courses") {
       pageView.innerHTML = renderCoursesPage();
     }
+    return supabaseCourses;
   } catch (error) {
     console.warn("Supabase courses unavailable.", error);
     coursesLoadedFromSupabase = false;
+    coursesLoadFailed = true;
+    return [];
+  } finally {
+    coursesLoadPromise = null;
+  }
+  })();
+  return coursesLoadPromise;
+}
+
+async function renderCoursesPageFromCms() {
+  home.classList.remove("active");
+  pageView.classList.add("active");
+  if (!coursesLoadedFromSupabase && !coursesLoadFailed) {
+    pageView.innerHTML = `
+      <div class="courses-page">
+        <section class="courses-hero">
+          <div>
+            <p class="eyebrow">Courses</p>
+            <h1>課程報名</h1>
+            <p>正在讀取後台課程資料，請稍候。</p>
+          </div>
+        </section>
+      </div>
+    `;
+    await loadSupabaseCourses();
+  }
+  if (location.hash.slice(1).split("?")[0] === "courses") {
+    pageView.innerHTML = renderCoursesPage();
   }
 }
 
@@ -3725,33 +4103,47 @@ function renderCoursesPage() {
           <span>左右滑動查看本月主打課程</span>
         </div>
         <div class="featured-course-track" aria-label="重要課程輪播">
-          ${importantCourses.map((course) => `
-            <article class="featured-course-card click-card" data-course-id="${course.id}" data-course-title="${course.title}" tabindex="0" role="button">
-              <img src="${course.image}" alt="${course.title}" />
+          ${importantCourses.length ? importantCourses.map((course) => `
+            <article class="featured-course-card click-card" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" tabindex="0" role="button">
+              <img src="${escapeHTML(course.image)}" alt="${escapeHTML(course.title)}" />
               <div>
-                <span>${course.type}</span>
-                <h3>${course.title}</h3>
-                <p>${course.intro}</p>
-                <button class="course-register" type="button" data-course-id="${course.id}" data-course-title="${course.title}">立即報名</button>
+                <span>${escapeHTML(course.type)}</span>
+                <h3>${escapeHTML(course.title)}</h3>
+                <p>${escapeHTML(course.intro)}</p>
+                <button class="course-register" type="button" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}">立即報名</button>
               </div>
             </article>
-          `).join("")}
+          `).join("") : `
+            <article class="featured-course-card">
+              <div>
+                <span>CMS</span>
+                <h3>等待後台新增重要課程</h3>
+                <p>在課程管理中勾選「重要課程輪播」並發布後，這裡會自動顯示。</p>
+              </div>
+            </article>
+          `}
         </div>
       </section>
       <section class="course-list">
-        ${courses.map((course, index) => `
-          <article class="course-card click-card" data-course-id="${course.id}" data-course-title="${course.title}" tabindex="0" role="button">
-            <div class="course-thumb"><img src="${course.image}" alt="${course.title}" /><span>${String(index + 1).padStart(2, "0")}</span></div>
+        ${courses.length ? courses.map((course, index) => `
+          <article class="course-card click-card" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" tabindex="0" role="button">
+            <div class="course-thumb"><img src="${escapeHTML(course.image)}" alt="${escapeHTML(course.title)}" /><span>${String(index + 1).padStart(2, "0")}</span></div>
             <div class="course-body">
-              <div class="course-topline"><span class="course-type">${course.type}</span><span class="course-seats">${course.seats}</span></div>
-              <h3>${course.title}</h3>
-              <p>${course.intro}</p>
-              <div class="course-info-line"><span><em>地點</em>${course.type}｜${course.location}</span><b><em>費用</em>${course.price}</b></div>
-              <div class="course-info-line"><span><em>日期</em>${course.date}</span><b><em>時間</em>${course.time}</b></div>
-              <button class="course-register" type="button" data-course-id="${course.id}" data-course-title="${course.title}">立即報名</button>
+              <div class="course-topline"><span class="course-type">${escapeHTML(course.type)}</span><span class="course-seats">${escapeHTML(course.seats)}</span></div>
+              <h3>${escapeHTML(course.title)}</h3>
+              <p>${escapeHTML(course.intro)}</p>
+              <div class="course-info-line"><span><em>地點</em>${escapeHTML(course.type)}｜${escapeHTML(course.location)}</span><b><em>費用</em>${escapeHTML(course.price)}</b></div>
+              <div class="course-info-line"><span><em>日期</em>${escapeHTML(course.date)}</span><b><em>時間</em>${escapeHTML(course.time)}</b></div>
+              <button class="course-register" type="button" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}">立即報名</button>
             </div>
           </article>
-        `).join("")}
+        `).join("") : `
+          <div class="course-empty-state">
+            <h2>目前沒有開放報名的課程</h2>
+            <p>後台新增課程並設為「已發布」與「前台顯示」後，這裡會自動出現。</p>
+            <a class="primary-button" href="#contact">聯絡課程窗口</a>
+          </div>
+        `}
       </section>
       <div class="course-modal" id="courseSignupModal" hidden>
         <form class="course-modal-card" id="courseSignupForm">
@@ -3760,6 +4152,7 @@ function renderCoursesPage() {
           <h2>課程報名確認</h2>
           <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
           <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
+          <label>Email<input name="Email" type="email" required placeholder="請輸入 Email" /></label>
           <label>您本次報名的課程<input name="課程" id="courseSignupTitle" type="text" readonly /></label>
           <input name="course_id" id="courseSignupId" type="hidden" />
           <input name="_subject" type="hidden" value="歲悅長照課程報名通知" />
@@ -3897,19 +4290,29 @@ function renderInvestorsPage() {
 
 function renderAboutPage() {
   const aboutValues = [
-    ["歲月安心", "把家屬的焦慮變成清楚流程，讓長輩在熟悉的生活裡被穩定照顧。"],
-    ["悅享生活", "照顧不只是完成任務，也要讓長輩保有選擇、尊嚴與生活節奏。"],
-    ["陪伴成長", "支持照顧者、督導、行政與家庭一起學習，讓服務品質能持續變好。"]
+    ["歲月安心", "我們理解家屬第一次面對照顧安排時，常常不知道該找誰、該問什麼、該怎麼判斷服務是否合適。歲悅把評估、媒合、派案、紀錄與回報整理成清楚流程，讓照顧不再只靠家屬自己摸索。"],
+    ["悅享生活", "長照不是把長輩從生活中抽離，而是協助長輩在安全基礎上保有選擇、尊嚴與原本熟悉的節奏。我們重視每一次移位、用餐、沐浴、活動與對話背後的感受。"],
+    ["陪伴成長", "好的照顧需要整個團隊一起變好。歲悅支持照顧服務員、督導、行政、治療師、講師與家庭照顧者共同學習，讓經驗能被整理、品質能被複製、服務能持續升級。"]
+  ];
+  const aboutPrinciples = [
+    ["需求先被聽懂", "每個家庭遇到的困難不同，有人需要喘息，有人需要出院返家銜接，有人需要失智照顧建議。我們先釐清真實情境，再提出服務安排。"],
+    ["照顧要可追蹤", "服務不是完成一次就結束，而是要能留下紀錄、回報狀態、看見變化。讓家屬知道今天做了什麼，也讓督導能更快發現風險。"],
+    ["專業要變親切", "長照制度、補助、服務類型與課程常讓家庭覺得複雜。歲悅希望把專業說成家屬聽得懂的語言，讓開始照顧變得更容易。"],
+    ["長輩保有主體感", "我們重視長輩的習慣、偏好與情緒反應。照顧不是代替長輩做所有事，而是在安全範圍裡支持長輩繼續參與生活。"],
+    ["照顧者也被支持", "第一線人員需要清楚的工作流程、教育訓練、督導支援與情緒支持。照顧者被照顧，服務才會穩定。"],
+    ["品質可以被改善", "現場回饋、家屬意見、異常事件與教育訓練都會回到品管流程，讓服務不是靠個人熱情，而是靠系統持續變好。"]
   ];
   const aboutSystems = [
     ["居家照顧", "到宅身體照顧、生活支持、服務紀錄與家屬回報。", "assets/homepage-batch/01-care-home-greeting.png"],
     ["日間照顧", "白天托顧、活動參與、共餐休息與家屬喘息支持。", "assets/daycare-recruit-02-exercise.png"],
+    ["社區據點", "失智據點、健康促進、家屬課程與社區預防延緩失能。", "assets/homepage-batch/12-community-health-class.png"],
+    ["護理復能", "職能治療、復能訓練、居家安全建議與生活功能支持。", "assets/nursing-rehab-hero.png"],
     ["移工培訓", "把家庭照顧技能拆成可理解、可練習、可追蹤的課程。", "assets/migrant-recruit-01-classroom.png"],
     ["教育品管", "用教材、訓練、稽核與改善流程承接服務品質。", "assets/quality-recruit-04-quality-meeting.png"]
   ];
   const aboutStats = [
     ["3", "核心服務縣市", "臺北、新北、桃園持續拓展"],
-    ["6", "服務事業模組", "居家、日照、據點、復能、培訓、品管"],
+    ["8", "服務事業模組", "居家、日照、據點、復能、培訓、品管、招募、系統"],
     ["95%", "服務滿意度", "持續追蹤家屬與長輩回饋"],
     ["12+", "年度訓練模組", "讓前線與後勤都有成長路徑"]
   ];
@@ -3918,6 +4321,74 @@ function renderAboutPage() {
     ["建立計畫", "把照顧目標、服務內容、回報方式與風險提醒整理清楚。"],
     ["穩定執行", "透過督導、紀錄與行政支援，讓每一次服務都可追蹤。"],
     ["持續改善", "把現場回饋變成訓練、品管與下一次更好的照顧。"]
+  ];
+  const aboutTeams = [
+    ["居家照顧團隊", "由照顧服務員、居服督導、個案管理與行政支援一起承接到宅服務，協助家庭完成身體照顧、生活支持、服務安排與即時溝通。"],
+    ["日間照顧團隊", "透過照服員、社工、護理與活動設計，讓長輩白天有安全陪伴、規律活動與共餐休息，也讓家屬獲得喘息。"],
+    ["社區據點團隊", "在社區中提供健康促進、失智友善活動、家屬支持與課程報名，讓預防照顧更早進入生活。"],
+    ["護理復能團隊", "以治療師與復能人員協助長輩維持日常功能，從移位、步行、認知活動到居家環境調整，讓生活能力被看見。"],
+    ["移工培訓團隊", "把家庭照顧常見情境轉化為課程，協助移工、雇主與家庭照顧者理解安全技巧、溝通方法與照顧流程。"],
+    ["教育品管與行政團隊", "負責教材、訓練、稽核、資料紀錄、系統維護與表單流程，讓前線可以專心照顧，讓管理可以更透明。"]
+  ];
+  const aboutQuality = [
+    ["服務紀錄", "每一次服務都應留下可回顧的紀錄，包含服務項目、長輩狀態、異常提醒與家屬需要知道的資訊。"],
+    ["督導訪視", "督導不是只處理問題，也會定期理解照顧現場，協助人員調整方法、回應家庭需求。"],
+    ["異常回報", "跌倒風險、情緒變化、用藥疑慮、家屬溝通落差，都需要被及早發現、被正確回報。"],
+    ["教育訓練", "我們把常見照顧情境做成教材與課程，讓新進人員、在職人員與家庭照顧者都能持續學習。"],
+    ["家屬回饋", "家屬的安心感是重要指標。服務回饋會進入改善流程，讓下一次安排更貼近家庭需要。"],
+    ["數位管理", "透過後台、表單、文章、課程與資料下載管理，讓組織資訊更容易維護，也讓服務內容能持續更新。"]
+  ];
+  const aboutFuture = [
+    ["北北桃服務網絡", "持續深化臺北、新北、桃園服務據點，讓家庭能更快找到附近可銜接的照顧資源。"],
+    ["Health 3.0 照顧知識", "用文章、影片、短影片與名人講堂，把長照知識做成一般家庭也能理解的內容。"],
+    ["照顧系統工具", "發展居家、日照、會計、人資、電子公文、專案管理與 PDF 工具，讓長照單位更有效率。"],
+    ["人才培育", "打造清楚的招募、培訓、升遷與福利制度，讓願意投入長照的人能看見自己的職涯路徑。"]
+  ];
+  const aboutPainPoints = [
+    ["家屬不知道從哪裡開始", "面對出院返家、失智症狀、跌倒風險或照顧者壓力時，家庭最常遇到的不是不願意照顧，而是不知道第一步該怎麼做。"],
+    ["服務資訊太分散", "居家、日照、據點、復能、補助、課程與移工照顧各自有不同入口，家屬常常需要自己拼湊答案。"],
+    ["照顧品質難以判斷", "人到了現場不等於服務品質穩定。家屬需要知道服務內容、照顧狀態、異常提醒與後續調整是否有人追蹤。"],
+    ["第一線照顧者缺支援", "照顧服務員與督導每天面對大量現場變化，如果沒有清楚流程、教育訓練與行政支援，很容易把壓力全部留在個人身上。"],
+    ["跨部門協作不透明", "居家、日照、復能、課程、行政與品管都在照顧鏈上，但如果資料沒有串起來，家庭會感覺每次都要重講一次。"],
+    ["長照難以被信任地放大", "服務據點越多，越需要一致的訓練、紀錄、回報、稽核與管理方法，才能讓品質不是靠單一人員撐住。"]
+  ];
+  const aboutOperatingModel = [
+    ["01", "諮詢入口", "先讓家庭用最容易說出口的方式描述困難，不急著貼標籤，也不急著推服務。"],
+    ["02", "需求評估", "整理長輩身體狀態、生活習慣、家庭照顧量能、風險情境與預算限制。"],
+    ["03", "服務設計", "依照需求組合居家照顧、日間照顧、社區據點、護理復能、課程或移工培訓。"],
+    ["04", "人員媒合", "依照地區、時段、照顧難度與服務目標安排適合的人員與督導支持。"],
+    ["05", "紀錄回報", "讓服務內容、長輩狀態、異常提醒與家屬關心事項，都能被記錄與追蹤。"],
+    ["06", "改善迭代", "把現場回饋帶回訓練、品管、流程與系統，讓下一次服務比這一次更好。"]
+  ];
+  const aboutStakeholders = [
+    ["對長輩", "我們希望長輩不是被照顧到失去主體，而是在安全、尊嚴與陪伴裡，保有選擇、節奏與生活感。"],
+    ["對家屬", "我們協助家屬把焦慮變成可討論的問題，把問題變成可安排的計畫，讓照顧不再只靠一個人硬撐。"],
+    ["對照顧服務員", "我們重視第一線的專業與情緒支持，讓照顧者有訓練、有督導、有工具，也有可以長期發展的職涯。"],
+    ["對督導與行政", "我們把流程、紀錄、表單、回報與品管整理清楚，讓管理不是一直救火，而是能看見問題並提前處理。"],
+    ["對合作單位", "我們以清楚窗口、服務資料、課程品質與合作紀錄建立信任，讓政府、學校、社區與企業夥伴能順利協作。"]
+  ];
+  const aboutStandards = [
+    ["服務標準化", "把個案建檔、需求評估、服務媒合、服務紀錄、異常回報與督導追蹤整理成可訓練、可交接、可稽核的流程。"],
+    ["教育模組化", "將移位、沐浴、用餐、失智溝通、跌倒預防、紀錄品質與服務倫理拆成可學習、可演練的課程模組。"],
+    ["資料透明化", "重要資訊不只存在聊天紀錄裡，而是透過後台、表單、文章、課程、下載檔與報表，讓組織記憶能被保存。"],
+    ["風險前置化", "跌倒、營養、情緒、家庭壓力、服務缺口與人員異動都應及早被看見，避免問題變大後才處理。"],
+    ["溝通一致化", "讓家屬、督導、第一線、行政與合作窗口使用一致語言，降低重複說明與資訊落差。"],
+    ["改善持續化", "服務不是一次交付，而是持續接收回饋、調整流程、更新教材、改善系統與優化團隊分工。"]
+  ];
+  const aboutPromises = [
+    ["清楚", "把複雜長照服務整理成家屬能理解的選項與下一步。"],
+    ["穩定", "用督導、紀錄、訓練與品管降低服務落差。"],
+    ["尊重", "讓長輩的習慣、情緒、偏好與生活節奏被納入照顧安排。"],
+    ["支持", "不只支持家庭，也支持第一線照顧者與內部管理團隊。"],
+    ["透明", "重要服務資訊、表單、課程、公告與紀錄能被追蹤與更新。"],
+    ["成長", "把照顧經驗轉成知識、制度、人才與系統，讓組織持續往前。"]
+  ];
+  const aboutFaqs = [
+    ["歲悅長照集團跟一般照顧單位有什麼不同？", "歲悅不只提供單一服務，而是把居家、日照、社區據點、復能、移工培訓、教育品管、招募與系統工具整合成可長期運作的照顧網絡。"],
+    ["如果家人不知道該選居家還是日照，可以先問歲悅嗎？", "可以。歲悅會先協助理解家庭情境，再依長輩狀態、家屬照顧量能、地區與服務目標，討論適合的組合。"],
+    ["歲悅如何維持服務品質？", "我們重視服務紀錄、督導追蹤、教育訓練、異常回報、家屬回饋與流程改善，讓品質不只靠個人經驗，也靠制度承接。"],
+    ["歲悅是否只服務長輩家庭？", "主要服務長輩與家庭，也協助長照單位、合作機構、學校、社區與企業進行課程、合作、招募與系統工具導入。"],
+    ["未來歲悅想成為什麼樣的長照品牌？", "我們希望成為家庭想到長照時最容易開始的入口，也成為照顧者、合作夥伴與長照單位能信任的專業支持系統。"]
   ];
 
   return `
@@ -3938,6 +4409,20 @@ function renderAboutPage() {
         </aside>
       </section>
 
+      <section class="about-story">
+        <article class="about-story-card">
+          <p class="eyebrow">Why We Exist</p>
+          <h2>歲悅想解決的，不只是「有沒有人來照顧」，而是家庭在照顧路上不知道下一步該怎麼走。</h2>
+          <p>許多家庭第一次接觸長照，是在長輩突然跌倒、出院返家、失智症狀變明顯，或主要照顧者已經快撐不住的時候。這些時刻通常很急、很亂，也很孤單。歲悅長照集團希望把照顧變成一件可以被理解、可以被安排、可以被追蹤的事。</p>
+          <p>我們的 slogan 是「照顧就像去超商，買牛奶一樣簡單」。這不是把照顧說得很輕，而是提醒自己：再複雜的專業，都應該被整理成家庭容易開始的入口。當家屬需要協助時，可以知道要找誰、要準備什麼、接下來會發生什麼，也知道有人會一起承接。</p>
+        </article>
+        <div class="about-story-notes">
+          <article><b>01</b><span>把照顧入口變簡單</span><p>從諮詢、評估到媒合服務，降低家屬開始尋求協助的門檻。</p></article>
+          <article><b>02</b><span>把服務過程變清楚</span><p>透過紀錄、回報、督導與行政支援，讓照顧不是黑盒子。</p></article>
+          <article><b>03</b><span>把長照經驗變資產</span><p>把前線經驗整理成課程、品管、內容與系統，讓組織持續進步。</p></article>
+        </div>
+      </section>
+
       <section class="about-belief">
         <div class="about-section-head">
           <p class="eyebrow">Brand Belief</p>
@@ -3946,6 +4431,39 @@ function renderAboutPage() {
         </div>
         <div class="about-value-grid">
           ${aboutValues.map(([title, copy]) => `<article><span></span><h3>${title}</h3><p>${copy}</p></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="about-problem-section">
+        <div class="about-section-head">
+          <p class="eyebrow">Problems We Solve</p>
+          <h2>長照現場真正困難的地方，往往不是單一服務不足，而是資訊、流程與支持系統沒有接起來。</h2>
+          <span>歲悅把家庭、第一線、督導、行政與合作單位常遇到的問題整理成服務設計的起點。</span>
+        </div>
+        <div class="about-problem-grid">
+          ${aboutPainPoints.map(([title, copy]) => `<article><h3>${escapeHTML(title)}</h3><p>${escapeHTML(copy)}</p></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="about-principles">
+        <div class="about-section-head">
+          <p class="eyebrow">Care Principles</p>
+          <h2>我們判斷服務好不好，不只看任務有沒有完成，也看家庭是不是更安心。</h2>
+          <span>歲悅把照顧拆成可以被執行的原則，讓每個部門、每位夥伴都能往同一個方向前進。</span>
+        </div>
+        <div class="about-principle-grid">
+          ${aboutPrinciples.map(([title, copy], index) => `<article><b>${String(index + 1).padStart(2, "0")}</b><h3>${title}</h3><p>${copy}</p></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="about-operating-section">
+        <div class="about-section-head">
+          <p class="eyebrow">Operating Model</p>
+          <h2>從第一通電話到長期追蹤，歲悅把照顧拆成可以被理解、被交接、被改善的六個步驟。</h2>
+          <span>這套方法不是為了讓服務變得冰冷，而是讓每一位長輩、家屬與照顧者都不必在混亂中靠運氣。</span>
+        </div>
+        <div class="about-operating-grid">
+          ${aboutOperatingModel.map(([step, title, copy]) => `<article><b>${escapeHTML(step)}</b><h3>${escapeHTML(title)}</h3><p>${escapeHTML(copy)}</p></article>`).join("")}
         </div>
       </section>
 
@@ -3965,6 +4483,45 @@ function renderAboutPage() {
         </div>
       </section>
 
+      <section class="about-stakeholder-section">
+        <div class="about-section-head">
+          <p class="eyebrow">For Everyone In Care</p>
+          <h2>歲悅的服務設計，不只看見長輩，也看見長輩身邊每一個正在承擔的人。</h2>
+          <span>照顧如果只要求某一個人更努力，通常走不久；照顧需要被分工、被支持、被制度化。</span>
+        </div>
+        <div class="about-stakeholder-board">
+          ${aboutStakeholders.map(([title, copy], index) => `
+            <article>
+              <b>${String(index + 1).padStart(2, "0")}</b>
+              <h3>${escapeHTML(title)}</h3>
+              <p>${escapeHTML(copy)}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="about-team-section">
+        <div class="about-section-head">
+          <p class="eyebrow">Our Teams</p>
+          <h2>歲悅不是單一服務單位，而是一個把前線、督導、教育、行政與系統串在一起的照顧團隊。</h2>
+          <span>每個部門都有自己的專業位置，但共同目標都是讓家庭被承接、長輩被尊重、照顧者被支持。</span>
+        </div>
+        <div class="about-team-grid">
+          ${aboutTeams.map(([title, copy]) => `<article><h3>${title}</h3><p>${copy}</p></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="about-standard-section">
+        <div class="about-section-head">
+          <p class="eyebrow">Management Standard</p>
+          <h2>我們把溫暖放進制度裡，也把制度做得足夠親切，讓現場真的願意使用。</h2>
+          <span>品質管理不是只做稽核，而是把服務、教育、資料、風險、溝通與改善變成日常的一部分。</span>
+        </div>
+        <div class="about-standard-grid">
+          ${aboutStandards.map(([title, copy]) => `<article><h3>${escapeHTML(title)}</h3><p>${escapeHTML(copy)}</p></article>`).join("")}
+        </div>
+      </section>
+
       <section class="about-stats">
         ${aboutStats.map(([value, label, copy]) => `<article><strong>${value}</strong><span>${label}</span><p>${copy}</p></article>`).join("")}
       </section>
@@ -3979,6 +4536,66 @@ function renderAboutPage() {
           ${aboutSteps.map(([title, copy], index) => `<article><b>${String(index + 1).padStart(2, "0")}</b><h3>${title}</h3><p>${copy}</p></article>`).join("")}
         </div>
       </section>
+
+      <section class="about-quality-section">
+        <div class="about-quality-board">
+          <div>
+            <p class="eyebrow">Quality Management</p>
+            <h2>品質不是一句口號，而是每一天都要被紀錄、被檢查、被修正。</h2>
+            <p>長照服務最困難的地方，是每個家庭都不同、每個現場都會變動。歲悅用紀錄、督導、教育與回饋流程，讓照顧品質可以被看見，也可以被持續改善。</p>
+          </div>
+          <div class="about-quality-grid">
+            ${aboutQuality.map(([title, copy]) => `<article><h3>${title}</h3><p>${copy}</p></article>`).join("")}
+          </div>
+        </div>
+      </section>
+
+      <section class="about-future">
+        <div class="about-section-head">
+          <p class="eyebrow">Future Direction</p>
+          <h2>未來的歲悅，會把長照服務、照顧知識、人才培育與數位系統做得更完整。</h2>
+          <span>我們希望不只照顧個別家庭，也能協助更多長照單位、照顧者與社區建立更穩定的照顧能力。</span>
+        </div>
+        <div class="about-future-grid">
+          ${aboutFuture.map(([title, copy]) => `<article><h3>${title}</h3><p>${copy}</p></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="about-promise-section">
+        <div class="about-section-head">
+          <p class="eyebrow">Brand Promise</p>
+          <h2>歲悅希望每一次照顧，都能讓家庭感覺事情正在變清楚，而不是更混亂。</h2>
+          <span>我們對外說的是品牌承諾，對內要求的是每天都要能落地的工作標準。</span>
+        </div>
+        <div class="about-promise-grid">
+          ${aboutPromises.map(([title, copy]) => `<article><strong>${escapeHTML(title)}</strong><p>${escapeHTML(copy)}</p></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="about-faq-section">
+        <div class="about-section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>認識歲悅常見問題</h2>
+          <span>如果你是家屬、合作夥伴、投資人或想加入長照產業的人，可以先從這裡理解歲悅的定位。</span>
+        </div>
+        <div class="about-faq-list">
+          ${aboutFaqs.map(([question, answer], index) => `
+            <details ${index === 0 ? "open" : ""}>
+              <summary>${escapeHTML(question)}</summary>
+              <p>${escapeHTML(answer)}</p>
+            </details>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel about-cta-panel">
+        <div>
+          <p class="eyebrow">Start With Suiyuecare</p>
+          <h2>如果你正在找一個能把照顧說清楚、做穩定、走長久的團隊，歲悅可以一起討論下一步。</h2>
+          <p>不論是家庭照顧諮詢、服務合作、人才招募、土地合作、投資洽詢或系統導入，都可以從一個清楚的對話開始。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡歲悅</a>
+      </section>
     </div>
   `;
 }
@@ -3991,70 +4608,34 @@ function renderMilestonesPage() {
     ["1", "共同使命", "讓照顧變得更容易理解、更容易開始"]
   ];
   const timeline = [
-    {
-      year: "2019",
-      title: "把照顧的第一個問題聽清楚",
-      tag: "Origin",
-      copy: "歲悅從家庭照顧的真實痛點出發：家屬不知道該找誰、怎麼安排、如何確認服務品質。我們開始把照顧需求整理成可以被理解的流程。",
-      image: "assets/homepage-batch/10-family-consultation.png"
-    },
-    {
-      year: "2020",
-      title: "建立居家照顧服務雛形",
-      tag: "Home Care",
-      copy: "從到宅照顧、生活支持、服務紀錄與家屬回報開始，逐步建立前線照服員、督導與行政後勤之間的協作節奏。",
-      image: "assets/homepage-batch/01-care-home-greeting.png"
-    },
-    {
-      year: "2021",
-      title: "照顧紀錄與督導制度成形",
-      tag: "Quality",
-      copy: "服務不只要被完成，也要能被追蹤。歲悅把照顧紀錄、家屬回報、督導提醒與服務檢核放進日常管理。",
-      image: "assets/homepage-batch/03-supervisor-care-plan.png"
-    },
-    {
-      year: "2022",
-      title: "日間照顧與社區支持延伸",
-      tag: "Day Care",
-      copy: "我們將照顧從家中延伸到日間照顧與社區活動，讓長輩白天有節奏、有陪伴，也讓家屬有喘息與放心的空間。",
-      image: "assets/homepage-batch/02-daycare-group-exercise.png"
-    },
-    {
-      year: "2023",
-      title: "移工培訓與家庭照顧課程啟動",
-      tag: "Training",
-      copy: "將移位、用餐、沐浴、溝通與安全照顧拆成可練習的課程，讓家庭照顧不只依賴經驗，也能有方法、有標準。",
-      image: "assets/migrant-recruit-02-transfer.png"
-    },
-    {
-      year: "2024",
-      title: "教育品管成為集團核心能力",
-      tag: "Education",
-      copy: "把前線服務經驗轉化為教材、稽核、回饋與改善流程，讓照顧品質可以被複製，也讓每一位照顧者被支持。",
-      image: "assets/quality-recruit-04-quality-meeting.png"
-    },
-    {
-      year: "2025",
-      title: "北北桃服務網絡持續展開",
-      tag: "Network",
-      copy: "服務據點與合作單位逐步串接，形成臺北、新北、桃園的照顧網絡，讓更多家庭能在需要時更快找到歲悅。",
-      image: "assets/north-service-map.png"
-    },
-    {
-      year: "2026",
-      title: "走向更清楚、更可信任的長照集團",
-      tag: "Suiyuecare Corps.",
-      copy: "我們持續把服務、訓練、招募、資訊與投資人溝通整合在一起，讓歲悅成為家庭、人才與合作夥伴都能信任的長照品牌。",
-      image: "assets/homepage-batch/16-taipei-service-office.png"
-    }
-  ];
+    ["2025", "01", "北區服務藍圖盤點", "Planning", "整理臺北、新北、桃園家庭照顧需求，確認居家、日照、社區與復能服務的發展方向。", "assets/homepage-batch/10-family-consultation.png", "已完成"],
+    ["2025", "02", "居家照顧流程標準化", "Home Care", "建立個案建檔、服務媒合、派案、照顧紀錄與家屬回報的基礎流程。", "assets/homepage-batch/01-care-home-greeting.png", "已完成"],
+    ["2025", "03", "督導陪跑制度啟動", "Quality", "把督導訪視、異常回報、服務品質檢核與照服員支持放進日常管理。", "assets/homepage-batch/03-supervisor-care-plan.png", "已完成"],
+    ["2025", "04", "日間照顧場域規劃", "Day Care", "規劃長輩白天活動、餐食、休息、健康觀察與家屬回報的中心營運節奏。", "assets/homepage-batch/02-daycare-group-exercise.png", "已完成"],
+    ["2025", "05", "社區據點服務設計", "Community", "盤點健康促進、家屬課程、照顧諮詢與社區活動，讓照顧支持更靠近生活圈。", "assets/homepage-batch/12-community-health-class.png", "已完成"],
+    ["2025", "06", "護理復能協作模型成形", "Reablement", "整合護理觀察、復能訓練與照顧陪伴，讓長輩能在生活裡重新練回能力。", "assets/homepage-batch/13-rehab-walking-practice.png", "已完成"],
+    ["2025", "07", "移工照顧培訓課程開發", "Training", "將移位、沐浴、用餐、溝通與安全照顧拆成可演練的課程內容。", "assets/migrant-recruit-02-transfer.png", "已完成"],
+    ["2025", "08", "教育品管教材整理", "Education", "把第一線服務經驗轉化為教材、檢核表與案例討論，讓照顧品質可以被複製。", "assets/quality-recruit-04-quality-meeting.png", "已完成"],
+    ["2025", "09", "北北桃據點資料盤點", "Network", "整理士林、大同、萬華、信義、新店、新莊與蘆竹等服務節點資訊。", "assets/north-service-map.png", "已完成"],
+    ["2025", "10", "人才招募制度擴充", "Recruiting", "建立居家、日照、移工培訓、教學品管與行政部門的職缺內容與發展路徑。", "assets/homepage-batch/06-orange-polo-supervisor.png", "已完成"],
+    ["2025", "11", "後台內容管理架構規劃", "CMS", "規劃文章、圖片、課程、表單、檔案下載與頁面文案的後台管理方式。", "assets/homepage-batch/04-admin-team-office.png", "已完成"],
+    ["2025", "12", "年度服務與合作成果整理", "Review", "彙整服務據點、合作單位、得標紀錄與年度營運成果，作為 2026 擴展基礎。", "assets/homepage-batch/16-taipei-service-office.png", "已完成"],
+    ["2026", "01", "健康 3.0 內容中心上線", "Health 3.0", "建立文章、懶人包、活動專區、影音與短影片內容，讓家屬更容易理解照顧知識。", "assets/homepage-batch/18-health-fall-prevention-cover.png", "已完成"],
+    ["2026", "02", "課程報名與表單留存完成", "Courses", "課程卡片、報名彈窗、表單資料留存與後台課程管理逐步串接。", "assets/homepage-batch/12-community-health-class.png", "已完成"],
+    ["2026", "03", "投資人專區資料化", "Investor", "將公告、財報、下載檔與圖表資料改為後台可管理，提升對外資訊透明度。", "assets/homepage-batch/04-admin-team-office.png", "已完成"],
+    ["2026", "04", "服務八大子頁模板化", "Service Pages", "居家、日照、社區、護理復能、移工培訓、教育品管、關於與大事記版型統一整理。", "assets/homepage-batch/09-nurse-blood-pressure.png", "已完成"],
+    ["2026", "05", "網站上線前總檢與內容補強", "Launch Check", "檢查前後台資料、SEO、RWD、表單寄信、圖片裁切、權限與內容健康檢查。", "assets/homepage-batch/15-phone-consultation.png", "進行中"],
+  ].map(([year, month, title, tag, copy, image, status]) => ({ year, month, title, tag, copy, image, status }));
+  const sortedTimeline = [...timeline].sort((a, b) => Number(b.year) - Number(a.year) || Number(b.month) - Number(a.month));
+  const timelineGroups = [...new Set(sortedTimeline.map((item) => item.year))]
+    .map((year) => ({ year, items: sortedTimeline.filter((item) => item.year === year) }));
 
   return `
     <div class="milestones-page">
       <section class="milestone-hero">
         <div>
           <p class="eyebrow">Milestones</p>
-          <h1>大記事</h1>
+          <h1>大事記</h1>
           <p>從一通照顧諮詢開始，到北北桃服務網絡與教育品管系統，歲悅把每一個家庭的需求，慢慢整理成可以被理解、被追蹤、被信任的照顧歷程。</p>
           <div class="milestone-scroll-cue">
             <span></span>
@@ -4080,25 +4661,36 @@ function renderMilestonesPage() {
         </div>
         <div class="milestone-intro">
           <p class="eyebrow">Our Journey</p>
-          <h2>每一步，都是為了讓家庭更容易開始照顧。</h2>
-          <p>我們把歲悅的發展做成可以一路往下看的故事。滑到不同年份時，節點會亮起，讓觀看者像翻閱品牌成長紀錄一樣理解我們。</p>
+          <h2>最新進度在最上方，越往下越接近歲悅開始整理照顧系統的起點。</h2>
+          <p>大事記依年度與月份倒序排列，先看最近完成與正在推進的內容，再一路往下回看 2026、2025 的服務、品管、內容與後台建置歷程。</p>
         </div>
         <div class="milestone-list">
-          ${timeline.map((item, index) => `
-            <article class="milestone-card ${index === 0 ? "active" : ""}" data-milestone-card>
-              <div class="milestone-year">
-                <span>${item.year}</span>
-                <b>${String(index + 1).padStart(2, "0")}</b>
+          ${timelineGroups.map((group) => `
+            <section class="milestone-year-group" aria-label="${group.year} 年大事記">
+              <div class="milestone-year-heading">
+                <span>${group.year}</span>
+                <p>${group.year === "2026" ? "從最新上線準備往前回看，整理網站、內容、後台與資料化管理如何一步步成形。" : "12 月回到 1 月，回看歲悅如何建立服務、品管與營運基礎。"}</p>
               </div>
-              <figure>
-                <img src="${item.image}" alt="${item.title}" />
-              </figure>
-              <div class="milestone-copy">
-                <small>${item.tag}</small>
-                <h3>${item.title}</h3>
-                <p>${item.copy}</p>
-              </div>
-            </article>
+              ${group.items.map((item, index) => {
+                const globalIndex = sortedTimeline.findIndex((entry) => entry.year === item.year && entry.month === item.month);
+                return `
+                  <article class="milestone-card ${globalIndex === 0 ? "active" : ""}" data-milestone-card>
+                    <div class="milestone-year">
+                      <span>${item.month}月</span>
+                      <b>${item.year}</b>
+                    </div>
+                    <figure>
+                      <img src="${item.image}" alt="${item.title}" />
+                    </figure>
+                    <div class="milestone-copy">
+                      <small>${globalIndex === 0 ? "<i>最新</i>" : ""}${item.tag}<em>${item.status}</em></small>
+                      <h3>${item.title}</h3>
+                      <p>${item.copy}</p>
+                    </div>
+                  </article>
+                `;
+              }).join("")}
+            </section>
           `).join("")}
         </div>
       </section>
@@ -4118,28 +4710,64 @@ function renderMilestonesPage() {
 
 function renderHomeCarePage() {
   const highlights = [
-    ["到宅生活支持", "協助備餐、陪伴、環境整理與日常安全觀察，讓長輩在熟悉的家裡維持生活節奏。"],
-    ["身體照顧服務", "依照個案狀態安排沐浴、如廁、移位、翻身、用餐與陪同外出等照顧。"],
-    ["督導品質追蹤", "督導定期回訪，確認服務內容、照顧風險與家屬回饋，讓服務不是派人到場而已。"],
-    ["家屬即時回報", "透過照顧紀錄、異常提醒與溝通窗口，讓家人下班後也能掌握長輩狀況。"]
+    ["把需求講清楚", "先釐清長輩目前最困擾的生活情境，例如洗澡、如廁、移位、用餐、出院返家或白天無人陪伴。"],
+    ["把服務排穩定", "依照區域、時段、照顧強度與長輩個性安排照顧服務員，讓家庭不是每次都重新適應。"],
+    ["把紀錄留完整", "服務後整理照顧紀錄、狀態變化與提醒事項，讓家屬知道今天發生什麼，也知道下一步要注意什麼。"],
+    ["把品質追到底", "督導定期回訪、檢視服務內容與家屬回饋，讓照顧不是有人到場而已，而是有人持續負責。"]
+  ];
+  const painPoints = [
+    ["剛出院返家", "床邊起身、輪椅轉位、沐浴動線、用餐狀態都需要重新安排，家屬常常不知道第一週該怎麼做。"],
+    ["白天沒人在家", "家屬上班後最擔心跌倒、忘記吃飯、情緒低落或臨時狀況無人協助。"],
+    ["失智照顧壓力", "反覆詢問、作息混亂、抗拒洗澡或外出，需要有耐心且能理解行為背後需求的陪伴。"],
+    ["照顧者太累", "長期照顧容易累積睡眠不足、情緒壓力與家庭摩擦，需要喘息，也需要有人一起分擔。"],
+    ["不知道服務品質", "只知道有人來，卻不清楚今天做了什麼、長輩狀態有沒有變化、是否需要調整服務。"],
+    ["家人意見不同", "每位家屬對照顧期待不同，歲悅會協助把需求、服務範圍與回報方式說清楚。"]
   ];
   const scenes = [
-    ["assets/homepage-batch/01-care-home-greeting.png", "到宅前的安心問候", "好的居家照顧從進門開始，先理解長輩今天的狀態與情緒。"],
-    ["assets/homepage-batch/07-orange-apron-meal-prep.png", "生活照顧與營養陪伴", "備餐、用餐觀察與日常陪伴，是讓長輩穩定生活的重要細節。"],
-    ["assets/homepage-batch/08-orange-apron-walking.png", "陪同活動與安全移動", "用合適步調陪長輩走動，維持活動量，也降低跌倒風險。"],
-    ["assets/homepage-batch/03-supervisor-care-plan.png", "督導與家屬討論計畫", "把照顧需求、服務目標與回報方式說清楚，讓家庭不用自己猜。"]
+    ["assets/homecare-detail-01-greeting.png", "進門先看見人", "服務員進門後先問候、觀察精神與情緒，讓長輩知道今天不是被處理，而是被陪伴。"],
+    ["assets/homecare-detail-02-care-plan.png", "家屬與督導一起排照顧", "把服務目標、時段、禁忌、回報方式與家屬最在意的事情寫進計畫裡。"],
+    ["assets/homecare-detail-03-safe-transfer.png", "安全移動不靠硬撐", "協助起身、移位、陪同走動時，用合適步調與支撐方式降低跌倒風險。"],
+    ["assets/homecare-detail-04-daily-support.png", "日常細節也要被記得", "備餐、用餐觀察、生活提醒與照顧紀錄，讓家裡的照顧變得清楚可追蹤。"]
   ];
   const serviceItems = [
-    ["身體照顧", "沐浴、穿脫衣物、如廁、移位、翻身、拍背、用餐協助", "適合出院返家、行動不便或需穩定照顧者"],
-    ["生活照顧", "備餐、陪伴、環境整理、陪同外出、代購與生活提醒", "適合獨居、白天家人不在或需要日常支持者"],
-    ["喘息支持", "短時段照顧接手，讓主要照顧者能休息、辦事或安心上班", "適合長期照顧壓力較高的家庭"],
-    ["照顧紀錄", "服務紀錄、狀態回報、異常提醒、督導追蹤與家屬溝通", "適合希望清楚掌握照顧品質的家屬"]
+    ["身體照顧", "沐浴、穿脫衣物、如廁、移位、翻身、拍背、用餐協助。", "適合出院返家、行動不便、需協助盥洗或日常照顧者。"],
+    ["生活照顧", "備餐、陪伴、簡易環境整理、代購、陪同外出與生活提醒。", "適合獨居、白天家人不在、需要日常支持的長輩。"],
+    ["陪同就醫", "陪同掛號、候診、拿藥、交通動線提醒與回家後重點回報。", "適合家屬無法請假，或長輩外出需要有人陪同者。"],
+    ["喘息支持", "短時段接手照顧，讓主要照顧者能休息、辦事、上班或恢復生活。", "適合長期照顧壓力高、需要固定喘息時段的家庭。"],
+    ["失智陪伴", "用穩定語氣、生活線索與熟悉活動陪伴，降低焦躁與抗拒。", "適合有認知退化、作息混亂或需要耐心引導的長輩。"],
+    ["安全觀察", "觀察跌倒風險、進食飲水、精神變化、皮膚狀況與居家動線。", "適合希望及早發現風險並調整環境的家庭。"],
+    ["家屬回報", "服務紀錄、照片回報、異常提醒、家屬溝通與督導追蹤。", "適合想掌握照顧品質、需要清楚資訊的家屬。"],
+    ["資源銜接", "協助家屬理解長照資源、日照、復能、輔具與其他服務銜接。", "適合剛開始接觸長照、不確定該怎麼安排的家庭。"]
+  ];
+  const scenarios = [
+    ["出院返家第一週", "協助家屬把床邊、浴室、用餐、服藥提醒與移位方式重新整理，降低返家初期的混亂。", "重點：安全動線、照顧教學、服務銜接"],
+    ["白天獨居陪伴", "固定到宅確認長輩狀態、協助備餐與生活提醒，讓家屬在上班時也能安心。", "重點：陪伴、飲食、狀態回報"],
+    ["失智長輩支持", "用熟悉節奏陪伴盥洗、進食、活動與情緒安撫，降低家屬每天溝通拉扯。", "重點：耐心引導、穩定作息、情緒支持"],
+    ["主要照顧者喘息", "由照顧服務員在固定時段接手，讓家屬能補眠、外出、工作或照顧自己。", "重點：短時接手、穩定交班、家屬支持"]
+  ];
+  const qualityItems = [
+    ["媒合不是只看地點", "同時評估服務時段、長輩個性、照顧強度與照服員經驗，降低不適配機率。"],
+    ["服務前有交代", "把注意事項、服務範圍、禁忌與家屬期待先交代清楚，避免現場靠猜。"],
+    ["服務後有紀錄", "服務內容、長輩狀態、特殊狀況與下次提醒都會留下紀錄，讓家屬可追蹤。"],
+    ["督導會回頭看", "不是派案後就結束，督導會依回饋調整服務內容，讓品質能一路維持。"],
+    ["異常要被提醒", "跌倒風險、食慾改變、情緒變化、皮膚狀況或居家安全問題，都會提醒家屬。"],
+    ["跨服務可銜接", "若長輩後續需要日照、護理復能、輔具或其他資源，可協助整理下一步。"]
   ];
   const flow = [
-    ["01", "需求諮詢", "了解長輩生活能力、疾病狀態、家屬期待與目前最困擾的照顧問題。"],
-    ["02", "照顧評估", "由專人整理服務目標、風險提醒、時段需求與適合的照顧內容。"],
-    ["03", "人員媒合", "依照地區、服務時段、照顧需求與個案特性安排合適照顧服務員。"],
-    ["04", "服務追蹤", "透過紀錄、督導與回訪持續調整，讓照顧能穩定走得長久。"]
+    ["01", "需求諮詢", "先了解長輩生活能力、疾病狀態、照顧困難、服務區域、希望時段與家屬期待。"],
+    ["02", "到宅或電話評估", "整理服務目標、風險提醒、可提供項目與目前最需要優先處理的照顧問題。"],
+    ["03", "照顧計畫建立", "把服務內容、注意事項、回報方式、家屬溝通窗口與可能變動狀況寫清楚。"],
+    ["04", "照服員媒合", "依照地區、時段、照顧強度與長輩特性安排合適人員，必要時由督導協助銜接。"],
+    ["05", "正式到宅服務", "服務員依計畫執行照顧，並在現場觀察長輩狀態與家庭環境變化。"],
+    ["06", "紀錄與追蹤", "服務後回報重點，督導依家屬回饋與長輩變化調整服務，讓照顧走得久。"]
+  ];
+  const faqs = [
+    ["居家照顧一定要每天使用嗎？", "不一定。可以依家庭需求安排固定時段、短時喘息、陪同就醫或階段性服務，重點是先把需求與可安排區域確認清楚。"],
+    ["家屬不在家也可以服務嗎？", "可以，但服務開始前會先確認進出方式、聯絡窗口、緊急狀況處理與回報方式，讓責任界線清楚。"],
+    ["可以協助失智長輩嗎？", "可以。會依長輩的習慣、情緒觸發點、溝通方式與安全風險安排服務內容，並提醒家屬需要一起配合的地方。"],
+    ["如果照顧服務員不適合怎麼辦？", "歲悅會先了解不適合的原因，包含服務內容、溝通方式、時段或照顧強度，再由督導協助調整。"],
+    ["服務內容可以中途調整嗎？", "可以。長輩狀態會變，家庭需求也會變，因此會透過紀錄與回饋逐步調整服務重點。"],
+    ["目前服務區域有哪些？", "目前以臺北市、新北市與桃園部分區域為主，實際可服務範圍會依人力、時段與照顧需求確認。"]
   ];
 
   return `
@@ -4148,17 +4776,22 @@ function renderHomeCarePage() {
         <div class="service-detail-copy">
           <p class="eyebrow">Home Care</p>
           <h1>居家照顧</h1>
-          <p>歲悅居家照顧把專業服務帶進家裡，從身體照顧、生活支持到家屬回報，讓長輩能在熟悉的環境中被穩定照顧，也讓家人知道每一步都有依靠。</p>
+          <p>歲悅居家照顧把服務帶進長輩熟悉的家，從出院返家、日常生活支持、身體照顧到家屬回報，將看似零散的照顧需求整理成一套可安排、可追蹤、可調整的日常系統。</p>
           <div class="hero-actions">
             <a class="primary-button" href="#contact">預約居家諮詢</a>
             <a class="secondary-button" href="#network">查看服務區域</a>
           </div>
+          <div class="homecare-hero-points">
+            <article><span>服務範圍</span><strong>士林、北投、大同、南港、萬華、新店、中和、永和、新莊、蘆竹等區域陸續安排</strong></article>
+            <article><span>服務重點</span><strong>到宅陪伴、身體照顧、生活支持、家屬回報、督導追蹤</strong></article>
+            <article><span>適合家庭</span><strong>出院返家、獨居、失智陪伴、主要照顧者需要喘息的家庭</strong></article>
+          </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/homepage-batch/01-care-home-greeting.png" alt="歲悅居家照顧到宅服務情境" />
+          <img src="assets/homecare-detail-01-greeting.png" alt="歲悅居家照顧到宅問候情境" />
           <div>
             <span>Home Care Service</span>
-            <strong>把照顧安排進熟悉的日常。</strong>
+            <strong>把照顧帶進家裡，也把安心留在家裡。</strong>
           </div>
         </aside>
       </section>
@@ -4180,13 +4813,29 @@ function renderHomeCarePage() {
         </div>
       </section>
 
+      <section class="service-detail-section homecare-positioning">
+        <div class="service-section-head">
+          <p class="eyebrow">Family Pain Points</p>
+          <h2>家屬真正卡住的，通常不是一件事。</h2>
+          <span>居家照顧最難的是每天都會發生的小狀況。歲悅會先把問題拆清楚，再把照顧安排進家庭可以承受的節奏。</span>
+        </div>
+        <div class="homecare-problem-grid">
+          ${painPoints.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
       <section class="service-detail-section">
         <div class="service-section-head">
           <p class="eyebrow">Service Scenes</p>
           <h2>真實服務情境</h2>
-          <span>使用先前生成的歲悅照顧形象照，呈現居家照顧的核心現場：進門問候、備餐陪伴、安全移動與督導溝通。</span>
+          <span>這一頁新增 4 張居家照顧情境圖，呈現服務從進門、評估、移動到日常支持的完整感受。</span>
         </div>
-        <div class="community-scene-grid">
+        <div class="homecare-gallery">
           ${scenes.map(([image, title, copy]) => `
             <figure>
               <img src="${image}" alt="${title}" />
@@ -4218,6 +4867,23 @@ function renderHomeCarePage() {
 
       <section class="service-detail-section">
         <div class="service-section-head">
+          <p class="eyebrow">Care Scenarios</p>
+          <h2>不同家庭，需要不同的居家照顧設計。</h2>
+          <span>歲悅不會只問「要幾小時」，而會先問家裡最需要被解決的是什麼。</span>
+        </div>
+        <div class="homecare-scenario-grid">
+          ${scenarios.map(([title, copy, tag]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+              <small>${tag}</small>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
           <p class="eyebrow">How It Works</p>
           <h2>從諮詢到穩定服務</h2>
           <span>讓家屬不用自己摸索：先釐清需求，再安排服務，最後用紀錄與督導讓照顧持續被看見。</span>
@@ -4229,6 +4895,63 @@ function renderHomeCarePage() {
               <h3>${title}</h3>
               <p>${copy}</p>
             </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section homecare-quality-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Quality System</p>
+          <h2>居家照顧要走得長，靠的是細節被持續看見。</h2>
+          <span>我們把服務、紀錄、督導與家屬溝通放在同一套節奏裡，讓照顧不只是今天有來，而是明天能更穩。</span>
+        </div>
+        <div class="homecare-quality-grid">
+          ${qualityItems.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="homecare-family-board">
+          <article>
+            <p class="eyebrow">Family Communication</p>
+            <h2>家屬不用自己猜，照顧者也不是單打獨鬥。</h2>
+            <p>居家照顧最需要的是資訊透明。歲悅會把服務內容、現場觀察、家屬提醒與督導追蹤串在一起，讓每個家庭知道現在正在做什麼、為什麼這樣做、接下來要注意什麼。</p>
+          </article>
+          <article>
+            <b>01</b>
+            <h3>服務前確認</h3>
+            <p>先確認服務範圍、長輩習慣、禁忌、鑰匙或門禁、緊急聯絡與回報方式。</p>
+          </article>
+          <article>
+            <b>02</b>
+            <h3>服務中觀察</h3>
+            <p>看見食慾、精神、情緒、移位安全、居家環境與家屬需要知道的小變化。</p>
+          </article>
+          <article>
+            <b>03</b>
+            <h3>服務後回報</h3>
+            <p>留下照顧紀錄與提醒事項，讓家屬下班後不用從零開始追問。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>家屬常見問題</h2>
+          <span>正式安排前，最重要的是把服務範圍、責任界線與回報方式說清楚。</span>
+        </div>
+        <div class="software-faq-list">
+          ${faqs.map(([question, answer]) => `
+            <details>
+              <summary>${question}</summary>
+              <p>${answer}</p>
+            </details>
           `).join("")}
         </div>
       </section>
@@ -4247,28 +4970,64 @@ function renderHomeCarePage() {
 
 function renderDayCarePage() {
   const highlights = [
-    ["白天安心托顧", "讓長輩白天有規律作息、有人陪伴，晚上仍能回到熟悉的家。"],
-    ["活動與復能", "安排伸展、肌力、認知、手作與團體互動，維持生活能力與參與感。"],
-    ["餐食與休息", "照顧用餐、飲水、午休與身體狀態，讓家屬不用擔心白天照顧空窗。"],
-    ["家屬喘息支持", "讓主要照顧者能上班、休息或處理生活，也能持續掌握長輩狀態。"]
+    ["白天有安全場域", "讓長輩離開長時間獨處的狀態，在有人看見、有人陪伴、有人觀察的環境中度過白天。"],
+    ["生活節奏被重新建立", "用報到、量測、活動、共餐、午休與回家準備，讓長輩每天有穩定節奏與期待。"],
+    ["活動不是填時間", "透過伸展、肌力、認知、手作、音樂與團體互動，讓長輩保有參與感與生活功能。"],
+    ["家屬也能喘口氣", "白天照顧由團隊接手，讓主要照顧者能工作、休息與處理生活，同時仍能掌握長輩狀態。"]
+  ];
+  const painPoints = [
+    ["白天一個人在家", "家屬上班後最擔心長輩跌倒、忘記吃飯、久坐不動或突然身體不舒服。"],
+    ["在家越來越少活動", "長輩如果缺少外出與互動，身體功能、食慾、情緒與睡眠常會一起下降。"],
+    ["家屬無法長期請假", "照顧不是一天兩天，家屬需要一個可以穩定銜接白天照顧的服務場域。"],
+    ["長輩抗拒陌生環境", "第一次去日照中心常會緊張，因此需要熟悉、試讀、陪伴與逐步建立安全感。"],
+    ["不知道白天過得如何", "家屬需要知道長輩今天吃得好不好、活動狀態如何、精神與情緒是否有變化。"],
+    ["照顧壓力持續累積", "主要照顧者若沒有喘息，長期下來容易疲乏，也會影響家庭關係與照顧品質。"]
   ];
   const scenes = [
-    ["assets/homepage-batch/02-daycare-group-exercise.png", "日照團體律動", "透過安全、可跟上的活動節奏，讓長輩維持肌力、平衡與自信。"],
-    ["assets/daycare-recruit-03-meal.png", "餐食與用餐照顧", "從用餐狀況、食慾到吞嚥觀察，讓日常照顧更細緻。"],
-    ["assets/daycare-recruit-04-activity.png", "手作與團體活動", "活動不是填時間，而是讓長輩有互動、有選擇，也有成就感。"],
-    ["assets/daycare-recruit-05-handover.png", "交班與家屬回報", "服務紀錄與交班讓家屬知道今天發生什麼，也讓團隊延續照顧。"]
+    ["assets/daycare-detail-01-exercise.png", "團體活動讓身體醒過來", "用安全、可跟上的節奏帶領伸展與律動，讓長輩重新感覺自己仍然能動。"],
+    ["assets/daycare-detail-02-meal.png", "共餐不是吃飯而已", "餐食照顧會觀察食慾、吞嚥、飲水與情緒，也讓長輩在陪伴中用餐。"],
+    ["assets/daycare-detail-03-activity.png", "手作與認知活動", "透過簡單任務、顏色、記憶與互動，讓活動成為長輩有成就感的時刻。"],
+    ["assets/daycare-detail-04-checkin.png", "早晨報到與家屬交接", "從進門問候與健康觀察開始，讓家屬知道今天有人接住長輩。"]
   ];
   const serviceItems = [
-    ["日間生活照顧", "接待、量測、用餐、午休、如廁與生活安全觀察", "適合白天需要陪伴與規律照顧的長輩"],
-    ["健康促進活動", "椅上運動、伸展、肌力、平衡、音樂律動與認知刺激", "適合希望維持功能與活動量的長輩"],
-    ["社交陪伴", "共餐、團體活動、節慶活動與人際互動", "適合在家較少出門、需要生活刺激者"],
-    ["家庭喘息", "白天照顧接手、狀態回報、服務建議與資源轉介", "適合主要照顧者需要穩定支持的家庭"]
+    ["生活照顧", "報到接待、健康觀察、如廁協助、午休照顧、回家準備與安全巡視。", "適合白天需要陪伴、提醒與基本生活支持的長輩。"],
+    ["餐食照顧", "共餐、飲水提醒、用餐觀察、吞嚥風險提醒與營養狀態初步留意。", "適合食慾下降、容易忘記吃飯或需要用餐陪伴者。"],
+    ["健康促進", "椅上運動、伸展、肌力、平衡、律動、認知刺激與生活功能活動。", "適合希望維持活動量、延緩退化與增加生活刺激者。"],
+    ["社交陪伴", "團體活動、節慶活動、手作課程、音樂互動與同儕交流。", "適合在家較少出門、情緒低落或需要人際互動者。"],
+    ["失智友善支持", "用熟悉節奏、環境提示、活動引導與安全陪伴，降低焦躁與不安。", "適合輕中度失智、需要白天規律活動與陪伴者。"],
+    ["家屬回報", "出席狀況、用餐活動、精神情緒、特殊事件與照顧建議回饋。", "適合希望知道長輩白天過得如何的家庭。"],
+    ["交通與接送提醒", "依實際服務條件協助討論交通安排、接送注意事項與到離場交接。", "適合家屬上班時間不易親自接送者。"],
+    ["資源銜接", "協助家屬理解長照資源、居家照顧、復能、課程與家庭支持方案。", "適合照顧需求可能逐步變化的家庭。"]
+  ];
+  const scenarios = [
+    ["家屬白天要上班", "長輩白天到中心參與活動、用餐與休息，家屬能安心工作，晚上再回到熟悉的家。", "重點：白天托顧、家屬喘息、規律回報"],
+    ["長輩在家越來越少動", "透過團體律動、伸展、手作與社交互動，讓長輩重新建立活動量與生活期待。", "重點：活動參與、功能維持、生活刺激"],
+    ["失智長輩需要規律", "用固定流程、熟悉人員、活動提示與友善環境，降低不安與抗拒。", "重點：熟悉節奏、情緒安撫、安全觀察"],
+    ["出院後需要白天支持", "日照能承接白天活動、餐食、休息與觀察，搭配家屬與居家資源一起穩定恢復。", "重點：照顧銜接、體力恢復、家庭支持"]
+  ];
+  const qualityItems = [
+    ["到離場都有觀察", "從報到、量測、精神狀態到離場準備，都會留意長輩今天是否和平常不同。"],
+    ["活動設計有目的", "每一類活動都對應到身體、認知、情緒、社交或生活功能，不只是讓時間過去。"],
+    ["餐食狀況要被看見", "用餐速度、食慾、飲水、吞嚥與精神變化，都可能是照顧調整的重要線索。"],
+    ["交班回報要清楚", "團隊內部交班與對家屬回報能銜接，避免重要狀況只停留在某個人腦中。"],
+    ["家屬意見會被整理", "家屬的擔心、長輩回家後的狀態與服務建議，都會回到照顧調整。"],
+    ["跨服務能銜接", "當長輩需要居家照顧、護理復能、課程或其他資源時，可協助家屬整理下一步。"]
   ];
   const flow = [
-    ["01", "諮詢與參觀", "了解長輩身體狀態、生活習慣、交通需求與家屬期待。"],
-    ["02", "初次評估", "整理照顧風險、活動能力、用餐需求與適合參與的活動節奏。"],
-    ["03", "試讀體驗", "讓長輩熟悉環境、人員與活動安排，降低第一次到新地方的不安。"],
-    ["04", "穩定參與", "依照出席、活動、餐食與精神狀態，持續調整照顧安排。"]
+    ["01", "電話諮詢", "了解長輩身體狀態、認知情形、生活習慣、交通需求與家屬最擔心的問題。"],
+    ["02", "預約參觀", "讓家屬與長輩實際看見空間、活動安排、照顧人員與一日作息。"],
+    ["03", "初步評估", "整理照顧風險、活動能力、用餐需求、情緒反應與適合參與的活動節奏。"],
+    ["04", "試讀熟悉", "讓長輩慢慢熟悉環境與人員，降低第一次進入陌生場域的不安。"],
+    ["05", "穩定出席", "依照出席頻率、活動參與、餐食與精神狀態，調整照顧安排。"],
+    ["06", "家屬回報", "把每日重要觀察與建議回饋給家屬，必要時連結其他照顧資源。"]
+  ];
+  const faqs = [
+    ["日間照顧和居家照顧差在哪裡？", "日間照顧是白天到中心接受照顧、活動、共餐與休息；居家照顧則是照顧服務員到家裡協助。兩者可以依家庭需求搭配。"],
+    ["長輩不想去陌生地方怎麼辦？", "可以先參觀、短時間試讀或由家屬陪同熟悉。重點不是強迫長輩接受，而是慢慢建立安全感。"],
+    ["日照中心一天會做什麼？", "通常會包含報到觀察、量測、活動、共餐、午休、下午活動、點心與回家準備，實際安排會依中心與長輩狀態調整。"],
+    ["家屬可以知道長輩白天狀態嗎？", "可以。日照會回報出席、活動、餐食、精神狀況與特殊事件，讓家屬知道白天照顧重點。"],
+    ["失智長輩適合日照嗎？", "許多失智長輩適合規律的日間照顧，但仍要依行為狀態、安全風險與中心照顧量能評估。"],
+    ["如果只想先體驗可以嗎？", "可以先預約參觀或討論試讀安排，讓長輩與家屬確認環境、活動與照顧方式是否合適。"]
   ];
 
   return `
@@ -4277,17 +5036,22 @@ function renderDayCarePage() {
         <div class="service-detail-copy">
           <p class="eyebrow">Day Care</p>
           <h1>日間照顧</h1>
-          <p>歲悅日間照顧讓長輩白天有安全場域、規律活動、餐食照顧與社交陪伴，也讓家屬能在工作與照顧之間找到可以喘息的節奏。</p>
+          <p>歲悅日間照顧把白天最需要被接住的照顧需求整理成一套穩定節奏：安全場域、規律活動、共餐休息、健康觀察、家屬回報與喘息支持，讓長輩白天有陪伴，晚上安心回家。</p>
           <div class="hero-actions">
             <a class="primary-button" href="#contact">預約參觀日照</a>
             <a class="secondary-button" href="#courses">查看體驗活動</a>
           </div>
+          <div class="homecare-hero-points">
+            <article><span>服務重點</span><strong>白天托顧、共餐休息、健康促進、團體活動、家屬回報</strong></article>
+            <article><span>適合對象</span><strong>白天獨處、活動量下降、需要規律作息或家屬需要喘息的長輩</strong></article>
+            <article><span>照顧特色</span><strong>讓長輩白天被看見、被陪伴、被鼓勵，也讓家屬能持續掌握狀態</strong></article>
+          </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/homepage-batch/02-daycare-group-exercise.png" alt="歲悅日間照顧團體活動情境" />
+          <img src="assets/daycare-detail-01-exercise.png" alt="歲悅日間照顧團體活動情境" />
           <div>
             <span>Day Care Center</span>
-            <strong>白天有人陪，晚上安心回家。</strong>
+            <strong>白天有生活，晚上安心回家。</strong>
           </div>
         </aside>
       </section>
@@ -4309,13 +5073,29 @@ function renderDayCarePage() {
         </div>
       </section>
 
+      <section class="service-detail-section homecare-positioning">
+        <div class="service-section-head">
+          <p class="eyebrow">Family Pain Points</p>
+          <h2>日間照顧承接的，是家庭每天白天最擔心的空窗。</h2>
+          <span>歲悅不是只提供一個白天待著的地方，而是把照顧、活動、餐食、觀察與回報安排成可持續的日常。</span>
+        </div>
+        <div class="homecare-problem-grid">
+          ${painPoints.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
       <section class="service-detail-section">
         <div class="service-section-head">
           <p class="eyebrow">Service Scenes</p>
           <h2>真實服務情境</h2>
-          <span>使用先前生成的日間照顧照片，呈現活動、餐食、團體互動與交班回報等日照現場。</span>
+          <span>這一頁新增 4 張日照情境圖，讓參觀者可以快速感受到中心的一日照顧節奏。</span>
         </div>
-        <div class="community-scene-grid">
+        <div class="homecare-gallery">
           ${scenes.map(([image, title, copy]) => `
             <figure>
               <img src="${image}" alt="${title}" />
@@ -4324,6 +5104,23 @@ function renderDayCarePage() {
                 <span>${copy}</span>
               </figcaption>
             </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Scenarios</p>
+          <h2>哪些家庭適合日間照顧？</h2>
+          <span>只要白天照顧開始成為家裡最大的壓力，日照就可能是讓家庭重新穩定的一個選項。</span>
+        </div>
+        <div class="homecare-scenario-grid">
+          ${scenarios.map(([title, copy, tag]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+              <small>${tag}</small>
+            </article>
           `).join("")}
         </div>
       </section>
@@ -4362,6 +5159,63 @@ function renderDayCarePage() {
         </div>
       </section>
 
+      <section class="service-detail-section homecare-quality-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Quality System</p>
+          <h2>好的日照，不只看活動熱不熱鬧，更要看細節有沒有被記住。</h2>
+          <span>日照中心每天都有很多小變化。歲悅重視到離場觀察、活動參與、餐食狀態、團隊交班與家屬回報。</span>
+        </div>
+        <div class="homecare-quality-grid">
+          ${qualityItems.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="homecare-family-board">
+          <article>
+            <p class="eyebrow">Daily Rhythm</p>
+            <h2>一日照顧的重點，是讓長輩重新有生活節奏。</h2>
+            <p>日照的價值不只是安全看顧，而是讓長輩在白天有互動、有活動、有休息、有被鼓勵的時刻。當白天變得穩定，家裡晚上的照顧壓力也會跟著下降。</p>
+          </article>
+          <article>
+            <b>AM</b>
+            <h3>報到與健康觀察</h3>
+            <p>進門問候、確認精神、量測或觀察身體狀態，讓團隊知道今天該如何安排活動強度。</p>
+          </article>
+          <article>
+            <b>NOON</b>
+            <h3>共餐與午休</h3>
+            <p>觀察用餐、飲水、吞嚥與休息狀況，讓照顧不只停留在活動表上。</p>
+          </article>
+          <article>
+            <b>PM</b>
+            <h3>活動與回家準備</h3>
+            <p>下午活動後整理物品、交接提醒，讓家屬知道今天的狀態與需要留意的事情。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>家屬常見問題</h2>
+          <span>正式加入前，最重要的是讓長輩熟悉場域，也讓家屬清楚知道照顧方式。</span>
+        </div>
+        <div class="software-faq-list">
+          ${faqs.map(([question, answer]) => `
+            <details>
+              <summary>${question}</summary>
+              <p>${answer}</p>
+            </details>
+          `).join("")}
+        </div>
+      </section>
+
       <section class="service-cta-panel">
         <div>
           <p class="eyebrow">Visit Day Care</p>
@@ -4376,28 +5230,64 @@ function renderDayCarePage() {
 
 function renderNursingPage() {
   const highlights = [
-    ["護理觀察", "定期觀察血壓、食慾、睡眠、傷口、用藥與身體變化，及早看見照顧風險。"],
-    ["復能陪伴", "依照長輩能力設定可達成的小目標，陪同練習步行、肌力、平衡與日常動作。"],
-    ["家庭教學", "把移位、翻身、用餐、跌倒預防與照顧注意事項教給家屬與照顧者。"],
-    ["跨專業回報", "讓護理、督導、照服員與家屬用同一份紀錄理解長輩狀態。"]
+    ["看見身體變化", "護理觀察不是只量數字，而是把血壓、食慾、睡眠、皮膚、傷口、用藥與精神狀態放回生活脈絡裡判斷。"],
+    ["把能力練回生活", "復能不是做漂亮動作，而是讓長輩能更安全地起身、移位、走路、用餐、洗澡與參與日常。"],
+    ["讓家屬學會方法", "把移位、翻身、跌倒預防、居家動線、用餐姿勢與照顧觀察教給家屬和照顧者。"],
+    ["跨專業一起追蹤", "護理、治療、督導、照服員與家庭用同一套紀錄理解狀態，避免每個人各說各話。"]
+  ];
+  const painPoints = [
+    ["出院後不敢動", "長輩回家後常因怕跌倒、怕痛、怕麻煩而越來越少活動，能力反而退得更快。"],
+    ["家屬不知道怎麼扶", "起身、移位、洗澡、上廁所都怕出事，照顧者常用蠻力撐，長期下來人也受傷。"],
+    ["健康數字看不懂", "血壓、食慾、睡眠、傷口、精神狀態出現變化時，家屬不知道哪些需要注意、哪些需要就醫。"],
+    ["居家環境有風險", "浴室濕滑、床邊動線、椅子高度、夜間照明與門檻，都可能讓長輩跌倒或不敢活動。"],
+    ["訓練無法延續", "在專業人員面前做得到，回家卻不知道怎麼練、練多久、什麼狀況要停止。"],
+    ["照顧者缺少回饋", "家屬、移工或照服員每天都在照顧，但很少有人回頭看方法是否正確、是否需要調整。"]
   ];
   const scenes = [
-    ["assets/homepage-batch/13-rehab-walking-practice.png", "步行與平衡練習", "復能不是催促長輩，而是陪他一步一步重新找回把握。"],
-    ["assets/homepage-batch/09-nurse-blood-pressure.png", "護理觀察與量測", "用日常量測與觀察提早發現變化，減少家屬不確定感。"],
-    ["assets/homepage-batch/14-care-notes.png", "照顧紀錄追蹤", "把每次服務、觀察與提醒留下紀錄，讓照顧可以延續。"],
-    ["assets/homepage-batch/03-supervisor-care-plan.png", "復能目標討論", "督導與家庭一起確認目標，讓練習符合生活需求。"]
+    ["assets/nursing-detail-01-vitals.png", "護理觀察與健康量測", "從血壓、精神、食慾與日常變化看見風險，讓家屬知道什麼需要注意。"],
+    ["assets/nursing-detail-02-walking.png", "步行與移位練習", "復能不是催促長輩，而是用安全步調陪他一步一步重新找回把握。"],
+    ["assets/nursing-detail-03-home-safety.png", "居家安全與家屬教學", "把浴室、床邊、動線與扶手配置說清楚，降低家庭照顧的意外風險。"],
+    ["assets/nursing-detail-04-care-plan.png", "跨專業目標討論", "護理、治療、照顧與家屬一起確認目標，讓練習回到真實生活。"]
   ];
   const serviceItems = [
-    ["健康狀態追蹤", "血壓、食慾、睡眠、排泄、皮膚與傷口狀態觀察", "適合出院返家、慢性病或身體狀況需追蹤者"],
-    ["復能訓練支持", "坐站、步行、平衡、肌力與日常生活動作練習", "適合希望恢復活動能力與生活自理者"],
-    ["照顧風險提醒", "跌倒風險、環境動線、用藥安全、吞嚥與營養提醒", "適合家屬擔心照顧細節與意外風險者"],
-    ["家屬與照顧者教學", "移位技巧、翻身、沐浴安全、陪走與日常觀察方法", "適合家中多人共同照顧或有移工照顧者"]
+    ["健康狀態追蹤", "血壓、食慾、睡眠、排泄、皮膚、傷口、用藥與精神狀態觀察。", "適合出院返家、慢性病、身體狀況不穩或家屬需要判斷指引者。"],
+    ["復能訓練支持", "坐站、移位、步行、平衡、肌力、耐力與日常生活動作練習。", "適合希望恢復活動能力、降低臥床與維持生活自理者。"],
+    ["居家安全建議", "床邊動線、浴室安全、扶手、照明、門檻、椅高與防滑配置建議。", "適合有跌倒風險、家中動線不順或家屬擔心意外者。"],
+    ["照顧技巧教學", "移位、翻身、拍背、沐浴安全、陪走、用餐姿勢與日常觀察方法。", "適合家屬、移工、照服員共同照顧，需要統一方法的家庭。"],
+    ["復能目標設計", "把專業訓練拆成生活目標，例如安全走到浴室、自己坐起、穩定用餐。", "適合不想只做訓練，而想改善真正生活場景的長輩。"],
+    ["營養與吞嚥提醒", "觀察食慾、飲水、吞嚥、餐具姿勢與用餐疲累狀況，提供照顧提醒。", "適合用餐速度變慢、容易嗆咳、食慾下降或體力不足者。"],
+    ["照顧紀錄與回報", "整理每次觀察、練習內容、家屬提醒、風險變化與後續建議。", "適合需要多人協作、希望照顧資訊透明可追蹤的家庭。"],
+    ["跨服務銜接", "依需求銜接居家照顧、日間照顧、輔具資源、課程或家庭照顧支持。", "適合需求變化快、需要整合不同服務的家庭。"]
+  ];
+  const scenarios = [
+    ["出院返家後體力下降", "協助家屬理解哪些活動可以練、哪些要避免，並把復能目標拆回日常生活。", "重點：返家銜接、體力恢復、安全活動"],
+    ["跌倒後不敢走", "透過步行、平衡、坐站與環境調整，陪長輩慢慢恢復移動信心。", "重點：跌倒預防、步態安全、心理支持"],
+    ["家屬照顧方法不一致", "把移位、翻身、陪走、沐浴與用餐方法統一，降低家屬與照顧者之間的落差。", "重點：家庭教學、照顧一致性、風險降低"],
+    ["慢性病與功能退化並存", "同時追蹤健康狀態與生活功能，避免只看疾病數字，卻忽略長輩每天能不能生活。", "重點：護理觀察、復能支持、生活功能"]
+  ];
+  const qualityItems = [
+    ["先評估再練習", "每一次復能都要先看精神、疼痛、血壓、活動能力與安全風險，不是直接開始訓練。"],
+    ["目標要回到生活", "復能目標不是只看步數或肌力，而是能不能安全起身、走到廁所、坐穩吃飯。"],
+    ["家屬要學得會", "專業人員做得到不夠，家屬與照顧者也要理解怎麼做、何時停止、何時求助。"],
+    ["環境要一起調整", "如果床、椅、浴室、照明與動線不安全，再多訓練都可能被居家風險抵消。"],
+    ["紀錄要能追蹤", "每次練習內容、身體反應、風險提醒與下次目標都要留下來，讓照顧能延續。"],
+    ["跨專業要對齊", "護理、治療、督導、照服員與家屬需要用同一套目標說話，才不會互相抵消。"]
   ];
   const flow = [
-    ["01", "狀態評估", "先了解疾病史、近期變化、活動能力、用藥與家庭照顧方式。"],
-    ["02", "目標設定", "把復能目標拆成小步驟，例如安全起身、穩定步行或自行用餐。"],
-    ["03", "到宅支持", "由專業人員陪同練習，並同步提醒家屬日常照顧注意事項。"],
-    ["04", "追蹤調整", "依照紀錄與回饋調整訓練強度、照顧方式與風險提醒。"]
+    ["01", "需求諮詢", "了解長輩疾病史、近期變化、出院狀態、跌倒經驗、家屬擔心與生活目標。"],
+    ["02", "護理與功能評估", "整理健康狀態、活動能力、用藥、疼痛、居家環境與照顧者能力。"],
+    ["03", "目標設定", "把復能目標拆成小步驟，例如安全起身、穩定步行、自己用餐或到浴室。"],
+    ["04", "到宅或場域支持", "由專業人員陪同練習，並同步教家屬與照顧者日常照顧方法。"],
+    ["05", "居家環境調整", "依實際動線提出扶手、防滑、照明、床椅高度與輔具使用建議。"],
+    ["06", "追蹤與轉介", "依紀錄與回饋調整訓練強度，必要時銜接醫療、輔具、居家或日照服務。"]
+  ];
+  const faqs = [
+    ["護理復能和一般復健有什麼不同？", "護理復能更重視生活場景、居家風險、照顧者教學與日常延續，不只是在場域中完成訓練動作。"],
+    ["長輩很虛弱也可以做復能嗎？", "可以先從安全評估、姿勢調整、床邊活動、坐站或低強度練習開始，重點是依狀態安排，不勉強。"],
+    ["家屬需要一起學嗎？", "非常建議。復能真正有效的關鍵，是家屬與照顧者在每天生活中能用正確方式陪伴。"],
+    ["可以協助居家安全建議嗎？", "可以。會從浴室、床邊、走道、照明、門檻、椅高與常用物品位置看起，協助降低跌倒與移位風險。"],
+    ["服務會留下紀錄嗎？", "會。每次服務會整理觀察、練習內容、身體反應與後續提醒，讓家庭與團隊能持續追蹤。"],
+    ["護理復能可以和居家照顧搭配嗎？", "可以。復能人員設定方法與目標後，居家照顧服務員與家屬可以在日常中協助延續。"]
   ];
 
   return `
@@ -4406,14 +5296,19 @@ function renderNursingPage() {
         <div class="service-detail-copy">
           <p class="eyebrow">Nursing & Reablement</p>
           <h1>護理復能</h1>
-          <p>歲悅護理復能把護理觀察、復能目標與家庭照顧教學串在一起，讓長輩不是被動被照顧，而是在安全支持下慢慢恢復生活能力。</p>
+          <p>歲悅護理復能把護理觀察、生活功能評估、復能訓練、居家安全與家屬教學串在一起，讓長輩不是被動被照顧，而是在安全支持下重新練回能參與生活的能力。</p>
           <div class="hero-actions">
             <a class="primary-button" href="#contact">預約復能諮詢</a>
             <a class="secondary-button" href="#health">閱讀復能知識</a>
           </div>
+          <div class="homecare-hero-points">
+            <article><span>服務重點</span><strong>護理觀察、功能評估、步行移位、居家安全、家屬教學與追蹤回報</strong></article>
+            <article><span>適合對象</span><strong>出院返家、跌倒後不敢動、體力下降、慢性病或照顧方法需要調整者</strong></article>
+            <article><span>核心目標</span><strong>讓復能回到生活，不只練身體，也讓家庭知道每天怎麼陪伴</strong></article>
+          </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/homepage-batch/13-rehab-walking-practice.png" alt="歲悅護理復能步行練習情境" />
+          <img src="assets/nursing-detail-02-walking.png" alt="歲悅護理復能步行練習情境" />
           <div>
             <span>Nursing Reablement</span>
             <strong>復能不是催促，而是陪長輩一步一步重新有把握。</strong>
@@ -4438,13 +5333,29 @@ function renderNursingPage() {
         </div>
       </section>
 
+      <section class="service-detail-section homecare-positioning">
+        <div class="service-section-head">
+          <p class="eyebrow">Family Pain Points</p>
+          <h2>護理復能處理的，是家屬每天最怕做錯的照顧細節。</h2>
+          <span>不是只把長輩帶去練習，而是回到家裡真正會發生的移位、步行、用餐、沐浴與安全問題。</span>
+        </div>
+        <div class="homecare-problem-grid">
+          ${painPoints.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
       <section class="service-detail-section">
         <div class="service-section-head">
           <p class="eyebrow">Service Scenes</p>
           <h2>真實服務情境</h2>
-          <span>使用先前生成的護理復能照片，呈現步行練習、健康量測、紀錄追蹤與目標討論。</span>
+          <span>這一頁新增 4 張護理復能情境圖，呈現健康量測、步行訓練、居家安全與跨專業討論。</span>
         </div>
-        <div class="community-scene-grid">
+        <div class="homecare-gallery">
           ${scenes.map(([image, title, copy]) => `
             <figure>
               <img src="${image}" alt="${title}" />
@@ -4453,6 +5364,23 @@ function renderNursingPage() {
                 <span>${copy}</span>
               </figcaption>
             </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Scenarios</p>
+          <h2>哪些家庭適合護理復能？</h2>
+          <span>只要長輩的身體變化開始影響生活能力，或家屬不知道怎麼安全照顧，就適合先做復能與照顧評估。</span>
+        </div>
+        <div class="homecare-scenario-grid">
+          ${scenarios.map(([title, copy, tag]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+              <small>${tag}</small>
+            </article>
           `).join("")}
         </div>
       </section>
@@ -4474,6 +5402,47 @@ function renderNursingPage() {
         </div>
       </section>
 
+      <section class="service-detail-section homecare-quality-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Quality System</p>
+          <h2>復能要走得長，必須把專業變成家庭每天做得到的方法。</h2>
+          <span>歲悅重視評估、目標、教學、環境、紀錄與跨專業協作，讓復能不是一次性的訓練，而是能延續的生活支持。</span>
+        </div>
+        <div class="homecare-quality-grid">
+          ${qualityItems.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="homecare-family-board">
+          <article>
+            <p class="eyebrow">Reablement Philosophy</p>
+            <h2>復能不是要長輩變回以前，而是讓現在的生活多一點把握。</h2>
+            <p>我們會尊重長輩目前的身體狀態與意願，把專業目標轉成家庭看得懂的生活任務。能安全坐起來、能穩定走到餐桌、能自己拿杯子喝水，這些都是值得被看見的進步。</p>
+          </article>
+          <article>
+            <b>01</b>
+            <h3>先保安全</h3>
+            <p>評估血壓、疼痛、跌倒風險與環境動線，避免用錯方法造成二次傷害。</p>
+          </article>
+          <article>
+            <b>02</b>
+            <h3>再練能力</h3>
+            <p>把坐站、移位、步行與日常活動拆成長輩能完成的小步驟。</p>
+          </article>
+          <article>
+            <b>03</b>
+            <h3>最後延續</h3>
+            <p>教會家屬與照顧者如何在每天生活中安全陪伴與觀察變化。</p>
+          </article>
+        </div>
+      </section>
+
       <section class="service-detail-section">
         <div class="service-section-head">
           <p class="eyebrow">How It Works</p>
@@ -4487,6 +5456,22 @@ function renderNursingPage() {
               <h3>${title}</h3>
               <p>${copy}</p>
             </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>家屬常見問題</h2>
+          <span>護理復能最重要的是先安全、再練習、最後把方法留在家裡。</span>
+        </div>
+        <div class="software-faq-list">
+          ${faqs.map(([question, answer]) => `
+            <details>
+              <summary>${question}</summary>
+              <p>${answer}</p>
+            </details>
           `).join("")}
         </div>
       </section>
@@ -4505,28 +5490,64 @@ function renderNursingPage() {
 
 function renderMigrantTrainingPage() {
   const highlights = [
-    ["照顧技能實作", "把翻身、移位、沐浴、用餐、陪走等動作拆成能理解、能練習、能回家使用的步驟。"],
-    ["家庭溝通情境", "協助移工理解家屬期待、長輩情緒與日常回報方式，減少照顧誤會。"],
-    ["安全與衛教", "將跌倒預防、感染控制、用藥提醒、營養觀察與環境安全放入課程。"],
-    ["訓後追蹤支持", "課後可搭配督導回饋、家屬諮詢與複訓安排，讓學會的技巧真的用得上。"]
+    ["把技能教到能做", "翻身、移位、沐浴、如廁、用餐、陪走與拍背都要拆成看得懂、練得會、回家後做得出來的步驟。"],
+    ["把溝通變成共同語言", "協助移工理解家屬期待、長輩情緒、每日回報與突發狀況處理，降低誤會。"],
+    ["把安全放進每個動作", "跌倒預防、感染控制、用藥提醒、營養觀察、環境安全與緊急狀況都要能被實作。"],
+    ["把訓練延續到家庭", "課後可搭配督導回饋、家屬諮詢、複訓安排與照顧紀錄，讓技巧真的進到日常。"]
+  ];
+  const painPoints = [
+    ["移工聽過但不會做", "很多課程停留在聽講，回到家面對洗澡、移位、餵食、情緒抗拒時仍不知道如何操作。"],
+    ["家屬交代不清楚", "家屬常用自己的經驗交代事情，但沒有把優先順序、禁忌、回報方式與緊急處理說成共同語言。"],
+    ["長輩拒絕照顧", "移工需要理解長輩為什麼抗拒，也要學會用合適語氣、順序與情境引導，而不是硬做。"],
+    ["安全動作不穩定", "翻身、移位、扶走、沐浴和用餐是高風險情境，只要姿勢錯，長輩和照顧者都可能受傷。"],
+    ["文化與語言有落差", "家庭期待、長輩習慣、照顧價值和回報方式不同，若沒有演練，很容易累積摩擦。"],
+    ["訓練後沒有人追蹤", "如果課後沒有回饋與複訓，學到的技巧很容易在真實家庭壓力中變形。"]
   ];
   const scenes = [
-    ["assets/migrant-recruit-01-classroom.png", "照顧課堂示範", "用圖像、示範與情境練習，讓照顧技巧不只停在聽懂。"],
-    ["assets/migrant-recruit-02-transfer.png", "安全移位練習", "移位與翻身是家庭照顧的高風險動作，必須反覆練習到穩定。"],
-    ["assets/migrant-recruit-03-meal-prep.png", "餐食與營養觀察", "從備餐、用餐姿勢到食慾觀察，讓照顧更貼近日常。"],
-    ["assets/migrant-recruit-04-communication.png", "家庭溝通訓練", "透過情境對話，降低語言、文化與期待差異造成的照顧落差。"]
+    ["assets/migrant-detail-01-classroom.png", "課堂示範與分組練習", "把照顧技能拆成步驟，讓移工不只聽懂，也能實際操作。"],
+    ["assets/migrant-detail-02-transfer.png", "安全移位實作", "床到輪椅、翻身與扶走都要反覆演練，降低長輩與照顧者受傷風險。"],
+    ["assets/migrant-detail-03-meal.png", "餐食與營養照顧", "從備餐、吞嚥、餵食姿勢到飲水提醒，讓日常照顧更細緻。"],
+    ["assets/migrant-detail-04-communication.png", "家庭溝通情境演練", "透過角色扮演練習每日回報、家屬交代與長輩抗拒照顧的處理。"]
   ];
   const serviceItems = [
-    ["基礎照顧訓練", "翻身、拍背、移位、沐浴、如廁、用餐與陪同活動", "適合剛到家庭服務或需要建立基礎技巧的移工"],
-    ["長輩狀態觀察", "食慾、睡眠、精神、跌倒風險、皮膚與排泄狀況觀察", "適合需要協助回報長輩狀態的照顧者"],
-    ["家庭情境演練", "家屬交代、長輩拒絕照顧、突發狀況與每日回報練習", "適合家庭溝通容易卡住或照顧分工不清者"],
-    ["證書與複訓", "課程紀錄、完訓證明、複訓安排與督導建議", "適合企業、家庭或仲介單位安排系統化訓練"]
+    ["基礎身體照顧", "翻身、拍背、移位、沐浴、如廁、穿脫衣物、陪走與床邊照顧。", "適合剛到家庭服務或需要建立基礎照顧技巧的移工。"],
+    ["安全移位與防跌", "床到輪椅、椅到站立、浴室動線、扶走姿勢、跌倒預防與輔具使用。", "適合家中長輩行動不穩、跌倒風險高或照顧者常用蠻力者。"],
+    ["餐食與營養觀察", "備餐、軟質餐、飲水提醒、餵食姿勢、吞嚥觀察、食慾與體重變化。", "適合長輩食慾下降、吞嚥不順或家屬擔心營養不足者。"],
+    ["失智與情緒照顧", "重複詢問、抗拒洗澡、日夜顛倒、情緒不安與熟悉線索引導。", "適合照顧認知退化、失智症或情緒起伏較大的長輩。"],
+    ["家庭溝通與回報", "家屬交代、每日回報、異常提醒、照片紀錄、照顧邊界與衝突處理。", "適合家庭溝通容易卡住、照顧分工不清或期待不同者。"],
+    ["衛教與感染控制", "手部衛生、口腔清潔、皮膚觀察、傷口提醒、感染預防與用藥安全。", "適合慢性病、臥床、皮膚脆弱或需長期照顧的家庭。"],
+    ["突發狀況處理", "跌倒、嗆咳、發燒、意識改變、呼吸不適與緊急聯絡流程。", "適合需要建立家庭緊急處理 SOP 的雇主與照顧者。"],
+    ["證書與複訓", "課程紀錄、完訓證明、技能回饋、複訓安排與督導建議。", "適合企業、家庭或仲介單位安排系統化訓練。"]
+  ];
+  const scenarios = [
+    ["新聘移工剛到家", "先建立基礎照顧方法、家庭規則、長輩習慣與每日回報方式，降低磨合期混亂。", "重點：基礎技能、家庭交接、日常回報"],
+    ["家中有高風險動作", "針對移位、洗澡、如廁、扶走與床邊照顧反覆演練，避免照顧者與長輩一起受傷。", "重點：安全移位、防跌、照顧者保護"],
+    ["長輩有失智或抗拒照顧", "透過情境演練理解行為背後需求，學習非強迫式溝通、環境提示與活動引導。", "重點：失智友善、情緒安撫、溝通引導"],
+    ["雇主想建立一致照顧標準", "把家庭禁忌、服務期待、回報方式、緊急流程與照顧紀錄整理成共同規則。", "重點：雇主溝通、流程標準、照顧紀錄"]
+  ];
+  const qualityItems = [
+    ["先看照顧場景", "課程不是套版教材，會先理解長輩狀態、家庭環境、移工語言能力與家屬期待。"],
+    ["示範後要實作", "每個動作都要從老師示範進到學員練習，才知道回家後能不能真的做。"],
+    ["錯誤動作要修正", "訓練現場會看姿勢、力道、站位、語氣與流程，避免錯誤技巧被帶回家庭。"],
+    ["回報方式要一致", "家屬需要知道移工每天該回報什麼，移工也要知道哪些狀況不能自己判斷。"],
+    ["語言文化要被考慮", "用圖像、示範、簡單語句與角色扮演降低理解落差，讓課程更接近真實家庭。"],
+    ["課後要能追蹤", "透過複訓、督導建議與家屬諮詢，讓培訓效果能持續延伸到照顧現場。"]
   ];
   const flow = [
-    ["01", "確認訓練需求", "了解家庭照顧情境、移工語言能力、照顧對象狀態與最需要補強的技巧。"],
-    ["02", "安排課程模組", "依照需求選擇基礎照顧、安全移位、餐食照顧、溝通情境或衛教主題。"],
-    ["03", "實作與演練", "透過示範、分組練習與情境演練，把照顧方法變成可操作的動作。"],
-    ["04", "回饋與追蹤", "課後提供重點回饋，必要時安排複訓、督導諮詢或家庭照顧建議。"]
+    ["01", "確認家庭情境", "了解照顧對象狀態、家庭規則、移工語言能力、照顧困難與最需要補強的技能。"],
+    ["02", "設計課程模組", "依需求組合基礎照顧、安全移位、餐食營養、失智陪伴、溝通回報與衛教安全。"],
+    ["03", "示範與分解", "由講師把每個照顧動作拆解成順序、站位、提醒語與注意事項。"],
+    ["04", "實作與角色演練", "透過分組練習、情境演練與即時修正，確認學員不是只聽懂。"],
+    ["05", "家屬共識整理", "把家屬期待、禁忌、回報方式、緊急流程與照顧紀錄整理成可執行規則。"],
+    ["06", "訓後回饋與複訓", "課後提供重點回饋，必要時安排複訓、督導諮詢或家庭照顧建議。"]
+  ];
+  const faqs = [
+    ["移工培訓可以客製化嗎？", "可以。可以依長輩狀態、家庭環境、移工語言能力與雇主期待，安排不同課程模組。"],
+    ["家屬需要一起上課嗎？", "建議家屬至少參與需求確認或重點回饋，因為照顧標準與回報方式需要家庭一起對齊。"],
+    ["課程會有實作嗎？", "會。移位、翻身、餵食、沐浴安全、溝通情境等都會用示範與演練確認學員理解。"],
+    ["適合剛來台灣的移工嗎？", "適合。課程會盡量用圖像、示範、簡單語句與實作降低理解門檻。"],
+    ["可以提供完訓證明嗎？", "可以依課程規劃提供課程紀錄或完訓證明，適合家庭、企業或合作單位留存。"],
+    ["如果課後在家還是遇到問題怎麼辦？", "可再安排複訓、督導諮詢或家庭照顧建議，把實際問題帶回課程調整。"]
   ];
 
   return `
@@ -4535,14 +5556,19 @@ function renderMigrantTrainingPage() {
         <div class="service-detail-copy">
           <p class="eyebrow">Migrant Care Training</p>
           <h1>移工培訓</h1>
-          <p>歲悅移工培訓把家庭照顧現場常見的困難轉成可練習的課程，讓移工、家屬與長輩之間有更清楚的照顧方法與溝通節奏。</p>
+          <p>歲悅移工培訓把家庭照顧現場常見的困難轉成可練習、可回報、可追蹤的課程，讓移工、家屬與長輩之間有共同語言，也讓照顧技巧真正能回到家裡使用。</p>
           <div class="hero-actions">
             <a class="primary-button" href="#contact">洽詢培訓課程</a>
             <a class="secondary-button" href="#courses">查看課程報名</a>
           </div>
+          <div class="homecare-hero-points">
+            <article><span>訓練重點</span><strong>身體照顧、安全移位、餐食營養、失智陪伴、家庭溝通與緊急處理</strong></article>
+            <article><span>適合對象</span><strong>剛到家庭服務、需要補強技能、或雇主希望建立一致照顧標準的移工</strong></article>
+            <article><span>課程特色</span><strong>示範、實作、角色演練與訓後回饋，讓技能不只停在課堂</strong></article>
+          </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/migrant-recruit-01-classroom.png" alt="歲悅移工照顧培訓課堂情境" />
+          <img src="assets/migrant-detail-01-classroom.png" alt="歲悅移工照顧培訓課堂情境" />
           <div>
             <span>Training Program</span>
             <strong>把照顧技巧教到能真的回家使用。</strong>
@@ -4567,13 +5593,29 @@ function renderMigrantTrainingPage() {
         </div>
       </section>
 
+      <section class="service-detail-section homecare-positioning">
+        <div class="service-section-head">
+          <p class="eyebrow">Training Pain Points</p>
+          <h2>移工培訓要解決的，不只是「會不會做」，而是家庭能不能一起做對。</h2>
+          <span>移工、家屬與長輩常常卡在同一件事：方法沒有說清楚、現場沒練過、回家後沒人追蹤。</span>
+        </div>
+        <div class="homecare-problem-grid">
+          ${painPoints.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
       <section class="service-detail-section">
         <div class="service-section-head">
           <p class="eyebrow">Training Scenes</p>
           <h2>訓練現場情境</h2>
-          <span>使用之前生成的移工培訓照片，呈現課堂、移位、餐食照顧與家庭溝通演練。</span>
+          <span>這一頁新增 4 張移工培訓情境圖，呈現課堂、移位、餐食照顧與家庭溝通演練。</span>
         </div>
-        <div class="community-scene-grid">
+        <div class="homecare-gallery">
           ${scenes.map(([image, title, copy]) => `
             <figure>
               <img src="${image}" alt="${title}" />
@@ -4582,6 +5624,23 @@ function renderMigrantTrainingPage() {
                 <span>${copy}</span>
               </figcaption>
             </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Scenarios</p>
+          <h2>哪些家庭或單位適合移工培訓？</h2>
+          <span>只要家庭照顧開始出現溝通落差、技巧不穩或安全風險，就需要把方法重新對齊。</span>
+        </div>
+        <div class="homecare-scenario-grid">
+          ${scenarios.map(([title, copy, tag]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+              <small>${tag}</small>
+            </article>
           `).join("")}
         </div>
       </section>
@@ -4603,6 +5662,47 @@ function renderMigrantTrainingPage() {
         </div>
       </section>
 
+      <section class="service-detail-section homecare-quality-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Quality System</p>
+          <h2>好的培訓，不是上完課，而是回家後照顧真的變穩。</h2>
+          <span>歲悅重視需求、示範、實作、修正、溝通與訓後追蹤，讓培訓變成家庭照顧品質的一部分。</span>
+        </div>
+        <div class="homecare-quality-grid">
+          ${qualityItems.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="homecare-family-board">
+          <article>
+            <p class="eyebrow">Training Philosophy</p>
+            <h2>我們不是只教移工，而是幫整個家庭建立照顧共識。</h2>
+            <p>移工培訓如果只要求移工學會，卻沒有讓家屬說清楚期待、禁忌與回報方式，照顧仍然會卡住。歲悅把課程設計成家庭共同語言，讓每一個照顧動作都有人知道為什麼這樣做。</p>
+          </article>
+          <article>
+            <b>01</b>
+            <h3>先對齊期待</h3>
+            <p>確認家庭規則、長輩習慣、服務邊界與每日回報方式。</p>
+          </article>
+          <article>
+            <b>02</b>
+            <h3>再練習技能</h3>
+            <p>用示範與實作讓移位、沐浴、用餐、陪走不只停在聽懂。</p>
+          </article>
+          <article>
+            <b>03</b>
+            <h3>最後追蹤改善</h3>
+            <p>把課後遇到的問題帶回回饋與複訓，讓照顧越來越穩。</p>
+          </article>
+        </div>
+      </section>
+
       <section class="service-detail-section">
         <div class="service-section-head">
           <p class="eyebrow">How It Works</p>
@@ -4616,6 +5716,22 @@ function renderMigrantTrainingPage() {
               <h3>${title}</h3>
               <p>${copy}</p>
             </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>家屬常見問題</h2>
+          <span>移工培訓最重要的是讓技能、溝通與回報方式都能回到家庭現場。</span>
+        </div>
+        <div class="software-faq-list">
+          ${faqs.map(([question, answer]) => `
+            <details>
+              <summary>${question}</summary>
+              <p>${answer}</p>
+            </details>
           `).join("")}
         </div>
       </section>
@@ -4634,28 +5750,64 @@ function renderMigrantTrainingPage() {
 
 function renderQualityPage() {
   const highlights = [
-    ["標準化教材", "把第一線照顧經驗整理成教材、流程與檢核表，讓好服務不是只靠個人經驗。"],
-    ["新人與在職訓練", "依職務與服務情境安排訓練，讓照服員、督導與行政都能理解照顧品質標準。"],
-    ["服務紀錄稽核", "透過紀錄檢視、督導回饋與異常追蹤，讓照顧品質被看見、被討論、被改善。"],
-    ["持續改善機制", "從家屬回饋、現場問題與教育訓練資料中，持續修正服務流程。"]
+    ["把經驗整理成教材", "第一線的好做法不能只留在資深人員身上，要轉成教材、流程、案例與檢核表。"],
+    ["把新人帶進標準", "新人不只需要知道工作內容，更要理解歲悅的照顧語言、服務邊界、紀錄方式與家屬溝通。"],
+    ["把紀錄變成品質線索", "服務紀錄不是行政作業，而是看見風險、追蹤改善與判斷訓練需求的重要依據。"],
+    ["把問題轉成改善", "品管不是抓錯，而是把家屬回饋、異常事件與現場困難轉成下一次更穩的流程。"]
+  ];
+  const painPoints = [
+    ["好服務靠個人經驗", "如果服務品質只靠資深人員提醒，新人一多、據點一多，做法就容易不一致。"],
+    ["訓練上完就忘", "課程如果沒有對應現場情境、紀錄檢核與督導回饋，學到的內容很難落地。"],
+    ["紀錄寫了但沒被用", "服務紀錄若只是留存，沒有被回看、分析與轉成行動，就無法真的改善品質。"],
+    ["家屬回饋沒有閉環", "家屬提出問題後，如果沒有處理狀態、改善責任與追蹤結果，信任就會流失。"],
+    ["跨部門資訊斷裂", "教育、督導、行政與現場如果各自處理問題，服務品質就很難累積成制度。"],
+    ["擴張時品質容易掉", "當服務量、據點與人員增加，如果沒有標準化中台支撐，品質落差會快速放大。"]
   ];
   const scenes = [
-    ["assets/quality-recruit-01-materials.png", "教材與流程整理", "把照顧現場的經驗整理成可學習、可複製、可追蹤的訓練資料。"],
-    ["assets/quality-recruit-02-training.png", "內部教育訓練", "訓練不是把人叫來上課，而是讓服務方法更一致。"],
-    ["assets/quality-recruit-03-record-review.png", "服務紀錄檢核", "從紀錄看見服務品質、照顧風險與需要再支持的現場問題。"],
-    ["assets/quality-recruit-04-quality-meeting.png", "品質改善會議", "讓督導、教育與營運一起把問題轉成下一輪改善行動。"]
+    ["assets/quality-detail-01-materials.png", "教材與流程整理", "把照顧現場的經驗整理成可學習、可複製、可追蹤的訓練資料。"],
+    ["assets/quality-detail-02-training.png", "內部教育訓練", "訓練不是把人叫來上課，而是讓服務方法、語言與判斷更一致。"],
+    ["assets/quality-detail-03-audit.png", "服務紀錄檢核", "從紀錄看見服務品質、照顧風險與需要再支持的現場問題。"],
+    ["assets/quality-detail-04-improvement.png", "品質改善會議", "讓督導、教育與營運一起把問題轉成下一輪改善行動。"]
   ];
   const serviceItems = [
-    ["教育訓練規劃", "新人訓練、在職訓練、專題課程、情境演練與訓後回饋", "適合照服員、督導、行政與跨部門團隊"],
-    ["服務標準建立", "照顧流程、紀錄格式、風險提醒、家屬回報與異常處理標準", "適合需要擴張服務但仍維持品質的團隊"],
-    ["品管稽核", "服務紀錄、家屬回饋、督導訪視、課程出席與改善追蹤", "適合需要定期檢視服務穩定度的單位"],
-    ["改善專案", "問題盤點、原因分析、改善方案、追蹤指標與回饋會議", "適合想把現場問題轉成制度改善的團隊"]
+    ["新人訓練制度", "品牌理念、服務倫理、照顧流程、紀錄規範、家屬溝通與異常回報。", "適合新進照服員、督導、行政與跨部門新人。"],
+    ["在職訓練規劃", "失智照顧、移位安全、溝通技巧、風險辨識、服務紀錄與專題課程。", "適合需要持續提升專業與一致做法的服務團隊。"],
+    ["服務標準建立", "照顧流程、紀錄格式、風險提醒、家屬回報、交班與異常處理標準。", "適合擴張服務量或多據點營運時維持品質。"],
+    ["紀錄與稽核", "服務紀錄、督導訪視、家屬回饋、課程出席、異常事件與改善追蹤。", "適合需要定期檢視服務穩定度與風險的單位。"],
+    ["案例討論會", "把真實照顧事件轉成案例，討論判斷、溝通、流程與下次可改善行動。", "適合督導、照服員與教育品管共同學習。"],
+    ["家屬回饋管理", "整理家屬問題、處理狀態、責任分工、回覆內容與追蹤結果。", "適合想建立信任閉環與客訴改善機制的團隊。"],
+    ["異常事件改善", "問題盤點、原因分析、改善方案、追蹤指標、回饋會議與再教育。", "適合要把現場問題轉成制度改善的服務單位。"],
+    ["管理報表設計", "訓練覆蓋率、稽核完成率、缺失類型、改善進度與服務品質指標。", "適合需要管理者快速掌握品質狀態的組織。"]
+  ];
+  const scenarios = [
+    ["新據點或新團隊建立", "先建立教材、流程、交班、紀錄與督導標準，避免團隊各做各的。", "重點：新人訓練、SOP、服務標準"],
+    ["服務量快速增加", "用訓練、稽核與報表管理品質落差，讓擴張不犧牲服務穩定度。", "重點：品質中台、稽核追蹤、管理報表"],
+    ["家屬回饋變多", "把問題分類、處理狀態、改善責任與回覆節奏建立起來，讓信任能被修復。", "重點：回饋管理、客訴閉環、改善追蹤"],
+    ["現場問題反覆發生", "透過案例討論、原因分析與再教育，把重複問題轉成制度調整。", "重點：案例討論、異常改善、再教育"]
+  ];
+  const qualityItems = [
+    ["教材要來自現場", "教材不是漂亮簡報，而是從服務紀錄、督導回饋、家屬問題與實際案例整理出來。"],
+    ["訓練要能被驗證", "上課不是結束，要看出席、測驗、演練、紀錄與服務表現是否真的改變。"],
+    ["稽核不是找麻煩", "稽核是為了看見風險與缺口，讓現場知道下一步怎麼修正。"],
+    ["改善要有負責人", "每個改善行動都要有責任人、期限、追蹤狀態與回看機制。"],
+    ["資料要回到管理", "訓練、紀錄、稽核、回饋與異常資料要能變成管理者看得懂的品質指標。"],
+    ["文化要支持學習", "品管要讓前線敢回報問題、願意討論案例，而不是害怕被責備。"]
   ];
   const flow = [
-    ["01", "盤點品質議題", "整理服務紀錄、家屬回饋、督導觀察與現場常見問題。"],
-    ["02", "建立訓練模組", "把議題轉成教材、演練情境、檢核表與可追蹤指標。"],
-    ["03", "執行教育品管", "安排課程、紀錄檢核、督導回饋與跨部門改善會議。"],
-    ["04", "追蹤改善成效", "定期回看服務品質、訓練覆蓋率與問題改善狀態。"]
+    ["01", "盤點品質議題", "整理服務紀錄、家屬回饋、督導觀察、異常事件與現場常見問題。"],
+    ["02", "建立標準與教材", "把議題轉成教材、流程、演練情境、檢核表與可追蹤指標。"],
+    ["03", "安排訓練與演練", "依職務、場域與服務類型安排新人訓練、在職課程與案例討論。"],
+    ["04", "執行紀錄檢核", "檢視服務紀錄、家屬回報、督導訪視與異常處理是否符合標準。"],
+    ["05", "召開改善會議", "跨部門討論原因、責任、改善方案與需要再教育的內容。"],
+    ["06", "追蹤改善成效", "定期回看訓練覆蓋率、問題類型、改善進度與服務品質變化。"]
+  ];
+  const faqs = [
+    ["教育品管是在抓錯嗎？", "不是。教育品管的目標是讓問題被看見、被討論、被改善，讓前線更有方法，而不是讓人害怕回報。"],
+    ["哪些人需要接受教育訓練？", "照服員、督導、行政、課務、管理者都需要。不同角色會有不同訓練重點。"],
+    ["服務紀錄為什麼重要？", "紀錄能看見長輩狀態、服務落差、家屬回饋與風險變化，是品質管理最重要的資料來源之一。"],
+    ["可以協助其他單位建立品管制度嗎？", "可以依需求協助規劃教材、流程、稽核表、回饋機制與改善追蹤方式。"],
+    ["教育品管和後台 CMS 有關嗎？", "有。文章、課程、檔案、表單、內容健康檢查與網站流量中心，都能成為管理與改善的一部分。"],
+    ["怎麼知道改善有沒有效？", "需要設定指標，例如訓練完成率、稽核缺失改善率、家屬回饋處理時間與重複問題下降情形。"]
   ];
 
   return `
@@ -4664,14 +5816,19 @@ function renderQualityPage() {
         <div class="service-detail-copy">
           <p class="eyebrow">Education & Quality</p>
           <h1>教育品管</h1>
-          <p>歲悅教育品管把前線服務、督導經驗、家屬回饋與訓練制度串在一起，讓照顧品質不是靠運氣，而是能被訓練、被追蹤、被持續改善。</p>
+          <p>歲悅教育品管把前線服務、督導經驗、家屬回饋、服務紀錄與訓練制度串在一起，讓照顧品質不只是靠個人熱情，而是能被整理、被訓練、被追蹤、被持續改善。</p>
           <div class="hero-actions">
             <a class="primary-button" href="#contact">洽詢品管合作</a>
             <a class="secondary-button" href="#courses">查看訓練課程</a>
           </div>
+          <div class="homecare-hero-points">
+            <article><span>品管重點</span><strong>教材、訓練、紀錄、稽核、家屬回饋、異常改善與管理報表</strong></article>
+            <article><span>適合對象</span><strong>照服員、督導、行政、課務、管理者與正在擴張服務的長照團隊</strong></article>
+            <article><span>核心價值</span><strong>讓好服務可以被學會、被複製，也可以在問題發生後被修正</strong></article>
+          </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/quality-recruit-04-quality-meeting.png" alt="歲悅教育品管品質改善會議情境" />
+          <img src="assets/quality-detail-04-improvement.png" alt="歲悅教育品管品質改善會議情境" />
           <div>
             <span>Quality System</span>
             <strong>讓好的照顧可以被教會，也可以被穩定複製。</strong>
@@ -4696,13 +5853,29 @@ function renderQualityPage() {
         </div>
       </section>
 
+      <section class="service-detail-section homecare-positioning">
+        <div class="service-section-head">
+          <p class="eyebrow">Quality Pain Points</p>
+          <h2>教育品管要處理的，是服務擴張後最容易被忽略的品質落差。</h2>
+          <span>當人員、據點與服務量增加，品質不能只靠提醒，而要靠一套能學習、能檢核、能改善的制度。</span>
+        </div>
+        <div class="homecare-problem-grid">
+          ${painPoints.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
       <section class="service-detail-section">
         <div class="service-section-head">
           <p class="eyebrow">Quality Scenes</p>
           <h2>教育品管情境</h2>
-          <span>使用之前生成的教學品管照片，呈現教材整理、內部訓練、紀錄檢核與品質改善會議。</span>
+          <span>這一頁新增 4 張教育品管情境圖，呈現教材整理、內訓課堂、紀錄稽核與改善會議。</span>
         </div>
-        <div class="community-scene-grid">
+        <div class="homecare-gallery">
           ${scenes.map(([image, title, copy]) => `
             <figure>
               <img src="${image}" alt="${title}" />
@@ -4711,6 +5884,23 @@ function renderQualityPage() {
                 <span>${copy}</span>
               </figcaption>
             </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Scenarios</p>
+          <h2>哪些團隊最需要教育品管？</h2>
+          <span>服務越多、據點越多、人員越多，就越需要把照顧品質整理成系統。</span>
+        </div>
+        <div class="homecare-scenario-grid">
+          ${scenarios.map(([title, copy, tag]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+              <small>${tag}</small>
+            </article>
           `).join("")}
         </div>
       </section>
@@ -4732,6 +5922,47 @@ function renderQualityPage() {
         </div>
       </section>
 
+      <section class="service-detail-section homecare-quality-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Quality System</p>
+          <h2>品管不是單一部門的事，而是讓整個組織一起變穩的方式。</h2>
+          <span>歲悅用教材、訓練、稽核、改善會議與管理報表，把前線經驗整理成可以持續運作的品質系統。</span>
+        </div>
+        <div class="homecare-quality-grid">
+          ${qualityItems.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="homecare-family-board">
+          <article>
+            <p class="eyebrow">Quality Philosophy</p>
+            <h2>我們相信，照顧品質不是被要求出來的，而是被支持出來的。</h2>
+            <p>前線願意學、督導願意回饋、行政願意整理資料、管理者願意修正流程，品質才會真正提升。教育品管的目的，是讓每個人知道問題可以被說出來，也可以被一起解決。</p>
+          </article>
+          <article>
+            <b>01</b>
+            <h3>讓方法一致</h3>
+            <p>把照顧流程、紀錄、回報與異常處理整理成清楚標準。</p>
+          </article>
+          <article>
+            <b>02</b>
+            <h3>讓問題可追</h3>
+            <p>透過紀錄、稽核、家屬回饋與改善狀態，看見品質變化。</p>
+          </article>
+          <article>
+            <b>03</b>
+            <h3>讓團隊成長</h3>
+            <p>把案例、問題與改善變成下一輪訓練，讓團隊越做越穩。</p>
+          </article>
+        </div>
+      </section>
+
       <section class="service-detail-section">
         <div class="service-section-head">
           <p class="eyebrow">How It Works</p>
@@ -4745,6 +5976,22 @@ function renderQualityPage() {
               <h3>${title}</h3>
               <p>${copy}</p>
             </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>常見問題</h2>
+          <span>教育品管的核心，是把現場經驗變成組織能長期使用的服務能力。</span>
+        </div>
+        <div class="software-faq-list">
+          ${faqs.map(([question, answer]) => `
+            <details>
+              <summary>${question}</summary>
+              <p>${answer}</p>
+            </details>
           `).join("")}
         </div>
       </section>
@@ -5091,28 +6338,64 @@ function renderLandRecruitingPage() {
 
 function renderCommunityPage() {
   const highlights = [
-    ["健康促進", "每週安排量測、伸展、肌力與認知活動，讓長輩用輕鬆節奏維持身體功能。"],
-    ["共餐陪伴", "透過共餐、茶敘與節慶活動，讓長輩有固定出門理由，也讓家屬少一點擔心。"],
-    ["預防延緩", "把跌倒預防、營養提醒、用藥安全與日常觀察放進社區課程。"],
-    ["資源串聯", "協助串接居家照顧、日間照顧、護理復能與長照資源，不讓家庭自己摸索。"]
+    ["離家近的照顧入口", "讓長輩不用等到失能很嚴重才接觸長照，而是在生活圈裡就能開始參與活動、被看見與被提醒。"],
+    ["預防延緩失能", "透過伸展、肌力、平衡、認知與社交活動，把預防照顧做在生活裡，而不是等問題發生才處理。"],
+    ["家屬支持與諮詢", "據點也是家屬最容易開口詢問的地方，協助釐清長照資源、服務選擇與下一步安排。"],
+    ["區域資源串聯", "把居家照顧、日間照顧、護理復能、家屬課程與社區活動串起來，讓照顧更貼近日常。"]
+  ];
+  const painPoints = [
+    ["長輩不想出門", "在家待久了，活動量、食慾、社交互動與情緒都可能慢慢下降，需要一個熟悉且壓力低的出門理由。"],
+    ["家屬不知道去哪問", "很多家庭還不到需要大量服務，但已經開始擔心跌倒、失智、營養、用藥與照顧壓力。"],
+    ["社區資源太零散", "活動、課程、服務、補助與轉介常分散在不同窗口，家屬需要有人協助整理。"],
+    ["預防常被忽略", "長輩還能走、還能自理時，最適合透過活動維持功能，但這也是最容易被忽視的階段。"],
+    ["照顧者缺少同伴", "家屬在照顧路上常覺得孤單，據點能提供課程、交流與被理解的空間。"],
+    ["需要更早發現變化", "出席、互動、食慾、活動表現與情緒變化，都是社區工作者可以早一步看見的訊號。"]
   ];
   const scenes = [
-    ["assets/homepage-batch/12-community-health-class.png", "健康促進小組", "透過團體活動維持身體功能，也讓長輩重新建立社交節奏。"],
-    ["assets/homepage-batch/11-elder-art-activity.png", "手作與認知活動", "以手作、懷舊與互動設計，讓活動不只是打發時間，而是生活參與。"],
-    ["assets/homepage-batch/02-daycare-group-exercise.png", "規律運動課", "用安全、可跟上的動作，協助長輩練習肌力、平衡與活動信心。"],
-    ["assets/homepage-batch/16-taipei-service-office.png", "在地服務窗口", "據點也是家庭諮詢入口，讓需要照顧的人可以更快被接住。"]
+    ["assets/community-detail-01-exercise.png", "健康促進小組", "用椅上運動、伸展與平衡練習，讓長輩在熟悉社區裡維持活動量。"],
+    ["assets/community-detail-02-meal.png", "共餐與茶敘陪伴", "共餐不只是吃飯，也是在固定時間被看見、被關心、重新建立社交節奏。"],
+    ["assets/community-detail-03-workshop.png", "認知手作活動", "透過手作、桌遊、懷舊與互動設計，讓長輩在活動中保有參與感。"],
+    ["assets/community-detail-04-consult.png", "家屬資源諮詢", "把長照資源、服務轉介與照顧疑問說成家屬聽得懂的下一步。"]
   ];
   const flow = [
-    ["01", "電話或 LINE 諮詢", "先了解長輩年齡、生活狀態、活動能力與家屬期待。"],
-    ["02", "據點活動媒合", "依照體力、興趣與交通距離，建議適合的課程或活動時段。"],
-    ["03", "第一次參與", "由據點人員協助熟悉環境、活動節奏與安全注意事項。"],
-    ["04", "持續追蹤", "觀察出席、互動、食慾與精神狀態，必要時轉介其他長照服務。"]
+    ["01", "初步諮詢", "了解長輩生活狀態、活動能力、交通距離、家屬期待與最想改善的問題。"],
+    ["02", "活動媒合", "依體力、興趣、認知狀態與交通可近性，建議適合的課程、共餐或健康促進活動。"],
+    ["03", "第一次參與", "由據點人員協助熟悉環境、活動流程、安全注意事項與同儕互動。"],
+    ["04", "固定出席", "透過固定活動建立生活節奏，讓長輩有出門理由，也讓家屬看見變化。"],
+    ["05", "狀態觀察", "觀察出席、食慾、互動、情緒、活動表現與精神狀態，必要時提醒家屬。"],
+    ["06", "資源轉介", "依照需求銜接居家照顧、日間照顧、護理復能、家屬課程或其他長照資源。"]
   ];
   const programs = [
-    ["活力伸展班", "椅上運動、肌力練習、平衡訓練", "適合行動較慢、想維持體力的長輩"],
-    ["共餐關懷", "營養餐食、用餐陪伴、日常觀察", "適合獨居、白天需要社交與關懷者"],
-    ["認知手作課", "手作、桌遊、懷舊活動與團體互動", "適合希望維持專注與人際互動者"],
-    ["家屬支持", "資源說明、照顧技巧、服務轉介", "適合剛開始面對長照需求的家庭"]
+    ["活力伸展班", "椅上運動、肌力練習、平衡訓練、跌倒預防與柔軟度活動。", "適合行動較慢、想維持體力與活動信心的長輩。"],
+    ["共餐關懷", "營養餐食、用餐陪伴、茶敘互動、日常觀察與情緒支持。", "適合獨居、白天需要社交、飲食與關懷者。"],
+    ["認知手作課", "手作、桌遊、懷舊活動、節慶創作、記憶刺激與團體互動。", "適合希望維持專注、記憶刺激與人際互動者。"],
+    ["健康講座", "跌倒預防、營養、失智友善、用藥安全、睡眠與照顧技巧。", "適合長輩、家屬與社區民眾一起建立照顧知識。"],
+    ["家屬支持", "資源說明、照顧技巧、服務轉介、情緒支持與照顧者交流。", "適合剛開始面對長照需求或照顧壓力增加的家庭。"],
+    ["照顧諮詢", "協助理解長照服務、居家照顧、日照、復能、課程與後續安排。", "適合不知道下一步該找誰、該怎麼安排的家屬。"],
+    ["失智友善活動", "以熟悉節奏、懷舊素材與低壓互動陪伴，降低焦慮並增加參與。", "適合輕度認知退化、需要社交與規律刺激的長輩。"],
+    ["社區資源轉介", "協助家屬連結長照、社福、醫療、復能與其他在地支持資源。", "適合需求開始變複雜、需要整合資訊的家庭。"]
+  ];
+  const scenarios = [
+    ["長輩還沒失能，但越來越少出門", "透過固定活動、共餐與社交互動，讓長輩重新有出門理由，避免功能與情緒慢慢退化。", "重點：預防延緩、社交參與、生活節奏"],
+    ["家屬剛開始接觸長照", "據點可以先提供諮詢、課程與資源說明，讓家屬不用一開始就面對複雜制度。", "重點：家屬支持、資源說明、服務轉介"],
+    ["獨居或白天少人互動", "共餐、茶敘與團體活動能增加被關心的頻率，也讓社區人員早一步看見狀態變化。", "重點：共餐關懷、情緒支持、日常觀察"],
+    ["失智友善與家屬喘息", "以熟悉、安全、低壓活動陪伴長輩，也讓家屬能獲得照顧技巧與情緒支持。", "重點：失智友善、家屬課程、照顧技巧"]
+  ];
+  const qualityItems = [
+    ["活動不是越多越好", "據點活動要符合長輩體力、興趣與安全狀態，重點是願意持續參與。"],
+    ["出席狀態要被看見", "長輩突然缺席、互動下降、食慾改變或情緒低落，都可能是需要關心的訊號。"],
+    ["課程要能帶回生活", "跌倒預防、營養、失智友善與用藥安全，都要讓長輩與家屬回家後用得上。"],
+    ["家屬問題要被整理", "家屬常問的服務、補助、照顧技巧與轉介問題，會被整理成清楚的下一步。"],
+    ["社區合作要穩定", "據點會連結里辦、公部門、醫療與社福資源，讓照顧網絡不只靠單一單位。"],
+    ["轉介要有邏輯", "當長輩需求變高時，能從社區活動銜接居家、日照、復能或其他照顧資源。"]
+  ];
+  const faqs = [
+    ["社區據點和日間照顧有什麼不同？", "社區據點多以健康促進、共餐、課程與社區支持為主，日間照顧則是較完整的白天托顧與生活照顧。兩者可以依需求銜接。"],
+    ["長輩一定要失能才能參加嗎？", "不一定。社區據點很適合還能出門、但需要增加活動、社交與預防照顧的長輩。"],
+    ["家屬可以一起參加課程嗎？", "可以。許多據點活動與家屬支持課程，都鼓勵家屬一起理解照顧技巧與資源。"],
+    ["據點活動會固定嗎？", "活動會依據點規劃、服務區域與年度課程調整，建議先聯絡確認最近活動與報名方式。"],
+    ["如果長輩後續需要更多服務怎麼辦？", "據點可以協助家屬理解居家照顧、日間照顧、護理復能與其他長照資源，做下一步銜接。"],
+    ["社區據點適合獨居長輩嗎？", "適合。固定共餐、活動與關懷能增加長輩被看見的頻率，也能讓家屬更安心。"]
   ];
 
   return `
@@ -5121,17 +6404,22 @@ function renderCommunityPage() {
         <div class="service-detail-copy">
           <p class="eyebrow">Community Care</p>
           <h1>社區據點</h1>
-          <p>歲悅把健康促進、共餐陪伴、預防延緩失能與家屬支持放進社區，讓長輩在離家更近的地方被看見、被邀請，也被穩定支持。</p>
+          <p>歲悅社區據點把健康促進、共餐陪伴、預防延緩失能、家屬支持與資源轉介放進生活圈，讓長輩在離家更近的地方開始被看見，也讓家庭在真正需要大量照顧前，就有一個可以先問、先來、先被接住的入口。</p>
           <div class="hero-actions">
             <a class="primary-button" href="#contact">預約據點諮詢</a>
             <a class="secondary-button" href="#network">查看服務區域</a>
           </div>
+          <div class="homecare-hero-points">
+            <article><span>據點角色</span><strong>健康促進、共餐關懷、家屬諮詢、失智友善與長照資源入口</strong></article>
+            <article><span>適合對象</span><strong>還能出門但活動量下降、獨居、白天缺少互動或家屬剛開始接觸長照者</strong></article>
+            <article><span>服務特色</span><strong>把預防、陪伴、課程與轉介放在社區，讓照顧更早、更近、更自然</strong></article>
+          </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/homepage-batch/12-community-health-class.png" alt="歲悅社區據點健康促進活動" />
+          <img src="assets/community-detail-01-exercise.png" alt="歲悅社區據點健康促進活動" />
           <div>
             <span>Community Hub</span>
-            <strong>讓照顧從家門口附近開始。</strong>
+            <strong>讓照顧從生活圈附近開始。</strong>
           </div>
         </aside>
       </section>
@@ -5153,13 +6441,29 @@ function renderCommunityPage() {
         </div>
       </section>
 
+      <section class="service-detail-section homecare-positioning">
+        <div class="service-section-head">
+          <p class="eyebrow">Community Pain Points</p>
+          <h2>社區據點要解決的，是照顧開始之前的空白。</h2>
+          <span>很多家庭還沒準備好接受長照服務，但已經有擔心。據點就是讓長輩與家屬更早靠近資源的地方。</span>
+        </div>
+        <div class="homecare-problem-grid">
+          ${painPoints.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
       <section class="service-detail-section community-scenes">
         <div class="service-section-head">
           <p class="eyebrow">Service Scenes</p>
           <h2>真實服務情境</h2>
-          <span>用之前生成的歲悅形象照，呈現社區據點最重要的幾個現場：活動、共餐、運動與諮詢。</span>
+          <span>這一頁新增 4 張社區據點情境圖，呈現健康促進、共餐、認知活動與家屬諮詢。</span>
         </div>
-        <div class="community-scene-grid">
+        <div class="homecare-gallery">
           ${scenes.map(([image, title, copy]) => `
             <figure>
               <img src="${image}" alt="${title}" />
@@ -5168,6 +6472,23 @@ function renderCommunityPage() {
                 <span>${copy}</span>
               </figcaption>
             </figure>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Scenarios</p>
+          <h2>哪些家庭適合先從社區據點開始？</h2>
+          <span>社區據點不是最後一步，而是很多家庭開始理解照顧的第一站。</span>
+        </div>
+        <div class="homecare-scenario-grid">
+          ${scenarios.map(([title, copy, tag]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
+              <small>${tag}</small>
+            </article>
           `).join("")}
         </div>
       </section>
@@ -5184,6 +6505,22 @@ function renderCommunityPage() {
               <h3>${title}</h3>
               <p>${items}</p>
               <span>${fit}</span>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section homecare-quality-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Quality System</p>
+          <h2>社區據點的價值，在於讓變化被更早看見。</h2>
+          <span>出席、互動、食慾、活動表現與家屬提問，都是據點判斷是否需要進一步支持的重要線索。</span>
+        </div>
+        <div class="homecare-quality-grid">
+          ${qualityItems.map(([title, copy]) => `
+            <article>
+              <h3>${title}</h3>
+              <p>${copy}</p>
             </article>
           `).join("")}
         </div>
@@ -5208,6 +6545,31 @@ function renderCommunityPage() {
         </div>
       </section>
 
+      <section class="service-detail-section">
+        <div class="homecare-family-board">
+          <article>
+            <p class="eyebrow">Community Role</p>
+            <h2>據點是一個讓照顧更早發生、也更不害怕的地方。</h2>
+            <p>許多長輩一開始不覺得自己需要長照，家屬也不知道該怎麼開口。社區據點用活動、共餐、課程與諮詢降低進入門檻，讓照顧不再像突然發生的大事，而是可以慢慢靠近的日常支持。</p>
+          </article>
+          <article>
+            <b>01</b>
+            <h3>長輩願意來</h3>
+            <p>活動要有趣、環境要熟悉、人員要親切，長輩才會願意固定出門。</p>
+          </article>
+          <article>
+            <b>02</b>
+            <h3>家屬問得到</h3>
+            <p>把補助、服務、轉介與照顧技巧說清楚，讓家屬不用在網路上自己亂找。</p>
+          </article>
+          <article>
+            <b>03</b>
+            <h3>資源接得上</h3>
+            <p>當需求提高時，能銜接居家、日照、護理復能與其他長照服務。</p>
+          </article>
+        </div>
+      </section>
+
       <section class="service-detail-section community-flow-section">
         <div class="service-section-head">
           <p class="eyebrow">How It Works</p>
@@ -5221,6 +6583,22 @@ function renderCommunityPage() {
               <h3>${title}</h3>
               <p>${copy}</p>
             </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>家屬常見問題</h2>
+          <span>社區據點最重要的功能，是讓長輩與家屬更早接觸照顧支持。</span>
+        </div>
+        <div class="software-faq-list">
+          ${faqs.map(([question, answer]) => `
+            <details>
+              <summary>${question}</summary>
+              <p>${answer}</p>
+            </details>
           `).join("")}
         </div>
       </section>
@@ -5265,13 +6643,13 @@ function renderFinancePage() {
           <h1>財務資訊</h1>
           <p>以月營收、季度財報、財務分析與股東會年報為核心，建立投資人能快速閱讀、下載與追蹤的財務資訊中心。</p>
         </div>
-        <aside class="finance-hero-chart" aria-label="年度營運趨勢示意圖">
+        <aside class="finance-hero-chart" aria-label="年度營運趨勢圖">
           <span>Revenue Trend</span>
           <div class="mini-line-chart">
             <i style="--x:8%;--y:70%"></i><i style="--x:25%;--y:56%"></i><i style="--x:42%;--y:62%"></i><i style="--x:59%;--y:42%"></i><i style="--x:76%;--y:36%"></i><i style="--x:92%;--y:22%"></i>
           </div>
           <strong>+12.4%</strong>
-          <p>最近月營收成長率示意</p>
+          <p>最近月營收成長率</p>
         </aside>
       </section>
 
@@ -5283,8 +6661,8 @@ function renderFinancePage() {
       </nav>
 
       <section class="ir-kpi-strip" aria-label="財務資訊摘要">
-        <article><span>Monthly Revenue</span><strong>NT$ 8.6M</strong><em>最近月營收示意</em></article>
-        <article><span>YoY Growth</span><strong>+12.4%</strong><em>年增率示意</em></article>
+        <article><span>Monthly Revenue</span><strong>NT$ 8.6M</strong><em>最近月營收</em></article>
+        <article><span>YoY Growth</span><strong>+12.4%</strong><em>年增率</em></article>
         <article><span>Service Mix</span><strong>4 Units</strong><em>主要收入來源</em></article>
         <article><span>Disclosure</span><strong>Quarterly</strong><em>季度更新節奏</em></article>
       </section>
@@ -5417,7 +6795,7 @@ function renderGovernancePage() {
         <aside class="governance-hero-card">
           <span>Governance Score</span>
           <div class="score-ring governance-score"><b>91</b><span>Index</span></div>
-          <p>治理成熟度示意</p>
+          <p>治理成熟度</p>
         </aside>
       </section>
 
@@ -5433,7 +6811,7 @@ function renderGovernancePage() {
       </nav>
 
       <section class="ir-kpi-strip governance-kpis" aria-label="公司治理摘要">
-        <article><span>Governance Index</span><strong>91</strong><em>治理成熟度示意</em></article>
+        <article><span>Governance Index</span><strong>91</strong><em>治理成熟度</em></article>
         <article><span>Audit Coverage</span><strong>92%</strong><em>服務紀錄稽核</em></article>
         <article><span>Training</span><strong>96%</strong><em>年度訓練覆蓋</em></article>
         <article><span>Open Cases</span><strong>0</strong><em>重大未結案件</em></article>
@@ -5660,7 +7038,7 @@ function renderShareholdersPage() {
             </dl>
           </article>
           <article class="chart-card">
-            <div class="chart-card-head"><span>股東結構示意</span><strong>100%</strong></div>
+            <div class="chart-card-head"><span>股東結構</span><strong>100%</strong></div>
             <div class="donut-chart shareholder-donut" style="--a:46%;--b:28%;--c:16%;--d:10%"><em>Holders</em></div>
             <ul class="chart-legend"><li>創辦團隊 46%</li><li>策略投資人 28%</li><li>員工持股 16%</li><li>其他股東 10%</li></ul>
           </article>
@@ -5813,6 +7191,48 @@ function renderSoftwarePage() {
     ["03", "介面與資料設計", "規劃欄位、清單、儀表板、下載檔、權限與手機/平板使用情境。"],
     ["04", "導入與迭代", "先以核心流程上線，再依使用者回饋持續調整報表、權限與操作細節。"]
   ];
+  const painPoints = [
+    ["資料散落", "個案、課程、員工、合約、帳務與公文分散在 Excel、LINE、紙本與雲端資料夾，交接時很容易漏。"],
+    ["流程看不見", "主管想知道進度，卻只能一個一個問；誰負責、卡在哪、下一步是什麼，都缺少共同畫面。"],
+    ["報表做很久", "每月統計、服務量、收入支出、課程名單、稽核資料都要人工整理，越忙越容易出錯。"],
+    ["權限不清楚", "不同職務需要看到不同資料，但一般表格很難控管權限，也缺少操作紀錄。"],
+    ["工具不貼現場", "套裝軟體常常要求人配合系統，導致前線不想用；我們更重視讓系統配合真實工作。"],
+    ["擴點難複製", "當單位變多、部門變多，如果沒有一致流程與資料結構，管理品質很難穩定放大。"]
+  ];
+  const scenarios = [
+    ["長照居家機構", "個案建檔、服務媒合、派案排班、服務紀錄、督導訪視、家屬回報與核銷資料整合。", "適合需要降低督導追蹤壓力、提升服務紀錄完整度的居家服務單位。"],
+    ["日間照顧中心", "出席接送、餐食、活動、健康量測、異常事件、家屬通知與中心每日營運看板。", "適合需要掌握現場動線、活動紀錄與家屬溝通品質的日照中心。"],
+    ["教育訓練單位", "課程上架、報名名單、繳費狀態、簽到退、證書、講師、回饋表與課後追蹤。", "適合辦理照服員課程、長照繼續教育與內部訓練的單位。"],
+    ["企業行政部門", "會計、人資、公文、合約、專案、檔案下載與跨部門任務集中管理。", "適合正在擴編、展店、投標或需要建立管理制度的企業。"]
+  ];
+  const roleMatrix = [
+    ["經營主管", "看整體營運數據、異常警示、部門進度與財務摘要，不需要再等月底人工彙整。"],
+    ["部門主管 / 督導", "追蹤個案、班表、紀錄、任務、待處理事項與服務品質，讓問題能被即時接住。"],
+    ["第一線同仁", "用手機或平板完成紀錄、回報、簽到、上傳照片與查看今日任務，降低行政負擔。"],
+    ["行政 / 財務 / 人資", "管理請款、發票、薪資資料、證照效期、教育訓練、公文與檔案下載。"],
+    ["家屬 / 合作窗口", "依權限看到服務摘要、通知、回報與必要文件，讓溝通更透明但不暴露敏感資料。"]
+  ];
+  const packages = [
+    ["Starter", "先把最痛的單一流程系統化", "適合先做課程報名、文件下載、表單留存、專案看板或單一部門工作流。"],
+    ["Operation", "多模組整合到日常營運", "適合把會計、人資、公文、居家或日照營運資料串在同一個後台。"],
+    ["Enterprise", "跨單位、跨部門、跨權限管理", "適合多據點管理、投資人資料、內部稽核、報表中心與權限分級。"],
+    ["Custom", "依單位流程客製開發", "適合已有清楚流程但市面軟體無法符合，需要客製欄位、簽核與報表。"]
+  ];
+  const controls = [
+    ["權限分級", "依董事、主管、督導、行政、第一線與外部窗口設定可讀、可寫、可下載範圍。"],
+    ["操作紀錄", "重要新增、修改、刪除與發布動作保留紀錄，方便追蹤責任與還原問題。"],
+    ["圖片裁切", "後台上傳圖片可依桌機、平板、手機預覽裁切，降低前台跑版與照片切臉。"],
+    ["檔案下載", "公告、財報、課程簡章、表單與內部文件可上傳、分類、排序與設定是否公開。"],
+    ["報表匯出", "營運數據可依日期、分類、單位與狀態篩選，匯出 CSV、Excel 或 PDF。"],
+    ["表單留存", "聯絡、課程、招募、投資人詢問等表單可寄信，也會留存在後台方便追蹤。"]
+  ];
+  const faqs = [
+    ["可以只做其中一個系統嗎？", "可以。通常會建議先從最常卡住、最耗人力、最容易出錯的流程開始，例如課程報名、居家派案或文件下載。"],
+    ["會不會改動現有網站版型？", "不會以破壞前台版型為前提。系統會把內容、圖片、檔案與卡片資料化，前台仍維持既有設計規範。"],
+    ["可以匯入舊資料嗎？", "可以評估 Excel、CSV 或既有表格資料匯入。導入前會先盤點欄位，避免錯誤資料直接進到新系統。"],
+    ["手機和平板可以使用嗎？", "可以。後台可依不同使用者情境調整表格、卡片、操作按鈕與圖片比例，讓第一線不必只靠電腦作業。"],
+    ["需要多久才能上線？", "依範圍不同而定。單一模組可先以短週期上線，多模組整合則會分階段驗收，避免一次改太多造成團隊不會用。"]
+  ];
 
   return `
     <div class="service-detail-page software-page">
@@ -5829,6 +7249,22 @@ function renderSoftwarePage() {
         <aside class="software-hero-board" aria-label="歲悅軟體系統畫面">
           ${renderSystemScreen(screens[0].title, screens[0].subtitle, screens[0].stats, screens[0].rows, screens[0].accent)}
         </aside>
+      </section>
+
+      <section class="service-detail-section software-positioning">
+        <div class="service-section-head">
+          <p class="eyebrow">Why Software</p>
+          <h2>把單位每天最耗力的工作，變成可以被追蹤、交接與改善的流程</h2>
+          <span>歲悅的軟體系統不是為了炫技，而是為了讓照顧服務、行政營運、財務資料與管理制度能夠同步前進。系統要讓人更輕鬆，不是讓團隊多一個負擔。</span>
+        </div>
+        <div class="software-problem-grid">
+          ${painPoints.map(([title, copy]) => `
+            <article>
+              <h3>${escapeHTML(title)}</h3>
+              <p>${escapeHTML(copy)}</p>
+            </article>
+          `).join("")}
+        </div>
       </section>
 
       <section class="service-detail-section">
@@ -5851,12 +7287,46 @@ function renderSoftwarePage() {
 
       <section class="service-detail-section">
         <div class="service-section-head">
+          <p class="eyebrow">Use Cases</p>
+          <h2>不同單位可以依照自己的現場情境導入</h2>
+          <span>我們會先理解單位是居家、日照、教育訓練、行政管理或混合型組織，再決定資料欄位、角色權限與第一階段最該上線的功能。</span>
+        </div>
+        <div class="software-scenario-grid">
+          ${scenarios.map(([title, copy, note]) => `
+            <article>
+              <h3>${escapeHTML(title)}</h3>
+              <p>${escapeHTML(copy)}</p>
+              <small>${escapeHTML(note)}</small>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
           <p class="eyebrow">System Screens</p>
           <h2>系統畫面佐證</h2>
           <span>以下以歲悅系統介面風格呈現實際營運會用到的儀表板、清單與進度狀態，方便單位快速理解導入後的使用情境。</span>
         </div>
         <div class="software-screen-grid">
           ${screens.map((screen) => renderSystemScreen(screen.title, screen.subtitle, screen.stats, screen.rows, screen.accent)).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Roles & Permissions</p>
+          <h2>不是每個人都看同一套資料，而是每個角色看到剛好需要的資訊</h2>
+          <span>真正能被長期使用的系統，關鍵不是功能很多，而是主管、督導、行政、第一線與外部窗口都能在自己的位置上快速完成工作。</span>
+        </div>
+        <div class="software-role-board">
+          ${roleMatrix.map(([title, copy], index) => `
+            <article>
+              <b>${String(index + 1).padStart(2, "0")}</b>
+              <h3>${escapeHTML(title)}</h3>
+              <p>${escapeHTML(copy)}</p>
+            </article>
+          `).join("")}
         </div>
       </section>
 
@@ -5873,6 +7343,55 @@ function renderSoftwarePage() {
               <h3>${title}</h3>
               <p>${copy}</p>
             </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Service Packages</p>
+          <h2>從單一流程到整套營運後台，都能分階段上線</h2>
+          <span>如果單位明天就要改善某一個痛點，可以先做小；如果已經準備擴點或整合部門，也可以直接規劃成企業級後台。</span>
+        </div>
+        <div class="software-package-grid">
+          ${packages.map(([title, subtitle, copy]) => `
+            <article>
+              <h3>${escapeHTML(title)}</h3>
+              <strong>${escapeHTML(subtitle)}</strong>
+              <p>${escapeHTML(copy)}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section software-control-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Management Control</p>
+          <h2>後台要讓新同仁也敢操作，讓管理者也能放心控管</h2>
+          <span>我們會把內容更新、圖片裁切、表單留存、權限、檔案下載與操作紀錄納入規劃，讓系統不是只有工程師能懂。</span>
+        </div>
+        <div class="software-control-grid">
+          ${controls.map(([title, copy]) => `
+            <article>
+              <h3>${escapeHTML(title)}</h3>
+              <p>${escapeHTML(copy)}</p>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section software-faq-section">
+        <div class="service-section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>常見導入問題</h2>
+          <span>先把期待講清楚，導入系統才不會變成只完成畫面、卻沒有人真正使用。</span>
+        </div>
+        <div class="software-faq-list">
+          ${faqs.map(([question, answer]) => `
+            <details>
+              <summary>${escapeHTML(question)}</summary>
+              <p>${escapeHTML(answer)}</p>
+            </details>
           `).join("")}
         </div>
       </section>
@@ -6796,6 +8315,28 @@ function renderArticleLoadingPage() {
   `;
 }
 
+function renderPageLoadingState(title = "正在讀取頁面", body = "請稍候，正在取得最新後台內容。") {
+  return `
+    <article class="article-page">
+      <section class="health-empty-state">
+        <h2>${escapeHTML(title)}</h2>
+        <p>${escapeHTML(body)}</p>
+      </section>
+    </article>
+  `;
+}
+
+async function renderServiceTemplatePageOnce(slug, fallbackRenderer, afterRender) {
+  const fallbackHtml = fallbackRenderer();
+  pageView.innerHTML = fallbackHtml;
+  const loaded = await loadSupabaseServiceTemplatePage(slug);
+  if (location.hash.slice(1).split("?")[0] !== slug) return;
+  if (!loaded) {
+    pageView.innerHTML = fallbackHtml;
+  }
+  if (typeof afterRender === "function") afterRender();
+}
+
 function renderArticleNotFoundPage() {
   return `
     <article class="article-page">
@@ -7176,6 +8717,14 @@ function renderPage(slug) {
   const page = anchorTarget ? null : pages[normalized];
   const isHome = !articleSlug && !careStorySlug && !masterTalkSlug && (normalized === "home" || Boolean(anchorTarget));
   const handledBySpecialCms =
+    normalized === "about" ||
+    normalized === "milestones" ||
+    normalized === "home-care" ||
+    normalized === "day-care" ||
+    normalized === "community" ||
+    normalized === "nursing" ||
+    normalized === "migrant-training" ||
+    normalized === "quality" ||
     serviceTemplateSlugs.has(normalized) ||
     recruitingTemplateSlugs.has(normalized) ||
     ["investors", "ir-finance", "ir-governance", "ir-shareholders"].includes(normalized);
@@ -7213,48 +8762,39 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderAboutPage();
-    loadSupabaseServiceTemplatePage(normalized);
   } else if (normalized === "milestones") {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderMilestonesPage();
-    loadSupabaseServiceTemplatePage(normalized);
     initMilestonePage();
   } else if (normalized === "home-care") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderHomeCarePage();
-    loadSupabaseServiceTemplatePage(normalized);
+    renderCmsEnhancedServicePageOnce(normalized, renderHomeCarePage);
   } else if (normalized === "day-care") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderDayCarePage();
-    loadSupabaseServiceTemplatePage(normalized);
+    renderCmsEnhancedServicePageOnce(normalized, renderDayCarePage);
   } else if (normalized === "community") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderCommunityPage();
-    loadSupabaseServiceTemplatePage(normalized);
+    renderCmsEnhancedServicePageOnce(normalized, renderCommunityPage);
   } else if (normalized === "nursing") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderNursingPage();
-    loadSupabaseServiceTemplatePage(normalized);
+    renderCmsEnhancedServicePageOnce(normalized, renderNursingPage);
   } else if (normalized === "migrant-training") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderMigrantTrainingPage();
-    loadSupabaseServiceTemplatePage(normalized);
+    renderCmsEnhancedServicePageOnce(normalized, renderMigrantTrainingPage);
   } else if (normalized === "quality") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderQualityPage();
-    loadSupabaseServiceTemplatePage(normalized);
+    renderCmsEnhancedServicePageOnce(normalized, renderQualityPage);
   } else if (normalized === "software") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderSoftwarePage();
-    loadSupabaseServiceTemplatePage(normalized);
+    renderServiceTemplatePageOnce(normalized, renderSoftwarePage);
   } else if (normalized === "land") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -7277,10 +8817,7 @@ function renderPage(slug) {
     pageView.innerHTML = renderSearchPage(searchParams.get("q") || "");
     loadSupabaseHealthArticles({ rerender: true });
   } else if (normalized === "courses") {
-    home.classList.remove("active");
-    pageView.classList.add("active");
-    pageView.innerHTML = renderCoursesPage();
-    loadSupabaseCourses({ rerender: true });
+    renderCoursesPageFromCms();
   } else if (normalized === "talent") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -7289,23 +8826,19 @@ function renderPage(slug) {
   } else if (normalized === "investors") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderInvestorsPage();
-    loadSupabaseInvestorPage(normalized);
+    renderInvestorPageOnce(normalized, renderInvestorsPage);
   } else if (normalized === "ir-finance") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderFinancePage();
-    loadSupabaseInvestorPage(normalized);
+    renderInvestorPageOnce(normalized, renderFinancePage);
   } else if (normalized === "ir-governance") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderGovernancePage();
-    loadSupabaseInvestorPage(normalized);
+    renderInvestorPageOnce(normalized, renderGovernancePage);
   } else if (normalized === "ir-shareholders") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderShareholdersPage();
-    loadSupabaseInvestorPage(normalized);
+    renderInvestorPageOnce(normalized, renderShareholdersPage);
   } else if (page) {
     pageView.innerHTML = `
       <div class="detail-hero">

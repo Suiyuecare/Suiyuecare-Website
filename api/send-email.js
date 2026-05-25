@@ -6,6 +6,14 @@ const FORM_RECIPIENTS = {
   recruiting: process.env.RECRUITING_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com"
 };
 
+const FORM_LABELS = {
+  contact: "聯絡我們 / 服務諮詢",
+  course_signup: "課程報名",
+  investor: "投資人招募",
+  land: "土地招募",
+  recruiting: "人才招募"
+};
+
 function json(response, statusCode, payload) {
   response.statusCode = statusCode;
   response.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -48,9 +56,9 @@ function buildSubmissionPayload(body) {
 
 async function saveToSupabase(payload) {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error("Server is missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
+    throw new Error("Server is missing SUPABASE_URL/VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY.");
   }
 
   const response = await fetch(`${supabaseUrl}/rest/v1/rpc/submit_form_submission`, {
@@ -74,18 +82,42 @@ async function saveToSupabase(payload) {
 async function updateSubmissionEmailStatus(submissionId, emailSent) {
   if (!submissionId) return;
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !supabaseKey) return;
 
-  await fetch(`${supabaseUrl}/rest/v1/form_submissions?id=eq.${encodeURIComponent(String(submissionId).replace(/^"|"$/g, ""))}`, {
-    method: "PATCH",
+  await fetch(`${supabaseUrl}/rest/v1/rpc/update_form_submission_email_status`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       apikey: supabaseKey,
-      Authorization: `Bearer ${supabaseKey}`,
-      Prefer: "return=minimal"
+      Authorization: `Bearer ${supabaseKey}`
     },
-    body: JSON.stringify({ email_sent: Boolean(emailSent) })
+    body: JSON.stringify({
+      submission_id: String(submissionId).replace(/^"|"$/g, ""),
+      email_sent_value: Boolean(emailSent),
+      submitter_email_sent_value: null
+    })
+  });
+}
+
+async function updateSubmitterEmailStatus(submissionId, submitterEmailSent) {
+  if (!submissionId) return;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseKey) return;
+
+  await fetch(`${supabaseUrl}/rest/v1/rpc/update_form_submission_email_status`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`
+    },
+    body: JSON.stringify({
+      submission_id: String(submissionId).replace(/^"|"$/g, ""),
+      email_sent_value: true,
+      submitter_email_sent_value: Boolean(submitterEmailSent)
+    })
   });
 }
 
@@ -96,6 +128,7 @@ function renderEmailHtml(payload) {
     ["電話", payload.phone],
     ["Email", payload.email],
     ["主旨/需求", payload.subject],
+    ["報名課程", payload.metadata.course_title],
     ["內容", payload.message],
     ["部門/分類", payload.metadata.department_title],
     ["職缺/項目", payload.metadata.opening_title],
@@ -118,12 +151,40 @@ function renderEmailHtml(payload) {
   `;
 }
 
-async function sendEmail(payload) {
+function renderSubmitterReplyHtml(payload) {
+  const formLabel = FORM_LABELS[payload.form_type] || payload.form_type || "官網表單";
+  const subjectLabel = payload.metadata.course_title || payload.metadata.opening_title || payload.subject || formLabel;
+  return `
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC','Segoe UI',sans-serif;line-height:1.9;color:#3f2414">
+      <h2 style="margin:0 0 12px;color:#f08a24">我們已收到你的資料</h2>
+      <p>${String(payload.name || "您好").replace(/[<>]/g, "")} 您好：</p>
+      <p>感謝你填寫歲悅長照集團官網表單。我們已收到你剛剛送出的「${String(formLabel).replace(/[<>]/g, "")}」資料。</p>
+      <table style="border-collapse:collapse;width:100%;max-width:680px;margin:16px 0">
+        <tr>
+          <th style="width:140px;text-align:left;vertical-align:top;padding:10px;border:1px solid #f2dfc5;background:#fff7ed">表單項目</th>
+          <td style="padding:10px;border:1px solid #f2dfc5">${String(formLabel).replace(/[<>]/g, "")}</td>
+        </tr>
+        <tr>
+          <th style="width:140px;text-align:left;vertical-align:top;padding:10px;border:1px solid #f2dfc5;background:#fff7ed">內容摘要</th>
+          <td style="padding:10px;border:1px solid #f2dfc5">${String(subjectLabel || "-").replace(/[<>]/g, "")}</td>
+        </tr>
+        <tr>
+          <th style="width:140px;text-align:left;vertical-align:top;padding:10px;border:1px solid #f2dfc5;background:#fff7ed">送出時間</th>
+          <td style="padding:10px;border:1px solid #f2dfc5">${String(payload.metadata.submitted_at || "-").replace(/[<>]/g, "")}</td>
+        </tr>
+      </table>
+      <p>我們的人員會於近日內主動與你聯繫，協助確認下一步需求與安排。</p>
+      <p style="margin-top:18px;color:#7b6658">歲悅長照集團<br />照顧就像去超商，買牛奶一樣簡單。</p>
+    </div>
+  `;
+}
+
+async function sendEmail(payload, options = {}) {
   if (!process.env.RESEND_API_KEY) {
     return { skipped: true, reason: "Missing RESEND_API_KEY", setupRequired: true };
   }
 
-  const recipient = payload.recipient_email || FORM_RECIPIENTS[payload.form_type] || FORM_RECIPIENTS.contact;
+  const recipient = options.to || payload.recipient_email || FORM_RECIPIENTS[payload.form_type] || FORM_RECIPIENTS.contact;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -133,9 +194,9 @@ async function sendEmail(payload) {
     body: JSON.stringify({
       from: process.env.MAIL_FROM || "Suiyuecare Website <noreply@suiyuecare.com>",
       to: [recipient],
-      reply_to: payload.email || undefined,
-      subject: `歲悅官網表單｜${payload.subject || payload.form_type}`,
-      html: renderEmailHtml(payload)
+      reply_to: options.replyTo || payload.email || undefined,
+      subject: options.subject || `歲悅官網表單｜${payload.subject || payload.form_type}`,
+      html: options.html || renderEmailHtml(payload)
     })
   });
 
@@ -144,6 +205,17 @@ async function sendEmail(payload) {
     throw new Error(result.message || "Email provider rejected the request.");
   }
   return result;
+}
+
+async function sendSubmitterReply(payload) {
+  if (!payload.email) return { skipped: true, reason: "Missing submitter email" };
+  const formLabel = FORM_LABELS[payload.form_type] || "官網表單";
+  return sendEmail(payload, {
+    to: payload.email,
+    replyTo: payload.recipient_email || FORM_RECIPIENTS[payload.form_type] || FORM_RECIPIENTS.contact,
+    subject: `歲悅長照集團已收到你的${formLabel}資料`,
+    html: renderSubmitterReplyHtml(payload)
+  });
 }
 
 module.exports = async function handler(request, response) {
@@ -157,8 +229,8 @@ module.exports = async function handler(request, response) {
     if (sanitize(request.body?._honey, 120)) {
       return json(response, 200, { ok: true, message: "資料已送出。" });
     }
-    if (!payload.name || !payload.phone) {
-      return json(response, 400, { ok: false, message: "請填寫姓名與電話。" });
+    if (!payload.name || !payload.phone || !payload.email) {
+      return json(response, 400, { ok: false, message: "請填寫姓名、電話與 Email。" });
     }
     if (request.body?.privacy_consent !== true && request.body?.privacy_consent !== "on") {
       return json(response, 400, { ok: false, message: "請先同意個人資料使用告知。" });
@@ -180,15 +252,26 @@ module.exports = async function handler(request, response) {
 
     const emailSent = !email?.skipped;
     await updateSubmissionEmailStatus(submissionId, emailSent);
+    let submitterEmail = null;
+    try {
+      submitterEmail = await sendSubmitterReply(payload);
+    } catch (submitterEmailError) {
+      console.error(submitterEmailError);
+      submitterEmail = { error: submitterEmailError.message || "Submitter confirmation failed." };
+    }
+    const submitterEmailSent = Boolean(submitterEmail && !submitterEmail.skipped && !submitterEmail.error);
+    await updateSubmitterEmailStatus(submissionId, submitterEmailSent);
     return json(response, emailSent ? 200 : 202, {
       ok: true,
       submissionId,
       emailSent,
+      submitterEmailSent,
       emailSetupRequired: Boolean(email?.setupRequired),
       message: emailSent
-        ? "資料已留存後台並已寄出通知信。"
+        ? "資料已留存後台，並已寄出通知信與填寫者確認信。"
         : "資料已留存後台，但寄信服務尚未設定 RESEND_API_KEY。",
-      email
+      email,
+      submitterEmail
     });
   } catch (error) {
     console.error(error);

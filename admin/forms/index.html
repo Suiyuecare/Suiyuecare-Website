@@ -1,108 +1,11 @@
 <!doctype html>
 <html lang="zh-Hant">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>表單資料管理｜歲悅長照集團</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/src/admin/admin.css" />
+    <meta http-equiv="refresh" content="0; url=/admin/404/" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>後台頁面已移除｜歲悅長照集團</title>
   </head>
-  <body class="admin-app-page">
-    <div class="admin-app-shell" hidden>
-      <aside class="admin-sidebar">
-        <div class="admin-sidebar-head">
-          <a class="admin-brand" href="/"><img src="/assets/company-logo.png" alt="" /><span><strong>歲悅長照集團</strong><small>CMS Console</small></span></a>
-        </div>
-        <nav class="admin-menu" aria-label="後台選單">
-          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
-          <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
-          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
-          <a href="/admin/courses"><span>CS</span><strong>課程管理</strong></a>
-          <a href="/admin/files"><span>DL</span><strong>檔案下載</strong></a>
-          <a class="active" href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
-          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
-          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
-          <a href="/admin/traffic"><span>AN</span><strong>網站流量中心</strong></a>
-          <a href="/admin/content-health"><span>QA</span><strong>內容健康檢查</strong></a>
-        </nav>
-        <div class="admin-sidebar-note"><span>Forms</span><strong>表單留存中心</strong><p>確認官網表單是否成功留存，並追蹤處理狀態。</p></div>
-      </aside>
-
-      <main class="admin-main">
-        <header class="admin-topbar">
-          <div class="admin-topbar-title">
-            <p class="admin-eyebrow">Submissions</p>
-            <h1>表單資料管理</h1>
-            <span>管理聯絡我們、課程報名、人才招募、土地合作與投資洽談表單。</span>
-          </div>
-          <div class="admin-topbar-actions">
-            <a class="admin-preview-link" href="/#contact" target="_blank" rel="noopener">查看聯絡表單</a>
-            <div class="admin-userbox"><b id="adminUserInitial">S</b><span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span><button id="adminLogout" type="button">登出</button></div>
-          </div>
-        </header>
-
-        <section class="admin-workspace-panel">
-          <div class="admin-workspace-head">
-            <div><p class="admin-eyebrow">Workflow</p><h2>表單處理流程</h2></div>
-            <span class="admin-soft-note">每一筆表單都應該走完：新案件 → 已聯絡 → 已結案，必要時標記垃圾或安排追蹤。</span>
-          </div>
-          <div class="forms-workflow-board" id="formsWorkflowBoard">
-            <article data-state="new"><span>01</span><strong>新案件</strong><p>尚未有人聯絡，請先確認電話、信箱與需求。</p><em data-count="new">0</em></article>
-            <article data-state="contacted"><span>02</span><strong>已聯絡</strong><p>已完成第一次聯絡，請填下一步與追蹤日期。</p><em data-count="contacted">0</em></article>
-            <article data-state="closed"><span>03</span><strong>已結案</strong><p>需求已處理完成，或已轉交對應窗口。</p><em data-count="closed">0</em></article>
-            <article data-state="spam"><span>--</span><strong>垃圾</strong><p>無效、測試或廣告訊息，避免干擾待辦。</p><em data-count="spam">0</em></article>
-          </div>
-        </section>
-
-        <section class="admin-workspace-panel">
-          <div class="admin-workspace-head">
-            <div><p class="admin-eyebrow">Filters</p><h2>篩選表單</h2></div>
-            <button type="button" id="refreshFormsButton">重新整理</button>
-          </div>
-          <div class="admin-form-grid">
-            <label><span>表單類型</span><select id="formTypeFilter"><option value="">全部</option><option value="contact">聯絡我們</option><option value="course_signup">課程報名</option><option value="recruiting">人才招募</option><option value="land">土地合作</option><option value="investor">投資洽談</option></select></label>
-            <label><span>處理狀態</span><select id="formStatusFilter"><option value="">全部</option><option value="new">新案件</option><option value="contacted">已聯絡</option><option value="closed">已結案</option><option value="spam">垃圾</option></select></label>
-          </div>
-        </section>
-
-        <div id="adminFormsStatus" class="admin-data-status">正在讀取表單資料...</div>
-
-        <section class="admin-editor-layout">
-          <section class="admin-workspace-panel">
-            <div class="admin-workspace-head"><div><p class="admin-eyebrow">Inbox</p><h2>表單列表</h2></div></div>
-            <div class="admin-table-wrap">
-              <table class="admin-data-table admin-article-table">
-                <thead><tr><th>送出者</th><th>類型</th><th>主旨</th><th>狀態</th><th>時間</th><th>操作</th></tr></thead>
-                <tbody id="formsTableBody"></tbody>
-              </table>
-            </div>
-          </section>
-
-          <section class="admin-workspace-panel">
-            <div class="admin-workspace-head"><div><p class="admin-eyebrow">Detail</p><h2 id="formDetailTitle">表單詳細資料</h2></div></div>
-            <form id="formSubmissionEditor" class="admin-form-grid">
-              <input type="hidden" name="id" />
-              <label><span>處理狀態</span><select name="status"><option value="new">新案件</option><option value="contacted">已聯絡</option><option value="closed">已結案</option><option value="spam">垃圾</option></select></label>
-              <label><span>優先度</span><select name="priority"><option value="normal">一般</option><option value="high">高</option><option value="urgent">緊急</option><option value="low">低</option></select></label>
-              <label><span>下次追蹤日期</span><input type="datetime-local" name="next_follow_up_at" /></label>
-              <label><span>下一步</span><input type="text" name="next_action" placeholder="例：明天上午回電確認服務區域" /></label>
-              <label class="admin-field-wide"><span>內部備註</span><textarea name="internal_note" rows="6"></textarea></label>
-              <div class="forms-quick-actions admin-field-wide">
-                <button type="button" data-quick-status="contacted">標記已聯絡</button>
-                <button type="button" data-quick-status="closed">標記已結案</button>
-                <button type="button" data-quick-status="spam">標記垃圾</button>
-              </div>
-              <div id="formProcessTimeline" class="forms-process-timeline admin-field-wide"></div>
-              <div id="formDetailBox" class="admin-empty-state admin-field-wide">請從左側選擇一筆表單。</div>
-              <button type="submit">儲存狀態與備註</button>
-            </form>
-          </section>
-        </section>
-      </main>
-    </div>
-    <div id="adminLoading" class="admin-loading"><strong>正在檢查登入狀態</strong><span>請稍候...</span></div>
-    <script type="module" src="/src/admin/forms.js"></script>
+  <body>
+    <p>此後台模組已移除，請前往 <a href="/admin/404/">後台 404</a>。</p>
   </body>
 </html>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="800" viewBox="0 0 1600 800">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#fff4e8"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+    <radialGradient id="sun" cx="80%" cy="18%" r="60%"><stop offset="0" stop-color="#d46a13" stop-opacity=".28"/><stop offset="1" stop-color="#d46a13" stop-opacity="0"/></radialGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#3d210d" flood-opacity=".16"/></filter>
+  </defs>
+  <rect width="1600" height="800" fill="url(#bg)"/>
+  <rect width="1600" height="800" fill="url(#sun)"/>
+  <circle cx="1220" cy="170" r="230" fill="#d46a13" opacity=".12"/>
+  <circle cx="1360" cy="520" r="310" fill="#d46a13" opacity=".08"/>
+  <g filter="url(#shadow)">
+    <rect x="104" y="108" width="560" height="520" rx="44" fill="#fff" opacity=".92"/>
+    <rect x="152" y="166" width="464" height="260" rx="36" fill="#d46a13" opacity=".18"/>
+    <circle cx="286" cy="296" r="78" fill="#d46a13" opacity=".88"/>
+    <circle cx="438" cy="278" r="58" fill="#fff" opacity=".86"/>
+    <path d="M210 482c70-86 141-86 211 0 62-67 118-69 170-7" fill="none" stroke="#3d210d" stroke-width="24" stroke-linecap="round" opacity=".28"/>
+  </g>
+  <text x="736" y="188" fill="#d46a13" font-size="34" font-family="Noto Sans TC, Arial, sans-serif" font-weight="900" letter-spacing="8">HEALTH 3.0</text>
+  <text x="736" y="310" fill="#3d210d" font-size="74" font-family="Noto Sans TC, Arial, sans-serif" font-weight="900">夜間起身防跌清單</text>
+  <text x="736" y="390" fill="#7d6657" font-size="34" font-family="Noto Sans TC, Arial, sans-serif" font-weight="800">居家安全｜歲悅照顧知識</text>
+  <g transform="translate(736 480)">
+    <rect width="236" height="70" rx="35" fill="#d46a13"/>
+    <text x="118" y="46" text-anchor="middle" fill="#fff" font-size="26" font-family="Noto Sans TC, Arial, sans-serif" font-weight="900">Read More</text>
+  </g>
+  <text x="736" y="642" fill="#3d210d" font-size="30" font-family="Noto Sans TC, Arial, sans-serif" font-weight="800" opacity=".78">照顧就像去超商 買牛奶一樣簡單</text>
+</svg>

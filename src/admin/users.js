@@ -14,17 +14,16 @@ const usersList = document.querySelector("#usersList");
 const permissionGroups = [
   {
     title: "系統與發布",
-    hint: "適合主管、網站負責人與內容審核者。",
+    hint: "只有執行長/最高權限帳號可以正式發布與核准，其餘帳號請送審。",
     fields: [
       ["can_manage_users", "管理使用者"],
-      ["can_edit_site_settings", "全站設定"],
       ["can_publish", "正式發布"],
       ["can_review_publish", "審核發布"]
     ]
   },
   {
-    title: "頁面與首頁",
-    hint: "控制首頁模組、固定頁面與模板欄位。",
+    title: "頁面內容",
+    hint: "控制頁面文案、圖片與固定卡片內容。",
     fields: [
       ["can_view_pages", "檢視頁面"],
       ["can_edit_pages", "新增/編輯頁面"],
@@ -50,24 +49,12 @@ const permissionGroups = [
     ]
   },
   {
-    title: "課程與檔案",
-    hint: "控制課程報名、投資人檔案與下載資料。",
+    title: "課程管理",
+    hint: "控制課程報名資料。",
     fields: [
       ["can_view_courses", "檢視課程"],
       ["can_edit_courses", "新增/編輯課程"],
-      ["can_delete_courses", "刪除課程"],
-      ["can_view_files", "檢視檔案"],
-      ["can_manage_files", "新增/編輯檔案"],
-      ["can_delete_files", "刪除檔案"]
-    ]
-  },
-  {
-    title: "表單與客服",
-    hint: "控制聯絡、課程、招募等表單資料處理。",
-    fields: [
-      ["can_view_forms", "檢視表單"],
-      ["can_edit_forms", "處理表單"],
-      ["can_export_forms", "匯出表單"]
+      ["can_delete_courses", "刪除課程"]
     ]
   },
   {
@@ -133,8 +120,8 @@ const roleDefaults = {
   },
   admin: {
     can_manage_users: true,
-    can_publish: true,
-    can_review_publish: true,
+    can_publish: false,
+    can_review_publish: false,
     can_edit_site_settings: true,
     can_view_pages: true,
     can_delete_pages: true,
@@ -244,6 +231,31 @@ function setStatus(message, type = "info") {
   statusBox.dataset.status = type;
 }
 
+async function getAccessToken() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw error;
+  const token = data?.session?.access_token;
+  if (!token) throw new Error("登入狀態已失效，請重新登入後再試一次。");
+  return token;
+}
+
+async function adminUsersRequest({ method = "GET", body } = {}) {
+  const token = await getAccessToken();
+  const response = await fetch("/api/admin-users", {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || !payload.ok) {
+    throw new Error(payload.message || "使用者權限 API 失敗。");
+  }
+  return payload;
+}
+
 function mergedAdmin(profile) {
   const admin = admins.find((item) => item.profile_id === profile.id) || {};
   return { ...roleDefaults[profile.role || "viewer"], ...admin };
@@ -267,7 +279,7 @@ function renderPermissionGroups(admin) {
 
 function renderUsers() {
   if (!profiles.length) {
-    usersList.innerHTML = `<div class="admin-empty-state">目前沒有 profiles。請先在 Supabase Auth 建立使用者並建立 profile。</div>`;
+    usersList.innerHTML = `<div class="admin-empty-state">目前沒有後台使用者。請重新整理本頁；若你已登入，系統會自動建立第一位 owner 管理者。</div>`;
     return;
   }
 
@@ -303,14 +315,9 @@ async function loadUsers() {
   setStatus("正在讀取使用者資料...", "info");
   refreshButton?.setAttribute("disabled", "true");
   try {
-    const [profileResult, adminResult] = await Promise.all([
-      supabase.from("profiles").select("id,user_id,email,display_name,role,is_active,updated_at").order("updated_at", { ascending: false }),
-      supabase.from("admins").select("*")
-    ]);
-    if (profileResult.error) throw profileResult.error;
-    if (adminResult.error) throw adminResult.error;
-    profiles = profileResult.data || [];
-    admins = adminResult.data || [];
+    const payload = await adminUsersRequest();
+    profiles = payload.profiles || [];
+    admins = payload.admins || [];
     renderUsers();
     setStatus("", "success");
   } catch (error) {
@@ -355,18 +362,21 @@ async function saveUser(card, form) {
   adminPayload.can_view_analytics = adminPayload.can_view_analytics || adminPayload.can_export_analytics;
 
   setStatus("正在儲存使用者權限...", "info");
-  const profileResult = await supabase.from("profiles").update(profilePayload).eq("id", profileId);
-  if (profileResult.error) {
-    setStatus(`儲存 profile 失敗：${profileResult.error.message}`, "error");
-    return;
+  try {
+    await adminUsersRequest({
+      method: "POST",
+      body: {
+        profile_id: profileId,
+        ...profilePayload,
+        ...adminPayload
+      }
+    });
+    setStatus("使用者權限已儲存。", "success");
+    await loadUsers();
+  } catch (error) {
+    console.error("Failed to save user permissions", error);
+    setStatus(`儲存使用者權限失敗：${error.message}`, "error");
   }
-  const adminResult = await supabase.from("admins").upsert(adminPayload, { onConflict: "profile_id" });
-  if (adminResult.error) {
-    setStatus(`儲存 admin 權限失敗：${adminResult.error.message}`, "error");
-    return;
-  }
-  setStatus("使用者權限已儲存。", "success");
-  await loadUsers();
 }
 
 usersList?.addEventListener("change", (event) => {

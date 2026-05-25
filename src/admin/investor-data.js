@@ -24,6 +24,12 @@ const noticeFormTitle = document.querySelector("#noticeFormTitle");
 const financialFormTitle = document.querySelector("#financialFormTitle");
 const chartFormTitle = document.querySelector("#chartFormTitle");
 const chartPointEditor = document.querySelector("#chartPointEditor");
+const investorCountTargets = {
+  notices: document.querySelector('[data-investor-count="notices"]'),
+  financials: document.querySelector('[data-investor-count="financials"]'),
+  charts: document.querySelector('[data-investor-count="charts"]'),
+  files: document.querySelector('[data-investor-count="files"]')
+};
 
 let notices = [];
 let financials = [];
@@ -430,6 +436,10 @@ function resetChartForm() {
 }
 
 function renderList() {
+  if (investorCountTargets.notices) investorCountTargets.notices.textContent = notices.length;
+  if (investorCountTargets.financials) investorCountTargets.financials.textContent = financials.length;
+  if (investorCountTargets.charts) investorCountTargets.charts.textContent = charts.length;
+  if (investorCountTargets.files) investorCountTargets.files.textContent = downloadableFiles.length;
   list.innerHTML = `
     ${renderTable("公告", notices, "notice", (item) => `${item.notice_type} · ${item.date_label || ""}`)}
     ${renderTable("財務資料", financials, "financial", (item) => `${item.item_type} · ${item.period_label}`)}
