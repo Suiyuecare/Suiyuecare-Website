@@ -3621,10 +3621,10 @@ function bindLocationControls() {
 }
 
 const healthSectionCategorySlugs = {
-  lazyPack: ["lazy-pack", "guide", "懶人包"],
+  lazyPack: ["lazy-pack", "lazy_pack", "guide", "懶人包"],
   activity: ["activity", "event", "活動專區"],
   video: ["video", "影音", "影片"],
-  shortVideo: ["short-video", "shorts", "短影片"]
+  shortVideo: ["short-video", "short_video", "shorts", "短影片"]
 };
 
 function articleMatchesHealthSection(article, slugs = []) {
@@ -3674,6 +3674,15 @@ function getLatestCareArticles(sourceArticles = []) {
   ];
   const filtered = sourceArticles.filter((article) => !articleMatchesHealthSection(article, specialSections));
   return sortHealthArticlesLatest(filtered.length ? filtered : sourceArticles).slice(0, 6);
+}
+
+function getHealthSectionUrl(sectionKey, fallbackQuery) {
+  const sectionSlugs = (healthSectionCategorySlugs[sectionKey] || []).map(categorySlug);
+  const matchedCategory = getHealthCategoryList().find((category) => {
+    const values = [category.slug, category.type, category.sectionKey].map(categorySlug);
+    return values.some((value) => sectionSlugs.includes(value));
+  });
+  return matchedCategory ? `#health?category=${encodeURIComponent(matchedCategory.slug)}` : `#search?q=${encodeURIComponent(fallbackQuery)}`;
 }
 
 function renderHealthMiniCard(article, label = article.category) {
@@ -3817,7 +3826,7 @@ function renderHealthPage(selectedCategorySlug = "") {
       <section class="health-pack-section">
         <div class="health-section-head">
           <div><p class="eyebrow">Guides</p><h2>懶人包</h2></div>
-          <a href="#search?q=${encodeURIComponent("懶人包")}">更多懶人包</a>
+          <a href="${escapeHTML(getHealthSectionUrl("lazyPack", "懶人包"))}">更多懶人包</a>
         </div>
         <div class="health-pack-grid">
           ${lazyPacks.map((article) => renderHealthMiniCard(article, "懶人包")).join("") || `<div class="health-empty-state"><h2>尚未建立懶人包文章</h2><p>請在後台文章管理新增分類為「懶人包」的文章。</p></div>`}
@@ -3827,7 +3836,7 @@ function renderHealthPage(selectedCategorySlug = "") {
       <section class="health-event-section">
         <div class="health-section-head">
           <div><p class="eyebrow">Events</p><h2>活動專區</h2></div>
-          <a href="#courses">課程報名</a>
+          <a href="${escapeHTML(getHealthSectionUrl("activity", "活動專區"))}">更多活動</a>
         </div>
         <div class="health-event-grid">
           ${eventCards.map(renderHealthEventCard).join("") || `<div class="health-empty-state"><h2>尚未建立活動文章</h2><p>請在後台文章管理新增分類為「活動專區」的文章。</p></div>`}
@@ -3837,7 +3846,7 @@ function renderHealthPage(selectedCategorySlug = "") {
       <section class="health-media-hub">
         <div class="health-section-head">
           <div><p class="eyebrow">Video</p><h2>影音與短影片</h2></div>
-          <a href="#search?q=${encodeURIComponent("影片")}">更多影音</a>
+          <a href="${escapeHTML(getHealthSectionUrl("video", "影片"))}">更多影音</a>
         </div>
         <div class="health-media-grid">
           ${mediaCards.map((article) => renderHealthVideoCard(article, articleMatchesHealthSection(article, healthSectionCategorySlugs.shortVideo) ? "短影片" : "影片")).join("")}
