@@ -3906,89 +3906,6 @@ let coursesLoadedFromSupabase = false;
 let coursesLoadFailed = false;
 let coursesLoadPromise = null;
 
-function fallbackCourses() {
-  return [
-    {
-      id: "fallback-caregiver-core-training",
-      title: "照服員核心訓練班",
-      intro: "建立照服員上線前的基本能力。",
-      date: "2026.05.20",
-      time: "09:00-17:00",
-      price: "NT$ 3,600",
-      type: "實體課",
-      location: "臺北教室",
-      seats: "剩餘 12 名",
-      image: "assets/homepage-batch/05-orange-polo-caregiver.png",
-      isFeatured: true
-    },
-    {
-      id: "fallback-family-care-practical-class",
-      title: "家庭照顧者實用課",
-      intro: "快速學會起身、用餐、跌倒預防與照顧溝通。",
-      date: "2026.05.24",
-      time: "19:30-21:00",
-      price: "免費",
-      type: "線上同步課",
-      location: "Google Meet",
-      seats: "80 人",
-      image: "assets/homepage-batch/12-community-health-class.png",
-      isFeatured: true
-    },
-    {
-      id: "fallback-dementia-communication-workshop",
-      title: "失智照顧溝通工作坊",
-      intro: "用情境演練理解重複提問、拒絕洗澡與情緒不安。",
-      date: "2026.06.02",
-      time: "13:30-16:30",
-      price: "NT$ 1,200",
-      type: "實體課",
-      location: "新北據點",
-      seats: "24 人",
-      image: "assets/homepage-batch/19-health-dementia-cover.png",
-      isFeatured: true
-    },
-    {
-      id: "fallback-migrant-care-skills-training",
-      title: "移工照顧技能培訓",
-      intro: "建立一致的安全移位、用藥提醒與紀錄回報流程。",
-      date: "2026.06.08",
-      time: "10:00-15:00",
-      price: "NT$ 2,000",
-      type: "實體課",
-      location: "臺北教室",
-      seats: "30 人",
-      image: "assets/homepage-batch/03-supervisor-care-plan.png",
-      isFeatured: false
-    },
-    {
-      id: "fallback-supervisor-quality-management",
-      title: "督導品質管理研習",
-      intro: "聚焦服務媒合、異常追蹤、紀錄檢核與團隊支持。",
-      date: "2026.06.15",
-      time: "20:00-22:00",
-      price: "NT$ 980",
-      type: "線上同步課",
-      location: "Zoom",
-      seats: "120 人",
-      image: "assets/homepage-batch/04-admin-team-office.png",
-      isFeatured: false
-    },
-    {
-      id: "fallback-nursing-reablement-basic",
-      title: "護理復能基礎課",
-      intro: "理解復能目標、步態觀察與家屬陪伴方法。",
-      date: "2026.06.22",
-      time: "可隨時觀看",
-      price: "NT$ 680",
-      type: "預錄課",
-      location: "線上學習",
-      seats: "不限人數",
-      image: "assets/homepage-batch/13-rehab-walking-practice.png",
-      isFeatured: false
-    }
-  ];
-}
-
 function formatCourseDate(value) {
   if (!value) return "可隨時觀看";
   return new Intl.DateTimeFormat("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(value)).replace(/\//g, ".");
@@ -4021,7 +3938,6 @@ function normalizeCourse(course) {
 
 function getVisibleCourses() {
   if (coursesLoadedFromSupabase) return supabaseCourses.map(normalizeCourse);
-  if (coursesLoadFailed) return fallbackCourses();
   return [];
 }
 
@@ -4148,8 +4064,8 @@ function renderCoursesPage() {
           </article>
         `).join("") : `
           <div class="course-empty-state">
-            <h2>目前沒有開放報名的課程</h2>
-            <p>後台新增課程並設為「已發布」與「前台顯示」後，這裡會自動出現。</p>
+            <h2>${coursesLoadFailed ? "課程資料暫時無法讀取" : "目前沒有開放報名的課程"}</h2>
+            <p>${coursesLoadFailed ? "請稍後重新整理，或直接聯絡課程窗口。系統不會顯示寫死的範例課程。" : "後台新增課程並設為「已發布」與「前台顯示」後，這裡會自動出現。"}</p>
             <a class="primary-button" href="#contact">聯絡課程窗口</a>
           </div>
         `}
