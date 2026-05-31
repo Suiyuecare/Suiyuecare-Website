@@ -286,13 +286,13 @@ function auditSiteSettings(settings, issues) {
   ["brand_name", "brand_name_en", "slogan", "logo_url", "phone", "email", "primary_nav", "footer_columns"].forEach((key) => {
     const item = byKey[key];
     if (!item) {
-      addIssue(issues, { severity: "critical", scope: "site", title: `全站設定缺少：${key}`, detail: "Header / Footer 可能會使用前台預設值。", editUrl: "/admin/site-settings", updatedAt: null });
+      addIssue(issues, { severity: "critical", scope: "site", title: `全站設定缺少：${key}`, detail: "Header / Footer 可能會使用前台預設值。", editUrl: "/admin/content-health", updatedAt: null });
       return;
     }
     const hasText = Boolean(item.value_text);
     const hasJson = Array.isArray(item.value_json) ? item.value_json.length > 0 : item.value_json && Object.keys(item.value_json).length > 0;
-    if (!hasText && !hasJson) addIssue(issues, { severity: "warning", scope: "site", title: `全站設定沒有內容：${item.setting_label || key}`, detail: key, editUrl: "/admin/site-settings", updatedAt: item.updated_at });
-    if (!item.is_enabled) addIssue(issues, { severity: "critical", scope: "site", title: `全站設定已停用：${item.setting_label || key}`, detail: key, editUrl: "/admin/site-settings", updatedAt: item.updated_at });
+    if (!hasText && !hasJson) addIssue(issues, { severity: "warning", scope: "site", title: `全站設定沒有內容：${item.setting_label || key}`, detail: key, editUrl: "/admin/content-health", updatedAt: item.updated_at });
+    if (!item.is_enabled) addIssue(issues, { severity: "critical", scope: "site", title: `全站設定已停用：${item.setting_label || key}`, detail: key, editUrl: "/admin/content-health", updatedAt: item.updated_at });
   });
 }
 
@@ -300,12 +300,12 @@ function auditHomeModules(modules, issues) {
   const sectionSettings = modules.filter((item) => item.module_key === "section_setting");
   ["updates", "care-system", "service-scene", "video", "network", "services", "care-stories", "home-health", "contact", "partners"].forEach((key) => {
     if (!sectionSettings.some((item) => item.item_key === key)) {
-      addIssue(issues, { severity: "warning", scope: "home", title: `首頁區塊缺設定：${key}`, detail: "可到首頁模組新增 section_setting。", editUrl: "/admin/home-modules", updatedAt: null });
+      addIssue(issues, { severity: "warning", scope: "home", title: `首頁區塊缺設定：${key}`, detail: "首頁固定區塊設定已收斂到頁面管理與內容健康檢查，不再使用首頁模組空殼。", editUrl: "/admin/pages", updatedAt: null });
     }
   });
   sectionSettings.forEach((item) => {
-    if (!item.title && !item.metadata?.hidden) addIssue(issues, { severity: "warning", scope: "home", title: `首頁區塊缺標題：${item.item_key}`, detail: item.metadata?.selector || "", editUrl: "/admin/home-modules", updatedAt: item.updated_at });
-    if (!item.metadata?.selector && !item.item_key) addIssue(issues, { severity: "warning", scope: "home", title: `首頁區塊設定缺 selector：${item.title || "未命名"}`, detail: "請補 item_key 或 metadata.selector。", editUrl: "/admin/home-modules", updatedAt: item.updated_at });
+    if (!item.title && !item.metadata?.hidden) addIssue(issues, { severity: "warning", scope: "home", title: `首頁區塊缺標題：${item.item_key}`, detail: item.metadata?.selector || "", editUrl: "/admin/pages", updatedAt: item.updated_at });
+    if (!item.metadata?.selector && !item.item_key) addIssue(issues, { severity: "warning", scope: "home", title: `首頁區塊設定缺 selector：${item.title || "未命名"}`, detail: "請補 item_key 或 metadata.selector。", editUrl: "/admin/pages", updatedAt: item.updated_at });
   });
 }
 
@@ -317,25 +317,25 @@ function auditServiceTemplateFields(fields, issues) {
     return acc;
   }, {});
   servicePages.forEach((slug) => {
-    if (!grouped[slug]?.length) addIssue(issues, { severity: "critical", scope: "service", title: `服務頁缺模板欄位：${slug}`, detail: "此頁可能仍靠前台硬編碼，後台無法完整維護。", editUrl: "/admin/template-fields", updatedAt: null });
+    if (!grouped[slug]?.length) addIssue(issues, { severity: "critical", scope: "service", title: `服務頁缺模板欄位：${slug}`, detail: "此頁可能仍靠前台硬編碼，後台無法完整維護。", editUrl: "/admin/pages", updatedAt: null });
   });
   fields
     .filter((field) => servicePages.has(field.page_slug))
     .forEach((field) => {
       if (["feature_cards", "flow_cards", "faq_items"].includes(field.field_key)) {
         const cards = Array.isArray(field.json_value) ? field.json_value : Array.isArray(field.json_value?.items) ? field.json_value.items : [];
-        if (!cards.length) addIssue(issues, { severity: "warning", scope: "service", title: `服務頁卡片列表為空：${field.page_slug} / ${field.field_label}`, detail: field.field_key, editUrl: `/admin/template-fields`, updatedAt: field.updated_at });
+        if (!cards.length) addIssue(issues, { severity: "warning", scope: "service", title: `服務頁卡片列表為空：${field.page_slug} / ${field.field_label}`, detail: field.field_key, editUrl: `/admin/pages`, updatedAt: field.updated_at });
         cards.forEach((card, index) => {
           const hasTitle = card.title || card.question;
           const hasBody = card.body || card.description || card.answer;
-          if (!hasTitle || !hasBody) addIssue(issues, { severity: "warning", scope: "service", title: `服務頁卡片內容不完整：${field.page_slug} / ${field.field_label} #${index + 1}`, detail: "請補齊標題與內容，或刪除空卡片。", editUrl: `/admin/template-fields`, updatedAt: field.updated_at });
+          if (!hasTitle || !hasBody) addIssue(issues, { severity: "warning", scope: "service", title: `服務頁卡片內容不完整：${field.page_slug} / ${field.field_label} #${index + 1}`, detail: "請補齊標題與內容，或刪除空卡片。", editUrl: `/admin/pages`, updatedAt: field.updated_at });
         });
       }
       if (field.field_type === "image" && !field.image_id && !field.text_value) {
-        addIssue(issues, { severity: "warning", scope: "service", title: `服務頁圖片欄位缺圖：${field.page_slug} / ${field.field_label}`, detail: field.field_key, editUrl: `/admin/template-fields`, updatedAt: field.updated_at });
+        addIssue(issues, { severity: "warning", scope: "service", title: `服務頁圖片欄位缺圖：${field.page_slug} / ${field.field_label}`, detail: field.field_key, editUrl: `/admin/pages`, updatedAt: field.updated_at });
       }
       if (field.field_type !== "image" && field.is_enabled && !field.text_value && !field.json_value) {
-        addIssue(issues, { severity: "info", scope: "service", title: `服務頁欄位啟用但無內容：${field.page_slug} / ${field.field_label}`, detail: field.field_key, editUrl: `/admin/template-fields`, updatedAt: field.updated_at });
+        addIssue(issues, { severity: "info", scope: "service", title: `服務頁欄位啟用但無內容：${field.page_slug} / ${field.field_label}`, detail: field.field_key, editUrl: `/admin/pages`, updatedAt: field.updated_at });
       }
     });
 }
