@@ -1257,7 +1257,10 @@ img[data-image-usage="map"],
 
 .admin-media-usage li {
   display: grid;
-  gap: 2px;
+  gap: 3px;
+  padding: 7px 8px;
+  border-radius: 12px;
+  background: rgba(255, 250, 245, 0.86);
 }
 
 .admin-media-usage a {
@@ -1269,12 +1272,33 @@ img[data-image-usage="map"],
 
 .admin-media-usage li span,
 .admin-media-usage > span,
-.admin-media-usage em {
+.admin-media-usage em,
+.admin-media-usage small,
+.admin-media-usage summary {
   color: var(--admin-muted);
   font-size: 12px;
   font-style: normal;
   font-weight: 850;
   line-height: 1.45;
+}
+
+.admin-media-usage small {
+  color: rgba(72, 43, 25, 0.62);
+}
+
+.admin-media-usage details {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-media-usage summary {
+  cursor: pointer;
+  color: var(--admin-orange-dark);
+  font-weight: 1000;
+}
+
+.admin-media-usage details[open] summary {
+  margin-bottom: 8px;
 }
 
 .admin-media-card button {

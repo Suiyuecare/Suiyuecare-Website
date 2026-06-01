@@ -35,11 +35,46 @@ function setMediaStatus(message, type = "info") {
 function addUsage(usageMap, mediaId, usage) {
   if (!mediaId) return;
   const list = usageMap.get(mediaId) || [];
-  const key = `${usage.type}|${usage.title}|${usage.href}`;
-  if (!list.some((item) => `${item.type}|${item.title}|${item.href}` === key)) {
-    list.push(usage);
+  const normalizedUsage = {
+    front: getUsageFrontHint(usage.type),
+    field: getUsageFieldHint(usage.type),
+    ...usage
+  };
+  const key = `${normalizedUsage.type}|${normalizedUsage.title}|${normalizedUsage.href}|${normalizedUsage.field}`;
+  if (!list.some((item) => `${item.type}|${item.title}|${item.href}|${item.field}` === key)) {
+    list.push(normalizedUsage);
   }
   usageMap.set(mediaId, list);
+}
+
+function getUsageFrontHint(type = "") {
+  if (type.includes("Hero")) return "前台頁面頂部 Hero";
+  if (type.includes("OG")) return "社群分享預覽圖";
+  if (type.includes("頁面區塊")) return "前台頁面內容區塊";
+  if (type.includes("服務頁")) return "服務項目子頁固定版型";
+  if (type.includes("首頁")) return "首頁模組";
+  if (type.includes("文章分類")) return "Health 3.0 分類卡片";
+  if (type.includes("文章")) return "Health 3.0 列表與文章內頁";
+  if (type.includes("課程")) return "課程報名卡片與輪播";
+  if (type.includes("真實照顧")) return "首頁真實照顧情境";
+  if (type.includes("名人講堂")) return "Health 3.0 名人講堂";
+  if (type.includes("招募") || type.includes("職缺")) return "招募與合作頁面";
+  if (type.includes("全站")) return "Header / Footer / 全站固定文字";
+  if (type.includes("投資人")) return "投資人專區";
+  if (type.includes("檔案下載")) return "下載資料或投資人附件";
+  return "前台或後台內容";
+}
+
+function getUsageFieldHint(type = "") {
+  if (type.includes("URL")) return "以圖片 URL 方式引用";
+  if (type.includes("Hero")) return "Hero 圖片欄位";
+  if (type.includes("OG")) return "SEO / 社群分享圖欄位";
+  if (type.includes("封面")) return "封面圖欄位";
+  if (type.includes("頭像")) return "人物頭像欄位";
+  if (type.includes("Logo")) return "Logo 圖片欄位";
+  if (type.includes("分類")) return "分類圖片欄位";
+  if (type.includes("卡片")) return "卡片圖片欄位";
+  return "圖片欄位";
 }
 
 function normalizeMediaReference(value) {
@@ -228,10 +263,28 @@ async function fetchMediaUsage(items) {
       title: row.title || row.section_key || "未命名區塊",
       href: row.page_id ? `/admin/pages/${encodeURIComponent(row.page_id)}` : "/admin/pages"
     })),
+    safeUrlUsageQuery("page_template_fields", "id, page_slug, field_label, field_key, text_value, json_value", mediaReferenceMap, (row) => [
+      row.text_value,
+      ...collectStringValues(row.json_value)
+    ], (row) => ({
+      type: "服務頁固定內容 URL",
+      title: `${row.page_slug || "頁面"}｜${row.field_label || row.field_key || "圖片欄位"}`,
+      href: "/admin/pages"
+    })),
     safeUrlUsageQuery("content_modules", "id, module_key, title, item_key, metadata", mediaReferenceMap, (row) => collectStringValues(row.metadata), (row) => ({
       type: "首頁模組圖片 URL",
       title: row.title || row.item_key || row.module_key || "未命名模組",
       href: "/admin/pages"
+    })),
+    safeUrlUsageQuery("articles", "id, slug, title, subtitle, excerpt, content, content_json", mediaReferenceMap, (row) => [
+      row.subtitle,
+      row.excerpt,
+      row.content,
+      ...collectStringValues(row.content_json)
+    ], (row) => ({
+      type: "文章內文圖片 URL",
+      title: row.title || row.slug || "未命名文章",
+      href: `/admin/articles/${encodeURIComponent(row.id)}`
     })),
     safeUrlUsageQuery("care_stories", "id, title, person_name, cover_image_url, avatar_image_url", mediaReferenceMap, (row) => [row.cover_image_url, row.avatar_image_url], (row) => ({
       type: "真實照顧情境圖片 URL",
@@ -257,6 +310,49 @@ async function fetchMediaUsage(items) {
       type: "職缺圖片 URL",
       title: row.title || row.page_slug || "未命名職缺",
       href: "/admin/recruiting"
+    })),
+    safeUrlUsageQuery("site_settings", "id, setting_label, setting_key, value_text, value_json", mediaReferenceMap, (row) => [
+      row.value_text,
+      ...collectStringValues(row.value_json)
+    ], (row) => ({
+      type: "全站固定內容 URL",
+      title: row.setting_label || row.setting_key || "全站圖片",
+      href: "/admin/pages"
+    })),
+    safeUrlUsageQuery("investor_notices", "id, notice_type, title, summary, body, link_url, metadata", mediaReferenceMap, (row) => [
+      row.summary,
+      row.body,
+      row.link_url,
+      ...collectStringValues(row.metadata)
+    ], (row) => ({
+      type: "投資人公告圖片 URL",
+      title: row.title || row.notice_type || "未命名公告",
+      href: "/admin/investor-data"
+    })),
+    safeUrlUsageQuery("investor_financial_items", "id, item_type, period_label, title, note, metadata", mediaReferenceMap, (row) => [
+      row.note,
+      ...collectStringValues(row.metadata)
+    ], (row) => ({
+      type: "投資人財務資料圖片 URL",
+      title: `${row.period_label || ""} ${row.title || row.item_type || "未命名財務資料"}`.trim(),
+      href: "/admin/investor-data"
+    })),
+    safeUrlUsageQuery("investor_chart_datasets", "id, page_slug, chart_title, chart_key, data_points, metadata", mediaReferenceMap, (row) => [
+      ...collectStringValues(row.data_points),
+      ...collectStringValues(row.metadata)
+    ], (row) => ({
+      type: "投資人圖表圖片 URL",
+      title: row.chart_title || row.chart_key || "未命名圖表",
+      href: "/admin/investor-data"
+    })),
+    safeUrlUsageQuery("downloadable_files", "id, title, category, public_url, storage_path, metadata", mediaReferenceMap, (row) => [
+      row.public_url,
+      row.storage_path,
+      ...collectStringValues(row.metadata)
+    ], (row) => ({
+      type: "檔案下載 URL",
+      title: row.title || row.category || "未命名下載檔",
+      href: "/admin/investor-data"
     }))
   ]);
 
@@ -269,27 +365,42 @@ function renderUsageSummary(item) {
   if (!usages.length) {
     return `
       <div class="admin-media-usage empty">
-        <strong>使用狀態</strong>
-        <span>目前沒有偵測到前台/後台引用，可安全整理；若是手動貼在內文中的外部 URL，仍建議再確認一次。</span>
+        <strong>使用位置：未偵測到引用</strong>
+        <span>目前沒有在頁面、文章、課程、招募、投資人或全站設定中找到這張圖片。若是手動貼在外部平台，仍建議再確認一次。</span>
       </div>
     `;
   }
 
-  const visibleUsages = usages.slice(0, 4);
+  const visibleUsages = usages.slice(0, 6);
   const restCount = Math.max(0, usages.length - visibleUsages.length);
+  const hiddenUsages = usages.slice(visibleUsages.length);
   return `
     <div class="admin-media-usage">
-      <strong>使用中：${usages.length} 個位置</strong>
-      <span>刪除前請先到下列位置更換圖片，避免前台破圖。</span>
+      <strong>使用位置：${usages.length} 個</strong>
+      <span>刪除前請先到下列位置更換圖片，避免前台缺圖或版面跑掉。</span>
       <ul>
         ${visibleUsages.map((usage) => `
           <li>
             <a href="${escapeHTML(usage.href)}">${escapeHTML(usage.type)}</a>
             <span>${escapeHTML(usage.title)}</span>
+            <small>${escapeHTML(usage.front || "前台內容")} · ${escapeHTML(usage.field || "圖片欄位")}</small>
           </li>
         `).join("")}
       </ul>
-      ${restCount ? `<em>另有 ${restCount} 個位置使用這張圖片</em>` : ""}
+      ${restCount ? `
+        <details>
+          <summary>另有 ${restCount} 個位置，展開查看</summary>
+          <ul>
+            ${hiddenUsages.map((usage) => `
+              <li>
+                <a href="${escapeHTML(usage.href)}">${escapeHTML(usage.type)}</a>
+                <span>${escapeHTML(usage.title)}</span>
+                <small>${escapeHTML(usage.front || "前台內容")} · ${escapeHTML(usage.field || "圖片欄位")}</small>
+              </li>
+            `).join("")}
+          </ul>
+        </details>
+      ` : ""}
     </div>
   `;
 }
@@ -340,6 +451,9 @@ function updateMediaCounts(items = mediaItems) {
 
 function matchesSearch(item, query) {
   if (!query) return true;
+  const usageText = (mediaUsageMap.get(item.id) || [])
+    .map((usage) => [usage.type, usage.title, usage.front, usage.field].filter(Boolean).join(" "))
+    .join(" ");
   const haystack = [
     item.file_name,
     item.alt_text,
@@ -347,7 +461,8 @@ function matchesSearch(item, query) {
     item.public_url,
     item.storage_path,
     getImageUsageOption(item.image_usage)?.label,
-    getFocalPointOption(item.focal_point)?.label
+    getFocalPointOption(item.focal_point)?.label,
+    usageText
   ].filter(Boolean).join(" ").toLowerCase();
   return haystack.includes(query.toLowerCase());
 }
