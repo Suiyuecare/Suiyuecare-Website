@@ -1216,7 +1216,7 @@ async function fetchSupabaseHealthArticles() {
       ? supabase.from("media").select("id, public_url, alt_text, file_name, image_usage, focal_point").in("id", mediaIds)
       : Promise.resolve({ data: [], error: null }),
     categoryIds.length
-      ? supabase.from("article_categories").select("id, name, display_label, slug, type, section_key").in("id", categoryIds)
+      ? supabase.from("article_categories").select("id, name, display_label, slug, type, section_key, is_enabled").in("id", categoryIds)
       : Promise.resolve({ data: [], error: null })
   ]);
 
@@ -1224,8 +1224,10 @@ async function fetchSupabaseHealthArticles() {
   if (categoriesResult.error) throw categoriesResult.error;
 
   const mediaById = new Map((mediaResult.data || []).map((media) => [media.id, media]));
-  const categoriesById = new Map((categoriesResult.data || []).map((category) => [category.id, category]));
-  return articles.map((article) => normalizeSupabaseArticle(article, mediaById, categoriesById));
+  const categoriesById = new Map((categoriesResult.data || []).filter((category) => category.is_enabled !== false).map((category) => [category.id, category]));
+  return articles
+    .filter((article) => !article.category_id || categoriesById.has(article.category_id))
+    .map((article) => normalizeSupabaseArticle(article, mediaById, categoriesById));
 }
 
 async function loadSupabaseHealthArticles({ rerender = false } = {}) {

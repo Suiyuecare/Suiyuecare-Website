@@ -12,6 +12,7 @@ const articlesTableBody = document.querySelector("#adminArticlesTableBody");
 const refreshArticlesButton = document.querySelector("#adminRefreshArticles");
 
 let articles = [];
+let categoryById = new Map();
 
 function setArticlesStatus(message, type = "info") {
   if (!articlesStatus) return;
@@ -64,14 +65,21 @@ function renderArticles() {
   }
 
   articlesTableBody.innerHTML = articles.map((article) => {
-    const categoryName = article.article_categories?.name || "未分類";
+    const category = categoryById.get(article.category_id);
+    const categoryName = category?.name || "未分類";
+    const categoryMeta = category
+      ? `${category.section_key || "health"}${category.is_enabled === false ? " · 已停用" : ""}`
+      : "尚未選擇分類";
     return `
       <tr>
         <td>
           <strong>${escapeHTML(article.title || "未命名文章")}</strong>
           <small>${escapeHTML(article.subtitle || article.slug || "尚無副標題")}</small>
         </td>
-        <td>${escapeHTML(categoryName)}</td>
+        <td>
+          <strong>${escapeHTML(categoryName)}</strong>
+          <small>${escapeHTML(categoryMeta)}</small>
+        </td>
         <td>
           <strong>${escapeHTML(renderContentType(article.content_type))}</strong>
           <small>${escapeHTML(article.related_service || article.target_audience || "未設定")}${article.reading_minutes ? ` · ${Number(article.reading_minutes)} 分鐘` : ""}</small>
@@ -101,6 +109,7 @@ async function loadArticles() {
       .from("articles")
       .select(`
         id,
+        category_id,
         title,
         subtitle,
         slug,
@@ -111,12 +120,7 @@ async function loadArticles() {
         related_service,
         is_featured,
         published_at,
-        updated_at,
-        article_categories (
-          id,
-          name,
-          slug
-        )
+        updated_at
       `)
       .order("is_featured", { ascending: false })
       .order("published_at", { ascending: false, nullsFirst: false })
@@ -125,6 +129,17 @@ async function loadArticles() {
     if (error) throw error;
 
     articles = data || [];
+    const categoryIds = [...new Set(articles.map((article) => article.category_id).filter(Boolean))];
+    if (categoryIds.length) {
+      const { data: categoryRows, error: categoryError } = await supabase
+        .from("article_categories")
+        .select("id, name, slug, section_key, is_enabled")
+        .in("id", categoryIds);
+      if (categoryError) throw categoryError;
+      categoryById = new Map((categoryRows || []).map((category) => [category.id, category]));
+    } else {
+      categoryById = new Map();
+    }
     renderArticles();
     setArticlesStatus("", "success");
   } catch (error) {

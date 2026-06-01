@@ -16,6 +16,16 @@ const refreshCategoriesButton = document.querySelector("#adminRefreshCategories"
 let categories = [];
 let mediaImages = [];
 
+const typeSectionMap = {
+  article: "health",
+  lazy_pack: "lazy_pack",
+  event: "activity",
+  video: "video",
+  short_video: "short_video",
+  interview: "master_talk",
+  story: "care_story"
+};
+
 function toCsvList(value = []) {
   return Array.isArray(value) ? value.join(", ") : "";
 }
@@ -38,6 +48,49 @@ function renderTypeLabel(value = "article") {
     story: "真實照顧情境"
   };
   return labels[value] || value || "一般文章";
+}
+
+function renderSectionLabel(value = "health") {
+  const labels = {
+    health: "健康3.0 一般文章",
+    lazy_pack: "懶人包",
+    activity: "活動專區",
+    video: "影音",
+    short_video: "短影片",
+    master_talk: "名人講堂",
+    care_story: "真實照顧情境"
+  };
+  return labels[value] || value || "健康3.0 一般文章";
+}
+
+function getCategoryFrontHint(category = {}) {
+  const sectionKey = category.section_key || typeSectionMap[category.type] || "health";
+  const sectionLabel = renderSectionLabel(sectionKey);
+  if (category.is_enabled === false) return "停用後，前台分類列與分類篩選不會顯示。";
+  if (category.show_in_nav === false) return `文章仍可歸類為「${sectionLabel}」，但不會出現在 Health 3.0 分類列。`;
+  return `會出現在 Health 3.0 分類列；此分類文章會進入「${sectionLabel}」版位與分類頁。`;
+}
+
+function syncSectionFromType() {
+  const matchedSection = typeSectionMap[categoryForm.elements.type.value] || "health";
+  categoryForm.elements.section_key.value = matchedSection;
+  renderCategoryFormHint();
+}
+
+function renderCategoryFormHint() {
+  const hint = document.querySelector("#categoryFrontMapHint");
+  if (!hint || !categoryForm) return;
+  const pseudoCategory = {
+    section_key: categoryForm.elements.section_key.value,
+    type: categoryForm.elements.type.value,
+    is_enabled: categoryForm.elements.is_enabled.checked,
+    show_in_nav: categoryForm.elements.show_in_nav.checked
+  };
+  hint.innerHTML = `
+    <strong>前台對應</strong>
+    <span>${escapeHTML(getCategoryFrontHint(pseudoCategory))}</span>
+    <span>若文章同時設定「內容型態」，前台會以內容型態與分類區塊共同判斷，避免影音、懶人包或活動文章跑錯區。</span>
+  `;
 }
 
 function setCategoriesStatus(message, type = "info") {
@@ -76,6 +129,7 @@ function resetCategoryForm() {
   categoryFormTitle.textContent = "新增分類";
   renderParentOptions();
   renderMediaOptions();
+  renderCategoryFormHint();
 }
 
 function renderParentOptions(selectedId = "") {
@@ -122,6 +176,7 @@ function renderCategories() {
       <td>
         <strong>${escapeHTML(renderTypeLabel(category.type))}</strong>
         <small>${escapeHTML(category.section_key || "health")}${category.show_in_nav ? " · 顯示於分類列" : " · 不顯示於分類列"}</small>
+        <small>${escapeHTML(getCategoryFrontHint(category))}</small>
       </td>
       <td><code>/${escapeHTML(category.slug || "")}</code></td>
       <td>${Number(category.sort_order || 0)}</td>
@@ -216,7 +271,7 @@ async function saveCategory(event) {
     parent_id: categoryForm.elements.parent_id.value || null,
     description: categoryForm.elements.description.value.trim() || null,
     type: categoryForm.elements.type.value || "article",
-    section_key: categoryForm.elements.section_key.value || "health",
+    section_key: categoryForm.elements.section_key.value || typeSectionMap[categoryForm.elements.type.value] || "health",
     display_label: categoryForm.elements.display_label.value.trim() || null,
     color: categoryForm.elements.color.value.trim() || null,
     icon: categoryForm.elements.icon.value.trim() || null,
@@ -277,6 +332,7 @@ function editCategory(id) {
   categoryForm.elements.seo_title.value = category.seo_title || "";
   categoryForm.elements.seo_description.value = category.seo_description || "";
   categoryFormTitle.textContent = "編輯分類";
+  renderCategoryFormHint();
   categoryForm.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -305,6 +361,10 @@ categoryForm?.elements.name.addEventListener("input", () => {
     categoryForm.elements.slug.value = slugify(categoryForm.elements.name.value);
   }
 });
+categoryForm?.elements.type.addEventListener("change", syncSectionFromType);
+categoryForm?.elements.section_key.addEventListener("change", renderCategoryFormHint);
+categoryForm?.elements.is_enabled.addEventListener("change", renderCategoryFormHint);
+categoryForm?.elements.show_in_nav.addEventListener("change", renderCategoryFormHint);
 categoryForm?.elements.slug.addEventListener("blur", () => {
   categoryForm.elements.slug.value = slugify(categoryForm.elements.slug.value);
 });
