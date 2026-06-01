@@ -257,8 +257,8 @@ div {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(28, 12, 4, 0.9) 0%, rgba(28, 12, 4, 0.7) 38%, rgba(28, 12, 4, 0.22) 68%, rgba(28, 12, 4, 0.04) 100%),
-    linear-gradient(180deg, rgba(28, 12, 4, 0.16), rgba(28, 12, 4, 0.7)),
+    linear-gradient(90deg, rgba(255, 248, 238, 0.72) 0%, rgba(255, 248, 238, 0.5) 38%, rgba(255, 248, 238, 0.12) 68%, rgba(255, 248, 238, 0) 100%),
+    linear-gradient(180deg, rgba(255, 248, 238, 0.06), rgba(255, 248, 238, 0.18)),
     url("assets/homepage-batch/01-care-home-greeting.png") center / cover;
   transform: scale(1.03);
 }
@@ -295,7 +295,7 @@ h2 {
   font-weight: 900;
   line-height: 1.12;
 }
-.hero .eyebrow { color: #c45c10; }
+.hero .eyebrow { color: var(--orange-dark); }
 .hero h1 { color: #fff; text-shadow: 0 22px 58px rgba(0,0,0,.54), 0 4px 18px rgba(63,33,13,.58); }
 .hero-copy > p:not(.eyebrow), .care-layout p, .section-head > p, .wall-side p, .service-grid p, .health-stack span, .contact-section p {
   color: var(--muted);

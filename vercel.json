@@ -3,6 +3,50 @@
   "trailingSlash": false,
   "buildCommand": "vite build",
   "outputDirectory": "dist",
+  "headers": [
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/admin/apm",
+      "has": [
+        {
+          "type": "host",
+          "value": "login.suiyuecare.com"
+        }
+      ],
+      "destination": "https://apm.suiyuecare.com/",
+      "permanent": false
+    },
+    {
+      "source": "/admin/apm/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "login.suiyuecare.com"
+        }
+      ],
+      "destination": "https://apm.suiyuecare.com/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/",

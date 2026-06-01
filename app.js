@@ -2953,8 +2953,8 @@ function renderSupabaseHero(items) {
   const background = hero.querySelector(".hero-bg");
   if (background) {
     background.style.background = `
-      linear-gradient(90deg, rgba(28, 12, 4, 0.88) 0%, rgba(28, 12, 4, 0.68) 38%, rgba(28, 12, 4, 0.22) 68%, rgba(28, 12, 4, 0.04) 100%),
-      linear-gradient(180deg, rgba(28, 12, 4, 0.14), rgba(28, 12, 4, 0.68)),
+      linear-gradient(90deg, rgba(255, 248, 238, 0.72) 0%, rgba(255, 248, 238, 0.5) 38%, rgba(255, 248, 238, 0.12) 68%, rgba(255, 248, 238, 0) 100%),
+      linear-gradient(180deg, rgba(255, 248, 238, 0.06), rgba(255, 248, 238, 0.18)),
       url("${image}") ${item.metadata?.image_position || "center"} / cover
     `;
   }
