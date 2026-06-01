@@ -1007,6 +1007,7 @@ select[data-publish-locked="true"] {
   aspect-ratio: 16 / 9;
 }
 .admin-media-card figure[data-image-usage="square"],
+.admin-media-card figure[data-image-usage="milestone"],
 .admin-media-card figure[data-image-usage="avatar"] {
   aspect-ratio: 1 / 1;
 }
@@ -1301,6 +1302,7 @@ img[data-image-usage="map"],
   aspect-ratio: 16 / 9;
 }
 .admin-section-image-tools figure[data-image-usage="square"],
+.admin-section-image-tools figure[data-image-usage="milestone"],
 .admin-section-image-tools figure[data-image-usage="avatar"] {
   aspect-ratio: 1 / 1;
 }

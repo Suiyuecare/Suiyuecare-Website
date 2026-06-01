@@ -7,6 +7,7 @@ export const imageUsageOptions = [
   { value: "service_hero", label: "服務頁 Hero", ratio: "4:3", hint: "服務頁右側主圖，建議 1400x1050" },
   { value: "article_cover", label: "文章封面", ratio: "16:9", hint: "健康3.0與文章內頁封面，建議 1200x675" },
   { value: "card", label: "卡片縮圖", ratio: "4:3", hint: "一般卡片、列表與區塊圖片" },
+  { value: "milestone", label: "大事記圖片", ratio: "1:1", hint: "大事記時間軸使用，固定正方形" },
   { value: "square", label: "方形圖片", ratio: "1:1", hint: "方形輪播或小型視覺卡" },
   { value: "avatar", label: "人物頭像", ratio: "1:1", hint: "人物臉部，建議置中或靠上" },
   { value: "logo", label: "Logo/識別", ratio: "完整顯示", hint: "不裁切，使用 contain" },
@@ -39,6 +40,7 @@ const imageUsageRatios = {
   service_hero: 4 / 3,
   article_cover: 16 / 9,
   card: 4 / 3,
+  milestone: 1,
   square: 1,
   avatar: 1
 };
@@ -48,6 +50,7 @@ const cropOutputSizes = {
   service_hero: { width: 1400, height: 1050 },
   article_cover: { width: 1600, height: 900 },
   card: { width: 1200, height: 900 },
+  milestone: { width: 1200, height: 1200 },
   square: { width: 1200, height: 1200 },
   avatar: { width: 900, height: 900 }
 };
@@ -71,6 +74,11 @@ const responsivePreviewProfiles = {
   card: [
     { key: "desktop", label: "網頁", ratio: "4 / 3" },
     { key: "tablet", label: "平板", ratio: "4 / 3" },
+    { key: "mobile", label: "手機", ratio: "1 / 1" }
+  ],
+  milestone: [
+    { key: "desktop", label: "網頁", ratio: "1 / 1" },
+    { key: "tablet", label: "平板", ratio: "1 / 1" },
     { key: "mobile", label: "手機", ratio: "1 / 1" }
   ],
   square: [

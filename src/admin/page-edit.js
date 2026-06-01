@@ -126,7 +126,7 @@ function renderSections() {
           <label>
             <span>圖片用途</span>
             <select data-content-field="image_usage">
-              ${["hero","service_hero","article_cover","card","square","avatar","logo","map","freeform"].map((value) => `<option value="${value}" ${imageSettings.image_usage === value ? "selected" : ""}>${escapeHTML(getImageUsageOption(value)?.label || value)}</option>`).join("")}
+              ${["hero","service_hero","article_cover","card","milestone","square","avatar","logo","map","freeform"].map((value) => `<option value="${value}" ${imageSettings.image_usage === value ? "selected" : ""}>${escapeHTML(getImageUsageOption(value)?.label || value)}</option>`).join("")}
             </select>
           </label>
           <label>
