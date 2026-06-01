@@ -136,6 +136,14 @@ function renderCategories() {
   `).join("");
 }
 
+function attachParentCategories(items = []) {
+  const lookup = new Map(items.map((category) => [category.id, category]));
+  return items.map((category) => ({
+    ...category,
+    parent: category.parent_id ? lookup.get(category.parent_id) || null : null
+  }));
+}
+
 async function loadCategories() {
   if (!supabase) return;
   refreshCategoriesButton?.setAttribute("disabled", "true");
@@ -164,12 +172,7 @@ async function loadCategories() {
           is_enabled,
           seo_title,
           seo_description,
-          seo_keywords,
-          parent:article_categories!article_categories_parent_id_fkey (
-            id,
-            name,
-            slug
-          )
+          seo_keywords
         `)
         .order("sort_order", { ascending: true })
         .order("name", { ascending: true }),
@@ -184,7 +187,7 @@ async function loadCategories() {
     if (categoryResult.error) throw categoryResult.error;
     if (mediaResult.error) throw mediaResult.error;
 
-    categories = categoryResult.data || [];
+    categories = attachParentCategories(categoryResult.data || []);
     mediaImages = mediaResult.data || [];
     renderParentOptions();
     renderMediaOptions();
