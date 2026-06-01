@@ -19,20 +19,60 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <main class="not-found-page">
+    <main class="not-found-page" data-error-scope="frontend">
       <div>
-        <p class="eyebrow">404</p>
+        <p class="eyebrow">Website 404</p>
         <h1>這個頁面目前不存在或尚未發布。</h1>
-        <p>請回到首頁、健康3.0，或留下需求讓歲悅協助判斷適合的照顧方向。</p>
+        <p>這是官網前台的錯誤頁。請回到首頁、健康3.0，或留下需求讓歲悅協助判斷適合的照顧方向。</p>
         <div class="hero-actions">
           <a class="primary-button" href="/">回到首頁</a>
           <a class="secondary-button" href="/#contact">聯絡我們</a>
         </div>
       </div>
       <aside>
-        <strong>Suiyuecare Corps.</strong>
+        <strong>前台頁面不存在</strong>
         <code>照顧就像去超商 買牛奶一樣簡單</code>
+        <nav class="not-found-links" aria-label="快速回到網站主要頁面">
+          <a href="/#services">服務項目</a>
+          <a href="/#health">健康3.0</a>
+          <a href="/#courses">課程報名</a>
+        </nav>
       </aside>
     </main>
+    <script>
+      (() => {
+        try {
+          const storageKey = "suiyuecare_analytics_ids";
+          const fallbackRandom = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          const cryptoId = () => {
+            if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+            return fallbackRandom();
+          };
+          const current = JSON.parse(localStorage.getItem(storageKey) || "{}");
+          const ids = {
+            visitor_id: current.visitor_id || cryptoId(),
+            session_id: current.session_id || cryptoId()
+          };
+          localStorage.setItem(storageKey, JSON.stringify(ids));
+          fetch("/api/analytics", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            keepalive: true,
+            body: JSON.stringify({
+              ...ids,
+              event_type: "error_404",
+              event_label: "frontend_static_404",
+              page_path: window.location.pathname + window.location.search,
+              target_url: window.location.href,
+              metadata: {
+                area: "frontend",
+                referrer: document.referrer || "",
+                user_agent: navigator.userAgent || ""
+              }
+            })
+          }).catch(() => {});
+        } catch {}
+      })();
+    </script>
   </body>
 </html>

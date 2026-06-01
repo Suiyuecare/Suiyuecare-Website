@@ -7617,6 +7617,27 @@ h2 {
   white-space: normal;
 }
 
+.not-found-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.not-found-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(240, 138, 36, .22);
+  border-radius: 999px;
+  background: #fffaf2;
+  color: var(--brown);
+  font-size: 14px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
 .cms-section-stack {
   display: grid;
   gap: 28px;

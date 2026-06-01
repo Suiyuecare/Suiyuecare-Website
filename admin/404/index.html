@@ -37,7 +37,7 @@
         <div class="admin-sidebar-note">
           <span>Admin 404</span>
           <strong>後台頁面不存在</strong>
-          <p>此頁可能已移除，或尚未開放給後台使用者。</p>
+          <p>此頁可能已移除、尚未開放，或不是正式後台模組。</p>
         </div>
       </aside>
       <main class="admin-main">
@@ -55,7 +55,7 @@
         <section class="admin-placeholder-panel">
           <p class="admin-eyebrow">Removed Module</p>
           <h2>這不是前台 404。</h2>
-          <p>前台訪客看到的是品牌官網 404；後台使用者看到的是這個後台專用提示，避免誤以為網站前台壞掉。</p>
+          <p>前台訪客看到的是品牌官網 404；後台使用者看到的是這個後台專用提示，避免誤以為網站前台壞掉。若你是在找課程、招募、投資人資料或文章，請直接點下面的正式模組。</p>
           <div class="admin-quick-link-grid">
             <a href="/admin/courses"><strong>課程管理</strong><span>管理課程與報名資料</span></a>
             <a href="/admin/recruiting"><strong>招募管理</strong><span>部門、職缺與應徵內容</span></a>
@@ -65,5 +65,40 @@
         </section>
       </main>
     </div>
+    <script>
+      (() => {
+        try {
+          const storageKey = "suiyuecare_admin_analytics_ids";
+          const fallbackRandom = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          const cryptoId = () => {
+            if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+            return fallbackRandom();
+          };
+          const current = JSON.parse(localStorage.getItem(storageKey) || "{}");
+          const ids = {
+            visitor_id: current.visitor_id || cryptoId(),
+            session_id: current.session_id || cryptoId()
+          };
+          localStorage.setItem(storageKey, JSON.stringify(ids));
+          fetch("/api/analytics", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            keepalive: true,
+            body: JSON.stringify({
+              ...ids,
+              event_type: "error_404",
+              event_label: "admin_static_404",
+              page_path: window.location.pathname + window.location.search,
+              target_url: window.location.href,
+              metadata: {
+                area: "admin",
+                referrer: document.referrer || "",
+                user_agent: navigator.userAgent || ""
+              }
+            })
+          }).catch(() => {});
+        } catch {}
+      })();
+    </script>
   </body>
 </html>
