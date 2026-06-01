@@ -116,6 +116,13 @@
           <div id="adminMediaStatus" class="admin-data-status">等待上傳或讀取媒體庫...</div>
         </section>
 
+        <section class="admin-dashboard-grid compact admin-media-summary" aria-label="圖片 CMS 摘要">
+          <article><span>Total</span><strong data-media-count="total">--</strong><p>全部圖片</p></article>
+          <article><span>Used</span><strong data-media-count="used">--</strong><p>已被前台/後台引用</p></article>
+          <article><span>Unused</span><strong data-media-count="unused">--</strong><p>尚未偵測到使用位置</p></article>
+          <article><span>Alt</span><strong data-media-count="missingAlt">--</strong><p>缺少替代文字</p></article>
+        </section>
+
         <section class="admin-workspace-panel admin-media-panel">
           <div class="admin-workspace-head">
             <div>
@@ -123,6 +130,35 @@
               <h2>圖片列表</h2>
             </div>
             <button type="button" id="adminRefreshMedia">重新整理</button>
+          </div>
+          <div class="admin-media-toolbar">
+            <label>
+              <span>搜尋圖片</span>
+              <input id="adminMediaSearch" type="search" placeholder="輸入檔名、alt、說明或 URL" />
+            </label>
+            <label>
+              <span>使用狀態</span>
+              <select id="adminMediaUsageFilter">
+                <option value="all">全部圖片</option>
+                <option value="used">使用中</option>
+                <option value="unused">未使用</option>
+                <option value="missing-alt">缺少 alt</option>
+              </select>
+            </label>
+            <label>
+              <span>圖片用途</span>
+              <select id="adminMediaTypeFilter">
+                <option value="all">全部用途</option>
+                <option value="hero">首頁 Hero</option>
+                <option value="service_hero">服務頁 Hero</option>
+                <option value="article_cover">文章封面</option>
+                <option value="card">卡片縮圖</option>
+                <option value="square">方形圖片</option>
+                <option value="avatar">人物頭像</option>
+                <option value="logo">Logo/識別</option>
+                <option value="map">地圖/資訊圖</option>
+              </select>
+            </label>
           </div>
           <div id="adminMediaGrid" class="admin-media-grid" aria-live="polite"></div>
         </section>

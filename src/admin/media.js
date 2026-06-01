@@ -12,8 +12,18 @@ const uploadForm = document.querySelector("#adminMediaUploadForm");
 const mediaStatus = document.querySelector("#adminMediaStatus");
 const mediaGrid = document.querySelector("#adminMediaGrid");
 const refreshMediaButton = document.querySelector("#adminRefreshMedia");
+const mediaSearchInput = document.querySelector("#adminMediaSearch");
+const mediaUsageFilter = document.querySelector("#adminMediaUsageFilter");
+const mediaTypeFilter = document.querySelector("#adminMediaTypeFilter");
+const mediaCountTargets = {
+  total: document.querySelector('[data-media-count="total"]'),
+  used: document.querySelector('[data-media-count="used"]'),
+  unused: document.querySelector('[data-media-count="unused"]'),
+  missingAlt: document.querySelector('[data-media-count="missingAlt"]')
+};
 
 let mediaUsageMap = new Map();
+let mediaItems = [];
 
 function setMediaStatus(message, type = "info") {
   if (!mediaStatus) return;
@@ -288,7 +298,7 @@ function renderMedia(items) {
   if (!mediaGrid) return;
 
   if (!items.length) {
-    mediaGrid.innerHTML = '<div class="admin-empty-state">目前沒有圖片。請先上傳第一張圖片。</div>';
+    mediaGrid.innerHTML = `<div class="admin-empty-state">${mediaItems.length ? "沒有符合篩選條件的圖片。" : "目前沒有圖片。請先上傳第一張圖片。"}</div>`;
     return;
   }
 
@@ -314,6 +324,53 @@ function renderMedia(items) {
   }).join("");
 }
 
+function updateMediaCounts(items = mediaItems) {
+  const used = items.filter((item) => (mediaUsageMap.get(item.id) || []).length > 0).length;
+  const missingAlt = items.filter((item) => !String(item.alt_text || "").trim()).length;
+  const counts = {
+    total: items.length,
+    used,
+    unused: Math.max(0, items.length - used),
+    missingAlt
+  };
+  Object.entries(counts).forEach(([key, value]) => {
+    if (mediaCountTargets[key]) mediaCountTargets[key].textContent = String(value);
+  });
+}
+
+function matchesSearch(item, query) {
+  if (!query) return true;
+  const haystack = [
+    item.file_name,
+    item.alt_text,
+    item.caption,
+    item.public_url,
+    item.storage_path,
+    getImageUsageOption(item.image_usage)?.label,
+    getFocalPointOption(item.focal_point)?.label
+  ].filter(Boolean).join(" ").toLowerCase();
+  return haystack.includes(query.toLowerCase());
+}
+
+function applyMediaFilters() {
+  const query = mediaSearchInput?.value?.trim() || "";
+  const usageFilter = mediaUsageFilter?.value || "all";
+  const typeFilter = mediaTypeFilter?.value || "all";
+
+  const filtered = mediaItems.filter((item) => {
+    const usageCount = (mediaUsageMap.get(item.id) || []).length;
+    const hasAlt = Boolean(String(item.alt_text || "").trim());
+    if (!matchesSearch(item, query)) return false;
+    if (typeFilter !== "all" && (item.image_usage || "card") !== typeFilter) return false;
+    if (usageFilter === "used" && !usageCount) return false;
+    if (usageFilter === "unused" && usageCount) return false;
+    if (usageFilter === "missing-alt" && hasAlt) return false;
+    return true;
+  });
+
+  renderMedia(filtered);
+}
+
 async function loadMedia() {
   if (!supabase) return;
   refreshMediaButton?.setAttribute("disabled", "true");
@@ -323,11 +380,15 @@ async function loadMedia() {
     const data = await fetchMediaImages();
     setMediaStatus("正在比對圖片使用位置...", "info");
     mediaUsageMap = await fetchMediaUsage(data);
-    renderMedia(data);
+    mediaItems = data;
+    updateMediaCounts(mediaItems);
+    applyMediaFilters();
     setMediaStatus("", "success");
   } catch (error) {
     console.error("Failed to load media", error);
     setMediaStatus(`無法讀取圖片列表：${error.message}`, "error");
+    mediaItems = [];
+    updateMediaCounts(mediaItems);
     renderMedia([]);
   } finally {
     refreshMediaButton?.removeAttribute("disabled");
@@ -409,6 +470,9 @@ async function deleteMedia(card) {
 
 uploadForm?.addEventListener("submit", uploadMedia);
 refreshMediaButton?.addEventListener("click", loadMedia);
+mediaSearchInput?.addEventListener("input", applyMediaFilters);
+mediaUsageFilter?.addEventListener("change", applyMediaFilters);
+mediaTypeFilter?.addEventListener("change", applyMediaFilters);
 mediaGrid?.addEventListener("click", (event) => {
   const deleteButton = event.target.closest("[data-delete-media]");
   if (!deleteButton) return;
