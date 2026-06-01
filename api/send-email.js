@@ -54,14 +54,51 @@ function buildSubmissionPayload(body) {
   };
 }
 
+function supabaseUrl() {
+  return process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+}
+
+function supabaseServiceKey() {
+  return process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+}
+
+function supabasePublicKey() {
+  return process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || "";
+}
+
+function normalizeSubmissionId(value) {
+  if (Array.isArray(value)) return normalizeSubmissionId(value[0]?.id || value[0]);
+  if (value && typeof value === "object") return String(value.id || value.submission_id || "").replace(/^"|"$/g, "");
+  return String(value || "").replace(/^"|"$/g, "");
+}
+
+function buildSubmissionRecord(payload, emailSent = false, submitterEmailSent = null) {
+  return {
+    form_type: payload.form_type,
+    name: payload.name || null,
+    phone: payload.phone || null,
+    email: payload.email || null,
+    subject: payload.subject || null,
+    message: payload.message || null,
+    source_path: payload.source_path || null,
+    status: "new",
+    metadata: {
+      ...payload.metadata,
+      submitter_email_sent: submitterEmailSent
+    },
+    recipient_email: payload.recipient_email || null,
+    email_sent: Boolean(emailSent)
+  };
+}
+
 async function saveToSupabase(payload) {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) {
+  const url = supabaseUrl();
+  const supabaseKey = supabaseServiceKey();
+  if (!url || !supabaseKey) {
     throw new Error("Server is missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
   }
 
-  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/submit_form_submission`, {
+  const response = await fetch(`${url}/rest/v1/rpc/submit_form_submission`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -79,13 +116,39 @@ async function saveToSupabase(payload) {
   return response.json();
 }
 
+async function saveToSupabasePublicIntake(payload, emailSent, submitterEmailSent) {
+  const url = supabaseUrl();
+  const supabaseKey = supabasePublicKey();
+  if (!url || !supabaseKey) {
+    throw new Error("Server is missing SUPABASE_URL/VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY.");
+  }
+
+  const response = await fetch(`${url}/rest/v1/form_submissions?select=id`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`
+    },
+    body: JSON.stringify(buildSubmissionRecord(payload, emailSent, submitterEmailSent))
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(`Supabase public form backup failed: ${message}`);
+  }
+
+  return response.json();
+}
+
 async function updateSubmissionEmailStatus(submissionId, emailSent) {
   if (!submissionId) return;
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) return;
+  const url = supabaseUrl();
+  const supabaseKey = supabaseServiceKey();
+  if (!url || !supabaseKey) return;
 
-  await fetch(`${supabaseUrl}/rest/v1/rpc/update_form_submission_email_status`, {
+  await fetch(`${url}/rest/v1/rpc/update_form_submission_email_status`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -102,11 +165,11 @@ async function updateSubmissionEmailStatus(submissionId, emailSent) {
 
 async function updateSubmitterEmailStatus(submissionId, submitterEmailSent) {
   if (!submissionId) return;
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) return;
+  const url = supabaseUrl();
+  const supabaseKey = supabaseServiceKey();
+  if (!url || !supabaseKey) return;
 
-  await fetch(`${supabaseUrl}/rest/v1/rpc/update_form_submission_email_status`, {
+  await fetch(`${url}/rest/v1/rpc/update_form_submission_email_status`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -236,22 +299,40 @@ module.exports = async function handler(request, response) {
       return json(response, 400, { ok: false, message: "請先同意個人資料使用告知。" });
     }
 
-    const submissionId = await saveToSupabase(payload);
+    let submissionId = null;
+    let savedWithFallback = false;
+    let saveError = null;
+    try {
+      submissionId = normalizeSubmissionId(await saveToSupabase(payload));
+    } catch (error) {
+      saveError = error;
+      console.error(error);
+    }
+
     let email = null;
     try {
       email = await sendEmail(payload);
     } catch (emailError) {
       console.error(emailError);
+      if (!submissionId) {
+        try {
+          submissionId = normalizeSubmissionId(await saveToSupabasePublicIntake(payload, false, false));
+          savedWithFallback = true;
+        } catch (fallbackError) {
+          console.error(fallbackError);
+        }
+      }
       return json(response, 202, {
         ok: true,
         submissionId,
         emailSent: false,
+        savedWithFallback,
+        saveWarning: saveError ? saveError.message : null,
         message: "資料已留存後台，但寄信服務尚未完成或暫時失敗。"
       });
     }
 
     const emailSent = !email?.skipped;
-    await updateSubmissionEmailStatus(submissionId, emailSent);
     let submitterEmail = null;
     try {
       submitterEmail = await sendSubmitterReply(payload);
@@ -260,12 +341,20 @@ module.exports = async function handler(request, response) {
       submitterEmail = { error: submitterEmailError.message || "Submitter confirmation failed." };
     }
     const submitterEmailSent = Boolean(submitterEmail && !submitterEmail.skipped && !submitterEmail.error);
-    await updateSubmitterEmailStatus(submissionId, submitterEmailSent);
+    if (submissionId) {
+      await updateSubmissionEmailStatus(submissionId, emailSent);
+      await updateSubmitterEmailStatus(submissionId, submitterEmailSent);
+    } else {
+      submissionId = normalizeSubmissionId(await saveToSupabasePublicIntake(payload, emailSent, submitterEmailSent));
+      savedWithFallback = true;
+    }
     return json(response, emailSent ? 200 : 202, {
       ok: true,
       submissionId,
       emailSent,
       submitterEmailSent,
+      savedWithFallback,
+      saveWarning: saveError ? saveError.message : null,
       emailSetupRequired: Boolean(email?.setupRequired),
       message: emailSent
         ? "資料已留存後台，並已寄出通知信與填寫者確認信。"

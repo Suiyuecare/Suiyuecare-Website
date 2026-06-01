@@ -25,6 +25,11 @@ function decodeJwtPayload(token = "") {
   }
 }
 
+function projectRefFromSupabaseUrl(url = "") {
+  const match = String(url || "").match(/^https:\/\/([a-z0-9-]+)\.supabase\.co/i);
+  return match?.[1] || "";
+}
+
 module.exports = async function handler(request, response) {
   if (request.method !== "GET") {
     response.setHeader("Allow", "GET");
@@ -47,7 +52,11 @@ module.exports = async function handler(request, response) {
   const hasSupabaseUrl = Boolean(supabaseUrl);
   const hasServiceRoleKey = Boolean(serviceRoleKey);
   const serviceRoleLooksValid = serviceRolePayload?.role === "service_role";
-  const ready = hasResendKey && hasMailFrom && hasSupabaseUrl && hasServiceRoleKey && serviceRoleLooksValid;
+  const supabaseProjectRef = projectRefFromSupabaseUrl(supabaseUrl);
+  const serviceRoleProjectMatches = Boolean(serviceRoleLooksValid && serviceRolePayload?.ref === supabaseProjectRef);
+  const hasPublicKey = Boolean(process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY);
+  const canStoreForms = serviceRoleProjectMatches || hasPublicKey;
+  const ready = hasResendKey && hasMailFrom && hasSupabaseUrl && canStoreForms;
 
   return json(response, ready ? 200 : 503, {
     ok: ready,
@@ -57,6 +66,8 @@ module.exports = async function handler(request, response) {
       VITE_SUPABASE_URL: Boolean(process.env.VITE_SUPABASE_URL),
       SUPABASE_SERVICE_ROLE_KEY: hasServiceRoleKey,
       SUPABASE_SERVICE_ROLE_KEY_ROLE: serviceRoleLooksValid ? "service_role" : serviceRolePayload?.role || "missing_or_invalid",
+      SUPABASE_SERVICE_ROLE_KEY_PROJECT_MATCH: serviceRoleProjectMatches,
+      FORM_PUBLIC_INTAKE_FALLBACK: hasPublicKey,
       RESEND_API_KEY: hasResendKey,
       MAIL_FROM: hasMailFrom,
       CONTACT_NOTIFY_EMAIL: Boolean(recipients.contact),
@@ -67,7 +78,9 @@ module.exports = async function handler(request, response) {
     },
     recipients: Object.fromEntries(Object.entries(recipients).map(([key, value]) => [key, maskedEmail(value)])),
     message: ready
-      ? "Email provider and Supabase server credentials are configured."
-      : "Production API is not ready. Set SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY and MAIL_FROM in Vercel environment variables, then redeploy."
+      ? serviceRoleProjectMatches
+        ? "Email provider and Supabase server credentials are configured."
+        : "Email provider is configured. Supabase service role key project does not match the URL, so forms use the insert-only public intake fallback."
+      : "Production API is not ready. Set SUPABASE_SERVICE_ROLE_KEY or VITE_SUPABASE_ANON_KEY, RESEND_API_KEY and MAIL_FROM in Vercel environment variables, then redeploy."
   });
 };
