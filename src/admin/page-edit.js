@@ -98,6 +98,10 @@ function renderSections() {
             <span>顯示</span>
           </label>
         </header>
+        <div class="admin-front-map">
+          <strong>前台對應</strong>
+          <span>頁面 <code>#${escapeHTML(currentPage?.slug || "")}</code> 的 <code>${escapeHTML(section.section_key || "section")}</code> 區塊。修改這張卡的標題、文字、按鈕或圖片，會影響官網同一個區塊。</span>
+        </div>
         <div class="admin-form-grid">
           <label>
             <span>Section 標題</span>

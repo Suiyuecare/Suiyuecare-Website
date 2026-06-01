@@ -57,6 +57,10 @@
 
         <section class="admin-workspace-panel">
           <div class="admin-workspace-head"><div><p class="admin-eyebrow">Hero Settings</p><h2 id="pageSettingsTitle">頁面 Hero 主文案</h2></div><button type="submit" form="pageSettingsForm">儲存 Hero</button></div>
+          <div class="admin-front-map">
+            <strong>前台對應</strong>
+            <span>這裡控制目前選擇的招募頁 Hero：人才招募、土地招募或投資人招募。Hero 圖、主標、副標、按鈕與表單收件信箱會同步到該前台頁面。</span>
+          </div>
           <form id="pageSettingsForm" class="admin-form-grid">
             <input name="id" type="hidden" />
             <label><span>頁面小標</span><input name="eyebrow" type="text" placeholder="Recruiting" /></label>
@@ -82,6 +86,10 @@
         <section class="admin-editor-layout">
           <section class="admin-workspace-panel">
             <div class="admin-workspace-head"><div><p class="admin-eyebrow">Department</p><h2 id="departmentFormTitle">新增部門/分類</h2></div><button type="button" id="newDepartmentButton">清空新增</button></div>
+            <div class="admin-front-map">
+              <strong>前台對應</strong>
+              <span>部門/分類會成為招募頁中的分組，例如居家照顧部門、日間照顧部、土地合作類型。部門已發布且前台顯示時，底下的卡片才有清楚分類。</span>
+            </div>
             <form id="departmentEditorForm" class="admin-form-grid">
               <input name="id" type="hidden" />
               <label><span>部門/分類名稱</span><input name="title" type="text" required /></label>
@@ -100,6 +108,10 @@
 
           <section class="admin-workspace-panel">
             <div class="admin-workspace-head"><div><p class="admin-eyebrow">Opening</p><h2 id="openingFormTitle">新增職缺/合作卡片</h2></div><button type="button" id="newOpeningButton">清空新增</button></div>
+            <div class="admin-front-map">
+              <strong>前台對應</strong>
+              <span>這裡的每一筆資料會變成前台一張職缺或合作卡片。標題、摘要、圖片、條件、福利與申請按鈕都會同步；已發布、前台顯示、所屬部門正確時，卡片才會出現。</span>
+            </div>
             <form id="openingEditorForm" class="admin-form-grid">
               <input name="id" type="hidden" />
               <label><span>所屬部門/分類</span><select name="department_id" required></select></label>

@@ -60,6 +60,10 @@
             <div><p class="admin-eyebrow">Page Copy</p><h2>投資人頁面文案設定</h2></div>
             <button type="submit" form="investorPageSettingsForm">儲存頁面設定</button>
           </div>
+          <div class="admin-front-map">
+            <strong>前台對應</strong>
+            <span>這裡控制投資人專區四個頁面的 Hero、CTA、KPI 指標與 FAQ：投資人首頁、財務資訊、公司治理、股東專區。選擇不同頁面後，請確認儲存的是正確前台分頁。</span>
+          </div>
           <form id="investorPageSettingsForm" class="admin-form-grid">
             <label>
               <span>要編輯的頁面</span>
@@ -97,6 +101,10 @@
         <section class="admin-editor-layout">
           <section class="admin-workspace-panel">
             <div class="admin-workspace-head"><div><p class="admin-eyebrow">Notice</p><h2 id="noticeFormTitle">新增公告</h2></div><button id="newNoticeButton" type="button">清空新增</button></div>
+            <div class="admin-front-map">
+              <strong>前台對應</strong>
+              <span>公告會出現在投資人首頁最新動態，並依類型同步到財務資訊、公司治理或股東專區。若有正式 PDF，請綁定下載檔案。</span>
+            </div>
             <form id="noticeForm" class="admin-form-grid">
               <input name="id" type="hidden" />
               <label><span>類型</span><select name="notice_type"><option value="news">最新消息</option><option value="award">得標紀錄</option><option value="governance">治理公告</option><option value="shareholder">股東公告</option><option value="material">重大訊息</option><option value="progress">設立進度</option></select></label>
@@ -114,6 +122,10 @@
           </section>
           <section class="admin-workspace-panel">
             <div class="admin-workspace-head"><div><p class="admin-eyebrow">Financial</p><h2 id="financialFormTitle">新增財務資料</h2></div><button id="newFinancialButton" type="button">清空新增</button></div>
+            <div class="admin-front-map">
+              <strong>前台對應</strong>
+              <span>財務資料會出現在「財務資訊」分頁的每月營收、財務分析、季度財報與股東會年報 tab。正式上線資料建議綁定下載檔，避免看起來像展示頁。</span>
+            </div>
             <form id="financialForm" class="admin-form-grid">
               <input name="id" type="hidden" />
               <label><span>類型</span><select name="item_type"><option value="monthly_revenue">每月營收</option><option value="finance_analysis">財務分析</option><option value="quarterly_report">季度財報</option><option value="annual_report">股東會年報</option></select></label>
@@ -134,6 +146,10 @@
 
         <section class="admin-workspace-panel">
           <div class="admin-workspace-head"><div><p class="admin-eyebrow">Chart</p><h2 id="chartFormTitle">新增圖表資料</h2></div><button id="newChartButton" type="button">清空新增</button></div>
+          <div class="admin-front-map">
+            <strong>前台對應</strong>
+            <span>圖表資料會依頁面與圖表 Key 顯示在投資人專區的數據圖、柱狀圖、折線圖、圓餅圖或進度條。請用資料列新增數值，不需要貼 JSON。</span>
+          </div>
           <form id="chartForm" class="admin-form-grid">
             <input name="id" type="hidden" />
             <label><span>頁面</span><select name="page_slug"><option value="investors">投資人首頁</option><option value="ir-finance">財務資訊</option><option value="ir-governance">公司治理</option><option value="ir-shareholders">股東專區</option></select></label>
