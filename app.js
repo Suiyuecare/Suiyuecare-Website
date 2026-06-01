@@ -8977,6 +8977,15 @@ function initMilestonePage() {
   window.requestAnimationFrame(updateMilestoneProgress);
 }
 
+function updateScrollProgress() {
+  const bar = document.querySelector(".scroll-progress-bar");
+  if (!bar) return;
+  const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+  const scrollable = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+  const progress = Math.min(Math.max(scrollTop / scrollable, 0), 1);
+  bar.style.transform = `scaleX(${progress})`;
+}
+
 document.addEventListener("click", (event) => {
   const link = event.target.closest("a[href]");
   if (link) {
@@ -9232,7 +9241,10 @@ if (sceneImages.length > 1) {
 }
 
 window.addEventListener("hashchange", () => renderPage(location.hash.slice(1)));
-window.addEventListener("scroll", updateMilestoneProgress, { passive: true });
+window.addEventListener("scroll", () => {
+  updateMilestoneProgress();
+  updateScrollProgress();
+}, { passive: true });
 window.addEventListener("error", (event) => {
   trackFrontendError("window_error", {
     message: event.message,
@@ -9248,8 +9260,12 @@ window.addEventListener("unhandledrejection", (event) => {
     stack: event.reason?.stack
   });
 });
-window.addEventListener("resize", updateMilestoneProgress);
+window.addEventListener("resize", () => {
+  updateMilestoneProgress();
+  updateScrollProgress();
+});
 window.addEventListener("pagehide", flushPageEngagement);
+updateScrollProgress();
 renderPage(location.hash.slice(1));
 loadSupabaseSiteSettings();
 loadSupabasePageContent("home");

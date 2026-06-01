@@ -148,6 +148,27 @@ div {
   background: rgba(255, 253, 248, 0.94);
   backdrop-filter: blur(18px);
 }
+.scroll-progress {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  z-index: 219;
+  height: 5px;
+  background: rgba(246, 233, 217, 0.72);
+  pointer-events: none;
+}
+.scroll-progress-bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(90deg, var(--orange-dark), var(--orange), #f6b24a);
+  box-shadow: 0 0 18px rgba(240, 138, 36, 0.38);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.08s linear;
+}
 .brand { display: inline-flex; align-items: center; gap: 12px; justify-self: start; flex-shrink: 0; }
 .brand-mark {
   display: grid;
