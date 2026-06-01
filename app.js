@@ -3907,6 +3907,7 @@ let supabaseCourses = [];
 let coursesLoadedFromSupabase = false;
 let coursesLoadFailed = false;
 let coursesLoadPromise = null;
+let courseCoverById = new Map();
 
 function formatCourseDate(value) {
   if (!value) return "可隨時觀看";
@@ -3921,7 +3922,7 @@ function formatCourseTime(start, end) {
 }
 
 function normalizeCourse(course) {
-  const cover = course.cover_image || course.media || {};
+  const cover = courseCoverById.get(course.cover_image_id) || course.cover_image || course.media || {};
   return {
     id: course.id,
     title: course.title,
@@ -3953,7 +3954,7 @@ async function loadSupabaseCourses({ rerender = false } = {}) {
   try {
     const { data, error } = await supabase
       .from("courses")
-      .select("id, title, subtitle, excerpt, description, course_type, location, location_detail, starts_at, ends_at, price_text, capacity, seats_label, registration_status, registration_url, is_featured, sort_order, cover_image:media!courses_cover_image_id_fkey(id, public_url, alt_text)")
+      .select("id, title, subtitle, excerpt, description, course_type, location, location_detail, starts_at, ends_at, price_text, capacity, seats_label, registration_status, registration_url, is_featured, sort_order, cover_image_id")
       .eq("status", "published")
       .eq("is_enabled", true)
       .order("is_featured", { ascending: false })
@@ -3961,6 +3962,17 @@ async function loadSupabaseCourses({ rerender = false } = {}) {
       .order("starts_at", { ascending: true, nullsFirst: false });
     if (error) throw error;
     supabaseCourses = data || [];
+    const coverIds = [...new Set(supabaseCourses.map((course) => course.cover_image_id).filter(Boolean))];
+    if (coverIds.length) {
+      const { data: coverRows, error: coverError } = await supabase
+        .from("media")
+        .select("id, public_url, alt_text, file_name, image_usage, focal_point")
+        .in("id", coverIds);
+      if (coverError) throw coverError;
+      courseCoverById = new Map((coverRows || []).map((cover) => [cover.id, cover]));
+    } else {
+      courseCoverById = new Map();
+    }
     coursesLoadedFromSupabase = true;
     coursesLoadFailed = false;
     if (rerender && location.hash.slice(1).split("?")[0] === "courses") {
@@ -3971,6 +3983,7 @@ async function loadSupabaseCourses({ rerender = false } = {}) {
     console.warn("Supabase courses unavailable.", error);
     coursesLoadedFromSupabase = false;
     coursesLoadFailed = true;
+    courseCoverById = new Map();
     return [];
   } finally {
     coursesLoadPromise = null;

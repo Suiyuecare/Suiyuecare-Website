@@ -939,6 +939,32 @@ input {
   font-weight: 900;
 }
 
+.admin-table-media-cell {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.admin-table-media-cell img,
+.admin-table-media-cell > span {
+  width: 64px;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  border: 1px solid rgba(234, 211, 179, 0.72);
+  background: var(--admin-soft);
+  object-fit: cover;
+}
+
+.admin-table-media-cell > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--admin-orange-dark);
+  font-size: 14px;
+  font-weight: 1000;
+}
+
 .admin-state-badge {
   display: inline-flex;
   align-items: center;

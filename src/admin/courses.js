@@ -33,6 +33,7 @@ const courseCountTargets = {
 let courses = [];
 let courseSignups = [];
 let selectedCourseSignup = null;
+let courseCoverById = new Map();
 
 const signupStatusLabels = {
   new: "未處理",
@@ -105,7 +106,7 @@ function getSignupMeta(item = {}) {
 }
 
 function getCover(course) {
-  return course.cover_image || course.media || null;
+  return courseCoverById.get(course.cover_image_id) || course.cover_image || course.media || null;
 }
 
 function renderCoverPreview(course = null) {
@@ -137,9 +138,16 @@ function renderCourses() {
     return;
   }
 
-  tableBody.innerHTML = courses.map((course) => `
+  tableBody.innerHTML = courses.map((course) => {
+    const cover = getCover(course);
+    return `
     <tr>
-      <td><strong>${escapeHTML(course.title)}</strong><small>${escapeHTML(course.excerpt || course.slug)}</small></td>
+      <td>
+        <div class="admin-table-media-cell">
+          ${cover?.public_url ? `<img src="${escapeHTML(cover.public_url)}" alt="${escapeHTML(cover.alt_text || course.title || "課程封面")}" />` : `<span aria-hidden="true">CS</span>`}
+          <div><strong>${escapeHTML(course.title)}</strong><small>${escapeHTML(course.excerpt || course.slug)}</small></div>
+        </div>
+      </td>
       <td><time>${course.starts_at ? formatUpdatedAt(course.starts_at) : "未設定"}</time></td>
       <td>${escapeHTML(course.course_type || "-")}</td>
       <td>${renderStatusBadge(course.status)}</td>
@@ -151,7 +159,8 @@ function renderCourses() {
         </div>
       </td>
     </tr>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function renderSignupCounts() {
@@ -291,18 +300,30 @@ async function loadCourses() {
   try {
     const { data, error } = await supabase
       .from("courses")
-      .select("*, cover_image:media!courses_cover_image_id_fkey(id, public_url, alt_text, file_name)")
+      .select("*")
       .order("is_featured", { ascending: false })
       .order("sort_order", { ascending: true })
       .order("starts_at", { ascending: true, nullsFirst: false });
     if (error) throw error;
     courses = data || [];
+    const coverIds = [...new Set(courses.map((course) => course.cover_image_id).filter(Boolean))];
+    if (coverIds.length) {
+      const { data: coverRows, error: coverError } = await supabase
+        .from("media")
+        .select("id, public_url, alt_text, file_name, image_usage, focal_point")
+        .in("id", coverIds);
+      if (coverError) throw coverError;
+      courseCoverById = new Map((coverRows || []).map((cover) => [cover.id, cover]));
+    } else {
+      courseCoverById = new Map();
+    }
     renderCourses();
     setStatus("", "success");
   } catch (error) {
     console.error("Failed to load courses", error);
     setStatus(`讀取課程失敗：${error.message}`, "error");
     courses = [];
+    courseCoverById = new Map();
     renderCourses();
   } finally {
     refreshButton?.removeAttribute("disabled");
