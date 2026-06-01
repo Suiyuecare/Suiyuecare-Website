@@ -207,7 +207,7 @@ export async function prepareImageForUpload(file, imageUsage = "card") {
 
   const image = await readImage(file);
   const currentRatio = image.naturalWidth / image.naturalHeight;
-  if (Math.abs(currentRatio - ratio) / ratio < 0.035) return file;
+  const ratioIsAlreadySafe = Math.abs(currentRatio - ratio) / ratio < 0.035;
 
   return new Promise((resolve) => {
     const modal = createCropModal();
@@ -232,10 +232,12 @@ export async function prepareImageForUpload(file, imageUsage = "card") {
     let originX = 0;
     let originY = 0;
     let settled = false;
+    let previewFrameRequest = 0;
 
     function cleanup(result) {
       if (settled) return;
       settled = true;
+      if (previewFrameRequest) cancelAnimationFrame(previewFrameRequest);
       URL.revokeObjectURL(objectUrl);
       modal.hidden = true;
       document.body.classList.remove("modal-open");
@@ -256,23 +258,65 @@ export async function prepareImageForUpload(file, imageUsage = "card") {
       updateDevicePreviews();
     }
 
-    function getCropCenterPosition() {
+    function getCropSourceRect() {
       const rect = frame.getBoundingClientRect();
       const scale = baseScale * zoom;
       const sx = clamp(-x / scale, 0, image.naturalWidth);
       const sy = clamp(-y / scale, 0, image.naturalHeight);
       const sw = clamp(rect.width / scale, 1, image.naturalWidth - sx);
       const sh = clamp(rect.height / scale, 1, image.naturalHeight - sy);
-      const centerX = clamp(((sx + sw / 2) / image.naturalWidth) * 100, 0, 100);
-      const centerY = clamp(((sy + sh / 2) / image.naturalHeight) * 100, 0, 100);
-      return { centerX, centerY };
+      return { sx, sy, sw, sh };
+    }
+
+    function drawBaseCrop() {
+      const { sx, sy, sw, sh } = getCropSourceRect();
+      const canvas = document.createElement("canvas");
+      canvas.width = outputSize.width;
+      canvas.height = outputSize.height;
+      const context = canvas.getContext("2d");
+      context.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+      return canvas;
+    }
+
+    function drawDevicePreview(baseCanvas, previewRatio) {
+      const baseRatio = baseCanvas.width / baseCanvas.height;
+      const canvas = document.createElement("canvas");
+      canvas.width = 420;
+      canvas.height = Math.round(canvas.width / previewRatio);
+      const context = canvas.getContext("2d");
+      let sx = 0;
+      let sy = 0;
+      let sw = baseCanvas.width;
+      let sh = baseCanvas.height;
+
+      if (baseRatio > previewRatio) {
+        sw = baseCanvas.height * previewRatio;
+        sx = (baseCanvas.width - sw) / 2;
+      } else if (baseRatio < previewRatio) {
+        sh = baseCanvas.width / previewRatio;
+        sy = (baseCanvas.height - sh) / 2;
+      }
+
+      context.drawImage(baseCanvas, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL("image/jpeg", 0.78);
+    }
+
+    function parseRatio(ratioText = "4 / 3") {
+      const [width, height] = ratioText.split("/").map((part) => Number(part.trim()));
+      return width && height ? width / height : ratio;
     }
 
     function updateDevicePreviews() {
       if (!deviceGrid) return;
-      const { centerX, centerY } = getCropCenterPosition();
-      deviceGrid.querySelectorAll("[data-device-preview-image]").forEach((previewImage) => {
-        previewImage.style.objectPosition = `${centerX}% ${centerY}%`;
+      if (previewFrameRequest) cancelAnimationFrame(previewFrameRequest);
+      previewFrameRequest = requestAnimationFrame(() => {
+        const baseCanvas = drawBaseCrop();
+        deviceGrid.querySelectorAll("[data-device-preview-image]").forEach((previewImage) => {
+          const previewRatio = parseRatio(previewImage.dataset.previewRatio);
+          previewImage.src = drawDevicePreview(baseCanvas, previewRatio);
+          previewImage.style.objectPosition = "center center";
+        });
+        previewFrameRequest = 0;
       });
     }
 
@@ -288,28 +332,22 @@ export async function prepareImageForUpload(file, imageUsage = "card") {
     }
 
     async function applyCrop() {
-      const rect = frame.getBoundingClientRect();
-      const scale = baseScale * zoom;
-      const sx = clamp(-x / scale, 0, image.naturalWidth);
-      const sy = clamp(-y / scale, 0, image.naturalHeight);
-      const sw = clamp(rect.width / scale, 1, image.naturalWidth - sx);
-      const sh = clamp(rect.height / scale, 1, image.naturalHeight - sy);
-      const canvas = document.createElement("canvas");
-      canvas.width = outputSize.width;
-      canvas.height = outputSize.height;
-      const context = canvas.getContext("2d");
-      context.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+      const canvas = drawBaseCrop();
       cleanup(await canvasToFile(canvas, file));
     }
 
-    title.textContent = `${usageOption?.label || "此版位"}建議比例：${usageOption?.ratio || ""}`;
-    copy.textContent = `目前圖片為 ${image.naturalWidth} × ${image.naturalHeight}，和版位比例不同。可拖曳圖片調整重點，或直接保留原圖。`;
-    hint.textContent = "拖曳圖片可調整裁切位置，右側滑桿可放大圖片。";
+    title.textContent = ratioIsAlreadySafe
+      ? `確認${usageOption?.label || "此版位"}圖片裁切：${usageOption?.ratio || ""}`
+      : `${usageOption?.label || "此版位"}建議比例：${usageOption?.ratio || ""}`;
+    copy.textContent = ratioIsAlreadySafe
+      ? `目前圖片為 ${image.naturalWidth} × ${image.naturalHeight}，比例已接近版位需求。仍可拖曳或放大微調重點，再確認桌機、平板、手機預覽。`
+      : `目前圖片為 ${image.naturalWidth} × ${image.naturalHeight}，和版位比例不同。請拖曳圖片調整重點，並確認三種裝置預覽。`;
+    hint.textContent = "左側是實際輸出的裁切範圍；右側是這張裁切後圖片放到網頁、平板、手機容器時的可視畫面。";
     deviceGrid.innerHTML = previewProfile.map((item) => `
       <figure class="admin-crop-device-card" data-device-preview="${item.key}">
         <span>${item.label}</span>
         <div style="aspect-ratio:${item.ratio}">
-          <img src="${objectUrl}" alt="${item.label}端預覽" data-device-preview-image />
+          <img src="${objectUrl}" alt="${item.label}端預覽" data-device-preview-image data-preview-ratio="${item.ratio}" />
         </div>
       </figure>
     `).join("");
