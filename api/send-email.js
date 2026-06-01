@@ -123,11 +123,11 @@ async function saveToSupabasePublicIntake(payload, emailSent, submitterEmailSent
     throw new Error("Server is missing SUPABASE_URL/VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY.");
   }
 
-  const response = await fetch(`${url}/rest/v1/form_submissions?select=id`, {
+  const response = await fetch(`${url}/rest/v1/form_submissions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Prefer: "return=representation",
+      Prefer: "return=minimal",
       apikey: supabaseKey,
       Authorization: `Bearer ${supabaseKey}`
     },
@@ -139,7 +139,7 @@ async function saveToSupabasePublicIntake(payload, emailSent, submitterEmailSent
     throw new Error(`Supabase public form backup failed: ${message}`);
   }
 
-  return response.json();
+  return null;
 }
 
 async function updateSubmissionEmailStatus(submissionId, emailSent) {
