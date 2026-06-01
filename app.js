@@ -2609,6 +2609,24 @@ function renderInvestorFaq(config = {}) {
   return `<div class="shareholder-faq">${faqs.map((item, index) => `<details ${index === 0 ? "open" : ""}><summary>${escapeHTML(item.question || "")}</summary><p>${escapeHTML(item.answer || "")}</p></details>`).join("")}</div>`;
 }
 
+async function fetchInvestorFileMap(items = []) {
+  const fileIds = [...new Set(items.map((item) => item?.file_id).filter(Boolean))];
+  if (!fileIds.length) return new Map();
+  const { data, error } = await supabase
+    .from("downloadable_files")
+    .select("id, title, description, public_url, file_type, category, status, is_enabled, is_public, published_at")
+    .in("id", fileIds);
+  if (error) throw error;
+  return new Map((data || []).map((file) => [file.id, file]));
+}
+
+function attachInvestorFiles(items = [], fileMap) {
+  return (items || []).map((item) => ({
+    ...item,
+    file: fileMap.get(item.file_id) || item.file || null
+  }));
+}
+
 async function fetchSupabaseInvestorData(pageSlug = "investors") {
   const cacheKey = pageSlug;
   if (supabaseInvestorCache.has(cacheKey)) return supabaseInvestorCache.get(cacheKey);
@@ -2618,7 +2636,7 @@ async function fetchSupabaseInvestorData(pageSlug = "investors") {
   const [{ data: notices, error: noticeError }, { data: financials, error: financialError }, { data: charts, error: chartError }, { data: files, error: fileError }] = await Promise.all([
     supabase
       .from("investor_notices")
-      .select("*, file:downloadable_files(id, title, public_url, file_type, category)")
+      .select("*")
       .eq("is_enabled", true)
       .eq("status", "published")
       .lte("published_at", now)
@@ -2626,7 +2644,7 @@ async function fetchSupabaseInvestorData(pageSlug = "investors") {
       .order("published_on", { ascending: false, nullsFirst: false }),
     supabase
       .from("investor_financial_items")
-      .select("*, file:downloadable_files(id, title, public_url, file_type, category)")
+      .select("*")
       .eq("is_enabled", true)
       .eq("status", "published")
       .lte("published_at", now)
@@ -2654,11 +2672,14 @@ async function fetchSupabaseInvestorData(pageSlug = "investors") {
   if (financialError) throw financialError;
   if (chartError) throw chartError;
   if (fileError) throw fileError;
+  const fileMap = await fetchInvestorFileMap([...(notices || []), ...(financials || [])]);
+  const noticesWithFiles = attachInvestorFiles(notices, fileMap);
+  const financialsWithFiles = attachInvestorFiles(financials, fileMap);
   const result = {
-    notices: notices || [],
-    noticesByType: groupByKey(notices || [], "notice_type"),
-    financials: financials || [],
-    financialsByType: groupByKey(financials || [], "item_type"),
+    notices: noticesWithFiles,
+    noticesByType: groupByKey(noticesWithFiles, "notice_type"),
+    financials: financialsWithFiles,
+    financialsByType: groupByKey(financialsWithFiles, "item_type"),
     charts: charts || [],
     chartsByKey: groupByKey(charts || [], "chart_key"),
     files: files || [],

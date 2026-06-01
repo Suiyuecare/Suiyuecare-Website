@@ -380,13 +380,13 @@ function publishedAt(status) {
 }
 
 function fileOptionLabel(file) {
-  return [file.title, file.file_type, file.category].filter(Boolean).join("｜");
+  const visibility = file.status === "published" && file.is_enabled ? "可公開" : "未公開/停用";
+  return [file.title, file.file_type, file.category, visibility].filter(Boolean).join("｜");
 }
 
 function renderFileSelectOptions(selectedId = "") {
   const rows = downloadableFiles.map((file) => {
-    const suffix = file.status === "published" && file.is_enabled ? "" : "（未發布/停用）";
-    return `<option value="${escapeHTML(file.id)}" ${file.id === selectedId ? "selected" : ""}>${escapeHTML(fileOptionLabel(file) + suffix)}</option>`;
+    return `<option value="${escapeHTML(file.id)}" ${file.id === selectedId ? "selected" : ""}>${escapeHTML(fileOptionLabel(file))}</option>`;
   });
   return [`<option value="">不綁定檔案</option>`].concat(rows).join("");
 }
@@ -397,9 +397,11 @@ function refreshFileSelects(selected = {}) {
 }
 
 function linkedFileLabel(fileId) {
-  if (!fileId) return "";
+  if (!fileId) return "未綁定下載檔";
   const file = downloadableFiles.find((item) => item.id === fileId);
-  return file ? `綁定檔案：${file.title}` : "綁定檔案：已選擇";
+  if (!file) return "綁定檔案：已選擇";
+  const visibility = file.status === "published" && file.is_enabled ? "可公開下載" : "未公開/停用";
+  return `綁定檔案：${file.title}（${file.file_type || "檔案"}｜${visibility}）`;
 }
 
 function resetNoticeForm() {
