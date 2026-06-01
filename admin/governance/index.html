@@ -62,51 +62,51 @@
         <section class="admin-workspace-panel">
           <div class="admin-workspace-head">
             <div><p class="admin-eyebrow">Publish Flow</p><h2>發布流程總覽</h2></div>
-            <span class="admin-soft-note">給內容同仁看的上線路徑：先存草稿，再送審，核准後才會出現在前台。</span>
+            <span class="admin-soft-note">請記住：儲存只是存到後台，核准發布後才會出現在官網。</span>
           </div>
           <div class="governance-flow-board">
             <article data-step="draft">
               <span>01</span>
-              <strong>編輯草稿</strong>
-              <p>在頁面或文章編輯器完成文案、圖片、SEO、分類與發布日期。</p>
+              <strong>先儲存草稿</strong>
+              <p>把文字、圖片、分類、SEO 填好後按「儲存」。這一步只是存到後台，前台還不會改變。</p>
               <a href="/admin/articles">去文章管理</a>
             </article>
             <article data-step="review">
               <span>02</span>
-              <strong>送審發布</strong>
-              <p>按下「送審發布」後，內容會進入待審佇列，前台暫時不會變動。</p>
+              <strong>按送審發布</strong>
+              <p>確認內容沒問題後按「送審發布」。送出後會排隊等主管或執行長看，前台仍維持舊版本。</p>
               <em id="pendingPublishCount">待審 0 筆</em>
             </article>
             <article data-step="approve">
               <span>03</span>
-              <strong>核准或退回</strong>
-              <p>有審核權限者檢查內容健康、圖片、SEO，再決定核准或退回修改。</p>
+              <strong>主管檢查</strong>
+              <p>主管或執行長會檢查圖片、錯字、連結、SEO 與前台顯示。可以核准，也可以退回請你修改。</p>
               <em id="reviewPermissionHint">正在確認權限</em>
             </article>
             <article data-step="live">
               <span>04</span>
-              <strong>正式上線</strong>
-              <p>核准後狀態會變成已發布，前台只讀取已啟用且已發布的內容。</p>
+              <strong>核准後上線</strong>
+              <p>核准後內容才會變成「已發布」。官網只會顯示「已發布」且「前台顯示」有打開的內容。</p>
               <a href="/" target="_blank" rel="noopener">查看前台</a>
             </article>
           </div>
           <div class="governance-flow-note">
-            <strong>上線檢查重點</strong>
-            <p>送審前建議先到「內容健康檢查」確認是否缺圖片、缺 alt、缺 SEO 或文章尚未發布。若只是儲存草稿，前台不會更新。</p>
+            <strong>送審前先看這裡</strong>
+            <p>如果你只是按「儲存」，前台不會更新。要更新官網，請依序完成：儲存草稿、送審發布、主管核准。送審前建議先跑內容健康檢查，確認沒有缺圖、缺 alt、缺 SEO、錯連結或空白區塊。</p>
             <a href="/admin/content-health">打開內容健康檢查</a>
           </div>
           <div class="governance-staff-guide">
             <article>
-              <strong>一般同仁</strong>
-              <p>可以儲存草稿、更新圖片與送審；送審後前台不會立刻改變，要等主管或執行長核准。</p>
+              <strong>一般同仁怎麼做</strong>
+              <p>你可以新增內容、換圖片、儲存草稿，也可以送審。送審後請到發布佇列看狀態，還沒核准前官網不會改。</p>
             </article>
             <article>
-              <strong>主管 / Admin</strong>
-              <p>負責檢查內容健康、SEO、圖片與分類是否正確，再核准或退回修改。</p>
+              <strong>主管怎麼做</strong>
+              <p>請看待審內容、確認前台頁面、圖片比例、連結、分類與 SEO。沒問題就核准，有問題就退回並寫清楚要改哪裡。</p>
             </article>
             <article>
-              <strong>執行長 / Owner</strong>
-              <p>最高權限可以直接發布，也可以調整權限、使用者、備份與還原。</p>
+              <strong>執行長怎麼做</strong>
+              <p>執行長帳號可以直接發布，也可以核准別人的送審、調整使用者權限、建立備份與還原資料。</p>
             </article>
           </div>
         </section>
@@ -116,7 +116,7 @@
         <section class="admin-workspace-panel">
           <div class="admin-workspace-head">
             <div><p class="admin-eyebrow">Publish Queue</p><h2>發布佇列</h2></div>
-            <span class="admin-soft-note">Pending 是待審，Approved 代表已核准上線，Rejected 代表退回修改。</span>
+            <span class="admin-soft-note">待審＝還沒上線；已核准＝官網會讀取；已退回＝請修改後重新送審。</span>
           </div>
           <div id="publishRequestsList" class="governance-request-list"></div>
         </section>

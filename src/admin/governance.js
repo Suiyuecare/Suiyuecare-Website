@@ -36,10 +36,10 @@ const requestStatusLabels = {
 };
 
 const requestStatusNotes = {
-  pending: "下一步：請具審核權限者檢查內容後核准或退回。",
-  approved: "已完成：內容已切換為已發布，前台可讀取。",
-  rejected: "需修改：請回到編輯頁修正後重新送審。",
-  cancelled: "已取消：此送審單不會影響前台。"
+  pending: "下一步：主管或執行長檢查後，會核准上線或退回修改。現在官網還不會更新。",
+  approved: "已完成：內容已核准發布，官網會讀取這個版本。",
+  rejected: "需修改：請回到編輯頁修正內容，再重新送審。",
+  cancelled: "已取消：這張送審單不會影響官網。"
 };
 
 function setStatus(message, type = "info") {
@@ -77,8 +77,8 @@ function renderPermissions() {
   `).join("");
   if (reviewPermissionHint) {
     reviewPermissionHint.textContent = permissions.can_review_publish
-      ? "你可以審核發布"
-      : "你可以送審，但不能核准";
+      ? "你可以核准或退回送審內容"
+      : "你可以送審，但不能核准；請等主管或執行長處理";
     reviewPermissionHint.dataset.state = permissions.can_review_publish ? "enabled" : "disabled";
   }
 }

@@ -244,7 +244,7 @@ export function applyPublishStatusUi(permissions = {}) {
     if (canPublish) {
       publishOption.disabled = false;
       statusSelect.dataset.publishLocked = "false";
-      ensurePublishHint(statusSelect, "執行長帳號可以直接發布。");
+      ensurePublishHint(statusSelect, "你是執行長/最高權限帳號，可以選「已發布」直接讓前台更新。");
       return;
     }
 
@@ -252,7 +252,7 @@ export function applyPublishStatusUi(permissions = {}) {
       publishOption.disabled = true;
     }
     statusSelect.dataset.publishLocked = "true";
-    ensurePublishHint(statusSelect, "此帳號需先儲存草稿，再使用「送審發布」；只有執行長可以直接發布。");
+    ensurePublishHint(statusSelect, "一般同仁不能直接選「已發布」。請先儲存草稿，再按「送審發布」，等主管或執行長核准。");
   });
 }
 
