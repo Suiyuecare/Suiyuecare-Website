@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabaseClient.js";
+import { supabase, supabaseStorageBuckets } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
 import { prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
@@ -28,6 +28,11 @@ const recruitingCountTargets = {
 
 let departments = [];
 let openings = [];
+let recruitingImageById = new Map();
+
+function getLinkedImage(item, idKey = "image_id", relationKey = "image") {
+  return recruitingImageById.get(item?.[idKey]) || item?.[relationKey] || null;
+}
 
 function setStatus(message, type = "info") {
   statusBox.hidden = !message;
@@ -76,7 +81,8 @@ async function uploadRecruitingImage(file, altText, imageUsage = "card") {
     altText,
     caption: altText,
     imageUsage,
-    focalPoint: "center"
+    focalPoint: "center",
+    bucket: supabaseStorageBuckets.jobImages
   });
 }
 
@@ -145,7 +151,7 @@ function fillPageForm(page) {
   pageForm.elements.primary_cta_url.value = page?.primary_cta_url || "#recruiting-openings";
   pageForm.elements.secondary_cta_text.value = page?.secondary_cta_text || "聯絡我們";
   pageForm.elements.secondary_cta_url.value = page?.secondary_cta_url || "#contact";
-  pageForm.elements.hero_image_url.value = page?.hero_image_url || page?.hero_image?.public_url || "";
+  pageForm.elements.hero_image_url.value = page?.hero_image_url || getLinkedImage(page, "hero_image_id", "hero_image")?.public_url || "";
   pageForm.elements.form_recipient_email.value = page?.form_recipient_email || "";
   pageForm.elements.sort_order.value = page?.sort_order || 0;
   pageForm.elements.status.value = page?.status || "draft";
@@ -180,14 +186,22 @@ function renderDataList() {
         <table class="admin-data-table">
           <thead><tr><th>名稱</th><th>狀態</th><th>更新</th><th>操作</th></tr></thead>
           <tbody>
-            ${departments.map((department) => `
+            ${departments.map((department) => {
+              const image = getLinkedImage(department);
+              return `
               <tr>
-                <td><strong>${escapeHTML(department.title)}</strong><small>${escapeHTML(department.department_slug)}</small></td>
+                <td>
+                  <div class="admin-table-media-cell">
+                    ${image?.public_url || department.image_url ? `<img src="${escapeHTML(image?.public_url || department.image_url)}" alt="${escapeHTML(department.title)}" />` : `<span aria-hidden="true">DP</span>`}
+                    <div><strong>${escapeHTML(department.title)}</strong><small>${escapeHTML(department.department_slug)}</small></div>
+                  </div>
+                </td>
                 <td>${escapeHTML(statusLabel(department.status))}${department.is_enabled ? "" : " / 停用"}</td>
                 <td>${formatUpdatedAt(department.updated_at)}</td>
                 <td><div class="admin-table-actions"><button type="button" data-edit-department="${escapeHTML(department.id)}">編輯</button><button type="button" data-delete-department="${escapeHTML(department.id)}">刪除</button></div></td>
               </tr>
-            `).join("")}
+            `;
+            }).join("")}
           </tbody>
         </table>
       </div>
@@ -200,9 +214,15 @@ function renderDataList() {
           <tbody>
             ${openings.map((opening) => {
               const department = departments.find((item) => item.id === opening.department_id);
+              const image = getLinkedImage(opening);
               return `
                 <tr>
-                  <td><strong>${escapeHTML(opening.title)}</strong><small>${escapeHTML(opening.opening_slug)}</small></td>
+                  <td>
+                    <div class="admin-table-media-cell">
+                      ${image?.public_url || opening.image_url ? `<img src="${escapeHTML(image?.public_url || opening.image_url)}" alt="${escapeHTML(opening.title)}" />` : `<span aria-hidden="true">RC</span>`}
+                      <div><strong>${escapeHTML(opening.title)}</strong><small>${escapeHTML(opening.opening_slug)}</small></div>
+                    </div>
+                  </td>
                   <td>${escapeHTML(department?.title || "-")}</td>
                   <td>${escapeHTML(statusLabel(opening.status))}${opening.is_enabled ? "" : " / 停用"}</td>
                   <td><div class="admin-table-actions"><button type="button" data-edit-opening="${escapeHTML(opening.id)}">編輯</button><button type="button" data-delete-opening="${escapeHTML(opening.id)}">刪除</button></div></td>
@@ -222,7 +242,7 @@ function fillDepartmentForm(department) {
   departmentForm.elements.department_slug.value = department.department_slug || "";
   departmentForm.elements.eyebrow.value = department.eyebrow || "";
   departmentForm.elements.description.value = department.description || "";
-  departmentForm.elements.image_url.value = department.image_url || department.image?.public_url || "";
+  departmentForm.elements.image_url.value = department.image_url || getLinkedImage(department)?.public_url || "";
   departmentForm.elements.highlights.value = formatListInput(department.highlights);
   clearFileInput(departmentForm.elements.image_file);
   departmentForm.elements.sort_order.value = department.sort_order || 0;
@@ -242,7 +262,7 @@ function fillOpeningForm(opening) {
   openingForm.elements.location.value = opening.location || "";
   openingForm.elements.salary_text.value = opening.salary_text || "";
   openingForm.elements.capacity_label.value = opening.capacity_label || "";
-  openingForm.elements.image_url.value = opening.image_url || opening.image?.public_url || "";
+  openingForm.elements.image_url.value = opening.image_url || getLinkedImage(opening)?.public_url || "";
   openingForm.elements.duties.value = formatListInput(opening.duties);
   openingForm.elements.requirements.value = formatListInput(opening.requirements);
   openingForm.elements.benefits.value = formatListInput(opening.benefits);
@@ -263,17 +283,17 @@ async function loadRecruitingData() {
     const [{ data: pageData, error: pageError }, { data: departmentData, error: departmentError }, { data: openingData, error: openingError }] = await Promise.all([
       supabase
         .from("recruiting_pages")
-        .select("*, hero_image:media!recruiting_pages_hero_image_id_fkey(id, public_url, alt_text, file_name)")
+        .select("*")
         .eq("page_slug", pageSlug)
         .maybeSingle(),
       supabase
         .from("recruiting_departments")
-        .select("*, image:media!recruiting_departments_image_id_fkey(id, public_url, alt_text, file_name)")
+        .select("*")
         .eq("page_slug", pageSlug)
         .order("sort_order", { ascending: true }),
       supabase
         .from("recruiting_openings")
-        .select("*, image:media!recruiting_openings_image_id_fkey(id, public_url, alt_text, file_name)")
+        .select("*")
         .eq("page_slug", pageSlug)
         .order("is_featured", { ascending: false })
         .order("sort_order", { ascending: true })
@@ -281,9 +301,24 @@ async function loadRecruitingData() {
     if (pageError) throw pageError;
     if (departmentError) throw departmentError;
     if (openingError) throw openingError;
-    fillPageForm(pageData);
     departments = departmentData || [];
     openings = openingData || [];
+    const imageIds = [
+      pageData?.hero_image_id,
+      ...departments.map((department) => department.image_id),
+      ...openings.map((opening) => opening.image_id)
+    ].filter(Boolean);
+    if (imageIds.length) {
+      const { data: imageRows, error: imageError } = await supabase
+        .from("media")
+        .select("id, public_url, alt_text, file_name, image_usage, focal_point")
+        .in("id", [...new Set(imageIds)]);
+      if (imageError) throw imageError;
+      recruitingImageById = new Map((imageRows || []).map((image) => [image.id, image]));
+    } else {
+      recruitingImageById = new Map();
+    }
+    fillPageForm(pageData);
     renderDepartmentOptions();
     renderDataList();
     resetDepartmentForm();
@@ -293,6 +328,7 @@ async function loadRecruitingData() {
     console.error("Failed to load recruiting data", error);
     departments = [];
     openings = [];
+    recruitingImageById = new Map();
     renderDepartmentOptions();
     renderDataList();
     setStatus(`讀取招募資料失敗：${error.message}`, "error");

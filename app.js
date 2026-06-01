@@ -2118,6 +2118,26 @@ async function loadSupabaseServiceTemplatePage(slug) {
 const recruitingTemplateSlugs = new Set(["talent", "land", "investor-recruiting"]);
 const supabaseRecruitingPageCache = new Map();
 
+async function fetchRecruitingMediaMap(items = []) {
+  const imageIds = [...new Set(items.flatMap((item) => [item?.hero_image_id, item?.image_id]).filter(Boolean))];
+  if (!imageIds.length) return new Map();
+  const { data, error } = await supabase
+    .from("media")
+    .select("id, public_url, alt_text, file_name, image_usage, focal_point")
+    .in("id", imageIds);
+  if (error) throw error;
+  return new Map((data || []).map((image) => [image.id, image]));
+}
+
+function attachRecruitingImage(item, mediaMap) {
+  if (!item) return item;
+  return {
+    ...item,
+    hero_image: mediaMap.get(item.hero_image_id) || item.hero_image || null,
+    image: mediaMap.get(item.image_id) || item.image || null
+  };
+}
+
 function getRecruitingImage(item, fallback = "assets/homepage-batch/04-admin-team-office.png") {
   const url = item?.image?.public_url || item?.hero_image?.public_url || item?.image_url || item?.hero_image_url || fallback;
   return normalizeRecruitingAssetUrl(url);
@@ -2344,7 +2364,7 @@ async function fetchSupabaseRecruitingPage(slug) {
   if (supabaseRecruitingPageCache.has(slug)) return supabaseRecruitingPageCache.get(slug);
   const pageQuery = supabase
     .from("recruiting_pages")
-    .select("*, hero_image:media!recruiting_pages_hero_image_id_fkey(id, public_url, alt_text, file_name)")
+    .select("*")
     .eq("page_slug", slug)
     .eq("is_enabled", true)
     .eq("status", "published")
@@ -2353,7 +2373,7 @@ async function fetchSupabaseRecruitingPage(slug) {
 
   const departmentsQuery = supabase
     .from("recruiting_departments")
-    .select("*, image:media!recruiting_departments_image_id_fkey(id, public_url, alt_text, file_name)")
+    .select("*")
     .eq("page_slug", slug)
     .eq("is_enabled", true)
     .eq("status", "published")
@@ -2362,7 +2382,7 @@ async function fetchSupabaseRecruitingPage(slug) {
 
   const openingsQuery = supabase
     .from("recruiting_openings")
-    .select("*, image:media!recruiting_openings_image_id_fkey(id, public_url, alt_text, file_name)")
+    .select("*")
     .eq("page_slug", slug)
     .eq("is_enabled", true)
     .eq("status", "published")
@@ -2380,7 +2400,12 @@ async function fetchSupabaseRecruitingPage(slug) {
   if (openingsError) throw openingsError;
   if (!page) return null;
 
-  const result = { page, departments: departments || [], openings: openings || [] };
+  const mediaMap = await fetchRecruitingMediaMap([page, ...(departments || []), ...(openings || [])]);
+  const result = {
+    page: attachRecruitingImage(page, mediaMap),
+    departments: (departments || []).map((department) => attachRecruitingImage(department, mediaMap)),
+    openings: (openings || []).map((opening) => attachRecruitingImage(opening, mediaMap))
+  };
   supabaseRecruitingPageCache.set(slug, result);
   return result;
 }
