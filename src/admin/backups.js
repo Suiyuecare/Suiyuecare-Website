@@ -18,26 +18,77 @@ const historyBody = document.querySelector("#backupHistoryBody");
 const restoreFileInput = document.querySelector("#restoreFileInput");
 const restorePreview = document.querySelector("#restorePreview");
 const restoreConfirmCheck = document.querySelector("#restoreConfirmCheck");
+const restoreSafetyBackupCheck = document.querySelector("#restoreSafetyBackupCheck");
 const restoreBackupButton = document.querySelector("#restoreBackupButton");
 const launchReadinessSummary = document.querySelector("#launchReadinessSummary");
 const launchChecklist = document.querySelector("#launchChecklist");
 
-const backupTables = [
-  ["media", "圖片資料"],
-  ["pages", "頁面"],
-  ["page_sections", "頁面區塊"],
-  ["article_categories", "文章分類"],
-  ["articles", "文章"],
-  ["courses", "課程"],
-  ["care_stories", "真實照顧情境"],
-  ["expert_talks", "名人講堂"],
-  ["recruiting_pages", "招募頁"],
-  ["recruiting_departments", "招募部門"],
-  ["recruiting_openings", "招募職缺/合作卡"],
-  ["investor_notices", "投資人公告"],
-  ["investor_financial_items", "投資人財務資料"],
-  ["investor_chart_datasets", "投資人圖表資料"]
+const backupTableGroups = [
+  {
+    title: "全站與頁面",
+    tables: [
+      ["media", "圖片資料"],
+      ["site_settings", "全站設定"],
+      ["pages", "頁面"],
+      ["page_sections", "頁面區塊"],
+      ["content_modules", "首頁/固定模組"],
+      ["page_template_fields", "模板欄位"]
+    ]
+  },
+  {
+    title: "文章與課程",
+    tables: [
+      ["article_categories", "文章分類"],
+      ["articles", "文章"],
+      ["courses", "課程"],
+      ["downloadable_files", "下載檔案"],
+      ["care_stories", "真實照顧情境"],
+      ["expert_talks", "名人講堂"]
+    ]
+  },
+  {
+    title: "招募與投資人",
+    tables: [
+      ["recruiting_pages", "招募頁"],
+      ["recruiting_departments", "招募部門"],
+      ["recruiting_openings", "招募職缺/合作卡"],
+      ["investor_notices", "投資人公告"],
+      ["investor_financial_items", "投資人財務資料"],
+      ["investor_chart_datasets", "投資人圖表資料"]
+    ]
+  },
+  {
+    title: "後台輔助設定",
+    tables: [
+      ["content_templates", "內容模板"],
+      ["analytics_report_schedules", "報表寄送設定"]
+    ]
+  }
 ];
+
+const backupTables = backupTableGroups.flatMap((group) => group.tables);
+const sortableTables = new Set([
+  "site_settings",
+  "pages",
+  "page_sections",
+  "article_categories",
+  "articles",
+  "courses",
+  "downloadable_files",
+  "care_stories",
+  "expert_talks",
+  "content_modules",
+  "page_template_fields",
+  "recruiting_pages",
+  "recruiting_departments",
+  "recruiting_openings",
+  "investor_notices",
+  "investor_financial_items",
+  "investor_chart_datasets",
+  "content_templates"
+]);
+const optionalBackupTables = new Set(["site_settings", "content_modules", "page_template_fields", "downloadable_files", "content_templates", "analytics_report_schedules"]);
+const excludedBackupTables = ["form_submissions", "analytics_page_views", "analytics_events", "analytics_alerts", "analytics_health_checks", "profiles", "admins", "backup_manifests"];
 
 let selectedBackup = null;
 let history = [];
@@ -99,18 +150,18 @@ async function verifyBackupChecksum(backup) {
 }
 
 function renderTableSummary(counts = {}) {
-  backupTableSummary.innerHTML = backupTables.map(([table, label]) => `
+  backupTableSummary.innerHTML = backupTableGroups.flatMap((group) => group.tables.map(([table, label]) => `
     <article>
       <span>${escapeHTML(label)}</span>
       <strong>${Number.isFinite(counts[table]) ? counts[table] : "--"}</strong>
-      <small>${escapeHTML(table)}</small>
+      <small>${escapeHTML(group.title)} · ${escapeHTML(table)}</small>
     </article>
-  `).join("");
+  `)).join("");
 }
 
 async function fetchTableRows(table) {
   let query = supabase.from(table).select("*");
-  if (["pages", "article_categories", "courses", "downloadable_files", "content_modules", "page_template_fields", "recruiting_pages", "recruiting_departments", "recruiting_openings", "investor_notices", "investor_financial_items", "investor_chart_datasets"].includes(table)) {
+  if (sortableTables.has(table)) {
     query = query.order("sort_order", { ascending: true });
   }
   const { data, error } = await query;
@@ -138,6 +189,11 @@ async function createBackup(backupType = "manual") {
       created_at: new Date().toISOString(),
       backup_type: backupType,
       notes: notesInput?.value.trim() || (backupType === "pre_deploy" ? "正式上線前備份" : null),
+      excluded_tables: excludedBackupTables,
+      table_groups: backupTableGroups.map((group) => ({
+        title: group.title,
+        tables: group.tables.map(([table]) => table)
+      })),
       tables
     };
     const json = backupPayloadForChecksum(backup);
@@ -154,7 +210,8 @@ async function createBackup(backupType = "manual") {
       metadata: {
         file_name: fileName,
         row_counts: rowCounts,
-        format_version: backup.format_version
+        format_version: backup.format_version,
+        excluded_tables: excludedBackupTables
       }
     });
     if (error) throw error;
@@ -180,7 +237,7 @@ function summarizeBackup(backup) {
   }, {});
 }
 
-async function renderRestorePreview(backup) {
+async function renderRestorePreview(backup, missingTables = []) {
   const counts = summarizeBackup(backup);
   const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
   const checksum = await verifyBackupChecksum(backup);
@@ -188,6 +245,7 @@ async function renderRestorePreview(backup) {
     <strong>${escapeHTML(backup.app || "未知備份")} · ${escapeHTML(backup.created_at || "沒有時間")}</strong>
     <span>共 ${total} 筆 CMS 資料。Checksum：${escapeHTML(backup.checksum || "未提供")}</span>
     <span data-status="${checksum.ok ? "success" : "error"}">${escapeHTML(checksum.message)}</span>
+    ${missingTables.length ? `<span data-status="warning">此備份檔缺少新版資料表：${missingTables.map((table) => escapeHTML(table)).join("、")}。還原時會以空表略過，不會刪除現有資料。</span>` : ""}
     <div class="backup-restore-counts">
       ${backupTables.map(([table, label]) => `<em>${escapeHTML(label)} <b>${counts[table]}</b></em>`).join("")}
     </div>
@@ -195,27 +253,34 @@ async function renderRestorePreview(backup) {
   if (!checksum.ok) throw new Error(checksum.message);
 }
 
-function validateBackup(backup) {
+function normalizeBackupTables(backup) {
   if (!backup || backup.app !== "suiyuecare-cms") throw new Error("這不是歲悅 CMS 備份檔。");
   if (backup.format_version !== 1) throw new Error("備份檔版本不支援，請使用新版後台重新建立備份。");
   if (!backup.tables || typeof backup.tables !== "object") throw new Error("備份檔缺少 tables 區塊。");
+  const missingTables = [];
   backupTables.forEach(([table]) => {
-    if (!Array.isArray(backup.tables[table])) throw new Error(`備份檔缺少 ${table} 資料。`);
+    if (Array.isArray(backup.tables[table])) return;
+    if (!optionalBackupTables.has(table)) throw new Error(`備份檔缺少必要資料表：${table}。`);
+    missingTables.push(table);
   });
+  return missingTables;
 }
 
 async function handleRestoreFile() {
   selectedBackup = null;
   restoreBackupButton.disabled = true;
   restoreConfirmCheck.checked = false;
+  if (restoreSafetyBackupCheck) restoreSafetyBackupCheck.checked = false;
   const file = restoreFileInput.files?.[0];
   if (!file) return;
   try {
     const text = await file.text();
     const parsed = JSON.parse(text);
-    validateBackup(parsed);
-    await renderRestorePreview(parsed);
+    const missingTables = normalizeBackupTables(parsed);
+    Object.defineProperty(parsed, "__missingTables", { value: missingTables, enumerable: false });
+    await renderRestorePreview(parsed, missingTables);
     selectedBackup = parsed;
+    updateRestoreButtonState();
     setStatus("備份檔已讀取，請確認預覽後勾選安全還原確認。", "info");
   } catch (error) {
     console.error("Failed to read backup file", error);
@@ -237,6 +302,10 @@ async function restoreBackup() {
   }
   if (!restoreConfirmCheck.checked) {
     setStatus("請先勾選安全還原確認。", "error");
+    return;
+  }
+  if (!restoreSafetyBackupCheck?.checked) {
+    setStatus("請先確認已建立目前狀態備份，避免還原後無法回到現在版本。", "error");
     return;
   }
   if (!window.confirm("確定要執行安全還原嗎？相同 ID 的 CMS 資料會被備份檔覆寫，但不會刪除現有資料。")) return;
@@ -268,7 +337,8 @@ async function restoreBackup() {
         restored_at: new Date().toISOString(),
         source_created_at: selectedBackup.created_at,
         row_counts: restoredCounts,
-        restore_mode: "safe_merge"
+        restore_mode: "safe_merge",
+        missing_tables: selectedBackup.__missingTables || []
       }
     });
     if (error) throw error;
@@ -418,9 +488,12 @@ async function loadLaunchReadiness() {
   }
 }
 
-restoreConfirmCheck?.addEventListener("change", () => {
-  restoreBackupButton.disabled = !selectedBackup || !restoreConfirmCheck.checked;
-});
+function updateRestoreButtonState() {
+  restoreBackupButton.disabled = !selectedBackup || !restoreConfirmCheck?.checked || !restoreSafetyBackupCheck?.checked;
+}
+
+restoreConfirmCheck?.addEventListener("change", updateRestoreButtonState);
+restoreSafetyBackupCheck?.addEventListener("change", updateRestoreButtonState);
 restoreFileInput?.addEventListener("change", handleRestoreFile);
 restoreBackupButton?.addEventListener("click", restoreBackup);
 createBackupButton?.addEventListener("click", () => createBackup("manual"));

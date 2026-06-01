@@ -540,25 +540,52 @@ Vercel Cron 已設定日報、週報、月報，以及每 30 分鐘網站健康�
 
 ### 備份與還原
 
-備份 CMS 主要資料表：
+備份 CMS 主要內容資料表：
 
 ```bash
 SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run backup:supabase
 ```
 
-還原：
+預覽還原內容，不寫入資料庫：
+
+```bash
+SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run restore:supabase -- --dry-run backups/your-backup.json
+```
+
+安全合併還原：
 
 ```bash
 SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run restore:supabase -- backups/your-backup.json
 ```
 
+還原採用 safe merge：相同 `id` 的 CMS 內容會被備份檔覆寫，但備份檔沒有的現有資料不會被刪除。正式還原前，請先建立一份「目前狀態」備份。
+
 備份內容包含：
 
+- `media`
+- `site_settings`
 - `pages`
 - `page_sections`
-- `media`
+- `content_modules`
+- `page_template_fields`
 - `article_categories`
 - `articles`
-- `form_submissions`
+- `courses`
+- `downloadable_files`
+- `care_stories`
+- `expert_talks`
+- `recruiting_pages`
+- `recruiting_departments`
+- `recruiting_openings`
+- `investor_notices`
+- `investor_financial_items`
+- `investor_chart_datasets`
 - `content_templates`
 - `analytics_report_schedules`
+
+備份內容不包含：
+
+- `form_submissions`：含個資與表單處理資料，請用表單資料管理與 Supabase 專案備份處理。
+- `analytics_page_views`、`analytics_events`、`analytics_alerts`、`analytics_health_checks`：流量與監控流水資料量大，日常內容備份不匯出。
+- `profiles`、`admins`：登入帳號與權限資料不放入可下載 JSON。
+- `backup_manifests`：備份紀錄本身不備份自己。

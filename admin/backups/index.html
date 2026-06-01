@@ -80,7 +80,17 @@
               <div><p class="admin-eyebrow">Step 01</p><h2>建立正式備份</h2></div>
               <button type="button" id="createBackupButton">產生並下載備份</button>
             </div>
-            <p class="admin-soft-note">備份會包含頁面、圖片資料、文章分類、課程、招募、投資人資料與文章管理。表單個資不會放進備份檔。</p>
+            <div class="admin-cms-guidance-grid">
+              <article>
+                <strong>會備份</strong>
+                <p>前台頁面、頁面區塊、首頁模組、圖片資料、文章與分類、課程、招募、投資人資料、下載檔案、報表寄送設定。</p>
+              </article>
+              <article>
+                <strong>不備份</strong>
+                <p>表單個資、流量明細、網站錯誤紀錄、使用者登入資料與備份紀錄本身，避免把敏感或大量流水資料放進 JSON。</p>
+              </article>
+            </div>
+            <p class="admin-soft-note">這裡是「內容備份」，適合上線前、批次匯入前、重要頁面大改版前使用。正式資料庫全量災難復原仍應搭配 Supabase 專案層級備份。</p>
             <label class="admin-field-wide"><span>備份備註</span><textarea id="backupNotes" rows="4" placeholder="例：上線前備份、修改首頁前備份、投資人資料批次更新前備份"></textarea></label>
             <div id="backupTableSummary" class="backup-table-summary"></div>
           </article>
@@ -95,8 +105,9 @@
               <strong>尚未選擇備份檔</strong>
               <span>選擇檔案後會先列出版本、建立時間、資料表與筆數，不會立刻寫入資料庫。</span>
             </div>
+            <label class="admin-toggle-field"><input id="restoreSafetyBackupCheck" type="checkbox" /><span>我已先建立「目前狀態」備份，保留還原前版本。</span></label>
             <label class="admin-toggle-field"><input id="restoreConfirmCheck" type="checkbox" /><span>我理解還原會用備份檔覆寫相同 ID 的 CMS 內容，但不會刪除現有資料。</span></label>
-            <p class="admin-soft-note">還原前系統會驗證備份檔格式與 checksum。還原完成後，請重新跑內容健康檢查並人工確認首頁、Health 3.0、課程、服務頁與投資人專區。</p>
+            <p class="admin-soft-note">安全還原是「合併覆寫」，不是完整回滾；備份檔沒有的資料不會被刪除。還原完成後，請重新跑內容健康檢查並人工確認首頁、Health 3.0、課程、服務頁與投資人專區。</p>
           </article>
         </section>
 
