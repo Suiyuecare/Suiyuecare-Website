@@ -14,7 +14,6 @@ export default defineConfig({
         adminCourses: "admin/courses/index.html",
         adminRecruiting: "admin/recruiting/index.html",
         adminInvestorData: "admin/investor-data/index.html",
-        adminApm: "admin/apm/index.html",
         adminStories: "admin/stories/index.html",
         adminCategories: "admin/categories/index.html",
         adminArticles: "admin/articles/index.html",

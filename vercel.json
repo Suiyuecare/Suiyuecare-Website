@@ -23,30 +23,6 @@
       ]
     }
   ],
-  "redirects": [
-    {
-      "source": "/admin/apm",
-      "has": [
-        {
-          "type": "host",
-          "value": "login.suiyuecare.com"
-        }
-      ],
-      "destination": "https://apm.suiyuecare.com/",
-      "permanent": false
-    },
-    {
-      "source": "/admin/apm/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "login.suiyuecare.com"
-        }
-      ],
-      "destination": "https://apm.suiyuecare.com/",
-      "permanent": false
-    }
-  ],
   "rewrites": [
     {
       "source": "/",

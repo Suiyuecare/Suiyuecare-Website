@@ -380,9 +380,26 @@ const moduleIcons = {
 };
 
 const moduleLaunchUrls = {
-  accounting: "/admin/investor-data/",
-  "agile-projects": "/admin/apm/"
+  accounting: "https://finance.suiyuecare.com/",
+  "agile-projects": "https://apm.suiyuecare.com/"
 };
+
+const connectedModuleIds = new Set(Object.keys(moduleLaunchUrls));
+const sharedGeneralAffairsModules = new Set(["edoc", "pdf-editor"]);
+const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions", "organization-chart", "employee-accounts"]);
+const generalAffairsManagers = new Set(["ceo", "admin-director"]);
+
+function buildModuleLaunchUrl(moduleId, profile) {
+  const launchUrl = moduleLaunchUrls[moduleId];
+  if (!launchUrl) return null;
+
+  const url = new URL(launchUrl);
+  url.searchParams.set("portal", "1");
+  url.searchParams.set("email", profile.email);
+  url.searchParams.set("role", profile.label);
+  url.searchParams.set("scope", profile.scope);
+  return url.toString();
+}
 
 const employeeAccountRows = [
   [1, "崇業聯合會計師事務所", "未設定", "外部檢核單位", "外部檢核單位", "未設定", "未設定", "臺北市、新北市、桃園市", "未設定", "指定範圍", "外部待設定"],
@@ -1982,18 +1999,47 @@ async function applyGoogleSession() {
 }
 
 function moduleIsAllowed(module, profile) {
+  const profileRoleId = profile.sourceProfileId || profile.id;
+  if (module.id === "general-affairs") return true;
+  if (sharedGeneralAffairsModules.has(module.id)) return true;
+  if (restrictedGeneralAffairsModules.has(module.id)) return generalAffairsManagers.has(profileRoleId);
   return profile.modules.includes(module.id);
 }
 
-function getVisibleModules(profile) {
-  return modules
-    .map((module) => {
-      if (!module.children) return moduleIsAllowed(module, profile) ? module : null;
-      const children = module.children.filter((child) => moduleIsAllowed(child, profile));
-      if (!moduleIsAllowed(module, profile) && children.length === 0) return null;
-      return { ...module, children };
-    })
-    .filter(Boolean);
+function getModuleAccessState(module, profile) {
+  const hasChildren = Array.isArray(module.children) && module.children.length > 0;
+  const allowed = moduleIsAllowed(module, profile);
+  const hasAllowedChild = hasChildren && module.children.some((child) => moduleIsAllowed(child, profile));
+
+  if (!allowed && !hasAllowedChild) {
+    return {
+      allowed: false,
+      actionText: "此帳號無權限",
+      status: "denied"
+    };
+  }
+
+  if (hasChildren) {
+    return {
+      allowed: true,
+      actionText: "查看",
+      status: "folder"
+    };
+  }
+
+  if (connectedModuleIds.has(module.id)) {
+    return {
+      allowed: true,
+      actionText: "開啟",
+      status: "ready"
+    };
+  }
+
+  return {
+    allowed: true,
+    actionText: "努力製作中",
+    status: "building"
+  };
 }
 
 function renderSession(profile) {
@@ -2142,7 +2188,11 @@ function createModuleButton(module, profile) {
   const rule = moduleOrgRules[module.id];
   const owner = rule ? getOrgNode(rule.owner) : null;
   const scopeText = scopeLabels[rule?.scope || profile.scope] || rule?.scope || profile.scope;
-  const actionText = hasChildren ? "查看" : "開啟";
+  const accessState = getModuleAccessState(module, profile);
+  button.dataset.accessStatus = accessState.status;
+  if (!accessState.allowed) {
+    button.setAttribute("aria-disabled", "true");
+  }
   button.innerHTML = `
     <span class="module-number">${moduleIcons[module.id] || module.number}</span>
     <span class="module-card-main">
@@ -2151,20 +2201,32 @@ function createModuleButton(module, profile) {
     </span>
     <span class="module-card-footer">
       <span>${getOwnerDisplayName(owner)}｜${scopeText}</span>
-      <b>${actionText}</b>
+      <b>${accessState.actionText}</b>
     </span>
   `;
 
   button.addEventListener("click", () => {
-    const launchUrl = moduleLaunchUrls[module.id];
+    if (!accessState.allowed) {
+      setStatus(`${getModuleDisplayName(module)}：此帳號無權限。`, "error");
+      return;
+    }
+
+    const launchUrl = buildModuleLaunchUrl(module.id, profile);
     if (launchUrl) {
       window.location.href = launchUrl;
       return;
     }
+
     if (hasChildren) {
       renderLevelTwo(module, profile);
       return;
     }
+
+    if (accessState.status === "building") {
+      setStatus(`${getModuleDisplayName(module)} 正在努力製作中。`, "info");
+      return;
+    }
+
     if (module.id === "organization-chart") {
       renderOrganizationTool(profile);
       return;
@@ -2190,7 +2252,7 @@ function createModuleButton(module, profile) {
 function renderLevelOne(profile = getStoredProfile()) {
   if (!profile || !moduleLevelOneGrid || !moduleLevelOne || !moduleLevelTwo || !moduleTitle) return;
   moduleTitle.textContent = "選擇工作區";
-  moduleLevelOneGrid.replaceChildren(...getVisibleModules(profile).map((module) => createModuleButton(module, profile)));
+  moduleLevelOneGrid.replaceChildren(...modules.map((module) => createModuleButton(module, profile)));
   moduleLevelTwoGrid?.classList.remove("detail-grid");
   moduleLevelOne.hidden = false;
   moduleLevelOne.classList.add("active");
