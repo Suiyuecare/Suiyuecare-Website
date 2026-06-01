@@ -11,6 +11,84 @@ import {
   setStatus
 } from "./auth.js";
 
+const TOAST_SELECTOR = ".admin-data-status, .admin-form-status, .admin-loading";
+const TOAST_ACTION_PATTERN = /儲存|上傳|刪除|送審|核准|退回|處理|更新|建立|匯入|還原|備份/;
+let statusToastObserver = null;
+
+function ensureToastRegion() {
+  let region = document.querySelector(".admin-toast-region");
+  if (region) return region;
+  region = document.createElement("div");
+  region.className = "admin-toast-region";
+  region.setAttribute("aria-live", "polite");
+  region.setAttribute("aria-atomic", "false");
+  document.body.appendChild(region);
+  return region;
+}
+
+function shouldToastStatus(element, message, type) {
+  if (!message || element.hidden) return false;
+  if (!["info", "success", "error"].includes(type)) return false;
+  if (type === "info" && !TOAST_ACTION_PATTERN.test(message)) return false;
+  return type !== "success" || TOAST_ACTION_PATTERN.test(message) || /已.+。?$/.test(message);
+}
+
+function showAdminToast(message, type = "info") {
+  const region = ensureToastRegion();
+  const toast = document.createElement("div");
+  toast.className = "admin-toast";
+  toast.dataset.status = type;
+  toast.setAttribute("role", type === "error" ? "alert" : "status");
+  const title = type === "success" ? "已完成" : type === "error" ? "操作失敗" : "處理中";
+  toast.innerHTML = `<strong>${title}</strong><span>${message}</span>`;
+  region.appendChild(toast);
+
+  const timeout = type === "info" ? 2600 : 4600;
+  window.setTimeout(() => {
+    toast.classList.add("leaving");
+    window.setTimeout(() => toast.remove(), 220);
+  }, timeout);
+}
+
+function handleStatusElement(element) {
+  const message = element.textContent.trim();
+  const type = element.dataset.status || "info";
+  const fingerprint = `${type}:${message}`;
+  if (element.dataset.toastFingerprint === fingerprint) return;
+  element.dataset.toastFingerprint = fingerprint;
+  if (shouldToastStatus(element, message, type)) showAdminToast(message, type);
+}
+
+function initAdminStatusToasts() {
+  if (statusToastObserver || !document.body) return;
+  ensureToastRegion();
+
+  document.querySelectorAll(TOAST_SELECTOR).forEach(handleStatusElement);
+  statusToastObserver = new MutationObserver((mutations) => {
+    const candidates = new Set();
+    mutations.forEach((mutation) => {
+      const target = mutation.target.nodeType === Node.ELEMENT_NODE ? mutation.target : mutation.target.parentElement;
+      if (!target) return;
+      if (target.matches?.(TOAST_SELECTOR)) candidates.add(target);
+      target.querySelectorAll?.(TOAST_SELECTOR).forEach((element) => candidates.add(element));
+    });
+    candidates.forEach(handleStatusElement);
+  });
+  statusToastObserver.observe(document.body, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ["data-status", "hidden"]
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initAdminStatusToasts, { once: true });
+} else {
+  initAdminStatusToasts();
+}
+
 export async function bootProtectedAdminPage({
   loading,
   shell,
