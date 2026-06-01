@@ -1,3 +1,5 @@
+import { supabase } from "../lib/supabaseClient.js";
+
 const signOutButton = document.querySelector("#signOutButton");
 const status = document.querySelector("#loginStatus");
 const signedOutViews = document.querySelectorAll('[data-auth-view="signed-out"]');
@@ -14,11 +16,14 @@ const quickLoginGrid = document.querySelector("#quickLoginGrid");
 const organizationChart = document.querySelector("#organizationChart");
 const signedInOrganizationChart = document.querySelector("#signedInOrganizationChart");
 const portalLoginForm = document.querySelector("#portalLoginForm");
+const portalGoogleLoginButton = document.querySelector("#portalGoogleLoginButton");
 const loginEmail = document.querySelector("#loginEmail");
 const loginPassword = document.querySelector("#loginPassword");
 
 const storageKey = "suiyuecare.portal.quickLoginProfile";
 const demoPassword = "suiyuecare";
+const portalHomePath = "/portal/";
+const portalProductionOrigin = "https://login.suiyuecare.com";
 let activeQuickLoginGroup = "management";
 
 const modules = [
@@ -1064,6 +1069,109 @@ const auditLogDefinitions = [
   }
 ];
 
+const securityRestrictionDefinitions = [
+  {
+    id: "no-self-escalation",
+    order: "01",
+    title: "禁止自我提權",
+    appliesTo: "所有使用者",
+    trigger: "角色、職等、Data Scope、模組權限異動",
+    enforcement: "操作者與被異動帳號相同時，禁止提高權限或擴大資料範圍。",
+    audit: "記錄操作者、異動前後、阻擋原因與時間。",
+    severity: "最高"
+  },
+  {
+    id: "last-super-admin",
+    order: "02",
+    title: "保留最後最高管理者",
+    appliesTo: "執行長、最高管理者、系統權限管理者",
+    trigger: "刪除、停用、降權、移除 manage 權限",
+    enforcement: "若操作會導致沒有最高管理者，必須阻擋。",
+    audit: "記錄嘗試刪除或降權的操作與目標帳號。",
+    severity: "最高"
+  },
+  {
+    id: "external-expiry",
+    order: "03",
+    title: "外部帳號有效期限",
+    appliesTo: "外部檢核單位、會計事務所",
+    trigger: "登入、查看、匯出、列印",
+    enforcement: "外部帳號必須設定有效期限，到期自動停用，不得延長為永久帳號。",
+    audit: "記錄授權期間、停用時間、匯出報表與操作人。",
+    severity: "高"
+  },
+  {
+    id: "google-allowlist",
+    order: "04",
+    title: "Google 帳號白名單",
+    appliesTo: "Google OAuth 登入",
+    trigger: "Google 登入回到 Portal",
+    enforcement: "Google email 必須對應既有 Portal 帳號、角色與 Data Scope，否則立即登出並拒絕進入。",
+    audit: "記錄登入 email、登入結果、拒絕原因與時間。",
+    severity: "高"
+  },
+  {
+    id: "sensitive-export",
+    order: "05",
+    title: "敏感資料匯出限制",
+    appliesTo: "個資、薪資、財務、高度個資",
+    trigger: "匯出、列印、下載",
+    enforcement: "需具備模組權限、功能按鈕權限、Data Scope 與匯出授權；需填寫原因。",
+    audit: "記錄範圍、筆數、欄位、檔案類型、原因與操作人。",
+    severity: "最高"
+  },
+  {
+    id: "it-content-separation",
+    order: "06",
+    title: "資訊課維護與內容隔離",
+    appliesTo: "資訊課、系統維護者",
+    trigger: "帳號維護、系統設定、權限設定",
+    enforcement: "可維護系統與帳號，但不預設查看薪資、個資、財務與敏感業務內容。",
+    audit: "記錄維護內容，不記錄或暴露非授權敏感內容。",
+    severity: "高"
+  },
+  {
+    id: "board-shareholder-privacy",
+    order: "07",
+    title: "董事會與股東個資隔離",
+    appliesTo: "董事會、股東",
+    trigger: "查看重大報表、經營摘要、投資人資料",
+    enforcement: "董事會需另行授權才可看個資明細；股東只看投資人與經營摘要。",
+    audit: "記錄查詢報表與是否含個資欄位。",
+    severity: "高"
+  },
+  {
+    id: "region-boundary",
+    order: "08",
+    title: "區域與業務線邊界",
+    appliesTo: "區經理、業務部長、課長、組長",
+    trigger: "跨區域、跨業務線、跨課別查詢",
+    enforcement: "不得跨出自己區域、業務線、課別或負責項目，除非有自訂授權。",
+    audit: "記錄查詢條件、Data Scope、授權來源與阻擋結果。",
+    severity: "高"
+  },
+  {
+    id: "delete-protection",
+    order: "09",
+    title: "刪除保護與二次確認",
+    appliesTo: "所有具 delete 權限角色",
+    trigger: "刪除帳號、資料、合約、紀錄",
+    enforcement: "重要資料優先停用；刪除需二次確認與原因，不得刪除操作紀錄。",
+    audit: "記錄刪除原因、覆核人、備份狀態與時間。",
+    severity: "最高"
+  },
+  {
+    id: "audit-immutability",
+    order: "10",
+    title: "操作紀錄不可竄改",
+    appliesTo: "操作紀錄、權限異動紀錄、匯出列印紀錄",
+    trigger: "修改、刪除、覆寫操作紀錄",
+    enforcement: "操作紀錄不得由一般使用者修改或刪除，管理者只能查詢與匯出稽核摘要。",
+    audit: "紀錄本身採追加式留存，保留查詢與匯出紀錄。",
+    severity: "最高"
+  }
+];
+
 function getModuleDisplayName(module) {
   return moduleDisplayNames[module.id] || module.name;
 }
@@ -1232,6 +1340,68 @@ const quickLoginGroups = [
 const accountAliases = {
   "entrepreneur@suiyuecare.com": "ceo"
 };
+
+function getQuickLoginProfile(profileId) {
+  return quickLoginProfiles.find((profile) => profile.id === profileId) || null;
+}
+
+function canUseEmployeeAccount(account) {
+  return Boolean(account?.email) && account.email !== "未設定" && account.accountStatus === "啟用";
+}
+
+function getEmployeeProfileId(account) {
+  const grade = normalizeGradeText(`${account.grade} ${account.title}`);
+  const department = normalizeGradeText(account.department);
+  const className = normalizeGradeText(account.className);
+
+  if (grade.includes("會計事務所") || grade.includes("外部檢核")) return "external-audit";
+  if (grade.includes("股東")) return "shareholder";
+  if (grade.includes("董事長") || grade.includes("執行長")) return "ceo";
+  if (grade.includes("董事會")) return "board";
+  if (grade.includes("區經理")) return "region-manager";
+  if (grade.includes("行政部長")) return "admin-director";
+  if (grade.includes("人資課長") || className.includes("人資課")) return "hr-chief";
+  if (grade.includes("出納")) return "cashier-chief";
+  if (grade.includes("會計課長") || className.includes("會計課") || className.includes("財會課")) return "accounting-chief";
+  if (grade.includes("總務課長") || className.includes("總務課")) return "ga-chief";
+  if (grade.includes("投資人關係")) return "admin-director";
+  if (grade.includes("部長") || grade.includes("機構業務負責人") || department.includes("照顧部") || department.includes("品管部") || department.includes("據點部") || department.includes("軟體") || department.includes("移工")) return "business-director";
+  if (grade.includes("課長")) return "section-chief";
+  if (grade.includes("組長") || grade.includes("督導")) return "team-lead";
+  return "staff";
+}
+
+function getEmployeeProfileById(profileId) {
+  if (!profileId?.startsWith("employee-")) return null;
+  const employeeNo = Number(profileId.replace("employee-", ""));
+  const account = employeeAccounts.find((employee) => employee.no === employeeNo);
+  return getEmployeeProfile(account);
+}
+
+function getEmployeeProfile(account) {
+  if (!canUseEmployeeAccount(account)) return null;
+  const template = getQuickLoginProfile(getEmployeeProfileId(account)) || getQuickLoginProfile("staff");
+  if (!template) return null;
+
+  return {
+    ...template,
+    id: `employee-${account.no}`,
+    label: account.name,
+    title: account.title,
+    email: account.email,
+    scope: normalizeDataScopeId(account.dataScope || template.scope),
+    note: `${account.company}｜${account.department}${account.className === "未設定" ? "" : `｜${account.className}`}`,
+    sourceProfileId: template.id
+  };
+}
+
+function findEmployeeProfileByEmail(email) {
+  const normalizedEmail = email.trim().toLowerCase();
+  const account = employeeAccounts.find(
+    (employee) => canUseEmployeeAccount(employee) && employee.email.toLowerCase() === normalizedEmail
+  );
+  return getEmployeeProfile(account);
+}
 
 function setStatus(message, type = "info") {
   if (!status) return;
@@ -1706,16 +1876,55 @@ function auditLogMatchesQuery(row, query) {
     .includes(query.toLowerCase());
 }
 
+function getSecurityRestrictionRows() {
+  return securityRestrictionDefinitions.map((restriction) => {
+    const auditRows = auditLogDefinitions.filter(
+      (audit) =>
+        restriction.audit.includes(audit.event) ||
+        audit.guardrail.includes(restriction.title) ||
+        restriction.trigger.includes(audit.event)
+    );
+    const sensitiveRows = sensitiveDataDefinitions.filter(
+      (definition) =>
+        restriction.appliesTo.includes(definition.label) ||
+        restriction.trigger.includes(definition.label) ||
+        restriction.enforcement.includes(definition.label)
+    );
+
+    return {
+      ...restriction,
+      auditCoverage: auditRows.length || (restriction.audit.includes("記錄") ? 1 : 0),
+      sensitiveCoverage: sensitiveRows.length,
+      needsBlock: ["最高", "高"].includes(restriction.severity)
+    };
+  });
+}
+
+function securityRestrictionMatchesQuery(row, query) {
+  if (!query) return true;
+  return [
+    row.title,
+    row.appliesTo,
+    row.trigger,
+    row.enforcement,
+    row.audit,
+    row.severity
+  ]
+    .join(" ")
+    .toLowerCase()
+    .includes(query.toLowerCase());
+}
+
 function getStoredProfile() {
   const profileId = window.localStorage.getItem(storageKey);
-  return quickLoginProfiles.find((profile) => profile.id === profileId) || null;
+  return getQuickLoginProfile(profileId) || getEmployeeProfileById(profileId);
 }
 
 function findProfileByEmail(email) {
   const normalizedEmail = email.trim().toLowerCase();
   const aliasProfileId = accountAliases[normalizedEmail];
-  if (aliasProfileId) return quickLoginProfiles.find((profile) => profile.id === aliasProfileId) || null;
-  return quickLoginProfiles.find((profile) => profile.email.toLowerCase() === normalizedEmail) || null;
+  if (aliasProfileId) return getQuickLoginProfile(aliasProfileId);
+  return quickLoginProfiles.find((profile) => profile.email.toLowerCase() === normalizedEmail) || findEmployeeProfileByEmail(normalizedEmail);
 }
 
 function setStoredProfile(profile) {
@@ -1724,6 +1933,40 @@ function setStoredProfile(profile) {
 
 function clearStoredProfile() {
   window.localStorage.removeItem(storageKey);
+}
+
+function getPortalRedirectUrl() {
+  if (window.location.protocol === "file:") return null;
+  if (["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)) {
+    return `${portalProductionOrigin}${portalHomePath}`;
+  }
+  return `${window.location.origin}${portalHomePath}`;
+}
+
+async function applyGoogleSession() {
+  if (!supabase) return false;
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    setStatus(`Google 登入狀態檢查失敗：${error.message}`, "error");
+    return false;
+  }
+
+  const email = data.session?.user?.email || "";
+  if (!email) return false;
+
+  const profile = findProfileByEmail(email);
+  if (!profile) {
+    clearStoredProfile();
+    await supabase.auth.signOut();
+    renderSession(null);
+    setStatus(`Google 帳號 ${email} 尚未建立 Portal 權限，請由系統權限中心開通。`, "error");
+    return true;
+  }
+
+  setStoredProfile(profile);
+  renderSession(profile);
+  setStatus(`已使用 Google 登入：${profile.label}。`, "success");
+  return true;
 }
 
 function moduleIsAllowed(module, profile) {
@@ -2000,6 +2243,9 @@ function createPermissionTabs(activeTab) {
       <button type="button" role="tab" aria-selected="${activeTab === "audit-logs"}" data-permission-tab="audit-logs">
         <span>9</span>權限異動與操作紀錄
       </button>
+      <button type="button" role="tab" aria-selected="${activeTab === "security"}" data-permission-tab="security">
+        <span>10</span>安全限制
+      </button>
     </div>
   `;
 }
@@ -2043,6 +2289,10 @@ function bindPermissionTabs(panel, profile, activeTab) {
       }
       if (nextTab === "audit-logs") {
         renderAuditLogTool(profile);
+        return;
+      }
+      if (nextTab === "security") {
+        renderSecurityRestrictionTool(profile);
       }
     });
   });
@@ -3357,10 +3607,145 @@ function renderAuditLogTool(profile) {
   setStatus("已開啟權限異動與操作紀錄。", "info");
 }
 
-function bootPortalLogin() {
+function renderSecurityRestrictionTool(profile) {
+  if (!moduleLevelTwoGrid || !moduleTitle) return;
+  moduleTitle.textContent = "系統權限｜安全限制";
+
+  const restrictionRows = getSecurityRestrictionRows();
+  const highestRows = restrictionRows.filter((row) => row.severity === "最高");
+  const blockingRows = restrictionRows.filter((row) => row.needsBlock);
+  const panel = document.createElement("section");
+  panel.className = "tool-detail account-management security-restriction-management";
+  panel.innerHTML = `
+    <div class="section-head account-head">
+      <div>
+        <p class="portal-kicker">Security Guardrails</p>
+        <h3>安全限制</h3>
+        <small>把不可被繞過的登入、授權、刪除、匯出、外部帳號與操作紀錄限制集中控管。</small>
+      </div>
+      <span>${escapeHtml(profile.label)}｜${escapeHtml(scopeLabels[profile.scope] || profile.scope)}</span>
+    </div>
+    ${createPermissionTabs("security")}
+    <div class="affiliation-summary security-restriction-summary" aria-label="安全限制摘要">
+      <article>
+        <span>安全限制</span>
+        <strong>${restrictionRows.length}</strong>
+        <small>登入、權限、資料、紀錄全面限制</small>
+      </article>
+      <article>
+        <span>最高風險</span>
+        <strong>${highestRows.length}</strong>
+        <small>必須阻擋或二次確認</small>
+      </article>
+      <article>
+        <span>強制阻擋</span>
+        <strong>${blockingRows.length}</strong>
+        <small>違反規則不可只警告</small>
+      </article>
+      <article>
+        <span>Google 限制</span>
+        <strong>1</strong>
+        <small>未對應 Portal 權限不得進入</small>
+      </article>
+    </div>
+    <div class="grade-layout">
+      <div class="grade-card-list security-restriction-card-list" aria-label="安全限制項目">
+        ${restrictionRows
+          .map(
+            (row) => `
+              <article>
+                <span>${escapeHtml(row.order)}</span>
+                <div>
+                  <strong>${escapeHtml(row.title)}</strong>
+                  <small>${escapeHtml(row.severity)}｜${escapeHtml(row.appliesTo)}</small>
+                </div>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+      <div class="affiliation-panel">
+        <div class="affiliation-panel-head">
+          <strong>安全限制矩陣</strong>
+          <span>限制 / 觸發 / 阻擋 / 紀錄</span>
+        </div>
+        <label class="account-search">
+          <span>搜尋安全限制</span>
+          <input id="securityRestrictionSearchInput" type="search" placeholder="自我提權、Google、外部帳號、刪除、匯出" autocomplete="off">
+        </label>
+        <div class="account-table-wrap">
+          <table class="account-table security-restriction-table">
+            <thead>
+              <tr>
+                <th>限制項目</th>
+                <th>適用對象</th>
+                <th>觸發情境</th>
+                <th>系統處置</th>
+                <th>紀錄要求</th>
+                <th>風險</th>
+              </tr>
+            </thead>
+            <tbody data-security-restriction-table-body></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <p class="account-note">安全限制是權限中心的最後防線；即使角色、模組、按鈕或 Data Scope 設定錯誤，仍需阻擋自我提權、刪除最後最高管理者、未授權 Google 登入與敏感資料匯出。</p>
+  `;
+
+  const searchInput = panel.querySelector("#securityRestrictionSearchInput");
+  const tableBody = panel.querySelector("[data-security-restriction-table-body]");
+
+  const renderRows = () => {
+    const query = searchInput?.value.trim() || "";
+    const rows = restrictionRows.filter((row) => securityRestrictionMatchesQuery(row, query));
+
+    if (rows.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6">
+            <div class="empty-account-state">找不到符合條件的安全限制。</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tableBody.innerHTML = rows
+      .map(
+        (row) => `
+          <tr>
+            <td>
+              <div class="account-person">
+                <strong>${escapeHtml(row.order)} ${escapeHtml(row.title)}</strong>
+                <small>${row.needsBlock ? "強制阻擋" : "記錄與提示"}｜${row.auditCoverage} 項紀錄覆蓋</small>
+              </div>
+            </td>
+            <td>${escapeHtml(row.appliesTo)}</td>
+            <td>${escapeHtml(row.trigger)}</td>
+            <td>${escapeHtml(row.enforcement)}</td>
+            <td>${escapeHtml(row.audit)}</td>
+            <td><span class="status-pill ${row.severity === "最高" ? "is-external" : row.severity === "高" ? "is-pending" : "is-active"}">${escapeHtml(row.severity)}</span></td>
+          </tr>
+        `
+      )
+      .join("");
+  };
+
+  bindPermissionTabs(panel, profile, "security");
+  searchInput?.addEventListener("input", renderRows);
+
+  moduleLevelTwoGrid.classList.add("detail-grid");
+  moduleLevelTwoGrid.replaceChildren(panel);
+  renderRows();
+  setStatus("已開啟安全限制。", "info");
+}
+
+async function bootPortalLogin() {
   renderOrganizationChart(organizationChart);
   renderQuickLoginPicker();
   renderSession(getStoredProfile());
+  await applyGoogleSession();
 }
 
 portalLoginForm?.addEventListener("submit", (event) => {
@@ -3388,10 +3773,45 @@ portalLoginForm?.addEventListener("submit", (event) => {
 
 signOutButton?.addEventListener("click", () => {
   clearStoredProfile();
+  supabase?.auth.signOut();
   renderSession(null);
   setStatus("已登出，請重新選擇快速登入角色。", "success");
 });
 
 backToLevelOneButton?.addEventListener("click", () => renderLevelOne());
 
-bootPortalLogin();
+portalGoogleLoginButton?.addEventListener("click", async () => {
+  if (!supabase) {
+    setStatus("Google 登入尚未設定 Supabase Auth，請先確認環境設定。", "error");
+    return;
+  }
+
+  const redirectTo = getPortalRedirectUrl();
+  if (!redirectTo) {
+    setStatus("Google 登入需要使用 http 或 https 網址，請從本機伺服器或正式站開啟入口網。", "error");
+    return;
+  }
+
+  portalGoogleLoginButton.disabled = true;
+  setStatus("正在前往 Google 登入...", "info");
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo,
+      queryParams: {
+        access_type: "offline",
+        prompt: "select_account"
+      }
+    }
+  });
+
+  if (error) {
+    portalGoogleLoginButton.disabled = false;
+    setStatus(`Google 登入失敗：${error.message}`, "error");
+  }
+});
+
+bootPortalLogin().catch((error) => {
+  setStatus(`入口網登入狀態檢查失敗：${error.message}`, "error");
+});

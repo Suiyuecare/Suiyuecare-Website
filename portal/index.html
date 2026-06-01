@@ -32,7 +32,7 @@
           <dl class="security-list" aria-label="入口權限摘要">
             <div>
               <dt>登入方式</dt>
-              <dd>Email / Password</dd>
+              <dd>Google / Email</dd>
             </div>
             <div>
               <dt>權限模型</dt>
@@ -49,10 +49,15 @@
           <div class="login-card-head">
             <p class="portal-kicker">Sign In</p>
             <h2 id="loginTitle">帳號登入</h2>
-            <p>請輸入公司核發的帳號密碼。</p>
+            <p>請使用 Google 或公司核發的帳號密碼登入。</p>
           </div>
 
           <form class="login-form" id="portalLoginForm">
+            <button class="google-login-button" type="button" id="portalGoogleLoginButton">
+              <span aria-hidden="true">G</span>
+              使用 Google 登入
+            </button>
+            <div class="login-divider"><span>或使用 Email 登入</span></div>
             <label>
               <span>帳號 Email</span>
               <input id="loginEmail" name="email" type="email" autocomplete="username" placeholder="name@suiyuecare.com" required />
