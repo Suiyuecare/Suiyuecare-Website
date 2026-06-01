@@ -21,6 +21,25 @@ function getSupabaseAdmin() {
   });
 }
 
+function getSupabaseForUser(token) {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const publicKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!supabaseUrl || !publicKey) {
+    throw new Error("Missing SUPABASE_URL/VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY.");
+  }
+  return createClient(supabaseUrl, publicKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    },
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  });
+}
+
 function getBearerToken(request) {
   const header = request.headers.authorization || "";
   const match = header.match(/^Bearer\s+(.+)$/i);
@@ -80,6 +99,32 @@ async function verifyRequest(request, supabase) {
   }
 
   return data.user;
+}
+
+async function getAuthorizedSupabase(request) {
+  const token = getBearerToken(request);
+  if (!token) {
+    const error = new Error("Missing bearer token.");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  try {
+    const adminClient = getSupabaseAdmin();
+    const user = await verifyRequest(request, adminClient);
+    return { supabase: adminClient, user, mode: "service_role" };
+  } catch (error) {
+    console.warn("Falling back to user-scoped admin-users client.", error.message);
+  }
+
+  const userClient = getSupabaseForUser(token);
+  const { data, error } = await userClient.auth.getUser(token);
+  if (error || !data?.user) {
+    const authError = new Error(error?.message || "Invalid session.");
+    authError.statusCode = 401;
+    throw authError;
+  }
+  return { supabase: userClient, user: data.user, mode: "rls" };
 }
 
 async function getCurrentAdmin(supabase, user) {
@@ -191,12 +236,13 @@ async function handleUpdate(request, response, supabase, user, totalProfiles) {
 
   const targetEmail = String(body.email || targetProfile.email || "").toLowerCase();
   const requestedRole = body.role || "viewer";
+  const normalizedRole = targetEmail === ownerEmail ? "owner" : requestedRole === "owner" ? "admin" : requestedRole;
   if (requestedRole === "owner" && targetEmail !== ownerEmail) {
-    return json(response, 403, { ok: false, message: "Only the CEO account can be assigned owner role." });
+    return json(response, 403, { ok: false, message: "只有 entrepreneur@suiyuecare.com 可以是最高權限 Owner。其他管理者請設定為 Admin。" });
   }
 
   const profilePayload = {
-    role: targetEmail === ownerEmail ? "owner" : requestedRole,
+    role: targetEmail === ownerEmail ? "owner" : normalizedRole,
     display_name: body.display_name || null,
     email: targetEmail || null,
     is_active: Boolean(body.is_active)
@@ -212,7 +258,7 @@ async function handleUpdate(request, response, supabase, user, totalProfiles) {
   Object.keys(ownerPermissions).forEach((key) => {
     adminPayload[key] = Boolean(body[key]);
   });
-  const isOwnerRole = adminPayload.role === "owner";
+  const isOwnerRole = targetEmail === ownerEmail && adminPayload.role === "owner";
   adminPayload.can_publish = isOwnerRole;
   adminPayload.can_review_publish = isOwnerRole;
   const { error: adminError } = await supabase.from("admins").upsert(adminPayload, { onConflict: "profile_id" });
@@ -228,8 +274,7 @@ module.exports = async function handler(request, response) {
       return json(response, 405, { ok: false, message: "Method not allowed" });
     }
 
-    const supabase = getSupabaseAdmin();
-    const user = await verifyRequest(request, supabase);
+    const { supabase, user, mode } = await getAuthorizedSupabase(request);
     const totalProfiles = await profilesCount(supabase);
     const currentAdmin = await getCurrentAdmin(supabase, user);
     if (!canManageUsers(user, currentAdmin, totalProfiles)) {
@@ -243,7 +288,7 @@ module.exports = async function handler(request, response) {
     }
 
     const data = await listUsers(supabase);
-    return json(response, 200, { ok: true, ...data });
+    return json(response, 200, { ok: true, authMode: mode, ...data });
   } catch (error) {
     console.error("admin-users api failed", error);
     return json(response, error.statusCode || 500, { ok: false, message: error.message || "Unexpected error." });

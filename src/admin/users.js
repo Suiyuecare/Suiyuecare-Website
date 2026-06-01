@@ -222,6 +222,20 @@ const roleDefaults = {
   }
 };
 
+const roleLabels = {
+  owner: "Owner｜最高權限（僅 entrepreneur）",
+  admin: "Admin｜主管管理者（不能直接發布）",
+  editor: "Editor｜內容編輯者（需送審）",
+  viewer: "Viewer｜只讀檢視"
+};
+
+const roleDescriptions = {
+  owner: "只有 entrepreneur@suiyuecare.com 使用。可管理所有權限、直接發布、核准送審。",
+  admin: "適合主管或後台管理者。可管理使用者與多數資料，但發布仍需送審給 Owner。",
+  editor: "適合企劃、行政、課程或招募同仁。可新增與編輯內容，但不能正式發布。",
+  viewer: "適合只需要查看資料的人員。不能新增、編輯、刪除或發布。"
+};
+
 let profiles = [];
 let admins = [];
 
@@ -261,6 +275,14 @@ function mergedAdmin(profile) {
   return { ...roleDefaults[profile.role || "viewer"], ...admin };
 }
 
+function renderRoleOptions(selectedRole = "viewer", email = "") {
+  const normalizedEmail = String(email || "").toLowerCase();
+  return ["owner", "admin", "editor", "viewer"].map((role) => {
+    const ownerLocked = role === "owner" && normalizedEmail !== "entrepreneur@suiyuecare.com";
+    return `<option value="${role}" ${selectedRole === role ? "selected" : ""} ${ownerLocked ? "disabled" : ""}>${escapeHTML(roleLabels[role])}</option>`;
+  }).join("");
+}
+
 function renderPermissionGroups(admin) {
   return permissionGroups.map((group) => `
     <section class="permission-group-card">
@@ -285,6 +307,7 @@ function renderUsers() {
 
   usersList.innerHTML = profiles.map((profile) => {
     const admin = mergedAdmin(profile);
+    const role = profile.role || "viewer";
     return `
       <article class="admin-section-card user-permission-card" data-profile-id="${escapeHTML(profile.id)}">
         <header>
@@ -295,9 +318,14 @@ function renderUsers() {
           </div>
           <label class="admin-toggle-field"><input data-profile-enabled type="checkbox" ${profile.is_active ? "checked" : ""} /><span>啟用帳號</span></label>
         </header>
+        <div class="admin-help-card user-role-summary">
+          <strong>目前角色：${escapeHTML(roleLabels[role] || role)}</strong>
+          <p>${escapeHTML(roleDescriptions[role] || "請依照職務需求勾選細項權限。")}</p>
+          <small>發布規則：除了 entrepreneur Owner 以外，所有帳號都需要送審，不能直接讓前台上線。</small>
+        </div>
         <form class="admin-form-grid compact user-permission-form">
           <label><span>角色</span><select name="role" data-role-select>
-            ${["owner", "admin", "editor", "viewer"].map((role) => `<option value="${role}" ${profile.role === role ? "selected" : ""}>${role}</option>`).join("")}
+            ${renderRoleOptions(role, profile.email)}
           </select></label>
           <label><span>顯示名稱</span><input name="display_name" type="text" value="${escapeHTML(profile.display_name || "")}" /></label>
           <label><span>Email</span><input name="email" type="email" value="${escapeHTML(profile.email || "")}" /></label>
