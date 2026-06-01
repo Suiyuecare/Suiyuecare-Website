@@ -26,9 +26,17 @@
     <meta name="deployment-version" content="assets-public-20260519" />
     <title>歲悅長照集團｜Suiyuecare Corps.</title>
     <script>
-      if (window.location.hostname === "login.suiyuecare.com" && window.location.pathname === "/") {
-        window.location.replace(`/portal/${window.location.search}${window.location.hash}`);
-      }
+      (() => {
+        const authSearch = window.location.search || "";
+        const authHash = window.location.hash || "";
+        const hasSupabaseAuthParams = /[?&](code|access_token|refresh_token|error|error_description)=/.test(authSearch) || /(access_token|refresh_token|error|error_description)=/.test(authHash);
+        const isLoginRoot = window.location.hostname === "login.suiyuecare.com" && window.location.pathname === "/";
+        const isVercelAuthRoot = window.location.hostname === "suiyuecare-website.vercel.app" && window.location.pathname === "/" && hasSupabaseAuthParams;
+
+        if (isLoginRoot || isVercelAuthRoot) {
+          window.location.replace(`https://login.suiyuecare.com/portal/${authSearch}${authHash}`);
+        }
+      })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -21,9 +21,11 @@ const loginEmail = document.querySelector("#loginEmail");
 const loginPassword = document.querySelector("#loginPassword");
 
 const storageKey = "suiyuecare.portal.quickLoginProfile";
+const storageEmailKey = "suiyuecare.portal.loginEmail";
 const demoPassword = "suiyuecare";
 const portalHomePath = "/portal/";
 const portalProductionOrigin = "https://login.suiyuecare.com";
+const portalOAuthBridgeOrigin = "https://suiyuecare-website.vercel.app";
 let activeQuickLoginGroup = "management";
 
 const modules = [
@@ -45,18 +47,12 @@ const modules = [
     name: "總務系統",
     children: [
       { id: "edoc", number: "5-1", name: "公文簽核系統" },
-      { id: "contract", number: "5-2", name: "合約管理系統" }
-    ]
-  },
-  {
-    id: "toolbox",
-    number: "6",
-    name: "工具箱",
-    children: [
-      { id: "system-permissions", number: "6-1", name: "系統權限" },
-      { id: "organization-chart", number: "6-2", name: "組織圖" },
-      { id: "employee-accounts", number: "6-3", name: "員工帳號" },
-      { id: "pdf-editor", number: "6-4", name: "PDF 編輯器" }
+      { id: "contract", number: "5-2", name: "合約管理系統" },
+      { id: "system-permissions", number: "5-3", name: "系統權限" },
+      { id: "organization-chart", number: "5-4", name: "組織圖" },
+      { id: "employee-accounts", number: "5-5", name: "員工帳號" },
+      { id: "agile-projects", number: "5-6", name: "敏捷專案管理" },
+      { id: "pdf-editor", number: "5-7", name: "PDF 編輯器" }
     ]
   }
 ];
@@ -226,10 +222,10 @@ const moduleOrgRules = {
   "general-affairs": { owner: "ga-class", scope: "department", policy: "總務課管理" },
   edoc: { owner: "ga-class", scope: "department", policy: "依簽核流程與職等審核" },
   contract: { owner: "legal-class", scope: "company", policy: "法務與總務共同控管" },
-  toolbox: { owner: "it-class", scope: "assigned", policy: "依工具授權開放" },
   "system-permissions": { owner: "it-class", scope: "custom", policy: "資訊課維護帳號，不預設看敏感內容" },
   "organization-chart": { owner: "it-class", scope: "company", policy: "依組織節點檢視公司架構" },
   "employee-accounts": { owner: "it-class", scope: "custom", policy: "員工帳號與登入狀態管理" },
+  "agile-projects": { owner: "ga-class", scope: "assigned", policy: "依專案、衝刺與負責人授權" },
   "pdf-editor": { owner: "it-class", scope: "assigned", policy: "已授權使用者可用" }
 };
 
@@ -359,10 +355,10 @@ const moduleDescriptions = {
   "general-affairs": "處理行政、總務與文件流程",
   edoc: "追蹤公文與簽核進度",
   contract: "管理合約與到期提醒",
-  toolbox: "開啟常用工具與平台設定",
   "system-permissions": "管理角色、權限與資料範圍",
   "organization-chart": "查看公司組織與權責關係",
   "employee-accounts": "管理員工登入帳號",
+  "agile-projects": "管理任務、看板、衝刺與專案節奏",
   "pdf-editor": "編輯、合併與整理 PDF 文件"
 };
 
@@ -376,11 +372,16 @@ const moduleIcons = {
   "general-affairs": "行政",
   edoc: "簽核",
   contract: "合約",
-  toolbox: "工具",
   "system-permissions": "權限",
   "organization-chart": "組織",
   "employee-accounts": "帳號",
+  "agile-projects": "專案",
   "pdf-editor": "PDF"
+};
+
+const moduleLaunchUrls = {
+  accounting: "/admin/investor-data/",
+  "agile-projects": "/admin/apm/"
 };
 
 const employeeAccountRows = [
@@ -634,7 +635,7 @@ const roleDefinitions = [
     grade: "區經理",
     category: "區域管理角色",
     defaultScope: "region",
-    modules: ["系統公告", "照顧服務", "會計系統", "工具箱"],
+    modules: ["系統公告", "照顧服務", "會計系統", "總務系統"],
     actions: ["view", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     limits: "只能看自己區域資料。"
   },
@@ -645,7 +646,7 @@ const roleDefinitions = [
     grade: "行政部長",
     category: "行政管理角色",
     defaultScope: "department",
-    modules: ["人資系統", "會計系統", "總務系統", "工具箱"],
+    modules: ["人資系統", "會計系統", "總務系統"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     limits: "管理行政部門；不預設查看敏感業務內容。"
   },
@@ -656,7 +657,7 @@ const roleDefinitions = [
     grade: "課長",
     category: "行政課級角色",
     defaultScope: "class",
-    modules: ["人資系統", "工具箱"],
+    modules: ["人資系統", "總務系統"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     limits: "限人資課與授權人事資料。"
   },
@@ -667,7 +668,7 @@ const roleDefinitions = [
     grade: "課長",
     category: "行政課級角色",
     defaultScope: "class",
-    modules: ["會計系統", "工具箱"],
+    modules: ["會計系統", "總務系統"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "export", "print"],
     limits: "限財會課帳務與指定報表。"
   },
@@ -678,7 +679,7 @@ const roleDefinitions = [
     grade: "課長",
     category: "行政課級角色",
     defaultScope: "class",
-    modules: ["會計系統", "工具箱"],
+    modules: ["會計系統", "總務系統"],
     actions: ["view", "create", "edit", "submit", "export", "print"],
     limits: "限出納收付款與指定財務流程。"
   },
@@ -689,7 +690,7 @@ const roleDefinitions = [
     grade: "課長",
     category: "行政課級角色",
     defaultScope: "class",
-    modules: ["總務系統", "公文簽核系統", "合約管理系統", "工具箱"],
+    modules: ["總務系統", "公文簽核系統", "合約管理系統", "敏捷專案管理"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     limits: "限總務、公文與合約流程。"
   },
@@ -700,7 +701,7 @@ const roleDefinitions = [
     grade: "業務部長",
     category: "業務管理角色",
     defaultScope: "business_unit",
-    modules: ["照顧服務", "居家照顧", "日間照顧", "工具箱"],
+    modules: ["照顧服務", "居家照顧", "日間照顧", "總務系統"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     limits: "只看自己業務線資料。"
   },
@@ -711,7 +712,7 @@ const roleDefinitions = [
     grade: "課長",
     category: "課級角色",
     defaultScope: "class",
-    modules: ["依課別開放", "工具箱"],
+    modules: ["依課別開放", "總務系統"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "print"],
     limits: "限本課資料與被授權流程。"
   },
@@ -722,7 +723,7 @@ const roleDefinitions = [
     grade: "組長",
     category: "現場角色",
     defaultScope: "assigned",
-    modules: ["依任務開放", "工具箱"],
+    modules: ["依任務開放", "總務系統"],
     actions: ["view", "create", "edit", "submit", "assign", "print"],
     limits: "限自己負責個案、任務或人員。"
   },
@@ -733,7 +734,7 @@ const roleDefinitions = [
     grade: "職員",
     category: "一般角色",
     defaultScope: "self",
-    modules: ["依職務開放", "工具箱"],
+    modules: ["依職務開放", "總務系統"],
     actions: ["view", "create", "edit", "submit", "print"],
     limits: "僅自己或被指派資料，不允許提升自己權限。"
   }
@@ -804,13 +805,6 @@ const modulePermissionDefinitions = [
     limits: "合約到期、法務與總務權限分工控管。"
   },
   {
-    moduleId: "toolbox",
-    roles: ["ceo", "admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
-    actions: ["view", "print"],
-    sensitivity: "工具",
-    limits: "工具依個別授權開放。"
-  },
-  {
     moduleId: "system-permissions",
     roles: ["ceo", "admin-director"],
     actions: ["view", "create", "edit", "delete", "assign", "export", "print", "manage"],
@@ -830,6 +824,13 @@ const modulePermissionDefinitions = [
     actions: ["view", "create", "edit", "assign", "export", "print", "manage"],
     sensitivity: "帳號 / 個資",
     limits: "帳號啟停、角色異動、權限變更都需操作紀錄。"
+  },
+  {
+    moduleId: "agile-projects",
+    roles: ["ceo", "admin-director", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
+    actions: ["view", "create", "edit", "submit", "assign", "export", "print", "manage"],
+    sensitivity: "內部專案",
+    limits: "依專案、衝刺、負責人與跨部門協作範圍控管。"
   },
   {
     moduleId: "pdf-editor",
@@ -870,12 +871,12 @@ const sensitiveDataDefinitions = [
     id: "internal",
     order: "02",
     label: "內部作業資料",
-    match: ["內部作業", "內部組織", "工具"],
+    match: ["內部作業", "內部組織", "工具", "內部專案"],
     level: "中",
-    examples: "總務作業、組織節點、一般工具入口",
+    examples: "總務作業、組織節點、一般工具入口、敏捷專案任務",
     allowedScopes: ["assigned", "class", "department", "company"],
     requiredControls: ["角色授權", "Data Scope 過濾", "操作紀錄"],
-    restriction: "不可因工具箱權限而穿透原模組資料。"
+    restriction: "不可因總務工具權限而穿透原模組資料。"
   },
   {
     id: "personal",
@@ -1216,7 +1217,7 @@ const quickLoginProfiles = [
     email: "ceo@suiyuecare.com",
     scope: "group",
     note: "全集團",
-    modules: ["announcements", "business", "home-care", "day-care", "hr", "accounting", "general-affairs", "edoc", "contract", "toolbox", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "hr", "accounting", "general-affairs", "edoc", "contract", "system-permissions", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "region-manager",
@@ -1225,7 +1226,7 @@ const quickLoginProfiles = [
     email: "region.manager@suiyuecare.com",
     scope: "region",
     note: "僅自己區域資料",
-    modules: ["announcements", "business", "home-care", "day-care", "accounting", "toolbox", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "admin-director",
@@ -1234,7 +1235,7 @@ const quickLoginProfiles = [
     email: "admin.director@suiyuecare.com",
     scope: "department",
     note: "行政部門管理",
-    modules: ["announcements", "hr", "accounting", "general-affairs", "edoc", "contract", "toolbox", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "hr", "accounting", "general-affairs", "edoc", "contract", "system-permissions", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "hr-chief",
@@ -1243,7 +1244,7 @@ const quickLoginProfiles = [
     email: "hr.chief@suiyuecare.com",
     scope: "class",
     note: "人資課資料",
-    modules: ["announcements", "hr", "toolbox", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "hr", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "accounting-chief",
@@ -1252,7 +1253,7 @@ const quickLoginProfiles = [
     email: "accounting.chief@suiyuecare.com",
     scope: "class",
     note: "會計帳務與報表",
-    modules: ["announcements", "accounting", "toolbox", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "cashier-chief",
@@ -1261,7 +1262,7 @@ const quickLoginProfiles = [
     email: "cashier.chief@suiyuecare.com",
     scope: "class",
     note: "出納付款與收款",
-    modules: ["announcements", "accounting", "toolbox", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "ga-chief",
@@ -1270,7 +1271,7 @@ const quickLoginProfiles = [
     email: "ga.chief@suiyuecare.com",
     scope: "class",
     note: "公文、合約與總務事項",
-    modules: ["announcements", "general-affairs", "edoc", "contract", "toolbox", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "general-affairs", "edoc", "contract", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "business-director",
@@ -1279,7 +1280,7 @@ const quickLoginProfiles = [
     email: "business.director@suiyuecare.com",
     scope: "business_unit",
     note: "自己業務線資料",
-    modules: ["announcements", "business", "home-care", "day-care", "toolbox", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "section-chief",
@@ -1288,7 +1289,7 @@ const quickLoginProfiles = [
     email: "section.chief@suiyuecare.com",
     scope: "class",
     note: "本課資料",
-    modules: ["announcements", "business", "home-care", "day-care", "toolbox", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "team-lead",
@@ -1297,7 +1298,7 @@ const quickLoginProfiles = [
     email: "team.lead@suiyuecare.com",
     scope: "assigned",
     note: "自己負責資料",
-    modules: ["announcements", "business", "home-care", "day-care", "toolbox", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "staff",
@@ -1306,7 +1307,7 @@ const quickLoginProfiles = [
     email: "staff@suiyuecare.com",
     scope: "self",
     note: "僅自己與被指派任務",
-    modules: ["announcements", "business", "home-care", "day-care", "toolbox", "organization-chart", "employee-accounts", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   }
 ];
 
@@ -1917,28 +1918,39 @@ function securityRestrictionMatchesQuery(row, query) {
 
 function getStoredProfile() {
   const profileId = window.localStorage.getItem(storageKey);
-  return getQuickLoginProfile(profileId) || getEmployeeProfileById(profileId);
+  const storedEmail = window.localStorage.getItem(storageEmailKey);
+  const profile = getQuickLoginProfile(profileId) || getEmployeeProfileById(profileId);
+  if (!profile || !storedEmail) return profile;
+  return { ...profile, email: storedEmail };
 }
 
 function findProfileByEmail(email) {
   const normalizedEmail = email.trim().toLowerCase();
   const aliasProfileId = accountAliases[normalizedEmail];
-  if (aliasProfileId) return getQuickLoginProfile(aliasProfileId);
+  if (aliasProfileId) {
+    const aliasProfile = getQuickLoginProfile(aliasProfileId);
+    return aliasProfile ? { ...aliasProfile, email: normalizedEmail } : null;
+  }
   return quickLoginProfiles.find((profile) => profile.email.toLowerCase() === normalizedEmail) || findEmployeeProfileByEmail(normalizedEmail);
 }
 
 function setStoredProfile(profile) {
   window.localStorage.setItem(storageKey, profile.id);
+  window.localStorage.setItem(storageEmailKey, profile.email);
 }
 
 function clearStoredProfile() {
   window.localStorage.removeItem(storageKey);
+  window.localStorage.removeItem(storageEmailKey);
 }
 
 function getPortalRedirectUrl() {
   if (window.location.protocol === "file:") return null;
   if (["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)) {
     return `${portalProductionOrigin}${portalHomePath}`;
+  }
+  if (window.location.hostname === "login.suiyuecare.com") {
+    return `${portalOAuthBridgeOrigin}${portalHomePath}`;
   }
   return `${window.location.origin}${portalHomePath}`;
 }
@@ -2144,6 +2156,11 @@ function createModuleButton(module, profile) {
   `;
 
   button.addEventListener("click", () => {
+    const launchUrl = moduleLaunchUrls[module.id];
+    if (launchUrl) {
+      window.location.href = launchUrl;
+      return;
+    }
     if (hasChildren) {
       renderLevelTwo(module, profile);
       return;
@@ -2158,6 +2175,10 @@ function createModuleButton(module, profile) {
     }
     if (module.id === "employee-accounts") {
       renderAccountManagementTool(profile, "員工帳號");
+      return;
+    }
+    if (module.id === "agile-projects") {
+      renderAgileProjectTool(profile);
       return;
     }
     setStatus(`${module.name} 尚未設定正式連結。`, "info");
@@ -2192,7 +2213,7 @@ function renderLevelTwo(parentModule, profile) {
 
 function renderOrganizationTool(profile) {
   if (!moduleLevelTwoGrid || !moduleTitle) return;
-  moduleTitle.textContent = "工具箱｜組織圖";
+  moduleTitle.textContent = "總務系統｜組織圖";
 
   const panel = document.createElement("section");
   panel.className = "tool-detail";
@@ -2210,7 +2231,48 @@ function renderOrganizationTool(profile) {
   moduleLevelTwoGrid.classList.add("detail-grid");
   moduleLevelTwoGrid.replaceChildren(panel);
   renderOrganizationChart(panel.querySelector(".org-chart"), profile);
-  setStatus("已開啟工具箱中的組織圖。", "info");
+  setStatus("已開啟總務系統中的組織圖。", "info");
+}
+
+function renderAgileProjectTool(profile) {
+  if (!moduleLevelTwoGrid || !moduleTitle) return;
+  moduleTitle.textContent = "總務系統｜敏捷專案管理";
+
+  const panel = document.createElement("section");
+  panel.className = "tool-detail account-management";
+  panel.innerHTML = `
+    <div class="account-head">
+      <strong>敏捷專案管理</strong>
+      <small>依專案、衝刺、負責人與跨部門協作範圍控管；正式串接前先建立入口欄位與權限位置。</small>
+    </div>
+    <div class="account-stats">
+      <article>
+        <span>專案</span>
+        <strong>0</strong>
+        <small>待串接資料表</small>
+      </article>
+      <article>
+        <span>衝刺</span>
+        <strong>0</strong>
+        <small>待建立 Sprint</small>
+      </article>
+      <article>
+        <span>任務</span>
+        <strong>0</strong>
+        <small>待建立看板</small>
+      </article>
+      <article>
+        <span>目前權限</span>
+        <strong>${escapeHtml(scopeLabels[profile.scope] || profile.scope)}</strong>
+        <small>${escapeHtml(profile.email)}</small>
+      </article>
+    </div>
+    <div class="empty-account-state">敏捷專案管理入口已建立；下一步可接專案、看板、Sprint、任務指派與操作紀錄資料表。</div>
+  `;
+
+  moduleLevelTwoGrid.classList.add("detail-grid");
+  moduleLevelTwoGrid.replaceChildren(panel);
+  setStatus("已開啟敏捷專案管理。", "info");
 }
 
 function createPermissionTabs(activeTab) {

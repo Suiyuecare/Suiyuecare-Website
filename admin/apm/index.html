@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>敏捷專案管理 APM｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/portal/">
+            <img src="/assets/company-logo.png" alt="" />
+            <span><strong>歲悅長照集團</strong><small>APM Console</small></span>
+          </a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/investor-data"><span>FN</span><strong>Finance</strong></a>
+          <a class="active" href="/admin/apm"><span>PM</span><strong>APM 專案管理</strong></a>
+          <a href="/admin/users"><span>US</span><strong>使用者權限</strong></a>
+          <a href="/portal/"><span>PT</span><strong>回入口網</strong></a>
+        </nav>
+        <div class="admin-sidebar-note">
+          <span>Agile Project Management</span>
+          <strong>專案・Sprint・任務</strong>
+          <p>APM 先承接 Portal 權限與 Google 登入，後續可接獨立 Supabase 專案資料。</p>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Agile Project Management</p>
+            <h1>敏捷專案管理 APM</h1>
+            <span>集中管理跨部門專案、Sprint、任務負責人與進度節奏。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="admin-preview-link" href="/portal/">回入口網</a>
+            <div class="admin-userbox">
+              <b id="adminUserInitial">S</b>
+              <span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span>
+              <button id="adminLogout" type="button">登出</button>
+            </div>
+          </div>
+        </header>
+
+        <div id="apmStatus" class="admin-data-status">正在檢查 APM 權限...</div>
+
+        <section class="admin-dashboard-grid compact" aria-label="APM 摘要">
+          <article><span>Projects</span><strong data-apm-count="projects">3</strong><p>進行中專案</p></article>
+          <article><span>Sprints</span><strong data-apm-count="sprints">2</strong><p>本期衝刺</p></article>
+          <article><span>Tasks</span><strong data-apm-count="tasks">12</strong><p>任務卡片</p></article>
+          <article><span>Blocked</span><strong data-apm-count="blocked">1</strong><p>需主管協助</p></article>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">Board</p><h2>APM 任務看板</h2></div>
+            <span class="admin-soft-note">目前為 Portal 串接版；正式資料表建立後可改讀 APM Supabase。</span>
+          </div>
+          <div id="apmBoard" class="admin-launch-grid"></div>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">Architecture</p><h2>跨模組登入與資料來源</h2></div>
+          </div>
+          <div class="admin-cms-guidance-grid">
+            <article><span>Identity</span><strong>共用 Google 帳號</strong><p>由 Portal/Logging 完成 Google 登入與員工角色判斷。</p></article>
+            <article><span>Permission</span><strong>沿用 Portal 權限</strong><p>APM 會以登入 email、角色與 Data Scope 決定可見專案。</p></article>
+            <article><span>Data</span><strong>可獨立 Supabase</strong><p>未來 APM 可使用自己的 Supabase 專案，只接收可信任身份。</p></article>
+            <article><span>Audit</span><strong>操作紀錄</strong><p>新增、指派、狀態異動、匯出與刪除都應寫入不可竄改紀錄。</p></article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="adminLoading" class="admin-loading">
+      <strong>正在檢查登入狀態</strong>
+      <span>請稍候...</span>
+    </div>
+
+    <script type="module" src="/src/admin/apm.js"></script>
+  </body>
+</html>
