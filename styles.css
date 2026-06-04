@@ -7299,19 +7299,71 @@ h2 {
   h1 { font-size: clamp(34px, 9.6vw, 40px); line-height: 1.12; }
   h2 { font-size: clamp(30px, 8.6vw, 38px); }
   .hero, .section, .detail-hero, .detail-content, .site-footer, .health-hero, .health-grid, .courses-hero, .course-list, .article-topbar, .article-layout, .investor-hero, .investor-panel, .ir-sub-hero, .ir-tab-panel, .career-hero, .career-tab-panel, .career-openings, .about-hero, .about-story, .about-belief, .about-principles, .about-system, .about-team-section, .about-method, .about-quality-section, .about-future, .about-stats, .milestone-hero, .milestone-stats, .milestone-journey, .service-detail-hero, .service-detail-section { padding-inline: 20px; }
-  .hero { min-height: auto; padding-top: 74px; overflow-x: clip; }
+  .hero {
+    min-height: max(760px, calc(100svh - var(--header-height)));
+    padding-top: clamp(70px, 14vh, 112px);
+    padding-bottom: 46px;
+    overflow-x: clip;
+    align-items: start;
+    background: #2d1709;
+  }
   .hero-bg {
-    left: 0;
-    right: 0;
+    position: absolute;
+    inset: 0;
+    display: block;
     width: 100%;
+    min-height: 100%;
+    margin: 0;
+    border-radius: 0;
+    background-image:
+      linear-gradient(90deg, rgba(255,248,238,.76) 0%, rgba(255,248,238,.58) 42%, rgba(255,248,238,.12) 74%, rgba(255,248,238,0) 100%),
+      linear-gradient(180deg, rgba(255,248,238,.1), rgba(255,248,238,.34)),
+      url("assets/hero-care.png") !important;
+    background-position: 72% center !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    transform: none;
+    box-shadow: none;
   }
   .hero-copy {
-    max-width: 100%;
+    position: relative;
+    z-index: 1;
+    align-self: start;
+    max-width: min(84vw, 410px);
+    padding-top: clamp(250px, 38vh, 330px);
     padding-right: 0;
+  }
+  .hero .eyebrow { display: none; }
+  .hero h1 {
+    max-width: 100%;
+    margin-bottom: 14px;
+    color: #fff;
+    font-size: clamp(31px, 8.8vw, 38px);
+    line-height: 1.1;
+    text-shadow: 0 12px 34px rgba(83,43,11,.48), 0 2px 10px rgba(63,33,13,.5);
   }
   .hero-copy > p:not(.eyebrow) {
     font-size: 17px;
     line-height: 1.85;
+  }
+  .hero-actions .ghost-button {
+    display: none;
+  }
+  .hero-copy > p[data-cms-field="body"] {
+    display: block;
+    max-width: 330px;
+    margin-bottom: 22px;
+    color: rgba(63, 33, 13, .72);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.72;
+    text-shadow: 0 1px 16px rgba(255, 248, 238, .62);
+  }
+  .hero-slogan {
+    margin-bottom: 18px;
+    padding: 10px 16px;
+    font-size: 14px !important;
+    line-height: 1.35 !important;
   }
   .hero-dashboard {
     min-height: auto;
