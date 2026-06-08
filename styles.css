@@ -1336,26 +1336,32 @@ h2 {
   content: "";
   position: absolute;
   z-index: 2;
-  top: 18px;
-  right: 18px;
+  top: 50%;
+  left: 50%;
   width: 54px;
   height: 54px;
   border-radius: 999px;
   background: rgba(240,138,36,.94);
   box-shadow: 0 14px 30px rgba(83,43,11,.2);
+  transform: translate(-50%, -50%);
 }
 .health-preview.media-card::after,
 .health-video-card::after {
   content: "";
   position: absolute;
   z-index: 3;
-  top: 36px;
-  right: 36px;
+  top: 50%;
+  left: 50%;
   width: 0;
   height: 0;
   border-top: 9px solid transparent;
   border-bottom: 9px solid transparent;
   border-left: 14px solid #fff;
+  transform: translate(-35%, -50%);
+}
+.health-preview.media-card::before,
+.health-preview.media-card::after {
+  top: 85px;
 }
 .health-preview.media-card h3 {
   font-size: 22px;
