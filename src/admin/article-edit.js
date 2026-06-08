@@ -119,6 +119,127 @@ function renderSuggestionOptions() {
     .catch((error) => console.warn("Failed to load article suggestions", error));
 }
 
+function closestEditorField(name) {
+  const element = form?.elements?.[name];
+  if (!element) return null;
+  return element.closest("label, .admin-toggle-field, .admin-section-image-tools, .admin-nested-panel");
+}
+
+function renameEditorField(name, label, helpText = "") {
+  const field = closestEditorField(name);
+  if (!field) return;
+  const labelText = field.matches("label")
+    ? field.querySelector(":scope > span")
+    : field.querySelector("strong, h3");
+  if (labelText) labelText.textContent = label;
+  if (helpText) {
+    let hint = field.querySelector(":scope > small, .admin-simple-hint");
+    if (!hint) {
+      hint = document.createElement("small");
+      hint.className = "admin-simple-hint";
+      field.append(hint);
+    }
+    hint.textContent = helpText;
+  }
+}
+
+function moveFieldTo(container, name) {
+  const field = closestEditorField(name);
+  if (field) container.append(field);
+  return field;
+}
+
+function simplifyArticleEditorLayout() {
+  if (!form || form.dataset.simpleComposerReady === "true") return;
+  const rootGrid = form.querySelector(".admin-form-grid");
+  if (!rootGrid) return;
+
+  form.dataset.simpleComposerReady = "true";
+
+  const aiPanel = document.querySelector("#generateArticleWithAiButton")?.closest(".admin-front-map");
+  if (aiPanel) {
+    aiPanel.classList.add("admin-ai-writing-panel");
+    const title = aiPanel.querySelector("strong");
+    if (title) title.textContent = "AI 文章撰寫";
+    const text = aiPanel.querySelector("span");
+    if (text) {
+      text.textContent = "先填大標題、副標、本文重點或資料來源，再讓 AI 產生初稿。產生後仍可用下方編輯器調整文字、圖片與影片。";
+    }
+  }
+
+  const simpleSection = document.createElement("section");
+  simpleSection.className = "admin-simple-article-composer admin-field-wide";
+  simpleSection.innerHTML = `
+    <div class="admin-simple-composer-head">
+      <div>
+        <p class="admin-eyebrow">Simple Article Composer</p>
+        <h3>文章撰寫</h3>
+      </div>
+      <span>預設只顯示正式撰稿會用到的欄位；網址、排序、CTA、FAQ 等可到下方「進階設定」調整。</span>
+    </div>
+  `;
+  const simpleGrid = document.createElement("div");
+  simpleGrid.className = "admin-form-grid admin-simple-article-grid";
+  simpleSection.append(simpleGrid);
+
+  const advancedSection = document.createElement("details");
+  advancedSection.className = "admin-advanced-settings admin-field-wide";
+  advancedSection.innerHTML = `
+    <summary>
+      <span>進階設定</span>
+      <small>Slug、排序、CTA、相關文章、影片欄位、SEO 微調與 FAQ</small>
+    </summary>
+  `;
+  const advancedGrid = document.createElement("div");
+  advancedGrid.className = "admin-form-grid compact";
+  advancedSection.append(advancedGrid);
+
+  rootGrid.prepend(simpleSection);
+  rootGrid.append(advancedSection);
+
+  renameEditorField("title", "大標題（同步 SEO 標題）", "文章主標題，儲存時也會作為 SEO 標題的預設值。");
+  renameEditorField("subtitle", "副標（同步 SEO 描述）", "文章摘要式副標，儲存時也會作為 SEO 描述的預設值。");
+  renameEditorField("category_id", "文章類型", "例如失智症、照顧技巧、家屬支持、懶人包等。");
+  renameEditorField("content_type", "此文章會出現的地方", "決定文章會出現在 Health 3.0、最新動態、得標紀錄、活動專區或影音區。");
+  renameEditorField("summary_points", "本文重點", "一行一個重點，會出現在文章內頁的重點區。");
+  renameEditorField("content", "內文", "可調整字級、顏色、粗體、插入圖片與影片。");
+  renameEditorField("tags", "標籤（同步 SEO 關鍵字）", "可重複選用曾經輸入過的標籤，並同步作為 SEO 關鍵字。");
+  renameEditorField("published_at", "日期", "預設可用當日，也可以指定發布或顯示時間。");
+  renameEditorField("source_name", "資料來源名稱", "會出現在文章下方 Reference 區。");
+  renameEditorField("source_url", "資料來源 URL", "若有外部資料來源，請填入原始網址。");
+
+  const coverBlock = document.querySelector(".admin-section-image-tools");
+  const coverTitle = coverBlock?.querySelector("strong");
+  const coverHelp = coverBlock?.querySelector("p");
+  if (coverTitle) coverTitle.textContent = "文章圖片";
+  if (coverHelp) {
+    coverHelp.textContent = "可從媒體庫選擇或上傳圖片；上傳後可裁切成符合前台文章卡片與文章 Hero 的比例。";
+  }
+
+  [
+    "title",
+    "subtitle"
+  ].forEach((name) => moveFieldTo(simpleGrid, name));
+  if (coverBlock) simpleGrid.append(coverBlock);
+  [
+    "summary_points",
+    "content",
+    "source_name",
+    "source_url",
+    "author_name",
+    "author_title",
+    "tags",
+    "published_at",
+    "content_type",
+    "category_id",
+    "status",
+    "is_enabled"
+  ].forEach((name) => moveFieldTo(simpleGrid, name));
+
+  const remaining = [...rootGrid.children].filter((child) => child !== simpleSection && child !== advancedSection);
+  remaining.forEach((child) => advancedGrid.append(child));
+}
+
 function getArticleIdFromLocation() {
   const queryId = new URLSearchParams(window.location.search).get("id");
   if (queryId) return queryId;
@@ -886,6 +1007,7 @@ bootProtectedAdminPage({
   userInitial,
   logoutButton,
   onReady: async () => {
+    simplifyArticleEditorLayout();
     renderSuggestionOptions();
     await loadArticleEditor();
   }
