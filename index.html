@@ -27,6 +27,11 @@
     <title>歲悅長照集團｜Suiyuecare Corps.</title>
     <script>
       (() => {
+        if (window.location.hostname === "apm.suiyuecare.com") {
+          document.documentElement.dataset.appHost = "apm";
+          document.title = "敏捷專案管理｜歲悅長照集團";
+        }
+
         const authSearch = window.location.search || "";
         const authHash = window.location.hash || "";
         const hasSupabaseAuthParams = /[?&](code|access_token|refresh_token|error|error_description)=/.test(authSearch) || /(access_token|refresh_token|error|error_description)=/.test(authHash);
@@ -42,6 +47,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <link id="apmAdminStyles" rel="stylesheet" href="/src/admin/admin.css" media="not all" />
+    <style>
+      html[data-app-host="apm"] body {
+        margin: 0;
+        background: #f7f3ec;
+      }
+
+      html[data-app-host="apm"] body > :not(.apm-root-shell):not(script) {
+        display: none !important;
+      }
+
+      html:not([data-app-host="apm"]) .apm-root-shell {
+        display: none !important;
+      }
+    </style>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -61,6 +81,82 @@
     </script>
   </head>
   <body>
+    <div class="apm-root-shell admin-app-page">
+      <div class="admin-app-shell" hidden>
+        <aside class="admin-sidebar">
+          <div class="admin-sidebar-head">
+            <a class="admin-brand" href="https://login.suiyuecare.com/portal/">
+              <img src="/assets/company-logo.png" alt="" />
+              <span><strong>歲悅長照集團</strong><small>APM Console</small></span>
+            </a>
+          </div>
+          <nav class="admin-menu" aria-label="APM 選單">
+            <a class="active" href="/"><span>PM</span><strong>APM 專案管理</strong></a>
+            <a href="https://login.suiyuecare.com/portal/"><span>PT</span><strong>回模組頁</strong></a>
+          </nav>
+          <div class="admin-sidebar-note">
+            <span>Agile Project Management</span>
+            <strong>專案・Sprint・任務</strong>
+            <p>APM 會承接 Logging 的 Google 帳號、角色與資料範圍。</p>
+          </div>
+        </aside>
+
+        <main class="admin-main">
+          <header class="admin-topbar">
+            <div class="admin-topbar-title">
+              <p class="admin-eyebrow">Agile Project Management</p>
+              <h1>敏捷專案管理 APM</h1>
+              <span>集中管理跨部門專案、Sprint、任務負責人與進度節奏。</span>
+            </div>
+            <div class="admin-topbar-actions">
+              <a class="admin-preview-link" href="https://login.suiyuecare.com/portal/">回模組頁</a>
+              <div class="admin-userbox">
+                <b id="adminUserInitial">S</b>
+                <span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span>
+                <button id="adminLogout" type="button">登出</button>
+              </div>
+            </div>
+          </header>
+
+          <div id="apmStatus" class="admin-data-status">正在檢查 APM 權限...</div>
+
+          <section class="admin-dashboard-grid compact" aria-label="APM 摘要">
+            <article><span>Projects</span><strong data-apm-count="projects">3</strong><p>進行中專案</p></article>
+            <article><span>Sprints</span><strong data-apm-count="sprints">2</strong><p>本期衝刺</p></article>
+            <article><span>Tasks</span><strong data-apm-count="tasks">12</strong><p>任務卡片</p></article>
+            <article><span>Blocked</span><strong data-apm-count="blocked">1</strong><p>需主管協助</p></article>
+          </section>
+
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head">
+              <div><p class="admin-eyebrow">Board</p><h2>APM 任務看板</h2></div>
+              <span class="admin-soft-note">目前為 Logging 串接版；正式資料表建立後可改讀 APM Supabase。</span>
+            </div>
+            <div id="apmBoard" class="admin-launch-grid"></div>
+          </section>
+
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head">
+              <div><p class="admin-eyebrow">Architecture</p><h2>跨模組登入與資料來源</h2></div>
+            </div>
+            <div class="admin-cms-guidance-grid">
+              <article><span>Identity</span><strong>共用 Google 帳號</strong><p>由 Logging 完成 Google 登入與員工角色判斷。</p></article>
+              <article><span>Permission</span><strong>沿用 Logging 權限</strong><p>APM 會以登入 email、角色與 Data Scope 決定可見專案。</p></article>
+              <article><span>Data</span><strong>可獨立 Supabase</strong><p>APM 可使用自己的 Supabase 專案，只接收可信任身份。</p></article>
+              <article><span>Audit</span><strong>操作紀錄</strong><p>新增、指派、狀態異動、匯出與刪除都應寫入不可竄改紀錄。</p></article>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <div id="adminLoading" class="admin-loading">
+        <img src="/assets/company-logo.png" alt="" />
+        <strong>正在進入 APM</strong>
+        <span>系統正在確認你的 Logging 登入狀態，完成後會開啟敏捷專案管理。</span>
+        <i></i>
+      </div>
+    </div>
+
     <div class="intro-loader" aria-hidden="true">
       <div class="intro-line"></div>
       <div class="intro-brand">
@@ -117,7 +213,7 @@
         <section class="hero" data-cms-section="hero">
           <div class="hero-bg" data-cms-field="background_image" aria-hidden="true"></div>
           <div class="hero-copy reveal">
-            <p class="eyebrow" data-cms-field="eyebrow">Professional Care Network</p>
+            <p class="eyebrow" data-cms-field="eyebrow">AI Empowered Suiyuecare System</p>
             <h1 data-cms-field="title">把長照變成家人看得懂、也放得下心的日常系統。</h1>
             <p class="hero-slogan" data-cms-field="subtitle">照顧就像去超商，買牛奶一樣簡單。</p>
             <p data-cms-field="body">歲悅長照集團整合居家、日照、社區、復能、培訓與品質管理，讓每一次照顧都能被安排、被追蹤，也被溫柔地完成。</p>
@@ -139,37 +235,40 @@
                 </div>
               </div>
               <div class="news-list active" data-news-panel="news">
-                <article><time>2026.05</time><strong>歲悅長照新增北北桃服務調度窗口</strong><p>整合居家照顧、日間照顧與護理復能諮詢，協助家庭更快找到適合服務。</p></article>
-                <article><time>2026.04</time><strong>健康3.0照顧知識專欄上線</strong><p>提供家屬可快速理解的照顧技巧、營養衛教與安全提醒。</p></article>
-                <article><time>2026.03</time><strong>移工照顧訓練課程開放報名</strong><p>以實作情境、家庭溝通與照顧安全為核心，提升家庭照顧穩定度。</p></article>
-                <article><time>2026.02</time><strong>日照中心春季活動課表更新</strong><p>新增音樂律動、手作活動與復能小組，讓長輩維持規律生活節奏。</p></article>
-                <article><time>2026.01</time><strong>北區居家服務督導制度升級</strong><p>強化到宅訪視、服務紀錄回饋與異常事件追蹤，提升照顧品質。</p></article>
-                <article><time>2025.12</time><strong>歲悅照顧者支持講座開放報名</strong><p>針對家屬壓力、失智溝通與喘息資源，提供可立即使用的照顧方法。</p></article>
-                <article><time>2025.11</time><strong>社區據點健康促進活動加開</strong><p>增加共餐、伸展、認知活動與量測服務，支持長輩維持社交與健康。</p></article>
-                <article><time>2025.10</time><strong>護理復能到宅評估服務啟動</strong><p>串接護理觀察、復能目標與家庭照顧建議，協助長輩安全恢復日常能力。</p></article>
-                <article><time>2025.09</time><strong>照顧服務員在職教育完成年度梯次</strong><p>以移位安全、沐浴照顧、溝通技巧與紀錄品質為核心，持續提升服務一致性。</p></article>
-                <article><time>2025.08</time><strong>家庭照顧諮詢預約系統更新</strong><p>讓家屬可更快留下需求，由專人協助判斷適合的服務與資源入口。</p></article>
+                <article><time>2026.07</time><strong>歲悅新北公司與居家長照機構完成更名</strong><p>愛無限整合有限公司及附設居家長照機構更名為歲悅新北體系，擴大新北居家照顧服務量能。</p></article>
+                <article><time>2026.07</time><strong>歲悅新北居家職能治療所完成更名</strong><p>好窩居家職能治療所更名為歲悅新北居家職能治療所，銜接新北復能與個案管理服務。</p></article>
+                <article><time>2026.07</time><strong>居家照顧評鑑模組上線內部測試</strong><p>歲悅照顧系統新增居家照顧評鑑模組，協助服務紀錄、品質追蹤與評鑑資料整理。</p></article>
+                <article><time>2026.06</time><strong>併購愛無限整合有限公司並拓展新北業務</strong><p>整合新店、中和、永和居家照顧業務，強化新北市居家服務網絡。</p></article>
+                <article><time>2026.06</time><strong>併購好窩居家職能治療所</strong><p>拓增新店區個案管理服務與新北市護理復能業務，建立跨專業照顧支持。</p></article>
+                <article><time>2026.06</time><strong>集團宣傳影片完成</strong><p>完成歲悅長照集團宣傳影片，呈現照顧理念、服務網絡與團隊形象。</p></article>
+                <article><time>2026.06</time><strong>歲悅桃園居家長照機構選址完成</strong><p>預計設立於蘆竹區，並特約服務蘆竹、大園區，布局桃園居家照顧服務。</p></article>
+                <article><time>2026.05</time><strong>得標士林、大同、信義失智症據點</strong><p>新增三處失智症據點服務，深化臺北市社區失智支持與家屬諮詢資源。</p></article>
+                <article><time>2026.05</time><strong>會計系統模組上線內部測試</strong><p>歲悅照顧系統啟動會計系統模組測試，整合財務、行政與照顧營運資料。</p></article>
+                <article><time>2026.05</time><strong>萬華日照二館租約簽約完成</strong><p>完成十年期合約簽署，為萬華區日間照顧服務擴點預作準備。</p></article>
               </div>
               <div class="news-list" data-news-panel="awards">
-                <article><time>2026</time><strong>臺北市居家照顧服務合作案</strong><p>承接區域照顧支持與家屬諮詢服務，建立可追蹤的照顧流程。</p></article>
-                <article><time>2025</time><strong>新北市社區照顧據點服務案</strong><p>協助社區健康促進、共餐活動與預防延緩失能課程執行。</p></article>
-                <article><time>2025</time><strong>桃園市護理復能支持服務案</strong><p>串接護理評估、復能訓練與服務品質追蹤。</p></article>
-                <article><time>2025</time><strong>臺北市照顧服務員教育訓練委託案</strong><p>辦理照顧技巧、服務倫理與品質管理訓練，協助照顧人員穩定成長。</p></article>
-                <article><time>2024</time><strong>新北市長照家庭支持服務案</strong><p>提供家屬諮詢、照顧資源轉介與喘息需求評估。</p></article>
-                <article><time>2024</time><strong>臺北市社區健康促進活動執行案</strong><p>協助據點辦理健康量測、團體活動與預防延緩失能課程。</p></article>
-                <article><time>2024</time><strong>桃園市居家照顧服務品質提升案</strong><p>導入督導訪視、服務紀錄檢核與照顧風險提醒制度。</p></article>
-                <article><time>2023</time><strong>北區移工照顧技能培訓合作案</strong><p>以家庭照顧實務、溝通情境與安全照顧流程為課程核心。</p></article>
-                <article><time>2023</time><strong>臺北市高齡友善社區合作案</strong><p>串接社區據點、健康促進與長者關懷訪視。</p></article>
-                <article><time>2023</time><strong>長照服務資訊整合與諮詢案</strong><p>協助家庭理解服務選項、申請流程與照顧安排方向。</p></article>
+                <article><time>2026.05</time><strong>得標士林區失智症據點</strong><p>承接士林區失智友善社區支持、家屬諮詢與延緩失能活動服務。</p></article>
+                <article><time>2026.05</time><strong>得標大同區失智症據點</strong><p>協助大同區建立失智照顧支持、社區關懷與照顧資源轉介服務。</p></article>
+                <article><time>2026.05</time><strong>得標信義區失智症據點</strong><p>提供信義區失智症家屬照顧諮詢、預防延緩失能活動與課程報名。</p></article>
+                <article><time>2026.03</time><strong>臺北市聘用外籍看護工雇主安心計畫</strong><p>獲得集中訓練案 125 萬，協助家庭雇主與外籍看護工提升照顧品質。</p></article>
+                <article><time>2026.03</time><strong>臺北市照顧服務員訓練班乙班</strong><p>辦理照顧服務員訓練，強化照顧技巧、倫理與服務紀錄能力。</p></article>
+                <article><time>2026.02</time><strong>移工數位學習計畫</strong><p>獲得勞動部勞動力發展署 115 至 116 年移工數位學習計畫 2,616 萬。</p></article>
+                <article><time>2025.11</time><strong>家庭看護工作補充訓練計畫</strong><p>獲得高雄市政府勞工局 115 年度外國人從事家庭看護工作補充訓練計畫 130 萬。</p></article>
               </div>
             </div>
             <aside class="service-reel-panel recruit-panel" aria-label="員工招募快速入口">
               <p class="eyebrow">We want you</p>
               <h2>員工招募</h2>
               <div class="recruit-list">
-                <a href="#talent"><figure><img src="assets/homepage-batch/05-orange-polo-caregiver.png" alt="居家照顧服務員招募" /><figcaption>居家照顧服務員</figcaption></figure><div><p>到宅陪伴、生活支持、照顧紀錄。</p></div></a>
-                <a href="#talent"><figure><img src="assets/homepage-batch/06-orange-polo-supervisor.png" alt="居家服務督導招募" /><figcaption>居家服務督導</figcaption></figure><div><p>照顧品質追蹤、服務媒合與團隊支持。</p></div></a>
-                <a href="#talent"><figure><img src="assets/homepage-batch/04-admin-team-office.png" alt="日照照顧服務員招募" /><figcaption>日照照顧服務員</figcaption></figure><div><p>活動陪伴、餐食照顧、長輩日常支持。</p></div></a>
+                <a href="#talent"><figure><img src="assets/homepage-batch/05-orange-polo-caregiver.png" alt="居家照顧服務員招募" /><figcaption>居家照顧服務員</figcaption></figure><div><p>到宅陪伴、身體照顧、生活支持與服務紀錄。</p></div></a>
+                <a href="#talent"><figure><img src="assets/homepage-batch/06-orange-polo-supervisor.png" alt="居家服務督導招募" /><figcaption>居家照顧服務督導</figcaption></figure><div><p>個案管理、照顧品質追蹤、服務媒合與團隊支持。</p></div></a>
+                <a href="#talent"><figure><img src="assets/daycare-recruit-02-exercise.png" alt="日照中心照顧服務員招募" /><figcaption>日照中心照顧服務員</figcaption></figure><div><p>活動陪伴、餐食照顧、長輩日常支持與紀錄。</p></div></a>
+                <a href="#talent"><figure><img src="assets/homepage-batch/03-supervisor-care-plan.png" alt="長照3.0個案管理師招募" /><figcaption>長照3.0個案管理師</figcaption></figure><div><p>需求評估、資源連結、家屬溝通與照顧計畫追蹤。</p></div></a>
+                <a href="#talent"><figure><img src="assets/daycare-recruit-05-handover.png" alt="日間照顧中心業務負責人兼任護理師招募" /><figcaption>日照業務負責人兼護理師</figcaption></figure><div><p>中心營運、護理觀察、團隊管理與品質維持。</p></div></a>
+                <a href="#talent"><figure><img src="assets/homepage-batch/12-community-health-class.png" alt="失智症據點管理員招募" /><figcaption>失智症據點管理員</figcaption></figure><div><p>據點活動、家屬諮詢、社區資源與服務紀錄。</p></div></a>
+                <a href="#talent"><figure><img src="assets/migrant-recruit-04-communication.png" alt="菲律賓社群行銷企劃招募" /><figcaption>菲律賓社群行銷企劃</figcaption></figure><div><p>移工社群內容、活動推廣、課程宣傳與合作溝通。</p></div></a>
+                <a href="#talent"><figure><img src="assets/quality-recruit-02-training.png" alt="活動企劃專員招募" /><figcaption>活動企劃專員</figcaption></figure><div><p>課程活動、社區方案、徵才活動與品牌企劃執行。</p></div></a>
+                <a href="#talent"><figure><img src="assets/admin-recruit-02-operations.png" alt="桃園居家照顧機構業務負責人招募" /><figcaption>桃園居家業務負責人</figcaption></figure><div><p>桃園居家機構籌設、特約服務、團隊建立與營運管理。</p></div></a>
               </div>
             </aside>
           </div>
@@ -329,19 +428,19 @@
             <div class="health-row media-row">
               <article class="health-preview media-card">
                 <img src="assets/homepage-batch/15-phone-consultation.png" alt="健康3.0照顧影片" />
-                <div><span>影片</span><h3>三分鐘理解居家照顧安排流程</h3><a href="#article-master-talk-care-psychology">Watch</a></div>
+                <div><span>影片</span><h3>三分鐘理解居家照顧安排流程</h3><a href="#article-master-talk-care-psychology">Read more &gt;</a></div>
               </article>
               <article class="health-preview media-card">
                 <img src="assets/homepage-batch/12-community-health-class.png" alt="日間照顧介紹影片" />
-                <div><span>影片</span><h3>日間照顧如何讓家庭喘息</h3><a href="#article-master-talk-care-psychology">Watch</a></div>
+                <div><span>影片</span><h3>日間照顧如何讓家庭喘息</h3><a href="#article-master-talk-care-psychology">Read more &gt;</a></div>
               </article>
               <article class="health-preview media-card short-video">
                 <img src="assets/homepage-batch/14-care-notes.png" alt="跌倒觀察短影片" />
-                <div><span>短影片</span><h3>跌倒後 24 小時觀察重點</h3><a href="#article-longterm-care-apply">View Shorts</a></div>
+                <div><span>短影片</span><h3>跌倒後 24 小時觀察重點</h3><a href="#article-longterm-care-apply">Read more &gt;</a></div>
               </article>
               <article class="health-preview media-card short-video">
                 <img src="assets/homepage-batch/08-orange-apron-walking.png" alt="居家安全短影片" />
-                <div><span>短影片</span><h3>浴室安全的快速檢查</h3><a href="#article-longterm-care-apply">View Shorts</a></div>
+                <div><span>短影片</span><h3>浴室安全的快速檢查</h3><a href="#article-longterm-care-apply">Read more &gt;</a></div>
               </article>
             </div>
             <div class="celebrity-row">
@@ -364,9 +463,9 @@
 
         <section class="contact-section section reveal" id="contact" data-cms-section="contact">
           <div>
-            <p class="eyebrow" data-cms-field="eyebrow">Contact</p>
-            <h2 data-cms-field="title">先留下需求，讓我們協助判斷適合的照顧方向。</h2>
-            <p data-cms-field="body">服務諮詢、課程報名、人才招募、土地合作與投資洽談，都可以從這裡開始。</p>
+            <p class="eyebrow" data-cms-field="eyebrow">Contact Us</p>
+            <h2 data-cms-field="title">把需求交給歲悅，讓專人陪你釐清下一步。</h2>
+            <p data-cms-field="body">不論是長照服務、課程報名、人才加入、土地合作或投資洽談，我們會依照你的需求安排合適窗口主動聯繫。</p>
           </div>
           <form class="contact-form" action="/api/send-email" method="POST" data-form-type="contact">
             <input type="hidden" name="form_type" value="contact" />
@@ -376,9 +475,9 @@
             <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
             <label>姓名<input type="text" name="姓名" placeholder="請輸入姓名" required /></label>
             <label>電話<input type="tel" name="電話" placeholder="請輸入聯絡電話" required /></label>
-            <label>Email<input type="email" name="Email" placeholder="請輸入 Email" required /></label>
+            <label>Email<input type="email" name="Email" placeholder="可選填，方便寄送回覆紀錄" /></label>
             <label>需求<select name="需求" required><option>長照服務諮詢</option><option>課程報名</option><option>人才招募</option><option>土地合作</option><option>投資洽談</option></select></label>
-            <label>說明<textarea name="說明" rows="4" placeholder="請簡單描述目前遇到的照顧情境" required></textarea></label>
+            <label>說明<textarea name="說明" rows="8" placeholder="請簡單描述目前遇到的照顧情境、希望諮詢的服務或合作方向" required></textarea></label>
             <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為回覆諮詢、服務安排與後續聯繫目的，使用我填寫的個人資料。</label>
             <button type="submit">送出諮詢</button>
           </form>
@@ -437,6 +536,17 @@
       <div class="footer-bottom"><span>© 2026 Suiyuecare Corps. All rights reserved.</span><span>照顧就像去超商 買牛奶一樣簡單</span></div>
     </footer>
 
-    <script type="module" src="app.js"></script>
+    <script type="module">
+      (async () => {
+        if (window.location.hostname === "apm.suiyuecare.com") {
+          const adminStyles = document.querySelector("#apmAdminStyles");
+          if (adminStyles) adminStyles.media = "all";
+          await import("/src/admin/apm.js");
+          return;
+        }
+
+        await import("./app.js");
+      })();
+    </script>
   </body>
 </html>

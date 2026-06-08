@@ -1175,19 +1175,20 @@ h2 {
 .service-grid a:hover,
 .service-grid a:focus-visible {
   border-color: rgba(240,138,36,.55);
-  box-shadow: 0 24px 58px rgba(83,43,11,.14);
+  background: var(--orange);
+  box-shadow: 0 24px 58px rgba(240,138,36,.24);
   color: var(--brown);
   transform: translateY(-5px);
 }
 .service-grid a:hover img,
 .service-grid a:focus-visible img {
-  opacity: .76;
-  filter: saturate(.58) contrast(.9) brightness(1.22);
+  opacity: .82;
+  filter: saturate(1.06) contrast(1) brightness(1.18);
 }
 .service-grid a:hover img,
 .service-grid a:focus-visible img { transform: scale(1.06); }
 .service-grid a:hover::before,
-.service-grid a:focus-visible::before { background: linear-gradient(180deg, rgba(255,253,248,.16), rgba(255,246,235,.82)); }
+.service-grid a:focus-visible::before { background: linear-gradient(180deg, rgba(240,138,36,.08), rgba(255,246,235,.9) 62%, rgba(240,138,36,.78)); }
 .service-grid a:hover::after,
 .service-grid a:focus-visible::after { background: rgba(240,138,36,.42); }
 .service-grid strong {
@@ -1221,7 +1222,7 @@ h2 {
 }
 .service-grid a:hover span,
 .service-grid a:focus-visible span {
-  background: rgba(255,255,255,.9);
+  background: rgba(255,255,255,.92);
   color: var(--brown);
 }
 @media (min-width: 1025px) {
@@ -1326,6 +1327,35 @@ h2 {
 }
 .health-preview.media-card img {
   height: 170px;
+}
+.health-preview.media-card {
+  position: relative;
+}
+.health-preview.media-card::before,
+.health-video-card::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  right: 18px;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  background: rgba(240,138,36,.94);
+  box-shadow: 0 14px 30px rgba(83,43,11,.2);
+}
+.health-preview.media-card::after,
+.health-video-card::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  top: 36px;
+  right: 36px;
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 14px solid #fff;
 }
 .health-preview.media-card h3 {
   font-size: 22px;
@@ -1851,12 +1881,6 @@ h2 {
   background: var(--brown);
   box-shadow: 0 18px 46px rgba(83,43,11,.08);
 }
-.health-video-card::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background: linear-gradient(180deg, transparent 38%, rgba(63,33,13,.82));
-}
 .health-video-card img,
 .health-video-card iframe,
 .health-video-card video {
@@ -1882,9 +1906,15 @@ h2 {
 .health-video-card div {
   position: absolute;
   z-index: 1;
+  top: 0;
   left: 22px;
   right: 22px;
-  bottom: 22px;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 130px 0 22px;
+  background: linear-gradient(180deg, transparent 36%, rgba(63,33,13,.82));
   color: #fff;
 }
 .health-video-card span {
@@ -1903,6 +1933,13 @@ h2 {
   font-weight: 800;
   line-height: 1.55;
   margin-top: 8px;
+}
+.health-video-card a {
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 12px;
+  color: #fff;
+  font-weight: 900;
 }
 .search-page {
   background: var(--paper);
@@ -6284,6 +6321,10 @@ h2 {
   background: #fff;
   color: var(--brown);
 }
+.contact-form textarea {
+  min-height: 190px;
+  resize: vertical;
+}
 .privacy-consent {
   display: grid !important;
   grid-template-columns: 22px minmax(0, 1fr);
@@ -7526,6 +7567,46 @@ h2 {
   }
   .health-card {
     grid-template-columns: 1fr;
+  }
+  .home-health-section .article-row,
+  .home-health-section .media-row,
+  .home-health-section .mini-article-grid,
+  .health-latest-grid,
+  .health-pack-grid,
+  .health-event-grid,
+  .health-media-grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 14px;
+    margin-inline: -20px;
+    padding: 0 20px 16px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .home-health-section .article-row::-webkit-scrollbar,
+  .home-health-section .media-row::-webkit-scrollbar,
+  .home-health-section .mini-article-grid::-webkit-scrollbar,
+  .health-latest-grid::-webkit-scrollbar,
+  .health-pack-grid::-webkit-scrollbar,
+  .health-event-grid::-webkit-scrollbar,
+  .health-media-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .home-health-section .article-row > *,
+  .home-health-section .media-row > *,
+  .home-health-section .mini-article-grid > *,
+  .health-list-card,
+  .health-pack-card,
+  .health-event-card,
+  .health-video-card {
+    flex: 0 0 min(310px, 82vw);
+    scroll-snap-align: start;
+  }
+  .home-health-section .mini-article-grid {
+    margin-inline: 0;
+    padding-inline: 0;
   }
   .health-card img {
     height: 180px;

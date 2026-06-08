@@ -107,9 +107,9 @@ const pages = {
     features: ["資訊分級呈現", "簡報與資料下載", "聯繫窗口"]
   },
   contact: {
-    eyebrow: "Contact",
+    eyebrow: "Contact Us",
     title: "聯絡我們",
-    intro: "不論是服務諮詢、課程報名、場地合作、人才加入或投資洽談，都可以從這裡開始。",
+    intro: "不論是長照服務、課程報名、人才加入、土地合作或投資洽談，我們會依照你的需求安排合適窗口主動聯繫。",
     focus: ["服務諮詢", "合作與招募", "客服與據點窗口"],
     features: ["表單入口", "電話與信箱", "據點位置資訊"]
   }
@@ -1474,17 +1474,34 @@ function applyCmsSection(section) {
   if (!root) return;
 
   const content = getSectionContent(section);
+  const sectionKey = root.dataset.cmsSection || "";
+  const normalizeCmsValue = (field, value) => {
+    if (!value || typeof value !== "string") return value;
+    if (sectionKey === "hero" && field === "eyebrow" && value === "Professional Care Network") {
+      return "AI Empowered Suiyuecare System";
+    }
+    if (sectionKey === "contact") {
+      const contactCopy = {
+        Contact: "Contact Us",
+        "先留下需求，讓我們協助判斷適合的照顧方向。": "把需求交給歲悅，讓專人陪你釐清下一步。",
+        "服務諮詢、課程報名、人才招募、土地合作與投資洽談，都可以從這裡開始。": "不論是長照服務、課程報名、人才加入、土地合作或投資洽談，我們會依照你的需求安排合適窗口主動聯繫。",
+        "不論是服務諮詢、課程報名、場地合作、人才加入或投資洽談，都可以從這裡開始。": "不論是長照服務、課程報名、人才加入、土地合作或投資洽談，我們會依照你的需求安排合適窗口主動聯繫。"
+      };
+      return contactCopy[value] || value;
+    }
+    return value;
+  };
   root.__cmsContent = content;
   root.hidden = false;
   root.dataset.cmsLoaded = "true";
 
-  setCmsText(root, "eyebrow", content.eyebrow);
-  setCmsText(root, "title", section.title || content.title);
-  setCmsText(root, "subtitle", content.subtitle);
-  setCmsText(root, "body", section.body || content.body);
+  setCmsText(root, "eyebrow", normalizeCmsValue("eyebrow", content.eyebrow));
+  setCmsText(root, "title", normalizeCmsValue("title", section.title || content.title));
+  setCmsText(root, "subtitle", normalizeCmsValue("subtitle", content.subtitle));
+  setCmsText(root, "body", normalizeCmsValue("body", section.body || content.body));
 
   if (content.fields && typeof content.fields === "object") {
-    Object.entries(content.fields).forEach(([field, value]) => setCmsText(root, field, value));
+    Object.entries(content.fields).forEach(([field, value]) => setCmsText(root, field, normalizeCmsValue(field, value)));
   }
 
   const imageUrl = content.image_url || content.background_image_url;
@@ -3000,18 +3017,22 @@ function renderSupabaseHero(items) {
   const image = getCmsModuleImage(item, "assets/homepage-batch/01-care-home-greeting.png");
   const background = hero.querySelector(".hero-bg");
   if (background) {
-    background.style.background = `
+    background.style.backgroundImage = `
       linear-gradient(90deg, rgba(255, 248, 238, 0.72) 0%, rgba(255, 248, 238, 0.5) 38%, rgba(255, 248, 238, 0.12) 68%, rgba(255, 248, 238, 0) 100%),
       linear-gradient(180deg, rgba(255, 248, 238, 0.06), rgba(255, 248, 238, 0.18)),
-      url("${image}") ${item.metadata?.image_position || "center"} / cover
+      url("${image}")
     `;
+    background.style.backgroundPosition = item.metadata?.image_position || "center";
+    background.style.backgroundSize = "cover";
+    background.style.backgroundRepeat = "no-repeat";
   }
 
   const setText = (selector, value) => {
     const element = hero.querySelector(selector);
     if (element && value) element.textContent = value;
   };
-  setText('[data-cms-field="eyebrow"]', item.eyebrow);
+  const eyebrow = item.eyebrow === "Professional Care Network" ? "AI Empowered Suiyuecare System" : item.eyebrow;
+  setText('[data-cms-field="eyebrow"]', eyebrow);
   setText('[data-cms-field="title"]', item.title);
   setText('[data-cms-field="subtitle"]', item.subtitle);
   setText('[data-cms-field="body"]', item.body);
@@ -3761,7 +3782,7 @@ function renderHealthVideoCard(article, label = article.category) {
   return `
     <article class="health-video-card ${article.videoEmbedUrl ? "has-video" : "click-card"}" ${article.videoEmbedUrl ? "" : `data-href="${escapeHTML(article.href)}" tabindex="0" role="link"`}>
       ${media}
-      <div><span>${escapeHTML(displayLabel)}${article.videoDuration ? ` · ${escapeHTML(article.videoDuration)}` : ""}</span><h3>${escapeHTML(article.title)}</h3>${article.videoCaption ? `<p>${escapeHTML(article.videoCaption)}</p>` : ""}</div>
+      <div><span>${escapeHTML(displayLabel)}${article.videoDuration ? ` · ${escapeHTML(article.videoDuration)}` : ""}</span><h3>${escapeHTML(article.title)}</h3>${article.videoCaption ? `<p>${escapeHTML(article.videoCaption)}</p>` : ""}<a href="${escapeHTML(article.href)}">Read more &gt;</a></div>
     </article>
   `;
 }
