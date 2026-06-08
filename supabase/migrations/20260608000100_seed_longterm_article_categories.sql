@@ -1,0 +1,46 @@
+-- Seed practical long-term care article categories for the CMS article editor.
+
+insert into public.article_categories
+  (name, slug, description, type, section_key, display_label, sort_order, is_enabled, show_in_nav, is_featured, seo_keywords, metadata)
+values
+  ('失智症照顧', 'dementia-care', '失智症陪伴、溝通、日常安全與家屬支持。', 'article', 'health', '失智症', 101, true, true, false, array['失智症','失智照顧','認知退化'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('照顧技巧', 'care-skills', '移位、沐浴、用餐、陪伴與居家安全等實用技巧。', 'article', 'health', '照顧技巧', 102, true, true, true, array['照顧技巧','居家照顧','照服員'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('家屬支持', 'family-support', '家庭照顧者壓力、溝通、分工與喘息服務。', 'article', 'health', '家屬支持', 103, true, true, true, array['家屬支持','家庭照顧者','喘息服務'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('懶人包', 'lazy-pack', '把複雜照顧資訊整理成快速理解的懶人包。', 'lazy_pack', 'lazy_pack', '懶人包', 104, true, true, true, array['長照懶人包','照顧懶人包'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('長照申請', 'longterm-care-application', '長照 2.0、居家服務、日照與補助申請流程。', 'article', 'health', '長照申請', 105, true, true, false, array['長照申請','長照2.0','補助'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('居家安全', 'home-safety', '跌倒預防、浴室安全、環境檢查與輔具配置。', 'article', 'health', '居家安全', 106, true, true, false, array['居家安全','跌倒預防','輔具'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('移位與復能', 'transfer-reablement', '移位、步態、復能訓練與日常活動能力維持。', 'article', 'health', '移位復能', 107, true, true, false, array['移位','復能','步態訓練'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('營養與用餐', 'nutrition-meal-care', '長輩飲食、吞嚥、食慾與營養補充。', 'article', 'health', '營養用餐', 108, true, true, false, array['長輩營養','用餐照顧','吞嚥'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('日間照顧', 'day-care-knowledge', '日照活動、適應期、接送與家屬溝通。', 'article', 'health', '日間照顧', 109, true, true, false, array['日間照顧','日照中心'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('居家照顧', 'home-care-knowledge', '居家服務流程、照顧紀錄、照服員與督導協作。', 'article', 'health', '居家照顧', 110, true, true, false, array['居家照顧','居家服務'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('照顧心理', 'care-psychology', '照顧壓力、情緒支持、溝通與心理韌性。', 'article', 'health', '照顧心理', 111, true, true, false, array['照顧心理','情緒支持'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('家庭溝通', 'family-communication', '家屬分工、照顧會議與共識建立。', 'article', 'health', '家庭溝通', 112, true, true, false, array['家庭溝通','照顧會議'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('出院返家', 'discharge-home-care', '出院後返家準備、照顧銜接與安全檢查。', 'article', 'health', '出院返家', 113, true, true, false, array['出院返家','返家照顧'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('醫療照護銜接', 'medical-care-transition', '醫療、護理、復能與長照服務之間的銜接。', 'article', 'health', '醫療銜接', 114, true, true, false, array['醫療銜接','護理復能'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('輔具與環境', 'assistive-devices', '輔具選擇、住宅調整與日常自立支持。', 'article', 'health', '輔具環境', 115, true, true, false, array['輔具','住宅調整'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('用藥提醒', 'medication-reminder', '用藥紀錄、提醒、家屬回報與安全注意事項。', 'article', 'health', '用藥提醒', 116, true, true, false, array['用藥提醒','用藥安全'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('睡眠與夜間照顧', 'sleep-night-care', '夜間安全、睡眠觀察與家屬照顧安排。', 'article', 'health', '夜間照顧', 117, true, true, false, array['夜間照顧','睡眠'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('慢性病日常', 'chronic-care-daily', '慢性病長輩日常照顧、觀察與生活支持。', 'article', 'health', '慢性病日常', 118, true, true, false, array['慢性病','日常照顧'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('社區活動', 'community-activities', '社區據點、健康促進與長輩活動設計。', 'event', 'activity', '社區活動', 119, true, true, false, array['社區據點','健康促進'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('課程活動', 'course-events', '照顧課程、家屬講座與專業培訓活動。', 'event', 'activity', '課程活動', 120, true, true, false, array['照顧課程','講座'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('影音專區', 'care-video', '照顧教學、短影音與專家訪談。', 'video', 'video', '影音專區', 121, true, true, false, array['照顧影片','影音'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('短影片', 'short-video', '適合快速理解的短影片內容。', 'short_video', 'short_video', '短影片', 122, true, true, false, array['短影片','照顧短片'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('名人講堂', 'master-talk', '專家、講師與跨域人物談照顧觀點。', 'interview', 'master_talk', '名人講堂', 123, true, true, false, array['名人講堂','專家觀點'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('照服員專欄', 'care-worker-column', '照服員第一線經驗、服務倫理與專業成長。', 'article', 'health', '照服員專欄', 124, true, true, false, array['照服員','照顧服務員'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('督導筆記', 'supervisor-notes', '督導如何規劃服務、追蹤品質與支援家庭。', 'article', 'health', '督導筆記', 125, true, true, false, array['督導','服務品質'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('移工照顧培訓', 'migrant-care-training', '外籍看護工照顧訓練、溝通與家庭協作。', 'article', 'health', '移工培訓', 126, true, true, false, array['移工培訓','外籍看護'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('品質管理', 'care-quality-management', '照顧紀錄、品管制度、評鑑與持續改善。', 'article', 'health', '品質管理', 127, true, true, false, array['品質管理','長照評鑑'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('照顧科技', 'care-technology', '照顧系統、數位工具與資料化服務管理。', 'article', 'health', '照顧科技', 128, true, true, false, array['照顧科技','長照系統'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('法規與政策', 'care-policy', '長照政策、補助規範與照顧制度更新。', 'article', 'health', '法規政策', 129, true, true, false, array['長照政策','法規'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb),
+  ('真實照顧故事', 'care-stories-category', '家庭回饋、照顧轉變與服務現場故事。', 'story', 'care_story', '照顧故事', 130, true, true, false, array['照顧故事','家屬回饋'], '{"seeded_by":"codex","group":"longterm-care-topic"}'::jsonb)
+on conflict (slug) do update set
+  name = excluded.name,
+  description = excluded.description,
+  type = excluded.type,
+  section_key = excluded.section_key,
+  display_label = excluded.display_label,
+  sort_order = excluded.sort_order,
+  is_enabled = true,
+  show_in_nav = true,
+  seo_keywords = excluded.seo_keywords,
+  metadata = coalesce(public.article_categories.metadata, '{}'::jsonb) || excluded.metadata;

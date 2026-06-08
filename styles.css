@@ -6616,6 +6616,35 @@ h2 {
   font-weight: 700;
   line-height: 2.15;
 }
+.article-body .article-inline-image {
+  margin: 34px 0;
+}
+.article-body .article-inline-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 24px;
+  object-fit: cover;
+  box-shadow: 0 20px 54px rgba(83,43,11,.12);
+}
+.article-body .article-inline-image figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.6;
+}
+.article-body ul,
+.article-body ol {
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 2;
+}
+.article-body a {
+  color: var(--orange);
+  font-weight: 900;
+}
 .article-faq {
   display: grid;
   gap: 12px;

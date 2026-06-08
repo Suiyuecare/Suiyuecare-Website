@@ -16,16 +16,108 @@ const coverPreview = document.querySelector("#articleCoverPreview");
 const openCoverPickerButton = document.querySelector("#openArticleCoverPicker");
 const clearCoverButton = document.querySelector("#clearArticleCover");
 const requestPublishButton = document.querySelector("#requestArticlePublishButton");
+const generateArticleWithAiButton = document.querySelector("#generateArticleWithAiButton");
+const articleRichEditor = document.querySelector("#articleRichEditor");
+const articleAuthorOptions = document.querySelector("#articleAuthorOptions");
+const articleTagOptions = document.querySelector("#articleTagOptions");
+const openInlineImagePickerButton = document.querySelector("#openArticleInlineImagePicker");
+const insertArticleVideoButton = document.querySelector("#insertArticleVideoButton");
 const coverPicker = document.querySelector("#articleCoverPicker");
 const coverPickerGrid = document.querySelector("#articleCoverPickerGrid");
 const coverPickerStatus = document.querySelector("#articleCoverPickerStatus");
 const coverUploadForm = document.querySelector("#articleCoverUploadForm");
+const inlineImagePicker = document.querySelector("#articleInlineImagePicker");
+const inlineImagePickerGrid = document.querySelector("#articleInlineImagePickerGrid");
+const inlineImagePickerStatus = document.querySelector("#articleInlineImagePickerStatus");
+const inlineImageUploadForm = document.querySelector("#articleInlineImageUploadForm");
 
 let articleId = null;
 let isNewArticle = true;
 let categories = [];
 let selectedCoverMedia = null;
 let currentContentJson = {};
+let lastEditorRange = null;
+
+function isHtmlContent(value = "") {
+  return /<\/?[a-z][\s\S]*>/i.test(String(value || ""));
+}
+
+function plainTextToEditorHtml(value = "") {
+  return String(value || "")
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => {
+      if (block.startsWith("## ")) return `<h2>${escapeHTML(block.slice(3))}</h2>`;
+      if (block.startsWith("### ")) return `<h3>${escapeHTML(block.slice(4))}</h3>`;
+      return `<p>${escapeHTML(block).replace(/\n/g, "<br>")}</p>`;
+    })
+    .join("");
+}
+
+function setRichEditorContent(value = "") {
+  if (!articleRichEditor) return;
+  articleRichEditor.innerHTML = isHtmlContent(value) ? value : plainTextToEditorHtml(value);
+  form.elements.content.value = articleRichEditor.innerHTML.trim();
+}
+
+function syncRichEditorToTextarea() {
+  if (!articleRichEditor) return;
+  form.elements.content.value = articleRichEditor.innerHTML.trim();
+}
+
+function focusRichEditor() {
+  articleRichEditor?.focus();
+}
+
+function saveEditorSelection() {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return;
+  const range = selection.getRangeAt(0);
+  if (articleRichEditor?.contains(range.commonAncestorContainer)) {
+    lastEditorRange = range.cloneRange();
+  }
+}
+
+function restoreEditorSelection() {
+  if (!lastEditorRange) {
+    focusRichEditor();
+    return;
+  }
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(lastEditorRange);
+}
+
+function insertHtmlAtEditor(html) {
+  restoreEditorSelection();
+  document.execCommand("insertHTML", false, html);
+  syncRichEditorToTextarea();
+  saveEditorSelection();
+}
+
+function renderSuggestionOptions() {
+  if (!articleAuthorOptions && !articleTagOptions) return;
+  supabase
+    .from("articles")
+    .select("author_name,tags")
+    .limit(500)
+    .then(({ data }) => {
+      const authors = new Set();
+      const tags = new Set();
+      (data || []).forEach((article) => {
+        if (article.author_name) authors.add(article.author_name);
+        (Array.isArray(article.tags) ? article.tags : []).forEach((tag) => tags.add(tag));
+      });
+      if (articleAuthorOptions) {
+        articleAuthorOptions.innerHTML = [...authors].sort().map((item) => `<option value="${escapeHTML(item)}"></option>`).join("");
+      }
+      if (articleTagOptions) {
+        articleTagOptions.innerHTML = [...tags].sort().map((item) => `<option value="${escapeHTML(item)}"></option>`).join("");
+      }
+    })
+    .catch((error) => console.warn("Failed to load article suggestions", error));
+}
 
 function getArticleIdFromLocation() {
   const queryId = new URLSearchParams(window.location.search).get("id");
@@ -167,7 +259,7 @@ function fillForm(article) {
   form.elements.source_name.value = article.source_name || currentContentJson.source_name || "";
   form.elements.source_url.value = article.source_url || currentContentJson.source_url || "";
   form.elements.related_slugs.value = Array.isArray(currentContentJson.related_slugs) ? currentContentJson.related_slugs.join(", ") : "";
-  form.elements.content.value = article.content || "";
+  setRichEditorContent(article.content || "");
   const video = getVideoContent(currentContentJson);
   form.elements.video_type.value = video.video_type;
   form.elements.video_provider.value = video.video_provider;
@@ -183,6 +275,7 @@ function fillForm(article) {
 }
 
 function buildPayload() {
+  syncRichEditorToTextarea();
   let publishedAt = fromLocalDateTimeInput(form.elements.published_at.value);
   const status = form.elements.status.value;
   if (status === "published" && !publishedAt) publishedAt = new Date().toISOString();
@@ -276,9 +369,9 @@ function buildPayload() {
     faq_json: toFaqItems(form.elements.faq_text.value),
     content: form.elements.content.value.trim() || null,
     content_json: contentJson,
-    seo_title: form.elements.seo_title.value.trim() || null,
-    seo_description: form.elements.seo_description.value.trim() || null,
-    seo_keywords: toTags(form.elements.seo_keywords.value)
+    seo_title: form.elements.seo_title.value.trim() || form.elements.title.value.trim() || null,
+    seo_description: form.elements.seo_description.value.trim() || form.elements.subtitle.value.trim() || form.elements.excerpt.value.trim() || null,
+    seo_keywords: toTags(form.elements.seo_keywords.value || form.elements.tags.value)
   };
 }
 
@@ -325,6 +418,8 @@ async function loadArticleEditor() {
     editorMeta.textContent = "建立新的文章草稿，儲存後可在列表中管理。";
     form.elements.status.value = "draft";
     form.elements.is_enabled.checked = true;
+    form.elements.published_at.value = toLocalDateTimeInput(new Date().toISOString());
+    setRichEditorContent("");
     currentContentJson = {};
     selectedCoverMedia = null;
     renderCoverImage();
@@ -404,6 +499,104 @@ function renderCoverPickerGrid(items) {
       <small>${escapeHTML(getImageUsageOption(item.image_usage)?.label || "卡片縮圖")} · ${escapeHTML(getFocalPointOption(item.focal_point)?.label || "置中")}</small>
     </button>
   `).join("");
+}
+
+function renderInlineImagePickerGrid(items) {
+  if (!inlineImagePickerGrid) return;
+  if (!items.length) {
+    inlineImagePickerGrid.innerHTML = '<div class="admin-empty-state">媒體庫目前沒有圖片，可以先在上方直接上傳。</div>';
+    return;
+  }
+
+  inlineImagePickerGrid.innerHTML = items.map((item) => `
+    <button type="button" class="admin-picker-card" data-inline-media-id="${escapeHTML(item.id)}">
+      <img src="${escapeHTML(item.public_url || "")}" alt="${escapeHTML(item.alt_text || item.file_name || "媒體圖片")}" data-image-usage="${escapeHTML(item.image_usage || "article_cover")}" data-focal-point="${escapeHTML(item.focal_point || "center")}" />
+      <span>${escapeHTML(item.alt_text || item.file_name || "未命名圖片")}</span>
+      <small>${escapeHTML(getImageUsageOption(item.image_usage)?.label || "文章圖片")} · 點選插入內文</small>
+    </button>
+  `).join("");
+}
+
+function setInlineImagePickerStatus(message, type = "info") {
+  if (!inlineImagePickerStatus) return;
+  inlineImagePickerStatus.hidden = !message;
+  inlineImagePickerStatus.textContent = message;
+  inlineImagePickerStatus.dataset.status = type;
+}
+
+async function loadInlineImagePickerMedia() {
+  setInlineImagePickerStatus("正在讀取媒體庫...", "info");
+  try {
+    const items = await fetchMediaImages();
+    renderInlineImagePickerGrid(items);
+    setInlineImagePickerStatus("", "success");
+  } catch (error) {
+    console.error("Failed to load inline image media", error);
+    setInlineImagePickerStatus(`無法讀取媒體庫：${error.message}`, "error");
+    renderInlineImagePickerGrid([]);
+  }
+}
+
+function openInlineImagePicker() {
+  saveEditorSelection();
+  inlineImagePicker.hidden = false;
+  document.body.classList.add("modal-open");
+  loadInlineImagePickerMedia();
+}
+
+function closeInlineImagePicker() {
+  inlineImagePicker.hidden = true;
+  inlineImageUploadForm?.reset();
+  document.body.classList.remove("modal-open");
+}
+
+function applyInlineImage(media) {
+  const alt = media.alt_text || media.caption || media.file_name || "文章圖片";
+  const caption = media.caption ? `<figcaption>${escapeHTML(media.caption)}</figcaption>` : "";
+  insertHtmlAtEditor(`
+    <figure class="article-inline-image">
+      <img src="${escapeHTML(media.public_url)}" alt="${escapeHTML(alt)}" data-image-usage="${escapeHTML(media.image_usage || "article_cover")}" data-focal-point="${escapeHTML(media.focal_point || "center")}" />
+      ${caption}
+    </figure>
+    <p><br></p>
+  `);
+  closeInlineImagePicker();
+  setEditorStatus("圖片已插入內文，請記得儲存文章。", "success");
+}
+
+async function uploadAndInsertInlineImage(event) {
+  event.preventDefault();
+  const file = inlineImageUploadForm.elements.file.files?.[0];
+  if (!file) {
+    setInlineImagePickerStatus("請先選擇圖片檔案。", "error");
+    return;
+  }
+
+  const submitButton = inlineImageUploadForm.querySelector("button[type='submit']");
+  submitButton?.setAttribute("disabled", "true");
+  setInlineImagePickerStatus("正在檢查圖片比例...", "info");
+
+  try {
+    const preparedFile = await prepareImageForUpload(file, inlineImageUploadForm.elements.image_usage.value || "article_cover");
+    if (!preparedFile) {
+      setInlineImagePickerStatus("已取消上傳。", "info");
+      return;
+    }
+    setInlineImagePickerStatus("正在上傳圖片並寫入 media 資料表...", "info");
+    const media = await uploadImageToMedia({
+      file: preparedFile,
+      altText: inlineImageUploadForm.elements.alt_text.value,
+      caption: inlineImageUploadForm.elements.caption.value,
+      imageUsage: inlineImageUploadForm.elements.image_usage.value || "article_cover",
+      focalPoint: inlineImageUploadForm.elements.focal_point.value || "center"
+    });
+    applyInlineImage(media);
+  } catch (error) {
+    console.error("Failed to upload inline image", error);
+    setInlineImagePickerStatus(`上傳失敗：${error.message}`, "error");
+  } finally {
+    submitButton?.removeAttribute("disabled");
+  }
 }
 
 async function loadCoverPickerMedia() {
@@ -517,6 +710,48 @@ async function saveArticle(event) {
   }
 }
 
+async function generateArticleWithAi() {
+  const title = form.elements.title.value.trim();
+  if (!title) {
+    setEditorStatus("請先填寫大標題，AI 才知道要寫哪一篇文章。", "error");
+    return;
+  }
+
+  generateArticleWithAiButton?.setAttribute("disabled", "true");
+  setEditorStatus("AI 正在產生文章草稿，請稍候...", "info");
+  try {
+    const response = await fetch("/api/generate-article", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        subtitle: form.elements.subtitle.value.trim(),
+        summary_points: toLines(form.elements.summary_points.value),
+        source_name: form.elements.source_name.value.trim(),
+        source_url: form.elements.source_url.value.trim(),
+        tags: toTags(form.elements.tags.value),
+        content_type: form.elements.content_type.value,
+        category_id: form.elements.category_id.value
+      })
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || "AI 產生失敗");
+
+    if (payload.subtitle && !form.elements.subtitle.value.trim()) form.elements.subtitle.value = payload.subtitle;
+    if (payload.summary_points?.length && !form.elements.summary_points.value.trim()) form.elements.summary_points.value = payload.summary_points.join("\n");
+    if (payload.tags?.length && !form.elements.tags.value.trim()) form.elements.tags.value = payload.tags.join(", ");
+    if (payload.seo_title && !form.elements.seo_title.value.trim()) form.elements.seo_title.value = payload.seo_title;
+    if (payload.seo_description && !form.elements.seo_description.value.trim()) form.elements.seo_description.value = payload.seo_description;
+    if (payload.content) setRichEditorContent(payload.content);
+    setEditorStatus("AI 文章草稿已產生，請人工確認後儲存。", "success");
+  } catch (error) {
+    console.error("Failed to generate article with AI", error);
+    setEditorStatus(`AI 產生失敗：${error.message}`, "error");
+  } finally {
+    generateArticleWithAiButton?.removeAttribute("disabled");
+  }
+}
+
 async function requestArticlePublish() {
   if (isNewArticle || !articleId) {
     setEditorStatus("請先儲存文章草稿，再送審發布。", "error");
@@ -556,6 +791,26 @@ async function requestArticlePublish() {
 }
 
 form?.addEventListener("submit", saveArticle);
+articleRichEditor?.addEventListener("input", syncRichEditorToTextarea);
+articleRichEditor?.addEventListener("keyup", saveEditorSelection);
+articleRichEditor?.addEventListener("mouseup", saveEditorSelection);
+document.querySelector(".admin-rich-editor-toolbar")?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-editor-command]");
+  if (!button) return;
+  event.preventDefault();
+  focusRichEditor();
+  document.execCommand(button.dataset.editorCommand, false, button.dataset.editorValue || null);
+  syncRichEditorToTextarea();
+});
+form?.elements.title.addEventListener("input", () => {
+  if (!form.elements.seo_title.value.trim()) form.elements.seo_title.value = form.elements.title.value;
+});
+form?.elements.subtitle.addEventListener("input", () => {
+  if (!form.elements.seo_description.value.trim()) form.elements.seo_description.value = form.elements.subtitle.value;
+});
+form?.elements.tags.addEventListener("input", () => {
+  if (!form.elements.seo_keywords.value.trim()) form.elements.seo_keywords.value = form.elements.tags.value;
+});
 form?.elements.title.addEventListener("input", () => {
   if (isNewArticle && !form.elements.slug.value) {
     form.elements.slug.value = slugify(form.elements.title.value);
@@ -563,6 +818,13 @@ form?.elements.title.addEventListener("input", () => {
 });
 form?.elements.slug.addEventListener("blur", () => {
   form.elements.slug.value = slugify(form.elements.slug.value);
+});
+generateArticleWithAiButton?.addEventListener("click", generateArticleWithAi);
+openInlineImagePickerButton?.addEventListener("click", openInlineImagePicker);
+insertArticleVideoButton?.addEventListener("click", () => {
+  const url = window.prompt("請貼上 YouTube / Vimeo / 影片網址：");
+  if (!url) return;
+  insertHtmlAtEditor(`<p><a href="${escapeHTML(url)}" target="_blank" rel="noopener">影片連結：${escapeHTML(url)}</a></p>`);
 });
 openCoverPickerButton?.addEventListener("click", openCoverPicker);
 clearCoverButton?.addEventListener("click", () => {
@@ -592,6 +854,28 @@ coverPicker?.addEventListener("click", (event) => {
   }
 });
 coverUploadForm?.addEventListener("submit", uploadAndSelectCover);
+inlineImagePickerGrid?.addEventListener("click", async (event) => {
+  const card = event.target.closest("[data-inline-media-id]");
+  if (!card) return;
+
+  const { data, error } = await supabase
+    .from("media")
+    .select("id, public_url, file_name, alt_text, caption, image_usage, focal_point")
+    .eq("id", card.dataset.inlineMediaId)
+    .single();
+
+  if (error) {
+    setInlineImagePickerStatus(`選擇圖片失敗：${error.message}`, "error");
+    return;
+  }
+  applyInlineImage(data);
+});
+inlineImagePicker?.addEventListener("click", (event) => {
+  if (event.target.closest("[data-close-inline-image-picker]") || event.target === inlineImagePicker) {
+    closeInlineImagePicker();
+  }
+});
+inlineImageUploadForm?.addEventListener("submit", uploadAndInsertInlineImage);
 requestPublishButton?.addEventListener("click", requestArticlePublish);
 bindAdminLogout(logoutButton);
 
@@ -601,5 +885,8 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadArticleEditor
+  onReady: async () => {
+    renderSuggestionOptions();
+    await loadArticleEditor();
+  }
 }).catch((error) => reportAdminBootError(loading, error));

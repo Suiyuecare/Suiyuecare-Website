@@ -1255,6 +1255,11 @@ async function loadSupabaseHealthArticles({ rerender = false } = {}) {
 }
 
 function renderMarkdownContent(content = "") {
+  const rawContent = String(content || "").trim();
+  if (/<\/?(p|h2|h3|figure|img|ul|ol|li|strong|b|em|i|span|a|br|iframe|video)[\s>]/i.test(rawContent)) {
+    return sanitizeArticleHtml(rawContent);
+  }
+
   const lines = String(content || "").split(/\r?\n/);
   const blocks = [];
   let paragraph = [];
@@ -1308,6 +1313,56 @@ function renderMarkdownContent(content = "") {
   flushList();
 
   return blocks.length ? blocks.join("") : "<p>文章內容準備中。</p>";
+}
+
+function sanitizeArticleHtml(html = "") {
+  const template = document.createElement("template");
+  template.innerHTML = String(html || "");
+  const allowedTags = new Set(["P", "BR", "H2", "H3", "UL", "OL", "LI", "STRONG", "B", "EM", "I", "SPAN", "FONT", "A", "FIGURE", "FIGCAPTION", "IMG", "IFRAME", "VIDEO", "SOURCE"]);
+  const allowedAttrs = {
+    A: new Set(["href", "target", "rel"]),
+    IMG: new Set(["src", "alt", "data-image-usage", "data-focal-point"]),
+    IFRAME: new Set(["src", "title", "loading", "allow", "allowfullscreen"]),
+    VIDEO: new Set(["src", "controls", "preload", "poster"]),
+    SOURCE: new Set(["src", "type"]),
+    SPAN: new Set(["style"]),
+    FONT: new Set(["color", "size"]),
+    FIGURE: new Set(["class"]),
+    P: new Set(["style"]),
+    H2: new Set(["style"]),
+    H3: new Set(["style"])
+  };
+
+  const walk = (node) => {
+    [...node.children].forEach((child) => {
+      if (!allowedTags.has(child.tagName)) {
+        child.replaceWith(document.createTextNode(child.textContent || ""));
+        return;
+      }
+
+      [...child.attributes].forEach((attr) => {
+        const tagAttrs = allowedAttrs[child.tagName] || new Set();
+        const isSafeStyle = attr.name === "style" && /^(color|font-size|background-color)\s*:/i.test(attr.value);
+        if (!tagAttrs.has(attr.name) && !isSafeStyle) {
+          child.removeAttribute(attr.name);
+          return;
+        }
+        if ((attr.name === "href" || attr.name === "src") && /^(javascript|data:text)/i.test(attr.value)) {
+          child.removeAttribute(attr.name);
+        }
+      });
+
+      if (child.tagName === "A") {
+        child.setAttribute("rel", "noopener");
+        if (/^https?:\/\//i.test(child.getAttribute("href") || "")) child.setAttribute("target", "_blank");
+      }
+      if (child.tagName === "FIGURE") child.classList.add("article-inline-image");
+      walk(child);
+    });
+  };
+
+  walk(template.content);
+  return template.innerHTML || "<p>文章內容準備中。</p>";
 }
 
 function normalizeSupabaseArticlePage(article, category, cover) {

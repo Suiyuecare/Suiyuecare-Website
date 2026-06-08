@@ -87,6 +87,11 @@
             <strong>前台對應</strong>
             <span>文章會依「內容型態」與「文章分類」出現在 Health 3.0 的最新照顧文章、懶人包、活動專區、影音與短影片，或首頁照顧知識區。封面圖會同時用於文章列表卡片與文章內頁 Hero。</span>
           </div>
+          <div class="admin-front-map">
+            <strong>AI 快速撰寫</strong>
+            <span>先填大標題、副標、本文重點或資料來源，再按「AI 產生文章草稿」。系統會產生可再編修的初稿，不會自動發布。</span>
+            <button type="button" id="generateArticleWithAiButton">AI 產生文章草稿</button>
+          </div>
 
           <form id="articleEditorForm" class="admin-editor-form">
             <div class="admin-form-grid">
@@ -193,7 +198,7 @@
               </div>
               <label>
                 <span>作者名稱</span>
-                <input type="text" name="author_name" />
+                <input type="text" name="author_name" list="articleAuthorOptions" />
               </label>
               <label>
                 <span>作者職稱</span>
@@ -201,7 +206,8 @@
               </label>
               <label class="admin-field-wide">
                 <span>文章標籤</span>
-                <input type="text" name="tags" placeholder="用逗號分隔，例如：居家照顧,復能,家庭照顧者" />
+                <input type="text" name="tags" list="articleTagOptions" placeholder="用逗號分隔，例如：居家照顧,復能,家庭照顧者" />
+                <small>標籤也會同步成 SEO 關鍵字；曾經用過的標籤會自動出現在建議清單。</small>
               </label>
               <label class="admin-field-wide">
                 <span>推薦顯示位置</span>
@@ -276,17 +282,33 @@
                   </label>
                 </div>
               </section>
-              <label class="admin-field-wide">
-                <span>文章內容</span>
-                <textarea name="content" rows="12" placeholder="可先使用純文字或 Markdown 撰寫。"></textarea>
+              <label class="admin-field-wide admin-article-content-field">
+                <span>內文</span>
+                <div class="admin-rich-editor-toolbar" aria-label="文章內容工具列">
+                  <button type="button" data-editor-command="formatBlock" data-editor-value="h2">大標</button>
+                  <button type="button" data-editor-command="formatBlock" data-editor-value="h3">小標</button>
+                  <button type="button" data-editor-command="bold">粗體</button>
+                  <button type="button" data-editor-command="italic">斜體</button>
+                  <button type="button" data-editor-command="foreColor" data-editor-value="#c96b1c">橘字</button>
+                  <button type="button" data-editor-command="foreColor" data-editor-value="#3f2414">深棕</button>
+                  <button type="button" data-editor-command="fontSize" data-editor-value="5">大字</button>
+                  <button type="button" data-editor-command="fontSize" data-editor-value="3">一般字</button>
+                  <button type="button" data-editor-command="insertUnorderedList">項目清單</button>
+                  <button type="button" id="openArticleInlineImagePicker">插入圖片</button>
+                  <button type="button" id="insertArticleVideoButton">插入影片</button>
+                </div>
+                <div id="articleRichEditor" class="admin-rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="像 Word 一樣在這裡撰寫文章，可插入圖片、影片、粗體、顏色與標題。"></div>
+                <textarea name="content" rows="12" hidden></textarea>
               </label>
               <label>
                 <span>SEO 標題</span>
                 <input type="text" name="seo_title" />
+                <small>預設會跟大標題同步，可再手動微調。</small>
               </label>
               <label>
                 <span>SEO 描述</span>
                 <textarea name="seo_description" rows="4"></textarea>
+                <small>預設會跟副標同步，可再手動微調。</small>
               </label>
               <label>
                 <span>SEO 關鍵字</span>
@@ -302,6 +324,8 @@
               </label>
             </div>
           </form>
+          <datalist id="articleAuthorOptions"></datalist>
+          <datalist id="articleTagOptions"></datalist>
         </section>
       </main>
     </div>
@@ -362,6 +386,60 @@
 
         <div id="articleCoverPickerStatus" class="admin-data-status">正在讀取媒體庫...</div>
         <div id="articleCoverPickerGrid" class="admin-picker-grid"></div>
+      </div>
+    </section>
+
+    <section id="articleInlineImagePicker" class="admin-modal" hidden aria-modal="true" role="dialog" aria-labelledby="articleInlineImagePickerTitle">
+      <div class="admin-modal-panel">
+        <header>
+          <div>
+            <p class="admin-eyebrow">Inline Image</p>
+            <h2 id="articleInlineImagePickerTitle">插入文章內圖片</h2>
+          </div>
+          <button type="button" data-close-inline-image-picker>關閉</button>
+        </header>
+
+        <form id="articleInlineImageUploadForm" class="admin-form-grid admin-inline-upload">
+          <label>
+            <span>直接上傳新圖片</span>
+            <input type="file" name="file" accept="image/*" />
+          </label>
+          <label>
+            <span>圖片替代文字</span>
+            <input type="text" name="alt_text" placeholder="例：照顧服務員陪伴長輩復能練習" />
+          </label>
+          <label>
+            <span>圖片用途</span>
+            <select name="image_usage">
+              <option value="article_cover" selected>文章內圖片 16:9</option>
+              <option value="card">段落圖片 4:3</option>
+              <option value="square">方形重點圖 1:1</option>
+              <option value="freeform">自由圖片</option>
+            </select>
+          </label>
+          <label>
+            <span>裁切焦點</span>
+            <select name="focal_point">
+              <option value="center">置中</option>
+              <option value="top">靠上</option>
+              <option value="bottom">靠下</option>
+              <option value="left">靠左</option>
+              <option value="right">靠右</option>
+              <option value="top-left">左上</option>
+              <option value="top-right">右上</option>
+              <option value="bottom-left">左下</option>
+              <option value="bottom-right">右下</option>
+            </select>
+          </label>
+          <label class="admin-field-wide">
+            <span>圖片說明</span>
+            <input type="text" name="caption" placeholder="可選填，會成為圖片下方說明" />
+          </label>
+          <button type="submit">上傳並插入</button>
+        </form>
+
+        <div id="articleInlineImagePickerStatus" class="admin-data-status">正在讀取媒體庫...</div>
+        <div id="articleInlineImagePickerGrid" class="admin-picker-grid"></div>
       </div>
     </section>
 
