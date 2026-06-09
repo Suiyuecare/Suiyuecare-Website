@@ -56,32 +56,15 @@
           <div class="login-card-head">
             <p class="portal-kicker">Sign In</p>
             <h2 id="loginTitle">帳號登入</h2>
-            <p>請使用 Google 或公司核發的帳號密碼登入。</p>
+            <p>請使用公司 Google 帳號登入。</p>
           </div>
 
-          <form class="login-form" id="portalLoginForm">
+          <div class="login-form">
             <button class="google-login-button" type="button" id="portalGoogleLoginButton">
               <span aria-hidden="true">G</span>
               使用 Google 登入
             </button>
-            <div class="login-divider"><span>或使用 Email 登入</span></div>
-            <label>
-              <span>帳號 Email</span>
-              <input id="loginEmail" name="email" type="email" autocomplete="username" placeholder="name@suiyuecare.com" required />
-            </label>
-            <label>
-              <span>密碼</span>
-              <input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" required />
-            </label>
-            <button class="primary-login-button" type="submit">登入工作台</button>
-          </form>
-
-          <details class="demo-login-panel">
-            <summary>測試帳號</summary>
-            <p class="demo-hint">測試密碼皆為 <b>suiyuecare</b>。點選角色後會自動帶入帳密，仍需按登入。</p>
-            <div class="quick-login-tabs" id="quickLoginTabs" role="tablist" aria-label="角色分類"></div>
-            <div class="quick-login-grid" id="quickLoginGrid" aria-label="快速登入角色"></div>
-          </details>
+          </div>
         </section>
       </section>
 
@@ -92,7 +75,10 @@
             <h2 id="moduleTitle">選擇工作區</h2>
             <p id="userSummary">正在讀取帳號資訊...</p>
           </div>
-          <button class="text-button" type="button" id="signOutButton">登出</button>
+          <div class="module-actions">
+            <button class="text-button" type="button" id="systemAnnouncementsButton">系統公告</button>
+            <button class="text-button" type="button" id="signOutButton">登出</button>
+          </div>
         </header>
 
         <div class="module-view active" id="moduleLevelOne" aria-labelledby="moduleTitle">

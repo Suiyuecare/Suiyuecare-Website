@@ -11,50 +11,47 @@ const moduleLevelTwo = document.querySelector("#moduleLevelTwo");
 const moduleLevelOneGrid = document.querySelector("#moduleLevelOneGrid");
 const moduleLevelTwoGrid = document.querySelector("#moduleLevelTwoGrid");
 const backToLevelOneButton = document.querySelector("#backToLevelOneButton");
-const quickLoginTabs = document.querySelector("#quickLoginTabs");
-const quickLoginGrid = document.querySelector("#quickLoginGrid");
 const organizationChart = document.querySelector("#organizationChart");
 const signedInOrganizationChart = document.querySelector("#signedInOrganizationChart");
-const portalLoginForm = document.querySelector("#portalLoginForm");
 const portalGoogleLoginButton = document.querySelector("#portalGoogleLoginButton");
-const loginEmail = document.querySelector("#loginEmail");
-const loginPassword = document.querySelector("#loginPassword");
+const systemAnnouncementsButton = document.querySelector("#systemAnnouncementsButton");
 
-const storageKey = "suiyuecare.portal.quickLoginProfile";
-const storageEmailKey = "suiyuecare.portal.loginEmail";
-const demoPassword = "suiyuecare";
+const storageKey = "suiyuecare.portal.profile";
+const storageEmailKey = "suiyuecare.portal.email";
+const pendingModuleLaunchKey = "suiyuecare.portal.pendingModuleLaunch";
 const portalHomePath = "/portal/";
 const portalProductionOrigin = "https://login.suiyuecare.com";
 const portalOAuthBridgeOrigin = "https://suiyuecare-website.vercel.app";
-let activeQuickLoginGroup = "management";
+
+const systemAnnouncementsModule = { id: "announcements", number: "0", name: "系統公告" };
 
 const modules = [
-  { id: "announcements", number: "1", name: "系統公告" },
   {
     id: "business",
-    number: "2",
+    number: "1",
     name: "業務系統",
     children: [
-      { id: "home-care", number: "2-1", name: "居家照顧系統" },
-      { id: "day-care", number: "2-2", name: "日間照顧系統" }
+      { id: "home-care", number: "1-1", name: "居家照顧系統" },
+      { id: "day-care", number: "1-2", name: "日間照顧系統" }
     ]
   },
-  { id: "hr", number: "3", name: "人資系統" },
-  { id: "accounting", number: "4", name: "會計系統" },
+  { id: "hr", number: "2", name: "人資系統" },
+  { id: "accounting", number: "3", name: "會計系統" },
   {
     id: "general-affairs",
-    number: "5",
+    number: "4",
     name: "總務系統",
     children: [
-      { id: "edoc", number: "5-1", name: "公文簽核系統" },
-      { id: "contract", number: "5-2", name: "合約管理系統" },
-      { id: "system-permissions", number: "5-3", name: "系統權限" },
-      { id: "organization-chart", number: "5-4", name: "組織圖" },
-      { id: "employee-accounts", number: "5-5", name: "員工帳號" },
-      { id: "agile-projects", number: "5-6", name: "敏捷專案管理" },
-      { id: "pdf-editor", number: "5-7", name: "PDF 編輯器" }
+      { id: "edoc", number: "4-1", name: "公文簽核系統" },
+      { id: "contract", number: "4-2", name: "合約管理系統" },
+      { id: "system-permissions", number: "4-3", name: "系統權限" },
+      { id: "organization-chart", number: "4-4", name: "組織圖" },
+      { id: "employee-accounts", number: "4-5", name: "員工帳號" },
+      { id: "pdf-editor", number: "4-6", name: "PDF 編輯器" }
     ]
-  }
+  },
+  { id: "agile-projects", number: "5", name: "敏捷專案管理" },
+  { id: "website-backoffice", number: "6", name: "網站後台管理" }
 ];
 
 const organizationNodes = [
@@ -226,6 +223,7 @@ const moduleOrgRules = {
   "organization-chart": { owner: "it-class", scope: "company", policy: "依組織節點檢視公司架構" },
   "employee-accounts": { owner: "it-class", scope: "custom", policy: "員工帳號與登入狀態管理" },
   "agile-projects": { owner: "ga-class", scope: "assigned", policy: "依專案、衝刺與負責人授權" },
+  "website-backoffice": { owner: "it-class", scope: "company", policy: "網站內容、發布流程與後台編輯權限" },
   "pdf-editor": { owner: "it-class", scope: "assigned", policy: "已授權使用者可用" }
 };
 
@@ -359,6 +357,7 @@ const moduleDescriptions = {
   "organization-chart": "查看公司組織與權責關係",
   "employee-accounts": "管理員工登入帳號",
   "agile-projects": "管理任務、看板、衝刺與專案節奏",
+  "website-backoffice": "管理官網內容、發布流程與頁面資料",
   "pdf-editor": "編輯、合併與整理 PDF 文件"
 };
 
@@ -376,29 +375,137 @@ const moduleIcons = {
   "organization-chart": "組織",
   "employee-accounts": "帳號",
   "agile-projects": "專案",
+  "website-backoffice": "後台",
   "pdf-editor": "PDF"
 };
 
 const moduleLaunchUrls = {
   accounting: "https://finance.suiyuecare.com/",
-  "agile-projects": "https://apm.suiyuecare.com/"
+  "agile-projects": "https://apm.suiyuecare.com/",
+  edoc: "https://edoc.suiyuecare.com/",
+  "website-backoffice": `${portalProductionOrigin}/admin/`
 };
 
 const connectedModuleIds = new Set(Object.keys(moduleLaunchUrls));
 const sharedGeneralAffairsModules = new Set(["edoc", "pdf-editor"]);
 const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions", "organization-chart", "employee-accounts"]);
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
+const signedHandoffModuleIds = new Set(["agile-projects", "edoc"]);
+const externalLaunchOrigins = new Map([
+  ["https://edoc.suiyuecare.com", "edoc"]
+]);
 
-function buildModuleLaunchUrl(moduleId, profile) {
-  const launchUrl = moduleLaunchUrls[moduleId];
+async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
+  const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
   if (!launchUrl) return null;
 
+  const payload = buildModuleLaunchPayload(moduleId, profile);
+  const signedHandoff = signedHandoffModuleIds.has(moduleId) ? await createSignedModuleHandoff(payload) : null;
   const url = new URL(launchUrl);
   url.searchParams.set("portal", "1");
-  url.searchParams.set("email", profile.email);
-  url.searchParams.set("role", profile.label);
-  url.searchParams.set("scope", profile.scope);
+  url.searchParams.set("email", payload.email);
+  url.searchParams.set("role", payload.sourceRoleKey);
+  url.searchParams.set("scope", payload.dataScopeKey);
+  url.searchParams.set("payload", signedHandoff?.payload || encodePortalPayload(payload));
+  if (signedHandoff?.signature) url.searchParams.set("signature", signedHandoff.signature);
+  if (signedHandoff?.token) url.searchParams.set("token", signedHandoff.token);
   return url.toString();
+}
+
+function buildModuleLaunchPayload(moduleId, profile) {
+  const sourceRoleKey = profile.sourceProfileId || profile.roleKey || profile.id;
+  const modulePermissions = getModulePermissionForProfile(moduleId, profile);
+  const organization = getProfileOrganization(profile);
+  return {
+    source: "logging-portal",
+    moduleId,
+    id: profile.employeeNo || profile.id,
+    loggingAccountId: profile.employeeNo || profile.id || profile.email,
+    profileId: profile.id,
+    sourceRoleKey,
+    roleKey: sourceRoleKey,
+    role: sourceRoleKey,
+    name: profile.label,
+    displayName: profile.label,
+    title: profile.title,
+    positionKey: sourceRoleKey,
+    positionLabel: getRoleName(sourceRoleKey),
+    email: profile.email,
+    unit: organization.department || profile.department || "",
+    scope: profile.scope,
+    dataScopeKey: profile.scope,
+    actions: modulePermissions.actions,
+    moduleActions: modulePermissions.actions,
+    modulePermissions,
+    ...organization,
+    launchedAt: new Date().toISOString()
+  };
+}
+
+function getModulePermissionForProfile(moduleId, profile) {
+  const sourceRoleKey = profile.sourceProfileId || profile.roleKey || profile.id;
+  const permission = modulePermissionDefinitions.find((row) =>
+    row.moduleId === moduleId && row.roles.includes(sourceRoleKey)
+  );
+  const fallbackRole = roleDefinitions.find((role) => role.id === sourceRoleKey);
+  const moduleActions = permission?.actions || fallbackRole?.actions || ["view"];
+  const roleActions = fallbackRole?.actions || [];
+  const actions = roleActions.length
+    ? moduleActions.filter((action) => roleActions.includes(action))
+    : moduleActions;
+  return {
+    moduleId,
+    roleKey: sourceRoleKey,
+    scope: profile.scope,
+    actions: actions.length ? actions : ["view"],
+    sensitivity: permission?.sensitivity || "一般",
+    limits: permission?.limits || fallbackRole?.limits || "依 Portal 權限控管"
+  };
+}
+
+function getProfileOrganization(profile) {
+  if (!profile?.employeeNo) return {};
+  const account = employeeAccounts.find((employee) => employee.no === profile.employeeNo);
+  if (!account) return {};
+  return {
+    employeeNo: account.no,
+    company: account.company,
+    department: account.department,
+    className: account.className,
+    region: account.region,
+    accountStatus: account.accountStatus
+  };
+}
+
+function encodePortalPayload(payload) {
+  const json = JSON.stringify(payload);
+  return window.btoa(unescape(encodeURIComponent(json)))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+async function createSignedModuleHandoff(payload) {
+  if (!supabase) throw new Error("Portal 尚未完成 Google 登入，無法建立模組登入簽章。");
+  const { data, error } = await supabase.auth.getSession();
+  const token = data?.session?.access_token;
+  if (error || !token) {
+    throw new Error(error?.message || "Portal 登入階段已失效，請重新登入。");
+  }
+
+  const response = await fetch("/api/portal-handoff", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ payload })
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.ok) {
+    throw new Error(result.message || "無法建立模組登入簽章。");
+  }
+  return result;
 }
 
 const employeeAccountRows = [
@@ -850,6 +957,13 @@ const modulePermissionDefinitions = [
     limits: "依專案、衝刺、負責人與跨部門協作範圍控管。"
   },
   {
+    moduleId: "website-backoffice",
+    roles: ["ceo"],
+    actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print", "manage"],
+    sensitivity: "網站內容 / 發布權限",
+    limits: "暫時僅執行長可操作；未來可在系統權限開放網站後台編輯給指定員工或全員。"
+  },
+  {
     moduleId: "pdf-editor",
     roles: ["ceo", "region-manager", "admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
     actions: ["view", "create", "edit", "print"],
@@ -1199,12 +1313,11 @@ function getOwnerDisplayName(owner) {
   return ownerDisplayNames[owner.id] || owner.label;
 }
 
-const quickLoginProfiles = [
+const roleProfiles = [
   {
     id: "external-audit",
     label: "外部檢核單位",
     title: "會計事務所",
-    email: "audit.office@suiyuecare.com",
     scope: "custom",
     note: "只讀、可匯出指定報表",
     modules: ["announcements", "accounting"]
@@ -1213,7 +1326,6 @@ const quickLoginProfiles = [
     id: "board",
     label: "董事會",
     title: "董事會成員",
-    email: "board@suiyuecare.com",
     scope: "group",
     note: "重大經營資訊，不含個資明細",
     modules: ["announcements", "accounting"]
@@ -1222,7 +1334,6 @@ const quickLoginProfiles = [
     id: "shareholder",
     label: "股東",
     title: "股東",
-    email: "shareholder@suiyuecare.com",
     scope: "custom",
     note: "投資人與經營摘要",
     modules: ["announcements", "accounting"]
@@ -1231,16 +1342,14 @@ const quickLoginProfiles = [
     id: "ceo",
     label: "執行長",
     title: "全集團最高營運權限",
-    email: "ceo@suiyuecare.com",
     scope: "group",
     note: "全集團",
-    modules: ["announcements", "business", "home-care", "day-care", "hr", "accounting", "general-affairs", "edoc", "contract", "system-permissions", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "hr", "accounting", "general-affairs", "edoc", "contract", "system-permissions", "organization-chart", "employee-accounts", "agile-projects", "website-backoffice", "pdf-editor"]
   },
   {
     id: "region-manager",
     label: "區經理",
     title: "台北區 / 新北區 / 桃園區",
-    email: "region.manager@suiyuecare.com",
     scope: "region",
     note: "僅自己區域資料",
     modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
@@ -1249,7 +1358,6 @@ const quickLoginProfiles = [
     id: "admin-director",
     label: "行政部長",
     title: "行政部門",
-    email: "admin.director@suiyuecare.com",
     scope: "department",
     note: "行政部門管理",
     modules: ["announcements", "hr", "accounting", "general-affairs", "edoc", "contract", "system-permissions", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
@@ -1258,7 +1366,6 @@ const quickLoginProfiles = [
     id: "hr-chief",
     label: "人資課長",
     title: "人資課",
-    email: "hr.chief@suiyuecare.com",
     scope: "class",
     note: "人資課資料",
     modules: ["announcements", "hr", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
@@ -1267,7 +1374,6 @@ const quickLoginProfiles = [
     id: "accounting-chief",
     label: "會計課長",
     title: "財會課",
-    email: "accounting.chief@suiyuecare.com",
     scope: "class",
     note: "會計帳務與報表",
     modules: ["announcements", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
@@ -1276,7 +1382,6 @@ const quickLoginProfiles = [
     id: "cashier-chief",
     label: "出納課長",
     title: "財會課 / 出納",
-    email: "cashier.chief@suiyuecare.com",
     scope: "class",
     note: "出納付款與收款",
     modules: ["announcements", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
@@ -1285,7 +1390,6 @@ const quickLoginProfiles = [
     id: "ga-chief",
     label: "總務課長",
     title: "總務課",
-    email: "ga.chief@suiyuecare.com",
     scope: "class",
     note: "公文、合約與總務事項",
     modules: ["announcements", "general-affairs", "edoc", "contract", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
@@ -1294,7 +1398,6 @@ const quickLoginProfiles = [
     id: "business-director",
     label: "業務部長",
     title: "居家照顧部 / 日間照顧部等",
-    email: "business.director@suiyuecare.com",
     scope: "business_unit",
     note: "自己業務線資料",
     modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
@@ -1303,7 +1406,6 @@ const quickLoginProfiles = [
     id: "section-chief",
     label: "課長",
     title: "業務課長",
-    email: "section.chief@suiyuecare.com",
     scope: "class",
     note: "本課資料",
     modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
@@ -1312,7 +1414,6 @@ const quickLoginProfiles = [
     id: "team-lead",
     label: "組長",
     title: "業務組長",
-    email: "team.lead@suiyuecare.com",
     scope: "assigned",
     note: "自己負責資料",
     modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
@@ -1321,37 +1422,9 @@ const quickLoginProfiles = [
     id: "staff",
     label: "職員",
     title: "一般職員",
-    email: "staff@suiyuecare.com",
     scope: "self",
     note: "僅自己與被指派任務",
     modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
-  }
-];
-
-const quickLoginGroups = [
-  {
-    id: "governance",
-    title: "治理與外部",
-    caption: "只開放摘要、報表與檢核所需入口",
-    profiles: ["external-audit", "board", "shareholder"]
-  },
-  {
-    id: "management",
-    title: "經營管理",
-    caption: "全集團與區域營運角色",
-    profiles: ["ceo", "region-manager"]
-  },
-  {
-    id: "admin",
-    title: "行政中心",
-    caption: "人資、財會、出納、總務",
-    profiles: ["admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief"]
-  },
-  {
-    id: "business",
-    title: "業務現場",
-    caption: "業務線主管與一線同仁",
-    profiles: ["business-director", "section-chief", "team-lead", "staff"]
   }
 ];
 
@@ -1359,8 +1432,8 @@ const accountAliases = {
   "entrepreneur@suiyuecare.com": "ceo"
 };
 
-function getQuickLoginProfile(profileId) {
-  return quickLoginProfiles.find((profile) => profile.id === profileId) || null;
+function getRoleProfile(profileId) {
+  return roleProfiles.find((profile) => profile.id === profileId) || null;
 }
 
 function canUseEmployeeAccount(account) {
@@ -1373,8 +1446,8 @@ function getEmployeeProfileId(account) {
   const className = normalizeGradeText(account.className);
 
   if (grade.includes("會計事務所") || grade.includes("外部檢核")) return "external-audit";
-  if (grade.includes("股東")) return "shareholder";
   if (grade.includes("董事長") || grade.includes("執行長")) return "ceo";
+  if (grade.includes("股東")) return "shareholder";
   if (grade.includes("董事會")) return "board";
   if (grade.includes("區經理")) return "region-manager";
   if (grade.includes("行政部長")) return "admin-director";
@@ -1398,16 +1471,22 @@ function getEmployeeProfileById(profileId) {
 
 function getEmployeeProfile(account) {
   if (!canUseEmployeeAccount(account)) return null;
-  const template = getQuickLoginProfile(getEmployeeProfileId(account)) || getQuickLoginProfile("staff");
+  const template = getRoleProfile(getEmployeeProfileId(account)) || getRoleProfile("staff");
   if (!template) return null;
 
   return {
     ...template,
     id: `employee-${account.no}`,
+    employeeNo: account.no,
     label: account.name,
     title: account.title,
     email: account.email,
     scope: normalizeDataScopeId(account.dataScope || template.scope),
+    company: account.company,
+    department: account.department,
+    className: account.className,
+    region: account.region,
+    accountStatus: account.accountStatus,
     note: `${account.company}｜${account.department}${account.className === "未設定" ? "" : `｜${account.className}`}`,
     sourceProfileId: template.id
   };
@@ -1936,19 +2015,21 @@ function securityRestrictionMatchesQuery(row, query) {
 function getStoredProfile() {
   const profileId = window.localStorage.getItem(storageKey);
   const storedEmail = window.localStorage.getItem(storageEmailKey);
-  const profile = getQuickLoginProfile(profileId) || getEmployeeProfileById(profileId);
+  const profile = getRoleProfile(profileId) || getEmployeeProfileById(profileId);
   if (!profile || !storedEmail) return profile;
   return { ...profile, email: storedEmail };
 }
 
 function findProfileByEmail(email) {
   const normalizedEmail = email.trim().toLowerCase();
+  const employeeProfile = findEmployeeProfileByEmail(normalizedEmail);
+  if (employeeProfile) return employeeProfile;
   const aliasProfileId = accountAliases[normalizedEmail];
   if (aliasProfileId) {
-    const aliasProfile = getQuickLoginProfile(aliasProfileId);
+    const aliasProfile = getRoleProfile(aliasProfileId);
     return aliasProfile ? { ...aliasProfile, email: normalizedEmail } : null;
   }
-  return quickLoginProfiles.find((profile) => profile.email.toLowerCase() === normalizedEmail) || findEmployeeProfileByEmail(normalizedEmail);
+  return null;
 }
 
 function setStoredProfile(profile) {
@@ -1970,6 +2051,71 @@ function getPortalRedirectUrl() {
     return `${portalOAuthBridgeOrigin}${portalHomePath}`;
   }
   return `${window.location.origin}${portalHomePath}`;
+}
+
+function safeModuleLaunchRequest(rawNext = "", explicitModule = "") {
+  const moduleId = explicitModule === "edoc" ? "edoc" : "";
+  if (!rawNext && moduleId) {
+    return { moduleId, returnTo: moduleLaunchUrls[moduleId] };
+  }
+  if (!rawNext) return null;
+  try {
+    const url = new URL(rawNext, portalProductionOrigin);
+    const origin = url.origin;
+    const inferredModule = externalLaunchOrigins.get(origin);
+    if (!inferredModule) return null;
+    if (moduleId && moduleId !== inferredModule) return null;
+    return { moduleId: inferredModule, returnTo: url.toString() };
+  } catch (error) {
+    return null;
+  }
+}
+
+function requestedModuleLaunchFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return safeModuleLaunchRequest(params.get("next") || params.get("returnTo") || "", params.get("module") || "");
+}
+
+function rememberRequestedModuleLaunch() {
+  const request = requestedModuleLaunchFromUrl();
+  if (!request) return null;
+  window.sessionStorage.setItem(pendingModuleLaunchKey, JSON.stringify(request));
+  return request;
+}
+
+function consumeRequestedModuleLaunch() {
+  const request = requestedModuleLaunchFromUrl();
+  if (request) return request;
+  try {
+    const raw = window.sessionStorage.getItem(pendingModuleLaunchKey);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    window.sessionStorage.removeItem(pendingModuleLaunchKey);
+    return null;
+  }
+}
+
+async function launchRequestedModuleIfReady(profile) {
+  const request = consumeRequestedModuleLaunch();
+  if (!profile || !request?.moduleId || !request?.returnTo) return false;
+  const module = modules.flatMap((item) => [item, ...(item.children || [])]).find((item) => item.id === request.moduleId);
+  if (!module || !moduleIsAllowed(module, profile)) {
+    window.sessionStorage.removeItem(pendingModuleLaunchKey);
+    setStatus(`${module?.name || request.moduleId}：此帳號無權限。`, "error");
+    return false;
+  }
+  setStatus(`正在啟動 ${getModuleDisplayName(module)}...`, "info");
+  try {
+    const launchUrl = await buildModuleLaunchUrl(request.moduleId, profile, request.returnTo);
+    window.sessionStorage.removeItem(pendingModuleLaunchKey);
+    if (launchUrl) {
+      window.location.replace(launchUrl);
+      return true;
+    }
+  } catch (error) {
+    setStatus(`${getModuleDisplayName(module)} 啟動失敗：${error.message}`, "error");
+  }
+  return false;
 }
 
 async function applyGoogleSession() {
@@ -2062,73 +2208,6 @@ function renderSession(profile) {
   renderOrganizationChart(signedInOrganizationChart, profile);
 }
 
-function createQuickLoginButton(profile) {
-  const button = document.createElement("button");
-  button.className = "quick-login-card";
-  button.type = "button";
-  button.innerHTML = `
-    <span class="quick-login-main">
-      <strong>${profile.label}</strong>
-      <small>${profile.title}</small>
-    </span>
-    <span class="quick-login-meta">
-      <b>${profile.scope}</b>
-      <small>${profile.note}</small>
-    </span>
-  `;
-
-  button.addEventListener("click", () => {
-    if (loginEmail) loginEmail.value = profile.email;
-    if (loginPassword) loginPassword.value = demoPassword;
-    setStatus(`已帶入 ${profile.label} 測試帳號，請按登入進入工作台。`, "info");
-  });
-
-  return button;
-}
-
-function createQuickLoginTab(group) {
-  const button = document.createElement("button");
-  button.className = "quick-login-tab";
-  button.type = "button";
-  button.role = "tab";
-  button.setAttribute("aria-selected", String(group.id === activeQuickLoginGroup));
-  button.textContent = group.title;
-
-  button.addEventListener("click", () => {
-    activeQuickLoginGroup = group.id;
-    renderQuickLoginPicker();
-  });
-
-  return button;
-}
-
-function createQuickLoginSection(group) {
-  const section = document.createElement("section");
-  section.className = "quick-login-section";
-  const profiles = group.profiles
-    .map((profileId) => quickLoginProfiles.find((profile) => profile.id === profileId))
-    .filter(Boolean);
-
-  section.innerHTML = `
-    <div class="quick-login-section-head">
-      <strong>${group.title}</strong>
-      <span>${group.caption}</span>
-    </div>
-  `;
-
-  const list = document.createElement("div");
-  list.className = "quick-login-list";
-  list.replaceChildren(...profiles.map(createQuickLoginButton));
-  section.append(list);
-  return section;
-}
-
-function renderQuickLoginPicker() {
-  const activeGroup = quickLoginGroups.find((group) => group.id === activeQuickLoginGroup) || quickLoginGroups[0];
-  quickLoginTabs?.replaceChildren(...quickLoginGroups.map(createQuickLoginTab));
-  quickLoginGrid?.replaceChildren(createQuickLoginSection(activeGroup));
-}
-
 function getOrgNode(nodeId) {
   return organizationNodes.find((node) => node.id === nodeId);
 }
@@ -2205,16 +2284,27 @@ function createModuleButton(module, profile) {
     </span>
   `;
 
-  button.addEventListener("click", () => {
+  button.addEventListener("click", async () => {
     if (!accessState.allowed) {
       setStatus(`${getModuleDisplayName(module)}：此帳號無權限。`, "error");
       return;
     }
 
-    const launchUrl = buildModuleLaunchUrl(module.id, profile);
-    if (launchUrl) {
-      window.location.href = launchUrl;
-      return;
+    if (connectedModuleIds.has(module.id)) {
+      button.disabled = true;
+      setStatus(`正在啟動 ${getModuleDisplayName(module)}...`, "info");
+      try {
+        const launchUrl = await buildModuleLaunchUrl(module.id, profile);
+        if (launchUrl) {
+          window.location.href = launchUrl;
+          return;
+        }
+      } catch (error) {
+        button.disabled = false;
+        setStatus(`${getModuleDisplayName(module)} 啟動失敗：${error.message}`, "error");
+        return;
+      }
+      button.disabled = false;
     }
 
     if (hasChildren) {
@@ -2271,6 +2361,67 @@ function renderLevelTwo(parentModule, profile) {
   moduleLevelTwo.hidden = false;
   moduleLevelTwo.classList.add("active");
   setStatus(`已開啟 ${getModuleDisplayName(parentModule)}。`, "info");
+}
+
+function renderAnnouncementsTool(profile) {
+  if (!moduleLevelTwoGrid || !moduleLevelOne || !moduleLevelTwo || !moduleTitle) return;
+  const accessState = getModuleAccessState(systemAnnouncementsModule, profile);
+  if (!accessState.allowed) {
+    setStatus("系統公告：此帳號無權限。", "error");
+    return;
+  }
+
+  moduleTitle.textContent = "系統公告";
+
+  const panel = document.createElement("section");
+  panel.className = "tool-detail account-management";
+  panel.innerHTML = `
+    <div class="account-head">
+      <strong>系統公告</strong>
+      <small>公司公告、任務提醒與重要消息會集中在這裡，依公司、部門、角色與資料範圍顯示。</small>
+    </div>
+    <div class="account-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>公告</th>
+            <th>對象</th>
+            <th>狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="account-person">
+                <strong>Portal 模組權限調整</strong>
+                <small>工作區移除系統公告，改為右上角獨立入口。</small>
+              </div>
+            </td>
+            <td>${escapeHtml(profile.label)}｜${escapeHtml(scopeLabels[profile.scope] || profile.scope)}</td>
+            <td><span class="status-pill is-active">已發布</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="account-person">
+                <strong>網站後台管理權限</strong>
+                <small>目前僅執行長可操作，未來可由系統權限開放給員工。</small>
+              </div>
+            </td>
+            <td>網站後台編輯帳號</td>
+            <td><span class="status-pill is-pending">規劃中</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  moduleLevelTwoGrid.classList.add("detail-grid");
+  moduleLevelTwoGrid.replaceChildren(panel);
+  moduleLevelOne.hidden = true;
+  moduleLevelOne.classList.remove("active");
+  moduleLevelTwo.hidden = false;
+  moduleLevelTwo.classList.add("active");
+  setStatus("已開啟系統公告。", "info");
 }
 
 function renderOrganizationTool(profile) {
@@ -3866,43 +4017,31 @@ function renderSecurityRestrictionTool(profile) {
 }
 
 async function bootPortalLogin() {
+  rememberRequestedModuleLaunch();
   renderOrganizationChart(organizationChart);
-  renderQuickLoginPicker();
   renderSession(getStoredProfile());
   await applyGoogleSession();
+  await launchRequestedModuleIfReady(getStoredProfile());
 }
-
-portalLoginForm?.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const email = loginEmail?.value || "";
-  const password = loginPassword?.value || "";
-  const profile = findProfileByEmail(email);
-
-  if (!profile) {
-    setStatus("找不到這個帳號，請確認 Email 或使用測試帳號快速帶入。", "error");
-    loginEmail?.focus();
-    return;
-  }
-
-  if (password !== demoPassword) {
-    setStatus("密碼錯誤。測試階段示範帳號密碼為 suiyuecare。", "error");
-    loginPassword?.focus();
-    return;
-  }
-
-  setStoredProfile(profile);
-  renderSession(profile);
-  setStatus(`已登入：${profile.label}。`, "success");
-});
 
 signOutButton?.addEventListener("click", () => {
   clearStoredProfile();
+  window.sessionStorage.removeItem(pendingModuleLaunchKey);
   supabase?.auth.signOut();
   renderSession(null);
-  setStatus("已登出，請重新選擇快速登入角色。", "success");
+  setStatus("已登出，請使用 Google 帳號重新登入。", "success");
 });
 
 backToLevelOneButton?.addEventListener("click", () => renderLevelOne());
+
+systemAnnouncementsButton?.addEventListener("click", () => {
+  const profile = getStoredProfile();
+  if (!profile) {
+    setStatus("請先登入後再查看系統公告。", "error");
+    return;
+  }
+  renderAnnouncementsTool(profile);
+});
 
 portalGoogleLoginButton?.addEventListener("click", async () => {
   if (!supabase) {
@@ -3910,6 +4049,7 @@ portalGoogleLoginButton?.addEventListener("click", async () => {
     return;
   }
 
+  rememberRequestedModuleLaunch();
   const redirectTo = getPortalRedirectUrl();
   if (!redirectTo) {
     setStatus("Google 登入需要使用 http 或 https 網址，請從本機伺服器或正式站開啟入口網。", "error");
