@@ -10,6 +10,7 @@ import {
   requireAdminSession,
   setStatus
 } from "./auth.js";
+import { renderAdminNavigation } from "./navigation.js";
 
 const TOAST_SELECTOR = ".admin-data-status, .admin-form-status, .admin-loading";
 const TOAST_ACTION_PATTERN = /儲存|上傳|刪除|送審|核准|退回|處理|更新|建立|匯入|還原|備份/;
@@ -164,6 +165,7 @@ export async function bootProtectedAdminPage({
   document.body.dataset.adminRole = permissions.role || "viewer";
   document.body.dataset.canPublish = permissions.can_publish ? "true" : "false";
   document.body.dataset.canReviewPublish = permissions.can_review_publish ? "true" : "false";
+  renderAdminNavigation(permissions);
   applyAdminPermissionUi(permissions);
 
   loading?.remove();

@@ -11,77 +11,111 @@ const refreshButton = document.querySelector("#refreshUsersButton");
 const statusBox = document.querySelector("#usersStatus");
 const usersList = document.querySelector("#usersList");
 
-const permissionGroups = [
+const permissionModules = [
   {
-    title: "系統與發布",
-    hint: "只有執行長/最高權限帳號可以正式發布與核准，其餘帳號請送審。",
-    fields: [
-      ["can_manage_users", "管理使用者"],
-      ["can_publish", "正式發布"],
-      ["can_review_publish", "審核發布"]
-    ]
+    id: "pages",
+    title: "官網頁面",
+    hint: "首頁、服務項目、招募合作與固定頁面文字圖片。",
+    viewFields: ["can_view_pages"],
+    editFields: ["can_edit_pages"],
+    deleteFields: ["can_delete_pages"]
   },
   {
-    title: "頁面內容",
-    hint: "控制頁面文案、圖片與固定卡片內容。",
-    fields: [
-      ["can_view_pages", "檢視頁面"],
-      ["can_edit_pages", "新增/編輯頁面"],
-      ["can_delete_pages", "刪除頁面卡片"]
-    ]
+    id: "media",
+    title: "圖片庫",
+    hint: "上傳圖片、裁切圖片、查看圖片被哪些地方使用。",
+    viewFields: ["can_view_media"],
+    editFields: ["can_manage_media"],
+    deleteFields: ["can_delete_media"]
   },
   {
-    title: "文章、故事與講堂",
-    hint: "控制 Health 3.0、真實照顧情境與名人講堂。",
-    fields: [
-      ["can_view_articles", "檢視內容"],
-      ["can_edit_articles", "新增/編輯內容"],
-      ["can_delete_articles", "刪除內容"]
-    ]
+    id: "articles",
+    title: "文章內容",
+    hint: "Health 3.0、最新消息、得標紀錄、真實照顧情境、名人講堂。",
+    viewFields: ["can_view_articles"],
+    editFields: ["can_edit_articles"],
+    deleteFields: ["can_delete_articles"]
   },
   {
-    title: "圖片素材",
-    hint: "控制媒體庫、圖片上傳與圖片刪除。",
-    fields: [
-      ["can_view_media", "檢視圖片"],
-      ["can_manage_media", "上傳/編輯圖片"],
-      ["can_delete_media", "刪除圖片"]
-    ]
+    id: "courses",
+    title: "課程報名",
+    hint: "課程卡片、日期、價格、報名資料。",
+    viewFields: ["can_view_courses"],
+    editFields: ["can_edit_courses"],
+    deleteFields: ["can_delete_courses"]
   },
   {
-    title: "課程管理",
-    hint: "控制課程報名資料。",
-    fields: [
-      ["can_view_courses", "檢視課程"],
-      ["can_edit_courses", "新增/編輯課程"],
-      ["can_delete_courses", "刪除課程"]
-    ]
+    id: "recruiting",
+    title: "招募管理",
+    hint: "人才招募、職缺卡片、部門介紹。",
+    viewFields: ["can_view_recruiting"],
+    editFields: ["can_edit_recruiting"],
+    deleteFields: ["can_delete_recruiting"]
   },
   {
-    title: "招募與投資人",
-    hint: "控制招募頁、職缺、投資人公告與圖表資料。",
-    fields: [
-      ["can_view_recruiting", "檢視招募"],
-      ["can_edit_recruiting", "編輯招募"],
-      ["can_delete_recruiting", "刪除招募"],
-      ["can_view_investor", "檢視投資人資料"],
-      ["can_edit_investor", "編輯投資人資料"],
-      ["can_delete_investor", "刪除投資人資料"]
-    ]
+    id: "investor",
+    title: "投資人資料",
+    hint: "投資人公告、財報下載、圖表資料。",
+    viewFields: ["can_view_investor"],
+    editFields: ["can_edit_investor"],
+    deleteFields: ["can_delete_investor"]
   },
   {
-    title: "數據與品質",
-    hint: "控制網站流量、報表匯出與內容健康檢查。",
-    fields: [
-      ["can_view_analytics", "檢視流量"],
-      ["can_export_analytics", "匯出流量報表"],
-      ["can_view_content_health", "內容健康檢查"],
-      ["can_manage_backups", "備份與還原"]
-    ]
+    id: "analytics",
+    title: "網站流量",
+    hint: "流量中心與報表匯出，建議只給主管或行銷管理者。",
+    viewFields: ["can_view_analytics"],
+    editFields: ["can_export_analytics"],
+    deleteFields: []
+  },
+  {
+    id: "quality",
+    title: "內容健康檢查",
+    hint: "上線前檢查缺圖、缺 SEO、未發布內容。",
+    viewFields: ["can_view_content_health"],
+    editFields: [],
+    deleteFields: []
+  },
+  {
+    id: "users",
+    title: "人員權限",
+    hint: "新增/停用後台使用者與調整權限，只建議給主管。",
+    viewFields: ["can_manage_users"],
+    editFields: ["can_manage_users"],
+    deleteFields: []
+  },
+  {
+    id: "backup",
+    title: "備份還原",
+    hint: "正式上線前備份與還原，建議只給最高權限或資訊窗口。",
+    viewFields: ["can_manage_backups"],
+    editFields: ["can_manage_backups"],
+    deleteFields: []
   }
 ];
 
-const permissionFields = permissionGroups.flatMap((group) => group.fields);
+const hiddenPermissionFields = [
+  "can_publish",
+  "can_review_publish",
+  "can_edit_site_settings",
+  "can_view_files",
+  "can_manage_files",
+  "can_delete_files",
+  "can_view_forms",
+  "can_edit_forms",
+  "can_export_forms"
+];
+
+const permissionFields = [
+  ...new Set([
+    ...permissionModules.flatMap((module) => [
+      ...module.viewFields,
+      ...module.editFields,
+      ...module.deleteFields
+    ]),
+    ...hiddenPermissionFields
+  ])
+].map((field) => [field, field]);
 
 const roleDefaults = {
   owner: {
@@ -283,20 +317,53 @@ function renderRoleOptions(selectedRole = "viewer", email = "") {
   }).join("");
 }
 
-function renderPermissionGroups(admin) {
-  return permissionGroups.map((group) => `
-    <section class="permission-group-card">
-      <header>
-        <strong>${escapeHTML(group.title)}</strong>
-        <span>${escapeHTML(group.hint)}</span>
-      </header>
-      <div class="permission-check-grid">
-        ${group.fields.map(([field, label]) => `
-          <label class="admin-toggle-field compact"><input name="${field}" type="checkbox" ${admin[field] ? "checked" : ""} /><span>${escapeHTML(label)}</span></label>
-        `).join("")}
+function permissionLevel(admin, module) {
+  if (module.editFields.some((field) => admin[field])) return "edit";
+  if (module.viewFields.some((field) => admin[field])) return "view";
+  return "none";
+}
+
+function renderPermissionMatrix(admin) {
+  const columns = [
+    ["none", "無", "看不到這個模組"],
+    ["view", "可看", "可以進入查看，但不能改"],
+    ["edit", "可編輯", "可以新增、編輯與送審"]
+  ];
+
+  return `
+    <div class="permission-matrix-help">
+      <strong>權限怎麼看？</strong>
+      <p>每個部門只需要選「無、可看、可編輯」。正式發布仍遵守規則：除了執行長最高權限以外，其他人都只能送審，不能直接上線。</p>
+    </div>
+    <div class="permission-matrix" role="table" aria-label="後台權限矩陣">
+      <div class="permission-matrix-row permission-matrix-head" role="row">
+        <span>模組</span>
+        ${columns.map(([, label]) => `<span>${label}</span>`).join("")}
       </div>
-    </section>
-  `).join("");
+      ${permissionModules.map((module) => {
+        const selectedLevel = permissionLevel(admin, module);
+        return `
+          <div class="permission-matrix-row" role="row">
+            <div class="permission-matrix-module">
+              <strong>${escapeHTML(module.title)}</strong>
+              <small>${escapeHTML(module.hint)}</small>
+            </div>
+            ${columns.map(([value, label, title]) => `
+              <label title="${escapeHTML(title)}">
+                <input
+                  type="radio"
+                  name="permission_level_${escapeHTML(module.id)}"
+                  value="${value}"
+                  ${selectedLevel === value ? "checked" : ""}
+                />
+                <span>${escapeHTML(label)}</span>
+              </label>
+            `).join("")}
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
 }
 
 function renderUsers() {
@@ -329,8 +396,8 @@ function renderUsers() {
           </select></label>
           <label><span>顯示名稱</span><input name="display_name" type="text" value="${escapeHTML(profile.display_name || "")}" /></label>
           <label><span>Email</span><input name="email" type="email" value="${escapeHTML(profile.email || "")}" /></label>
-          <div class="admin-field-wide permission-group-grid">
-            ${renderPermissionGroups(admin)}
+          <div class="admin-field-wide">
+            ${renderPermissionMatrix(admin)}
           </div>
           <button type="submit">儲存權限</button>
         </form>
@@ -358,9 +425,25 @@ async function loadUsers() {
 
 function applyRoleDefaults(form, role) {
   const defaults = roleDefaults[role] || roleDefaults.viewer;
-  permissionFields.forEach(([field]) => {
-    const input = form.elements[field];
-    if (input) input.checked = Boolean(defaults[field]);
+  permissionModules.forEach((module) => {
+    const input = form.elements[`permission_level_${module.id}`];
+    if (!input) return;
+    const nextLevel = permissionLevel(defaults, module);
+    Array.from(input).forEach((radio) => {
+      radio.checked = radio.value === nextLevel;
+    });
+  });
+}
+
+function applyModuleLevel(payload, module, level, role) {
+  module.viewFields.forEach((field) => {
+    payload[field] = level === "view" || level === "edit";
+  });
+  module.editFields.forEach((field) => {
+    payload[field] = level === "edit";
+  });
+  module.deleteFields.forEach((field) => {
+    payload[field] = level === "edit" && ["owner", "admin"].includes(role);
   });
 }
 
@@ -379,8 +462,18 @@ async function saveUser(card, form) {
     is_active: profilePayload.is_active
   };
   permissionFields.forEach(([field]) => {
-    adminPayload[field] = Boolean(form.elements[field]?.checked);
+    adminPayload[field] = false;
   });
+
+  permissionModules.forEach((module) => {
+    const level = form.elements[`permission_level_${module.id}`]?.value || "none";
+    applyModuleLevel(adminPayload, module, level, role);
+  });
+
+  if (String(profilePayload.email || "").toLowerCase() === "entrepreneur@suiyuecare.com" && role === "owner") {
+    Object.assign(adminPayload, roleDefaults.owner);
+  }
+
   adminPayload.can_edit_pages = adminPayload.can_edit_pages || adminPayload.can_edit_recruiting || adminPayload.can_edit_investor;
   adminPayload.can_edit_articles = Boolean(adminPayload.can_edit_articles);
   adminPayload.can_manage_media = adminPayload.can_manage_media || adminPayload.can_delete_media;

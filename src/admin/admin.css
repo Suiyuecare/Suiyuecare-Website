@@ -351,7 +351,23 @@ input {
 .admin-menu {
   align-content: start;
   display: grid;
-  gap: 8px;
+  gap: 16px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.admin-menu-section {
+  display: grid;
+  gap: 7px;
+}
+
+.admin-menu-section-label {
+  color: rgba(77, 45, 25, 0.58);
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: .16em;
+  padding: 0 10px;
+  text-transform: uppercase;
 }
 
 .admin-menu a {
@@ -381,7 +397,17 @@ input {
 }
 
 .admin-menu a strong {
+  display: grid;
+  gap: 2px;
   font-size: 16px;
+}
+
+.admin-menu a strong small {
+  color: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.25;
+  opacity: .64;
 }
 
 .admin-menu a.active,
@@ -3413,6 +3439,103 @@ img[data-image-usage="map"],
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.permission-matrix-help {
+  background: linear-gradient(135deg, rgba(240, 138, 36, 0.1), rgba(255, 255, 255, 0.92));
+  border: 1px solid rgba(219, 132, 42, 0.22);
+  border-radius: 20px;
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 16px 18px;
+}
+
+.permission-matrix-help strong {
+  color: var(--admin-brown);
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.permission-matrix-help p {
+  color: var(--admin-muted);
+  font-size: .9rem;
+  font-weight: 800;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.permission-matrix {
+  border: 1px solid var(--admin-line);
+  border-radius: 24px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, .78);
+}
+
+.permission-matrix-row {
+  display: grid;
+  grid-template-columns: minmax(250px, 1.6fr) repeat(3, minmax(112px, .55fr));
+  align-items: stretch;
+  border-bottom: 1px solid rgba(234, 211, 179, .72);
+}
+
+.permission-matrix-row:last-child {
+  border-bottom: 0;
+}
+
+.permission-matrix-head {
+  background: rgba(246, 237, 221, .9);
+  color: var(--admin-brown);
+  font-size: .9rem;
+  font-weight: 950;
+}
+
+.permission-matrix-head span {
+  padding: 14px 16px;
+}
+
+.permission-matrix-module {
+  display: grid;
+  gap: 5px;
+  padding: 16px;
+}
+
+.permission-matrix-module strong {
+  color: var(--admin-brown);
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.permission-matrix-module small {
+  color: var(--admin-muted);
+  font-size: .82rem;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.permission-matrix-row label {
+  align-items: center;
+  border-left: 1px solid rgba(234, 211, 179, .72);
+  cursor: pointer;
+  display: flex;
+  gap: 9px;
+  justify-content: center;
+  padding: 14px 10px;
+  color: var(--admin-muted);
+  font-size: .9rem;
+  font-weight: 950;
+  transition: background .16s ease, color .16s ease;
+}
+
+.permission-matrix-row label:has(input:checked) {
+  background: rgba(240, 138, 36, .14);
+  color: var(--admin-orange-dark);
+}
+
+.permission-matrix-row input {
+  accent-color: var(--admin-orange);
+  width: 18px;
+  height: 18px;
+}
+
 .permission-group-grid {
   display: grid;
   gap: 14px;
@@ -3706,6 +3829,14 @@ img[data-image-usage="map"],
 
   .permission-check-grid {
     grid-template-columns: 1fr;
+  }
+
+  .permission-matrix {
+    overflow-x: auto;
+  }
+
+  .permission-matrix-row {
+    min-width: 680px;
   }
 
   .permission-group-grid {
