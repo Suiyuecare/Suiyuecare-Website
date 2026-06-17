@@ -12,6 +12,26 @@ function maskedEmail(value = "") {
   return `${name.slice(0, 2)}***@${domain}`;
 }
 
+function createHttpError(statusCode, message) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+}
+
+function authorizationHeader(request) {
+  return request.headers?.authorization || request.headers?.Authorization || "";
+}
+
+function requireStatusAuthorization(request) {
+  const secret = process.env.STATUS_SECRET || process.env.CRON_SECRET || process.env.REPORT_CRON_SECRET;
+  if (!secret) {
+    throw createHttpError(503, "Status endpoint is not configured.");
+  }
+  if (authorizationHeader(request) !== `Bearer ${secret}`) {
+    throw createHttpError(401, "Unauthorized.");
+  }
+}
+
 function decodeJwtPayload(token = "") {
   const parts = String(token || "").split(".");
   if (parts.length < 2) return null;
@@ -34,6 +54,12 @@ module.exports = async function handler(request, response) {
   if (request.method !== "GET") {
     response.setHeader("Allow", "GET");
     return json(response, 405, { ok: false, message: "Method not allowed" });
+  }
+
+  try {
+    requireStatusAuthorization(request);
+  } catch (error) {
+    return json(response, error.statusCode || 500, { ok: false, message: error.message || "Unable to read email status." });
   }
 
   const recipients = {

@@ -211,7 +211,6 @@ button {
 }
 
 .login-card-head p:not(.portal-kicker),
-.demo-hint,
 .login-status,
 .module-topbar p:not(.portal-kicker) {
   color: var(--muted);
@@ -330,155 +329,6 @@ button {
   opacity: 0.72;
 }
 
-.demo-login-panel {
-  margin-top: 22px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--soft);
-}
-
-.demo-login-panel summary {
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  color: var(--orange-dark);
-  font-weight: 900;
-}
-
-.demo-hint {
-  margin: 0;
-  padding: 0 16px 14px;
-  font-size: 13px;
-}
-
-.demo-hint b {
-  color: var(--orange-dark);
-}
-
-.quick-login-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-  margin: 0 12px;
-  padding: 5px;
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  background: #fff;
-}
-
-.quick-login-tab {
-  min-height: 38px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 900;
-  transition: background 0.18s ease, color 0.18s ease;
-}
-
-.quick-login-tab[aria-selected="true"] {
-  background: var(--orange);
-  color: #fff;
-}
-
-.quick-login-grid {
-  margin: 12px;
-}
-
-.quick-login-section {
-  display: grid;
-  gap: 10px;
-}
-
-.quick-login-section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.quick-login-section-head strong {
-  color: var(--brown);
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.quick-login-section-head span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-  text-align: right;
-}
-
-.quick-login-list {
-  display: grid;
-  gap: 8px;
-}
-
-.quick-login-card {
-  min-height: 58px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 12px;
-  border: 1px solid rgba(234, 212, 184, 0.95);
-  border-radius: 12px;
-  background: #fff;
-  color: var(--brown);
-  text-align: left;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
-}
-
-.quick-login-card:hover {
-  border-color: rgba(240, 138, 36, 0.55);
-  box-shadow: 0 12px 24px rgba(69, 37, 17, 0.08);
-}
-
-.quick-login-main,
-.quick-login-meta {
-  min-width: 0;
-}
-
-.quick-login-card strong {
-  display: block;
-  color: var(--brown);
-  font-size: 15px;
-  line-height: 1.3;
-}
-
-.quick-login-card small {
-  display: block;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.35;
-}
-
-.quick-login-meta {
-  display: grid;
-  justify-items: end;
-  gap: 4px;
-  text-align: right;
-}
-
-.quick-login-meta b {
-  min-height: 24px;
-  display: inline-grid;
-  place-items: center;
-  padding: 0 8px;
-  border-radius: 999px;
-  background: #fff2e3;
-  color: var(--orange-dark);
-  font-size: 11px;
-}
-
-.quick-login-meta small {
-  max-width: 132px;
-}
-
 .login-status {
   min-height: 24px;
   width: min(1120px, 100%);
@@ -524,6 +374,14 @@ button {
 
 .module-topbar {
   margin-bottom: 28px;
+}
+
+.module-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex: 0 0 auto;
 }
 
 .module-topbar h2,
@@ -608,6 +466,32 @@ button {
   border-color: rgba(240, 138, 36, 0.38);
   background: #fff;
   box-shadow: 0 18px 38px rgba(69, 37, 17, 0.09);
+}
+
+.module-card[data-access-status="building"] {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 249, 241, 0.42)),
+    #fff;
+}
+
+.module-card[data-access-status="building"] .module-card-footer b {
+  color: #9b806b;
+}
+
+.module-card[data-access-status="denied"] {
+  cursor: not-allowed;
+  opacity: 0.66;
+  background: #fffaf5;
+}
+
+.module-card[data-access-status="denied"]:hover {
+  transform: none;
+  border-color: rgba(234, 212, 184, 0.82);
+  box-shadow: 0 12px 28px rgba(69, 37, 17, 0.04);
+}
+
+.module-card[data-access-status="denied"] .module-card-footer b {
+  color: #8b6f5e;
 }
 
 .module-number {
@@ -822,6 +706,17 @@ button {
   grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.55fr);
   gap: 16px;
   align-items: start;
+}
+
+.organization-tool-layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.9fr) minmax(0, 1.1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.organization-tool .compact {
+  margin-top: 0;
 }
 
 .grade-card-list {
@@ -1073,6 +968,14 @@ button {
   min-width: 1120px;
 }
 
+.organization-structure-table {
+  min-width: 920px;
+}
+
+.supervisor-table {
+  min-width: 1180px;
+}
+
 .button-permission-table {
   min-width: 1180px;
 }
@@ -1123,6 +1026,105 @@ button {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(234, 212, 184, 0.86);
   color: var(--brown);
+}
+
+.permission-row-editor {
+  min-width: 260px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(110px, 1fr)) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.permission-row-editor.is-compact {
+  min-width: 360px;
+  grid-template-columns: minmax(150px, 1fr) minmax(150px, 1fr) auto;
+}
+
+.permission-row-editor.account-row-editor {
+  min-width: 520px;
+  grid-template-columns: minmax(190px, 1.35fr) repeat(3, minmax(110px, 1fr)) auto;
+}
+
+.permission-row-editor label {
+  display: grid;
+  gap: 5px;
+}
+
+.permission-row-editor label span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.permission-row-editor select,
+.permission-row-editor input {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid rgba(234, 212, 184, 0.95);
+  border-radius: 11px;
+  background: #fff;
+  color: var(--brown);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  outline: none;
+}
+
+.permission-row-editor select[multiple] {
+  min-height: 112px;
+  padding: 8px;
+}
+
+.permission-row-editor select:focus {
+  border-color: rgba(240, 138, 36, 0.66);
+  box-shadow: 0 0 0 4px rgba(240, 138, 36, 0.1);
+}
+
+.permission-row-editor input:focus {
+  border-color: rgba(240, 138, 36, 0.66);
+  box-shadow: 0 0 0 4px rgba(240, 138, 36, 0.1);
+}
+
+.permission-save-button {
+  min-height: 38px;
+  white-space: nowrap;
+}
+
+.live-audit-panel {
+  margin-top: 4px;
+}
+
+.live-audit-table {
+  min-width: 1120px;
+}
+
+.supervisor-select {
+  width: 100%;
+  min-width: 240px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(234, 212, 184, 0.95);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--brown);
+  font-size: 13px;
+  font-weight: 800;
+  outline: none;
+}
+
+.supervisor-select:focus {
+  border-color: rgba(240, 138, 36, 0.66);
+  box-shadow: 0 0 0 4px rgba(240, 138, 36, 0.12);
+}
+
+.supervisor-reset-button {
+  align-self: end;
+}
+
+.supervisor-chart-list {
+  margin-top: 16px;
 }
 
 .account-table td small,
@@ -1296,9 +1298,50 @@ button {
   background: var(--soft);
 }
 
+.pdf-editor-dropzone {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  padding: 18px;
+  border: 1.5px dashed rgba(214, 154, 80, 0.62);
+  border-radius: 16px;
+  background: rgba(255, 248, 237, 0.72);
+  margin: 16px 0;
+}
+
+.pdf-editor-dropzone input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(234, 212, 184, 0.88);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.pdf-editor-dropzone strong {
+  display: block;
+  color: var(--ink);
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.pdf-editor-dropzone span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.pdf-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
 @media (max-width: 900px) {
   .portal-shell {
-    padding: 12px;
+    padding: 10px;
   }
 
   .login-page {
@@ -1311,21 +1354,41 @@ button {
   }
 
   .login-aside {
-    gap: 24px;
-    padding: 24px;
+    gap: 16px;
+    padding: 22px 24px 16px;
   }
 
   .login-message h1 {
-    font-size: 34px;
+    font-size: 30px;
+  }
+
+  .login-message p:not(.portal-kicker) {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .security-list {
+    gap: 8px;
   }
 
   .security-list div {
     grid-template-columns: 1fr;
-    gap: 4px;
+    gap: 2px;
+    min-height: 0;
+    padding: 9px 12px;
   }
 
   .login-card {
-    padding: 24px;
+    padding: 20px 24px 24px;
+  }
+
+  .login-card-head h2 {
+    font-size: 30px;
+  }
+
+  .login-form {
+    margin-top: 18px;
   }
 
   .quick-login-tabs,
@@ -1338,6 +1401,7 @@ button {
   .affiliation-summary,
   .affiliation-layout,
   .grade-layout,
+  .organization-tool-layout,
   .account-toolbar {
     grid-template-columns: 1fr;
   }
@@ -1365,6 +1429,10 @@ button {
   .module-topbar,
   .section-head {
     display: grid;
+  }
+
+  .module-actions {
+    justify-content: start;
   }
 
   .quick-login-section-head span,

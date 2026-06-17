@@ -8,6 +8,8 @@ const userInitial = document.querySelector("#adminUserInitial");
 const logoutButton = document.querySelector("#adminLogout");
 const statusBox = document.querySelector("#apmStatus");
 const board = document.querySelector("#apmBoard");
+const portalSessionKey = "suiyuecare.apm.portalSession";
+const portalHomeUrl = "https://login.suiyuecare.com/portal/";
 
 const columns = [
   {
@@ -48,6 +50,52 @@ function setStatus(message, type = "info") {
   statusBox.dataset.status = type;
 }
 
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function readPortalHandoff() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("portal") !== "1") return null;
+  const email = params.get("email") || "";
+  if (!email) return null;
+
+  return {
+    email,
+    role: params.get("role") || "Portal 使用者",
+    scope: params.get("scope") || "assigned",
+    signedInAt: new Date().toISOString()
+  };
+}
+
+function getStoredPortalSession() {
+  try {
+    const raw = window.localStorage.getItem(portalSessionKey);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredPortalSession(session) {
+  window.localStorage.setItem(portalSessionKey, JSON.stringify(session));
+}
+
+function clearStoredPortalSession() {
+  window.localStorage.removeItem(portalSessionKey);
+}
+
+function renderPortalSession(session) {
+  if (userEmail) userEmail.textContent = session.email;
+  if (userInitial) userInitial.textContent = session.email.trim().charAt(0).toUpperCase();
+  loading?.remove();
+  if (shell) shell.hidden = false;
+  renderBoard(
+    { user: { email: session.email } },
+    { role: session.role || "portal", scope: session.scope || "assigned" }
+  );
+}
+
 function renderBoard(session, permissions) {
   if (!board) return;
   board.replaceChildren(
@@ -73,13 +121,42 @@ function renderBoard(session, permissions) {
   setStatus(`已使用 ${session.user.email || "Google 帳號"} 進入 APM。角色：${permissions.role || "viewer"}。`, "success");
 }
 
-bootProtectedAdminPage({
-  loading,
-  shell,
-  userEmail,
-  userInitial,
-  logoutButton,
-  onReady: renderBoard
-})
-  .then(() => bindAdminLogout(logoutButton))
-  .catch((error) => reportAdminBootError(loading, error));
+async function bootApm() {
+  const handoff = readPortalHandoff();
+  if (handoff) {
+    setStoredPortalSession(handoff);
+    window.history.replaceState({}, "", "/");
+    await wait(450);
+    renderPortalSession(handoff);
+    return;
+  }
+
+  const storedSession = getStoredPortalSession();
+  if (storedSession?.email) {
+    await wait(300);
+    renderPortalSession(storedSession);
+    return;
+  }
+
+  if (window.location.hostname === "apm.suiyuecare.com") {
+    window.location.replace(portalHomeUrl);
+    return;
+  }
+
+  await bootProtectedAdminPage({
+    loading,
+    shell,
+    userEmail,
+    userInitial,
+    logoutButton,
+    onReady: renderBoard
+  });
+  bindAdminLogout(logoutButton);
+}
+
+logoutButton?.addEventListener("click", () => {
+  clearStoredPortalSession();
+  window.location.href = portalHomeUrl;
+});
+
+bootApm().catch((error) => reportAdminBootError(loading, error));

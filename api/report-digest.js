@@ -13,10 +13,60 @@ function startDateFor(type) {
   return date.toISOString();
 }
 
-async function supabaseSelect(path) {
+function decodeJwtPayload(token = "") {
+  const parts = String(token || "").split(".");
+  if (parts.length < 2) return null;
+
+  try {
+    const normalized = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    return JSON.parse(Buffer.from(padded, "base64").toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function projectRefFromSupabaseUrl(url = "") {
+  const match = String(url || "").match(/^https:\/\/([a-z0-9-]+)\.supabase\.co/i);
+  return match?.[1] || "";
+}
+
+function setupError(message) {
+  const error = new Error(message);
+  error.statusCode = 503;
+  error.setupRequired = true;
+  return error;
+}
+
+function requireCronAuthorization(request) {
+  const cronSecret = process.env.CRON_SECRET || process.env.REPORT_CRON_SECRET;
+  if (!cronSecret) throw setupError("Missing CRON_SECRET for scheduled report endpoint.");
+
+  const authorization = request.headers.authorization || "";
+  if (authorization !== `Bearer ${cronSecret}`) {
+    const error = new Error("Unauthorized");
+    error.statusCode = 401;
+    throw error;
+  }
+}
+
+function supabaseServiceConfig() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !key) throw new Error("Missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
+  if (!supabaseUrl || !key) {
+    throw setupError("Missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
+  }
+
+  const payload = decodeJwtPayload(key);
+  if (payload?.role !== "service_role" || payload?.ref !== projectRefFromSupabaseUrl(supabaseUrl)) {
+    throw setupError("SUPABASE_SERVICE_ROLE_KEY does not match SUPABASE_URL project.");
+  }
+
+  return { supabaseUrl, key };
+}
+
+async function supabaseSelect(path) {
+  const { supabaseUrl, key } = supabaseServiceConfig();
 
   const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
     headers: {
@@ -29,9 +79,7 @@ async function supabaseSelect(path) {
 }
 
 async function supabasePatch(path, payload) {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !key) throw new Error("Missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
+  const { supabaseUrl, key } = supabaseServiceConfig();
 
   const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
     method: "PATCH",
@@ -93,17 +141,9 @@ module.exports = async function handler(request, response) {
     return json(response, 405, { ok: false, message: "Method not allowed" });
   }
 
-  const cronSecret = process.env.REPORT_CRON_SECRET || process.env.CRON_SECRET;
-  if (cronSecret) {
-    const authorization = request.headers.authorization || "";
-    const bearer = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
-    const token = request.headers["x-cron-secret"] || request.query?.token || bearer;
-    if (token !== cronSecret) {
-      return json(response, 401, { ok: false, message: "Unauthorized" });
-    }
-  }
-
   try {
+    requireCronAuthorization(request);
+
     const requestUrl = new URL(request.url || "/api/report-digest", `https://${request.headers.host || "localhost"}`);
     const pathReportType = requestUrl.pathname.includes("monthly")
       ? "monthly"
@@ -128,7 +168,13 @@ module.exports = async function handler(request, response) {
 
     return json(response, 200, { ok: true, reportType, recipients, results });
   } catch (error) {
-    console.error(error);
-    return json(response, 500, { ok: false, message: error.message || "Report failed." });
+    const statusCode = error.statusCode || 500;
+    if (statusCode >= 500) console.error(error);
+    else console.warn("Report digest rejected", error.message);
+    return json(response, statusCode, {
+      ok: false,
+      message: statusCode >= 500 ? "Report failed." : error.message || "Report failed.",
+      setupRequired: Boolean(error.setupRequired)
+    });
   }
 };

@@ -25,6 +25,8 @@ const typeLabels = {
   course_signup: "課程報名",
   recruiting: "人才招募",
   land: "土地合作",
+  marketing: "網站行銷合作",
+  system: "系統後台諮詢",
   investor: "投資洽談"
 };
 

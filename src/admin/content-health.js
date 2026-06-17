@@ -383,7 +383,7 @@ function auditFormSubmissions(submissions, issues) {
       addIssue(issues, { severity: "warning", scope: "form", title: `${typeLabel} 超過 24 小時未結案`, detail: `${item.name || "未留姓名"}｜${item.phone || item.email || "缺聯絡方式"}`, editUrl, updatedAt: item.updated_at || item.created_at });
     }
     if (item.email_sent === false) {
-      addIssue(issues, { severity: "critical", scope: "form", title: `${typeLabel} 留存成功但寄信失敗`, detail: `${item.name || "未留姓名"}｜請確認 RESEND_API_KEY、MAIL_FROM 與收件信箱。`, editUrl, updatedAt: item.updated_at || item.created_at });
+      addIssue(issues, { severity: "critical", scope: "form", title: `${typeLabel} 留存成功但寄信失敗`, detail: `${item.name || "未留姓名"}｜請確認後端寄信服務設定與收件信箱。`, editUrl, updatedAt: item.updated_at || item.created_at });
     }
     if (!item.name || (!item.phone && !item.email)) {
       addIssue(issues, { severity: "warning", scope: "form", title: `${typeLabel} 缺必要聯絡資料`, detail: `姓名：${item.name || "缺"}，電話/Email：${item.phone || item.email || "缺"}`, editUrl, updatedAt: item.updated_at || item.created_at });

@@ -19,6 +19,9 @@ const systemAnnouncementsButton = document.querySelector("#systemAnnouncementsBu
 const storageKey = "suiyuecare.portal.profile";
 const storageEmailKey = "suiyuecare.portal.email";
 const pendingModuleLaunchKey = "suiyuecare.portal.pendingModuleLaunch";
+const supervisorAssignmentsStorageKey = "suiyuecare.portal.supervisorAssignments";
+const permissionSettingsStorageKey = "suiyuecare.portal.permissionSettings";
+const permissionAuditStorageKey = "suiyuecare.portal.permissionAudit";
 const portalHomePath = "/portal/";
 const portalProductionOrigin = "https://login.suiyuecare.com";
 const portalOAuthBridgeOrigin = "https://suiyuecare-website.vercel.app";
@@ -117,7 +120,7 @@ const organizationNodes = [
     label: "教學品管部",
     type: "業務線",
     scope: "business_unit",
-    roles: ["業務部長"]
+    roles: ["業務部長", "課長", "組長", "職員"]
   },
   {
     id: "community-bu",
@@ -125,7 +128,7 @@ const organizationNodes = [
     label: "社區據點部",
     type: "業務線",
     scope: "business_unit",
-    roles: ["業務部長"]
+    roles: ["業務部長", "課長", "組長", "職員"]
   },
   {
     id: "software-bu",
@@ -133,7 +136,7 @@ const organizationNodes = [
     label: "軟體販售部",
     type: "業務線",
     scope: "business_unit",
-    roles: ["業務部長"]
+    roles: ["業務部長", "課長", "組長", "職員"]
   },
   {
     id: "migrant-bu",
@@ -141,7 +144,7 @@ const organizationNodes = [
     label: "移工培訓部",
     type: "業務線",
     scope: "business_unit",
-    roles: ["業務部長"]
+    roles: ["業務部長", "課長", "組長", "職員"]
   },
   {
     id: "admin-dept",
@@ -149,7 +152,7 @@ const organizationNodes = [
     label: "行政部門",
     type: "部門",
     scope: "department",
-    roles: ["行政部長"]
+    roles: ["行政部長", "課長", "職員"]
   },
   {
     id: "hr-class",
@@ -222,7 +225,7 @@ const moduleOrgRules = {
   "system-permissions": { owner: "it-class", scope: "custom", policy: "資訊課維護帳號，不預設看敏感內容" },
   "organization-chart": { owner: "it-class", scope: "company", policy: "依組織節點檢視公司架構" },
   "employee-accounts": { owner: "it-class", scope: "custom", policy: "員工帳號與登入狀態管理" },
-  "agile-projects": { owner: "ga-class", scope: "assigned", policy: "依專案、衝刺與負責人授權" },
+  "agile-projects": { owner: "ga-class", scope: "company", policy: "比照會計系統，全員可進入；資料與操作依 APM 權限控管" },
   "website-backoffice": { owner: "it-class", scope: "company", policy: "網站內容、發布流程與後台編輯權限" },
   "pdf-editor": { owner: "it-class", scope: "assigned", policy: "已授權使用者可用" }
 };
@@ -381,19 +384,16 @@ const moduleIcons = {
 
 const moduleLaunchUrls = {
   accounting: "https://finance.suiyuecare.com/",
-  "agile-projects": "https://apm.suiyuecare.com/",
-  edoc: "https://edoc.suiyuecare.com/",
-  "website-backoffice": `${portalProductionOrigin}/admin/`
+  "agile-projects": "https://apm.suiyuecare.com/"
 };
 
 const connectedModuleIds = new Set(Object.keys(moduleLaunchUrls));
-const sharedGeneralAffairsModules = new Set(["edoc", "pdf-editor"]);
+const temporarilyOpenModuleIds = new Set(["accounting", "agile-projects", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
+const sharedGeneralAffairsModules = new Set(["pdf-editor"]);
 const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions", "organization-chart", "employee-accounts"]);
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
-const signedHandoffModuleIds = new Set(["agile-projects", "edoc"]);
-const externalLaunchOrigins = new Map([
-  ["https://edoc.suiyuecare.com", "edoc"]
-]);
+const signedHandoffModuleIds = new Set();
+const externalLaunchOrigins = new Map();
 
 async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
   const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
@@ -444,7 +444,7 @@ function buildModuleLaunchPayload(moduleId, profile) {
 
 function getModulePermissionForProfile(moduleId, profile) {
   const sourceRoleKey = profile.sourceProfileId || profile.roleKey || profile.id;
-  const permission = modulePermissionDefinitions.find((row) =>
+  const permission = getManagedModulePermissionDefinitions().find((row) =>
     row.moduleId === moduleId && row.roles.includes(sourceRoleKey)
   );
   const fallbackRole = roleDefinitions.find((role) => role.id === sourceRoleKey);
@@ -465,15 +465,29 @@ function getModulePermissionForProfile(moduleId, profile) {
 
 function getProfileOrganization(profile) {
   if (!profile?.employeeNo) return {};
-  const account = employeeAccounts.find((employee) => employee.no === profile.employeeNo);
+  const account = findEmployeeAccountByNo(profile.employeeNo);
   if (!account) return {};
+  const platformRecord = getEmployeePlatformRecord(account);
   return {
     employeeNo: account.no,
     company: account.company,
     department: account.department,
     className: account.className,
     region: account.region,
-    accountStatus: account.accountStatus
+    accountStatus: account.accountStatus,
+    organizationNodeId: platformRecord.organizationNodeId,
+    organizationNodeLabel: platformRecord.organizationNodeLabel,
+    organizationNodeType: platformRecord.organizationNodeType,
+    organizationPath: platformRecord.organizationPath,
+    organizationPathIds: platformRecord.organizationPathIds,
+    managerEmployeeId: platformRecord.managerEmployeeId,
+    managerName: platformRecord.managerName,
+    managerEmail: platformRecord.managerEmail,
+    managerRoleKey: platformRecord.managerRoleKey,
+    approvalManagerEmployeeId: platformRecord.approvalManagerEmployeeId,
+    approvalManagerName: platformRecord.approvalManagerName,
+    approvalManagerEmail: platformRecord.approvalManagerEmail,
+    approvalManagerRoleKey: platformRecord.approvalManagerRoleKey
   };
 }
 
@@ -552,7 +566,7 @@ const employeeAccountRows = [
   [41, "從缺", "daycare.xinyi@suiyuecare.com", "課長", "信義失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "信義失智據點課", "本課", "啟用"],
   [42, "陳蕙婷", "edu.control@suiyuecare.com", "部長", "教學品管部長", "教學品管部", "歲悅股份有限公司", "臺北市", "未設定", "本部門", "啟用"],
   [43, "楊書竣", "未設定", "部長", "軟體開發部長", "軟體開發部", "歲悅股份有限公司", "臺北市", "未設定", "本部門", "待補帳號"],
-  [44, "謝怡霖", "project@suiyuecare.com", "部長", "移工培訓部長", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "未設定", "本部門", "啟用"],
+  [44, "陳怡霖", "project@suiyuecare.com", "部長", "移工培訓部長", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "未設定", "本部門", "啟用"],
   [45, "徐靖雯", "project_hsu@suiyuecare.com", "課長", "業務助理", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "高雄到宅課", "本課", "啟用"],
   [46, "江守舜", "project_chiang@suiyuecare.com", "課長", "業務督導員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "本課", "啟用"],
   [47, "潘雨柔", "project_pan@suiyuecare.com", "職員", "業務督導員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "負責項目", "啟用"],
@@ -603,6 +617,252 @@ const employeeAccounts = employeeAccountRows.map(
     accountStatus
   })
 );
+
+function readJsonStorage(key, fallback) {
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function writeJsonStorage(key, value) {
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+function readPermissionSettings() {
+  const settings = readJsonStorage(permissionSettingsStorageKey, {});
+  return {
+    accounts: settings.accounts || {},
+    modules: settings.modules || {}
+  };
+}
+
+function writePermissionSettings(settings) {
+  writeJsonStorage(permissionSettingsStorageKey, {
+    accounts: settings.accounts || {},
+    modules: settings.modules || {}
+  });
+}
+
+function getManagedAccount(account) {
+  if (!account) return null;
+  const settings = readPermissionSettings();
+  const override = settings.accounts[String(account.no)] || {};
+  return {
+    ...account,
+    email: override.email || account.email,
+    accountStatus: override.accountStatus || account.accountStatus,
+    dataScope: override.dataScopeLabel || account.dataScope,
+    dataScopeKey: override.dataScopeKey || normalizeDataScopeId(account.dataScope),
+    roleKey: override.roleKey || getEmployeeProfileId(account),
+    permissionNote: override.note || ""
+  };
+}
+
+function getManagedEmployeeAccounts() {
+  return employeeAccounts.map((account) => getManagedAccount(account));
+}
+
+function getManagedModulePermissionDefinitions() {
+  const settings = readPermissionSettings();
+  return modulePermissionDefinitions.map((permission) => {
+    const override = settings.modules[permission.moduleId] || {};
+    return {
+      ...permission,
+      roles: Array.isArray(override.roles) ? override.roles : permission.roles,
+      actions: Array.isArray(override.actions) ? override.actions : permission.actions
+    };
+  });
+}
+
+function readPermissionAuditEvents() {
+  return readJsonStorage(permissionAuditStorageKey, []);
+}
+
+function writePermissionAuditEvents(events) {
+  writeJsonStorage(permissionAuditStorageKey, events.slice(0, 120));
+}
+
+function appendPermissionAudit(profile, event) {
+  const events = readPermissionAuditEvents();
+  const actor = profile || getStoredProfile();
+  events.unshift({
+    id: `audit-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    createdAt: new Date().toISOString(),
+    actorName: actor?.label || "未登入",
+    actorEmail: actor?.email || "",
+    ...event
+  });
+  writePermissionAuditEvents(events);
+}
+
+function getActiveEmployeeAccounts() {
+  return getManagedEmployeeAccounts().filter((account) => canUseEmployeeAccount(account));
+}
+
+function normalizeEmail(email = "") {
+  return String(email || "").trim().toLowerCase();
+}
+
+function findEmployeeAccountByEmail(email) {
+  const normalizedEmail = normalizeEmail(email);
+  return getManagedEmployeeAccounts().find((account) => normalizeEmail(account.email) === normalizedEmail) || null;
+}
+
+function findEmployeeAccountByNo(employeeNo) {
+  return getManagedEmployeeAccounts().find((account) => account.no === Number(employeeNo)) || null;
+}
+
+function getOrganizationNodeIdForAccount(account) {
+  const grade = normalizeGradeText(`${account?.grade || ""} ${account?.title || ""}`);
+  const department = normalizeGradeText(account?.department || "");
+  const className = normalizeGradeText(account?.className || "");
+  const region = normalizeGradeText(account?.region || "");
+  const title = normalizeGradeText(account?.title || "");
+
+  if (grade.includes("會計事務所") || grade.includes("外部檢核")) return "external-audit-unit";
+  if (grade.includes("董事長") || grade.includes("執行長") || grade.includes("董事會") || grade.includes("股東")) return "group";
+  if (grade.includes("區經理")) {
+    if (region.includes("新北")) return "new-taipei-region";
+    if (region.includes("桃園")) return "taoyuan-region";
+    return "taipei-region";
+  }
+  if (department.includes("投資人關係") || title.includes("投資人關係") || className.includes("投資人關係")) return "ir-class";
+  if (department.includes("行政部")) {
+    if (className.includes("人資")) return "hr-class";
+    if (className.includes("總務")) return "ga-class";
+    if (className.includes("會計") || className.includes("財會") || title.includes("出納")) return "finance-class";
+    if (className.includes("資訊")) return "it-class";
+    if (className.includes("法務")) return "legal-class";
+    if (className.includes("投資人關係")) return "ir-class";
+    return "admin-dept";
+  }
+  if (department.includes("居家照顧")) return "home-care-bu";
+  if (department.includes("日間照顧")) return "day-care-bu";
+  if (department.includes("教學品管")) return "quality-bu";
+  if (department.includes("社區據點")) return "community-bu";
+  if (department.includes("軟體")) return "software-bu";
+  if (department.includes("移工")) return "migrant-bu";
+  if (region.includes("新北")) return "new-taipei-region";
+  if (region.includes("桃園")) return "taoyuan-region";
+  if (region.includes("臺北") || region.includes("台北")) return "taipei-region";
+  return "group";
+}
+
+function getOrganizationPathForNode(nodeId) {
+  const path = [];
+  let current = getOrgNode(nodeId);
+  while (current) {
+    path.unshift(current);
+    current = getOrgNode(current.parentId);
+  }
+  return path;
+}
+
+function getOrganizationSnapshotForAccount(account) {
+  const nodeId = getOrganizationNodeIdForAccount(account);
+  const node = getOrgNode(nodeId);
+  const path = getOrganizationPathForNode(nodeId);
+  return {
+    organizationNodeId: nodeId,
+    organizationNodeLabel: node?.label || "",
+    organizationNodeType: node?.type || "",
+    organizationPath: path.map((item) => item.label),
+    organizationPathIds: path.map((item) => item.id)
+  };
+}
+
+function readSupervisorAssignments() {
+  try {
+    return JSON.parse(window.localStorage.getItem(supervisorAssignmentsStorageKey) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function writeSupervisorAssignments(assignments) {
+  window.localStorage.setItem(supervisorAssignmentsStorageKey, JSON.stringify(assignments));
+}
+
+function getDefaultSupervisorEmail(account) {
+  if (!account || !canUseEmployeeAccount(account)) return "";
+  const email = normalizeEmail(account.email);
+  const roleId = getEmployeeProfileId(account);
+  const department = normalizeGradeText(account.department);
+  const className = normalizeGradeText(account.className);
+
+  if (email === "entrepreneur@suiyuecare.com" || roleId === "ceo") return "";
+  if (roleId === "admin-director") return "entrepreneur@suiyuecare.com";
+  if (["hr-chief", "accounting-chief", "cashier-chief", "ga-chief"].includes(roleId)) return "admin@suiyuecare.com";
+  if (email === "investorrelations@suiyuecare.com") return "entrepreneur@suiyuecare.com";
+  if (roleId === "business-director") return "entrepreneur@suiyuecare.com";
+
+  if (department.includes("移工")) return "project@suiyuecare.com";
+  if (department.includes("教學品管")) return "edu.control@suiyuecare.com";
+  if (department.includes("居家照顧") || department.includes("社區據點")) return "homecare.taipei@suiyuecare.com";
+  if (department.includes("行政") || className.includes("人資") || className.includes("總務") || className.includes("會計")) {
+    return "admin@suiyuecare.com";
+  }
+  return "entrepreneur@suiyuecare.com";
+}
+
+function getSupervisorEmail(account) {
+  const assignments = readSupervisorAssignments();
+  const key = String(account?.no || "");
+  const saved = assignments[key]?.managerEmail;
+  return saved === undefined ? getDefaultSupervisorEmail(account) : saved;
+}
+
+function getApprovalManagerEmail(account) {
+  const assignments = readSupervisorAssignments();
+  const key = String(account?.no || "");
+  const saved = assignments[key]?.approvalManagerEmail;
+  return saved === undefined ? getSupervisorEmail(account) : saved;
+}
+
+function getSupervisorSnapshot(account) {
+  const managerEmail = getSupervisorEmail(account);
+  const approvalManagerEmail = getApprovalManagerEmail(account);
+  const manager = findEmployeeAccountByEmail(managerEmail);
+  const approvalManager = findEmployeeAccountByEmail(approvalManagerEmail);
+  return {
+    managerEmployeeId: manager?.no || null,
+    managerName: manager?.name || "",
+    managerEmail: manager?.email || "",
+    managerRoleKey: manager ? getEmployeeProfileId(manager) : "",
+    approvalManagerEmployeeId: approvalManager?.no || null,
+    approvalManagerName: approvalManager?.name || "",
+    approvalManagerEmail: approvalManager?.email || "",
+    approvalManagerRoleKey: approvalManager ? getEmployeeProfileId(approvalManager) : ""
+  };
+}
+
+function getEmployeePlatformRecord(account) {
+  account = getManagedAccount(account);
+  if (!account) return null;
+  return {
+    employeeNo: account.no,
+    name: account.name,
+    email: account.email,
+    grade: account.grade,
+    title: account.title,
+    roleKey: account.roleKey || getEmployeeProfileId(account),
+    company: account.company,
+    department: account.department,
+    className: account.className,
+    region: account.region,
+    dataScope: account.dataScopeKey || normalizeDataScopeId(account.dataScope),
+    accountStatus: account.accountStatus,
+    ...getOrganizationSnapshotForAccount(account),
+    ...getSupervisorSnapshot(account)
+  };
+}
+
+function getSupervisorRows() {
+  return getActiveEmployeeAccounts().map((account) => getEmployeePlatformRecord(account));
+}
 
 const gradeLevels = [
   {
@@ -781,7 +1041,7 @@ const roleDefinitions = [
     grade: "課長",
     category: "行政課級角色",
     defaultScope: "class",
-    modules: ["人資系統", "總務系統"],
+    modules: ["人資系統", "會計系統", "總務系統"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     limits: "限人資課與授權人事資料。"
   },
@@ -814,7 +1074,7 @@ const roleDefinitions = [
     grade: "課長",
     category: "行政課級角色",
     defaultScope: "class",
-    modules: ["總務系統", "公文簽核系統", "合約管理系統", "敏捷專案管理"],
+    modules: ["會計系統", "總務系統", "公文簽核系統", "合約管理系統", "敏捷專案管理"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     limits: "限總務、公文與合約流程。"
   },
@@ -825,7 +1085,7 @@ const roleDefinitions = [
     grade: "業務部長",
     category: "業務管理角色",
     defaultScope: "business_unit",
-    modules: ["照顧服務", "居家照顧", "日間照顧", "總務系統"],
+    modules: ["照顧服務", "居家照顧", "日間照顧", "會計系統", "總務系統"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     limits: "只看自己業務線資料。"
   },
@@ -836,7 +1096,7 @@ const roleDefinitions = [
     grade: "課長",
     category: "課級角色",
     defaultScope: "class",
-    modules: ["依課別開放", "總務系統"],
+    modules: ["依課別開放", "會計系統", "總務系統"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "print"],
     limits: "限本課資料與被授權流程。"
   },
@@ -847,7 +1107,7 @@ const roleDefinitions = [
     grade: "組長",
     category: "現場角色",
     defaultScope: "assigned",
-    modules: ["依任務開放", "總務系統"],
+    modules: ["依任務開放", "會計系統", "總務系統"],
     actions: ["view", "create", "edit", "submit", "assign", "print"],
     limits: "限自己負責個案、任務或人員。"
   },
@@ -858,7 +1118,7 @@ const roleDefinitions = [
     grade: "職員",
     category: "一般角色",
     defaultScope: "self",
-    modules: ["依職務開放", "總務系統"],
+    modules: ["依職務開放", "會計系統", "總務系統"],
     actions: ["view", "create", "edit", "submit", "print"],
     limits: "僅自己或被指派資料，不允許提升自己權限。"
   }
@@ -902,10 +1162,10 @@ const modulePermissionDefinitions = [
   },
   {
     moduleId: "accounting",
-    roles: ["external-audit", "board", "shareholder", "ceo", "region-manager", "admin-director", "accounting-chief", "cashier-chief"],
+    roles: ["external-audit", "board", "shareholder", "ceo", "region-manager", "admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "export", "print"],
     sensitivity: "財務",
-    limits: "外部檢核只讀與指定匯出；股東只看摘要。"
+    limits: "所有已啟用員工可進入 Finance；實際帳務資料與操作仍依 Finance 內部權限與 Data Scope 控管。"
   },
   {
     moduleId: "general-affairs",
@@ -951,10 +1211,10 @@ const modulePermissionDefinitions = [
   },
   {
     moduleId: "agile-projects",
-    roles: ["ceo", "admin-director", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
-    actions: ["view", "create", "edit", "submit", "assign", "export", "print", "manage"],
+    roles: ["external-audit", "board", "shareholder", "ceo", "region-manager", "admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
+    actions: ["view", "create", "edit", "submit", "approve", "reject", "export", "print"],
     sensitivity: "內部專案",
-    limits: "依專案、衝刺、負責人與跨部門協作範圍控管。"
+    limits: "所有已啟用員工可進入 APM；實際任務、KPI、專案獎金資料與操作仍依 APM 內部權限與 Data Scope 控管。"
   },
   {
     moduleId: "website-backoffice",
@@ -965,7 +1225,7 @@ const modulePermissionDefinitions = [
   },
   {
     moduleId: "pdf-editor",
-    roles: ["ceo", "region-manager", "admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
+    roles: ["external-audit", "board", "shareholder", "ceo", "region-manager", "admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
     actions: ["view", "create", "edit", "print"],
     sensitivity: "文件工具",
     limits: "僅工具操作；文件內容仍依來源模組權限控管。"
@@ -1352,7 +1612,7 @@ const roleProfiles = [
     title: "台北區 / 新北區 / 桃園區",
     scope: "region",
     note: "僅自己區域資料",
-    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
   },
   {
     id: "admin-director",
@@ -1368,7 +1628,7 @@ const roleProfiles = [
     title: "人資課",
     scope: "class",
     note: "人資課資料",
-    modules: ["announcements", "hr", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "hr", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
   },
   {
     id: "accounting-chief",
@@ -1376,7 +1636,7 @@ const roleProfiles = [
     title: "財會課",
     scope: "class",
     note: "會計帳務與報表",
-    modules: ["announcements", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
   },
   {
     id: "cashier-chief",
@@ -1384,7 +1644,7 @@ const roleProfiles = [
     title: "財會課 / 出納",
     scope: "class",
     note: "出納付款與收款",
-    modules: ["announcements", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
   },
   {
     id: "ga-chief",
@@ -1392,7 +1652,7 @@ const roleProfiles = [
     title: "總務課",
     scope: "class",
     note: "公文、合約與總務事項",
-    modules: ["announcements", "general-affairs", "edoc", "contract", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "accounting", "general-affairs", "edoc", "contract", "organization-chart", "agile-projects", "pdf-editor"]
   },
   {
     id: "business-director",
@@ -1400,7 +1660,7 @@ const roleProfiles = [
     title: "居家照顧部 / 日間照顧部等",
     scope: "business_unit",
     note: "自己業務線資料",
-    modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
   },
   {
     id: "section-chief",
@@ -1408,7 +1668,7 @@ const roleProfiles = [
     title: "業務課長",
     scope: "class",
     note: "本課資料",
-    modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
   },
   {
     id: "team-lead",
@@ -1416,7 +1676,7 @@ const roleProfiles = [
     title: "業務組長",
     scope: "assigned",
     note: "自己負責資料",
-    modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
   },
   {
     id: "staff",
@@ -1424,7 +1684,7 @@ const roleProfiles = [
     title: "一般職員",
     scope: "self",
     note: "僅自己與被指派任務",
-    modules: ["announcements", "business", "home-care", "day-care", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
   }
 ];
 
@@ -1455,23 +1715,27 @@ function getEmployeeProfileId(account) {
   if (grade.includes("出納")) return "cashier-chief";
   if (grade.includes("會計課長") || className.includes("會計課") || className.includes("財會課")) return "accounting-chief";
   if (grade.includes("總務課長") || className.includes("總務課")) return "ga-chief";
-  if (grade.includes("投資人關係")) return "admin-director";
-  if (grade.includes("部長") || grade.includes("機構業務負責人") || department.includes("照顧部") || department.includes("品管部") || department.includes("據點部") || department.includes("軟體") || department.includes("移工")) return "business-director";
+  if (grade.includes("投資人關係")) return "section-chief";
+  if (grade.includes("部長") || grade.includes("機構業務負責人")) return "business-director";
   if (grade.includes("課長")) return "section-chief";
-  if (grade.includes("組長") || grade.includes("督導")) return "team-lead";
+  if (grade.includes("組長")) return "team-lead";
+  if (grade.includes("職員")) return "staff";
+  if (grade.includes("督導")) return "team-lead";
+  if (department.includes("照顧部") || department.includes("品管部") || department.includes("據點部") || department.includes("軟體") || department.includes("移工")) return "staff";
   return "staff";
 }
 
 function getEmployeeProfileById(profileId) {
   if (!profileId?.startsWith("employee-")) return null;
   const employeeNo = Number(profileId.replace("employee-", ""));
-  const account = employeeAccounts.find((employee) => employee.no === employeeNo);
+  const account = findEmployeeAccountByNo(employeeNo);
   return getEmployeeProfile(account);
 }
 
 function getEmployeeProfile(account) {
+  account = getManagedAccount(account);
   if (!canUseEmployeeAccount(account)) return null;
-  const template = getRoleProfile(getEmployeeProfileId(account)) || getRoleProfile("staff");
+  const template = getRoleProfile(account.roleKey || getEmployeeProfileId(account)) || getRoleProfile("staff");
   if (!template) return null;
 
   return {
@@ -1481,7 +1745,7 @@ function getEmployeeProfile(account) {
     label: account.name,
     title: account.title,
     email: account.email,
-    scope: normalizeDataScopeId(account.dataScope || template.scope),
+    scope: account.dataScopeKey || normalizeDataScopeId(account.dataScope || template.scope),
     company: account.company,
     department: account.department,
     className: account.className,
@@ -1494,7 +1758,7 @@ function getEmployeeProfile(account) {
 
 function findEmployeeProfileByEmail(email) {
   const normalizedEmail = email.trim().toLowerCase();
-  const account = employeeAccounts.find(
+  const account = getManagedEmployeeAccounts().find(
     (employee) => canUseEmployeeAccount(employee) && employee.email.toLowerCase() === normalizedEmail
   );
   return getEmployeeProfile(account);
@@ -1515,7 +1779,7 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function getAccountStats(accounts = employeeAccounts) {
+function getAccountStats(accounts = getManagedEmployeeAccounts()) {
   return accounts.reduce(
     (stats, account) => {
       stats.total += 1;
@@ -1561,10 +1825,116 @@ function accountMatchesStatus(account, statusFilter) {
   return true;
 }
 
+function getRoleOptions(selectedRoleKey) {
+  return roleDefinitions
+    .map((role) => {
+      const selected = role.id === selectedRoleKey ? " selected" : "";
+      return `<option value="${escapeHtml(role.id)}"${selected}>${escapeHtml(role.name)}</option>`;
+    })
+    .join("");
+}
+
+function getDataScopeOptions(selectedScopeKey) {
+  return dataScopeDefinitions
+    .map((scope) => {
+      const selected = scope.id === selectedScopeKey ? " selected" : "";
+      return `<option value="${escapeHtml(scope.id)}"${selected}>${escapeHtml(scope.label)}</option>`;
+    })
+    .join("");
+}
+
+function getAccountStatusOptions(selectedStatus) {
+  return ["啟用", "停用", "待補帳號", "外部待設定"]
+    .map((status) => {
+      const selected = status === selectedStatus ? " selected" : "";
+      return `<option value="${escapeHtml(status)}"${selected}>${escapeHtml(status)}</option>`;
+    })
+    .join("");
+}
+
+function normalizeAccountEmailInput(value) {
+  const email = normalizeEmail(value);
+  return email || "未設定";
+}
+
+function isUnsetEmail(email) {
+  return normalizeEmail(email) === "未設定" || !normalizeEmail(email);
+}
+
+function validateAccountEmail(account, nextEmail, nextStatus) {
+  const normalizedEmail = normalizeAccountEmailInput(nextEmail);
+  if (nextStatus === "啟用" && isUnsetEmail(normalizedEmail)) {
+    return "啟用帳號前必須先補 Email。";
+  }
+  if (!isUnsetEmail(normalizedEmail) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return "Email 格式不正確。";
+  }
+  const isExternal = account.accountStatus.includes("外部") || account.roleKey === "external-audit";
+  if (!isUnsetEmail(normalizedEmail) && !isExternal && !normalizedEmail.endsWith("@suiyuecare.com")) {
+    return "內部員工帳號請使用 @suiyuecare.com 公司信箱。";
+  }
+  const duplicated = getManagedEmployeeAccounts().find(
+    (item) => item.no !== account.no && normalizeEmail(item.email) === normalizedEmail && !isUnsetEmail(normalizedEmail)
+  );
+  if (duplicated) return `Email 已被 ${duplicated.name} 使用。`;
+  return "";
+}
+
+function getMultiRoleOptions(selectedRoles = []) {
+  const selected = new Set(selectedRoles);
+  return roleDefinitions
+    .map((role) => {
+      const isSelected = selected.has(role.id) ? " selected" : "";
+      return `<option value="${escapeHtml(role.id)}"${isSelected}>${escapeHtml(role.name)}</option>`;
+    })
+    .join("");
+}
+
+function getMultiActionOptions(selectedActions = []) {
+  const selected = new Set(selectedActions);
+  return buttonActionDefinitions
+    .map((action) => {
+      const isSelected = selected.has(action.action) ? " selected" : "";
+      return `<option value="${escapeHtml(action.action)}"${isSelected}>${escapeHtml(action.label)}</option>`;
+    })
+    .join("");
+}
+
+function getSelectedOptions(select) {
+  return [...(select?.selectedOptions || [])].map((option) => option.value);
+}
+
+function getDataScopeLabel(scopeKey) {
+  return dataScopeDefinitions.find((scope) => scope.id === scopeKey)?.label || scopeLabels[scopeKey] || scopeKey;
+}
+
+function getActiveHighestAdminCount(nextAccounts = getManagedEmployeeAccounts()) {
+  return nextAccounts.filter((account) => canUseEmployeeAccount(account) && account.roleKey === "ceo").length;
+}
+
+function wouldRemoveLastHighestAdmin(employeeNo, nextAccountState) {
+  const nextAccounts = getManagedEmployeeAccounts().map((account) =>
+    account.no === Number(employeeNo)
+      ? {
+          ...account,
+          ...nextAccountState
+        }
+      : account
+  );
+  return getActiveHighestAdminCount(nextAccounts) < 1;
+}
+
+function summarizeChange(before, after) {
+  return Object.keys(after)
+    .filter((key) => before[key] !== after[key])
+    .map((key) => `${key}: ${before[key] || "空"} → ${after[key] || "空"}`)
+    .join("；");
+}
+
 function getAffiliationRows() {
   const groups = new Map();
 
-  employeeAccounts.forEach((account) => {
+  getManagedEmployeeAccounts().forEach((account) => {
     const key = [account.company, account.region, account.department, account.className].join("||");
     const row = groups.get(key) || {
       company: account.company,
@@ -1594,7 +1964,7 @@ function getAffiliationRows() {
 
 function countByField(fieldName) {
   const counts = new Map();
-  employeeAccounts.forEach((account) => {
+  getManagedEmployeeAccounts().forEach((account) => {
     const values = String(account[fieldName] || "未設定")
       .split(/[、,，]/)
       .map((value) => value.trim())
@@ -1616,15 +1986,16 @@ function affiliationMatchesQuery(row, query) {
 }
 
 function getOrgNodeAccountCount(node) {
-  if (node.id === "group") return employeeAccounts.length;
+  const accounts = getManagedEmployeeAccounts();
+  if (node.id === "group") return accounts.length;
   if (node.id === "external-audit-unit") {
-    return employeeAccounts.filter((account) => account.accountStatus.includes("外部")).length;
+    return accounts.filter((account) => account.accountStatus.includes("外部")).length;
   }
   if (node.type === "區域") {
-    return employeeAccounts.filter((account) => account.region.includes(node.label.replace("台", "臺")) || account.region.includes(node.label)).length;
+    return accounts.filter((account) => account.region.includes(node.label.replace("台", "臺")) || account.region.includes(node.label)).length;
   }
   if (["部門", "業務線", "課別"].includes(node.type)) {
-    return employeeAccounts.filter(
+    return accounts.filter(
       (account) => account.department === node.label || account.className === node.label
     ).length;
   }
@@ -1636,7 +2007,7 @@ function normalizeGradeText(value) {
 }
 
 function getAccountsForGradeLevel(level) {
-  return employeeAccounts.filter((account) => {
+  return getManagedEmployeeAccounts().filter((account) => {
     const grade = normalizeGradeText(account.grade);
     const title = normalizeGradeText(account.title);
     if (level.id === "board") return grade.includes("董事會") || title.includes("董事長");
@@ -1684,7 +2055,8 @@ function gradeMatchesQuery(level, query) {
 }
 
 function getAccountsForRole(role) {
-  return employeeAccounts.filter((account) => {
+  return getManagedEmployeeAccounts().filter((account) => {
+    if (account.roleKey) return account.roleKey === role.id;
     const grade = normalizeGradeText(account.grade);
     const title = normalizeGradeText(account.title);
     const department = normalizeGradeText(account.department);
@@ -1751,7 +2123,7 @@ function getRoleName(roleId) {
 }
 
 function getModulePermissionRows() {
-  return modulePermissionDefinitions.map((permission) => {
+  return getManagedModulePermissionDefinitions().map((permission) => {
     const module = getModuleById(permission.moduleId);
     const rule = moduleOrgRules[permission.moduleId] || {};
     const owner = getOrgNode(rule.owner);
@@ -1850,7 +2222,7 @@ function getDataScopeRows() {
   const buttonRows = getButtonPermissionRows();
 
   return dataScopeDefinitions.map((scope) => {
-    const accounts = employeeAccounts.filter((account) => normalizeDataScopeId(account.dataScope) === scope.id);
+    const accounts = getManagedEmployeeAccounts().filter((account) => normalizeDataScopeId(account.dataScope) === scope.id);
     const roles = roleDefinitions.filter((role) => role.defaultScope === scope.id);
     const grades = gradeLevels.filter((level) => level.defaultScope === scope.id);
     const modulesInScope = moduleRows.filter((permission) => normalizeDataScopeId(permission.scopeLabel) === scope.id);
@@ -2144,11 +2516,19 @@ async function applyGoogleSession() {
   return true;
 }
 
+function modulePermissionAllowsRole(moduleId, roleId) {
+  const permission = getManagedModulePermissionDefinitions().find((row) => row.moduleId === moduleId);
+  return Boolean(permission?.roles?.includes(roleId));
+}
+
 function moduleIsAllowed(module, profile) {
   const profileRoleId = profile.sourceProfileId || profile.id;
   if (module.id === "general-affairs") return true;
   if (sharedGeneralAffairsModules.has(module.id)) return true;
-  if (restrictedGeneralAffairsModules.has(module.id)) return generalAffairsManagers.has(profileRoleId);
+  if (restrictedGeneralAffairsModules.has(module.id)) {
+    return generalAffairsManagers.has(profileRoleId) || modulePermissionAllowsRole(module.id, profileRoleId);
+  }
+  if (modulePermissionAllowsRole(module.id, profileRoleId)) return true;
   return profile.modules.includes(module.id);
 }
 
@@ -2156,6 +2536,26 @@ function getModuleAccessState(module, profile) {
   const hasChildren = Array.isArray(module.children) && module.children.length > 0;
   const allowed = moduleIsAllowed(module, profile);
   const hasAllowedChild = hasChildren && module.children.some((child) => moduleIsAllowed(child, profile));
+  const isTemporarilyOpen = temporarilyOpenModuleIds.has(module.id);
+  const hasOpenChild = hasChildren && module.children.some(
+    (child) => temporarilyOpenModuleIds.has(child.id) && moduleIsAllowed(child, profile)
+  );
+
+  if (hasChildren && !hasOpenChild) {
+    return {
+      allowed: true,
+      actionText: "努力製作中",
+      status: "building"
+    };
+  }
+
+  if (!hasChildren && !isTemporarilyOpen) {
+    return {
+      allowed: true,
+      actionText: "努力製作中",
+      status: "building"
+    };
+  }
 
   if (!allowed && !hasAllowedChild) {
     return {
@@ -2183,8 +2583,8 @@ function getModuleAccessState(module, profile) {
 
   return {
     allowed: true,
-    actionText: "努力製作中",
-    status: "building"
+    actionText: "開啟",
+    status: "local-ready"
   };
 }
 
@@ -2329,6 +2729,10 @@ function createModuleButton(module, profile) {
       renderAccountManagementTool(profile, "員工帳號");
       return;
     }
+    if (module.id === "pdf-editor") {
+      renderPdfEditorTool(profile);
+      return;
+    }
     if (module.id === "agile-projects") {
       renderAgileProjectTool(profile);
       return;
@@ -2428,23 +2832,308 @@ function renderOrganizationTool(profile) {
   if (!moduleLevelTwoGrid || !moduleTitle) return;
   moduleTitle.textContent = "總務系統｜組織圖";
 
+  const supervisorRows = getSupervisorRows();
+  const missingManagerCount = supervisorRows.filter((row) => !row.managerEmail && row.roleKey !== "ceo").length;
+  const approvalCount = supervisorRows.filter((row) => row.approvalManagerEmail).length;
   const panel = document.createElement("section");
-  panel.className = "tool-detail";
+  panel.className = "tool-detail account-management organization-tool";
   panel.innerHTML = `
-    <div class="section-head">
+    <div class="section-head account-head">
       <div>
         <p class="portal-kicker">Organization Chart</p>
         <h3>歲悅組織圖</h3>
+        <small>平台共用的組織節點、員工歸屬、直屬主管與簽核主管。所有模組會依這裡的階層關係帶入權限資料。</small>
       </div>
-      <span>RBAC + Data Scope</span>
+      <span>${escapeHtml(profile.label)}｜${escapeHtml(scopeLabels[profile.scope] || profile.scope)}</span>
     </div>
-    <div class="org-chart compact" aria-label="歲悅組織圖"></div>
+    <div class="affiliation-summary" aria-label="組織圖摘要">
+      <article>
+        <span>組織節點</span>
+        <strong>${organizationNodes.length}</strong>
+        <small>全集團、區域、部門、課別、業務線</small>
+      </article>
+      <article>
+        <span>啟用員工</span>
+        <strong>${supervisorRows.length}</strong>
+        <small>可套用主管與模組權限</small>
+      </article>
+      <article>
+        <span>簽核主管</span>
+        <strong>${approvalCount}</strong>
+        <small>會帶入 approval manager</small>
+      </article>
+      <article>
+        <span>待補主管</span>
+        <strong>${missingManagerCount}</strong>
+        <small>不含執行長與最高層</small>
+      </article>
+    </div>
+    <div class="organization-tool-layout">
+      <div class="affiliation-panel">
+        <div class="affiliation-panel-head">
+          <strong>視覺化組織圖</strong>
+          <span>依組織節點自動生成</span>
+        </div>
+        <div class="org-chart compact" aria-label="歲悅組織圖"></div>
+      </div>
+      <div class="affiliation-panel">
+        <div class="affiliation-panel-head">
+          <strong>組織節點</strong>
+          <span>節點 / 上層 / 資料範圍 / 人數</span>
+        </div>
+        <div class="account-table-wrap">
+          <table class="account-table organization-structure-table">
+            <thead>
+              <tr>
+                <th>節點</th>
+                <th>上層節點</th>
+                <th>資料範圍</th>
+                <th>適用角色</th>
+                <th>人數</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${organizationNodes
+                .map((node) => {
+                  const parent = getOrgNode(node.parentId);
+                  return `
+                    <tr>
+                      <td>
+                        <div class="account-person">
+                          <strong>${escapeHtml(node.label)}</strong>
+                          <small>${escapeHtml(node.type)}｜${escapeHtml(node.id)}</small>
+                        </div>
+                      </td>
+                      <td>${escapeHtml(parent?.label || "最高層")}</td>
+                      <td>${escapeHtml(scopeLabels[node.scope] || node.scope)}</td>
+                      <td>
+                        <div class="action-chip-list">
+                          ${node.roles.map((role) => `<span>${escapeHtml(role)}</span>`).join("")}
+                        </div>
+                      </td>
+                      <td><span class="status-pill is-active">${getOrgNodeAccountCount(node)} 人</span></td>
+                    </tr>
+                  `;
+                })
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="account-toolbar">
+      <label class="account-search">
+        <span>搜尋員工或主管</span>
+        <input id="organizationPeopleSearchInput" type="search" placeholder="姓名、Email、部門、課別、主管" autocomplete="off">
+      </label>
+      <button type="button" class="text-button supervisor-reset-button" data-organization-supervisor-reset>恢復預設主管</button>
+    </div>
+    <div class="account-table-wrap supervisor-chart-list">
+      <table class="account-table supervisor-table">
+        <thead>
+          <tr>
+            <th>員工</th>
+            <th>組織路徑</th>
+            <th>直屬主管</th>
+            <th>簽核主管</th>
+            <th>跨模組欄位</th>
+          </tr>
+        </thead>
+        <tbody data-organization-supervisor-table-body></tbody>
+      </table>
+    </div>
+    <p class="account-note">主管設定目前先保存在 Portal；登入後切換 Finance、APM 或其他模組時，會把 organizationPath、managerEmployeeId、approvalManagerEmployeeId 一起帶出，讓各模組共用同一套組織階層。</p>
   `;
+
+  const searchInput = panel.querySelector("#organizationPeopleSearchInput");
+  const tableBody = panel.querySelector("[data-organization-supervisor-table-body]");
+  const resetButton = panel.querySelector("[data-organization-supervisor-reset]");
+
+  const renderSupervisorRows = () => {
+    const query = searchInput?.value.trim() || "";
+    const visibleRows = getSupervisorRows().filter((row) => supervisorRowMatchesQuery(row, query));
+    if (visibleRows.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="5">
+            <div class="empty-account-state">找不到符合條件的員工或主管。</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tableBody.innerHTML = visibleRows
+      .map((row) => `
+        <tr>
+          <td>
+            <div class="account-person">
+              <strong>${escapeHtml(row.name)}</strong>
+              <small>${escapeHtml(row.title)}｜${escapeHtml(row.email)}</small>
+            </div>
+          </td>
+          <td>
+            <strong>${escapeHtml(row.organizationPath.join(" ＞ "))}</strong>
+            <small>${escapeHtml(row.company)}｜${escapeHtml(row.region)}｜${escapeHtml(row.className)}</small>
+          </td>
+          <td>
+            <select class="supervisor-select" data-organization-supervisor-type="managerEmail" data-employee-no="${row.employeeNo}">
+              ${getSupervisorOptions(row.managerEmail, row.email)}
+            </select>
+          </td>
+          <td>
+            <select class="supervisor-select" data-organization-supervisor-type="approvalManagerEmail" data-employee-no="${row.employeeNo}">
+              ${getSupervisorOptions(row.approvalManagerEmail, row.email)}
+            </select>
+          </td>
+          <td>
+            <div class="action-chip-list module-chip-list">
+              <span>employee_no: ${escapeHtml(row.employeeNo)}</span>
+              <span>node: ${escapeHtml(row.organizationNodeId)}</span>
+              <span>manager: ${escapeHtml(row.managerEmployeeId || "null")}</span>
+              <span>approval: ${escapeHtml(row.approvalManagerEmployeeId || "null")}</span>
+            </div>
+          </td>
+        </tr>
+      `)
+      .join("");
+
+    tableBody.querySelectorAll("[data-organization-supervisor-type]").forEach((select) => {
+      select.addEventListener("change", () => {
+        const employeeNo = select.dataset.employeeNo;
+        const type = select.dataset.organizationSupervisorType;
+        const row = getSupervisorRows().find((item) => String(item.employeeNo) === String(employeeNo));
+        const assignments = readSupervisorAssignments();
+        assignments[employeeNo] = assignments[employeeNo] || {};
+        assignments[employeeNo][type] = select.value;
+        writeSupervisorAssignments(assignments);
+        appendPermissionAudit(profile, {
+          event: "組織圖主管異動",
+          target: row?.email || employeeNo,
+          summary: `${type}: ${select.value || "無直屬主管"}`,
+          result: "success"
+        });
+        renderSupervisorRows();
+        setStatus("已更新組織圖主管關係；所有模組的登入資料會套用新版主管階層。", "success");
+      });
+    });
+  };
+
+  resetButton?.addEventListener("click", () => {
+    writeSupervisorAssignments({});
+    appendPermissionAudit(profile, {
+      event: "組織圖主管關係重設",
+      target: "全體員工",
+      summary: "恢復預設主管階層",
+      result: "success"
+    });
+    renderSupervisorRows();
+    setStatus("已恢復預設主管關係。", "success");
+  });
+  searchInput?.addEventListener("input", renderSupervisorRows);
 
   moduleLevelTwoGrid.classList.add("detail-grid");
   moduleLevelTwoGrid.replaceChildren(panel);
   renderOrganizationChart(panel.querySelector(".org-chart"), profile);
+  renderSupervisorRows();
   setStatus("已開啟總務系統中的組織圖。", "info");
+}
+
+function renderPdfEditorTool(profile) {
+  if (!moduleLevelTwoGrid || !moduleTitle) return;
+  moduleTitle.textContent = "總務系統｜PDF 編輯器";
+
+  const panel = document.createElement("section");
+  panel.className = "tool-detail account-management pdf-editor-tool";
+  panel.innerHTML = `
+    <div class="account-head">
+      <strong>PDF 編輯器</strong>
+      <small>${escapeHtml(profile.label)}｜${escapeHtml(scopeLabels[profile.scope] || profile.scope)}｜${escapeHtml(profile.email)}</small>
+    </div>
+    <div class="pdf-editor-dropzone">
+      <input id="portalPdfInput" type="file" accept="application/pdf" multiple>
+      <div>
+        <strong>選擇 PDF 檔案</strong>
+        <span>可先整理待處理檔案清單。</span>
+      </div>
+    </div>
+    <div class="account-table-wrap">
+      <table class="account-table">
+        <thead>
+          <tr>
+            <th>檔名</th>
+            <th>大小</th>
+            <th>狀態</th>
+          </tr>
+        </thead>
+        <tbody data-pdf-file-list>
+          <tr>
+            <td colspan="3">
+              <div class="empty-account-state">尚未選擇 PDF 檔案。</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pdf-editor-actions">
+      <button type="button" class="text-button" data-pdf-clear>清除佇列</button>
+      <button type="button" class="text-button" data-pdf-next>準備處理</button>
+    </div>
+  `;
+
+  const input = panel.querySelector("#portalPdfInput");
+  const list = panel.querySelector("[data-pdf-file-list]");
+  const clearButton = panel.querySelector("[data-pdf-clear]");
+  const nextButton = panel.querySelector("[data-pdf-next]");
+  let files = [];
+
+  const formatFileSize = (size) => {
+    if (size >= 1024 * 1024) return `${(size / 1024 / 1024).toFixed(1)} MB`;
+    if (size >= 1024) return `${Math.round(size / 1024)} KB`;
+    return `${size} B`;
+  };
+
+  const renderFiles = () => {
+    if (!files.length) {
+      list.innerHTML = `
+        <tr>
+          <td colspan="3">
+            <div class="empty-account-state">尚未選擇 PDF 檔案。</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    list.innerHTML = files.map((file) => `
+      <tr>
+        <td>${escapeHtml(file.name)}</td>
+        <td>${escapeHtml(formatFileSize(file.size))}</td>
+        <td><span class="status-pill is-active">已加入</span></td>
+      </tr>
+    `).join("");
+  };
+
+  input?.addEventListener("change", () => {
+    files = Array.from(input.files || []).filter((file) => file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf"));
+    renderFiles();
+    setStatus(files.length ? `已加入 ${files.length} 個 PDF 檔案。` : "請選擇 PDF 檔案。", files.length ? "success" : "info");
+  });
+
+  clearButton?.addEventListener("click", () => {
+    files = [];
+    if (input) input.value = "";
+    renderFiles();
+    setStatus("PDF 佇列已清除。", "info");
+  });
+
+  nextButton?.addEventListener("click", () => {
+    setStatus(files.length ? "PDF 編輯器已準備好，下一階段可接合併、拆分與壓縮。正在努力製作中。" : "請先選擇 PDF 檔案。", files.length ? "info" : "error");
+  });
+
+  moduleLevelTwoGrid.classList.add("detail-grid");
+  moduleLevelTwoGrid.replaceChildren(panel);
+  renderFiles();
+  setStatus("已開啟 PDF 編輯器。", "info");
 }
 
 function renderAgileProjectTool(profile) {
@@ -2494,32 +3183,38 @@ function createPermissionTabs(activeTab) {
       <button type="button" role="tab" aria-selected="${activeTab === "accounts"}" data-permission-tab="accounts">
         <span>1</span>使用者帳號管理
       </button>
+      <button type="button" role="tab" aria-selected="${activeTab === "organization-structure"}" data-permission-tab="organization-structure">
+        <span>2</span>組織架構
+      </button>
       <button type="button" role="tab" aria-selected="${activeTab === "affiliations"}" data-permission-tab="affiliations">
-        <span>2</span>組織歸屬
+        <span>3</span>員工歸屬
+      </button>
+      <button type="button" role="tab" aria-selected="${activeTab === "supervisors"}" data-permission-tab="supervisors">
+        <span>4</span>主管關係
       </button>
       <button type="button" role="tab" aria-selected="${activeTab === "grades"}" data-permission-tab="grades">
-        <span>3</span>職等管理
+        <span>5</span>職等管理
       </button>
       <button type="button" role="tab" aria-selected="${activeTab === "roles"}" data-permission-tab="roles">
-        <span>4</span>角色管理
+        <span>6</span>角色管理
       </button>
       <button type="button" role="tab" aria-selected="${activeTab === "modules"}" data-permission-tab="modules">
-        <span>5</span>模組權限
+        <span>7</span>模組權限
       </button>
       <button type="button" role="tab" aria-selected="${activeTab === "buttons"}" data-permission-tab="buttons">
-        <span>6</span>功能按鈕權限
+        <span>8</span>功能按鈕權限
       </button>
       <button type="button" role="tab" aria-selected="${activeTab === "data-scopes"}" data-permission-tab="data-scopes">
-        <span>7</span>Data Scope 資料範圍
+        <span>9</span>Data Scope 資料範圍
       </button>
       <button type="button" role="tab" aria-selected="${activeTab === "sensitive-data"}" data-permission-tab="sensitive-data">
-        <span>8</span>敏感資料控管
+        <span>10</span>敏感資料控管
       </button>
       <button type="button" role="tab" aria-selected="${activeTab === "audit-logs"}" data-permission-tab="audit-logs">
-        <span>9</span>權限異動與操作紀錄
+        <span>11</span>權限異動與操作紀錄
       </button>
       <button type="button" role="tab" aria-selected="${activeTab === "security"}" data-permission-tab="security">
-        <span>10</span>安全限制
+        <span>12</span>安全限制
       </button>
     </div>
   `;
@@ -2534,8 +3229,16 @@ function bindPermissionTabs(panel, profile, activeTab) {
         renderAccountManagementTool(profile, "系統權限｜使用者帳號管理", true);
         return;
       }
+      if (nextTab === "organization-structure") {
+        renderOrganizationStructureTool(profile);
+        return;
+      }
       if (nextTab === "affiliations") {
         renderAffiliationTool(profile);
+        return;
+      }
+      if (nextTab === "supervisors") {
+        renderSupervisorRelationshipTool(profile);
         return;
       }
       if (nextTab === "grades") {
@@ -2577,15 +3280,17 @@ function renderAccountManagementTool(profile, title = "使用者帳號管理", s
   if (!moduleLevelTwoGrid || !moduleTitle) return;
   moduleTitle.textContent = title;
 
+  const isEmployeeAccountCenter = title.includes("員工帳號");
+  const canEditAccounts = showPermissionTabs || isEmployeeAccountCenter;
   const stats = getAccountStats();
   const panel = document.createElement("section");
   panel.className = "tool-detail account-management";
   panel.innerHTML = `
     <div class="section-head account-head">
       <div>
-        <p class="portal-kicker">Account Center</p>
-        <h3>使用者帳號管理</h3>
-        <small>依員工清冊建立帳號、職等、部門、課別與資料範圍。</small>
+        <p class="portal-kicker">${isEmployeeAccountCenter ? "Employee Accounts" : "Account Center"}</p>
+        <h3>${isEmployeeAccountCenter ? "員工帳號" : "使用者帳號管理"}</h3>
+        <small>${isEmployeeAccountCenter ? "補齊公司 Email、啟用或停用登入帳號，並設定登入角色與資料範圍。" : "依員工清冊建立帳號、職等、部門、課別與資料範圍。"}</small>
       </div>
       <span>${escapeHtml(profile.label)}｜${escapeHtml(scopeLabels[profile.scope] || profile.scope)}</span>
     </div>
@@ -2629,12 +3334,13 @@ function renderAccountManagementTool(profile, title = "使用者帳號管理", s
             <th>組織歸屬</th>
             <th>資料範圍</th>
             <th>狀態</th>
+            ${canEditAccounts ? "<th>帳號設定</th>" : ""}
           </tr>
         </thead>
         <tbody data-account-table-body></tbody>
       </table>
     </div>
-    <p class="account-note">下一階段會接上新增帳號、停用帳號、角色異動與操作紀錄；目前先把清冊資料整理成權限中心可檢視的帳號底稿。</p>
+    <p class="account-note">${canEditAccounts ? "帳號 Email、角色、狀態與 Data Scope 會先保存在 Portal 權限中心，並寫入操作紀錄；之後可直接落到 Supabase 權限資料表。" : "目前先把清冊資料整理成權限中心可檢視的帳號底稿。"}</p>
   `;
 
   const searchInput = panel.querySelector("#accountSearchInput");
@@ -2644,14 +3350,14 @@ function renderAccountManagementTool(profile, title = "使用者帳號管理", s
 
   const renderRows = () => {
     const query = searchInput?.value.trim() || "";
-    const accounts = employeeAccounts.filter(
+    const accounts = getManagedEmployeeAccounts().filter(
       (account) => accountMatchesQuery(account, query) && accountMatchesStatus(account, activeStatus)
     );
 
     if (accounts.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="5">
+          <td colspan="${canEditAccounts ? 6 : 5}">
             <div class="empty-account-state">找不到符合條件的帳號。</div>
           </td>
         </tr>
@@ -2667,6 +3373,7 @@ function renderAccountManagementTool(profile, title = "使用者帳號管理", s
               <div class="account-person">
                 <strong>${escapeHtml(account.name)}</strong>
                 <small>${escapeHtml(account.email)}</small>
+                ${canEditAccounts ? `<small>目前角色：${escapeHtml(getRoleName(account.roleKey))}</small>` : ""}
               </div>
             </td>
             <td>
@@ -2677,12 +3384,112 @@ function renderAccountManagementTool(profile, title = "使用者帳號管理", s
               <strong>${escapeHtml(account.department)}</strong>
               <small>${escapeHtml(account.company)}｜${escapeHtml(account.region)}｜${escapeHtml(account.className)}</small>
             </td>
-            <td>${escapeHtml(account.dataScope)}</td>
+            <td>${escapeHtml(getDataScopeLabel(account.dataScopeKey || normalizeDataScopeId(account.dataScope)))}</td>
             <td><span class="status-pill ${getStatusClass(account.accountStatus)}">${escapeHtml(account.accountStatus)}</span></td>
+            ${
+              canEditAccounts
+                ? `
+                  <td>
+                    <div class="permission-row-editor account-row-editor">
+                      <label>
+                        <span>Email</span>
+                        <input type="email" value="${escapeHtml(isUnsetEmail(account.email) ? "" : account.email)}" placeholder="name@suiyuecare.com" data-account-email="${account.no}">
+                      </label>
+                      <label>
+                        <span>角色</span>
+                        <select data-account-role="${account.no}">
+                          ${getRoleOptions(account.roleKey)}
+                        </select>
+                      </label>
+                      <label>
+                        <span>狀態</span>
+                        <select data-account-status="${account.no}">
+                          ${getAccountStatusOptions(account.accountStatus)}
+                        </select>
+                      </label>
+                      <label>
+                        <span>Data Scope</span>
+                        <select data-account-scope="${account.no}">
+                          ${getDataScopeOptions(account.dataScopeKey || normalizeDataScopeId(account.dataScope))}
+                        </select>
+                      </label>
+                      <button type="button" class="text-button permission-save-button" data-account-save="${account.no}">儲存</button>
+                    </div>
+                  </td>
+                `
+                : ""
+            }
           </tr>
         `
       )
       .join("");
+
+    tableBody.querySelectorAll("[data-account-save]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const employeeNo = Number(button.dataset.accountSave);
+        const account = getManagedEmployeeAccounts().find((item) => item.no === employeeNo);
+        if (!account) return;
+        if (normalizeEmail(account.email) === normalizeEmail(profile.email)) {
+          setStatus("安全限制：不允許一般使用者調整自己的角色、狀態或 Data Scope。", "error");
+          appendPermissionAudit(profile, {
+            event: "帳號權限異動遭阻擋",
+            target: account.email,
+            summary: "嘗試調整自己的權限",
+            result: "blocked"
+          });
+          return;
+        }
+
+        const roleKey = tableBody.querySelector(`[data-account-role="${employeeNo}"]`)?.value || account.roleKey;
+        const accountStatus = tableBody.querySelector(`[data-account-status="${employeeNo}"]`)?.value || account.accountStatus;
+        const dataScopeKey = tableBody.querySelector(`[data-account-scope="${employeeNo}"]`)?.value || account.dataScopeKey;
+        const email = normalizeAccountEmailInput(tableBody.querySelector(`[data-account-email="${employeeNo}"]`)?.value || account.email);
+        const emailError = validateAccountEmail(account, email, accountStatus);
+        if (emailError) {
+          setStatus(emailError, "error");
+          return;
+        }
+        const nextState = {
+          email,
+          roleKey,
+          accountStatus,
+          dataScopeKey,
+          dataScopeLabel: getDataScopeLabel(dataScopeKey)
+        };
+
+        if (wouldRemoveLastHighestAdmin(employeeNo, nextState)) {
+          setStatus("安全限制：不允許停用或降權最後一位最高管理者。", "error");
+          appendPermissionAudit(profile, {
+            event: "帳號權限異動遭阻擋",
+            target: account.email,
+            summary: "嘗試移除最後一位最高管理者",
+            result: "blocked"
+          });
+          return;
+        }
+
+        const before = {
+          email: account.email,
+          roleKey: account.roleKey,
+          accountStatus: account.accountStatus,
+          dataScopeKey: account.dataScopeKey || normalizeDataScopeId(account.dataScope)
+        };
+        const settings = readPermissionSettings();
+        settings.accounts[String(employeeNo)] = {
+          ...(settings.accounts[String(employeeNo)] || {}),
+          ...nextState
+        };
+        writePermissionSettings(settings);
+        appendPermissionAudit(profile, {
+          event: "帳號權限異動",
+          target: email,
+          summary: summarizeChange(before, nextState) || "未變更",
+          result: "success"
+        });
+        renderRows();
+        setStatus(`已更新 ${account.name} 的帳號權限。`, "success");
+      });
+    });
   };
 
   if (showPermissionTabs) bindPermissionTabs(panel, profile, "accounts");
@@ -2701,9 +3508,329 @@ function renderAccountManagementTool(profile, title = "使用者帳號管理", s
   setStatus("已開啟使用者帳號管理。", "info");
 }
 
+function organizationStructureMatchesQuery(node, query) {
+  if (!query) return true;
+  return [
+    node.label,
+    node.type,
+    node.scope,
+    node.roles.join(" "),
+    scopeLabels[node.scope] || node.scope
+  ]
+    .join(" ")
+    .toLowerCase()
+    .includes(query.toLowerCase());
+}
+
+function renderOrganizationStructureTool(profile) {
+  if (!moduleLevelTwoGrid || !moduleTitle) return;
+  moduleTitle.textContent = "系統權限｜組織架構";
+
+  const panel = document.createElement("section");
+  panel.className = "tool-detail account-management organization-structure-management";
+  panel.innerHTML = `
+    <div class="section-head account-head">
+      <div>
+        <p class="portal-kicker">Organization Master</p>
+        <h3>組織架構</h3>
+        <small>平台唯一組織主檔。所有模組都依這裡的公司、區域、部門、課別與業務線判斷資料範圍。</small>
+      </div>
+      <span>${escapeHtml(profile.label)}｜${escapeHtml(scopeLabels[profile.scope] || profile.scope)}</span>
+    </div>
+    ${createPermissionTabs("organization-structure")}
+    <div class="affiliation-summary" aria-label="組織架構摘要">
+      <article>
+        <span>組織節點</span>
+        <strong>${organizationNodes.length}</strong>
+        <small>全集團、區域、部門、課別、業務線</small>
+      </article>
+      <article>
+        <span>啟用帳號</span>
+        <strong>${getActiveEmployeeAccounts().length}</strong>
+        <small>已可套用主管與模組權限</small>
+      </article>
+      <article>
+        <span>跨模組欄位</span>
+        <strong>8</strong>
+        <small>company、region、department、class、manager 等</small>
+      </article>
+      <article>
+        <span>資料來源</span>
+        <strong>Portal</strong>
+        <small>Finance / APM / 公文 / 後台共用</small>
+      </article>
+    </div>
+    <div class="affiliation-layout">
+      <div class="affiliation-panel">
+        <div class="affiliation-panel-head">
+          <strong>視覺化組織圖</strong>
+          <span>由組織節點自動生成</span>
+        </div>
+        <div class="org-chart compact" aria-label="平台組織圖"></div>
+      </div>
+      <div class="affiliation-panel">
+        <div class="affiliation-panel-head">
+          <strong>組織節點清單</strong>
+          <span>節點 / 資料範圍 / 對應人數</span>
+        </div>
+        <label class="account-search">
+          <span>搜尋組織節點</span>
+          <input id="organizationStructureSearchInput" type="search" placeholder="公司、區域、部門、課別、角色" autocomplete="off">
+        </label>
+        <div class="account-table-wrap">
+          <table class="account-table organization-structure-table">
+            <thead>
+              <tr>
+                <th>節點</th>
+                <th>上層節點</th>
+                <th>資料範圍</th>
+                <th>適用角色</th>
+                <th>人數</th>
+              </tr>
+            </thead>
+            <tbody data-organization-structure-table-body></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <p class="account-note">這一頁先建立組織架構主檔；真正的編輯落庫會在下一階段接 Supabase。現在每次切換模組已會把組織節點與組織路徑帶出去。</p>
+  `;
+
+  const searchInput = panel.querySelector("#organizationStructureSearchInput");
+  const tableBody = panel.querySelector("[data-organization-structure-table-body]");
+
+  const renderRows = () => {
+    const query = searchInput?.value.trim() || "";
+    const rows = organizationNodes.filter((node) => organizationStructureMatchesQuery(node, query));
+    if (rows.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="5">
+            <div class="empty-account-state">找不到符合條件的組織節點。</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tableBody.innerHTML = rows
+      .map((node) => {
+        const parent = getOrgNode(node.parentId);
+        return `
+          <tr>
+            <td>
+              <div class="account-person">
+                <strong>${escapeHtml(node.label)}</strong>
+                <small>${escapeHtml(node.type)}｜${escapeHtml(node.id)}</small>
+              </div>
+            </td>
+            <td>${escapeHtml(parent?.label || "最高層")}</td>
+            <td>${escapeHtml(scopeLabels[node.scope] || node.scope)}</td>
+            <td>
+              <div class="action-chip-list">
+                ${node.roles.map((role) => `<span>${escapeHtml(role)}</span>`).join("")}
+              </div>
+            </td>
+            <td><span class="status-pill is-active">${getOrgNodeAccountCount(node)} 人</span></td>
+          </tr>
+        `;
+      })
+      .join("");
+  };
+
+  bindPermissionTabs(panel, profile, "organization-structure");
+  searchInput?.addEventListener("input", renderRows);
+
+  moduleLevelTwoGrid.classList.add("detail-grid");
+  moduleLevelTwoGrid.replaceChildren(panel);
+  renderOrganizationChart(panel.querySelector(".org-chart"), profile);
+  renderRows();
+  setStatus("已開啟組織架構。", "info");
+}
+
+function supervisorRowMatchesQuery(row, query) {
+  if (!query) return true;
+  return [
+    row.name,
+    row.email,
+    row.title,
+    row.company,
+    row.department,
+    row.className,
+    row.region,
+    row.managerName,
+    row.managerEmail,
+    row.approvalManagerName,
+    row.approvalManagerEmail
+  ]
+    .join(" ")
+    .toLowerCase()
+    .includes(query.toLowerCase());
+}
+
+function getSupervisorOptions(selectedEmail, currentEmail) {
+  const normalizedSelected = normalizeEmail(selectedEmail);
+  const normalizedCurrent = normalizeEmail(currentEmail);
+  return [
+    `<option value="">無直屬主管</option>`,
+    ...getActiveEmployeeAccounts()
+      .filter((account) => normalizeEmail(account.email) !== normalizedCurrent)
+      .map((account) => {
+        const email = normalizeEmail(account.email);
+        const selected = email === normalizedSelected ? " selected" : "";
+        return `<option value="${escapeHtml(account.email)}"${selected}>${escapeHtml(account.name)}｜${escapeHtml(account.title)}｜${escapeHtml(account.email)}</option>`;
+      })
+  ].join("");
+}
+
+function renderSupervisorRelationshipTool(profile) {
+  if (!moduleLevelTwoGrid || !moduleTitle) return;
+  moduleTitle.textContent = "系統權限｜主管關係";
+
+  const rows = getSupervisorRows();
+  const missingManagerCount = rows.filter((row) => !row.managerEmail && row.roleKey !== "ceo").length;
+  const approvalCount = rows.filter((row) => row.approvalManagerEmail).length;
+  const panel = document.createElement("section");
+  panel.className = "tool-detail account-management supervisor-management";
+  panel.innerHTML = `
+    <div class="section-head account-head">
+      <div>
+        <p class="portal-kicker">Reporting Line</p>
+        <h3>主管關係</h3>
+        <small>設定直屬主管、簽核主管與代理關係。所有模組會共用這裡的主管階層。</small>
+      </div>
+      <span>${escapeHtml(profile.label)}｜${escapeHtml(scopeLabels[profile.scope] || profile.scope)}</span>
+    </div>
+    ${createPermissionTabs("supervisors")}
+    <div class="affiliation-summary" aria-label="主管關係摘要">
+      <article>
+        <span>啟用員工</span>
+        <strong>${rows.length}</strong>
+        <small>可設定主管的人員</small>
+      </article>
+      <article>
+        <span>簽核主管</span>
+        <strong>${approvalCount}</strong>
+        <small>會帶入各模組 approval manager</small>
+      </article>
+      <article>
+        <span>待補主管</span>
+        <strong>${missingManagerCount}</strong>
+        <small>不含執行長或最高層</small>
+      </article>
+      <article>
+        <span>套用範圍</span>
+        <strong>全模組</strong>
+        <small>Finance / APM / 公文 / HR / 後台</small>
+      </article>
+    </div>
+    <div class="account-toolbar">
+      <label class="account-search">
+        <span>搜尋員工或主管</span>
+        <input id="supervisorSearchInput" type="search" placeholder="姓名、Email、部門、主管" autocomplete="off">
+      </label>
+      <button type="button" class="text-button supervisor-reset-button" data-supervisor-reset>恢復預設主管</button>
+    </div>
+    <div class="account-table-wrap">
+      <table class="account-table supervisor-table">
+        <thead>
+          <tr>
+            <th>員工</th>
+            <th>組織歸屬</th>
+            <th>直屬主管</th>
+            <th>簽核主管</th>
+            <th>跨模組欄位</th>
+          </tr>
+        </thead>
+        <tbody data-supervisor-table-body></tbody>
+      </table>
+    </div>
+    <p class="account-note">目前主管設定會先保存在 Portal 設定中，並在登入後切換模組時放入 handoff payload。之後接 Supabase 時，可直接落到 employees.manager_employee_id 與 approval_manager_employee_id。</p>
+  `;
+
+  const searchInput = panel.querySelector("#supervisorSearchInput");
+  const tableBody = panel.querySelector("[data-supervisor-table-body]");
+  const resetButton = panel.querySelector("[data-supervisor-reset]");
+
+  const renderRows = () => {
+    const query = searchInput?.value.trim() || "";
+    const visibleRows = getSupervisorRows().filter((row) => supervisorRowMatchesQuery(row, query));
+    if (visibleRows.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="5">
+            <div class="empty-account-state">找不到符合條件的主管關係。</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tableBody.innerHTML = visibleRows
+      .map((row) => `
+        <tr>
+          <td>
+            <div class="account-person">
+              <strong>${escapeHtml(row.name)}</strong>
+              <small>${escapeHtml(row.title)}｜${escapeHtml(row.email)}</small>
+            </div>
+          </td>
+          <td>
+            <strong>${escapeHtml(row.organizationNodeLabel || row.department)}</strong>
+            <small>${escapeHtml(row.company)}｜${escapeHtml(row.region)}｜${escapeHtml(row.className)}</small>
+          </td>
+          <td>
+            <select class="supervisor-select" data-supervisor-type="managerEmail" data-employee-no="${row.employeeNo}">
+              ${getSupervisorOptions(row.managerEmail, row.email)}
+            </select>
+          </td>
+          <td>
+            <select class="supervisor-select" data-supervisor-type="approvalManagerEmail" data-employee-no="${row.employeeNo}">
+              ${getSupervisorOptions(row.approvalManagerEmail, row.email)}
+            </select>
+          </td>
+          <td>
+            <div class="action-chip-list module-chip-list">
+              <span>manager_employee_id: ${escapeHtml(row.managerEmployeeId || "null")}</span>
+              <span>approval_manager_employee_id: ${escapeHtml(row.approvalManagerEmployeeId || "null")}</span>
+              <span>node: ${escapeHtml(row.organizationNodeId)}</span>
+            </div>
+          </td>
+        </tr>
+      `)
+      .join("");
+
+    tableBody.querySelectorAll("[data-supervisor-type]").forEach((select) => {
+      select.addEventListener("change", () => {
+        const assignments = readSupervisorAssignments();
+        const employeeNo = select.dataset.employeeNo;
+        const type = select.dataset.supervisorType;
+        assignments[employeeNo] = assignments[employeeNo] || {};
+        assignments[employeeNo][type] = select.value;
+        writeSupervisorAssignments(assignments);
+        renderRows();
+        setStatus("已更新主管關係；切換任一模組時會套用新的主管階層。", "success");
+      });
+    });
+  };
+
+  resetButton?.addEventListener("click", () => {
+    writeSupervisorAssignments({});
+    renderRows();
+    setStatus("已恢復預設主管關係。", "success");
+  });
+  bindPermissionTabs(panel, profile, "supervisors");
+  searchInput?.addEventListener("input", renderRows);
+
+  moduleLevelTwoGrid.classList.add("detail-grid");
+  moduleLevelTwoGrid.replaceChildren(panel);
+  renderRows();
+  setStatus("已開啟主管關係。", "info");
+}
+
 function renderAffiliationTool(profile) {
   if (!moduleLevelTwoGrid || !moduleTitle) return;
-  moduleTitle.textContent = "系統權限｜組織歸屬";
+  moduleTitle.textContent = "系統權限｜員工歸屬";
 
   const companyCounts = countByField("company");
   const regionCounts = countByField("region");
@@ -2716,13 +3843,13 @@ function renderAffiliationTool(profile) {
     <div class="section-head account-head">
       <div>
         <p class="portal-kicker">Organization Scope</p>
-        <h3>組織歸屬</h3>
+        <h3>員工歸屬</h3>
         <small>定義帳號所屬公司、機構、區域、部門、業務線與課別，作為 Data Scope 的判斷基礎。</small>
       </div>
       <span>${escapeHtml(profile.label)}｜${escapeHtml(scopeLabels[profile.scope] || profile.scope)}</span>
     </div>
     ${createPermissionTabs("affiliations")}
-    <div class="affiliation-summary" aria-label="組織歸屬摘要">
+    <div class="affiliation-summary" aria-label="員工歸屬摘要">
       <article>
         <span>公司 / 機構</span>
         <strong>${companyCounts.length}</strong>
@@ -2790,7 +3917,7 @@ function renderAffiliationTool(profile) {
         </div>
       </div>
     </div>
-    <p class="account-note">組織歸屬會影響模組可見範圍、資料查詢範圍與審核流程。後續接資料庫後，異動歸屬也會寫入操作紀錄。</p>
+    <p class="account-note">員工歸屬會影響模組可見範圍、資料查詢範圍與審核流程。後續接資料庫後，異動歸屬也會寫入操作紀錄。</p>
   `;
 
   const searchInput = panel.querySelector("#affiliationSearchInput");
@@ -2804,7 +3931,7 @@ function renderAffiliationTool(profile) {
       tableBody.innerHTML = `
         <tr>
           <td colspan="6">
-            <div class="empty-account-state">找不到符合條件的組織歸屬。</div>
+            <div class="empty-account-state">找不到符合條件的員工歸屬。</div>
           </td>
         </tr>
       `;
@@ -2837,7 +3964,7 @@ function renderAffiliationTool(profile) {
   moduleLevelTwoGrid.classList.add("detail-grid");
   moduleLevelTwoGrid.replaceChildren(panel);
   renderRows();
-  setStatus("已開啟組織歸屬。", "info");
+  setStatus("已開啟員工歸屬。", "info");
 }
 
 function renderGradeManagementTool(profile) {
@@ -3202,6 +4329,7 @@ function renderModulePermissionTool(profile) {
                 <th>可用角色</th>
                 <th>操作權限</th>
                 <th>限制</th>
+                <th>設定</th>
               </tr>
             </thead>
             <tbody data-module-permission-table-body></tbody>
@@ -3217,12 +4345,12 @@ function renderModulePermissionTool(profile) {
 
   const renderRows = () => {
     const query = searchInput?.value.trim() || "";
-    const rows = permissionRows.filter((row) => modulePermissionMatchesQuery(row, query));
+    const rows = getModulePermissionRows().filter((row) => modulePermissionMatchesQuery(row, query));
 
     if (rows.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="6">
+          <td colspan="7">
             <div class="empty-account-state">找不到符合條件的模組權限。</div>
           </td>
         </tr>
@@ -3253,10 +4381,76 @@ function renderModulePermissionTool(profile) {
               </div>
             </td>
             <td>${escapeHtml(row.limits)}</td>
+            <td>
+              <div class="permission-row-editor is-compact">
+                <label>
+                  <span>角色</span>
+                  <select multiple size="5" data-module-roles="${escapeHtml(row.moduleId)}">
+                    ${getMultiRoleOptions(row.roles)}
+                  </select>
+                </label>
+                <label>
+                  <span>操作</span>
+                  <select multiple size="5" data-module-actions="${escapeHtml(row.moduleId)}">
+                    ${getMultiActionOptions(row.actions)}
+                  </select>
+                </label>
+                <button type="button" class="text-button permission-save-button" data-module-save="${escapeHtml(row.moduleId)}">儲存</button>
+              </div>
+            </td>
           </tr>
         `
       )
       .join("");
+
+    tableBody.querySelectorAll("[data-module-save]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const moduleId = button.dataset.moduleSave;
+        const row = getModulePermissionRows().find((item) => item.moduleId === moduleId);
+        if (!row) return;
+        const selectedRoles = getSelectedOptions(tableBody.querySelector(`[data-module-roles="${moduleId}"]`));
+        const selectedActions = getSelectedOptions(tableBody.querySelector(`[data-module-actions="${moduleId}"]`));
+        if (!selectedRoles.length || !selectedActions.length) {
+          setStatus("模組權限至少需要保留一個角色與一個操作。", "error");
+          return;
+        }
+
+        if (moduleId === "system-permissions" && !selectedRoles.includes("ceo")) {
+          setStatus("安全限制：系統權限必須保留執行長角色。", "error");
+          appendPermissionAudit(profile, {
+            event: "模組權限異動遭阻擋",
+            target: getModuleDisplayName(row.module || {}),
+            summary: "嘗試移除系統權限的執行長角色",
+            result: "blocked"
+          });
+          return;
+        }
+
+        const before = {
+          roles: row.roles.join(","),
+          actions: row.actions.join(",")
+        };
+        const after = {
+          roles: selectedRoles.join(","),
+          actions: selectedActions.join(",")
+        };
+        const settings = readPermissionSettings();
+        settings.modules[moduleId] = {
+          ...(settings.modules[moduleId] || {}),
+          roles: selectedRoles,
+          actions: selectedActions
+        };
+        writePermissionSettings(settings);
+        appendPermissionAudit(profile, {
+          event: "模組權限異動",
+          target: getModuleDisplayName(row.module || {}),
+          summary: summarizeChange(before, after) || "未變更",
+          result: "success"
+        });
+        renderRows();
+        setStatus(`已更新 ${getModuleDisplayName(row.module || {})} 的模組權限。`, "success");
+      });
+    });
   };
 
   bindPermissionTabs(panel, profile, "modules");
@@ -3734,6 +4928,7 @@ function renderAuditLogTool(profile) {
   moduleTitle.textContent = "系統權限｜權限異動與操作紀錄";
 
   const auditRows = getAuditLogRows();
+  const liveAuditRows = readPermissionAuditEvents();
   const highestRiskRows = auditRows.filter((row) => row.risk === "最高");
   const approvalRows = auditRows.filter((row) => row.approval !== "不需審核");
   const totalButtonCoverage = auditRows.reduce((sum, row) => sum + row.buttonCount, 0);
@@ -3769,6 +4964,11 @@ function renderAuditLogTool(profile) {
         <span>按鈕覆蓋</span>
         <strong>${totalButtonCoverage}</strong>
         <small>依現有功能按鈕展開留痕</small>
+      </article>
+      <article>
+        <span>實際異動紀錄</span>
+        <strong>${liveAuditRows.length}</strong>
+        <small>本機權限中心已留存事件</small>
       </article>
     </div>
     <div class="grade-layout">
@@ -3811,6 +5011,58 @@ function renderAuditLogTool(profile) {
             <tbody data-audit-log-table-body></tbody>
           </table>
         </div>
+      </div>
+    </div>
+    <div class="affiliation-panel live-audit-panel">
+      <div class="affiliation-panel-head">
+        <strong>最近權限異動</strong>
+        <span>本機操作紀錄 / 之後可落 Supabase</span>
+      </div>
+      <div class="account-table-wrap">
+        <table class="account-table live-audit-table">
+          <thead>
+            <tr>
+              <th>時間</th>
+              <th>操作者</th>
+              <th>事件</th>
+              <th>目標</th>
+              <th>內容</th>
+              <th>結果</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              liveAuditRows.length
+                ? liveAuditRows
+                    .slice(0, 20)
+                    .map(
+                      (row) => `
+                        <tr>
+                          <td>${escapeHtml(new Date(row.createdAt).toLocaleString("zh-TW"))}</td>
+                          <td>
+                            <div class="account-person">
+                              <strong>${escapeHtml(row.actorName)}</strong>
+                              <small>${escapeHtml(row.actorEmail)}</small>
+                            </div>
+                          </td>
+                          <td>${escapeHtml(row.event)}</td>
+                          <td>${escapeHtml(row.target || "")}</td>
+                          <td>${escapeHtml(row.summary || "")}</td>
+                          <td><span class="status-pill ${row.result === "blocked" ? "is-external" : "is-active"}">${escapeHtml(row.result === "blocked" ? "已阻擋" : "成功")}</span></td>
+                        </tr>
+                      `
+                    )
+                    .join("")
+                : `
+                  <tr>
+                    <td colspan="6">
+                      <div class="empty-account-state">尚未有實際權限異動紀錄。</div>
+                    </td>
+                  </tr>
+                `
+            }
+          </tbody>
+        </table>
       </div>
     </div>
     <p class="account-note">操作紀錄不得由一般使用者刪除或修改；權限異動需記錄異動前後差異，並防止自我提權、刪除最後一位最高管理者與外部帳號逾期仍可使用。</p>
@@ -4038,6 +5290,11 @@ systemAnnouncementsButton?.addEventListener("click", () => {
   const profile = getStoredProfile();
   if (!profile) {
     setStatus("請先登入後再查看系統公告。", "error");
+    return;
+  }
+  const accessState = getModuleAccessState(systemAnnouncementsModule, profile);
+  if (accessState.status === "building") {
+    setStatus("系統公告正在努力製作中。", "info");
     return;
   }
   renderAnnouncementsTool(profile);

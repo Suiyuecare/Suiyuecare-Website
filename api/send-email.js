@@ -3,6 +3,8 @@ const FORM_RECIPIENTS = {
   course_signup: process.env.COURSE_NOTIFY_EMAIL || "edu.control@suiyuecare.com",
   investor: process.env.INVESTOR_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
   land: process.env.LAND_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
+  marketing: process.env.MARKETING_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
+  system: process.env.SYSTEM_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
   recruiting: process.env.RECRUITING_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com"
 };
 
@@ -11,8 +13,16 @@ const FORM_LABELS = {
   course_signup: "課程報名",
   investor: "投資人招募",
   land: "土地招募",
+  marketing: "網站行銷合作",
+  system: "系統後台諮詢",
   recruiting: "人才招募"
 };
+
+const FORM_RATE_LIMIT_WINDOW_MS = Number(process.env.FORM_RATE_LIMIT_WINDOW_MS || 10 * 60 * 1000);
+const FORM_RATE_LIMIT_MAX_PER_IP = Number(process.env.FORM_RATE_LIMIT_MAX_PER_IP || 8);
+const FORM_RATE_LIMIT_MAX_PER_CONTACT = Number(process.env.FORM_RATE_LIMIT_MAX_PER_CONTACT || 3);
+const formRateLimitStore = globalThis.__suiyuecareFormRateLimitStore || new Map();
+globalThis.__suiyuecareFormRateLimitStore = formRateLimitStore;
 
 function json(response, statusCode, payload) {
   response.statusCode = statusCode;
@@ -21,12 +31,146 @@ function json(response, statusCode, payload) {
   response.end(JSON.stringify(payload));
 }
 
+function createHttpError(statusCode, message) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+}
+
 function sanitize(value, maxLength = 2000) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
+function requestBody(request) {
+  if (request.body && typeof request.body === "object") return request.body;
+  if (typeof request.body !== "string") return {};
+  if (request.body.length > 25_000) {
+    throw createHttpError(413, "表單內容過長，請精簡後再送出。");
+  }
+  try {
+    return JSON.parse(request.body);
+  } catch {
+    return {};
+  }
+}
+
+function headerValue(request, name) {
+  const lowerName = name.toLowerCase();
+  const value = request.headers?.[lowerName] || request.headers?.[name] || "";
+  if (Array.isArray(value)) return String(value[0] || "");
+  return String(value || "");
+}
+
+function hostnameFromUrl(value = "") {
+  if (!value) return "";
+  try {
+    return new URL(value).hostname.toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+function requestHost(request) {
+  return (headerValue(request, "x-forwarded-host") || headerValue(request, "host")).split(":")[0].toLowerCase();
+}
+
+function allowedPublicApiHosts(request) {
+  const envHosts = String(process.env.PUBLIC_API_ALLOWED_ORIGINS || process.env.ALLOWED_PUBLIC_API_ORIGINS || "")
+    .split(",")
+    .map((item) => hostnameFromUrl(item.trim()) || item.trim().toLowerCase())
+    .filter(Boolean);
+  return new Set([
+    "suiyuecare.com",
+    "www.suiyuecare.com",
+    "login.suiyuecare.com",
+    "localhost",
+    "127.0.0.1",
+    requestHost(request),
+    ...envHosts
+  ].filter(Boolean));
+}
+
+function enforceAllowedPublicOrigin(request) {
+  const originHost = hostnameFromUrl(headerValue(request, "origin"));
+  const refererHost = hostnameFromUrl(headerValue(request, "referer"));
+  const sourceHost = originHost || refererHost;
+  if (!sourceHost) {
+    throw createHttpError(403, "Unsupported request source.");
+  }
+  if (!allowedPublicApiHosts(request).has(sourceHost)) {
+    throw createHttpError(403, "Unsupported request source.");
+  }
+}
+
+function clientIp(request) {
+  const forwarded = headerValue(request, "x-forwarded-for").split(",")[0]?.trim();
+  return forwarded || headerValue(request, "x-real-ip") || request.socket?.remoteAddress || "unknown";
+}
+
+function phoneDigits(value) {
+  return sanitize(value, 80).replace(/\D/g, "");
+}
+
+function isValidEmail(value) {
+  const email = sanitize(value, 180);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isValidPhone(value) {
+  const digits = phoneDigits(value);
+  return digits.length >= 7 && digits.length <= 20;
+}
+
+function isSupabaseServiceSetupError(error) {
+  const message = error?.message || "";
+  return message.includes("SUPABASE_SERVICE_ROLE_KEY") || message.includes("SUPABASE_URL");
+}
+
+function logSupabaseSaveError(error) {
+  if (isSupabaseServiceSetupError(error)) {
+    console.warn(`Supabase service save skipped: ${error.message}`);
+    return;
+  }
+  console.error(error);
+}
+
+function rateLimitExceeded(key, max, now = Date.now()) {
+  if (!key || max <= 0) return false;
+  if (formRateLimitStore.size > 800) {
+    for (const [entryKey, entry] of formRateLimitStore.entries()) {
+      if (!entry || entry.resetAt <= now) formRateLimitStore.delete(entryKey);
+    }
+  }
+
+  const existing = formRateLimitStore.get(key);
+  if (!existing || existing.resetAt <= now) {
+    formRateLimitStore.set(key, { count: 1, resetAt: now + FORM_RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+
+  existing.count += 1;
+  return existing.count > max;
+}
+
+function enforceRateLimit(request, payload) {
+  const ip = clientIp(request);
+  const email = sanitize(payload.email, 180).toLowerCase();
+  const phone = phoneDigits(payload.phone);
+  const formType = payload.form_type || "contact";
+  const checks = [
+    [`ip:${ip}:${formType}`, FORM_RATE_LIMIT_MAX_PER_IP],
+    email ? [`email:${email}`, FORM_RATE_LIMIT_MAX_PER_CONTACT] : null,
+    phone ? [`phone:${phone}`, FORM_RATE_LIMIT_MAX_PER_CONTACT] : null
+  ].filter(Boolean);
+
+  if (checks.some(([key, max]) => rateLimitExceeded(key, max))) {
+    throw createHttpError(429, "送出太頻繁，請稍後再試。");
+  }
+}
+
 function buildSubmissionPayload(body) {
-  const formType = sanitize(body.form_type || "contact", 80);
+  const requestedFormType = sanitize(body.form_type || "contact", 80);
+  const formType = FORM_RECIPIENTS[requestedFormType] ? requestedFormType : "contact";
   return {
     form_type: formType,
     name: sanitize(body.name || body["姓名"] || body["您的大名"], 160),
@@ -66,6 +210,29 @@ function supabasePublicKey() {
   return process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || "";
 }
 
+function decodeJwtPayload(token = "") {
+  const parts = String(token || "").split(".");
+  if (parts.length < 2) return null;
+
+  try {
+    const normalized = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    return JSON.parse(Buffer.from(padded, "base64").toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function projectRefFromSupabaseUrl(url = "") {
+  const match = String(url || "").match(/^https:\/\/([a-z0-9-]+)\.supabase\.co/i);
+  return match?.[1] || "";
+}
+
+function serviceRoleProjectMatches() {
+  const payload = decodeJwtPayload(supabaseServiceKey());
+  return Boolean(payload?.role === "service_role" && payload?.ref === projectRefFromSupabaseUrl(supabaseUrl()));
+}
+
 function normalizeSubmissionId(value) {
   if (Array.isArray(value)) return normalizeSubmissionId(value[0]?.id || value[0]);
   if (value && typeof value === "object") return String(value.id || value.submission_id || "").replace(/^"|"$/g, "");
@@ -91,11 +258,24 @@ function buildSubmissionRecord(payload, emailSent = false, submitterEmailSent = 
   };
 }
 
+async function saveFallbackSubmission(payload, emailSent, submitterEmailSent) {
+  try {
+    await saveToSupabasePublicIntake(payload, emailSent, submitterEmailSent);
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
 async function saveToSupabase(payload) {
   const url = supabaseUrl();
   const supabaseKey = supabaseServiceKey();
   if (!url || !supabaseKey) {
     throw new Error("Server is missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
+  }
+  if (!serviceRoleProjectMatches()) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY does not match SUPABASE_URL project.");
   }
 
   const response = await fetch(`${url}/rest/v1/rpc/submit_form_submission`, {
@@ -147,6 +327,7 @@ async function updateSubmissionEmailStatus(submissionId, emailSent) {
   const url = supabaseUrl();
   const supabaseKey = supabaseServiceKey();
   if (!url || !supabaseKey) return;
+  if (!serviceRoleProjectMatches()) return;
 
   await fetch(`${url}/rest/v1/rpc/update_form_submission_email_status`, {
     method: "POST",
@@ -168,6 +349,7 @@ async function updateSubmitterEmailStatus(submissionId, submitterEmailSent) {
   const url = supabaseUrl();
   const supabaseKey = supabaseServiceKey();
   if (!url || !supabaseKey) return;
+  if (!serviceRoleProjectMatches()) return;
 
   await fetch(`${url}/rest/v1/rpc/update_form_submission_email_status`, {
     method: "POST",
@@ -288,25 +470,31 @@ module.exports = async function handler(request, response) {
   }
 
   try {
-    const payload = buildSubmissionPayload(request.body || {});
-    if (sanitize(request.body?._honey, 120)) {
+    enforceAllowedPublicOrigin(request);
+    const body = requestBody(request);
+    const payload = buildSubmissionPayload(body);
+    if (sanitize(body._honey, 120)) {
       return json(response, 200, { ok: true, message: "資料已送出。" });
     }
     if (!payload.name || !payload.phone || !payload.email) {
       return json(response, 400, { ok: false, message: "請填寫姓名、電話與 Email。" });
     }
-    if (request.body?.privacy_consent !== true && request.body?.privacy_consent !== "on") {
+    if (!isValidEmail(payload.email)) {
+      return json(response, 400, { ok: false, message: "請填寫有效的 Email。" });
+    }
+    if (!isValidPhone(payload.phone)) {
+      return json(response, 400, { ok: false, message: "請填寫有效的聯絡電話。" });
+    }
+    if (body.privacy_consent !== true && body.privacy_consent !== "on") {
       return json(response, 400, { ok: false, message: "請先同意個人資料使用告知。" });
     }
+    enforceRateLimit(request, payload);
 
     let submissionId = null;
-    let savedWithFallback = false;
-    let saveError = null;
     try {
       submissionId = normalizeSubmissionId(await saveToSupabase(payload));
     } catch (error) {
-      saveError = error;
-      console.error(error);
+      logSupabaseSaveError(error);
     }
 
     let email = null;
@@ -315,20 +503,19 @@ module.exports = async function handler(request, response) {
     } catch (emailError) {
       console.error(emailError);
       if (!submissionId) {
-        try {
-          submissionId = normalizeSubmissionId(await saveToSupabasePublicIntake(payload, false, false));
-          savedWithFallback = true;
-        } catch (fallbackError) {
-          console.error(fallbackError);
+        const fallbackSaved = await saveFallbackSubmission(payload, false, false);
+        if (!fallbackSaved) {
+          return json(response, 503, {
+            ok: false,
+            message: "表單暫時無法送出，請稍後再試或改用電話、LINE 聯繫。"
+          });
         }
       }
       return json(response, 202, {
         ok: true,
-        submissionId,
         emailSent: false,
-        savedWithFallback,
-        saveWarning: saveError ? saveError.message : null,
-        message: "資料已留存後台，但寄信服務尚未完成或暫時失敗。"
+        submitterEmailSent: false,
+        message: "資料已收到，我們會盡快安排專人聯繫。"
       });
     }
 
@@ -345,25 +532,32 @@ module.exports = async function handler(request, response) {
       await updateSubmissionEmailStatus(submissionId, emailSent);
       await updateSubmitterEmailStatus(submissionId, submitterEmailSent);
     } else {
-      submissionId = normalizeSubmissionId(await saveToSupabasePublicIntake(payload, emailSent, submitterEmailSent));
-      savedWithFallback = true;
+      const fallbackSaved = await saveFallbackSubmission(payload, emailSent, submitterEmailSent);
+      if (!fallbackSaved && !emailSent) {
+        return json(response, 503, {
+          ok: false,
+          message: "表單暫時無法送出，請稍後再試或改用電話、LINE 聯繫。"
+        });
+      }
     }
     return json(response, emailSent ? 200 : 202, {
       ok: true,
-      submissionId,
       emailSent,
       submitterEmailSent,
-      savedWithFallback,
-      saveWarning: saveError ? saveError.message : null,
-      emailSetupRequired: Boolean(email?.setupRequired),
       message: emailSent
         ? "資料已留存後台，並已寄出通知信與填寫者確認信。"
-        : "資料已留存後台，但寄信服務尚未設定 RESEND_API_KEY。",
-      email,
-      submitterEmail
+        : "資料已收到，我們會盡快安排專人聯繫。"
     });
   } catch (error) {
-    console.error(error);
-    return json(response, 500, { ok: false, message: error.message || "表單送出失敗。" });
+    const statusCode = error.statusCode || 500;
+    if (statusCode >= 500) {
+      console.error(error);
+    } else {
+      console.warn(`Form submission rejected: ${error.message}`);
+    }
+    return json(response, statusCode, {
+      ok: false,
+      message: statusCode >= 500 ? "表單送出失敗，請稍後再試。" : error.message
+    });
   }
 };

@@ -7,6 +7,31 @@ function json(response, statusCode, payload) {
   response.end(JSON.stringify(payload));
 }
 
+function decodeJwtPayload(token = "") {
+  const parts = String(token || "").split(".");
+  if (parts.length < 2) return null;
+
+  try {
+    const normalized = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    return JSON.parse(Buffer.from(padded, "base64").toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function projectRefFromSupabaseUrl(url = "") {
+  const match = String(url || "").match(/^https:\/\/([a-z0-9-]+)\.supabase\.co/i);
+  return match?.[1] || "";
+}
+
+function serviceRoleProjectMatches() {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const payload = decodeJwtPayload(serviceRoleKey);
+  return Boolean(payload?.role === "service_role" && payload?.ref === projectRefFromSupabaseUrl(supabaseUrl));
+}
+
 function getSupabaseAdmin() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -44,6 +69,41 @@ function getBearerToken(request) {
   const header = request.headers.authorization || "";
   const match = header.match(/^Bearer\s+(.+)$/i);
   return match?.[1] || "";
+}
+
+function readJsonBody(request, maxBytes = 100_000) {
+  return new Promise((resolve, reject) => {
+    let raw = "";
+    let settled = false;
+
+    function finish(error, payload) {
+      if (settled) return;
+      settled = true;
+      if (error) reject(error);
+      else resolve(payload);
+    }
+
+    request.on("data", (chunk) => {
+      if (settled) return;
+      raw += chunk;
+      if (raw.length > maxBytes) {
+        const error = new Error("Request body too large.");
+        error.statusCode = 413;
+        finish(error);
+      }
+    });
+    request.on("end", () => {
+      if (settled) return;
+      try {
+        finish(null, raw ? JSON.parse(raw) : {});
+      } catch {
+        const error = new Error("Invalid JSON body.");
+        error.statusCode = 400;
+        finish(error);
+      }
+    });
+    request.on("error", finish);
+  });
 }
 
 const ownerEmail = "entrepreneur@suiyuecare.com";
@@ -109,12 +169,14 @@ async function getAuthorizedSupabase(request) {
     throw error;
   }
 
-  try {
-    const adminClient = getSupabaseAdmin();
-    const user = await verifyRequest(request, adminClient);
-    return { supabase: adminClient, user, mode: "service_role" };
-  } catch (error) {
-    console.warn("Falling back to user-scoped admin-users client.", error.message);
+  if (serviceRoleProjectMatches()) {
+    try {
+      const adminClient = getSupabaseAdmin();
+      const user = await verifyRequest(request, adminClient);
+      return { supabase: adminClient, user, mode: "service_role" };
+    } catch (error) {
+      console.warn("Falling back to user-scoped admin-users client.", error.message);
+    }
   }
 
   const userClient = getSupabaseForUser(token);
@@ -207,21 +269,7 @@ async function handleUpdate(request, response, supabase, user, totalProfiles) {
     return json(response, 403, { ok: false, message: "You do not have permission to manage users." });
   }
 
-  const body = await new Promise((resolve, reject) => {
-    let raw = "";
-    request.on("data", (chunk) => {
-      raw += chunk;
-      if (raw.length > 1_000_000) reject(new Error("Request body too large."));
-    });
-    request.on("end", () => {
-      try {
-        resolve(raw ? JSON.parse(raw) : {});
-      } catch (error) {
-        reject(error);
-      }
-    });
-    request.on("error", reject);
-  });
+  const body = await readJsonBody(request);
 
   const profileId = body.profile_id;
   if (!profileId) return json(response, 400, { ok: false, message: "Missing profile_id." });
@@ -291,6 +339,10 @@ module.exports = async function handler(request, response) {
     return json(response, 200, { ok: true, authMode: mode, ...data });
   } catch (error) {
     console.error("admin-users api failed", error);
-    return json(response, error.statusCode || 500, { ok: false, message: error.message || "Unexpected error." });
+    const statusCode = error.statusCode || 500;
+    return json(response, statusCode, {
+      ok: false,
+      message: statusCode >= 500 ? "Unexpected error." : error.message || "Unexpected error."
+    });
   }
 };

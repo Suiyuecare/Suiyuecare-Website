@@ -385,7 +385,7 @@ npm run build
 - 先寫入 Supabase `form_submissions`
 - 再使用 Resend 寄信
 - 若 `RESEND_API_KEY` 尚未設定，API 會回傳 `202`，資料仍會留存在後台，避免名單遺失
-- `/api/email-status` 會回報正式環境是否已設定 `RESEND_API_KEY` 與 `MAIL_FROM`，不會洩漏金鑰內容
+- `/api/email-status` 會回報正式環境是否已設定 `RESEND_API_KEY` 與 `MAIL_FROM`，需帶 `Authorization: Bearer <STATUS_SECRET 或 CRON_SECRET>`，不會公開洩漏環境狀態
 
 Vercel 需要設定：
 
@@ -401,6 +401,8 @@ LAND_NOTIFY_EMAIL=generalaffairs@suiyuecare.com
 RECRUITING_NOTIFY_EMAIL=generalaffairs@suiyuecare.com
 REPORT_FALLBACK_EMAIL=generalaffairs@suiyuecare.com
 REPORT_CRON_SECRET=...
+CRON_SECRET=...
+STATUS_SECRET=...
 SUPABASE_STORAGE_BUCKET_INVESTOR_FILES=investor-files
 VITE_SUPABASE_STORAGE_BUCKET_COURSE_IMAGES=course-images
 ```
@@ -408,7 +410,7 @@ VITE_SUPABASE_STORAGE_BUCKET_COURSE_IMAGES=course-images
 設定完成後請重新部署，再檢查：
 
 ```bash
-curl https://suiyuecare-website.vercel.app/api/email-status
+curl -H "Authorization: Bearer $STATUS_SECRET" https://www.suiyuecare.com/api/email-status
 ```
 
 若回傳 `ok: true`，代表表單寄信服務已啟用；若 `ok: false`，前台仍會留存表單到後台，但不會寄出通知信。
@@ -531,11 +533,11 @@ GET /api/report-digest-monthly
 GET /api/site-health-check
 ```
 
-Vercel Cron 已設定日報、週報、月報，以及每 30 分鐘網站健康檢查。此功能需要：
+Vercel Cron 已設定日報、週報、月報，以及每日網站健康檢查。這些排程端點會強制檢查 Vercel Cron 自動送出的 `Authorization: Bearer <CRON_SECRET>`，此功能需要：
 
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `RESEND_API_KEY`
-- `REPORT_CRON_SECRET`
+- `CRON_SECRET`
 - `SITE_URL`
 
 ### 備份與還原

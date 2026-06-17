@@ -841,9 +841,17 @@ async function generateArticleWithAi() {
   generateArticleWithAiButton?.setAttribute("disabled", "true");
   setEditorStatus("AI 正在產生文章草稿，請稍候...", "info");
   try {
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError) throw sessionError;
+    const token = sessionData?.session?.access_token;
+    if (!token) throw new Error("登入狀態已過期，請重新登入後再使用 AI 產文。");
+
     const response = await fetch("/api/generate-article", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
       body: JSON.stringify({
         title,
         subtitle: form.elements.subtitle.value.trim(),

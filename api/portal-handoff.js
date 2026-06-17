@@ -13,6 +13,11 @@ function json(response, statusCode, payload) {
 function parseBody(body) {
   if (!body) return {};
   if (typeof body === "string") {
+    if (body.length > 10_000) {
+      const error = new Error("Payload is too large.");
+      error.statusCode = 413;
+      throw error;
+    }
     try {
       return JSON.parse(body);
     } catch {

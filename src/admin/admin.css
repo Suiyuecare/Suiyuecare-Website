@@ -3904,10 +3904,37 @@ img[data-image-usage="map"],
 }
 
 @media (max-width: 640px) {
+  .admin-auth-page {
+    overflow-x: hidden;
+  }
+
   .admin-login-shell,
   .admin-main,
   .admin-sidebar {
     padding: 20px;
+  }
+
+  .admin-login-shell {
+    width: 100%;
+    max-width: 100vw;
+    gap: 24px;
+    align-content: start;
+  }
+
+  .admin-login-brand {
+    gap: 28px;
+  }
+
+  .admin-login-brand h1 {
+    font-size: clamp(36px, 11vw, 44px);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-login-brand p:not(.admin-eyebrow) {
+    max-width: 100%;
+    font-size: 16px;
+    overflow-wrap: anywhere;
   }
 
   .admin-login-card,
@@ -3915,6 +3942,18 @@ img[data-image-usage="map"],
   .admin-dashboard-grid article {
     border-radius: 22px;
     padding: 22px;
+  }
+
+  .admin-login-card {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .admin-form input,
+  .admin-form button,
+  .admin-login-divider {
+    min-width: 0;
   }
 
   .admin-userbox {

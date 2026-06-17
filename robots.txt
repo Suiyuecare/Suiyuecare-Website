@@ -1,6 +1,12 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /admin
 Disallow: /api/
+Disallow: /api
+Disallow: /portal/
+Disallow: /portal
+Disallow: /assets/backups/
+Disallow: /assets/backups
 
-Sitemap: https://suiyuecare.com/sitemap.xml
+Sitemap: https://www.suiyuecare.com/sitemap.xml

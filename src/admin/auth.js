@@ -8,10 +8,15 @@ export const permissionRules = {
   "/admin/": null,
   "/admin/pages": "can_view_pages",
   "/admin/pages/": "can_view_pages",
+  "/admin/home-modules": "can_view_pages",
+  "/admin/template-fields": "can_view_pages",
   "/admin/media": "can_view_media",
   "/admin/courses": "can_view_courses",
   "/admin/recruiting": "can_view_recruiting",
   "/admin/investor-data": "can_view_investor",
+  "/admin/files": "can_view_files",
+  "/admin/forms": "can_view_forms",
+  "/admin/site-settings": "can_edit_site_settings",
   "/admin/stories": "can_view_articles",
   "/admin/articles": "can_view_articles",
   "/admin/articles/": "can_view_articles",
@@ -93,6 +98,108 @@ const defaultPermissionState = {
   can_manage_backups: false
 };
 
+const portalAdminHandoffKey = "suiyuecare.admin.portalHandoff";
+const portalAdminAllowedEmails = new Set(["entrepreneur@suiyuecare.com"]);
+
+function decodePortalPayload(encodedPayload) {
+  if (!encodedPayload) return null;
+  try {
+    const normalized = encodedPayload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const json = decodeURIComponent(escape(window.atob(padded)));
+    return JSON.parse(json);
+  } catch (error) {
+    console.warn("Invalid portal admin payload", error);
+    return null;
+  }
+}
+
+function getPortalAdminPayloadFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("portal") !== "1") return null;
+  return decodePortalPayload(params.get("payload"));
+}
+
+function readStoredPortalAdminPayload() {
+  try {
+    const raw = window.sessionStorage.getItem(portalAdminHandoffKey);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function storePortalAdminPayload(payload) {
+  try {
+    window.sessionStorage.setItem(portalAdminHandoffKey, JSON.stringify(payload));
+  } catch {
+    // Session storage can be unavailable in some restricted browser modes.
+  }
+}
+
+function portalAdminPayloadIsFresh(payload) {
+  const launchedAt = Date.parse(payload?.launchedAt || "");
+  if (!Number.isFinite(launchedAt)) return false;
+  return Date.now() - launchedAt < 8 * 60 * 60 * 1000;
+}
+
+function getPortalAdminPayload(session) {
+  const urlPayload = getPortalAdminPayloadFromUrl();
+  if (urlPayload) storePortalAdminPayload(urlPayload);
+  const payload = urlPayload || readStoredPortalAdminPayload();
+  const sessionEmail = session?.user?.email?.toLowerCase();
+  const payloadEmail = payload?.email?.toLowerCase();
+  if (!sessionEmail || sessionEmail !== payloadEmail) return null;
+  if (payload?.moduleId !== "website-backoffice") return null;
+  if (!portalAdminPayloadIsFresh(payload)) return null;
+  if (!portalAdminAllowedEmails.has(sessionEmail)) return null;
+  if (!["ceo", "owner"].includes(payload.sourceRoleKey) && !["ceo", "owner"].includes(payload.roleKey)) return null;
+  return payload;
+}
+
+function buildPortalOwnerPermissions(session, payload) {
+  return {
+    ...defaultPermissionState,
+    profile_id: `portal-${session.user.id}`,
+    role: "owner",
+    display_name: payload.displayName || payload.name || "執行長",
+    email: session.user.email,
+    source: "logging-portal",
+    can_manage_users: true,
+    can_publish: true,
+    can_review_publish: true,
+    can_edit_site_settings: true,
+    can_view_pages: true,
+    can_edit_pages: true,
+    can_delete_pages: true,
+    can_view_articles: true,
+    can_edit_articles: true,
+    can_delete_articles: true,
+    can_view_media: true,
+    can_manage_media: true,
+    can_delete_media: true,
+    can_view_courses: true,
+    can_edit_courses: true,
+    can_delete_courses: true,
+    can_view_files: true,
+    can_manage_files: true,
+    can_delete_files: true,
+    can_view_forms: true,
+    can_edit_forms: true,
+    can_export_forms: true,
+    can_view_recruiting: true,
+    can_edit_recruiting: true,
+    can_delete_recruiting: true,
+    can_view_investor: true,
+    can_edit_investor: true,
+    can_delete_investor: true,
+    can_view_analytics: true,
+    can_export_analytics: true,
+    can_view_content_health: true,
+    can_manage_backups: true
+  };
+}
+
 function normalizePath(path = window.location.pathname) {
   return path.replace(/\/index\.html$/, "").replace(/\/$/, "") || "/admin";
 }
@@ -148,6 +255,9 @@ export async function requireAdminSession() {
 
 export async function getAdminPermissions() {
   if (!supabase) return {};
+  const session = await getCurrentSession();
+  const portalPayload = getPortalAdminPayload(session);
+  if (portalPayload) return buildPortalOwnerPermissions(session, portalPayload);
 
   const { data, error } = await supabase.rpc("get_current_admin_permissions");
   if (!error && data && Object.keys(data).length) return { ...defaultPermissionState, ...data };
@@ -155,7 +265,7 @@ export async function getAdminPermissions() {
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("id, role, display_name, email, is_active")
-    .eq("user_id", (await getCurrentSession())?.user?.id)
+    .eq("user_id", session?.user?.id)
     .maybeSingle();
 
   if (profileError) throw error || profileError;
@@ -260,6 +370,7 @@ export function redirectWhenSignedOut() {
   if (!supabase) return;
   supabase.auth.onAuthStateChange((event, session) => {
     if (event === "SIGNED_OUT" || !session) {
+      window.sessionStorage.removeItem(portalAdminHandoffKey);
       window.location.replace(ADMIN_LOGIN_PATH);
     }
   });

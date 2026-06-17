@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://suiyuecare.com/</loc>
-    <lastmod>2026-06-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+  <url><loc>https://www.suiyuecare.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.suiyuecare.com/home-care/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.suiyuecare.com/day-care/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.suiyuecare.com/community/</loc><changefreq>weekly</changefreq><priority>0.88</priority></url>
+  <url><loc>https://www.suiyuecare.com/nursing/</loc><changefreq>weekly</changefreq><priority>0.86</priority></url>
+  <url><loc>https://www.suiyuecare.com/migrant-training/</loc><changefreq>weekly</changefreq><priority>0.84</priority></url>
+  <url><loc>https://www.suiyuecare.com/quality/</loc><changefreq>weekly</changefreq><priority>0.82</priority></url>
+  <url><loc>https://www.suiyuecare.com/software/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.suiyuecare.com/health/</loc><changefreq>weekly</changefreq><priority>0.78</priority></url>
+  <url><loc>https://www.suiyuecare.com/courses/</loc><changefreq>weekly</changefreq><priority>0.76</priority></url>
+  <url><loc>https://www.suiyuecare.com/investors/</loc><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://www.suiyuecare.com/ir-finance/</loc><changefreq>weekly</changefreq><priority>0.72</priority></url>
+  <url><loc>https://www.suiyuecare.com/ir-governance/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.suiyuecare.com/ir-shareholders/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.suiyuecare.com/contact/</loc><changefreq>weekly</changefreq><priority>0.72</priority></url>
 </urlset>

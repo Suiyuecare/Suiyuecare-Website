@@ -9,11 +9,33 @@ function json(response, statusCode, payload) {
   response.end(JSON.stringify(payload));
 }
 
+function decodeJwtPayload(token = "") {
+  const parts = String(token || "").split(".");
+  if (parts.length < 2) return null;
+
+  try {
+    const normalized = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    return JSON.parse(Buffer.from(padded, "base64").toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function projectRefFromSupabaseUrl(url = "") {
+  const match = String(url || "").match(/^https:\/\/([a-z0-9-]+)\.supabase\.co/i);
+  return match?.[1] || "";
+}
+
 function supabaseConfig() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !key) throw new Error("Missing SUPABASE_URL/VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
-  return { supabaseUrl, key };
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const publicKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  const servicePayload = decodeJwtPayload(serviceKey);
+  const projectRef = projectRefFromSupabaseUrl(supabaseUrl);
+  const serviceRoleProjectMatches = Boolean(servicePayload?.role === "service_role" && servicePayload?.ref === projectRef);
+  if (!supabaseUrl) throw new Error("Missing SUPABASE_URL/VITE_SUPABASE_URL.");
+  return { supabaseUrl, serviceKey, publicKey, serviceRoleProjectMatches };
 }
 
 function siteUrl() {
@@ -22,13 +44,14 @@ function siteUrl() {
 }
 
 async function supabaseRequest(path, options = {}) {
-  const { supabaseUrl, key } = supabaseConfig();
+  const { supabaseUrl, serviceKey, serviceRoleProjectMatches } = supabaseConfig();
+  if (!serviceRoleProjectMatches) throw new Error("SUPABASE_SERVICE_ROLE_KEY does not match SUPABASE_URL project.");
   const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      apikey: key,
-      Authorization: `Bearer ${key}`,
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
       ...(options.headers || {})
     }
   });
@@ -65,7 +88,9 @@ function getSslCertificate(hostname) {
 }
 
 async function countRows(path) {
-  const { supabaseUrl, key } = supabaseConfig();
+  const { supabaseUrl, serviceKey, publicKey, serviceRoleProjectMatches } = supabaseConfig();
+  const key = serviceRoleProjectMatches ? serviceKey : publicKey;
+  if (!key) throw new Error("Missing usable Supabase API key.");
   const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
     method: "HEAD",
     headers: {
@@ -89,8 +114,38 @@ function checkRow(checkType, status, message, extra = {}) {
   };
 }
 
+function summarizeHealth(checks = [], alerts = []) {
+  const hasCritical = checks.some((check) => check.status === "critical")
+    || alerts.some((alert) => alert.severity === "critical");
+  const hasWarning = checks.some((check) => check.status === "warning")
+    || alerts.some((alert) => alert.severity === "warning");
+  return hasCritical ? "critical" : hasWarning ? "warning" : "ok";
+}
+
+function requireCronAuthorization(request) {
+  const cronSecret = process.env.CRON_SECRET || process.env.REPORT_CRON_SECRET;
+  if (!cronSecret) {
+    const error = new Error("Missing CRON_SECRET for scheduled health check endpoint.");
+    error.statusCode = 503;
+    error.setupRequired = true;
+    throw error;
+  }
+
+  const authorization = request.headers.authorization || "";
+  if (authorization !== `Bearer ${cronSecret}`) {
+    const error = new Error("Unauthorized");
+    error.statusCode = 401;
+    throw error;
+  }
+}
+
 async function insertHealthChecks(rows) {
   if (!rows.length) return;
+  try {
+    if (!supabaseConfig().serviceRoleProjectMatches) return;
+  } catch {
+    return;
+  }
   await supabaseRequest("analytics_health_checks", {
     method: "POST",
     headers: { Prefer: "return=minimal" },
@@ -99,6 +154,11 @@ async function insertHealthChecks(rows) {
 }
 
 async function ensureAlert(alert) {
+  try {
+    if (!supabaseConfig().serviceRoleProjectMatches) return;
+  } catch {
+    return;
+  }
   const existing = await supabaseRequest(`analytics_alerts?alert_type=eq.${encodeURIComponent(alert.alert_type)}&status=neq.resolved&select=id&limit=1`);
   if (existing?.length) return;
   await supabaseRequest("analytics_alerts", {
@@ -116,6 +176,18 @@ async function buildChecksAndAlerts() {
   const since24h = new Date(now - 24 * 60 * 60 * 1000).toISOString();
   const since48h = new Date(now - 48 * 60 * 60 * 1000).toISOString();
   const until24h = since24h;
+  let supabaseInfo = null;
+
+  try {
+    supabaseInfo = supabaseConfig();
+    if (!supabaseInfo.serviceRoleProjectMatches) {
+      checks.push(checkRow("config", "critical", "SUPABASE_SERVICE_ROLE_KEY 與 SUPABASE_URL 不屬於同一個 Supabase project，已跳過健康檢查寫入。"));
+      alerts.push({ alert_type: "supabase_service_role_mismatch", severity: "critical", title: "Supabase service role key 專案不匹配", message: "請在 Vercel production env 更新 SUPABASE_SERVICE_ROLE_KEY，使其 ref 與 SUPABASE_URL 相同。", metric_key: "supabase_service_role_project_match", metric_value: 0 });
+    }
+  } catch (error) {
+    checks.push(checkRow("config", "critical", `Supabase 設定缺漏：${error.message}`));
+    alerts.push({ alert_type: "supabase_config_missing", severity: "critical", title: "Supabase 設定缺漏", message: error.message, metric_key: "supabase_config", metric_value: 0 });
+  }
 
   try {
     const home = await fetchWithTimeout(baseUrl, {}, 10000);
@@ -128,7 +200,9 @@ async function buildChecksAndAlerts() {
   }
 
   try {
-    const { supabaseUrl, key } = supabaseConfig();
+    const { supabaseUrl, serviceKey, publicKey, serviceRoleProjectMatches } = supabaseConfig();
+    const key = serviceRoleProjectMatches ? serviceKey : publicKey;
+    if (!key) throw new Error("Missing usable Supabase API key.");
     const api = await fetchWithTimeout(`${supabaseUrl}/rest/v1/pages?select=id&limit=1`, { headers: { apikey: key, Authorization: `Bearer ${key}` } }, 8000);
     checks.push(checkRow("api", api.ok ? "ok" : "critical", api.ok ? `Supabase API 正常 ${api.responseTime}ms` : `Supabase API HTTP ${api.status}`, { responseTime: api.responseTime, checkedUrl: `${supabaseUrl}/rest/v1/pages` }));
     if (!api.ok) alerts.push({ alert_type: "api_down", severity: "critical", title: "API 狀態異常", message: `Supabase REST API HTTP ${api.status}`, metric_key: "api_status", metric_value: api.status });
@@ -163,6 +237,13 @@ async function buildChecksAndAlerts() {
   }
 
   try {
+    if (!supabaseInfo?.serviceRoleProjectMatches) {
+      checks.push(checkRow("traffic", "warning", "流量指標暫停：需要正確的 SUPABASE_SERVICE_ROLE_KEY 才能讀取 analytics，已避免產生 0 流量誤報。", {
+        metadata: { skipped: true, reason: "supabase_service_role_project_mismatch" }
+      }));
+      return { checks, alerts };
+    }
+
     const [views24h, viewsPrevious24h, forms24h, errors404, errors500] = await Promise.all([
       countRows(`analytics_page_views?created_at=gte.${encodeURIComponent(since24h)}&select=id`),
       countRows(`analytics_page_views?created_at=gte.${encodeURIComponent(since48h)}&created_at=lt.${encodeURIComponent(until24h)}&select=id`),
@@ -188,22 +269,22 @@ module.exports = async function handler(request, response) {
     return json(response, 405, { ok: false, message: "Method not allowed" });
   }
 
-  const cronSecret = process.env.REPORT_CRON_SECRET || process.env.CRON_SECRET;
-  if (cronSecret) {
-    const authorization = request.headers.authorization || "";
-    const bearer = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
-    const requestUrl = new URL(request.url || "/api/site-health-check", `https://${request.headers.host || "localhost"}`);
-    const token = request.headers["x-cron-secret"] || requestUrl.searchParams.get("token") || bearer;
-    if (token !== cronSecret) return json(response, 401, { ok: false, message: "Unauthorized" });
-  }
-
   try {
+    requireCronAuthorization(request);
+
     const { checks, alerts } = await buildChecksAndAlerts();
     await insertHealthChecks(checks);
     for (const alert of alerts) await ensureAlert({ ...alert, status: "unread", metadata: { source: "site-health-check" } });
-    return json(response, 200, { ok: true, checks, alerts });
+    const status = summarizeHealth(checks, alerts);
+    return json(response, 200, { ok: status !== "critical", status, checks, alerts });
   } catch (error) {
-    console.error(error);
-    return json(response, 500, { ok: false, message: error.message || "Site health check failed." });
+    const statusCode = error.statusCode || 500;
+    if (statusCode >= 500) console.error(error);
+    else console.warn("Site health check rejected", error.message);
+    return json(response, statusCode, {
+      ok: false,
+      message: statusCode >= 500 ? "Site health check failed." : error.message || "Site health check failed.",
+      setupRequired: Boolean(error.setupRequired)
+    });
   }
 };

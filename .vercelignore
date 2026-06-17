@@ -5,5 +5,8 @@ dist
 .env.*
 !.env.example
 .DS_Store
-pnpm-lock.yaml
-pnpm-workspace.yaml
+/*.png
+/outputs/
+/supabase/.temp/
+/assets/backups/
+/public/assets/backups/

@@ -6,3 +6,16 @@ dist
 .env
 .env.*
 !.env.example
+
+# Local/generated review artifacts
+/outputs/
+/*-check.png
+/mobile-*.png
+/option-*.png
+/service-*.png
+/portal-preview.png
+
+# Generated image backups; never commit or deploy these folders.
+/assets/backups/
+/public/assets/backups/
+/supabase/.temp/

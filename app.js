@@ -128,11 +128,11 @@ let siteSettings = {};
 let siteSettingsLoaded = false;
 let siteSettingsPromise = null;
 
-const SITE_ORIGIN = "https://suiyuecare.com";
+const SITE_ORIGIN = "https://www.suiyuecare.com";
 const DEFAULT_SEO = {
   title: "歲悅長照集團｜Suiyuecare Corps.",
   description: "歲悅長照集團整合居家照顧、日間照顧、社區據點、護理復能、移工培訓與教育品管，讓照顧變成家人看得懂、也放得下心的日常系統。",
-  image: "assets/hero-care.png",
+  image: "assets/hero-care-hero-fast.jpg",
   imageAlt: "歲悅長照照顧服務形象照",
   type: "website"
 };
@@ -229,8 +229,29 @@ function absoluteSiteUrl(path = "") {
 }
 
 function routeCanonical(slug = "home") {
-  const normalized = slug && slug !== "home" ? `/#${slug}` : "/";
-  return absoluteSiteUrl(normalized);
+  if (!slug || slug === "home") return absoluteSiteUrl("/");
+  const articleMatch = String(slug).match(/^article-(.+)$/);
+  if (articleMatch) return absoluteSiteUrl(`/article/${articleMatch[1]}/`);
+  const storyMatch = String(slug).match(/^care-story-(.+)$/);
+  if (storyMatch) return absoluteSiteUrl(`/care-story/${storyMatch[1]}/`);
+  const talkMatch = String(slug).match(/^master-talk-(.+)$/);
+  if (talkMatch) return absoluteSiteUrl(`/master-talk/${talkMatch[1]}/`);
+  return absoluteSiteUrl(`/${slug}/`);
+}
+
+function routeSlugFromPath(pathname = window.location.pathname) {
+  const cleaned = String(pathname || "/").replace(/^\/+|\/+$/g, "");
+  if (!cleaned) return "home";
+  const segments = cleaned.split("/");
+  if (segments[0] === "article" && segments[1]) return `article-${segments.slice(1).join("/")}`;
+  if (segments[0] === "care-story" && segments[1]) return `care-story-${segments.slice(1).join("/")}`;
+  if (segments[0] === "master-talk" && segments[1]) return `master-talk-${segments.slice(1).join("/")}`;
+  return segments[0] || "home";
+}
+
+function routeSlugFromLocation() {
+  const hashSlug = window.location.hash.slice(1).split("?")[0];
+  return hashSlug || routeSlugFromPath();
 }
 
 function absoluteImageUrl(image = DEFAULT_SEO.image) {
@@ -425,6 +446,21 @@ function formDataValue(formData, keys) {
   return "";
 }
 
+function contactNeedToFormType(need = "") {
+  if (/課程/.test(need)) return "course_signup";
+  if (/人才|應徵|招募/.test(need)) return "recruiting";
+  if (/土地|場地|空間/.test(need)) return "land";
+  if (/系統|後台|軟體|公文|專案管理|表單留存|檔案下載|業務系統/.test(need)) return "system";
+  if (/網站|行銷|品牌|社群|內容合作/.test(need)) return "marketing";
+  if (/投資/.test(need)) return "investor";
+  return "contact";
+}
+
+function contactFormType(form) {
+  const formData = new FormData(form);
+  return contactNeedToFormType(formDataValue(formData, ["需求", "need", "subject"]));
+}
+
 async function recordFormSubmission(form, formType = "contact") {
   if (!supabase || !form) return null;
   const formData = new FormData(form);
@@ -559,7 +595,7 @@ const articlePages = {
     category: "Health 3.0",
     title: "第一次申請長照服務，家人需要先準備什麼？",
     dek: "從需求盤點、照顧計畫、政府補助到服務媒合，用一篇文章把流程講清楚。",
-    image: "assets/homepage-batch/10-family-consultation.png",
+    image: "assets/homepage-batch/10-family-consultation-fast.jpg",
     author: "歲悅照顧編輯部",
     date: "2026.05.13",
     readTime: "6 min read",
@@ -576,7 +612,7 @@ const articlePages = {
     category: "Care Stories",
     title: "爸爸出院後，我終於知道每天該注意什麼。",
     dek: "家屬最需要的不是更多壓力，而是有人把照顧重點說清楚、每天回報、一起調整。",
-    image: "assets/homepage-batch/01-care-home-greeting.png",
+    image: "assets/homepage-batch/01-care-home-greeting-fast.jpg",
     author: "林小姐｜居家照顧",
     date: "2026.05.13",
     readTime: "4 min read",
@@ -593,7 +629,7 @@ const articlePages = {
     category: "Master Talk",
     title: "好的照顧，是讓長輩和家屬都保有生活感。",
     dek: "照顧心理講師周小姐談家庭照顧中的焦慮、溝通與支持系統。",
-    image: "assets/homepage-batch/10-family-consultation.png",
+    image: "assets/homepage-batch/10-family-consultation-fast.jpg",
     author: "照顧心理講師 周小姐",
     date: "2026.05.13",
     readTime: "5 min read",
@@ -647,7 +683,7 @@ Object.assign(articlePages, {
     category: "失智照顧",
     title: "重複提問怎麼回應，才不會讓彼此更焦慮？",
     dek: "理解長輩不安背後的需求，用更穩定的語句降低照顧衝突。",
-    image: "assets/homepage-batch/19-health-dementia-cover.png",
+    image: "assets/homepage-batch/19-health-dementia-cover-fast.jpg",
     author: "歲悅照顧編輯部",
     date: "2026.05.06",
     readTime: "5 min read",
@@ -681,7 +717,7 @@ Object.assign(articlePages, {
     category: "課程活動",
     title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
     dek: "把移位、用餐、跌倒預防與照顧溝通整理成家人也能操作的課程。",
-    image: "assets/homepage-batch/12-community-health-class.png",
+    image: "assets/homepage-batch/12-community-health-class-fast.jpg",
     author: "歲悅教育品管",
     date: "2026.04.28",
     readTime: "3 min read",
@@ -698,7 +734,7 @@ Object.assign(articlePages, {
     category: "活動專區",
     title: "日照體驗參觀日：認識家庭喘息與白天照顧",
     dek: "帶家屬理解日間照顧的一天，包含活動、共餐、休息與回報流程。",
-    image: "assets/homepage-batch/02-daycare-group-exercise.png",
+    image: "assets/homepage-batch/02-daycare-group-exercise-fast.jpg",
     author: "歲悅日照團隊",
     date: "2026.04.22",
     readTime: "3 min read",
@@ -715,7 +751,7 @@ Object.assign(articlePages, {
     category: "活動專區",
     title: "復能照顧工作坊：陪長輩一步一步重新有把握",
     dek: "用小目標、日常動作與安全陪伴，支持長輩找回生活能力。",
-    image: "assets/homepage-batch/13-rehab-walking-practice.png",
+    image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
     author: "歲悅護理復能團隊",
     date: "2026.04.18",
     readTime: "4 min read",
@@ -732,7 +768,7 @@ Object.assign(articlePages, {
     category: "短影片",
     title: "跌倒後 24 小時觀察重點",
     dek: "跌倒後不只看有沒有外傷，也要留意疼痛、意識、走路與精神變化。",
-    image: "assets/homepage-batch/14-care-notes.png",
+    image: "assets/homepage-batch/14-care-notes-fast.jpg",
     author: "歲悅照顧編輯部",
     date: "2026.04.16",
     readTime: "3 min read",
@@ -769,19 +805,19 @@ const relatedArticleCards = [
     href: "#article-longterm-care-apply",
     category: "Health 3.0",
     title: "第一次申請長照服務，家人需要先準備什麼？",
-    image: "assets/homepage-batch/10-family-consultation.png"
+    image: "assets/homepage-batch/10-family-consultation-fast.jpg"
   },
   {
     href: "#article-family-care-story",
     category: "Care Stories",
     title: "爸爸出院後，我終於知道每天該注意什麼。",
-    image: "assets/homepage-batch/01-care-home-greeting.png"
+    image: "assets/homepage-batch/01-care-home-greeting-fast.jpg"
   },
   {
     href: "#article-master-talk-care-psychology",
     category: "Master Talk",
     title: "好的照顧，是讓長輩和家屬都保有生活感。",
-    image: "assets/homepage-batch/10-family-consultation.png"
+    image: "assets/homepage-batch/10-family-consultation-fast.jpg"
   },
   {
     href: "#article-safe-transfer-tips",
@@ -799,7 +835,7 @@ const relatedArticleCards = [
     href: "#article-dementia-response",
     category: "失智照顧",
     title: "重複提問怎麼回應，才不會讓彼此更焦慮？",
-    image: "assets/homepage-batch/19-health-dementia-cover.png"
+    image: "assets/homepage-batch/19-health-dementia-cover-fast.jpg"
   },
   {
     href: "#article-caregiver-support",
@@ -811,7 +847,7 @@ const relatedArticleCards = [
     href: "#article-family-care-course",
     category: "課程報名",
     title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
-    image: "assets/homepage-batch/12-community-health-class.png"
+    image: "assets/homepage-batch/12-community-health-class-fast.jpg"
   }
 ];
 
@@ -821,7 +857,7 @@ const healthArticles = [
     category: "長照申請",
     title: "第一次申請長照服務，家人需要先準備什麼？",
     excerpt: "從需求盤點、照顧計畫、政府補助到服務媒合，用一篇文章把流程講清楚。",
-    image: "assets/homepage-batch/10-family-consultation.png",
+    image: "assets/homepage-batch/10-family-consultation-fast.jpg",
     author: "歲悅照顧編輯部",
     date: "2026.05.13",
     keywords: "長照申請 家庭照顧 服務媒合 居家照顧"
@@ -831,7 +867,7 @@ const healthArticles = [
     category: "家屬故事",
     title: "爸爸出院後，我終於知道每天該注意什麼。",
     excerpt: "每日回報、照顧紀錄與督導追蹤，讓出院返家的照顧不再只能靠家人猜。",
-    image: "assets/homepage-batch/01-care-home-greeting.png",
+    image: "assets/homepage-batch/01-care-home-greeting-fast.jpg",
     author: "林小姐｜居家照顧",
     date: "2026.05.13",
     keywords: "出院返家 居家照顧 家屬回饋 照顧紀錄"
@@ -841,7 +877,7 @@ const healthArticles = [
     category: "專家專欄",
     title: "好的照顧，是讓長輩和家屬都保有生活感。",
     excerpt: "照顧心理講師談家庭照顧中的焦慮、溝通與支持系統。",
-    image: "assets/homepage-batch/10-family-consultation.png",
+    image: "assets/homepage-batch/10-family-consultation-fast.jpg",
     author: "照顧心理講師 周小姐",
     date: "2026.05.13",
     keywords: "名人講堂 照顧心理 家屬支持"
@@ -871,7 +907,7 @@ const healthArticles = [
     category: "失智照顧",
     title: "重複提問怎麼回應，才不會讓彼此更焦慮？",
     excerpt: "理解長輩不安背後的需求，用更穩定的語句降低照顧衝突。",
-    image: "assets/homepage-batch/19-health-dementia-cover.png",
+    image: "assets/homepage-batch/19-health-dementia-cover-fast.jpg",
     author: "歲悅照顧編輯部",
     date: "2026.05.06",
     keywords: "失智 重複提問 溝通 情緒"
@@ -891,7 +927,7 @@ const healthArticles = [
     category: "課程",
     title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
     excerpt: "把移位、用餐、跌倒預防與照顧溝通整理成家人也能操作的課程。",
-    image: "assets/homepage-batch/12-community-health-class.png",
+    image: "assets/homepage-batch/12-community-health-class-fast.jpg",
     author: "歲悅教育品管",
     date: "2026.04.28",
     keywords: "課程 家屬照顧 移位 跌倒預防"
@@ -978,18 +1014,95 @@ function formatPostDate(dateValue, yearOnly = false) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function getPostImage(post, fallback = "assets/homepage-batch/02-daycare-group-exercise.png") {
+function getPostImage(post, fallback = "assets/homepage-batch/02-daycare-group-exercise-fast.jpg") {
   const embedded = post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
   const acfImage = post?.acf?.image?.url || post?.acf?.avatar?.url || post?.acf?.speaker_photo?.url || post?.acf?.cover?.url;
-  return acfImage || embedded || fallback;
+  return fastAssetUrl(acfImage || embedded || fallback);
 }
 
-function getCmsModuleImage(item, fallback = "assets/homepage-batch/02-daycare-group-exercise.png") {
-  return item?.image?.public_url || item?.metadata?.image_url || fallback;
+function getCmsModuleImage(item, fallback = "assets/homepage-batch/02-daycare-group-exercise-fast.jpg") {
+  return fastAssetUrl(item?.image?.public_url || item?.metadata?.image_url || fallback);
+}
+
+const fastAssetPaths = new Set([
+  "assets/nursing-detail-02-walking-fast.jpg",
+  "assets/hero-care-fast.jpg",
+  "assets/nursing-detail-04-care-plan-fast.jpg",
+  "assets/admin-recruit-02-operations-hero-fast.jpg",
+  "assets/migrant-detail-01-classroom-fast.jpg",
+  "assets/scene-care-note-fast.jpg",
+  "assets/hero-care-hero-fast.jpg",
+  "assets/service-overview-fast.jpg",
+  "assets/quality-recruit-contact-sheet-fast.jpg",
+  "assets/homecare-detail-01-greeting-hero-fast.jpg",
+  "assets/admin-recruit-02-operations-fast.jpg",
+  "assets/community-detail-02-meal-fast.jpg",
+  "assets/homecare-detail-01-greeting-fast.jpg",
+  "assets/quality-detail-04-improvement-fast.jpg",
+  "assets/daycare-recruit-contact-sheet-fast.jpg",
+  "assets/admin-recruit-contact-sheet-fast.jpg",
+  "assets/location-taipei-fast.jpg",
+  "assets/homecare-detail-03-safe-transfer-fast.jpg",
+  "assets/homecare-detail-02-care-plan-fast.jpg",
+  "assets/migrant-recruit-contact-sheet-fast.jpg",
+  "assets/nursing-detail-03-home-safety-fast.jpg",
+  "assets/homepage-batch/04-admin-team-office-fast.jpg",
+  "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
+  "assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg",
+  "assets/homepage-batch/01-care-home-greeting-fast.jpg",
+  "assets/homepage-batch/14-care-notes-fast.jpg",
+  "assets/homepage-batch/10-family-consultation-fast.jpg",
+  "assets/homepage-batch/03-supervisor-care-plan-fast.jpg",
+  "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg",
+  "assets/homepage-batch/16-taipei-service-office-fast.jpg",
+  "assets/homepage-batch/12-community-health-class-fast.jpg",
+  "assets/homepage-batch/19-health-dementia-cover-fast.jpg",
+  "assets/homepage-batch/02-daycare-group-exercise-fast.jpg",
+  "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+  "assets/cis-guide-fast.jpg",
+  "assets/quality-detail-02-training-fast.jpg",
+  "assets/homecare-detail-04-daily-support-fast.jpg",
+  "assets/migrant-detail-01-classroom-hero-fast.jpg",
+  "assets/migrant-recruit-04-communication-fast.jpg",
+  "assets/community-detail-03-workshop-fast.jpg",
+  "assets/location-taoyuan-fast.jpg",
+  "assets/quality-detail-03-audit-fast.jpg",
+  "assets/daycare-detail-01-exercise-fast.jpg",
+  "assets/quality-recruit-02-training-fast.jpg",
+  "assets/community-detail-01-exercise-hero-fast.jpg",
+  "assets/daycare-detail-02-meal-fast.jpg",
+  "assets/daycare-detail-04-checkin-fast.jpg",
+  "assets/scene-home-care-fast.jpg",
+  "assets/recruit-home-care-supervisor-fast.jpg",
+  "assets/daycare-detail-03-activity-fast.jpg",
+  "assets/location-newtaipei-fast.jpg",
+  "assets/community-detail-01-exercise-fast.jpg",
+  "assets/nursing-detail-02-walking-hero-fast.jpg",
+  "assets/recruit-day-care-worker-fast.jpg",
+  "assets/daycare-detail-01-exercise-hero-fast.jpg",
+  "assets/north-service-map-fast.jpg",
+  "assets/community-detail-04-consult-fast.jpg",
+  "assets/quality-detail-01-materials-fast.jpg",
+  "assets/migrant-detail-03-meal-fast.jpg",
+  "assets/migrant-detail-04-communication-fast.jpg",
+  "assets/recruit-home-care-worker-fast.jpg",
+  "assets/migrant-detail-02-transfer-fast.jpg",
+  "assets/nursing-detail-01-vitals-fast.jpg",
+  "assets/quality-detail-04-improvement-hero-fast.jpg"
+]);
+
+function fastAssetUrl(url = "") {
+  const raw = String(url || "");
+  const normalized = raw.replace(/^\/assets\//, "assets/");
+  if (!/\.png$/i.test(normalized)) return raw;
+  const fastPath = normalized.replace(/\.png$/i, "-fast.jpg");
+  if (!fastAssetPaths.has(fastPath)) return raw;
+  return raw.startsWith("/assets/") ? `/${fastPath}` : fastPath;
 }
 
 function normalizeLocalAssetUrl(url = "") {
-  return location.protocol === "file:" ? String(url).replace(/^\/assets\//, "assets/") : url;
+  const fastUrl = fastAssetUrl(url);
+  return location.protocol === "file:" ? String(fastUrl).replace(/^\/assets\//, "assets/") : fastUrl;
 }
 
 function normalizeYouTubeEmbedUrl(value = "") {
@@ -1069,7 +1182,7 @@ function normalizeSupabaseArticle(article, mediaById, categoriesById) {
   const category = categoryData?.display_label || categoryData?.name || "照顧知識";
   const slug = categoryData?.slug || categorySlug(category);
   const cover = mediaById.get(article.cover_image_id);
-  const image = cover?.public_url || "assets/homepage-batch/10-family-consultation.png";
+  const image = cover?.public_url || "assets/homepage-batch/10-family-consultation-fast.jpg";
   const subtitle = article.subtitle || article.excerpt || "";
   const excerpt = article.excerpt || article.subtitle || stripHTML(article.content || "").slice(0, 88);
   const publishedAt = article.published_at || article.updated_at;
@@ -1162,7 +1275,7 @@ async function loadSupabaseArticleCategories({ rerender = false } = {}) {
 
   const categories = await supabaseArticleCategoriesPromise;
   if (rerender && categories.length) {
-    const current = location.hash.slice(1).split("?")[0] || "home";
+    const current = routeSlugFromLocation() || "home";
     if (current === "health") renderPage(location.hash.slice(1));
   }
   return categories;
@@ -1248,7 +1361,7 @@ async function loadSupabaseHealthArticles({ rerender = false } = {}) {
 
   const articles = await supabaseHealthArticlesPromise;
   if (rerender && articles.length) {
-    const current = location.hash.slice(1).split("?")[0] || "home";
+    const current = routeSlugFromLocation() || "home";
     if (current === "health" || current === "search") renderPage(location.hash.slice(1));
   }
   return articles;
@@ -1375,7 +1488,7 @@ function normalizeSupabaseArticlePage(article, category, cover) {
     title: article.title || "未命名文章",
     subtitle: article.subtitle || article.excerpt || "",
     excerpt: article.excerpt || article.subtitle || "",
-    image: cover?.public_url || "assets/homepage-batch/10-family-consultation.png",
+    image: cover?.public_url || "assets/homepage-batch/10-family-consultation-fast.jpg",
     imageUsage: cover?.image_usage || "article_cover",
     focalPoint: cover?.focal_point || "center",
     videoUrl: video.url,
@@ -1621,7 +1734,7 @@ async function loadSupabasePageContent(slug) {
 
 function renderCmsDetailPage(page, sections = []) {
   const pageContent = getSectionContent(page);
-  const heroImage = pageContent.hero_image_url || sections.find((section) => getSectionContent(section).image_url)?.content_json?.image_url || "assets/hero-care.png";
+  const heroImage = pageContent.hero_image_url || sections.find((section) => getSectionContent(section).image_url)?.content_json?.image_url || "assets/hero-care-fast.jpg";
   const heroAlt = pageContent.hero_image_alt || page.title || "歲悅長照頁面主視覺";
   const primaryText = pageContent.button_text || "聯絡諮詢";
   const primaryHref = pageContent.button_href || "#contact";
@@ -1692,7 +1805,7 @@ async function loadSupabaseDetailPage(slug) {
     if (sectionsError) throw sectionsError;
     const pageContent = getSectionContent(page);
     const shouldOverride = pageContent.cms_mode === true || (sections || []).length > 0;
-    if (!shouldOverride || location.hash.slice(1).split("?")[0] !== slug) return;
+    if (!shouldOverride || routeSlugFromLocation() !== slug) return;
 
     setRouteSeo(page.slug || slug, {
       title: page.seo_title || (page.title ? `${page.title}｜歲悅長照集團` : undefined),
@@ -1731,6 +1844,15 @@ function getTemplateFieldValue(field) {
 function mapTemplateFields(fields = []) {
   return fields.reduce((map, field) => {
     const current = map[field.field_key];
+    const currentValue = getTemplateFieldValue(current);
+    const nextValue = getTemplateFieldValue(field);
+    const currentHasValue = Array.isArray(currentValue)
+      ? currentValue.length > 0
+      : currentValue !== "" && currentValue !== null && currentValue !== undefined && !(typeof currentValue === "object" && !Object.keys(currentValue || {}).length);
+    const nextHasValue = Array.isArray(nextValue)
+      ? nextValue.length > 0
+      : nextValue !== "" && nextValue !== null && nextValue !== undefined && !(typeof nextValue === "object" && !Object.keys(nextValue || {}).length);
+    if (currentHasValue && !nextHasValue) return map;
     if (current?.field_type === "image" && current.image?.public_url && !field.image?.public_url) return map;
     map[field.field_key] = field;
     return map;
@@ -1740,7 +1862,8 @@ function mapTemplateFields(fields = []) {
 function getTemplateText(fieldMap, key, fallback = "") {
   const value = getTemplateFieldValue(fieldMap[key]);
   if (Array.isArray(value) || typeof value === "object") return fallback;
-  return value === "" || value === null || value === undefined ? fallback : String(value);
+  const resolved = value === "" || value === null || value === undefined ? fallback : String(value);
+  return key.includes("image") ? fastAssetUrl(resolved) : resolved;
 }
 
 function getTemplateArray(fieldMap, key, fallback = []) {
@@ -1797,7 +1920,7 @@ function renderTemplateFaq(items) {
 function renderFixedServiceTemplate(slug, fields = []) {
   const fieldMap = mapTemplateFields(fields);
   const title = getTemplateText(fieldMap, "hero_title", "歲悅服務");
-  const heroImage = getTemplateText(fieldMap, "hero_image", "assets/hero-care.png");
+  const heroImage = getTemplateText(fieldMap, "hero_image", "assets/hero-care-fast.jpg");
   const primaryText = getTemplateText(fieldMap, "primary_cta_text", "預約諮詢");
   const primaryUrl = getTemplateText(fieldMap, "primary_cta_url", "#contact");
   const secondaryText = getTemplateText(fieldMap, "secondary_cta_text", "查看服務據點");
@@ -1957,7 +2080,7 @@ function renderCmsProblemGrid(items) {
 
 function renderCmsGallery(items) {
   return items.map((item) => {
-    const image = getCmsItemValue(item, ["image", "image_url", "url"], "assets/homepage-batch/01-care-home-greeting.png");
+    const image = getCmsItemValue(item, ["image", "image_url", "url"], "assets/homepage-batch/01-care-home-greeting-fast.jpg");
     const title = getCmsItemValue(item, ["title"], "");
     return `
       <figure>
@@ -2042,7 +2165,7 @@ function applyCmsEnhancedServicePage(html, slug, fields = []) {
   const body = getTemplateText(fieldMap, "hero_body", "");
   setNodeText(root, ".service-detail-hero .service-detail-copy .eyebrow", getTemplateText(fieldMap, "hero_eyebrow", ""));
   setNodeText(root, ".service-detail-hero .service-detail-copy h1", title);
-  setNodeText(root, ".service-detail-hero .service-detail-copy > p:not(.eyebrow)", body);
+  setNodeText(root, ".service-detail-hero .service-detail-copy > p:not(.eyebrow):not(.hero-slogan)", body);
   setNodeText(root, ".hero-actions .primary-button", getTemplateText(fieldMap, "primary_cta_text", ""));
   setNodeHref(root, ".hero-actions .primary-button", getTemplateText(fieldMap, "primary_cta_url", ""));
   setNodeText(root, ".hero-actions .secondary-button", getTemplateText(fieldMap, "secondary_cta_text", ""));
@@ -2149,7 +2272,7 @@ async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
   pageView.innerHTML = fallbackHtml;
   try {
     const fields = await fetchSupabaseServiceFields(slug);
-    if (location.hash.slice(1).split("?")[0] !== slug) return;
+    if (routeSlugFromLocation() !== slug) return;
     pageView.innerHTML = applyCmsEnhancedServicePage(fallbackHtml, slug, fields);
   } catch (error) {
     console.warn(`Supabase enhanced service page unavailable for ${slug}.`, error);
@@ -2169,7 +2292,7 @@ async function loadSupabaseServiceTemplatePage(slug) {
 
     if (error) throw error;
     if (!data?.some((field) => field.field_key === "hero_title")) return false;
-    if (location.hash.slice(1).split("?")[0] !== slug) return true;
+    if (routeSlugFromLocation() !== slug) return true;
     const fieldMap = mapTemplateFields(data);
     const title = getTemplateText(fieldMap, "hero_title", routeSeoMap[slug]?.title || pages[slug]?.title || "歲悅服務");
     const body = getTemplateText(fieldMap, "hero_body", routeSeoMap[slug]?.description || pages[slug]?.intro || DEFAULT_SEO.description);
@@ -2210,7 +2333,7 @@ function attachRecruitingImage(item, mediaMap) {
   };
 }
 
-function getRecruitingImage(item, fallback = "assets/homepage-batch/04-admin-team-office.png") {
+function getRecruitingImage(item, fallback = "assets/homepage-batch/04-admin-team-office-fast.jpg") {
   const url = item?.image?.public_url || item?.hero_image?.public_url || item?.image_url || item?.hero_image_url || fallback;
   return normalizeRecruitingAssetUrl(url);
 }
@@ -2226,7 +2349,7 @@ function normalizeRecruitingList(value) {
 }
 
 function renderRecruitingHero(page) {
-  const image = getRecruitingImage(page, "assets/homepage-batch/04-admin-team-office.png");
+  const image = getRecruitingImage(page, "assets/homepage-batch/04-admin-team-office-fast.jpg");
   return `
     <section class="service-detail-hero recruiting-cms-hero ${escapeHTML(page.page_slug)}-recruiting-hero">
       <div class="service-detail-copy">
@@ -2261,7 +2384,7 @@ function renderRecruitingDepartmentTabs(departments) {
 }
 
 function renderRecruitingDepartmentPanel(page, department, openings, index) {
-  const image = getRecruitingImage(department, "assets/recruit-home-care-worker.png");
+  const image = getRecruitingImage(department, "assets/recruit-home-care-worker-fast.jpg");
   const highlights = normalizeRecruitingList(department.highlights);
   const gallery = normalizeRecruitingList(department.gallery);
   return `
@@ -2318,7 +2441,7 @@ function renderRecruitingOpeningGrid(page, department, openings) {
 }
 
 function renderRecruitingOpeningCard(page, department, opening, index) {
-  const image = getRecruitingImage(opening, getRecruitingImage(department, "assets/recruit-home-care-worker.png"));
+  const image = getRecruitingImage(opening, getRecruitingImage(department, "assets/recruit-home-care-worker-fast.jpg"));
   const duties = normalizeRecruitingList(opening.duties);
   const requirements = normalizeRecruitingList(opening.requirements);
   const benefits = normalizeRecruitingList(opening.benefits);
@@ -2422,6 +2545,7 @@ function renderRecruitingApplicationModal(page) {
           <input name="opening_id" id="recruitApplyOpeningId" type="hidden" />
           <input name="opening_slug" id="recruitApplyOpeningSlug" type="hidden" />
           <input name="opening_title" id="recruitApplyOpeningTitle" type="hidden" />
+          <input name="_honey" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
           <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為應徵、合作洽談與後續聯繫目的，使用我填寫的個人資料。</label>
           <p class="course-confirm-text">送出後，資料會寄到歲悅窗口並留存在後台表單資料。</p>
           <button class="primary-button" type="submit">確認送出</button>
@@ -2486,7 +2610,7 @@ async function loadSupabaseRecruitingPage(slug) {
   if (!supabase || !recruitingTemplateSlugs.has(slug)) return;
   try {
     const data = await fetchSupabaseRecruitingPage(slug);
-    if (!data || location.hash.slice(1).split("?")[0] !== slug) return;
+    if (!data || routeSlugFromLocation() !== slug) return;
     pageView.innerHTML = slug === "talent"
       ? renderRecruitingTalentPage(data.page, data.departments, data.openings)
       : renderRecruitingOpportunityPage(data.page, data.departments, data.openings);
@@ -2499,16 +2623,22 @@ const supabaseInvestorCache = new Map();
 
 function fileHref(file) {
   if (!file) return "#contact";
-  if (file.public_url) return file.public_url;
-  if (file.id) return `/api/download-file?id=${encodeURIComponent(file.id)}`;
+  if (file.id && ((file.public_url && file.public_url !== "#contact") || file.storage_path)) {
+    return `/api/download-file?id=${encodeURIComponent(file.id)}`;
+  }
   return "#contact";
 }
 
 function hasDownloadFile(file) {
-  return Boolean(file?.public_url || file?.id);
+  return Boolean(file?.id && ((file.public_url && file.public_url !== "#contact") || file.storage_path));
+}
+
+function isRequestOnlyFile(file) {
+  return Boolean(file) && !hasDownloadFile(file);
 }
 
 function renderInvestorDownloadCell(file, label = "下載") {
+  if (isRequestOnlyFile(file)) return `<a href="#contact" class="ir-request-file">申請${escapeHTML(label)}</a>`;
   if (!hasDownloadFile(file)) return `<span class="ir-muted-action" aria-label="未提供公開下載檔案">—</span>`;
   return `<a href="${escapeHTML(fileHref(file))}" target="_blank" rel="noopener">${escapeHTML(label)}</a>`;
 }
@@ -2533,15 +2663,15 @@ function renderCmsNoticeLinks(items, fallbackHref = "#investors") {
 }
 
 function renderCmsDownloadGrid(files, emptyText = "目前暫無公開下載檔案") {
-  const downloadableFiles = (files || []).filter(hasDownloadFile);
-  if (!downloadableFiles.length) return `<div class="health-empty-state"><h2>${escapeHTML(emptyText)}</h2><p>相關文件將依公司公告時程更新。</p></div>`;
+  const visibleFiles = (files || []).filter((file) => hasDownloadFile(file) || isRequestOnlyFile(file));
+  if (!visibleFiles.length) return `<div class="health-empty-state"><h2>${escapeHTML(emptyText)}</h2><p>相關文件將依公司公告時程更新。</p></div>`;
   return `
     <div class="download-grid">
-      ${downloadableFiles.map((file) => `
-        <a href="${escapeHTML(fileHref(file))}" target="${file.public_url && file.public_url.startsWith("#") ? "" : "_blank"}" rel="noopener">
-          <span>${escapeHTML(file.file_type || "PDF")}</span>
+      ${visibleFiles.map((file) => `
+        <a href="${escapeHTML(fileHref(file))}" target="${hasDownloadFile(file) ? "_blank" : ""}" rel="noopener" class="${isRequestOnlyFile(file) ? "request-only-file" : ""}">
+          <span>${escapeHTML(isRequestOnlyFile(file) ? "申請" : (file.file_type || "PDF"))}</span>
           <strong>${escapeHTML(file.title)}</strong>
-          <em>${escapeHTML(file.description || file.category || "下載檔案")}</em>
+          <em>${escapeHTML(isRequestOnlyFile(file) ? "請留下需求，由投資人窗口提供正式文件" : (file.description || file.category || "下載檔案"))}</em>
         </a>
       `).join("")}
     </div>
@@ -2860,7 +2990,7 @@ async function loadSupabaseInvestorPage(slug) {
   if (!supabase || !["investors", "ir-finance", "ir-governance", "ir-shareholders"].includes(slug)) return false;
   try {
     const data = await fetchSupabaseInvestorData(slug);
-    if (location.hash.slice(1).split("?")[0] !== slug) return true;
+    if (routeSlugFromLocation() !== slug) return true;
     setRouteSeo(slug);
     if (slug === "investors") pageView.innerHTML = renderCmsInvestorsPage(data);
     if (slug === "ir-finance") pageView.innerHTML = renderCmsFinancePage(data);
@@ -2875,7 +3005,7 @@ async function loadSupabaseInvestorPage(slug) {
 
 async function renderInvestorPageOnce(slug, fallbackRenderer) {
   const loaded = await loadSupabaseInvestorPage(slug);
-  if (location.hash.slice(1).split("?")[0] !== slug) return;
+  if (routeSlugFromLocation() !== slug) return;
   if (!loaded) {
     pageView.innerHTML = fallbackRenderer();
   }
@@ -2918,7 +3048,7 @@ function renderWordPressStories(posts) {
     const service = acf.service_type || "居家照顧";
     const quote = acf.quote || stripHTML(post.title?.rendered || "");
     const feedback = acf.short_feedback || stripHTML(post.excerpt?.rendered || post.content?.rendered || "");
-    const image = getPostImage(post, "assets/homepage-batch/05-orange-polo-caregiver.png");
+    const image = getPostImage(post, "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg");
     return `
       <article>
         <img class="story-face" src="${escapeHTML(image)}" alt="${escapeHTML(name)}頭像" />
@@ -2961,7 +3091,7 @@ function renderWordPressMasterTalk(posts) {
     return `
       <article>
         <figure>
-          <img src="${escapeHTML(getPostImage(post, "assets/homepage-batch/10-family-consultation.png"))}" alt="${escapeHTML(speaker)}" />
+          <img src="${escapeHTML(getPostImage(post, "assets/homepage-batch/10-family-consultation-fast.jpg"))}" alt="${escapeHTML(speaker)}" />
           <figcaption>${escapeHTML(speaker)}</figcaption>
         </figure>
         <div>
@@ -2998,7 +3128,7 @@ function renderSupabaseRecruit(items) {
   if (!items?.length || !recruitList) return;
 
   recruitList.innerHTML = items.map((item) => {
-    const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver.png");
+    const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg");
     return `
       <a href="${escapeHTML(item.link_url || "#talent")}">
         <figure>
@@ -3028,7 +3158,7 @@ function renderSupabaseStories(items) {
   slider.innerHTML = items.map((item) => {
     const name = item.subtitle || item.metadata?.person_name || "家屬回饋";
     const service = item.badge_label || item.metadata?.service_type || "居家照顧";
-    const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver.png");
+    const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg");
     return `
       <article>
         <img class="story-face" src="${escapeHTML(image)}" alt="${escapeHTML(name)}頭像" />
@@ -3047,7 +3177,7 @@ function renderSupabaseMasterTalk(items) {
 
   slider.innerHTML = items.map((item) => {
     const speaker = item.subtitle || item.metadata?.speaker || "名人講堂";
-    const image = getCmsModuleImage(item, "assets/homepage-batch/10-family-consultation.png");
+    const image = getCmsModuleImage(item, "assets/homepage-batch/10-family-consultation-fast.jpg");
     return `
       <article>
         <figure>
@@ -3069,7 +3199,7 @@ function renderSupabaseHero(items) {
   const hero = document.querySelector(".hero");
   if (!item || !hero) return;
 
-  const image = getCmsModuleImage(item, "assets/homepage-batch/01-care-home-greeting.png");
+  const image = getCmsModuleImage(item, "assets/homepage-batch/01-care-home-greeting-fast.jpg");
   const background = hero.querySelector(".hero-bg");
   if (background) {
     background.style.backgroundImage = `
@@ -3117,7 +3247,7 @@ function renderSupabaseServices(items) {
   if (!items?.length || !grid) return;
 
   grid.innerHTML = items.map((item, index) => {
-    const image = getCmsModuleImage(item, "assets/homepage-batch/07-orange-apron-meal-prep.png");
+    const image = getCmsModuleImage(item, "assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg");
     return `
       <a href="${escapeHTML(item.link_url || "#contact")}">
         <img src="${escapeHTML(image)}" alt="${escapeHTML(item.metadata?.image_alt || `${item.title}服務情境`)}" />
@@ -3135,7 +3265,7 @@ function normalizeSupabaseLocation(item) {
   const email = metadata.email || "generalaffairs@suiyuecare.com";
   const phone = metadata.phone || item.link_text || "02-6604-5432";
   return {
-    image: getCmsModuleImage(item, "assets/homepage-batch/16-taipei-service-office.png"),
+    image: getCmsModuleImage(item, "assets/homepage-batch/16-taipei-service-office-fast.jpg"),
     alt: metadata.image_alt || `${item.title}據點照片`,
     type: item.subtitle || metadata.type || "服務據點",
     name: item.title || "Suiyuecare Corps. 服務據點",
@@ -3325,7 +3455,7 @@ function renderHeaderNav(items = defaultPrimaryNav) {
     return `<a${className} href="${escapeHTML(item.href || "#home")}">${escapeHTML(item.label || "未命名")}</a>`;
   }).join("");
   bindNavigationDropdowns();
-  const current = `#${(location.hash.slice(1).split("?")[0] || "home")}`;
+  const current = `#${(routeSlugFromLocation() || "home")}`;
   nav.querySelectorAll("a").forEach((link) => {
     link.classList.toggle("active", link.getAttribute("href") === current);
   });
@@ -3457,7 +3587,7 @@ async function loadSupabaseHomeModules() {
 }
 
 function normalizeCareStory(row) {
-  const cover = normalizeLocalAssetUrl(row.cover_image?.public_url || row.cover_image_url || "assets/homepage-batch/05-orange-polo-caregiver.png");
+  const cover = normalizeLocalAssetUrl(row.cover_image?.public_url || row.cover_image_url || "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg");
   const avatar = normalizeLocalAssetUrl(row.avatar_image?.public_url || row.avatar_image_url || cover);
   return {
     slug: row.slug,
@@ -3477,7 +3607,7 @@ function normalizeCareStory(row) {
 }
 
 function normalizeExpertTalk(row) {
-  const image = normalizeLocalAssetUrl(row.image?.public_url || row.image_url || "assets/homepage-batch/10-family-consultation.png");
+  const image = normalizeLocalAssetUrl(row.image?.public_url || row.image_url || "assets/homepage-batch/10-family-consultation-fast.jpg");
   return {
     slug: row.slug,
     href: `#master-talk-${row.slug}`,
@@ -3591,7 +3721,7 @@ async function loadWordPressContent() {
 
 let locationData = {
   shilin: {
-    image: "assets/homepage-batch/16-taipei-service-office.png",
+    image: "assets/homepage-batch/16-taipei-service-office-fast.jpg",
     alt: "士林服務據點照片",
     type: "臺北市｜居家照顧站",
     name: "歲悅士林失智據點 / 居家長照機構",
@@ -3604,7 +3734,7 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   datong: {
-    image: "assets/homepage-batch/10-family-consultation.png",
+    image: "assets/homepage-batch/10-family-consultation-fast.jpg",
     alt: "大同服務據點照片",
     type: "臺北市｜家屬諮詢站",
     name: "歲悅大同失智據點",
@@ -3617,7 +3747,7 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   "wanhua-a": {
-    image: "assets/homepage-batch/07-orange-apron-meal-prep.png",
+    image: "assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg",
     alt: "萬華居家服務據點照片",
     type: "臺北市｜居家服務點",
     name: "歲悅萬華日照1館",
@@ -3630,7 +3760,7 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   "wanhua-b": {
-    image: "assets/homepage-batch/14-care-notes.png",
+    image: "assets/homepage-batch/14-care-notes-fast.jpg",
     alt: "萬華照顧支援據點照片",
     type: "臺北市｜照顧支援點",
     name: "歲悅萬華日照2館",
@@ -3643,7 +3773,7 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   xinyi: {
-    image: "assets/homepage-batch/10-family-consultation.png",
+    image: "assets/homepage-batch/10-family-consultation-fast.jpg",
     alt: "信義服務據點照片",
     type: "臺北市｜健康促進站",
     name: "歲悅信義失智據點",
@@ -3656,7 +3786,7 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   xindian: {
-    image: "assets/homepage-batch/12-community-health-class.png",
+    image: "assets/homepage-batch/12-community-health-class-fast.jpg",
     alt: "新店日間照顧據點照片",
     type: "新北市｜日間照顧點",
     name: "歲悅新店居家長照機構 / 歲悅職能治療所",
@@ -3669,7 +3799,7 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   xinzhuang: {
-    image: "assets/homepage-batch/12-community-health-class.png",
+    image: "assets/homepage-batch/12-community-health-class-fast.jpg",
     alt: "新莊社區據點照片",
     type: "新北市｜社區照顧點",
     name: "歲悅新莊辦公室",
@@ -3682,7 +3812,7 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   luzhu: {
-    image: "assets/homepage-batch/13-rehab-walking-practice.png",
+    image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
     alt: "蘆竹護理復能據點照片",
     type: "桃園市｜護理復能點",
     name: "歲悅蘆竹居家長照機構",
@@ -4033,18 +4163,32 @@ let courseCoverById = new Map();
 
 function formatCourseDate(value) {
   if (!value) return "可隨時觀看";
-  return new Intl.DateTimeFormat("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(value)).replace(/\//g, ".");
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "日期待公告";
+  return new Intl.DateTimeFormat("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit" }).format(date).replace(/\//g, ".");
 }
 
 function formatCourseTime(start, end) {
   if (!start) return "可隨時觀看";
+  const startDate = new Date(start);
+  if (Number.isNaN(startDate.getTime())) return "時間待公告";
   const formatter = new Intl.DateTimeFormat("zh-TW", { hour: "2-digit", minute: "2-digit", hour12: false });
-  const startText = formatter.format(new Date(start));
-  return end ? `${startText}-${formatter.format(new Date(end))}` : startText;
+  const startText = formatter.format(startDate);
+  const endDate = end ? new Date(end) : null;
+  return endDate && !Number.isNaN(endDate.getTime()) ? `${startText}-${formatter.format(endDate)}` : startText;
+}
+
+function courseIsOpen(course) {
+  if (course.registration_status && course.registration_status !== "open") return false;
+  if (!course.starts_at) return true;
+  const startsAt = new Date(course.starts_at);
+  if (Number.isNaN(startsAt.getTime())) return true;
+  return startsAt.getTime() >= Date.now();
 }
 
 function normalizeCourse(course) {
   const cover = courseCoverById.get(course.cover_image_id) || course.cover_image || course.media || {};
+  const isOpen = courseIsOpen(course);
   return {
     id: course.id,
     title: course.title,
@@ -4054,10 +4198,12 @@ function normalizeCourse(course) {
     price: course.price_text || "免費",
     type: course.course_type || "實體課",
     location: course.location || "待公告",
-    seats: course.seats_label || (course.capacity ? `${course.capacity} 人` : "名額開放中"),
-    image: cover.public_url || "assets/homepage-batch/12-community-health-class.png",
+    seats: isOpen ? (course.seats_label || (course.capacity ? `${course.capacity} 人` : "名額開放中")) : "已截止",
+    image: cover.public_url || "assets/homepage-batch/12-community-health-class-fast.jpg",
     isFeatured: Boolean(course.is_featured),
-    registrationStatus: course.registration_status || "open"
+    registrationStatus: course.registration_status || "open",
+    isOpen,
+    statusLabel: isOpen ? "立即報名" : "已截止"
   };
 }
 
@@ -4097,7 +4243,7 @@ async function loadSupabaseCourses({ rerender = false } = {}) {
     }
     coursesLoadedFromSupabase = true;
     coursesLoadFailed = false;
-    if (rerender && location.hash.slice(1).split("?")[0] === "courses") {
+    if (rerender && routeSlugFromLocation() === "courses") {
       pageView.innerHTML = renderCoursesPage();
     }
     return supabaseCourses;
@@ -4131,7 +4277,7 @@ async function renderCoursesPageFromCms() {
     `;
     await loadSupabaseCourses();
   }
-  if (location.hash.slice(1).split("?")[0] === "courses") {
+  if (routeSlugFromLocation() === "courses") {
     pageView.innerHTML = renderCoursesPage();
   }
 }
@@ -4153,9 +4299,9 @@ function renderCoursesPage() {
         <div class="course-hero-card">
           <h2>找一堂適合你的長照課</h2>
           <form class="course-search">
-            <input type="search" placeholder="搜尋課程或講師" />
-            <select><option>台北</option><option>新北</option><option>線上</option></select>
-            <button type="button">搜尋</button>
+            <input name="course_query" type="search" placeholder="搜尋課程或講師" />
+            <select name="course_location"><option value="">全部地點</option><option>台北</option><option>新北</option><option>線上</option></select>
+            <button type="submit">搜尋</button>
           </form>
         </div>
       </section>
@@ -4166,13 +4312,13 @@ function renderCoursesPage() {
         </div>
         <div class="featured-course-track" aria-label="重要課程輪播">
           ${importantCourses.length ? importantCourses.map((course) => `
-            <article class="featured-course-card click-card" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" tabindex="0" role="button">
+            <article class="featured-course-card click-card ${course.isOpen ? "" : "is-closed"}" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" data-course-open="${course.isOpen ? "true" : "false"}" data-course-search-text="${escapeHTML(`${course.title} ${course.intro} ${course.type} ${course.location}`)}" tabindex="0" role="button">
               <img src="${escapeHTML(course.image)}" alt="${escapeHTML(course.title)}" />
               <div>
                 <span>${escapeHTML(course.type)}</span>
                 <h3>${escapeHTML(course.title)}</h3>
                 <p>${escapeHTML(course.intro)}</p>
-                <button class="course-register" type="button" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}">立即報名</button>
+                <button class="course-register" type="button" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" ${course.isOpen ? "" : "disabled"}>${escapeHTML(course.statusLabel)}</button>
               </div>
             </article>
           `).join("") : `
@@ -4188,7 +4334,7 @@ function renderCoursesPage() {
       </section>
       <section class="course-list">
         ${courses.length ? courses.map((course, index) => `
-          <article class="course-card click-card" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" tabindex="0" role="button">
+          <article class="course-card click-card ${course.isOpen ? "" : "is-closed"}" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" data-course-open="${course.isOpen ? "true" : "false"}" data-course-search-text="${escapeHTML(`${course.title} ${course.intro} ${course.type} ${course.location}`)}" tabindex="0" role="button">
             <div class="course-thumb"><img src="${escapeHTML(course.image)}" alt="${escapeHTML(course.title)}" /><span>${String(index + 1).padStart(2, "0")}</span></div>
             <div class="course-body">
               <div class="course-topline"><span class="course-type">${escapeHTML(course.type)}</span><span class="course-seats">${escapeHTML(course.seats)}</span></div>
@@ -4196,7 +4342,7 @@ function renderCoursesPage() {
               <p>${escapeHTML(course.intro)}</p>
               <div class="course-info-line"><span><em>地點</em>${escapeHTML(course.type)}｜${escapeHTML(course.location)}</span><b><em>費用</em>${escapeHTML(course.price)}</b></div>
               <div class="course-info-line"><span><em>日期</em>${escapeHTML(course.date)}</span><b><em>時間</em>${escapeHTML(course.time)}</b></div>
-              <button class="course-register" type="button" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}">立即報名</button>
+              <button class="course-register" type="button" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" ${course.isOpen ? "" : "disabled"}>${escapeHTML(course.statusLabel)}</button>
             </div>
           </article>
         `).join("") : `
@@ -4219,6 +4365,7 @@ function renderCoursesPage() {
           <input name="course_id" id="courseSignupId" type="hidden" />
           <input name="_subject" type="hidden" value="歲悅長照課程報名通知" />
           <input name="_captcha" type="hidden" value="false" />
+          <input name="_honey" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
           <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為課程報名、通知與後續聯繫目的，使用我填寫的個人資料。</label>
           <p class="course-confirm-text">是否要報名？</p>
           <div class="course-modal-actions">
@@ -4365,9 +4512,9 @@ function renderAboutPage() {
     ["品質可以被改善", "現場回饋、家屬意見、異常事件與教育訓練都會回到品管流程，讓服務不是靠個人熱情，而是靠系統持續變好。"]
   ];
   const aboutSystems = [
-    ["居家照顧", "到宅身體照顧、生活支持、服務紀錄與家屬回報。", "assets/homepage-batch/01-care-home-greeting.png"],
+    ["居家照顧", "到宅身體照顧、生活支持、服務紀錄與家屬回報。", "assets/homepage-batch/01-care-home-greeting-fast.jpg"],
     ["日間照顧", "白天托顧、活動參與、共餐休息與家屬喘息支持。", "assets/daycare-recruit-02-exercise.png"],
-    ["社區據點", "失智據點、健康促進、家屬課程與社區預防延緩失能。", "assets/homepage-batch/12-community-health-class.png"],
+    ["社區據點", "失智據點、健康促進、家屬課程與社區預防延緩失能。", "assets/homepage-batch/12-community-health-class-fast.jpg"],
     ["護理復能", "職能治療、復能訓練、居家安全建議與生活功能支持。", "assets/nursing-rehab-hero.png"],
     ["移工培訓", "把家庭照顧技能拆成可理解、可練習、可追蹤的課程。", "assets/migrant-recruit-01-classroom.png"],
     ["教育品管", "用教材、訓練、稽核與改善流程承接服務品質。", "assets/quality-recruit-04-quality-meeting.png"]
@@ -4466,7 +4613,7 @@ function renderAboutPage() {
           </div>
         </div>
         <aside class="about-hero-image">
-          <img src="assets/hero-care.png" alt="歲悅長照照顧情境" />
+          <img src="assets/hero-care-fast.jpg" alt="歲悅長照照顧情境" />
           <div><span>Suiyuecare Corps.</span><strong>照顧就像去超商，買牛奶一樣簡單。</strong></div>
         </aside>
       </section>
@@ -4670,21 +4817,21 @@ function renderMilestonesPage() {
     ["1", "共同使命", "讓照顧變得更容易理解、更容易開始"]
   ];
   const timeline = [
-    ["2025", "01", "北區服務藍圖盤點", "Planning", "整理臺北、新北、桃園家庭照顧需求，確認居家、日照、社區與復能服務的發展方向。", "assets/homepage-batch/10-family-consultation.png", "已完成"],
-    ["2025", "02", "居家照顧流程標準化", "Home Care", "建立個案建檔、服務媒合、派案、照顧紀錄與家屬回報的基礎流程。", "assets/homepage-batch/01-care-home-greeting.png", "已完成"],
-    ["2025", "03", "督導陪跑制度啟動", "Quality", "把督導訪視、異常回報、服務品質檢核與照服員支持放進日常管理。", "assets/homepage-batch/03-supervisor-care-plan.png", "已完成"],
-    ["2025", "04", "日間照顧場域規劃", "Day Care", "規劃長輩白天活動、餐食、休息、健康觀察與家屬回報的中心營運節奏。", "assets/homepage-batch/02-daycare-group-exercise.png", "已完成"],
-    ["2025", "05", "社區據點服務設計", "Community", "盤點健康促進、家屬課程、照顧諮詢與社區活動，讓照顧支持更靠近生活圈。", "assets/homepage-batch/12-community-health-class.png", "已完成"],
-    ["2025", "06", "護理復能協作模型成形", "Reablement", "整合護理觀察、復能訓練與照顧陪伴，讓長輩能在生活裡重新練回能力。", "assets/homepage-batch/13-rehab-walking-practice.png", "已完成"],
+    ["2025", "01", "北區服務藍圖盤點", "Planning", "整理臺北、新北、桃園家庭照顧需求，確認居家、日照、社區與復能服務的發展方向。", "assets/homepage-batch/10-family-consultation-fast.jpg", "已完成"],
+    ["2025", "02", "居家照顧流程標準化", "Home Care", "建立個案建檔、服務媒合、派案、照顧紀錄與家屬回報的基礎流程。", "assets/homepage-batch/01-care-home-greeting-fast.jpg", "已完成"],
+    ["2025", "03", "督導陪跑制度啟動", "Quality", "把督導訪視、異常回報、服務品質檢核與照服員支持放進日常管理。", "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", "已完成"],
+    ["2025", "04", "日間照顧場域規劃", "Day Care", "規劃長輩白天活動、餐食、休息、健康觀察與家屬回報的中心營運節奏。", "assets/homepage-batch/02-daycare-group-exercise-fast.jpg", "已完成"],
+    ["2025", "05", "社區據點服務設計", "Community", "盤點健康促進、家屬課程、照顧諮詢與社區活動，讓照顧支持更靠近生活圈。", "assets/homepage-batch/12-community-health-class-fast.jpg", "已完成"],
+    ["2025", "06", "護理復能協作模型成形", "Reablement", "整合護理觀察、復能訓練與照顧陪伴，讓長輩能在生活裡重新練回能力。", "assets/homepage-batch/13-rehab-walking-practice-fast.jpg", "已完成"],
     ["2025", "07", "移工照顧培訓課程開發", "Training", "將移位、沐浴、用餐、溝通與安全照顧拆成可演練的課程內容。", "assets/migrant-recruit-02-transfer.png", "已完成"],
     ["2025", "08", "教育品管教材整理", "Education", "把第一線服務經驗轉化為教材、檢核表與案例討論，讓照顧品質可以被複製。", "assets/quality-recruit-04-quality-meeting.png", "已完成"],
-    ["2025", "09", "北北桃據點資料盤點", "Network", "整理士林、大同、萬華、信義、新店、新莊與蘆竹等服務節點資訊。", "assets/north-service-map.png", "已完成"],
-    ["2025", "10", "人才招募制度擴充", "Recruiting", "建立居家、日照、移工培訓、教學品管與行政部門的職缺內容與發展路徑。", "assets/homepage-batch/06-orange-polo-supervisor.png", "已完成"],
-    ["2025", "11", "後台內容管理架構規劃", "CMS", "規劃文章、圖片、課程、表單、檔案下載與頁面文案的後台管理方式。", "assets/homepage-batch/04-admin-team-office.png", "已完成"],
-    ["2025", "12", "年度服務與合作成果整理", "Review", "彙整服務據點、合作單位、得標紀錄與年度營運成果，作為 2026 擴展基礎。", "assets/homepage-batch/16-taipei-service-office.png", "已完成"],
+    ["2025", "09", "北北桃據點資料盤點", "Network", "整理士林、大同、萬華、信義、新店、新莊與蘆竹等服務節點資訊。", "assets/north-service-map-fast.jpg", "已完成"],
+    ["2025", "10", "人才招募制度擴充", "Recruiting", "建立居家、日照、移工培訓、教學品管與行政部門的職缺內容與發展路徑。", "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg", "已完成"],
+    ["2025", "11", "後台內容管理架構規劃", "CMS", "規劃文章、圖片、課程、表單、檔案下載與頁面文案的後台管理方式。", "assets/homepage-batch/04-admin-team-office-fast.jpg", "已完成"],
+    ["2025", "12", "年度服務與合作成果整理", "Review", "彙整服務據點、合作單位、得標紀錄與年度營運成果，作為 2026 擴展基礎。", "assets/homepage-batch/16-taipei-service-office-fast.jpg", "已完成"],
     ["2026", "01", "健康 3.0 內容中心上線", "Health 3.0", "建立文章、懶人包、活動專區、影音與短影片內容，讓家屬更容易理解照顧知識。", "assets/homepage-batch/18-health-fall-prevention-cover.png", "已完成"],
-    ["2026", "02", "課程報名與表單留存完成", "Courses", "課程卡片、報名彈窗、表單資料留存與後台課程管理逐步串接。", "assets/homepage-batch/12-community-health-class.png", "已完成"],
-    ["2026", "03", "投資人專區資料化", "Investor", "將公告、財報、下載檔與圖表資料改為後台可管理，提升對外資訊透明度。", "assets/homepage-batch/04-admin-team-office.png", "已完成"],
+    ["2026", "02", "課程報名與表單留存完成", "Courses", "課程卡片、報名彈窗、表單資料留存與後台課程管理逐步串接。", "assets/homepage-batch/12-community-health-class-fast.jpg", "已完成"],
+    ["2026", "03", "投資人專區資料化", "Investor", "將公告、財報、下載檔與圖表資料改為後台可管理，提升對外資訊透明度。", "assets/homepage-batch/04-admin-team-office-fast.jpg", "已完成"],
     ["2026", "04", "服務八大子頁模板化", "Service Pages", "居家、日照、社區、護理復能、移工培訓、教育品管、關於與大事記版型統一整理。", "assets/homepage-batch/09-nurse-blood-pressure.png", "已完成"],
     ["2026", "05", "網站上線前總檢與內容補強", "Launch Check", "檢查前後台資料、SEO、RWD、表單寄信、圖片裁切、權限與內容健康檢查。", "assets/homepage-batch/15-phone-consultation.png", "進行中"],
   ].map(([year, month, title, tag, copy, image, status]) => ({ year, month, title, tag, copy, image, status }));
@@ -4705,7 +4852,7 @@ function renderMilestonesPage() {
           </div>
         </div>
         <aside class="milestone-hero-card">
-          <img src="assets/homepage-batch/04-admin-team-office.png" alt="歲悅長照團隊發展" />
+          <img src="assets/homepage-batch/04-admin-team-office-fast.jpg" alt="歲悅長照團隊發展" />
           <div>
             <span>Suiyuecare Corps.</span>
             <strong>讓照顧從不安，走向清楚與安心。</strong>
@@ -4770,7 +4917,612 @@ function renderMilestonesPage() {
   `;
 }
 
+const oneMinuteServices = {
+  "home-care": {
+    eyebrow: "Home Care",
+    title: "居家照顧",
+    oneLiner: "讓長輩在熟悉的家裡被安全陪伴，也讓家屬不用一個人硬撐。",
+    image: "assets/homecare-detail-01-greeting-hero-instant.jpg",
+    imageAlt: "居家照顧服務員到宅問候長輩",
+    badge: "到宅照顧",
+    idealFor: ["出院返家需要協助", "白天家人不在家", "主要照顧者需要喘息"],
+    outcomes: ["沐浴、用餐、移位與生活支持", "服務後有紀錄，家屬看得懂", "督導追蹤，必要時調整服務"],
+    flow: ["說明家中照顧情境", "確認區域、時段與照顧強度", "安排服務並回報紀錄"],
+    scenes: [
+      { image: "assets/homecare-detail-02-care-plan-fast.jpg", title: "到宅評估", text: "先看長輩生活動線、起身移位、用餐與如廁情況。" },
+      { image: "assets/homecare-detail-03-safe-transfer-fast.jpg", title: "安全移位", text: "協助床邊、輪椅、浴室移動，降低跌倒與拉傷風險。" },
+      { image: "assets/homecare-detail-04-daily-support-fast.jpg", title: "日常支持", text: "陪伴用餐、盥洗、整理與服務紀錄，讓家屬掌握狀態。" }
+    ],
+    applySteps: ["留下聯絡方式與照顧地點", "專人電話釐清長輩狀態與可服務時段", "確認服務內容、頻率與開始日期"],
+    primaryCta: "預約居家諮詢",
+    secondaryCta: "查看服務據點"
+  },
+  "day-care": {
+    eyebrow: "Day Care",
+    title: "日間照顧",
+    oneLiner: "白天到中心活動、用餐、休息與被照顧，晚上仍能回家。",
+    image: "assets/daycare-detail-01-exercise-hero-instant.jpg",
+    imageAlt: "日間照顧中心長輩活動",
+    badge: "白天托顧",
+    idealFor: ["白天獨自在家不放心", "需要活動與社交刺激", "家屬上班需要穩定支持"],
+    outcomes: ["日常作息、餐食、活動被安排", "中心照顧團隊觀察狀態", "減少家屬白天照顧壓力"],
+    flow: ["了解長輩生活能力", "安排參觀與適應", "建立出席、接送與回報方式"],
+    scenes: [
+      { image: "assets/daycare-detail-02-meal-fast.jpg", title: "營養共餐", text: "依長輩吞嚥、飲食習慣與作息，安排白天餐食。" },
+      { image: "assets/daycare-detail-03-activity-fast.jpg", title: "團體活動", text: "用運動、手作、認知與社交活動維持生活參與。" },
+      { image: "assets/daycare-detail-04-checkin-fast.jpg", title: "每日回報", text: "中心觀察精神、食慾與活動情形，必要時提醒家屬。" }
+    ],
+    applySteps: ["填寫想參觀的中心或區域", "安排參觀、試托或適應討論", "確認接送、出席頻率與補助資料"],
+    primaryCta: "詢問日照名額",
+    secondaryCta: "申請服務須知"
+  },
+  community: {
+    eyebrow: "Community",
+    title: "社區據點",
+    oneLiner: "把健康促進、共餐、活動與資源諮詢放在熟悉社區。",
+    image: "assets/community-detail-01-exercise-hero-instant.jpg",
+    imageAlt: "社區據點健康促進活動",
+    badge: "在地支持",
+    idealFor: ["想讓長輩增加外出", "需要預防延緩失能活動", "家屬想先理解長照資源"],
+    outcomes: ["固定活動與健康促進", "共餐、陪伴與社交連結", "可銜接居家、日照或其他資源"],
+    flow: ["確認所在區域", "選擇適合活動或諮詢", "安排參與並追蹤需求"],
+    scenes: [
+      { image: "assets/community-detail-02-meal-fast.jpg", title: "社區共餐", text: "讓長輩有固定外出理由，也有人留意飲食與精神狀態。" },
+      { image: "assets/community-detail-03-workshop-fast.jpg", title: "健康活動", text: "肌力、平衡、認知與手作活動，做在熟悉生活圈裡。" },
+      { image: "assets/community-detail-04-consult-fast.jpg", title: "資源諮詢", text: "協助家屬理解可申請的長照服務與下一步窗口。" }
+    ],
+    applySteps: ["告訴我們所在里別或常去區域", "確認近期活動、共餐或諮詢時段", "由據點協助報名與後續資源銜接"],
+    primaryCta: "詢問社區活動",
+    secondaryCta: "查看服務據點"
+  },
+  nursing: {
+    eyebrow: "Nursing Rehab",
+    title: "護理復能",
+    oneLiner: "用護理觀察與復能目標，陪長輩安全練回生活能力。",
+    image: "assets/nursing-detail-02-walking-hero-instant.jpg",
+    imageAlt: "護理復能步行練習",
+    badge: "健康與復能",
+    idealFor: ["出院後行動變弱", "擔心跌倒或健康變化", "需要家屬照顧教學"],
+    outcomes: ["健康量測與風險提醒", "移位、步行、日常能力練習", "居家安全與照顧方法建議"],
+    flow: ["描述目前身體狀態", "確認復能目標與風險", "安排服務與家屬教學"],
+    scenes: [
+      { image: "assets/nursing-detail-01-vitals-fast.jpg", title: "健康觀察", text: "量測血壓、皮膚、食慾、睡眠與用藥，提早看見變化。" },
+      { image: "assets/nursing-detail-02-walking-fast.jpg", title: "步行練習", text: "把復能目標放回生活，練起身、移位、走路與安全轉身。" },
+      { image: "assets/nursing-detail-03-home-safety-fast.jpg", title: "居家安全", text: "檢查浴室、床邊、動線與輔具，給家屬可執行的建議。" }
+    ],
+    applySteps: ["說明診斷、出院時間或目前身體狀況", "專人確認適合的護理或復能目標", "安排服務並提供家屬照顧提醒"],
+    primaryCta: "諮詢護理復能",
+    secondaryCta: "預約居家諮詢"
+  },
+  "migrant-training": {
+    eyebrow: "Migrant Training",
+    title: "移工培訓",
+    oneLiner: "讓家庭照顧移工學會安全照顧、溝通與日常觀察。",
+    image: "assets/migrant-detail-01-classroom-hero-instant.jpg",
+    imageAlt: "移工照顧培訓課程",
+    badge: "技能訓練",
+    idealFor: ["家中剛聘請移工", "照顧方法常常不一致", "希望降低移位與沐浴風險"],
+    outcomes: ["翻身、移位、沐浴與用餐技巧", "失智陪伴與家庭溝通情境", "家屬可共同理解照顧方法"],
+    flow: ["說明家中照顧難題", "選擇課程或到府教學形式", "課後整理重點與練習方向"],
+    scenes: [
+      { image: "assets/migrant-detail-02-transfer-fast.jpg", title: "移位實作", text: "拆解翻身、坐起、站立與輪椅轉移，讓照顧更安全。" },
+      { image: "assets/migrant-detail-03-meal-fast.jpg", title: "用餐照顧", text: "練習備餐、餵食、吞嚥觀察與飯後清潔回報。" },
+      { image: "assets/migrant-detail-04-communication-fast.jpg", title: "家庭溝通", text: "把每日回報、突發狀況與照顧界線整理成共同語言。" }
+    ],
+    applySteps: ["留下想訓練的照顧主題", "確認課程、到府教學或家屬共同參與方式", "完成報名後提供上課提醒與練習重點"],
+    primaryCta: "詢問移工培訓",
+    secondaryCta: "查看課程",
+    contactNeed: "課程報名"
+  },
+  quality: {
+    eyebrow: "Quality",
+    title: "教育品管",
+    oneLiner: "把照顧經驗變成教材、訓練、稽核與改善流程。",
+    image: "assets/quality-detail-04-improvement-hero-instant.jpg",
+    imageAlt: "教育品管品質改善會議",
+    badge: "品質系統",
+    idealFor: ["需要建立訓練制度", "服務品質想更一致", "希望用紀錄看見改善點"],
+    outcomes: ["教材與標準流程整理", "新人與在職教育訓練", "服務紀錄檢核與改善會議"],
+    flow: ["盤點目前服務流程", "找出訓練與稽核重點", "建立可追蹤的改善節奏"],
+    scenes: [
+      { image: "assets/quality-detail-01-materials-fast.jpg", title: "教材整理", text: "把現場經驗轉成新人看得懂、主管追得到的教材。" },
+      { image: "assets/quality-detail-02-training-fast.jpg", title: "教育訓練", text: "用案例、演練與回饋，讓服務語言與標準更一致。" },
+      { image: "assets/quality-detail-03-audit-fast.jpg", title: "品質檢核", text: "從紀錄、流程與服務回饋找出可改善的地方。" }
+    ],
+    applySteps: ["提出目前最想改善的服務流程", "安排訪談、文件盤點或訓練需求確認", "規劃教材、訓練與追蹤節奏"],
+    primaryCta: "洽詢教育品管",
+    secondaryCta: "了解軟體系統"
+  },
+  software: {
+    eyebrow: "Software",
+    title: "軟體系統",
+    oneLiner: "把會計、人資、公文、專案、PDF、居家與日照流程整合成後台。",
+    image: "assets/admin-recruit-02-operations-hero-instant.jpg",
+    imageAlt: "長照營運系統儀表板",
+    badge: "客製系統",
+    idealFor: ["資料散在 Excel 和 LINE", "主管想看進度與報表", "多據點或多部門需要權限控管"],
+    outcomes: ["表單、檔案、任務與報表集中", "角色權限與操作紀錄清楚", "可依單位流程客製模組"],
+    flow: ["盤點最卡的流程", "規劃第一階段模組", "導入後依使用回饋迭代"],
+    scenes: [
+      { image: "assets/admin-recruit-02-operations-fast.jpg", title: "營運後台", text: "把案件、任務、文件與進度集中，主管不用到處找資料。" },
+      { image: "assets/quality-detail-04-improvement-fast.jpg", title: "改善追蹤", text: "把會議決議、稽核缺失與改善期限變成可追蹤任務。" },
+      { image: "assets/homecare-detail-02-care-plan-fast.jpg", title: "照顧流程", text: "依居家、日照、行政或專案需求客製表單與權限。" }
+    ],
+    applySteps: ["列出目前最花時間的表單或流程", "安排線上訪談確認權限、報表與模組範圍", "提供第一階段導入規劃與時程"],
+    primaryCta: "洽詢系統客製",
+    secondaryCta: "了解教育品管"
+  }
+};
+
+const serviceInsightDetails = {
+  "出院返家需要協助": "剛回家時最容易卡在移位、洗澡、用餐與藥物作息，先把安全和節奏穩住。",
+  "白天家人不在家": "家屬上班時仍有人到宅陪伴與觀察，減少長輩獨處的不安與風險。",
+  "主要照顧者需要喘息": "照顧者可以保留休息、工作與處理家務的時間，不必每件事都自己扛。",
+  "沐浴、用餐、移位與生活支持": "把每天最消耗體力的照顧動作交給受訓人員協助，讓家裡更穩。",
+  "服務後有紀錄，家屬看得懂": "每次服務留下重點紀錄，家屬不用靠猜，也能追蹤長輩狀態。",
+  "督導追蹤，必要時調整服務": "照顧不是排好就結束，會依長輩變化調整方式、頻率與提醒。",
+  "說明家中照顧情境": "先不用準備完整資料，只要把目前最卡的日常情境說清楚。",
+  "確認區域、時段與照顧強度": "我們會協助判斷服務可行性、適合頻率與下一步安排。",
+  "安排服務並回報紀錄": "確認後安排服務，並用紀錄讓家屬知道每次照顧發生了什麼。",
+  "白天獨自在家不放心": "日照讓長輩白天有安全場域、固定作息與照顧團隊看見。",
+  "需要活動與社交刺激": "活動不是打發時間，而是維持身體、認知與人際互動。",
+  "家屬上班需要穩定支持": "家屬白天可以安心工作，晚上再把長輩接回熟悉的家。",
+  "日常作息、餐食、活動被安排": "中心把報到、活動、用餐、休息與回家準備串成穩定節奏。",
+  "中心照顧團隊觀察狀態": "食慾、精神、活動參與和身體狀況會被看見，異常可及早提醒。",
+  "減少家屬白天照顧壓力": "把白天照顧壓力分出去，家庭互動比較不只剩照顧工作。",
+  "了解長輩生活能力": "先確認行走、用餐、如廁、溝通與需要協助的程度。",
+  "安排參觀與適應": "透過參觀或適應討論，讓長輩與家屬更安心進入服務。",
+  "建立出席、接送與回報方式": "把每天怎麼到中心、怎麼回家、怎麼回報先說清楚。",
+  "想讓長輩增加外出": "從熟悉社區開始，讓長輩有比較低壓的外出理由。",
+  "需要預防延緩失能活動": "用規律活動維持肌力、平衡、認知與日常參與。",
+  "家屬想先理解長照資源": "據點可以作為第一個入口，先問問題，再銜接合適服務。",
+  "固定活動與健康促進": "把健康促進放進生活圈，讓參與變成習慣。",
+  "共餐、陪伴與社交連結": "不只吃一餐，也讓長輩被看見、有人說話、有連結。",
+  "可銜接居家、日照或其他資源": "當需求增加時，可以再協助轉介更合適的長照服務。",
+  "確認所在區域": "先確認離家近、交通可行的據點或活動。",
+  "選擇適合活動或諮詢": "依長輩興趣、能力與家屬問題選擇參與方式。",
+  "安排參與並追蹤需求": "參與後若發現照顧需求，也能再協助下一步。",
+  "出院後行動變弱": "從安全起身、走路與日常動作開始，慢慢找回能力。",
+  "擔心跌倒或健康變化": "透過觀察與提醒，把風險提早看見，不等出事才處理。",
+  "需要家屬照顧教學": "家屬可以學會更安全的扶持、移位與日常照顧方法。",
+  "健康量測與風險提醒": "觀察血壓、皮膚、食慾、睡眠與用藥，整理成可理解的提醒。",
+  "移位、步行、日常能力練習": "把復能放回生活情境，練的是回到日常需要的能力。",
+  "居家安全與照顧方法建議": "從浴室、床邊、動線與輔具提出可執行調整。",
+  "描述目前身體狀態": "先說明疾病、出院時間、行走能力與最擔心的風險。",
+  "確認復能目標與風險": "一起把目標訂得清楚，例如能安全起身、走到廁所或減少跌倒。",
+  "安排服務與家屬教學": "服務同時照顧長輩，也讓家屬知道在家怎麼接續。",
+  "家中剛聘請移工": "剛開始最需要建立共同照顧方法，避免每個人做法不同。",
+  "照顧方法常常不一致": "把翻身、移位、用餐與回報方式統一，家裡比較不混亂。",
+  "希望降低移位與沐浴風險": "針對最容易受傷的動作反覆練習，讓照顧更安全。",
+  "翻身、移位、沐浴與用餐技巧": "用實作讓移工知道每個動作的順序、力道與注意事項。",
+  "失智陪伴與家庭溝通情境": "練習情緒安撫、日常提醒與跟家屬回報的方式。",
+  "家屬可共同理解照顧方法": "家屬和移工使用同一套語言，照顧比較容易合作。",
+  "說明家中照顧難題": "先從最常卡住的一兩件事開始，例如洗澡、移位或溝通。",
+  "選擇課程或到府教學形式": "依家庭需求選擇團體課、個別課或到府教學。",
+  "課後整理重點與練習方向": "課程後留下可回家練習的重點，不讓學習停在教室。",
+  "需要建立訓練制度": "把新人訓練與在職教育整理成可複製的制度。",
+  "服務品質想更一致": "讓不同人員在紀錄、溝通與照顧流程上有共同標準。",
+  "希望用紀錄看見改善點": "從紀錄和回饋找問題，讓改善有依據，不靠感覺。",
+  "教材與標準流程整理": "把現場經驗轉成教材、流程、案例與檢核表。",
+  "新人與在職教育訓練": "讓新人進得來、資深人員也能持續校準服務品質。",
+  "服務紀錄檢核與改善會議": "定期看紀錄、討論問題，形成持續改善節奏。",
+  "盤點目前服務流程": "先了解現在怎麼做、卡在哪裡、誰需要參與。",
+  "找出訓練與稽核重點": "優先處理最影響品質與風險的環節。",
+  "建立可追蹤的改善節奏": "讓每次改善都有負責人、期限與回看方式。",
+  "資料散在 Excel 和 LINE": "把訊息、檔案與表單收回系統，降低漏看與重工。",
+  "主管想看進度與報表": "把任務、案件、費用與文件狀態整理成可追蹤畫面。",
+  "多據點或多部門需要權限控管": "依角色設定可看、可編、可審核的範圍，資料更安全。",
+  "表單、檔案、任務與報表集中": "把日常營運需要的資料放在同一個後台。",
+  "角色權限與操作紀錄清楚": "每個人負責什麼、做過什麼，都能被追蹤。",
+  "可依單位流程客製模組": "不是套一個固定系統，而是依照實際流程逐步導入。",
+  "盤點最卡的流程": "先找出最浪費時間、最容易出錯的一段流程。",
+  "規劃第一階段模組": "從最有感的功能開始做，避免一次導入太大太重。",
+  "導入後依使用回饋迭代": "上線後依使用狀況調整，讓系統真正貼近日常工作。"
+};
+
+const oneMinuteServiceStories = {
+  "home-care": [
+    {
+      name: "林小姐",
+      image: "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg",
+      title: "「爸爸出院後，我終於知道每天該注意什麼。」",
+      text: "每日回報會把移位、用餐、精神狀態和安全提醒說清楚，家人不用下班後一直追問。"
+    },
+    {
+      name: "張小姐",
+      image: "assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg",
+      title: "「照服員很細心，也會主動提醒家中風險。」",
+      text: "浴室止滑、床邊動線和用藥提醒都有被看見，感覺不是只有完成服務，而是真的有人一起照顧。"
+    },
+    {
+      name: "蔡先生",
+      image: "assets/homecare-detail-04-daily-support-fast.jpg",
+      title: "「媽媽白天有人陪，我工作時安心很多。」",
+      text: "固定時段有人到家協助盥洗、用餐與陪伴，家屬不用把所有照顧壓力都壓在自己身上。"
+    }
+  ],
+  "day-care": [
+    {
+      name: "陳小姐",
+      image: "assets/homepage-batch/02-daycare-group-exercise-fast.jpg",
+      title: "「媽媽白天有人陪，晚上還能回家睡。」",
+      text: "活動、餐食和休息都有安排，媽媽回家後比較有精神，家屬上班也比較放得下心。"
+    },
+    {
+      name: "周先生",
+      image: "assets/daycare-detail-03-activity-fast.jpg",
+      title: "「長輩開始期待每天去中心。」",
+      text: "從一開始抗拒出門，到後來會主動問今天有什麼活動，家裡的照顧氣氛也變輕鬆。"
+    },
+    {
+      name: "吳小姐",
+      image: "assets/daycare-detail-04-checkin-fast.jpg",
+      title: "「中心回報讓我下班後能快速掌握狀況。」",
+      text: "出席、食慾、活動參與和特殊狀況都有人整理，家屬不需要靠零碎訊息拼湊。"
+    }
+  ],
+  community: [
+    {
+      name: "鄭小姐",
+      image: "assets/homepage-batch/12-community-health-class-fast.jpg",
+      title: "「阿嬤開始期待每週的活動。」",
+      text: "固定出門、共餐和健康活動讓長輩重新有生活節奏，也讓家屬更早看見狀態變化。"
+    },
+    {
+      name: "何先生",
+      image: "assets/community-detail-02-meal-fast.jpg",
+      title: "「共餐不只是吃飯，是有人記得關心她。」",
+      text: "長輩白天多了互動和陪伴，家屬也能透過據點知道最近精神與食慾如何。"
+    },
+    {
+      name: "許小姐",
+      image: "assets/community-detail-04-consult-fast.jpg",
+      title: "「第一次有人把長照資源說得這麼清楚。」",
+      text: "原本不知道該從哪裡開始，據點協助整理可以問誰、怎麼申請、下一步怎麼安排。"
+    }
+  ],
+  nursing: [
+    {
+      name: "王小姐",
+      image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+      title: "「不是催長輩走快一點，而是陪他慢慢有把握。」",
+      text: "復能團隊把目標拆小，從安全起身、站穩到短距離步行，家屬也看得懂進步。"
+    },
+    {
+      name: "沈先生",
+      image: "assets/nursing-detail-01-vitals-fast.jpg",
+      title: "「有人幫忙觀察，我們比較不會慌。」",
+      text: "血壓、食慾、睡眠和皮膚狀況都有被提醒，家屬知道哪些變化需要再注意。"
+    },
+    {
+      name: "李小姐",
+      image: "assets/nursing-detail-03-home-safety-fast.jpg",
+      title: "「家裡怎麼調整，終於有具體方向。」",
+      text: "浴室、床邊和走道動線被重新檢查，家人知道哪些地方要先處理，照顧更安全。"
+    }
+  ],
+  "migrant-training": [
+    {
+      name: "黃小姐",
+      image: "assets/migrant-detail-02-transfer-fast.jpg",
+      title: "「家裡有移工後，最需要的是有人教方法。」",
+      text: "翻身、移位和沐浴安全用實作方式教清楚，家屬和移工都知道同一套照顧標準。"
+    },
+    {
+      name: "賴先生",
+      image: "assets/migrant-detail-04-communication-fast.jpg",
+      title: "「溝通方式對齊後，家裡少了很多誤會。」",
+      text: "課程把每日回報、突發狀況和照顧界線說明白，照顧不再只是各做各的。"
+    },
+    {
+      name: "郭小姐",
+      image: "assets/migrant-detail-03-meal-fast.jpg",
+      title: "「用餐照顧比想像中細，學過後放心很多。」",
+      text: "從備餐、餵食姿勢到吞嚥觀察都有練習，回家後比較知道怎麼看長輩狀態。"
+    }
+  ],
+  quality: [
+    {
+      name: "吳小姐",
+      image: "assets/homepage-batch/14-care-notes-fast.jpg",
+      title: "「每次服務後有紀錄，我下班也能掌握狀況。」",
+      text: "服務紀錄不是口頭交代，而是清楚整理飲食、活動、情緒與需要追蹤的狀況。"
+    },
+    {
+      name: "何小姐",
+      image: "assets/quality-detail-03-audit-fast.jpg",
+      title: "「遇到問題時，不是只有現場人員自己扛。」",
+      text: "督導和品管會一起檢視流程、調整做法，讓家屬感覺背後真的有一個團隊。"
+    },
+    {
+      name: "謝先生",
+      image: "assets/quality-detail-02-training-fast.jpg",
+      title: "「新人訓練有標準，服務品質比較穩。」",
+      text: "教材、演練與回饋讓每位照顧人員知道怎麼做，也讓主管比較容易追蹤改善。"
+    }
+  ],
+  software: [
+    {
+      name: "營運主管",
+      image: "assets/admin-recruit-02-operations-fast.jpg",
+      title: "「不用再從 LINE、Excel 和紙本裡找同一份資料。」",
+      text: "案件、表單、任務和文件集中後，主管看進度更快，交接也比較不容易漏。"
+    },
+    {
+      name: "行政窗口",
+      image: "assets/quality-detail-04-improvement-fast.jpg",
+      title: "「改善事項有人負責、有期限，也能回頭追。」",
+      text: "會議結論、稽核缺失和後續處理被整理成任務，跨部門協作比較清楚。"
+    },
+    {
+      name: "服務督導",
+      image: "assets/homecare-detail-02-care-plan-fast.jpg",
+      title: "「服務流程和權限清楚後，團隊更敢使用。」",
+      text: "不同角色看到該看的資料，紀錄和報表也能依流程累積，不再只靠人腦記。"
+    }
+  ]
+};
+
+function normalizeServiceInsight(item) {
+  if (item && typeof item === "object") {
+    return {
+      title: item.title || "",
+      text: item.text || serviceInsightDetails[item.title] || ""
+    };
+  }
+  return {
+    title: String(item || ""),
+    text: serviceInsightDetails[item] || "我們會依你的情境協助判斷，讓下一步更清楚。"
+  };
+}
+
+function renderServiceInsightList(items = [], scenes = [], offset = 0) {
+  return items.map((item, index) => {
+    const insight = normalizeServiceInsight(item);
+    const scene = scenes[(index + offset) % Math.max(scenes.length, 1)] || {};
+    return `
+      <li>
+        <span class="service-timeline-dot">${String(index + 1).padStart(2, "0")}</span>
+        ${scene.image ? `<figure><img src="${escapeHTML(scene.image)}" alt="${escapeHTML(insight.title)}" /></figure>` : ""}
+        <div>
+          <strong>${escapeHTML(insight.title)}</strong>
+          <p>${escapeHTML(insight.text)}</p>
+        </div>
+      </li>
+    `;
+  }).join("");
+}
+
+function renderServiceSceneCards(items = []) {
+  return items.map((item) => `
+    <article>
+      <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.title)}" />
+      <div>
+        <strong>${escapeHTML(item.title)}</strong>
+        <p>${escapeHTML(item.text)}</p>
+      </div>
+    </article>
+  `).join("");
+}
+
+function serviceSecondaryHref(text = "") {
+  if (text.includes("課程")) return "#courses";
+  if (text.includes("據點")) return "#network";
+  if (text.includes("居家")) return "#home-care";
+  if (text.includes("軟體")) return "#software";
+  if (text.includes("品管")) return "#quality";
+  return "#contact";
+}
+
+function renderServiceStorySection(service, slug) {
+  const stories = oneMinuteServiceStories[slug] || [];
+  if (!stories.length) return "";
+  return `
+    <section class="story-section service-story-section service-detail-section service-motion" aria-label="${escapeHTML(service.title)}使用者心得回饋">
+      <div class="service-section-head">
+        <div>
+          <p class="eyebrow">Care Stories</p>
+          <h2>${escapeHTML(service.title)}使用者心得回饋</h2>
+        </div>
+        <span>這裡只放與${escapeHTML(service.title)}相關的回饋，讓你看到接近自己情境的真實感受。</span>
+      </div>
+      <div class="story-slider service-story-slider" aria-label="${escapeHTML(service.title)}心得回饋滑動列表">
+        ${stories.map((story) => `
+          <article>
+            <img class="story-face" src="${escapeHTML(story.image)}" alt="${escapeHTML(story.name)}心得照片" />
+            <span class="story-meta"><b>${escapeHTML(story.name)}</b><em>${escapeHTML(service.title)}</em></span>
+            <h3>${escapeHTML(story.title)}</h3>
+            <div class="story-points"><p>${escapeHTML(story.text)}</p></div>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderServicePlainList(items = []) {
+  return items.map((item, index) => `
+    <li>
+      <span>${String(index + 1).padStart(2, "0")}</span>
+      <strong>${escapeHTML(item.title)}</strong>
+      <p>${escapeHTML(item.text)}</p>
+    </li>
+  `).join("");
+}
+
+function serviceFeeItems(service, slug) {
+  if (slug === "day-care") {
+    return [
+      { title: "政府補助", text: "依長照等級、照顧計畫與中心可服務名額確認補助與自付額。" },
+      { title: "自費項目", text: "接送、餐食或延伸服務會依實際需求與中心規範另外確認。" },
+      { title: "先評估再報價", text: "我們會先理解照顧頻率、出席天數與接送需求，再協助試算。" }
+    ];
+  }
+  return [
+    { title: "依服務內容確認", text: "費用會依服務類型、頻率、時段、區域與是否使用補助而不同。" },
+    { title: "可先諮詢試算", text: "不用先準備完整資料，留下需求後會由窗口協助初步判斷。" },
+    { title: "確認後再安排", text: "服務內容、費用與開始日期會確認清楚後再進入安排流程。" }
+  ];
+}
+
+function serviceLocationItems(service, slug) {
+  if (slug === "software") {
+    return [
+      { title: "線上訪談", text: "先以線上會議盤點流程、角色權限與第一階段模組。" },
+      { title: "跨區導入", text: "可依單位、部門或據點分階段導入，不限單一場域。" },
+      { title: "到場討論", text: "若流程複雜，可再安排現場訪談或工作坊確認細節。" }
+    ];
+  }
+  return [
+    { title: "台北市", text: "依服務項目、時段與人力安排確認可服務區域。" },
+    { title: "新北市", text: "可先留下所在地區，窗口會協助確認最近可銜接資源。" },
+    { title: "桃園市", text: "日照、居家、社區與其他服務會依各據點與服務範圍確認。" }
+  ];
+}
+
+function serviceNoticeItems(service, slug) {
+  return [
+    { title: "先描述情境即可", text: "不用一次準備完整資料，先說明長輩狀態、所在地區與最急迫的需求。" },
+    { title: "窗口會協助判斷", text: `我們會依${service.title}需求確認適合服務、可服務時間與下一步資料。` },
+    { title: "安排前會再次確認", text: "服務內容、費用、頻率與開始日期確認後，才會進入正式安排。" }
+  ];
+}
+
+function renderServiceInfoSection({ eyebrow, title, body, items, className = "", id = "" }) {
+  return `
+    <section${id ? ` id="${escapeHTML(id)}"` : ""} class="service-info-section service-detail-section service-motion ${escapeHTML(className)}">
+      <div class="service-section-head">
+        <div>
+          <p class="eyebrow">${escapeHTML(eyebrow)}</p>
+          <h2>${escapeHTML(title)}</h2>
+        </div>
+        <span>${escapeHTML(body)}</span>
+      </div>
+      <ol class="service-info-grid">
+        ${renderServicePlainList(items)}
+      </ol>
+    </section>
+  `;
+}
+
+function renderServiceContactSection(service, slug) {
+  const contactNeed = service.contactNeed || (slug === "software" ? "軟體系統諮詢" : slug === "quality" ? "教育品管諮詢" : "長照服務諮詢");
+  const options = [contactNeed, "長照服務諮詢", "課程報名", "人才招募", "土地合作", "投資洽談"].filter((item, index, list) => list.indexOf(item) === index);
+  return `
+    <section class="contact-section service-contact-section service-motion" id="service-contact" aria-label="${escapeHTML(service.title)}申請諮詢表單">
+      <div>
+        <p class="eyebrow">Contact Us</p>
+        <h2>想申請${escapeHTML(service.title)}？直接留下需求，讓歲悅協助你確認下一步。</h2>
+        <p>不用先準備完整資料。請先描述目前情境、服務區域或想詢問的內容，我們會依照${escapeHTML(service.title)}安排合適窗口主動聯繫。</p>
+      </div>
+      <form class="contact-form" action="/api/send-email" method="POST" data-form-type="contact">
+        <input type="hidden" name="form_type" value="${escapeHTML(contactNeedToFormType(contactNeed))}" />
+        <input type="hidden" name="_subject" value="歲悅長照官網${escapeHTML(service.title)}諮詢表單" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <label>姓名<input type="text" name="姓名" placeholder="請輸入姓名" required /></label>
+        <label>電話<input type="tel" name="電話" placeholder="請輸入聯絡電話" required /></label>
+        <label>Email<input type="email" name="Email" placeholder="請輸入 Email，方便寄送回覆紀錄" required /></label>
+        <label>需求<select name="需求" required>${options.map((option) => `<option${option === contactNeed ? " selected" : ""}>${escapeHTML(option)}</option>`).join("")}</select></label>
+        <label>說明<textarea name="說明" rows="8" placeholder="請簡單描述目前遇到的情境、希望詢問的服務內容、所在地區或方便聯絡時間" required></textarea></label>
+        <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為回覆諮詢、服務安排與後續聯繫目的，使用我填寫的個人資料。</label>
+        <button type="submit">送出${escapeHTML(service.title)}諮詢</button>
+      </form>
+    </section>
+  `;
+}
+
+function renderOneMinuteServicePage(slug) {
+  const service = oneMinuteServices[slug] || oneMinuteServices["home-care"];
+  const contactNeed = service.contactNeed || "長照服務諮詢";
+  return `
+    <div class="service-detail-page one-minute-service-page ${escapeHTML(slug)}-page">
+      <section class="hero service-detail-hero one-minute-service-hero ${escapeHTML(slug)}-hero">
+        <div
+          class="hero-bg"
+          data-cms-field="background_image"
+          style="background-image: linear-gradient(90deg, rgba(45, 23, 9, 0.58) 0%, rgba(70, 39, 18, 0.38) 34%, rgba(255, 248, 238, 0.24) 64%, rgba(255, 248, 238, 0.06) 100%), linear-gradient(180deg, rgba(255, 248, 238, 0.03), rgba(255, 248, 238, 0.2)), url('${escapeHTML(service.image)}');"
+          aria-hidden="true"
+        ></div>
+        <div class="hero-copy service-detail-copy">
+          <p class="eyebrow">${escapeHTML(service.eyebrow)}</p>
+          <h1>${escapeHTML(service.title)}</h1>
+          <p class="hero-slogan">${escapeHTML(service.badge)}｜2 分鐘了解</p>
+          <p>${escapeHTML(service.oneLiner)}</p>
+          <div class="one-minute-service-actions">
+            <a class="primary-button" href="#service-contact" data-service-scroll="#service-contact" data-contact-need="${escapeHTML(contactNeed)}">${escapeHTML(service.primaryCta)}</a>
+            <a class="ghost-button" href="#service-apply-notes" data-service-scroll="#service-apply-notes">申請服務須知</a>
+          </div>
+          <div class="one-minute-proof" aria-label="${escapeHTML(service.title)}重點摘要">
+            <span>2 分鐘了解</span>
+            <strong>先看照護情境，再知道怎麼申請</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="one-minute-service-summary service-motion" aria-label="${escapeHTML(service.title)}快速摘要">
+        <article class="service-motion">
+          <span>01</span>
+          <h2>你遇到的狀況</h2>
+          <ul>${renderServiceInsightList(service.idealFor, service.scenes, 0)}</ul>
+        </article>
+        <article class="service-motion">
+          <span>02</span>
+          <h2>我們可以提供什麼協助</h2>
+          <ul>${renderServiceInsightList(service.outcomes, service.scenes, 1)}</ul>
+        </article>
+        <article class="service-motion">
+          <span>03</span>
+          <h2>如何申請服務</h2>
+          <ul>${renderServiceInsightList(service.applySteps || service.flow, service.scenes, 2)}</ul>
+        </article>
+      </section>
+
+      <section class="two-minute-scenes service-motion" aria-label="${escapeHTML(service.title)}實際照護畫面">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Scenes</p>
+          <h2>實際照顧現場畫面</h2>
+        </div>
+        <div class="two-minute-scene-grid">
+          ${renderServiceSceneCards(service.scenes)}
+        </div>
+      </section>
+
+      ${renderServiceStorySection(service, slug)}
+
+      ${renderServiceInfoSection({
+        eyebrow: "Pricing",
+        title: "收費標準",
+        body: "實際費用會依服務內容、補助資格、區域與頻率確認，先留下需求即可協助試算。",
+        items: serviceFeeItems(service, slug),
+        className: "service-fee-section"
+      })}
+
+      ${renderServiceInfoSection({
+        eyebrow: "Locations",
+        title: "地點分佈",
+        body: "先確認你所在區域，我們會協助判斷可服務性、鄰近據點或合適窗口。",
+        items: serviceLocationItems(service, slug),
+        className: "service-location-section"
+      })}
+
+      ${renderServiceInfoSection({
+        eyebrow: "Before Apply",
+        title: "申請服務須知",
+        body: "申請前不用焦慮準備資料，先把目前情境說清楚，窗口會帶你往下一步走。",
+        items: serviceNoticeItems(service, slug),
+        className: "service-notes-section",
+        id: "service-apply-notes"
+      })}
+
+      ${renderServiceContactSection(service, slug)}
+    </div>
+  `;
+}
+
 function renderHomeCarePage() {
+  return renderOneMinuteServicePage("home-care");
   const highlights = [
     ["把需求講清楚", "先釐清長輩目前最困擾的生活情境，例如洗澡、如廁、移位、用餐、出院返家或白天無人陪伴。"],
     ["把服務排穩定", "依照區域、時段、照顧強度與長輩個性安排照顧服務員，讓家庭不是每次都重新適應。"],
@@ -4786,10 +5538,10 @@ function renderHomeCarePage() {
     ["家人意見不同", "每位家屬對照顧期待不同，歲悅會協助把需求、服務範圍與回報方式說清楚。"]
   ];
   const scenes = [
-    ["assets/homecare-detail-01-greeting.png", "進門先看見人", "服務員進門後先問候、觀察精神與情緒，讓長輩知道今天不是被處理，而是被陪伴。"],
-    ["assets/homecare-detail-02-care-plan.png", "家屬與督導一起排照顧", "把服務目標、時段、禁忌、回報方式與家屬最在意的事情寫進計畫裡。"],
-    ["assets/homecare-detail-03-safe-transfer.png", "安全移動不靠硬撐", "協助起身、移位、陪同走動時，用合適步調與支撐方式降低跌倒風險。"],
-    ["assets/homecare-detail-04-daily-support.png", "日常細節也要被記得", "備餐、用餐觀察、生活提醒與照顧紀錄，讓家裡的照顧變得清楚可追蹤。"]
+    ["assets/homecare-detail-01-greeting-fast.jpg", "進門先看見人", "服務員進門後先問候、觀察精神與情緒，讓長輩知道今天不是被處理，而是被陪伴。"],
+    ["assets/homecare-detail-02-care-plan-fast.jpg", "家屬與督導一起排照顧", "把服務目標、時段、禁忌、回報方式與家屬最在意的事情寫進計畫裡。"],
+    ["assets/homecare-detail-03-safe-transfer-fast.jpg", "安全移動不靠硬撐", "協助起身、移位、陪同走動時，用合適步調與支撐方式降低跌倒風險。"],
+    ["assets/homecare-detail-04-daily-support-fast.jpg", "日常細節也要被記得", "備餐、用餐觀察、生活提醒與照顧紀錄，讓家裡的照顧變得清楚可追蹤。"]
   ];
   const serviceItems = [
     ["身體照顧", "沐浴、穿脫衣物、如廁、移位、翻身、拍背、用餐協助。", "適合出院返家、行動不便、需協助盥洗或日常照顧者。"],
@@ -4850,7 +5602,7 @@ function renderHomeCarePage() {
           </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/homecare-detail-01-greeting.png" alt="歲悅居家照顧到宅問候情境" />
+          <img src="assets/homecare-detail-01-greeting-fast.jpg" alt="歲悅居家照顧到宅問候情境" />
           <div>
             <span>Home Care Service</span>
             <strong>把照顧帶進家裡，也把安心留在家裡。</strong>
@@ -5031,6 +5783,7 @@ function renderHomeCarePage() {
 }
 
 function renderDayCarePage() {
+  return renderOneMinuteServicePage("day-care");
   const highlights = [
     ["白天有安全場域", "讓長輩離開長時間獨處的狀態，在有人看見、有人陪伴、有人觀察的環境中度過白天。"],
     ["生活節奏被重新建立", "用報到、量測、活動、共餐、午休與回家準備，讓長輩每天有穩定節奏與期待。"],
@@ -5046,10 +5799,10 @@ function renderDayCarePage() {
     ["照顧壓力持續累積", "主要照顧者若沒有喘息，長期下來容易疲乏，也會影響家庭關係與照顧品質。"]
   ];
   const scenes = [
-    ["assets/daycare-detail-01-exercise.png", "團體活動讓身體醒過來", "用安全、可跟上的節奏帶領伸展與律動，讓長輩重新感覺自己仍然能動。"],
-    ["assets/daycare-detail-02-meal.png", "共餐不是吃飯而已", "餐食照顧會觀察食慾、吞嚥、飲水與情緒，也讓長輩在陪伴中用餐。"],
-    ["assets/daycare-detail-03-activity.png", "手作與認知活動", "透過簡單任務、顏色、記憶與互動，讓活動成為長輩有成就感的時刻。"],
-    ["assets/daycare-detail-04-checkin.png", "早晨報到與家屬交接", "從進門問候與健康觀察開始，讓家屬知道今天有人接住長輩。"]
+    ["assets/daycare-detail-01-exercise-fast.jpg", "團體活動讓身體醒過來", "用安全、可跟上的節奏帶領伸展與律動，讓長輩重新感覺自己仍然能動。"],
+    ["assets/daycare-detail-02-meal-fast.jpg", "共餐不是吃飯而已", "餐食照顧會觀察食慾、吞嚥、飲水與情緒，也讓長輩在陪伴中用餐。"],
+    ["assets/daycare-detail-03-activity-fast.jpg", "手作與認知活動", "透過簡單任務、顏色、記憶與互動，讓活動成為長輩有成就感的時刻。"],
+    ["assets/daycare-detail-04-checkin-fast.jpg", "早晨報到與家屬交接", "從進門問候與健康觀察開始，讓家屬知道今天有人接住長輩。"]
   ];
   const serviceItems = [
     ["生活照顧", "報到接待、健康觀察、如廁協助、午休照顧、回家準備與安全巡視。", "適合白天需要陪伴、提醒與基本生活支持的長輩。"],
@@ -5110,7 +5863,7 @@ function renderDayCarePage() {
           </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/daycare-detail-01-exercise.png" alt="歲悅日間照顧團體活動情境" />
+          <img src="assets/daycare-detail-01-exercise-fast.jpg" alt="歲悅日間照顧團體活動情境" />
           <div>
             <span>Day Care Center</span>
             <strong>白天有生活，晚上安心回家。</strong>
@@ -5291,6 +6044,7 @@ function renderDayCarePage() {
 }
 
 function renderNursingPage() {
+  return renderOneMinuteServicePage("nursing");
   const highlights = [
     ["看見身體變化", "護理觀察不是只量數字，而是把血壓、食慾、睡眠、皮膚、傷口、用藥與精神狀態放回生活脈絡裡判斷。"],
     ["把能力練回生活", "復能不是做漂亮動作，而是讓長輩能更安全地起身、移位、走路、用餐、洗澡與參與日常。"],
@@ -5306,10 +6060,10 @@ function renderNursingPage() {
     ["照顧者缺少回饋", "家屬、移工或照服員每天都在照顧，但很少有人回頭看方法是否正確、是否需要調整。"]
   ];
   const scenes = [
-    ["assets/nursing-detail-01-vitals.png", "護理觀察與健康量測", "從血壓、精神、食慾與日常變化看見風險，讓家屬知道什麼需要注意。"],
-    ["assets/nursing-detail-02-walking.png", "步行與移位練習", "復能不是催促長輩，而是用安全步調陪他一步一步重新找回把握。"],
-    ["assets/nursing-detail-03-home-safety.png", "居家安全與家屬教學", "把浴室、床邊、動線與扶手配置說清楚，降低家庭照顧的意外風險。"],
-    ["assets/nursing-detail-04-care-plan.png", "跨專業目標討論", "護理、治療、照顧與家屬一起確認目標，讓練習回到真實生活。"]
+    ["assets/nursing-detail-01-vitals-fast.jpg", "護理觀察與健康量測", "從血壓、精神、食慾與日常變化看見風險，讓家屬知道什麼需要注意。"],
+    ["assets/nursing-detail-02-walking-fast.jpg", "步行與移位練習", "復能不是催促長輩，而是用安全步調陪他一步一步重新找回把握。"],
+    ["assets/nursing-detail-03-home-safety-fast.jpg", "居家安全與家屬教學", "把浴室、床邊、動線與扶手配置說清楚，降低家庭照顧的意外風險。"],
+    ["assets/nursing-detail-04-care-plan-fast.jpg", "跨專業目標討論", "護理、治療、照顧與家屬一起確認目標，讓練習回到真實生活。"]
   ];
   const serviceItems = [
     ["健康狀態追蹤", "血壓、食慾、睡眠、排泄、皮膚、傷口、用藥與精神狀態觀察。", "適合出院返家、慢性病、身體狀況不穩或家屬需要判斷指引者。"],
@@ -5370,7 +6124,7 @@ function renderNursingPage() {
           </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/nursing-detail-02-walking.png" alt="歲悅護理復能步行練習情境" />
+          <img src="assets/nursing-detail-02-walking-fast.jpg" alt="歲悅護理復能步行練習情境" />
           <div>
             <span>Nursing Reablement</span>
             <strong>復能不是催促，而是陪長輩一步一步重新有把握。</strong>
@@ -5551,6 +6305,7 @@ function renderNursingPage() {
 }
 
 function renderMigrantTrainingPage() {
+  return renderOneMinuteServicePage("migrant-training");
   const highlights = [
     ["把技能教到能做", "翻身、移位、沐浴、如廁、用餐、陪走與拍背都要拆成看得懂、練得會、回家後做得出來的步驟。"],
     ["把溝通變成共同語言", "協助移工理解家屬期待、長輩情緒、每日回報與突發狀況處理，降低誤會。"],
@@ -5566,10 +6321,10 @@ function renderMigrantTrainingPage() {
     ["訓練後沒有人追蹤", "如果課後沒有回饋與複訓，學到的技巧很容易在真實家庭壓力中變形。"]
   ];
   const scenes = [
-    ["assets/migrant-detail-01-classroom.png", "課堂示範與分組練習", "把照顧技能拆成步驟，讓移工不只聽懂，也能實際操作。"],
-    ["assets/migrant-detail-02-transfer.png", "安全移位實作", "床到輪椅、翻身與扶走都要反覆演練，降低長輩與照顧者受傷風險。"],
-    ["assets/migrant-detail-03-meal.png", "餐食與營養照顧", "從備餐、吞嚥、餵食姿勢到飲水提醒，讓日常照顧更細緻。"],
-    ["assets/migrant-detail-04-communication.png", "家庭溝通情境演練", "透過角色扮演練習每日回報、家屬交代與長輩抗拒照顧的處理。"]
+    ["assets/migrant-detail-01-classroom-fast.jpg", "課堂示範與分組練習", "把照顧技能拆成步驟，讓移工不只聽懂，也能實際操作。"],
+    ["assets/migrant-detail-02-transfer-fast.jpg", "安全移位實作", "床到輪椅、翻身與扶走都要反覆演練，降低長輩與照顧者受傷風險。"],
+    ["assets/migrant-detail-03-meal-fast.jpg", "餐食與營養照顧", "從備餐、吞嚥、餵食姿勢到飲水提醒，讓日常照顧更細緻。"],
+    ["assets/migrant-detail-04-communication-fast.jpg", "家庭溝通情境演練", "透過角色扮演練習每日回報、家屬交代與長輩抗拒照顧的處理。"]
   ];
   const serviceItems = [
     ["基礎身體照顧", "翻身、拍背、移位、沐浴、如廁、穿脫衣物、陪走與床邊照顧。", "適合剛到家庭服務或需要建立基礎照顧技巧的移工。"],
@@ -5630,7 +6385,7 @@ function renderMigrantTrainingPage() {
           </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/migrant-detail-01-classroom.png" alt="歲悅移工照顧培訓課堂情境" />
+          <img src="assets/migrant-detail-01-classroom-fast.jpg" alt="歲悅移工照顧培訓課堂情境" />
           <div>
             <span>Training Program</span>
             <strong>把照顧技巧教到能真的回家使用。</strong>
@@ -5811,6 +6566,7 @@ function renderMigrantTrainingPage() {
 }
 
 function renderQualityPage() {
+  return renderOneMinuteServicePage("quality");
   const highlights = [
     ["把經驗整理成教材", "第一線的好做法不能只留在資深人員身上，要轉成教材、流程、案例與檢核表。"],
     ["把新人帶進標準", "新人不只需要知道工作內容，更要理解歲悅的照顧語言、服務邊界、紀錄方式與家屬溝通。"],
@@ -5826,10 +6582,10 @@ function renderQualityPage() {
     ["擴張時品質容易掉", "當服務量、據點與人員增加，如果沒有標準化中台支撐，品質落差會快速放大。"]
   ];
   const scenes = [
-    ["assets/quality-detail-01-materials.png", "教材與流程整理", "把照顧現場的經驗整理成可學習、可複製、可追蹤的訓練資料。"],
-    ["assets/quality-detail-02-training.png", "內部教育訓練", "訓練不是把人叫來上課，而是讓服務方法、語言與判斷更一致。"],
-    ["assets/quality-detail-03-audit.png", "服務紀錄檢核", "從紀錄看見服務品質、照顧風險與需要再支持的現場問題。"],
-    ["assets/quality-detail-04-improvement.png", "品質改善會議", "讓督導、教育與營運一起把問題轉成下一輪改善行動。"]
+    ["assets/quality-detail-01-materials-fast.jpg", "教材與流程整理", "把照顧現場的經驗整理成可學習、可複製、可追蹤的訓練資料。"],
+    ["assets/quality-detail-02-training-fast.jpg", "內部教育訓練", "訓練不是把人叫來上課，而是讓服務方法、語言與判斷更一致。"],
+    ["assets/quality-detail-03-audit-fast.jpg", "服務紀錄檢核", "從紀錄看見服務品質、照顧風險與需要再支持的現場問題。"],
+    ["assets/quality-detail-04-improvement-fast.jpg", "品質改善會議", "讓督導、教育與營運一起把問題轉成下一輪改善行動。"]
   ];
   const serviceItems = [
     ["新人訓練制度", "品牌理念、服務倫理、照顧流程、紀錄規範、家屬溝通與異常回報。", "適合新進照服員、督導、行政與跨部門新人。"],
@@ -5890,7 +6646,7 @@ function renderQualityPage() {
           </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/quality-detail-04-improvement.png" alt="歲悅教育品管品質改善會議情境" />
+          <img src="assets/quality-detail-04-improvement-fast.jpg" alt="歲悅教育品管品質改善會議情境" />
           <div>
             <span>Quality System</span>
             <strong>讓好的照顧可以被教會，也可以被穩定複製。</strong>
@@ -6121,7 +6877,7 @@ function renderInvestorRecruitingPage() {
           </div>
         </div>
         <aside class="service-hero-card investor-recruit-card">
-          <img src="assets/homepage-batch/04-admin-team-office.png" alt="歲悅長照集團投資人招募與營運團隊會議" />
+          <img src="assets/homepage-batch/04-admin-team-office-fast.jpg" alt="歲悅長照集團投資人招募與營運團隊會議" />
           <div>
             <span>Suiyuecare Growth</span>
             <strong>把長照需求，變成可治理、可複製、可長期信任的服務網絡。</strong>
@@ -6198,7 +6954,7 @@ function renderInvestorRecruitingPage() {
           <span>投資人可從投資人專區追蹤居家長照機構與日間照顧中心的設立進度，理解展店不是概念，而是可拆解的專案管理。</span>
         </div>
         <div class="land-area-board investor-area-board">
-          <img src="assets/north-service-map.png" alt="歲悅長照投資人招募北北桃布局地圖" />
+          <img src="assets/north-service-map-fast.jpg" alt="歲悅長照投資人招募北北桃布局地圖" />
           <div>
             <span>臺北市：士林、北投、大同、萬華、信義、南港服務密度提升</span>
             <span>新北市：新店、中永和、新莊照顧服務與場域合作評估</span>
@@ -6294,7 +7050,7 @@ function renderLandRecruitingPage() {
           </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/homepage-batch/16-taipei-service-office.png" alt="歲悅長照北北桃服務基地合作場域" />
+          <img src="assets/homepage-batch/16-taipei-service-office-fast.jpg" alt="歲悅長照北北桃服務基地合作場域" />
           <div>
             <span>Care Infrastructure</span>
             <strong>把合適的空間，變成家庭真正用得到的照顧據點。</strong>
@@ -6326,7 +7082,7 @@ function renderLandRecruitingPage() {
             <h2>基地初評會看什麼？</h2>
             <p>歲悅會用長照設立與實際營運兩個角度檢視場地，不會只看地點漂亮，而是判斷未來能不能安全、合規、可持續地服務長輩。</p>
           </div>
-          <img src="assets/homepage-batch/04-admin-team-office.png" alt="歲悅團隊進行基地與營運評估" />
+          <img src="assets/homepage-batch/04-admin-team-office-fast.jpg" alt="歲悅團隊進行基地與營運評估" />
         </div>
         <div class="land-checklist-grid">
           ${checklist.map(([title, copy]) => `
@@ -6362,7 +7118,7 @@ function renderLandRecruitingPage() {
           <span>目前以北北桃生活圈為主要拓點方向，會依照服務需求、交通可近性與照顧資源缺口做排序。</span>
         </div>
         <div class="land-area-board">
-          <img src="assets/north-service-map.png" alt="歲悅土地招募北北桃優先區域地圖" />
+          <img src="assets/north-service-map-fast.jpg" alt="歲悅土地招募北北桃優先區域地圖" />
           <div>
             ${targetAreas.map((area) => `<span>${area}</span>`).join("")}
           </div>
@@ -6399,6 +7155,7 @@ function renderLandRecruitingPage() {
 }
 
 function renderCommunityPage() {
+  return renderOneMinuteServicePage("community");
   const highlights = [
     ["離家近的照顧入口", "讓長輩不用等到失能很嚴重才接觸長照，而是在生活圈裡就能開始參與活動、被看見與被提醒。"],
     ["預防延緩失能", "透過伸展、肌力、平衡、認知與社交活動，把預防照顧做在生活裡，而不是等問題發生才處理。"],
@@ -6414,10 +7171,10 @@ function renderCommunityPage() {
     ["需要更早發現變化", "出席、互動、食慾、活動表現與情緒變化，都是社區工作者可以早一步看見的訊號。"]
   ];
   const scenes = [
-    ["assets/community-detail-01-exercise.png", "健康促進小組", "用椅上運動、伸展與平衡練習，讓長輩在熟悉社區裡維持活動量。"],
-    ["assets/community-detail-02-meal.png", "共餐與茶敘陪伴", "共餐不只是吃飯，也是在固定時間被看見、被關心、重新建立社交節奏。"],
-    ["assets/community-detail-03-workshop.png", "認知手作活動", "透過手作、桌遊、懷舊與互動設計，讓長輩在活動中保有參與感。"],
-    ["assets/community-detail-04-consult.png", "家屬資源諮詢", "把長照資源、服務轉介與照顧疑問說成家屬聽得懂的下一步。"]
+    ["assets/community-detail-01-exercise-fast.jpg", "健康促進小組", "用椅上運動、伸展與平衡練習，讓長輩在熟悉社區裡維持活動量。"],
+    ["assets/community-detail-02-meal-fast.jpg", "共餐與茶敘陪伴", "共餐不只是吃飯，也是在固定時間被看見、被關心、重新建立社交節奏。"],
+    ["assets/community-detail-03-workshop-fast.jpg", "認知手作活動", "透過手作、桌遊、懷舊與互動設計，讓長輩在活動中保有參與感。"],
+    ["assets/community-detail-04-consult-fast.jpg", "家屬資源諮詢", "把長照資源、服務轉介與照顧疑問說成家屬聽得懂的下一步。"]
   ];
   const flow = [
     ["01", "初步諮詢", "了解長輩生活狀態、活動能力、交通距離、家屬期待與最想改善的問題。"],
@@ -6478,7 +7235,7 @@ function renderCommunityPage() {
           </div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/community-detail-01-exercise.png" alt="歲悅社區據點健康促進活動" />
+          <img src="assets/community-detail-01-exercise-fast.jpg" alt="歲悅社區據點健康促進活動" />
           <div>
             <span>Community Hub</span>
             <strong>讓照顧從生活圈附近開始。</strong>
@@ -6590,7 +7347,7 @@ function renderCommunityPage() {
 
       <section class="service-detail-section community-area-section">
         <div class="community-area-card">
-          <img src="assets/north-service-map.png" alt="歲悅北北桃社區服務區域地圖" />
+          <img src="assets/north-service-map-fast.jpg" alt="歲悅北北桃社區服務區域地圖" />
           <div>
             <p class="eyebrow">North Taiwan Network</p>
             <h2>北北桃社區據點與健康促進服務</h2>
@@ -6807,7 +7564,7 @@ function renderFinancePage() {
         </div>
         <div class="annual-grid">
           <article class="annual-cover">
-            <img src="assets/homepage-batch/04-admin-team-office.png" alt="歲悅行政團隊整理年度報告" />
+            <img src="assets/homepage-batch/04-admin-team-office-fast.jpg" alt="歲悅行政團隊整理年度報告" />
             <div><span>2025 Annual Report</span><h3>讓投資人看見照顧網絡如何被制度化。</h3></div>
           </article>
           <div class="download-grid vertical">
@@ -6826,10 +7583,10 @@ function renderGovernancePage() {
     ["2026.03.18", "誠信經營與吹哨者保護辦法公告", "建立內外部通報管道與案件追蹤原則。"]
   ];
   const executives = [
-    ["執行長", "營運策略與服務網絡拓展", "assets/homepage-batch/04-admin-team-office.png"],
-    ["照顧品質長", "服務品管、督導制度與異常事件改善", "assets/homepage-batch/03-supervisor-care-plan.png"],
+    ["執行長", "營運策略與服務網絡拓展", "assets/homepage-batch/04-admin-team-office-fast.jpg"],
+    ["照顧品質長", "服務品管、督導制度與異常事件改善", "assets/homepage-batch/03-supervisor-care-plan-fast.jpg"],
     ["教育訓練長", "照服員、督導與移工培訓制度", "assets/homepage-batch/11-elder-art-activity.png"],
-    ["財務行政長", "財務控管、人資行政與投資人關係", "assets/homepage-batch/10-family-consultation.png"]
+    ["財務行政長", "財務控管、人資行政與投資人關係", "assets/homepage-batch/10-family-consultation-fast.jpg"]
   ];
   const auditItems = [
     ["服務紀錄稽核", "92%", "完成率"],
@@ -6887,7 +7644,7 @@ function renderGovernancePage() {
         </div>
         <div class="governance-news-grid">
           <article class="governance-image-card">
-            <img src="assets/homepage-batch/04-admin-team-office.png" alt="歲悅行政團隊治理會議" />
+            <img src="assets/homepage-batch/04-admin-team-office-fast.jpg" alt="歲悅行政團隊治理會議" />
             <div><span>Board Updates</span><h3>治理訊息不只是公告，而是讓投資人看見公司如何運作。</h3></div>
           </article>
           <div class="ir-update-card">
@@ -7013,7 +7770,7 @@ function renderGovernancePage() {
         </div>
         <div class="integrity-layout">
           <article class="governance-image-card">
-            <img src="assets/homepage-batch/14-care-notes.png" alt="歲悅照顧紀錄與誠信經營" />
+            <img src="assets/homepage-batch/14-care-notes-fast.jpg" alt="歲悅照顧紀錄與誠信經營" />
             <div><span>Integrity System</span><h3>照顧產業的信任，來自每一筆紀錄、每一次回報與每一個承諾。</h3></div>
           </article>
           <div class="finance-metrics">
@@ -7120,7 +7877,7 @@ function renderShareholdersPage() {
         </div>
         <div class="meeting-layout">
           <article class="governance-image-card">
-            <img src="assets/homepage-batch/10-family-consultation.png" alt="歲悅股東會與投資人溝通情境" />
+            <img src="assets/homepage-batch/10-family-consultation-fast.jpg" alt="歲悅股東會與投資人溝通情境" />
             <div><span>Annual Meeting</span><h3>把年度營運、治理進度與照顧網絡成長，清楚交代給每一位股東。</h3></div>
           </article>
           <article class="chart-card">
@@ -7215,6 +7972,7 @@ function renderSystemScreen(title, subtitle, stats = [], rows = [], accent = "or
 }
 
 function renderSoftwarePage() {
+  return renderOneMinuteServicePage("software");
   const systems = [
     ["會計系統", "收入、支出、請款、憑證與月結流程整合，讓財務資料不再散落在表格與訊息中。", "請款批次、收支分類、月報匯出、權限簽核"],
     ["人資系統", "員工資料、排班、出勤、訓練、證照與績效紀錄集中管理，支援長照單位人力調度。", "員工主檔、證照效期、排班出勤、教育訓練"],
@@ -7472,9 +8230,9 @@ function renderSoftwarePage() {
 
 function renderTalentPage() {
   const openings = [
-    ["居家照顧服務員", "居家照顧部門", "到宅身體照顧、生活支持、陪伴與服務紀錄。", "assets/homepage-batch/05-orange-polo-caregiver.png"],
-    ["居家服務督導", "居家照顧部門", "服務媒合、品質追蹤、照服員支持與家屬溝通。", "assets/homepage-batch/06-orange-polo-supervisor.png"],
-    ["日照照顧服務員", "日間照顧部", "長輩活動陪伴、餐食照顧、生活支持與安全觀察。", "assets/homepage-batch/02-daycare-group-exercise.png"]
+    ["居家照顧服務員", "居家照顧部門", "到宅身體照顧、生活支持、陪伴與服務紀錄。", "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg"],
+    ["居家服務督導", "居家照顧部門", "服務媒合、品質追蹤、照服員支持與家屬溝通。", "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg"],
+    ["日照照顧服務員", "日間照顧部", "長輩活動陪伴、餐食照顧、生活支持與安全觀察。", "assets/homepage-batch/02-daycare-group-exercise-fast.jpg"]
   ];
   const careerSteps = [
     ["0-3 個月", "新人陪跑", "完成基礎訓練、服務倫理、紀錄回報與安全照顧流程，由督導陪同熟悉第一線情境。"],
@@ -7520,17 +8278,17 @@ function renderTalentPage() {
       ["適合對象", "喜歡與長輩相處、重視細節、願意穩定累積照顧專業的夥伴"]
     ],
     gallery: [
-      ["assets/homepage-batch/01-care-home-greeting.png", "到宅服務前，用問候建立安心感。"],
-      ["assets/homepage-batch/05-orange-polo-caregiver.png", "照顧服務員是家庭最靠近現場的支持。"],
-      ["assets/homepage-batch/03-supervisor-care-plan.png", "督導與家屬討論照顧計畫。"],
-      ["assets/homepage-batch/14-care-notes.png", "服務紀錄讓照顧變得可追蹤。"],
-      ["assets/homepage-batch/10-family-consultation.png", "把家庭的擔心轉成清楚可執行的安排。"]
+      ["assets/homepage-batch/01-care-home-greeting-fast.jpg", "到宅服務前，用問候建立安心感。"],
+      ["assets/homepage-batch/05-orange-polo-caregiver-fast.jpg", "照顧服務員是家庭最靠近現場的支持。"],
+      ["assets/homepage-batch/03-supervisor-care-plan-fast.jpg", "督導與家屬討論照顧計畫。"],
+      ["assets/homepage-batch/14-care-notes-fast.jpg", "服務紀錄讓照顧變得可追蹤。"],
+      ["assets/homepage-batch/10-family-consultation-fast.jpg", "把家庭的擔心轉成清楚可執行的安排。"]
     ],
     roles: [
       {
         title: "居家照顧服務員",
         tag: "一線服務",
-        image: "assets/recruit-home-care-worker.png",
+        image: "assets/recruit-home-care-worker-fast.jpg",
         summary: "到宅提供身體照顧、生活支持、陪伴與服務紀錄，是長輩與家屬最直接的安心來源。",
         duties: ["身體照顧、備餐、陪同活動與安全觀察", "依服務計畫完成服務紀錄與回報", "與督導配合調整照顧細節"],
         requirements: ["具照顧服務員訓練結業證明或相關經驗佳", "願意學習服務紀錄、家屬溝通與安全照顧流程", "有耐心、守時、重視長輩尊嚴"],
@@ -7539,7 +8297,7 @@ function renderTalentPage() {
       {
         title: "居家服務督導",
         tag: "服務管理",
-        image: "assets/recruit-home-care-supervisor.png",
+        image: "assets/recruit-home-care-supervisor-fast.jpg",
         summary: "負責服務媒合、品質追蹤、照服員支持與家屬溝通，把照顧現場變成穩定系統。",
         duties: ["評估服務需求並安排合適照服員", "追蹤服務品質、異常事件與家屬回饋", "支持照服員工作狀況與教育訓練"],
         requirements: ["具居服督導、社工、護理或長照相關經驗佳", "能清楚溝通、整理紀錄並追蹤問題", "願意在前線與行政之間協調資源"],
@@ -7548,7 +8306,7 @@ function renderTalentPage() {
       {
         title: "個案服務協調員",
         tag: "家庭窗口",
-        image: "assets/homepage-batch/10-family-consultation.png",
+        image: "assets/homepage-batch/10-family-consultation-fast.jpg",
         summary: "協助家庭理解服務內容、建立照顧安排，讓需求、資源與實際執行能順利接起來。",
         duties: ["接洽家庭諮詢並整理需求", "協助服務說明、派案前資料確認", "追蹤服務開始後的家屬回饋"],
         requirements: ["具客服、行政、長照或社福溝通經驗佳", "文字紀錄清楚，能穩定追蹤細節", "面對家屬焦慮時能保持同理與秩序"],
@@ -7557,7 +8315,7 @@ function renderTalentPage() {
       {
         title: "居家護理復能夥伴",
         tag: "專業協作",
-        image: "assets/homepage-batch/13-rehab-walking-practice.png",
+        image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
         summary: "與護理、復能與照顧團隊合作，協助長輩把日常動作重新練回生活裡。",
         duties: ["協助復能活動與安全陪伴", "觀察長輩身體狀況並回報團隊", "配合專業人員執行居家支持建議"],
         requirements: ["具護理、復健、職能、照顧服務或運動指導背景佳", "能重視安全、節奏與長輩意願", "願意與跨專業團隊合作"],
@@ -7566,7 +8324,7 @@ function renderTalentPage() {
       {
         title: "居家行政調度專員",
         tag: "營運支援",
-        image: "assets/homepage-batch/04-admin-team-office.png",
+        image: "assets/homepage-batch/04-admin-team-office-fast.jpg",
         summary: "負責班表、服務紀錄、文件與行政追蹤，讓前線照顧能順利運作、不被雜事卡住。",
         duties: ["協助排班、服務異動與資料整理", "追蹤服務紀錄、文件與行政流程", "支援督導與客服窗口回覆"],
         requirements: ["熟悉文書、表格與資料整理", "細心、穩定，能處理多項進度", "具長照行政或客服經驗佳"],
@@ -7645,7 +8403,7 @@ function renderTalentPage() {
       ["assets/migrant-recruit-01-classroom.png", "從照顧流程開始，讓每位學員知道為什麼要這樣做。"],
       ["assets/migrant-recruit-02-transfer.png", "移位與安全照顧，需要反覆示範與實作。"],
       ["assets/migrant-recruit-03-meal-prep.png", "備餐與營養訓練，讓家庭照顧更穩定。"],
-      ["assets/migrant-recruit-04-communication.png", "溝通演練把照顧指令變成聽得懂的行動。"],
+      ["assets/migrant-recruit-04-communication-fast.jpg", "溝通演練把照顧指令變成聽得懂的行動。"],
       ["assets/migrant-recruit-05-certificate.png", "培訓紀錄與結訓追蹤，讓學習能被延續。"]
     ],
     roles: [
@@ -7670,7 +8428,7 @@ function renderTalentPage() {
       {
         title: "跨文化溝通輔導員",
         tag: "溝通支持",
-        image: "assets/migrant-recruit-04-communication.png",
+        image: "assets/migrant-recruit-04-communication-fast.jpg",
         summary: "協助移工、家庭與照顧團隊理解彼此需求，降低溝通誤會，讓照顧指令可以被正確執行。",
         duties: ["協助照顧情境溝通演練與用語整理", "支援家庭照顧規則、禁忌與回報方式說明", "收集學員困難並回饋課程設計"],
         requirements: ["具移工服務、語言教學、社福、客服或跨文化工作經驗佳", "能同理不同文化背景與家庭壓力", "文字整理與口語表達清楚"],
@@ -7704,7 +8462,7 @@ function renderTalentPage() {
     ],
     gallery: [
       ["assets/quality-recruit-01-materials.png", "把照顧經驗整理成教材，讓好服務可以被學會。"],
-      ["assets/quality-recruit-02-training.png", "內訓不是上課而已，而是讓現場做法更一致。"],
+      ["assets/quality-recruit-02-training-fast.jpg", "內訓不是上課而已，而是讓現場做法更一致。"],
       ["assets/quality-recruit-03-record-review.png", "服務紀錄檢核，讓照顧品質被看見也被追蹤。"],
       ["assets/quality-recruit-04-quality-meeting.png", "從問題到改善，讓團隊一起把流程變好。"],
       ["assets/quality-recruit-05-feedback.png", "現場回饋要具體、友善，也要能真正幫上忙。"]
@@ -7722,7 +8480,7 @@ function renderTalentPage() {
       {
         title: "內訓講師",
         tag: "教育訓練",
-        image: "assets/quality-recruit-02-training.png",
+        image: "assets/quality-recruit-02-training-fast.jpg",
         summary: "帶領新人訓練與在職教育，把照顧倫理、服務流程、情境處理與紀錄回報教到能落地。",
         duties: ["規劃並執行新人訓練、在職教育與情境演練", "依服務問題設計補強課程與測驗", "追蹤學員學習成果與現場應用狀況"],
         requirements: ["具照顧教學、護理、社工、督導或教育訓練經驗佳", "表達清楚，能把複雜流程拆成好理解步驟", "願意和前線團隊共同修正教材"],
@@ -7765,7 +8523,7 @@ function renderTalentPage() {
     ],
     gallery: [
       ["assets/admin-recruit-01-hr.png", "人資招募與新人報到，是讓好夥伴加入團隊的第一步。"],
-      ["assets/admin-recruit-02-operations.png", "營運調度讓服務、人力與資料能順利接上。"],
+      ["assets/admin-recruit-02-operations-fast.jpg", "營運調度讓服務、人力與資料能順利接上。"],
       ["assets/admin-recruit-03-finance.png", "財務行政把數字、文件與報表整理清楚。"],
       ["assets/admin-recruit-04-service.png", "客服總務承接家庭問題，也支援前線服務。"],
       ["assets/admin-recruit-05-meeting.png", "跨部門會議讓每個專案都有進度與負責人。"]
@@ -7783,7 +8541,7 @@ function renderTalentPage() {
       {
         title: "營運行政專員",
         tag: "營運支援",
-        image: "assets/admin-recruit-02-operations.png",
+        image: "assets/admin-recruit-02-operations-fast.jpg",
         summary: "協助服務資料、排程、跨部門需求與營運進度追蹤，讓每天的照顧服務不被行政流程卡住。",
         duties: ["整理服務資料、排程異動與跨部門需求", "追蹤營運專案、會議待辦與改善進度", "支援主管製作營運報表與流程文件"],
         requirements: ["熟悉表格、文件與資料整理", "能同時管理多項進度並主動回報", "具長照、醫療、教育或服務業行政經驗佳"],
@@ -7822,7 +8580,7 @@ function renderTalentPage() {
     "home-care-team": {
       eyebrow: "Home Care Team",
       title: "居家照顧部門",
-      image: "assets/homepage-batch/01-care-home-greeting.png",
+      image: "assets/homepage-batch/01-care-home-greeting-fast.jpg",
       intro: "到長輩熟悉的家中提供照顧，讓安全、尊嚴與家屬安心都被穩定承接。",
       roles: ["居家照顧服務員", "居家服務督導", "個案服務協調"],
       skills: ["身體照顧與生活支持", "服務紀錄與家屬溝通", "異常事件回報"]
@@ -7830,7 +8588,7 @@ function renderTalentPage() {
     "day-care-team": {
       eyebrow: "Day Care Team",
       title: "日間照顧部",
-      image: "assets/homepage-batch/12-community-health-class.png",
+      image: "assets/homepage-batch/12-community-health-class-fast.jpg",
       intro: "陪長輩白天有規律作息、活動參與、共餐與社交，也讓家庭有喘息空間。",
       roles: ["日照照顧服務員", "活動帶領員", "照顧班表協調"],
       skills: ["團體活動陪伴", "餐食與休息照顧", "日常安全觀察"]
@@ -7846,7 +8604,7 @@ function renderTalentPage() {
     "quality-team": {
       eyebrow: "Teaching Quality",
       title: "教學品管部",
-      image: "assets/homepage-batch/14-care-notes.png",
+      image: "assets/homepage-batch/14-care-notes-fast.jpg",
       intro: "把前線經驗整理成教材、稽核與改善流程，讓服務品質可以被複製。",
       roles: ["教育品管專員", "內訓講師", "服務稽核人員"],
       skills: ["教材設計", "服務紀錄檢核", "品管改善追蹤"]
@@ -7854,7 +8612,7 @@ function renderTalentPage() {
     "admin-team": {
       eyebrow: "Administration",
       title: "行政部",
-      image: "assets/homepage-batch/04-admin-team-office.png",
+      image: "assets/homepage-batch/04-admin-team-office-fast.jpg",
       intro: "支援營運、人資、財務、總務與投資人關係，讓前線照顧能穩定運作。",
       roles: ["行政總務", "人資招募", "財務行政", "客服與投資人窗口"],
       skills: ["跨部門協作", "資料整理與流程管理", "溝通與問題追蹤"]
@@ -7888,7 +8646,7 @@ function renderTalentPage() {
               title: "居家照顧部門",
               copy: "居家照顧是歲悅最靠近家庭的一線服務。我們進到長輩熟悉的家，把身體照顧、生活支持、家屬溝通與服務紀錄串成一套穩定流程，讓家庭不用自己猜、照顧者也不是單打獨鬥。",
               highlights: homeCareRecruit.highlights,
-              image: "assets/homepage-batch/01-care-home-greeting.png",
+              image: "assets/homepage-batch/01-care-home-greeting-fast.jpg",
               imageAlt: "歲悅居家照顧服務情境",
               coverEyebrow: "Suiyuecare Home Care",
               coverTitle: "把照顧帶進家裡，也把安心留在家裡。"
@@ -8212,7 +8970,7 @@ function renderTalentPage() {
           <div class="hero-actions"><a class="primary-button" href="#contact">投遞履歷</a><a class="secondary-button" href="#career-openings">查看職缺</a></div>
         </div>
         <aside class="service-hero-card">
-          <img src="assets/homepage-batch/06-orange-polo-supervisor.png" alt="歲悅長照人才招募" />
+          <img src="assets/homepage-batch/06-orange-polo-supervisor-fast.jpg" alt="歲悅長照人才招募" />
           <div><span>Suiyuecare Careers</span><strong>有制度的照顧，才走得長久。</strong></div>
         </aside>
       </section>
@@ -8392,7 +9150,7 @@ async function renderServiceTemplatePageOnce(slug, fallbackRenderer, afterRender
   const fallbackHtml = fallbackRenderer();
   pageView.innerHTML = fallbackHtml;
   const loaded = await loadSupabaseServiceTemplatePage(slug);
-  if (location.hash.slice(1).split("?")[0] !== slug) return;
+  if (routeSlugFromLocation() !== slug) return;
   if (!loaded) {
     pageView.innerHTML = fallbackHtml;
   }
@@ -8600,7 +9358,7 @@ function renderStaticArticlePage(slug) {
 async function loadArticlePage(slug) {
   try {
     const article = await fetchSupabaseArticlePage(slug);
-    if (location.hash.slice(1).split("?")[0] !== `article-${slug}`) return;
+    if (routeSlugFromLocation() !== `article-${slug}`) return;
     if (article) {
       setRouteSeo(`article-${slug}`, {
         title: article.seoTitle || `${article.title}｜健康3.0`,
@@ -8621,7 +9379,7 @@ async function loadArticlePage(slug) {
     pageView.innerHTML = article ? renderArticleLayout(article) : renderArticleNotFoundPage();
   } catch (error) {
     console.warn("Supabase article page unavailable.", error);
-    if (location.hash.slice(1).split("?")[0] !== `article-${slug}`) return;
+    if (routeSlugFromLocation() !== `article-${slug}`) return;
     if (!supabase && articlePages[slug]) {
       const fallback = articlePages[slug];
       setRouteSeo(`article-${slug}`, {
@@ -8721,7 +9479,7 @@ function renderExpertTalkArticle(talk) {
 async function loadCareStoryPage(slug) {
   try {
     const story = await fetchCareStoryPage(slug);
-    if (location.hash.slice(1).split("?")[0] !== `care-story-${slug}`) return;
+    if (routeSlugFromLocation() !== `care-story-${slug}`) return;
     if (story) {
       setRouteSeo(`care-story-${slug}`, {
         title: `${story.title}｜真實照顧情境`,
@@ -8745,7 +9503,7 @@ async function loadCareStoryPage(slug) {
 async function loadExpertTalkPage(slug) {
   try {
     const talk = await fetchExpertTalkPage(slug);
-    if (location.hash.slice(1).split("?")[0] !== `master-talk-${slug}`) return;
+    if (routeSlugFromLocation() !== `master-talk-${slug}`) return;
     if (talk) {
       setRouteSeo(`master-talk-${slug}`, {
         title: `${talk.title}｜名人講堂`,
@@ -8961,7 +9719,13 @@ function renderPage(slug) {
   navGroups.forEach((group) => group.querySelector(".nav-trigger")?.setAttribute("aria-expanded", "false"));
 
   if (anchorTarget && normalized !== "home") {
-    anchorTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+    const scrollTarget = normalized === "contact" ? anchorTarget.querySelector(".contact-form") || anchorTarget : anchorTarget;
+    [80, 650, 1500, 2800].forEach((delay, index) => {
+      window.setTimeout(() => {
+        if (routeSlugFromLocation() !== normalized) return;
+        scrollTarget.scrollIntoView({ behavior: index === 0 ? "smooth" : "auto", block: "start" });
+      }, delay);
+    });
   } else {
     window.scrollTo({ top: 0, behavior: "auto" });
   }
@@ -8971,6 +9735,20 @@ function renderPage(slug) {
   }
 
   trackPageView(`#${rawSlug || "home"}`);
+}
+
+let serviceMotionObserver = null;
+
+function observeServiceMotion(root = document) {
+  const items = root.querySelectorAll?.(".service-motion:not(.motion-bound)") || [];
+  items.forEach((item) => {
+    item.classList.add("motion-bound");
+    if (serviceMotionObserver) {
+      serviceMotionObserver.observe(item);
+    } else {
+      item.classList.add("in-view");
+    }
+  });
 }
 
 if ("IntersectionObserver" in window) {
@@ -8986,13 +9764,42 @@ if ("IntersectionObserver" in window) {
   );
 
   revealItems.forEach((item) => revealObserver.observe(item));
+
+  serviceMotionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+        }
+      });
+    },
+    { rootMargin: "0px 0px -12% 0px", threshold: 0.12 }
+  );
+  observeServiceMotion(document);
 } else {
   revealItems.forEach((item) => item.classList.add("in-view"));
+  observeServiceMotion(document);
 }
 
 window.setTimeout(() => {
   revealItems.forEach((item) => item.classList.add("in-view"));
+  observeServiceMotion(document);
 }, 900);
+
+if ("MutationObserver" in window && pageView) {
+  const serviceMotionMutationObserver = new MutationObserver(() => observeServiceMotion(pageView));
+  serviceMotionMutationObserver.observe(pageView, { childList: true, subtree: true });
+}
+
+document.addEventListener("click", (event) => {
+  const trigger = event.target.closest("[data-service-scroll]");
+  if (!trigger) return;
+  const selector = trigger.getAttribute("data-service-scroll");
+  const target = selector ? pageView?.querySelector(selector) : null;
+  if (!target) return;
+  event.preventDefault();
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
 menuToggle?.addEventListener("click", () => {
   const open = nav?.classList.toggle("open");
@@ -9164,6 +9971,7 @@ document.addEventListener("click", (event) => {
   if (registerButton) {
     event.preventDefault();
     event.stopPropagation();
+    if (registerButton.disabled) return;
     trackAnalyticsEvent("reservation_click", {
       label: registerButton.dataset.courseTitle || registerButton.textContent.trim(),
       targetUrl: "#courses"
@@ -9178,12 +9986,26 @@ document.addEventListener("click", (event) => {
   const courseCard = event.target.closest(".course-card, .featured-course-card");
   if (courseCard && !event.target.closest("a, button, input, select, textarea")) {
     event.preventDefault();
+    if (courseCard.dataset.courseOpen === "false") return;
     openCourseSignup(courseCard.dataset.courseTitle || courseCard.querySelector("h3")?.textContent || "", courseCard.dataset.courseId || "");
     return;
   }
 
   if (event.target.closest("[data-course-close]") || event.target.id === "courseSignupModal") {
     closeCourseSignup();
+    return;
+  }
+
+  const contactNeedLink = event.target.closest("[data-contact-need]");
+  if (contactNeedLink) {
+    const need = contactNeedLink.dataset.contactNeed;
+    const message = contactNeedLink.dataset.contactMessage;
+    window.setTimeout(() => {
+      const select = document.querySelector('.contact-form select[name="需求"]');
+      if (select && need) select.value = need;
+      const textarea = document.querySelector('.contact-form textarea[name="說明"]');
+      if (textarea && message && !textarea.value.trim()) textarea.value = message;
+    }, 120);
   }
 });
 
@@ -9269,15 +10091,18 @@ document.addEventListener("submit", (event) => {
   if (!form || form.id === "courseSignupForm" || form.classList.contains("health-search")) return;
   if (form.classList.contains("contact-form")) {
     event.preventDefault();
+    const formType = contactFormType(form);
+    const formTypeInput = form.querySelector('input[name="form_type"]');
+    if (formTypeInput) formTypeInput.value = formType;
     const submitButton = form.querySelector("button[type='submit']");
     const originalText = submitButton?.textContent || "送出諮詢";
     submitButton?.setAttribute("disabled", "true");
     if (submitButton) submitButton.textContent = "送出中...";
-    sendBackendForm(form, "contact").then((result) => {
+    sendBackendForm(form, formType).then((result) => {
       trackAnalyticsEvent("form_submit", {
-        label: "聯絡我們",
+        label: `聯絡我們｜${formType}`,
         targetUrl: form.action || location.href,
-        metadata: { form_class: "contact-form", email_sent: Boolean(result.emailSent) }
+        metadata: { form_class: "contact-form", form_type: formType, email_sent: Boolean(result.emailSent) }
       });
       form.reset();
       if (submitButton) {
@@ -9356,6 +10181,22 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("submit", (event) => {
+  const courseSearch = event.target.closest(".course-search");
+  if (courseSearch) {
+    event.preventDefault();
+    const formData = new FormData(courseSearch);
+    const keyword = String(formData.get("course_query") || "").trim().toLowerCase();
+    const locationFilter = String(formData.get("course_location") || "").trim();
+    const cards = document.querySelectorAll("[data-course-search-text]");
+    cards.forEach((card) => {
+      const text = String(card.dataset.courseSearchText || "").toLowerCase();
+      const matchesKeyword = !keyword || text.includes(keyword);
+      const matchesLocation = !locationFilter || text.includes(locationFilter.toLowerCase());
+      card.hidden = !(matchesKeyword && matchesLocation);
+    });
+    return;
+  }
+
   const form = event.target.closest(".health-search");
   if (!form) return;
   event.preventDefault();
@@ -9377,7 +10218,7 @@ if (sceneImages.length > 1) {
   }, 3600);
 }
 
-window.addEventListener("hashchange", () => renderPage(location.hash.slice(1)));
+window.addEventListener("hashchange", () => renderPage(routeSlugFromLocation()));
 window.addEventListener("scroll", () => {
   updateMilestoneProgress();
   updateScrollProgress();
@@ -9403,7 +10244,7 @@ window.addEventListener("resize", () => {
 });
 window.addEventListener("pagehide", flushPageEngagement);
 updateScrollProgress();
-renderPage(location.hash.slice(1));
+renderPage(routeSlugFromLocation());
 loadSupabaseSiteSettings();
 loadSupabasePageContent("home");
 loadSupabaseHomeModules().then((loaded) => {
