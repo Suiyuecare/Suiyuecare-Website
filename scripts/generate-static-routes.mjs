@@ -15,6 +15,7 @@ const routes = [
     title: "歲悅長照集團｜Suiyuecare Corps.",
     description: "歲悅長照集團整合居家照顧、日間照顧、社區據點、護理復能、移工培訓與教育品管，讓照顧變成家人看得懂、也放得下心的日常系統。",
     image: "/assets/hero-care-hero-fast.jpg",
+    preloadImage: "/assets/hero-care-hero-instant.jpg",
     priority: "1.0"
   },
   {
@@ -23,6 +24,7 @@ const routes = [
     title: "居家照顧｜歲悅長照集團",
     description: "歲悅居家照顧提供到宅照顧、生活協助、家屬溝通與服務紀錄，支持長輩在家安心生活。",
     image: "/assets/homecare-detail-01-greeting-hero-fast.jpg",
+    preloadImage: "/assets/homecare-detail-01-greeting-hero-instant.jpg",
     priority: "0.9"
   },
   {
@@ -31,6 +33,7 @@ const routes = [
     title: "日間照顧｜歲悅長照集團",
     description: "歲悅日間照顧以活動設計、餐食、復能與社交支持，降低家庭照顧壓力。",
     image: "/assets/daycare-detail-01-exercise-hero-fast.jpg",
+    preloadImage: "/assets/daycare-detail-01-exercise-hero-instant.jpg",
     priority: "0.9"
   },
   {
@@ -39,6 +42,7 @@ const routes = [
     title: "社區據點｜歲悅長照集團",
     description: "歲悅社區據點提供健康促進、共餐活動、預防延緩失能與在地照顧支持。",
     image: "/assets/community-detail-01-exercise-hero-fast.jpg",
+    preloadImage: "/assets/community-detail-01-exercise-hero-instant.jpg",
     priority: "0.88"
   },
   {
@@ -47,6 +51,7 @@ const routes = [
     title: "護理復能｜歲悅長照集團",
     description: "結合護理評估、復能目標與健康監測，協助長輩恢復生活能力並降低照顧風險。",
     image: "/assets/nursing-detail-02-walking-hero-fast.jpg",
+    preloadImage: "/assets/nursing-detail-02-walking-hero-instant.jpg",
     priority: "0.86"
   },
   {
@@ -55,6 +60,7 @@ const routes = [
     title: "移工培訓｜歲悅長照集團",
     description: "歲悅移工培訓提供照顧技能、家庭溝通、衛教與安全實作訓練，提升家庭照顧品質。",
     image: "/assets/migrant-detail-01-classroom-hero-fast.jpg",
+    preloadImage: "/assets/migrant-detail-01-classroom-hero-instant.jpg",
     priority: "0.84"
   },
   {
@@ -63,6 +69,7 @@ const routes = [
     title: "教育品管｜歲悅長照集團",
     description: "歲悅教育品管以標準化教材、督導制度、服務稽核與持續改善守住照顧品質。",
     image: "/assets/quality-detail-04-improvement-hero-fast.jpg",
+    preloadImage: "/assets/quality-detail-04-improvement-hero-instant.jpg",
     priority: "0.82"
   },
   {
@@ -71,6 +78,7 @@ const routes = [
     title: "軟體系統｜歲悅長照集團",
     description: "歲悅提供可客製化軟體系統，包含會計、人資、電子公文交換、專案管理、PDF 工具，以及居家與日照業務系統。",
     image: "/assets/admin-recruit-02-operations-hero-fast.jpg",
+    preloadImage: "/assets/admin-recruit-02-operations-hero-instant.jpg",
     priority: "0.8"
   },
   {
@@ -144,6 +152,7 @@ function replaceAttr(html, selector, value) {
 function routeHtml(baseHtml, route) {
   const canonical = absoluteUrl(route.path);
   const image = absoluteUrl(route.image);
+  const preloadImage = route.preloadImage || route.image;
   let html = baseHtml;
   html = html.replace(/<html lang="zh-Hant">/, `<html lang="zh-Hant" data-initial-route="${route.slug}">`);
   html = html.replace(/<title>.*?<\/title>/, `<title>${route.title}</title>`);
@@ -156,6 +165,7 @@ function routeHtml(baseHtml, route) {
   html = replaceAttr(html, /(<meta name="twitter:title" content=")(.*?)(" \/>)/, route.title);
   html = replaceAttr(html, /(<meta name="twitter:description" content=")(.*?)(" \/>)/, route.description);
   html = replaceAttr(html, /(<meta name="twitter:image" content=")(.*?)(" \/>)/, image);
+  html = replaceAttr(html, /(<link id="heroPreload" rel="preload" as="image" href=")(.*?)(" fetchpriority="high" \/>)/, preloadImage);
   html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1seo-routes-20260616$3`);
   return html;
 }

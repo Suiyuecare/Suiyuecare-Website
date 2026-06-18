@@ -48,9 +48,11 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link id="heroPreload" rel="preload" as="image" href="/assets/hero-care-hero-instant.jpg" fetchpriority="high" />
     <script>
       (() => {
         const heroPreloads = {
+          "#home": "/assets/hero-care-hero-instant.jpg",
           "#home-care": "/assets/homecare-detail-01-greeting-hero-instant.jpg",
           "#day-care": "/assets/daycare-detail-01-exercise-hero-instant.jpg",
           "#community": "/assets/community-detail-01-exercise-hero-instant.jpg",
@@ -66,12 +68,14 @@
           "/quality/": "/assets/quality-detail-04-improvement-hero-instant.jpg",
           "/software/": "/assets/admin-recruit-02-operations-hero-instant.jpg"
         };
-        const link = document.createElement("link");
+        const link = document.querySelector("#heroPreload") || document.createElement("link");
+        const heroImage = heroPreloads[window.location.hash] || heroPreloads[window.location.pathname] || "/assets/hero-care-hero-instant.jpg";
+        if (!link.id) link.id = "heroPreload";
         link.rel = "preload";
         link.as = "image";
-        link.href = heroPreloads[window.location.hash] || heroPreloads[window.location.pathname] || "/assets/hero-care-hero-instant.jpg";
-        link.fetchPriority = "high";
-        document.head.appendChild(link);
+        link.href = heroImage;
+        link.setAttribute("fetchpriority", "high");
+        if (!link.parentNode) document.head.appendChild(link);
       })();
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />

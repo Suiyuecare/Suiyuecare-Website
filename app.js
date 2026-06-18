@@ -136,6 +136,17 @@ const DEFAULT_SEO = {
   imageAlt: "歲悅長照照顧服務形象照",
   type: "website"
 };
+const HOME_HERO_INSTANT_IMAGE = "assets/hero-care-hero-instant.jpg";
+const routeHeroPreloads = {
+  home: HOME_HERO_INSTANT_IMAGE,
+  "home-care": "assets/homecare-detail-01-greeting-hero-instant.jpg",
+  "day-care": "assets/daycare-detail-01-exercise-hero-instant.jpg",
+  community: "assets/community-detail-01-exercise-hero-instant.jpg",
+  nursing: "assets/nursing-detail-02-walking-hero-instant.jpg",
+  "migrant-training": "assets/migrant-detail-01-classroom-hero-instant.jpg",
+  quality: "assets/quality-detail-04-improvement-hero-instant.jpg",
+  software: "assets/admin-recruit-02-operations-hero-instant.jpg"
+};
 
 const routeSeoMap = {
   home: DEFAULT_SEO,
@@ -253,6 +264,28 @@ function routeSlugFromLocation() {
   const hashSlug = window.location.hash.slice(1).split("?")[0];
   return hashSlug || routeSlugFromPath();
 }
+
+function pathForPreload(src = "") {
+  const raw = String(src || "").trim();
+  if (!raw || /^https?:\/\//i.test(raw)) return raw;
+  return raw.startsWith("/") ? raw : `/${raw}`;
+}
+
+function preloadHeroImage(src = HOME_HERO_INSTANT_IMAGE) {
+  const href = pathForPreload(src);
+  if (!href || !document.head) return;
+  const absoluteHref = new URL(href, window.location.href).href;
+  const existing = [...document.head.querySelectorAll('link[rel="preload"][as="image"]')]
+    .find((link) => link.href === absoluteHref || link.getAttribute("href") === href);
+  const link = existing || document.createElement("link");
+  link.rel = "preload";
+  link.as = "image";
+  link.href = href;
+  link.setAttribute("fetchpriority", "high");
+  if (!link.parentNode) document.head.appendChild(link);
+}
+
+preloadHeroImage(routeHeroPreloads[routeSlugFromLocation()] || HOME_HERO_INSTANT_IMAGE);
 
 function absoluteImageUrl(image = DEFAULT_SEO.image) {
   try {
@@ -1091,6 +1124,12 @@ const fastAssetPaths = new Set([
   "assets/quality-detail-04-improvement-hero-fast.jpg"
 ]);
 
+const instantHeroAssetPaths = new Map([
+  ["assets/hero-care-fast.jpg", HOME_HERO_INSTANT_IMAGE],
+  ["assets/hero-care-hero-fast.jpg", HOME_HERO_INSTANT_IMAGE],
+  ["assets/homepage-batch/01-care-home-greeting-fast.jpg", HOME_HERO_INSTANT_IMAGE]
+]);
+
 function fastAssetUrl(url = "") {
   const raw = String(url || "");
   const normalized = raw.replace(/^\/assets\//, "assets/");
@@ -1098,6 +1137,14 @@ function fastAssetUrl(url = "") {
   const fastPath = normalized.replace(/\.png$/i, "-fast.jpg");
   if (!fastAssetPaths.has(fastPath)) return raw;
   return raw.startsWith("/assets/") ? `/${fastPath}` : fastPath;
+}
+
+function instantHeroAssetUrl(url = "", fallback = HOME_HERO_INSTANT_IMAGE) {
+  const fastUrl = fastAssetUrl(url || fallback);
+  const normalized = String(fastUrl || fallback).replace(/^\/assets\//, "assets/");
+  const instantPath = instantHeroAssetPaths.get(normalized);
+  if (!instantPath) return fastUrl || fallback;
+  return String(fastUrl).startsWith("/assets/") ? `/${instantPath}` : instantPath;
 }
 
 function normalizeLocalAssetUrl(url = "") {
@@ -3199,7 +3246,8 @@ function renderSupabaseHero(items) {
   const hero = document.querySelector(".hero");
   if (!item || !hero) return;
 
-  const image = getCmsModuleImage(item, "assets/homepage-batch/01-care-home-greeting-fast.jpg");
+  const image = instantHeroAssetUrl(getCmsModuleImage(item, HOME_HERO_INSTANT_IMAGE), HOME_HERO_INSTANT_IMAGE);
+  preloadHeroImage(image);
   const background = hero.querySelector(".hero-bg");
   if (background) {
     background.style.backgroundImage = `
@@ -9529,6 +9577,7 @@ function renderPage(slug) {
 
   const rawSlug = slug || "home";
   const [normalized, queryString = ""] = rawSlug.split("?");
+  preloadHeroImage(routeHeroPreloads[normalized] || HOME_HERO_INSTANT_IMAGE);
   const searchParams = new URLSearchParams(queryString);
   const articleSlug = normalized.startsWith("article-") ? normalized.replace("article-", "") : null;
   const careStorySlug = normalized.startsWith("care-story-") ? normalized.replace("care-story-", "") : null;
