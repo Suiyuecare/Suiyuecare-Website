@@ -139,6 +139,8 @@ const DEFAULT_SEO = {
 const HOME_HERO_INSTANT_IMAGE = "assets/hero-care-hero-instant.jpg";
 const routeHeroPreloads = {
   home: HOME_HERO_INSTANT_IMAGE,
+  about: "assets/homepage-batch/04-admin-team-office-fast.jpg",
+  milestones: "assets/homepage-batch/16-taipei-service-office-fast.jpg",
   "home-care": "assets/homecare-detail-01-greeting-hero-instant.jpg",
   "day-care": "assets/daycare-detail-01-exercise-hero-instant.jpg",
   community: "assets/community-detail-01-exercise-hero-instant.jpg",
@@ -152,11 +154,12 @@ const routeSeoMap = {
   home: DEFAULT_SEO,
   about: {
     title: "關於歲悅｜歲悅長照集團",
-    description: "認識歲悅長照集團的品牌理念、照顧系統、服務網絡與專業團隊。"
+    description: "3 分鐘認識歲悅長照集團的組織願景、使命、團隊文化、服務系統與團隊成員。"
   },
   milestones: {
     title: "大事記｜歲悅長照集團",
-    description: "查看歲悅長照集團的重要里程碑、服務擴張、據點成立與合作紀錄。"
+    description: "查看歲悅長照集團的重要里程碑、服務擴張、據點成立與合作紀錄。",
+    image: "assets/homepage-batch/16-taipei-service-office-fast.jpg"
   },
   "home-care": {
     title: "居家照顧｜歲悅長照集團",
@@ -4857,6 +4860,197 @@ function renderAboutPage() {
   `;
 }
 
+function renderAboutPageThreeMinute() {
+  const chapters = [
+    {
+      id: "about-vision",
+      number: "01",
+      eyebrow: "Vision",
+      title: "組織願景",
+      lead: "讓每個家庭想到長照時，不再先感到混亂，而是知道有一個清楚、親切、值得信任的入口。",
+      body: "歲悅想建立的不是單一服務，而是一套靠近家庭生活的長照網絡。從居家照顧、日間照顧、社區據點到復能、培訓與品管，我們希望把複雜制度整理成家屬聽得懂、用得到、願意開始的下一步。",
+      image: "/assets/homepage-batch/10-family-consultation-fast.jpg",
+      points: ["家庭更容易開始", "長輩保有尊嚴與生活感", "照顧品質能被追蹤與改善"]
+    },
+    {
+      id: "about-mission",
+      number: "02",
+      eyebrow: "Mission",
+      title: "組織使命",
+      lead: "把照顧變成可以被理解、被安排、被回報，也被持續改善的日常系統。",
+      body: "我們每天做的事，是把家庭的焦慮翻譯成服務計畫，把現場照顧整理成紀錄與回饋，再把經驗回收到教育訓練和品質管理。讓家屬不用一個人摸索，讓第一線照顧者不是只靠熱情硬撐。",
+      image: "/assets/homepage-batch/03-supervisor-care-plan-fast.jpg",
+      points: ["先聽懂需求，再安排服務", "服務後留下家屬看得懂的紀錄", "用督導與教育支持第一線"]
+    },
+    {
+      id: "about-culture",
+      number: "03",
+      eyebrow: "Culture",
+      title: "團隊文化",
+      lead: "我們相信，溫柔不是抽象的感覺，而是每一次準時、每一筆紀錄、每一次回報都做得更清楚。",
+      body: "歲悅的文化很簡單：把專業說成人聽得懂的話，把現場經驗變成可學習的方法，把家屬的不安接住，也把照顧者的壓力看見。團隊可以快速前進，但不犧牲長輩與家屬真正需要的安心感。",
+      image: "/assets/quality-recruit-04-quality-meeting-fast.jpg",
+      points: ["清楚溝通", "主動回報", "一起改善"]
+    },
+    {
+      id: "about-team",
+      number: "04",
+      eyebrow: "Team",
+      title: "團隊成員",
+      lead: "歲悅不是單一人員到場服務，而是一群不同角色一起承接家庭的照顧系統。",
+      body: "從第一線服務、督導追蹤、護理復能、教育品管到行政系統，歲悅用角色分工承接家庭不同階段的照顧問題。",
+      image: "/assets/homepage-batch/04-admin-team-office-fast.jpg",
+      points: ["第一線照顧", "督導品管", "行政與系統支援"]
+    }
+  ];
+
+  const serviceCards = [
+    ["居家照顧", "到宅照顧、生活支持、服務紀錄與家屬回報。", "/assets/homecare-detail-01-greeting-fast.jpg", "#home-care"],
+    ["日間照顧", "白天到中心活動、用餐、休息，晚上仍能回家。", "/assets/daycare-detail-01-exercise-fast.jpg", "#day-care"],
+    ["社區據點", "健康促進、共餐、社區活動與長照資源諮詢。", "/assets/community-detail-01-exercise-fast.jpg", "#community"],
+    ["護理復能", "健康觀察、復能目標、移位步行與居家安全建議。", "/assets/nursing-detail-02-walking-fast.jpg", "#nursing"],
+    ["移工培訓", "把移位、沐浴、用餐與溝通做成可練習的課程。", "/assets/migrant-detail-02-transfer-fast.jpg", "#migrant-training"],
+    ["教育品管", "教材、訓練、稽核、紀錄檢核與改善流程。", "/assets/quality-detail-02-training-fast.jpg", "#quality"]
+  ];
+
+  const cultureCards = [
+    ["把話說清楚", "專業如果聽不懂，就很難讓家庭安心。我們練習把制度、服務與風險說成家屬能理解的下一步。"],
+    ["把紀錄留下來", "照顧不是只有當下完成，服務後的紀錄、回報與追蹤，會讓家屬知道狀態，也讓督導能看見變化。"],
+    ["把問題帶回團隊", "現場遇到的卡點不只交給個人消化，而是回到教育、品管、流程和系統裡一起改善。"],
+    ["把照顧者也照顧好", "長期穩定的服務，需要第一線有人教、有人問、有人一起承擔，而不是只要求人員自己撐住。"]
+  ];
+
+  const teamCards = [
+    ["照顧服務員", "在長輩熟悉的生活場域中，協助沐浴、用餐、移位、陪伴與生活支持。", "/assets/homepage-batch/05-orange-polo-caregiver-fast.jpg"],
+    ["居服督導", "協助評估需求、安排服務、追蹤紀錄與回應家屬在服務中的變化。", "/assets/homepage-batch/03-supervisor-care-plan-fast.jpg"],
+    ["日照與社區團隊", "設計白天作息、團體活動、共餐與社區支持，讓長輩有穩定參與。", "/assets/homepage-batch/02-daycare-group-exercise-fast.jpg"],
+    ["護理復能夥伴", "用健康觀察、復能訓練與居家安全建議，陪長輩練回生活能力。", "/assets/homepage-batch/13-rehab-walking-practice-fast.jpg"],
+    ["教育品管與培訓", "把服務經驗整理成教材、課程、稽核與改善流程，讓品質能被複製。", "/assets/quality-detail-04-improvement-fast.jpg"],
+    ["行政、系統與品牌", "支援表單、後台、內容、合作與營運資料，讓前線能專心照顧。", "/assets/homepage-batch/04-admin-team-office-fast.jpg"]
+  ];
+
+  return `
+    <div class="about-page about-three-minute-page">
+      <section class="hero service-detail-hero one-minute-service-hero about-minute-hero">
+        <div
+          class="hero-bg"
+          style="background-image: linear-gradient(90deg, rgba(45, 23, 9, 0.76) 0%, rgba(45, 23, 9, 0.56) 42%, rgba(45, 23, 9, 0.16) 72%, rgba(45, 23, 9, 0) 100%), linear-gradient(180deg, rgba(45, 23, 9, 0.04), rgba(45, 23, 9, 0.18)), url('/assets/homepage-batch/04-admin-team-office-fast.jpg');"
+          aria-hidden="true"
+        ></div>
+        <div class="hero-copy service-detail-copy">
+          <p class="eyebrow">About Suiyuecare</p>
+          <h1>關於歲悅</h1>
+          <p class="hero-slogan">3 分鐘看懂歲悅長照集團</p>
+          <p>歲悅長照把居家照顧、日間照顧、社區據點、護理復能、移工培訓與教育品管整合成一套更好開始、更好追蹤、也更好被信任的照顧系統。</p>
+          <div class="one-minute-service-actions">
+            <a class="primary-button" href="#about-vision" data-service-scroll="#about-vision">開始認識歲悅</a>
+            <a class="ghost-button" href="#about-services" data-service-scroll="#about-services">先看服務總覽</a>
+          </div>
+          <div class="one-minute-proof about-minute-proof" aria-label="關於歲悅閱讀摘要">
+            <span>3 分鐘</span>
+            <strong>願景、使命、文化、團隊，一次看完</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="about-read-map service-motion" aria-label="關於歲悅快速閱讀路徑">
+        ${chapters.map((chapter) => `
+          <a href="#${escapeHTML(chapter.id)}" data-service-scroll="#${escapeHTML(chapter.id)}">
+            <span>${escapeHTML(chapter.number)}</span>
+            <strong>${escapeHTML(chapter.title)}</strong>
+            <p>${escapeHTML(chapter.lead)}</p>
+          </a>
+        `).join("")}
+      </section>
+
+      <section id="about-services" class="about-services-section service-motion">
+        <div class="about-section-head">
+          <p class="eyebrow">What We Do</p>
+          <h2>我們提供什麼服務？</h2>
+          <span>如果只用一分鐘理解歲悅，重點就是：我們協助家庭把照顧需求整理清楚，再接上合適服務與後續追蹤。</span>
+        </div>
+        <div class="about-service-card-grid">
+          ${serviceCards.map(([title, copy, image, href]) => `
+            <a href="${escapeHTML(href)}">
+              <img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" />
+              <div>
+                <strong>${escapeHTML(title)}</strong>
+                <p>${escapeHTML(copy)}</p>
+              </div>
+            </a>
+          `).join("")}
+        </div>
+      </section>
+
+      ${chapters.slice(0, 2).map((chapter, index) => `
+        <section id="${escapeHTML(chapter.id)}" class="about-feature-panel service-motion ${index % 2 ? "is-reversed" : ""}">
+          <figure>
+            <img src="${escapeHTML(chapter.image)}" alt="${escapeHTML(chapter.title)}" />
+          </figure>
+          <div>
+            <p class="eyebrow">${escapeHTML(chapter.eyebrow)}</p>
+            <span>${escapeHTML(chapter.number)}</span>
+            <h2>${escapeHTML(chapter.title)}</h2>
+            <h3>${escapeHTML(chapter.lead)}</h3>
+            <p>${escapeHTML(chapter.body)}</p>
+            <ul>${chapter.points.map((point) => `<li>${escapeHTML(point)}</li>`).join("")}</ul>
+          </div>
+        </section>
+      `).join("")}
+
+      <section id="about-culture" class="about-culture-section service-motion">
+        <div class="about-section-head">
+          <p class="eyebrow">Culture</p>
+          <h2>團隊文化</h2>
+          <span>文化不是貼在牆上的字，而是服務現場每天做決定時，團隊會回頭檢查的工作方式。</span>
+        </div>
+        <div class="about-culture-layout">
+          <figure>
+            <img src="${escapeHTML(chapters[2].image)}" alt="歲悅團隊文化與教育品管" />
+          </figure>
+          <div class="about-culture-grid">
+            ${cultureCards.map(([title, copy], index) => `
+              <article>
+                <b>${String(index + 1).padStart(2, "0")}</b>
+                <h3>${escapeHTML(title)}</h3>
+                <p>${escapeHTML(copy)}</p>
+              </article>
+            `).join("")}
+          </div>
+        </div>
+      </section>
+
+      <section id="about-team" class="about-members-section service-motion">
+        <div class="about-section-head">
+          <p class="eyebrow">Team</p>
+          <h2>團隊成員</h2>
+          <span>先用角色看懂歲悅的團隊組成：真正穩定的照顧，背後需要前線、督導、教育、行政與系統一起運作。</span>
+        </div>
+        <div class="about-member-grid">
+          ${teamCards.map(([title, copy, image]) => `
+            <article>
+              <img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" />
+              <div>
+                <strong>${escapeHTML(title)}</strong>
+                <p>${escapeHTML(copy)}</p>
+              </div>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel about-cta-panel service-motion">
+        <div>
+          <p class="eyebrow">Start With Suiyuecare</p>
+          <h2>想更了解歲悅，或想討論照顧服務、合作、人才與系統導入？</h2>
+          <p>留下需求，我們會依照你的身份與問題，安排合適窗口回覆。</p>
+        </div>
+        <a class="primary-button" href="#contact">聯絡歲悅</a>
+      </section>
+    </div>
+  `;
+}
+
 function renderMilestonesPage() {
   const milestoneStats = [
     ["3", "核心服務城市", "臺北、新北、桃園逐步建立照顧網絡"],
@@ -4865,23 +5059,23 @@ function renderMilestonesPage() {
     ["1", "共同使命", "讓照顧變得更容易理解、更容易開始"]
   ];
   const timeline = [
-    ["2025", "01", "北區服務藍圖盤點", "Planning", "整理臺北、新北、桃園家庭照顧需求，確認居家、日照、社區與復能服務的發展方向。", "assets/homepage-batch/10-family-consultation-fast.jpg", "已完成"],
-    ["2025", "02", "居家照顧流程標準化", "Home Care", "建立個案建檔、服務媒合、派案、照顧紀錄與家屬回報的基礎流程。", "assets/homepage-batch/01-care-home-greeting-fast.jpg", "已完成"],
-    ["2025", "03", "督導陪跑制度啟動", "Quality", "把督導訪視、異常回報、服務品質檢核與照服員支持放進日常管理。", "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", "已完成"],
-    ["2025", "04", "日間照顧場域規劃", "Day Care", "規劃長輩白天活動、餐食、休息、健康觀察與家屬回報的中心營運節奏。", "assets/homepage-batch/02-daycare-group-exercise-fast.jpg", "已完成"],
-    ["2025", "05", "社區據點服務設計", "Community", "盤點健康促進、家屬課程、照顧諮詢與社區活動，讓照顧支持更靠近生活圈。", "assets/homepage-batch/12-community-health-class-fast.jpg", "已完成"],
-    ["2025", "06", "護理復能協作模型成形", "Reablement", "整合護理觀察、復能訓練與照顧陪伴，讓長輩能在生活裡重新練回能力。", "assets/homepage-batch/13-rehab-walking-practice-fast.jpg", "已完成"],
-    ["2025", "07", "移工照顧培訓課程開發", "Training", "將移位、沐浴、用餐、溝通與安全照顧拆成可演練的課程內容。", "assets/migrant-recruit-02-transfer.png", "已完成"],
-    ["2025", "08", "教育品管教材整理", "Education", "把第一線服務經驗轉化為教材、檢核表與案例討論，讓照顧品質可以被複製。", "assets/quality-recruit-04-quality-meeting.png", "已完成"],
-    ["2025", "09", "北北桃據點資料盤點", "Network", "整理士林、大同、萬華、信義、新店、新莊與蘆竹等服務節點資訊。", "assets/north-service-map-fast.jpg", "已完成"],
-    ["2025", "10", "人才招募制度擴充", "Recruiting", "建立居家、日照、移工培訓、教學品管與行政部門的職缺內容與發展路徑。", "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg", "已完成"],
-    ["2025", "11", "後台內容管理架構規劃", "CMS", "規劃文章、圖片、課程、表單、檔案下載與頁面文案的後台管理方式。", "assets/homepage-batch/04-admin-team-office-fast.jpg", "已完成"],
-    ["2025", "12", "年度服務與合作成果整理", "Review", "彙整服務據點、合作單位、得標紀錄與年度營運成果，作為 2026 擴展基礎。", "assets/homepage-batch/16-taipei-service-office-fast.jpg", "已完成"],
-    ["2026", "01", "健康 3.0 內容中心上線", "Health 3.0", "建立文章、懶人包、活動專區、影音與短影片內容，讓家屬更容易理解照顧知識。", "assets/homepage-batch/18-health-fall-prevention-cover.png", "已完成"],
-    ["2026", "02", "課程報名與表單留存完成", "Courses", "課程卡片、報名彈窗、表單資料留存與後台課程管理逐步串接。", "assets/homepage-batch/12-community-health-class-fast.jpg", "已完成"],
-    ["2026", "03", "投資人專區資料化", "Investor", "將公告、財報、下載檔與圖表資料改為後台可管理，提升對外資訊透明度。", "assets/homepage-batch/04-admin-team-office-fast.jpg", "已完成"],
-    ["2026", "04", "服務八大子頁模板化", "Service Pages", "居家、日照、社區、護理復能、移工培訓、教育品管、關於與大事記版型統一整理。", "assets/homepage-batch/09-nurse-blood-pressure.png", "已完成"],
-    ["2026", "05", "網站上線前總檢與內容補強", "Launch Check", "檢查前後台資料、SEO、RWD、表單寄信、圖片裁切、權限與內容健康檢查。", "assets/homepage-batch/15-phone-consultation.png", "進行中"],
+    ["2025", "01", "北區服務藍圖盤點", "Planning", "整理臺北、新北、桃園家庭照顧需求，確認居家、日照、社區與復能服務的發展方向。", "/assets/homepage-batch/10-family-consultation-fast.jpg", "已完成"],
+    ["2025", "02", "居家照顧流程標準化", "Home Care", "建立個案建檔、服務媒合、派案、照顧紀錄與家屬回報的基礎流程。", "/assets/homepage-batch/01-care-home-greeting-fast.jpg", "已完成"],
+    ["2025", "03", "督導陪跑制度啟動", "Quality", "把督導訪視、異常回報、服務品質檢核與照服員支持放進日常管理。", "/assets/homepage-batch/03-supervisor-care-plan-fast.jpg", "已完成"],
+    ["2025", "04", "日間照顧場域規劃", "Day Care", "規劃長輩白天活動、餐食、休息、健康觀察與家屬回報的中心營運節奏。", "/assets/homepage-batch/02-daycare-group-exercise-fast.jpg", "已完成"],
+    ["2025", "05", "社區據點服務設計", "Community", "盤點健康促進、家屬課程、照顧諮詢與社區活動，讓照顧支持更靠近生活圈。", "/assets/homepage-batch/12-community-health-class-fast.jpg", "已完成"],
+    ["2025", "06", "護理復能協作模型成形", "Reablement", "整合護理觀察、復能訓練與照顧陪伴，讓長輩能在生活裡重新練回能力。", "/assets/homepage-batch/13-rehab-walking-practice-fast.jpg", "已完成"],
+    ["2025", "07", "移工照顧培訓課程開發", "Training", "將移位、沐浴、用餐、溝通與安全照顧拆成可演練的課程內容。", "/assets/migrant-recruit-02-transfer.png", "已完成"],
+    ["2025", "08", "教育品管教材整理", "Education", "把第一線服務經驗轉化為教材、檢核表與案例討論，讓照顧品質可以被複製。", "/assets/quality-recruit-04-quality-meeting.png", "已完成"],
+    ["2025", "09", "北北桃據點資料盤點", "Network", "整理士林、大同、萬華、信義、新店、新莊與蘆竹等服務節點資訊。", "/assets/north-service-map-fast.jpg", "已完成"],
+    ["2025", "10", "人才招募制度擴充", "Recruiting", "建立居家、日照、移工培訓、教學品管與行政部門的職缺內容與發展路徑。", "/assets/homepage-batch/06-orange-polo-supervisor-fast.jpg", "已完成"],
+    ["2025", "11", "後台內容管理架構規劃", "CMS", "規劃文章、圖片、課程、表單、檔案下載與頁面文案的後台管理方式。", "/assets/homepage-batch/04-admin-team-office-fast.jpg", "已完成"],
+    ["2025", "12", "年度服務與合作成果整理", "Review", "彙整服務據點、合作單位、得標紀錄與年度營運成果，作為 2026 擴展基礎。", "/assets/homepage-batch/16-taipei-service-office-fast.jpg", "已完成"],
+    ["2026", "01", "健康 3.0 內容中心上線", "Health 3.0", "建立文章、懶人包、活動專區、影音與短影片內容，讓家屬更容易理解照顧知識。", "/assets/homepage-batch/18-health-fall-prevention-cover.png", "已完成"],
+    ["2026", "02", "課程報名與表單留存完成", "Courses", "課程卡片、報名彈窗、表單資料留存與後台課程管理逐步串接。", "/assets/homepage-batch/12-community-health-class-fast.jpg", "已完成"],
+    ["2026", "03", "投資人專區資料化", "Investor", "將公告、財報、下載檔與圖表資料改為後台可管理，提升對外資訊透明度。", "/assets/homepage-batch/04-admin-team-office-fast.jpg", "已完成"],
+    ["2026", "04", "服務八大子頁模板化", "Service Pages", "居家、日照、社區、護理復能、移工培訓、教育品管、關於與大事記版型統一整理。", "/assets/homepage-batch/09-nurse-blood-pressure.png", "已完成"],
+    ["2026", "05", "網站上線前總檢與內容補強", "Launch Check", "檢查前後台資料、SEO、RWD、表單寄信、圖片裁切、權限與內容健康檢查。", "/assets/homepage-batch/15-phone-consultation.png", "進行中"],
   ].map(([year, month, title, tag, copy, image, status]) => ({ year, month, title, tag, copy, image, status }));
   const sortedTimeline = [...timeline].sort((a, b) => Number(b.year) - Number(a.year) || Number(b.month) - Number(a.month));
   const timelineGroups = [...new Set(sortedTimeline.map((item) => item.year))]
@@ -4889,37 +5083,35 @@ function renderMilestonesPage() {
 
   return `
     <div class="milestones-page">
-      <section class="milestone-hero">
-        <div>
+      <section class="hero service-detail-hero one-minute-service-hero milestone-hero">
+        <div
+          class="hero-bg"
+          style="background-image: linear-gradient(90deg, rgba(45, 23, 9, 0.78) 0%, rgba(45, 23, 9, 0.58) 42%, rgba(45, 23, 9, 0.16) 74%, rgba(45, 23, 9, 0) 100%), linear-gradient(180deg, rgba(45, 23, 9, 0.08), rgba(45, 23, 9, 0.18)), url('/assets/homepage-batch/16-taipei-service-office-fast.jpg');"
+          aria-hidden="true"
+        ></div>
+        <div class="hero-copy service-detail-copy">
           <p class="eyebrow">Milestones</p>
           <h1>大事記</h1>
+          <p class="hero-slogan">沿著時間軸，看歲悅如何把照顧系統一步步整理成形。</p>
           <p>從一通照顧諮詢開始，到北北桃服務網絡與教育品管系統，歲悅把每一個家庭的需求，慢慢整理成可以被理解、被追蹤、被信任的照顧歷程。</p>
+          <div class="one-minute-service-actions">
+            <a class="primary-button" href="#milestone-timeline" data-service-scroll="#milestone-timeline">看時間軸</a>
+            <a class="ghost-button" href="#contact">合作洽詢</a>
+          </div>
           <div class="milestone-scroll-cue">
             <span></span>
             <strong>往下滑，看歲悅的發展歷程</strong>
           </div>
         </div>
-        <aside class="milestone-hero-card">
-          <img src="assets/homepage-batch/04-admin-team-office-fast.jpg" alt="歲悅長照團隊發展" />
-          <div>
-            <span>Suiyuecare Corps.</span>
-            <strong>讓照顧從不安，走向清楚與安心。</strong>
-          </div>
-        </aside>
       </section>
 
       <section class="milestone-stats">
         ${milestoneStats.map(([value, label, copy]) => `<article><strong>${value}</strong><span>${label}</span><p>${copy}</p></article>`).join("")}
       </section>
 
-      <section class="milestone-journey" aria-label="歲悅長照發展時間軸">
+      <section id="milestone-timeline" class="milestone-journey" aria-label="歲悅長照發展時間軸">
         <div class="milestone-rail" aria-hidden="true">
           <span class="milestone-rail-progress"></span>
-        </div>
-        <div class="milestone-intro">
-          <p class="eyebrow">Our Journey</p>
-          <h2>最新進度在最上方，越往下越接近歲悅開始整理照顧系統的起點。</h2>
-          <p>大事記依年度與月份倒序排列，先看最近完成與正在推進的內容，再一路往下回看 2026、2025 的服務、品管、內容與後台建置歷程。</p>
         </div>
         <div class="milestone-list">
           ${timelineGroups.map((group) => `
@@ -4931,13 +5123,13 @@ function renderMilestonesPage() {
               ${group.items.map((item, index) => {
                 const globalIndex = sortedTimeline.findIndex((entry) => entry.year === item.year && entry.month === item.month);
                 return `
-                  <article class="milestone-card ${globalIndex === 0 ? "active" : ""}" data-milestone-card>
+                  <article class="milestone-card ${globalIndex === 0 ? "active" : ""}" data-milestone-card style="--card-index:${globalIndex}">
                     <div class="milestone-year">
                       <span>${item.month}月</span>
                       <b>${item.year}</b>
                     </div>
                     <figure>
-                      <img src="${item.image}" alt="${item.title}" />
+                      <img src="${item.image}" alt="${item.title}" loading="${globalIndex < 2 ? "eager" : "lazy"}" />
                     </figure>
                     <div class="milestone-copy">
                       <small>${globalIndex === 0 ? "<i>最新</i>" : ""}${item.tag}<em>${item.status}</em></small>
@@ -9630,7 +9822,7 @@ function renderPage(slug) {
   } else if (normalized === "about") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderAboutPage();
+    pageView.innerHTML = renderAboutPageThreeMinute();
   } else if (normalized === "milestones") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -10307,7 +10499,7 @@ window.setTimeout(() => {
 
 window.addEventListener("load", () => {
   window.setTimeout(() => {
-    if (!location.hash || location.hash === "#home") {
+    if ((!location.hash || location.hash === "#home") && routeSlugFromPath() === "home") {
       history.replaceState(null, "", "#home");
       renderPage("home");
       window.scrollTo({ top: 0, behavior: "smooth" });

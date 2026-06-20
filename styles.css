@@ -2899,6 +2899,315 @@ h2 {
   padding: 22px;
   box-shadow: none;
 }
+.about-three-minute-page {
+  background: linear-gradient(180deg, #fffaf2 0, #fffdf8 38%, #fff7eb 100%);
+}
+.about-minute-hero {
+  min-height: min(760px, calc(100svh - var(--header-height)));
+}
+.about-minute-hero .hero-bg {
+  background-position: center;
+}
+.about-minute-hero .service-detail-copy {
+  max-width: min(760px, 58vw);
+}
+.about-minute-hero .service-detail-copy h1 {
+  font-size: clamp(58px, 6vw, 92px);
+}
+.about-minute-hero .service-detail-copy > p:not(.eyebrow):not(.hero-slogan) {
+  max-width: min(720px, 100%);
+  overflow-wrap: anywhere;
+}
+.about-minute-proof {
+  max-width: 520px;
+}
+.about-read-map,
+.about-services-section,
+.about-feature-panel,
+.about-culture-section,
+.about-members-section {
+  padding: 42px clamp(32px, 5vw, 86px);
+}
+.about-read-map {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 34px;
+}
+.about-read-map a,
+.about-service-card-grid a,
+.about-feature-panel,
+.about-culture-grid article,
+.about-member-grid article {
+  border: 1px solid rgba(234, 211, 179, .92);
+  border-radius: 22px;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 18px 44px rgba(83,43,11,.075);
+}
+.about-read-map a {
+  display: grid;
+  gap: 12px;
+  min-height: 220px;
+  padding: 24px;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.about-read-map a:hover,
+.about-service-card-grid a:hover,
+.about-member-grid article:hover {
+  transform: translateY(-4px);
+  border-color: rgba(240,138,36,.42);
+  box-shadow: 0 24px 62px rgba(83,43,11,.12);
+}
+.about-read-map span,
+.about-feature-panel span,
+.about-culture-grid b {
+  color: var(--orange-dark);
+  font-size: 18px;
+  font-weight: 1000;
+  letter-spacing: .12em;
+}
+.about-read-map strong {
+  color: var(--brown);
+  font-size: 28px;
+  line-height: 1.15;
+}
+.about-read-map p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.72;
+}
+.about-service-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.about-service-card-grid a {
+  overflow: hidden;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.about-service-card-grid img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+.about-service-card-grid div {
+  padding: 20px;
+}
+.about-service-card-grid strong,
+.about-member-grid strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--brown);
+  font-size: 24px;
+  font-weight: 1000;
+  line-height: 1.25;
+}
+.about-service-card-grid p,
+.about-feature-panel p,
+.about-culture-grid p,
+.about-member-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.78;
+}
+.about-feature-panel {
+  display: grid;
+  grid-template-columns: minmax(320px, .62fr) minmax(0, 1fr);
+  gap: clamp(22px, 4vw, 56px);
+  align-items: stretch;
+  margin: 28px clamp(32px, 5vw, 86px);
+  padding: clamp(22px, 3vw, 36px);
+}
+.about-feature-panel.is-reversed {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .62fr);
+}
+.about-feature-panel.is-reversed figure {
+  order: 2;
+}
+.about-feature-panel figure,
+.about-culture-layout figure {
+  min-height: 420px;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--brown);
+}
+.about-feature-panel img,
+.about-culture-layout img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.about-feature-panel > div {
+  display: grid;
+  align-content: center;
+  padding: clamp(10px, 2vw, 24px);
+}
+.about-feature-panel h2 {
+  margin: 8px 0 14px;
+  color: var(--brown);
+  font-size: clamp(42px, 5vw, 74px);
+  line-height: 1.05;
+}
+.about-feature-panel h3 {
+  max-width: 860px;
+  margin: 0 0 16px;
+  color: var(--brown);
+  font-size: clamp(24px, 2.6vw, 36px);
+  line-height: 1.3;
+}
+.about-feature-panel ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.about-feature-panel li {
+  padding: 9px 14px;
+  border: 1px solid rgba(240,138,36,.24);
+  border-radius: 999px;
+  background: #fff7eb;
+  color: var(--brown);
+  font-weight: 950;
+}
+.about-culture-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, .72fr) minmax(0, 1fr);
+  gap: 18px;
+}
+.about-culture-grid,
+.about-member-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.about-culture-grid article {
+  min-height: 230px;
+  padding: 24px;
+}
+.about-culture-grid h3 {
+  margin: 18px 0 10px;
+  color: var(--brown);
+  font-size: 28px;
+  line-height: 1.2;
+}
+.about-member-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.about-member-grid article {
+  overflow: hidden;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.about-member-grid img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+.about-member-grid div {
+  padding: 22px;
+}
+@media (max-width: 1180px) {
+  .about-minute-hero .service-detail-copy {
+    max-width: min(760px, 84vw);
+  }
+  .about-read-map,
+  .about-service-card-grid,
+  .about-culture-layout,
+  .about-member-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .about-feature-panel,
+  .about-feature-panel.is-reversed {
+    grid-template-columns: 1fr;
+  }
+  .about-feature-panel.is-reversed figure {
+    order: 0;
+  }
+  .about-culture-layout figure {
+    min-height: 360px;
+  }
+}
+@media (max-width: 760px) {
+  .about-three-minute-page,
+  .about-three-minute-page section,
+  .about-read-map a,
+  .about-service-card-grid a,
+  .about-culture-grid article,
+  .about-member-grid article {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  .about-three-minute-page h1,
+  .about-three-minute-page h2,
+  .about-three-minute-page h3,
+  .about-three-minute-page p,
+  .about-three-minute-page strong,
+  .about-three-minute-page li {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+    line-break: anywhere;
+  }
+  .about-minute-hero.service-detail-hero {
+    min-height: 650px;
+    height: 650px;
+  }
+  .about-minute-hero .service-detail-copy {
+    max-width: min(330px, calc(100vw - 40px));
+    padding-right: 0;
+  }
+  .about-minute-hero .service-detail-copy > p:not(.eyebrow):not(.hero-slogan) {
+    max-width: 100%;
+    font-size: 16px;
+    line-height: 1.78;
+  }
+  .about-minute-hero .service-detail-copy h1 {
+    font-size: clamp(42px, 13vw, 58px);
+  }
+  .about-read-map,
+  .about-services-section,
+  .about-feature-panel,
+  .about-culture-section,
+  .about-members-section {
+    max-width: 390px;
+    margin-left: 0;
+    margin-right: auto;
+    padding-inline: 20px;
+    padding-block: 30px;
+  }
+  .about-read-map,
+  .about-service-card-grid,
+  .about-culture-layout,
+  .about-culture-grid,
+  .about-member-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-read-map a {
+    min-height: 0;
+  }
+  .about-feature-panel {
+    margin-inline: 20px;
+  }
+  .about-feature-panel figure,
+  .about-culture-layout figure {
+    min-height: 280px;
+  }
+  .about-feature-panel h2 {
+    font-size: clamp(38px, 12vw, 52px);
+  }
+  .about-feature-panel h3 {
+    font-size: 23px;
+  }
+  .about-service-card-grid img,
+  .about-member-grid img {
+    height: 200px;
+  }
+}
 .milestones-page {
   background: #fffaf2;
   color: var(--brown);
@@ -3037,18 +3346,19 @@ h2 {
   line-height: 1.55;
 }
 .milestone-journey {
+  --timeline-x: 56px;
   position: relative;
-  display: grid;
-  grid-template-columns: 72px minmax(300px, .38fr) minmax(0, 1fr);
-  gap: 22px;
-  padding: 44px clamp(32px,5vw,86px) 58px;
+  display: block;
+  padding: 56px clamp(32px,5vw,86px) 68px;
 }
 .milestone-rail {
-  position: sticky;
-  top: 124px;
+  position: absolute;
+  top: 84px;
+  bottom: 92px;
+  left: calc(clamp(32px,5vw,86px) + var(--timeline-x));
   width: 4px;
-  height: calc(100vh - 180px);
-  margin: 0 auto;
+  height: auto;
+  margin: 0;
   overflow: hidden;
   border-radius: 999px;
   background: rgba(198,100,18,.18);
@@ -3082,26 +3392,40 @@ h2 {
   line-height: 1.85;
 }
 .milestone-list {
+  position: relative;
   display: grid;
-  gap: 34px;
+  gap: 46px;
 }
 .milestone-year-group {
   display: grid;
-  gap: 18px;
+  gap: 20px;
 }
 .milestone-year-heading {
   position: sticky;
   top: 92px;
   z-index: 2;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: 360px minmax(0, 1fr);
   gap: 18px;
   align-items: end;
-  padding: 10px 4px 12px;
+  padding: 14px 4px 16px;
   backdrop-filter: blur(16px);
   background: linear-gradient(180deg, rgba(255,250,242,.96), rgba(255,250,242,.72));
 }
+.milestone-year-heading::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--timeline-x) - 11px);
+  bottom: 26px;
+  width: 22px;
+  height: 22px;
+  border: 5px solid #fffaf2;
+  border-radius: 999px;
+  background: var(--orange);
+  box-shadow: 0 0 0 9px rgba(240,138,36,.13), 0 12px 30px rgba(198,100,18,.18);
+}
 .milestone-year-heading span {
+  padding-left: 90px;
   color: var(--orange-dark);
   font-size: clamp(52px, 5vw, 86px);
   font-weight: 1000;
@@ -3119,7 +3443,7 @@ h2 {
   --milestone-image-size: clamp(230px, 20vw, 320px);
   position: relative;
   display: grid;
-  grid-template-columns: 120px var(--milestone-image-size) minmax(0, 1fr);
+  grid-template-columns: 220px var(--milestone-image-size) minmax(0, 1fr);
   gap: 18px;
   align-items: center;
   min-height: calc(var(--milestone-image-size) + 28px);
@@ -3131,19 +3455,33 @@ h2 {
   opacity: .72;
   transform: translateY(10px) scale(.99);
   transition: opacity .35s ease, transform .35s ease, box-shadow .35s ease, border-color .35s ease, background .35s ease;
+  animation: milestoneRise .72s ease backwards;
+  animation-delay: calc(var(--card-index, 0) * 42ms);
 }
 .milestone-card::before {
   content: "";
   position: absolute;
-  top: 34px;
-  left: -35px;
-  width: 15px;
-  height: 15px;
+  top: 50%;
+  left: calc(var(--timeline-x) - 10px);
+  width: 20px;
+  height: 20px;
   border: 4px solid #fffaf2;
   border-radius: 999px;
   background: rgba(198,100,18,.42);
   box-shadow: 0 0 0 1px rgba(198,100,18,.18), 0 8px 22px rgba(198,100,18,.16);
   transition: transform .35s ease, background .35s ease, box-shadow .35s ease;
+  transform: translateY(-50%);
+}
+.milestone-card::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: calc(var(--timeline-x) + 16px);
+  width: 120px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(240,138,36,.4), rgba(240,138,36,0));
+  transform: translateY(-50%);
 }
 .milestone-card.active {
   opacity: 1;
@@ -3162,12 +3500,13 @@ h2 {
 .milestone-card:hover::before {
   background: var(--orange);
   box-shadow: 0 0 0 8px rgba(240,138,36,.12), 0 10px 26px rgba(198,100,18,.24);
-  transform: scale(1.15);
+  transform: translateY(-50%) scale(1.15);
 }
 .milestone-year {
   display: grid;
   align-content: space-between;
-  padding: 18px 8px 18px 18px;
+  min-height: 100%;
+  padding: 18px 8px 18px 90px;
 }
 .milestone-year span {
   color: var(--orange-dark);
@@ -3255,6 +3594,16 @@ h2 {
   font-size: 17px;
   font-weight: 850;
   line-height: 1.85;
+}
+@keyframes milestoneRise {
+  0% {
+    opacity: 0;
+    transform: translateY(22px) scale(.985);
+  }
+  100% {
+    opacity: .72;
+    transform: translateY(10px) scale(.99);
+  }
 }
 .milestone-next {
   margin: 0 clamp(32px,5vw,86px) 78px;
@@ -3448,6 +3797,35 @@ h2 {
 .one-minute-service-actions .ghost-button {
   min-width: 178px;
   box-shadow: 0 14px 30px rgba(45,23,9,.18);
+}
+.milestone-hero.service-detail-hero {
+  min-height: min(760px, calc(100svh - var(--header-height)));
+  padding: clamp(64px, 6.4vw, 108px) clamp(32px, 5vw, 86px);
+  background: #2d1709;
+}
+.milestone-hero .hero-bg {
+  background-position: center;
+}
+.milestone-hero .service-detail-copy {
+  max-width: min(800px, 60vw);
+}
+.milestone-hero .service-detail-copy h1 {
+  font-size: clamp(58px, 6.2vw, 98px);
+}
+.milestone-hero .hero-slogan {
+  max-width: min(100%, 680px);
+}
+.milestone-hero .milestone-scroll-cue {
+  margin-top: 26px;
+  color: rgba(255, 248, 238, .94);
+  text-shadow: 0 2px 14px rgba(45,23,9,.35);
+}
+.milestone-hero .milestone-scroll-cue span {
+  border-color: rgba(255,248,238,.7);
+  background: rgba(255,255,255,.08);
+}
+.milestone-hero .milestone-scroll-cue span::after {
+  background: #fff;
 }
 .one-minute-proof {
   display: inline-flex;
@@ -8968,5 +9346,150 @@ input[name="_honey"] { display: none !important; }
   .not-found-page,
   .cms-managed-section {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .about-three-minute-page .about-minute-hero.one-minute-service-hero .hero-copy.service-detail-copy {
+    max-width: min(330px, calc(100vw - 40px)) !important;
+  }
+  .about-three-minute-page .about-minute-hero.one-minute-service-hero .service-detail-copy > p:not(.eyebrow):not(.hero-slogan) {
+    max-width: 100% !important;
+    font-size: 16px !important;
+    line-height: 1.78 !important;
+  }
+  .about-three-minute-page .about-read-map,
+  .about-three-minute-page .about-services-section,
+  .about-three-minute-page .about-feature-panel,
+  .about-three-minute-page .about-culture-section,
+  .about-three-minute-page .about-members-section {
+    width: 100%;
+    max-width: 390px;
+    margin-left: 0;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .about-three-minute-page .about-read-map a,
+  .about-three-minute-page .about-service-card-grid a,
+  .about-three-minute-page .about-culture-grid article,
+  .about-three-minute-page .about-member-grid article {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 1180px) {
+  .milestones-page .milestone-journey {
+    --timeline-x: 48px;
+    display: block;
+    padding: 44px clamp(24px, 5vw, 56px) 58px;
+  }
+  .milestones-page .milestone-rail {
+    display: block;
+    left: calc(clamp(24px, 5vw, 56px) + var(--timeline-x));
+  }
+  .milestones-page .milestone-year-heading {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+  .milestones-page .milestone-year-heading span,
+  .milestones-page .milestone-year {
+    padding-left: 78px;
+  }
+  .milestones-page .milestone-card {
+    --milestone-image-size: clamp(220px, 27vw, 300px);
+    grid-template-columns: 168px var(--milestone-image-size) minmax(0, 1fr);
+  }
+  .milestones-page .milestone-card::before {
+    display: block;
+    left: calc(var(--timeline-x) - 10px);
+  }
+  .milestones-page .milestone-card::after {
+    left: calc(var(--timeline-x) + 16px);
+    width: 92px;
+  }
+}
+
+@media (max-width: 760px) {
+  .milestones-page .milestone-hero.one-minute-service-hero {
+    min-height: 680px;
+    height: auto;
+  }
+  .milestones-page .milestone-hero .hero-copy.service-detail-copy {
+    max-width: min(330px, calc(100vw - 40px));
+  }
+  .milestones-page .milestone-hero .service-detail-copy h1 {
+    font-size: clamp(50px, 15vw, 68px);
+  }
+  .milestones-page .milestone-hero .hero-slogan,
+  .milestones-page .milestone-hero .service-detail-copy > p:not(.eyebrow):not(.hero-slogan) {
+    max-width: 100%;
+  }
+  .milestones-page .milestone-journey {
+    --timeline-x: 24px;
+    padding: 34px 20px 48px;
+  }
+  .milestones-page .milestone-rail {
+    left: calc(20px + var(--timeline-x));
+    top: 58px;
+    bottom: 64px;
+  }
+  .milestones-page .milestone-list {
+    gap: 30px;
+  }
+  .milestones-page .milestone-year-heading {
+    top: var(--header-height);
+    grid-template-columns: 1fr;
+    padding-left: 54px;
+  }
+  .milestones-page .milestone-year-heading p {
+    display: none;
+  }
+  .milestones-page .milestone-year-heading::before {
+    left: calc(var(--timeline-x) - 10px);
+    bottom: 28px;
+  }
+  .milestones-page .milestone-year-heading span {
+    padding-left: 0;
+    font-size: 48px;
+  }
+  .milestones-page .milestone-card {
+    --milestone-image-size: 100%;
+    grid-template-columns: 1fr;
+    margin-left: 54px;
+    padding: 12px;
+  }
+  .milestones-page .milestone-card::before {
+    left: calc((var(--timeline-x) * -1) - 39px);
+    top: 36px;
+    transform: none;
+  }
+  .milestones-page .milestone-card::after {
+    left: calc((var(--timeline-x) * -1) - 13px);
+    top: 46px;
+    width: 34px;
+    transform: none;
+  }
+  .milestones-page .milestone-card.active::before,
+  .milestones-page .milestone-card:hover::before {
+    transform: scale(1.08);
+  }
+  .milestones-page .milestone-year {
+    min-height: 0;
+    padding: 8px 10px 0;
+  }
+  .milestones-page .milestone-card figure {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+  .milestones-page .milestone-copy {
+    padding: 6px 10px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .milestone-card {
+    animation: none;
   }
 }

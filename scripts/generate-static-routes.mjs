@@ -19,6 +19,24 @@ const routes = [
     priority: "1.0"
   },
   {
+    slug: "about",
+    path: "/about/",
+    title: "關於歲悅｜歲悅長照集團",
+    description: "3 分鐘認識歲悅長照集團的組織願景、使命、團隊文化、服務系統與團隊成員。",
+    image: "/assets/hero-care-hero-fast.jpg",
+    preloadImage: "/assets/homepage-batch/04-admin-team-office-fast.jpg",
+    priority: "0.92"
+  },
+  {
+    slug: "milestones",
+    path: "/milestones/",
+    title: "大事記｜歲悅長照集團",
+    description: "查看歲悅長照集團的重要里程碑、服務擴張、據點成立與合作紀錄。",
+    image: "/assets/homepage-batch/16-taipei-service-office-fast.jpg",
+    preloadImage: "/assets/homepage-batch/16-taipei-service-office-fast.jpg",
+    priority: "0.9"
+  },
+  {
     slug: "home-care",
     path: "/home-care/",
     title: "居家照顧｜歲悅長照集團",
