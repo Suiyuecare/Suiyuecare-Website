@@ -143,14 +143,14 @@ const routeHeroPreloads = {
   milestones: "assets/homepage-batch/16-taipei-service-office-fast.jpg",
   "home-care": "assets/homecare-detail-01-greeting-hero-fast.jpg",
   "day-care": "assets/daycare-detail-01-exercise-hero-fast.jpg",
-  community: "assets/community-detail-01-exercise-hero-fast.jpg",
+  community: "assets/community-detail-01-exercise-hero-hires.jpg",
   nursing: "assets/nursing-detail-02-walking-hero-fast.jpg",
   "migrant-training": "assets/migrant-detail-01-classroom-hero-fast.jpg",
   quality: "assets/quality-detail-04-improvement-hero-fast.jpg",
-  software: "assets/admin-recruit-02-operations-hero-fast.jpg",
-  talent: "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
+  software: "assets/admin-recruit-02-operations-hero-hires.jpg",
+  talent: "assets/homepage-batch/06-orange-polo-supervisor-hires.jpg",
   land: "assets/location-taipei-fast.jpg",
-  "investor-recruiting": "assets/admin-recruit-02-operations-hero-fast.jpg"
+  "investor-recruiting": "assets/admin-recruit-02-operations-hero-hires.jpg"
 };
 
 const routeSeoMap = {
@@ -788,7 +788,7 @@ Object.assign(articlePages, {
     category: "課程活動",
     title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
     dek: "把移位、用餐、跌倒預防與照顧溝通整理成家人也能操作的課程。",
-    image: "assets/homepage-batch/12-community-health-class-fast.jpg",
+    image: "assets/homepage-batch/12-community-health-class-hires.jpg",
     author: "歲悅教育品管",
     date: "2026.04.28",
     readTime: "3 min read",
@@ -805,7 +805,7 @@ Object.assign(articlePages, {
     category: "活動專區",
     title: "日照體驗參觀日：認識家庭喘息與白天照顧",
     dek: "帶家屬理解日間照顧的一天，包含活動、共餐、休息與回報流程。",
-    image: "assets/homepage-batch/02-daycare-group-exercise-fast.jpg",
+    image: "assets/homepage-batch/02-daycare-group-exercise-hires.jpg",
     author: "歲悅日照團隊",
     date: "2026.04.22",
     readTime: "3 min read",
@@ -918,7 +918,7 @@ const relatedArticleCards = [
     href: "#article-family-care-course",
     category: "課程報名",
     title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
-    image: "assets/homepage-batch/12-community-health-class-fast.jpg"
+    image: "assets/homepage-batch/12-community-health-class-hires.jpg"
   }
 ];
 
@@ -998,7 +998,7 @@ const healthArticles = [
     category: "課程",
     title: "家屬照顧課：把照顧技巧變成每天用得到的方法",
     excerpt: "把移位、用餐、跌倒預防與照顧溝通整理成家人也能操作的課程。",
-    image: "assets/homepage-batch/12-community-health-class-fast.jpg",
+    image: "assets/homepage-batch/12-community-health-class-hires.jpg",
     author: "歲悅教育品管",
     date: "2026.04.28",
     keywords: "課程 家屬照顧 移位 跌倒預防"
@@ -1085,13 +1085,13 @@ function formatPostDate(dateValue, yearOnly = false) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function getPostImage(post, fallback = "assets/homepage-batch/02-daycare-group-exercise-fast.jpg") {
+function getPostImage(post, fallback = "assets/homepage-batch/02-daycare-group-exercise-hires.jpg") {
   const embedded = post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
   const acfImage = post?.acf?.image?.url || post?.acf?.avatar?.url || post?.acf?.speaker_photo?.url || post?.acf?.cover?.url;
   return fastAssetUrl(acfImage || embedded || fallback);
 }
 
-function getCmsModuleImage(item, fallback = "assets/homepage-batch/02-daycare-group-exercise-fast.jpg") {
+function getCmsModuleImage(item, fallback = "assets/homepage-batch/02-daycare-group-exercise-hires.jpg") {
   return fastAssetUrl(item?.image?.public_url || item?.metadata?.image_url || fallback);
 }
 
@@ -1099,14 +1099,14 @@ const fastAssetPaths = new Set([
   "assets/nursing-detail-02-walking-fast.jpg",
   "assets/hero-care-fast.jpg",
   "assets/nursing-detail-04-care-plan-fast.jpg",
-  "assets/admin-recruit-02-operations-hero-fast.jpg",
+  "assets/admin-recruit-02-operations-hero-hires.jpg",
   "assets/migrant-detail-01-classroom-fast.jpg",
   "assets/scene-care-note-fast.jpg",
   "assets/hero-care-hero-fast.jpg",
   "assets/service-overview-fast.jpg",
   "assets/quality-recruit-contact-sheet-fast.jpg",
   "assets/homecare-detail-01-greeting-hero-fast.jpg",
-  "assets/admin-recruit-02-operations-fast.jpg",
+  "assets/admin-recruit-02-operations-hires.jpg",
   "assets/community-detail-02-meal-fast.jpg",
   "assets/homecare-detail-01-greeting-fast.jpg",
   "assets/quality-detail-04-improvement-fast.jpg",
@@ -1118,19 +1118,19 @@ const fastAssetPaths = new Set([
   "assets/migrant-recruit-contact-sheet-fast.jpg",
   "assets/nursing-detail-03-home-safety-fast.jpg",
   "assets/homepage-batch/04-admin-team-office-fast.jpg",
-  "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
+  "assets/homepage-batch/06-orange-polo-supervisor-hires.jpg",
   "assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg",
   "assets/homepage-batch/01-care-home-greeting-fast.jpg",
   "assets/homepage-batch/14-care-notes-fast.jpg",
   "assets/homepage-batch/10-family-consultation-fast.jpg",
   "assets/homepage-batch/03-supervisor-care-plan-fast.jpg",
-  "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg",
-  "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg",
-  "assets/homepage-batch/11-elder-art-activity-fast.jpg",
+  "assets/homepage-batch/05-orange-polo-caregiver-hires.jpg",
+  "assets/homepage-batch/09-nurse-blood-pressure-hires.jpg",
+  "assets/homepage-batch/11-elder-art-activity-hires.jpg",
   "assets/homepage-batch/16-taipei-service-office-fast.jpg",
-  "assets/homepage-batch/12-community-health-class-fast.jpg",
+  "assets/homepage-batch/12-community-health-class-hires.jpg",
   "assets/homepage-batch/19-health-dementia-cover-fast.jpg",
-  "assets/homepage-batch/02-daycare-group-exercise-fast.jpg",
+  "assets/homepage-batch/02-daycare-group-exercise-hires.jpg",
   "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
   "assets/cis-guide-fast.jpg",
   "assets/quality-detail-02-training-fast.jpg",
@@ -1142,7 +1142,7 @@ const fastAssetPaths = new Set([
   "assets/quality-detail-03-audit-fast.jpg",
   "assets/daycare-detail-01-exercise-fast.jpg",
   "assets/quality-recruit-02-training-fast.jpg",
-  "assets/community-detail-01-exercise-hero-fast.jpg",
+  "assets/community-detail-01-exercise-hero-hires.jpg",
   "assets/daycare-detail-02-meal-fast.jpg",
   "assets/daycare-detail-04-checkin-fast.jpg",
   "assets/scene-home-care-fast.jpg",
@@ -3136,7 +3136,7 @@ function renderWordPressStories(posts) {
     const service = acf.service_type || "居家照顧";
     const quote = acf.quote || stripHTML(post.title?.rendered || "");
     const feedback = acf.short_feedback || stripHTML(post.excerpt?.rendered || post.content?.rendered || "");
-    const image = getPostImage(post, "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg");
+    const image = getPostImage(post, "assets/homepage-batch/05-orange-polo-caregiver-hires.jpg");
     return `
       <article>
         <img class="story-face" src="${escapeHTML(image)}" alt="${escapeHTML(name)}頭像" />
@@ -3216,7 +3216,7 @@ function renderSupabaseRecruit(items) {
   if (!items?.length || !recruitList) return;
 
   recruitList.innerHTML = items.map((item) => {
-    const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg");
+    const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver-hires.jpg");
     return `
       <a href="${escapeHTML(normalizePublicHref(item.link_url || "/talent/"))}">
         <figure>
@@ -3246,7 +3246,7 @@ function renderSupabaseStories(items) {
   slider.innerHTML = items.map((item) => {
     const name = item.subtitle || item.metadata?.person_name || "家屬回饋";
     const service = item.badge_label || item.metadata?.service_type || "居家照顧";
-    const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg");
+    const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver-hires.jpg");
     return `
       <article>
         <img class="story-face" src="${escapeHTML(image)}" alt="${escapeHTML(name)}頭像" />
@@ -3678,7 +3678,7 @@ async function loadSupabaseHomeModules() {
 }
 
 function normalizeCareStory(row) {
-  const cover = normalizeLocalAssetUrl(row.cover_image?.public_url || row.cover_image_url || "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg");
+  const cover = normalizeLocalAssetUrl(row.cover_image?.public_url || row.cover_image_url || "assets/homepage-batch/05-orange-polo-caregiver-hires.jpg");
   const avatar = normalizeLocalAssetUrl(row.avatar_image?.public_url || row.avatar_image_url || cover);
   return {
     slug: row.slug,
@@ -3877,7 +3877,7 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   xindian: {
-    image: "assets/homepage-batch/12-community-health-class-fast.jpg",
+    image: "assets/homepage-batch/12-community-health-class-hires.jpg",
     alt: "新店日間照顧據點照片",
     type: "新北市｜日間照顧點",
     name: "歲悅新店居家長照機構 / 歲悅職能治療所",
@@ -3890,7 +3890,7 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   xinzhuang: {
-    image: "assets/homepage-batch/12-community-health-class-fast.jpg",
+    image: "assets/homepage-batch/12-community-health-class-hires.jpg",
     alt: "新莊社區據點照片",
     type: "新北市｜社區照顧點",
     name: "歲悅新莊辦公室",
@@ -4290,7 +4290,7 @@ function normalizeCourse(course) {
     type: course.course_type || "實體課",
     location: course.location || "待公告",
     seats: isOpen ? (course.seats_label || (course.capacity ? `${course.capacity} 人` : "名額開放中")) : "已截止",
-    image: cover.public_url || "assets/homepage-batch/12-community-health-class-fast.jpg",
+    image: cover.public_url || "assets/homepage-batch/12-community-health-class-hires.jpg",
     isFeatured: Boolean(course.is_featured),
     registrationStatus: course.registration_status || "open",
     isOpen,
@@ -4605,7 +4605,7 @@ function renderAboutPage() {
   const aboutSystems = [
     ["居家照顧", "到宅身體照顧、生活支持、服務紀錄與家屬回報。", "assets/homepage-batch/01-care-home-greeting-fast.jpg"],
     ["日間照顧", "白天托顧、活動參與、共餐休息與家屬喘息支持。", "assets/daycare-recruit-02-exercise.png"],
-    ["社區據點", "失智據點、健康促進、家屬課程與社區預防延緩失能。", "assets/homepage-batch/12-community-health-class-fast.jpg"],
+    ["社區據點", "失智據點、健康促進、家屬課程與社區預防延緩失能。", "assets/homepage-batch/12-community-health-class-hires.jpg"],
     ["護理復能", "職能治療、復能訓練、居家安全建議與生活功能支持。", "assets/nursing-rehab-hero.png"],
     ["移工培訓", "把家庭照顧技能拆成可理解、可練習、可追蹤的課程。", "assets/migrant-recruit-01-classroom.png"],
     ["教育品管", "用教材、訓練、稽核與改善流程承接服務品質。", "assets/quality-recruit-04-quality-meeting.png"]
@@ -4961,9 +4961,9 @@ function renderAboutPageThreeMinute() {
   ];
 
   const teamCards = [
-    ["照顧服務員", "在長輩熟悉的生活場域中，協助沐浴、用餐、移位、陪伴與生活支持。", "/assets/homepage-batch/05-orange-polo-caregiver-fast.jpg"],
+    ["照顧服務員", "在長輩熟悉的生活場域中，協助沐浴、用餐、移位、陪伴與生活支持。", "/assets/homepage-batch/05-orange-polo-caregiver-hires.jpg"],
     ["居服督導", "協助評估需求、安排服務、追蹤紀錄與回應家屬在服務中的變化。", "/assets/homepage-batch/03-supervisor-care-plan-fast.jpg"],
-    ["日照與社區團隊", "設計白天作息、團體活動、共餐與社區支持，讓長輩有穩定參與。", "/assets/homepage-batch/02-daycare-group-exercise-fast.jpg"],
+    ["日照與社區團隊", "設計白天作息、團體活動、共餐與社區支持，讓長輩有穩定參與。", "/assets/homepage-batch/02-daycare-group-exercise-hires.jpg"],
     ["護理復能夥伴", "用健康觀察、復能訓練與居家安全建議，陪長輩練回生活能力。", "/assets/homepage-batch/13-rehab-walking-practice-fast.jpg"],
     ["教育品管與培訓", "把服務經驗整理成教材、課程、稽核與改善流程，讓品質能被複製。", "/assets/quality-detail-04-improvement-fast.jpg"],
     ["行政、系統與品牌", "支援表單、後台、內容、合作與營運資料，讓前線能專心照顧。", "/assets/homepage-batch/04-admin-team-office-fast.jpg"]
@@ -5102,19 +5102,19 @@ function renderMilestonesPage() {
     ["2025", "01", "北區服務藍圖盤點", "Planning", "整理臺北、新北、桃園家庭照顧需求，確認居家、日照、社區與復能服務的發展方向。", "/assets/homepage-batch/10-family-consultation-fast.jpg", "已完成"],
     ["2025", "02", "居家照顧流程標準化", "Home Care", "建立個案建檔、服務媒合、派案、照顧紀錄與家屬回報的基礎流程。", "/assets/homepage-batch/01-care-home-greeting-fast.jpg", "已完成"],
     ["2025", "03", "督導陪跑制度啟動", "Quality", "把督導訪視、異常回報、服務品質檢核與照服員支持放進日常管理。", "/assets/homepage-batch/03-supervisor-care-plan-fast.jpg", "已完成"],
-    ["2025", "04", "日間照顧場域規劃", "Day Care", "規劃長輩白天活動、餐食、休息、健康觀察與家屬回報的中心營運節奏。", "/assets/homepage-batch/02-daycare-group-exercise-fast.jpg", "已完成"],
-    ["2025", "05", "社區據點服務設計", "Community", "盤點健康促進、家屬課程、照顧諮詢與社區活動，讓照顧支持更靠近生活圈。", "/assets/homepage-batch/12-community-health-class-fast.jpg", "已完成"],
+    ["2025", "04", "日間照顧場域規劃", "Day Care", "規劃長輩白天活動、餐食、休息、健康觀察與家屬回報的中心營運節奏。", "/assets/homepage-batch/02-daycare-group-exercise-hires.jpg", "已完成"],
+    ["2025", "05", "社區據點服務設計", "Community", "盤點健康促進、家屬課程、照顧諮詢與社區活動，讓照顧支持更靠近生活圈。", "/assets/homepage-batch/12-community-health-class-hires.jpg", "已完成"],
     ["2025", "06", "護理復能協作模型成形", "Reablement", "整合護理觀察、復能訓練與照顧陪伴，讓長輩能在生活裡重新練回能力。", "/assets/homepage-batch/13-rehab-walking-practice-fast.jpg", "已完成"],
     ["2025", "07", "移工照顧培訓課程開發", "Training", "將移位、沐浴、用餐、溝通與安全照顧拆成可演練的課程內容。", "/assets/migrant-recruit-02-transfer.png", "已完成"],
     ["2025", "08", "教育品管教材整理", "Education", "把第一線服務經驗轉化為教材、檢核表與案例討論，讓照顧品質可以被複製。", "/assets/quality-recruit-04-quality-meeting.png", "已完成"],
     ["2025", "09", "北北桃據點資料盤點", "Network", "整理士林、大同、萬華、信義、新店、新莊與蘆竹等服務節點資訊。", "/assets/north-service-map-fast.jpg", "已完成"],
-    ["2025", "10", "人才招募制度擴充", "Recruiting", "建立居家、日照、移工培訓、教學品管與行政部門的職缺內容與發展路徑。", "/assets/homepage-batch/06-orange-polo-supervisor-fast.jpg", "已完成"],
+    ["2025", "10", "人才招募制度擴充", "Recruiting", "建立居家、日照、移工培訓、教學品管與行政部門的職缺內容與發展路徑。", "/assets/homepage-batch/06-orange-polo-supervisor-hires.jpg", "已完成"],
     ["2025", "11", "後台內容管理架構規劃", "CMS", "規劃文章、圖片、課程、表單、檔案下載與頁面文案的後台管理方式。", "/assets/homepage-batch/04-admin-team-office-fast.jpg", "已完成"],
     ["2025", "12", "年度服務與合作成果整理", "Review", "彙整服務據點、合作單位、得標紀錄與年度營運成果，作為 2026 擴展基礎。", "/assets/homepage-batch/16-taipei-service-office-fast.jpg", "已完成"],
     ["2026", "01", "健康 3.0 內容中心上線", "Health 3.0", "建立文章、懶人包、活動專區、影音與短影片內容，讓家屬更容易理解照顧知識。", "/assets/homepage-batch/18-health-fall-prevention-cover.png", "已完成"],
-    ["2026", "02", "課程報名與表單留存完成", "Courses", "課程卡片、報名彈窗、表單資料留存與後台課程管理逐步串接。", "/assets/homepage-batch/12-community-health-class-fast.jpg", "已完成"],
+    ["2026", "02", "課程報名與表單留存完成", "Courses", "課程卡片、報名彈窗、表單資料留存與後台課程管理逐步串接。", "/assets/homepage-batch/12-community-health-class-hires.jpg", "已完成"],
     ["2026", "03", "投資人專區資料化", "Investor", "將公告、財報、下載檔與圖表資料改為後台可管理，提升對外資訊透明度。", "/assets/homepage-batch/04-admin-team-office-fast.jpg", "已完成"],
-    ["2026", "04", "服務八大子頁模板化", "Service Pages", "居家、日照、社區、護理復能、移工培訓、教育品管、關於與大事記版型統一整理。", "/assets/homepage-batch/09-nurse-blood-pressure.png", "已完成"],
+    ["2026", "04", "服務八大子頁模板化", "Service Pages", "居家、日照、社區、護理復能、移工培訓、教育品管、關於與大事記版型統一整理。", "/assets/homepage-batch/09-nurse-blood-pressure-hires.jpg", "已完成"],
     ["2026", "05", "網站上線前總檢與內容補強", "Launch Check", "檢查前後台資料、SEO、RWD、表單寄信、圖片裁切、權限與內容健康檢查。", "/assets/homepage-batch/15-phone-consultation.png", "進行中"],
   ].map(([year, month, title, tag, copy, image, status]) => ({ year, month, title, tag, copy, image, status }));
   const sortedTimeline = [...timeline].sort((a, b) => Number(b.year) - Number(a.year) || Number(b.month) - Number(a.month));
@@ -5240,7 +5240,7 @@ const oneMinuteServices = {
     eyebrow: "Community",
     title: "社區據點",
     oneLiner: "把健康促進、共餐、活動與資源諮詢放在熟悉社區。",
-    image: "assets/community-detail-01-exercise-hero-fast.jpg",
+    image: "assets/community-detail-01-exercise-hero-hires.jpg",
     imageAlt: "社區據點健康促進活動",
     badge: "在地支持",
     idealFor: ["想讓長輩增加外出", "需要預防延緩失能活動", "家屬想先理解長照資源"],
@@ -5317,14 +5317,14 @@ const oneMinuteServices = {
     eyebrow: "Software",
     title: "軟體系統",
     oneLiner: "把會計、人資、公文、專案、PDF、居家與日照流程整合成後台。",
-    image: "assets/admin-recruit-02-operations-hero-fast.jpg",
+    image: "assets/admin-recruit-02-operations-hero-hires.jpg",
     imageAlt: "長照營運系統儀表板",
     badge: "客製系統",
     idealFor: ["資料散在 Excel 和 LINE", "主管想看進度與報表", "多據點或多部門需要權限控管"],
     outcomes: ["表單、檔案、任務與報表集中", "角色權限與操作紀錄清楚", "可依單位流程客製模組"],
     flow: ["盤點最卡的流程", "規劃第一階段模組", "導入後依使用回饋迭代"],
     scenes: [
-      { image: "assets/admin-recruit-02-operations-fast.jpg", title: "營運後台", text: "把案件、任務、文件與進度集中，主管不用到處找資料。" },
+      { image: "assets/admin-recruit-02-operations-hires.jpg", title: "營運後台", text: "把案件、任務、文件與進度集中，主管不用到處找資料。" },
       { image: "assets/quality-detail-04-improvement-fast.jpg", title: "改善追蹤", text: "把會議決議、稽核缺失與改善期限變成可追蹤任務。" },
       { image: "assets/homecare-detail-02-care-plan-fast.jpg", title: "照顧流程", text: "依居家、日照、行政或專案需求客製表單與權限。" }
     ],
@@ -5404,7 +5404,7 @@ const oneMinuteServiceStories = {
   "home-care": [
     {
       name: "林小姐",
-      image: "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg",
+      image: "assets/homepage-batch/05-orange-polo-caregiver-hires.jpg",
       title: "「爸爸出院後，我終於知道每天該注意什麼。」",
       text: "每日回報會把移位、用餐、精神狀態和安全提醒說清楚，家人不用下班後一直追問。"
     },
@@ -5424,7 +5424,7 @@ const oneMinuteServiceStories = {
   "day-care": [
     {
       name: "陳小姐",
-      image: "assets/homepage-batch/02-daycare-group-exercise-fast.jpg",
+      image: "assets/homepage-batch/02-daycare-group-exercise-hires.jpg",
       title: "「媽媽白天有人陪，晚上還能回家睡。」",
       text: "活動、餐食和休息都有安排，媽媽回家後比較有精神，家屬上班也比較放得下心。"
     },
@@ -5444,7 +5444,7 @@ const oneMinuteServiceStories = {
   community: [
     {
       name: "鄭小姐",
-      image: "assets/homepage-batch/12-community-health-class-fast.jpg",
+      image: "assets/homepage-batch/12-community-health-class-hires.jpg",
       title: "「阿嬤開始期待每週的活動。」",
       text: "固定出門、共餐和健康活動讓長輩重新有生活節奏，也讓家屬更早看見狀態變化。"
     },
@@ -5524,7 +5524,7 @@ const oneMinuteServiceStories = {
   software: [
     {
       name: "營運主管",
-      image: "assets/admin-recruit-02-operations-fast.jpg",
+      image: "assets/admin-recruit-02-operations-hires.jpg",
       title: "「不用再從 LINE、Excel 和紙本裡找同一份資料。」",
       text: "案件、表單、任務和文件集中後，主管看進度更快，交接也比較不容易漏。"
     },
@@ -7865,7 +7865,7 @@ function renderGovernancePage() {
   const executives = [
     ["執行長", "營運策略與服務網絡拓展", "assets/homepage-batch/04-admin-team-office-fast.jpg"],
     ["照顧品質長", "服務品管、督導制度與異常事件改善", "assets/homepage-batch/03-supervisor-care-plan-fast.jpg"],
-    ["教育訓練長", "照服員、督導與移工培訓制度", "assets/homepage-batch/11-elder-art-activity.png"],
+    ["教育訓練長", "照服員、督導與移工培訓制度", "assets/homepage-batch/11-elder-art-activity-hires.jpg"],
     ["財務行政長", "財務控管、人資行政與投資人關係", "assets/homepage-batch/10-family-consultation-fast.jpg"]
   ];
   const auditItems = [
@@ -8510,9 +8510,9 @@ function renderSoftwarePage() {
 
 function renderTalentPage() {
   const openings = [
-    ["居家照顧服務員", "居家照顧部門", "到宅身體照顧、生活支持、陪伴與服務紀錄。", "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg"],
-    ["居家服務督導", "居家照顧部門", "服務媒合、品質追蹤、照服員支持與家屬溝通。", "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg"],
-    ["日照照顧服務員", "日間照顧部", "長輩活動陪伴、餐食照顧、生活支持與安全觀察。", "assets/homepage-batch/02-daycare-group-exercise-fast.jpg"]
+    ["居家照顧服務員", "居家照顧部門", "到宅身體照顧、生活支持、陪伴與服務紀錄。", "assets/homepage-batch/05-orange-polo-caregiver-hires.jpg"],
+    ["居家服務督導", "居家照顧部門", "服務媒合、品質追蹤、照服員支持與家屬溝通。", "assets/homepage-batch/06-orange-polo-supervisor-hires.jpg"],
+    ["日照照顧服務員", "日間照顧部", "長輩活動陪伴、餐食照顧、生活支持與安全觀察。", "assets/homepage-batch/02-daycare-group-exercise-hires.jpg"]
   ];
   const careerSteps = [
     ["0-3 個月", "新人陪跑", "完成基礎訓練、服務倫理、紀錄回報與安全照顧流程，由督導陪同熟悉第一線情境。"],
@@ -8559,7 +8559,7 @@ function renderTalentPage() {
     ],
     gallery: [
       ["assets/homepage-batch/01-care-home-greeting-fast.jpg", "到宅服務前，用問候建立安心感。"],
-      ["assets/homepage-batch/05-orange-polo-caregiver-fast.jpg", "照顧服務員是家庭最靠近現場的支持。"],
+      ["assets/homepage-batch/05-orange-polo-caregiver-hires.jpg", "照顧服務員是家庭最靠近現場的支持。"],
       ["assets/homepage-batch/03-supervisor-care-plan-fast.jpg", "督導與家屬討論照顧計畫。"],
       ["assets/homepage-batch/14-care-notes-fast.jpg", "服務紀錄讓照顧變得可追蹤。"],
       ["assets/homepage-batch/10-family-consultation-fast.jpg", "把家庭的擔心轉成清楚可執行的安排。"]
@@ -8803,7 +8803,7 @@ function renderTalentPage() {
     ],
     gallery: [
       ["assets/admin-recruit-01-hr.png", "人資招募與新人報到，是讓好夥伴加入團隊的第一步。"],
-      ["assets/admin-recruit-02-operations-fast.jpg", "營運調度讓服務、人力與資料能順利接上。"],
+      ["assets/admin-recruit-02-operations-hires.jpg", "營運調度讓服務、人力與資料能順利接上。"],
       ["assets/admin-recruit-03-finance.png", "財務行政把數字、文件與報表整理清楚。"],
       ["assets/admin-recruit-04-service.png", "客服總務承接家庭問題，也支援前線服務。"],
       ["assets/admin-recruit-05-meeting.png", "跨部門會議讓每個專案都有進度與負責人。"]
@@ -8821,7 +8821,7 @@ function renderTalentPage() {
       {
         title: "營運行政專員",
         tag: "營運支援",
-        image: "assets/admin-recruit-02-operations-fast.jpg",
+        image: "assets/admin-recruit-02-operations-hires.jpg",
         summary: "協助服務資料、排程、跨部門需求與營運進度追蹤，讓每天的照顧服務不被行政流程卡住。",
         duties: ["整理服務資料、排程異動與跨部門需求", "追蹤營運專案、會議待辦與改善進度", "支援主管製作營運報表與流程文件"],
         requirements: ["熟悉表格、文件與資料整理", "能同時管理多項進度並主動回報", "具長照、醫療、教育或服務業行政經驗佳"],
@@ -8868,7 +8868,7 @@ function renderTalentPage() {
     "day-care-team": {
       eyebrow: "Day Care Team",
       title: "日間照顧部",
-      image: "assets/homepage-batch/12-community-health-class-fast.jpg",
+      image: "assets/homepage-batch/12-community-health-class-hires.jpg",
       intro: "陪長輩白天有規律作息、活動參與、共餐與社交，也讓家庭有喘息空間。",
       roles: ["日照照顧服務員", "活動帶領員", "照顧班表協調"],
       skills: ["團體活動陪伴", "餐食與休息照顧", "日常安全觀察"]
@@ -8876,7 +8876,7 @@ function renderTalentPage() {
     "migrant-team": {
       eyebrow: "Migrant Training",
       title: "移工培訓部",
-      image: "assets/homepage-batch/11-elder-art-activity.png",
+      image: "assets/homepage-batch/11-elder-art-activity-hires.jpg",
       intro: "把家庭照顧技能拆解成可理解、可練習、可追蹤的課程內容。",
       roles: ["移工培訓講師", "課務助教", "家庭照顧課程企劃"],
       skills: ["照顧技能教學", "跨文化溝通", "課程教材製作"]
@@ -9245,7 +9245,7 @@ function renderTalentPage() {
       <section class="hero service-detail-hero one-minute-service-hero talent-recruit-hero">
         <div
           class="hero-bg"
-          style="background-image: linear-gradient(90deg, rgba(45, 23, 9, 0.76) 0%, rgba(45, 23, 9, 0.58) 42%, rgba(45, 23, 9, 0.18) 74%, rgba(45, 23, 9, 0) 100%), linear-gradient(180deg, rgba(45, 23, 9, 0.04), rgba(45, 23, 9, 0.2)), url('assets/homepage-batch/06-orange-polo-supervisor-fast.jpg');"
+          style="background-image: linear-gradient(90deg, rgba(45, 23, 9, 0.76) 0%, rgba(45, 23, 9, 0.58) 42%, rgba(45, 23, 9, 0.18) 74%, rgba(45, 23, 9, 0) 100%), linear-gradient(180deg, rgba(45, 23, 9, 0.04), rgba(45, 23, 9, 0.2)), url('assets/homepage-batch/06-orange-polo-supervisor-hires.jpg');"
           aria-hidden="true"
         ></div>
         <div class="hero-copy service-detail-copy">

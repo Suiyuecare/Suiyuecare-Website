@@ -59,8 +59,8 @@ const routes = [
     path: "/community/",
     title: "社區據點｜歲悅長照集團",
     description: "歲悅社區據點提供健康促進、共餐活動、預防延緩失能與在地照顧支持。",
-    image: "/assets/community-detail-01-exercise-hero-fast.jpg",
-    preloadImage: "/assets/community-detail-01-exercise-hero-fast.jpg",
+    image: "/assets/community-detail-01-exercise-hero-hires.jpg",
+    preloadImage: "/assets/community-detail-01-exercise-hero-hires.jpg",
     priority: "0.88"
   },
   {
@@ -95,8 +95,8 @@ const routes = [
     path: "/software/",
     title: "軟體系統｜歲悅長照集團",
     description: "歲悅提供可客製化軟體系統，包含會計、人資、電子公文交換、專案管理、PDF 工具，以及居家與日照業務系統。",
-    image: "/assets/admin-recruit-02-operations-hero-fast.jpg",
-    preloadImage: "/assets/admin-recruit-02-operations-hero-fast.jpg",
+    image: "/assets/admin-recruit-02-operations-hero-hires.jpg",
+    preloadImage: "/assets/admin-recruit-02-operations-hero-hires.jpg",
     priority: "0.8"
   },
   {
@@ -112,8 +112,8 @@ const routes = [
     path: "/talent/",
     title: "人才招募｜歲悅長照集團",
     description: "加入歲悅長照團隊，探索照顧服務員、督導、日照、教學品管與行政職涯機會。",
-    image: "/assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
-    preloadImage: "/assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
+    image: "/assets/homepage-batch/06-orange-polo-supervisor-hires.jpg",
+    preloadImage: "/assets/homepage-batch/06-orange-polo-supervisor-hires.jpg",
     priority: "0.76"
   },
   {
@@ -130,8 +130,8 @@ const routes = [
     path: "/investor-recruiting/",
     title: "投資人招募｜歲悅長照集團",
     description: "了解歲悅長照集團的展店模型、產業策略與投資合作機會。",
-    image: "/assets/admin-recruit-02-operations-hero-fast.jpg",
-    preloadImage: "/assets/admin-recruit-02-operations-hero-fast.jpg",
+    image: "/assets/admin-recruit-02-operations-hero-hires.jpg",
+    preloadImage: "/assets/admin-recruit-02-operations-hero-hires.jpg",
     priority: "0.72"
   },
   {
@@ -147,7 +147,7 @@ const routes = [
     path: "/investors/",
     title: "投資人專區｜歲悅長照集團",
     description: "歲悅投資人專區提供最新動態、營運進度、財務資訊、公司治理與股東專區資料。",
-    image: "/assets/admin-recruit-02-operations-hero-fast.jpg",
+    image: "/assets/admin-recruit-02-operations-hero-hires.jpg",
     priority: "0.75"
   },
   {
@@ -155,7 +155,7 @@ const routes = [
     path: "/ir-finance/",
     title: "財務資訊｜歲悅長照投資人專區",
     description: "查看歲悅長照每月營收、財務分析、季度財報、年報與可下載文件。",
-    image: "/assets/admin-recruit-02-operations-hero-fast.jpg",
+    image: "/assets/admin-recruit-02-operations-hero-hires.jpg",
     priority: "0.72"
   },
   {
@@ -163,7 +163,7 @@ const routes = [
     path: "/ir-governance/",
     title: "公司治理｜歲悅長照投資人專區",
     description: "查看歲悅長照重要訊息、治理運作、管理階層、稽核、風險管理與誠信經營。",
-    image: "/assets/admin-recruit-02-operations-hero-fast.jpg",
+    image: "/assets/admin-recruit-02-operations-hero-hires.jpg",
     priority: "0.7"
   },
   {
@@ -171,7 +171,7 @@ const routes = [
     path: "/ir-shareholders/",
     title: "股東專區｜歲悅長照投資人專區",
     description: "查看歲悅長照股務資訊、股東會、法說會、常見問答與股東文件下載。",
-    image: "/assets/admin-recruit-02-operations-hero-fast.jpg",
+    image: "/assets/admin-recruit-02-operations-hero-hires.jpg",
     priority: "0.7"
   },
   {
