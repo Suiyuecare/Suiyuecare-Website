@@ -300,7 +300,7 @@ div {
   background:
     linear-gradient(90deg, rgba(255, 248, 238, 0.72) 0%, rgba(255, 248, 238, 0.5) 38%, rgba(255, 248, 238, 0.12) 68%, rgba(255, 248, 238, 0) 100%),
     linear-gradient(180deg, rgba(255, 248, 238, 0.06), rgba(255, 248, 238, 0.18)),
-    url("assets/hero-care-hero-instant.jpg") center / cover;
+    url("assets/hero-care-hero-fast.jpg") center / cover;
   transform: scale(1.03);
 }
 .hero-copy {
@@ -1330,8 +1330,8 @@ h2 {
   height: 100%;
   object-fit: cover;
   opacity: 1;
-  filter: saturate(.98) contrast(.96) brightness(.78);
-  transform: scale(1.02);
+  filter: saturate(1.03) contrast(1.02) brightness(.9);
+  transform: none;
   transition: opacity .35s ease, filter .35s ease, transform .65s ease;
 }
 .service-grid a::before {
@@ -1339,7 +1339,7 @@ h2 {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(180deg, rgba(63,33,13,.08), rgba(63,33,13,.34) 42%, rgba(63,33,13,.86));
+  background: linear-gradient(180deg, rgba(63,33,13,.04), rgba(63,33,13,.24) 42%, rgba(63,33,13,.74));
   opacity: 1;
   transition: background .35s ease, opacity .35s ease;
 }
@@ -1363,11 +1363,11 @@ h2 {
 }
 .service-grid a:hover img,
 .service-grid a:focus-visible img {
-  opacity: .82;
-  filter: saturate(1.06) contrast(1) brightness(1.18);
+  opacity: 1;
+  filter: saturate(1.06) contrast(1.04) brightness(1.04);
 }
 .service-grid a:hover img,
-.service-grid a:focus-visible img { transform: scale(1.06); }
+.service-grid a:focus-visible img { transform: scale(1.025); }
 .service-grid a:hover::before,
 .service-grid a:focus-visible::before { background: linear-gradient(180deg, rgba(240,138,36,.08), rgba(255,246,235,.9) 62%, rgba(240,138,36,.78)); }
 .service-grid a:hover::after,
@@ -5914,6 +5914,10 @@ h2 {
 .career-page {
   background: var(--paper);
 }
+.talent-recruiting-hero .hero-bg,
+.talent-recruit-hero .hero-bg {
+  background-position: 64% 28% !important;
+}
 .career-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(420px, .55fr);
@@ -8777,7 +8781,7 @@ input[name="_honey"] { display: none !important; }
     background-image:
       linear-gradient(90deg, rgba(255,248,238,.76) 0%, rgba(255,248,238,.58) 42%, rgba(255,248,238,.12) 74%, rgba(255,248,238,0) 100%),
       linear-gradient(180deg, rgba(255,248,238,.1), rgba(255,248,238,.34)),
-      url("assets/hero-care-hero-instant.jpg") !important;
+      url("assets/hero-care-hero-fast.jpg") !important;
   }
   .hero-copy {
     position: relative;

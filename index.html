@@ -48,32 +48,32 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link id="heroPreload" rel="preload" as="image" href="/assets/hero-care-hero-instant.jpg" fetchpriority="high" />
+    <link id="heroPreload" rel="preload" as="image" href="/assets/hero-care-hero-fast.jpg" fetchpriority="high" />
     <script>
       (() => {
         const heroPreloads = {
-          "#home": "/assets/hero-care-hero-instant.jpg",
+          "#home": "/assets/hero-care-hero-fast.jpg",
           "#about": "/assets/homepage-batch/04-admin-team-office-fast.jpg",
           "#milestones": "/assets/homepage-batch/16-taipei-service-office-fast.jpg",
-          "#home-care": "/assets/homecare-detail-01-greeting-hero-instant.jpg",
-          "#day-care": "/assets/daycare-detail-01-exercise-hero-instant.jpg",
-          "#community": "/assets/community-detail-01-exercise-hero-instant.jpg",
-          "#nursing": "/assets/nursing-detail-02-walking-hero-instant.jpg",
-          "#migrant-training": "/assets/migrant-detail-01-classroom-hero-instant.jpg",
-          "#quality": "/assets/quality-detail-04-improvement-hero-instant.jpg",
-          "#software": "/assets/admin-recruit-02-operations-hero-instant.jpg",
+          "#home-care": "/assets/homecare-detail-01-greeting-hero-fast.jpg",
+          "#day-care": "/assets/daycare-detail-01-exercise-hero-fast.jpg",
+          "#community": "/assets/community-detail-01-exercise-hero-fast.jpg",
+          "#nursing": "/assets/nursing-detail-02-walking-hero-fast.jpg",
+          "#migrant-training": "/assets/migrant-detail-01-classroom-hero-fast.jpg",
+          "#quality": "/assets/quality-detail-04-improvement-hero-fast.jpg",
+          "#software": "/assets/admin-recruit-02-operations-hero-fast.jpg",
           "/about/": "/assets/homepage-batch/04-admin-team-office-fast.jpg",
           "/milestones/": "/assets/homepage-batch/16-taipei-service-office-fast.jpg",
-          "/home-care/": "/assets/homecare-detail-01-greeting-hero-instant.jpg",
-          "/day-care/": "/assets/daycare-detail-01-exercise-hero-instant.jpg",
-          "/community/": "/assets/community-detail-01-exercise-hero-instant.jpg",
-          "/nursing/": "/assets/nursing-detail-02-walking-hero-instant.jpg",
-          "/migrant-training/": "/assets/migrant-detail-01-classroom-hero-instant.jpg",
-          "/quality/": "/assets/quality-detail-04-improvement-hero-instant.jpg",
-          "/software/": "/assets/admin-recruit-02-operations-hero-instant.jpg"
+          "/home-care/": "/assets/homecare-detail-01-greeting-hero-fast.jpg",
+          "/day-care/": "/assets/daycare-detail-01-exercise-hero-fast.jpg",
+          "/community/": "/assets/community-detail-01-exercise-hero-fast.jpg",
+          "/nursing/": "/assets/nursing-detail-02-walking-hero-fast.jpg",
+          "/migrant-training/": "/assets/migrant-detail-01-classroom-hero-fast.jpg",
+          "/quality/": "/assets/quality-detail-04-improvement-hero-fast.jpg",
+          "/software/": "/assets/admin-recruit-02-operations-hero-fast.jpg"
         };
         const link = document.querySelector("#heroPreload") || document.createElement("link");
-        const heroImage = heroPreloads[window.location.hash] || heroPreloads[window.location.pathname] || "/assets/hero-care-hero-instant.jpg";
+        const heroImage = heroPreloads[window.location.hash] || heroPreloads[window.location.pathname] || "/assets/hero-care-hero-fast.jpg";
         if (!link.id) link.id = "heroPreload";
         link.rel = "preload";
         link.as = "image";
@@ -464,8 +464,8 @@
           <div class="service-grid">
             <a href="#home-care"><img src="assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg" alt="居家照顧服務情境" /><span>01</span><strong>居家照顧</strong><p>到宅照顧、生活支持、照顧計畫媒合。</p></a>
             <a href="#day-care"><img src="assets/homepage-batch/02-daycare-group-exercise-fast.jpg" alt="日間照顧活動情境" /><span>02</span><strong>日間照顧</strong><p>白天托顧、活動餐食、家庭喘息支持。</p></a>
-            <a href="#community"><img src="assets/homepage-batch/11-elder-art-activity.png" alt="社區據點服務情境" /><span>03</span><strong>社區據點</strong><p>鄰里共餐、健康促進、預防照顧。</p></a>
-            <a href="#nursing"><img src="assets/homepage-batch/09-nurse-blood-pressure.png" alt="護理復能服務情境" /><span>04</span><strong>護理復能</strong><p>護理評估、復能目標、健康追蹤。</p></a>
+            <a href="#community"><img src="assets/homepage-batch/11-elder-art-activity-fast.jpg" alt="社區據點服務情境" /><span>03</span><strong>社區據點</strong><p>鄰里共餐、健康促進、預防照顧。</p></a>
+            <a href="#nursing"><img src="assets/homepage-batch/09-nurse-blood-pressure-fast.jpg" alt="護理復能服務情境" /><span>04</span><strong>護理復能</strong><p>護理評估、復能目標、健康追蹤。</p></a>
             <a href="#migrant-training"><img src="assets/homepage-batch/10-family-consultation-fast.jpg" alt="移工培訓課程情境" /><span>05</span><strong>移工培訓</strong><p>照顧技能、家庭溝通、安全衛教。</p></a>
             <a href="#quality"><img src="assets/homepage-batch/14-care-notes-fast.jpg" alt="教育品管紀錄情境" /><span>06</span><strong>教育品管</strong><p>標準教材、督導稽核、持續改善。</p></a>
             <a href="#software"><img src="assets/admin-recruit-02-operations-fast.jpg" alt="軟體系統營運儀表板情境" /><span>07</span><strong>軟體系統</strong><p>會計、人資、公文、專案、PDF 與長照業務系統。</p></a>

@@ -136,18 +136,18 @@ const DEFAULT_SEO = {
   imageAlt: "歲悅長照照顧服務形象照",
   type: "website"
 };
-const HOME_HERO_INSTANT_IMAGE = "assets/hero-care-hero-instant.jpg";
+const HOME_HERO_INSTANT_IMAGE = "assets/hero-care-hero-fast.jpg";
 const routeHeroPreloads = {
   home: HOME_HERO_INSTANT_IMAGE,
   about: "assets/homepage-batch/04-admin-team-office-fast.jpg",
   milestones: "assets/homepage-batch/16-taipei-service-office-fast.jpg",
-  "home-care": "assets/homecare-detail-01-greeting-hero-instant.jpg",
-  "day-care": "assets/daycare-detail-01-exercise-hero-instant.jpg",
-  community: "assets/community-detail-01-exercise-hero-instant.jpg",
-  nursing: "assets/nursing-detail-02-walking-hero-instant.jpg",
-  "migrant-training": "assets/migrant-detail-01-classroom-hero-instant.jpg",
-  quality: "assets/quality-detail-04-improvement-hero-instant.jpg",
-  software: "assets/admin-recruit-02-operations-hero-instant.jpg"
+  "home-care": "assets/homecare-detail-01-greeting-hero-fast.jpg",
+  "day-care": "assets/daycare-detail-01-exercise-hero-fast.jpg",
+  community: "assets/community-detail-01-exercise-hero-fast.jpg",
+  nursing: "assets/nursing-detail-02-walking-hero-fast.jpg",
+  "migrant-training": "assets/migrant-detail-01-classroom-hero-fast.jpg",
+  quality: "assets/quality-detail-04-improvement-hero-fast.jpg",
+  software: "assets/admin-recruit-02-operations-hero-fast.jpg"
 };
 
 const routeSeoMap = {
@@ -1090,6 +1090,8 @@ const fastAssetPaths = new Set([
   "assets/homepage-batch/10-family-consultation-fast.jpg",
   "assets/homepage-batch/03-supervisor-care-plan-fast.jpg",
   "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg",
+  "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg",
+  "assets/homepage-batch/11-elder-art-activity-fast.jpg",
   "assets/homepage-batch/16-taipei-service-office-fast.jpg",
   "assets/homepage-batch/12-community-health-class-fast.jpg",
   "assets/homepage-batch/19-health-dementia-cover-fast.jpg",
@@ -2400,24 +2402,25 @@ function normalizeRecruitingList(value) {
 
 function renderRecruitingHero(page) {
   const image = getRecruitingImage(page, "assets/homepage-batch/04-admin-team-office-fast.jpg");
+  const focalPoint = focalPointToObjectPosition(page.metadata?.focal_point || "center");
+  const heroLabel = page.hero_badge || page.subtitle || page.title || "Suiyuecare Careers";
   return `
-    <section class="service-detail-hero recruiting-cms-hero ${escapeHTML(page.page_slug)}-recruiting-hero">
-      <div class="service-detail-copy">
+    <section class="hero service-detail-hero one-minute-service-hero recruiting-cms-hero ${escapeHTML(page.page_slug)}-recruiting-hero">
+      <div
+        class="hero-bg"
+        style="background-image: linear-gradient(90deg, rgba(45, 23, 9, 0.76) 0%, rgba(45, 23, 9, 0.58) 42%, rgba(45, 23, 9, 0.18) 74%, rgba(45, 23, 9, 0) 100%), linear-gradient(180deg, rgba(45, 23, 9, 0.04), rgba(45, 23, 9, 0.2)), url('${escapeHTML(image)}'); background-position: ${escapeHTML(focalPoint)};"
+        aria-hidden="true"
+      ></div>
+      <div class="hero-copy service-detail-copy">
         <p class="eyebrow">${escapeHTML(page.eyebrow || "Recruiting")}</p>
         <h1>${escapeHTML(page.title || "")}</h1>
+        <p class="hero-slogan">${escapeHTML(heroLabel)}</p>
         <p>${escapeHTML(page.body || page.subtitle || "")}</p>
         <div class="hero-actions">
           <a class="primary-button" href="${escapeHTML(page.primary_cta_url || "#recruiting-openings")}">${escapeHTML(page.primary_cta_text || "查看內容")}</a>
           <a class="secondary-button" href="${escapeHTML(page.secondary_cta_url || "#contact")}">${escapeHTML(page.secondary_cta_text || "聯絡我們")}</a>
         </div>
       </div>
-      <aside class="service-hero-card">
-        <img src="${escapeHTML(image)}" alt="${escapeHTML(page.title || "歲悅招募")}"${imageStyleAttr({ usage: "service_hero", focalPoint: page.metadata?.focal_point || "center" })} />
-        <div>
-          <span>${escapeHTML(page.hero_badge || "Suiyuecare Corps.")}</span>
-          <strong>${escapeHTML(page.hero_card_title || page.subtitle || page.title || "")}</strong>
-        </div>
-      </aside>
     </section>
   `;
 }
@@ -5162,7 +5165,7 @@ const oneMinuteServices = {
     eyebrow: "Home Care",
     title: "居家照顧",
     oneLiner: "讓長輩在熟悉的家裡被安全陪伴，也讓家屬不用一個人硬撐。",
-    image: "assets/homecare-detail-01-greeting-hero-instant.jpg",
+    image: "assets/homecare-detail-01-greeting-hero-fast.jpg",
     imageAlt: "居家照顧服務員到宅問候長輩",
     badge: "到宅照顧",
     idealFor: ["出院返家需要協助", "白天家人不在家", "主要照顧者需要喘息"],
@@ -5181,7 +5184,7 @@ const oneMinuteServices = {
     eyebrow: "Day Care",
     title: "日間照顧",
     oneLiner: "白天到中心活動、用餐、休息與被照顧，晚上仍能回家。",
-    image: "assets/daycare-detail-01-exercise-hero-instant.jpg",
+    image: "assets/daycare-detail-01-exercise-hero-fast.jpg",
     imageAlt: "日間照顧中心長輩活動",
     badge: "白天托顧",
     idealFor: ["白天獨自在家不放心", "需要活動與社交刺激", "家屬上班需要穩定支持"],
@@ -5200,7 +5203,7 @@ const oneMinuteServices = {
     eyebrow: "Community",
     title: "社區據點",
     oneLiner: "把健康促進、共餐、活動與資源諮詢放在熟悉社區。",
-    image: "assets/community-detail-01-exercise-hero-instant.jpg",
+    image: "assets/community-detail-01-exercise-hero-fast.jpg",
     imageAlt: "社區據點健康促進活動",
     badge: "在地支持",
     idealFor: ["想讓長輩增加外出", "需要預防延緩失能活動", "家屬想先理解長照資源"],
@@ -5219,7 +5222,7 @@ const oneMinuteServices = {
     eyebrow: "Nursing Rehab",
     title: "護理復能",
     oneLiner: "用護理觀察與復能目標，陪長輩安全練回生活能力。",
-    image: "assets/nursing-detail-02-walking-hero-instant.jpg",
+    image: "assets/nursing-detail-02-walking-hero-fast.jpg",
     imageAlt: "護理復能步行練習",
     badge: "健康與復能",
     idealFor: ["出院後行動變弱", "擔心跌倒或健康變化", "需要家屬照顧教學"],
@@ -5238,7 +5241,7 @@ const oneMinuteServices = {
     eyebrow: "Migrant Training",
     title: "移工培訓",
     oneLiner: "讓家庭照顧移工學會安全照顧、溝通與日常觀察。",
-    image: "assets/migrant-detail-01-classroom-hero-instant.jpg",
+    image: "assets/migrant-detail-01-classroom-hero-fast.jpg",
     imageAlt: "移工照顧培訓課程",
     badge: "技能訓練",
     idealFor: ["家中剛聘請移工", "照顧方法常常不一致", "希望降低移位與沐浴風險"],
@@ -5258,7 +5261,7 @@ const oneMinuteServices = {
     eyebrow: "Quality",
     title: "教育品管",
     oneLiner: "把照顧經驗變成教材、訓練、稽核與改善流程。",
-    image: "assets/quality-detail-04-improvement-hero-instant.jpg",
+    image: "assets/quality-detail-04-improvement-hero-fast.jpg",
     imageAlt: "教育品管品質改善會議",
     badge: "品質系統",
     idealFor: ["需要建立訓練制度", "服務品質想更一致", "希望用紀錄看見改善點"],
@@ -5277,7 +5280,7 @@ const oneMinuteServices = {
     eyebrow: "Software",
     title: "軟體系統",
     oneLiner: "把會計、人資、公文、專案、PDF、居家與日照流程整合成後台。",
-    image: "assets/admin-recruit-02-operations-hero-instant.jpg",
+    image: "assets/admin-recruit-02-operations-hero-fast.jpg",
     imageAlt: "長照營運系統儀表板",
     badge: "客製系統",
     idealFor: ["資料散在 Excel 和 LINE", "主管想看進度與報表", "多據點或多部門需要權限控管"],
@@ -9202,17 +9205,19 @@ function renderTalentPage() {
 
   return `
     <div class="career-page">
-      <section class="service-detail-hero talent-recruit-hero">
-        <div class="service-detail-copy">
-          <p class="eyebrow">We want you</p>
-          <h1>加入歲悅，把照顧變成一份能長久發展的專業。</h1>
+      <section class="hero service-detail-hero one-minute-service-hero talent-recruit-hero">
+        <div
+          class="hero-bg"
+          style="background-image: linear-gradient(90deg, rgba(45, 23, 9, 0.76) 0%, rgba(45, 23, 9, 0.58) 42%, rgba(45, 23, 9, 0.18) 74%, rgba(45, 23, 9, 0) 100%), linear-gradient(180deg, rgba(45, 23, 9, 0.04), rgba(45, 23, 9, 0.2)), url('assets/homepage-batch/06-orange-polo-supervisor-fast.jpg');"
+          aria-hidden="true"
+        ></div>
+        <div class="hero-copy service-detail-copy">
+          <p class="eyebrow">Talent Recruiting</p>
+          <h1>人才招募</h1>
+          <p class="hero-slogan">讓照顧專業被看見，也讓夥伴有路可以走。</p>
           <p>歲悅長照集團提供清楚訓練、督導支持、部門分工與升遷制度，讓照顧工作不只是辛苦，而是能被支持、被看見、被成就。</p>
-          <div class="hero-actions"><a class="primary-button" href="#contact">投遞履歷</a><a class="secondary-button" href="#career-openings">查看職缺</a></div>
+          <div class="hero-actions"><a class="primary-button" href="#career-openings">查看職缺</a><a class="secondary-button" href="#contact">聯絡我們</a></div>
         </div>
-        <aside class="service-hero-card">
-          <img src="assets/homepage-batch/06-orange-polo-supervisor-fast.jpg" alt="歲悅長照人才招募" />
-          <div><span>Suiyuecare Careers</span><strong>有制度的照顧，才走得長久。</strong></div>
-        </aside>
       </section>
 
       <nav class="career-tabs" aria-label="人才招募分頁">
