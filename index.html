@@ -62,6 +62,9 @@
           "#migrant-training": "/assets/migrant-detail-01-classroom-hero-fast.jpg",
           "#quality": "/assets/quality-detail-04-improvement-hero-fast.jpg",
           "#software": "/assets/admin-recruit-02-operations-hero-fast.jpg",
+          "#talent": "/assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
+          "#land": "/assets/location-taipei-fast.jpg",
+          "#investor-recruiting": "/assets/admin-recruit-02-operations-hero-fast.jpg",
           "/about/": "/assets/homepage-batch/04-admin-team-office-fast.jpg",
           "/milestones/": "/assets/homepage-batch/16-taipei-service-office-fast.jpg",
           "/home-care/": "/assets/homecare-detail-01-greeting-hero-fast.jpg",
@@ -70,7 +73,10 @@
           "/nursing/": "/assets/nursing-detail-02-walking-hero-fast.jpg",
           "/migrant-training/": "/assets/migrant-detail-01-classroom-hero-fast.jpg",
           "/quality/": "/assets/quality-detail-04-improvement-hero-fast.jpg",
-          "/software/": "/assets/admin-recruit-02-operations-hero-fast.jpg"
+          "/software/": "/assets/admin-recruit-02-operations-hero-fast.jpg",
+          "/talent/": "/assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
+          "/land/": "/assets/location-taipei-fast.jpg",
+          "/investor-recruiting/": "/assets/admin-recruit-02-operations-hero-fast.jpg"
         };
         const link = document.querySelector("#heroPreload") || document.createElement("link");
         const heroImage = heroPreloads[window.location.hash] || heroPreloads[window.location.pathname] || "/assets/hero-care-hero-fast.jpg";
@@ -97,6 +103,20 @@
 
       html:not([data-app-host="apm"]) .apm-root-shell {
         display: none !important;
+      }
+
+      html[data-initial-route]:not([data-initial-route="home"]):not([data-app-ready="true"]) body {
+        background: #fffdf8;
+      }
+
+      html[data-initial-route]:not([data-initial-route="home"]):not([data-app-ready="true"]) #home,
+      html[data-initial-route]:not([data-initial-route="home"]):not([data-app-ready="true"]) .site-footer {
+        display: none !important;
+      }
+
+      html[data-initial-route]:not([data-initial-route="home"]):not([data-app-ready="true"]) #pageView {
+        display: block;
+        min-height: 100vh;
       }
     </style>
     <script type="application/ld+json">
@@ -225,7 +245,7 @@
         </div>
         <div class="nav-group">
           <button class="nav-trigger" type="button" aria-expanded="false">招募與合作</button>
-          <div class="dropdown"><a href="#talent">人才招募</a><a href="#land">土地招募</a><a href="#investor-recruiting">投資人招募</a></div>
+          <div class="dropdown"><a href="/talent/">人才招募</a><a href="/land/">土地招募</a><a href="/investor-recruiting/">投資人招募</a></div>
         </div>
         <a href="#health">健康3.0</a>
         <a href="#courses">課程報名</a>
@@ -299,7 +319,7 @@
                 <strong>了解投資與合作機會</strong>
                 <p>營運進度、展店布局、財務資訊與洽談窗口。</p>
               </a>
-              <a class="audience-mini-card" href="#talent">
+              <a class="audience-mini-card" href="/talent/">
                 <span>人才招募</span>
                 <strong>想加入歲悅團隊</strong>
                 <p>照服員、督導、護理、企劃與營運職缺。</p>
@@ -344,15 +364,15 @@
               <p class="eyebrow">We want you</p>
               <h2>員工招募</h2>
               <div class="recruit-list">
-                <a href="#talent"><figure><img src="assets/homepage-batch/05-orange-polo-caregiver-fast.jpg" alt="居家照顧服務員招募" /><figcaption>居家照顧服務員</figcaption></figure><div><p>到宅陪伴、身體照顧、生活支持與服務紀錄。</p></div></a>
-                <a href="#talent"><figure><img src="assets/homepage-batch/06-orange-polo-supervisor-fast.jpg" alt="居家服務督導招募" /><figcaption>居家照顧服務督導</figcaption></figure><div><p>個案管理、照顧品質追蹤、服務媒合與團隊支持。</p></div></a>
-                <a href="#talent"><figure><img src="assets/daycare-recruit-02-exercise.png" alt="日照中心照顧服務員招募" /><figcaption>日照中心照顧服務員</figcaption></figure><div><p>活動陪伴、餐食照顧、長輩日常支持與紀錄。</p></div></a>
-                <a href="#talent"><figure><img src="assets/homepage-batch/03-supervisor-care-plan-fast.jpg" alt="長照3.0個案管理師招募" /><figcaption>長照3.0個案管理師</figcaption></figure><div><p>需求評估、資源連結、家屬溝通與照顧計畫追蹤。</p></div></a>
-                <a href="#talent"><figure><img src="assets/daycare-recruit-05-handover.png" alt="日間照顧中心業務負責人兼任護理師招募" /><figcaption>日照業務負責人兼護理師</figcaption></figure><div><p>中心營運、護理觀察、團隊管理與品質維持。</p></div></a>
-                <a href="#talent"><figure><img src="assets/homepage-batch/12-community-health-class-fast.jpg" alt="失智症據點管理員招募" /><figcaption>失智症據點管理員</figcaption></figure><div><p>據點活動、家屬諮詢、社區資源與服務紀錄。</p></div></a>
-                <a href="#talent"><figure><img src="assets/migrant-recruit-04-communication-fast.jpg" alt="菲律賓社群行銷企劃招募" /><figcaption>菲律賓社群行銷企劃</figcaption></figure><div><p>移工社群內容、活動推廣、課程宣傳與合作溝通。</p></div></a>
-                <a href="#talent"><figure><img src="assets/quality-recruit-02-training-fast.jpg" alt="活動企劃專員招募" /><figcaption>活動企劃專員</figcaption></figure><div><p>課程活動、社區方案、徵才活動與品牌企劃執行。</p></div></a>
-                <a href="#talent"><figure><img src="assets/admin-recruit-02-operations-fast.jpg" alt="桃園居家照顧機構業務負責人招募" /><figcaption>桃園居家業務負責人</figcaption></figure><div><p>桃園居家機構籌設、特約服務、團隊建立與營運管理。</p></div></a>
+                <a href="/talent/"><figure><img src="assets/homepage-batch/05-orange-polo-caregiver-fast.jpg" alt="居家照顧服務員招募" /><figcaption>居家照顧服務員</figcaption></figure><div><p>到宅陪伴、身體照顧、生活支持與服務紀錄。</p></div></a>
+                <a href="/talent/"><figure><img src="assets/homepage-batch/06-orange-polo-supervisor-fast.jpg" alt="居家服務督導招募" /><figcaption>居家照顧服務督導</figcaption></figure><div><p>個案管理、照顧品質追蹤、服務媒合與團隊支持。</p></div></a>
+                <a href="/talent/"><figure><img src="assets/daycare-recruit-02-exercise.png" alt="日照中心照顧服務員招募" /><figcaption>日照中心照顧服務員</figcaption></figure><div><p>活動陪伴、餐食照顧、長輩日常支持與紀錄。</p></div></a>
+                <a href="/talent/"><figure><img src="assets/homepage-batch/03-supervisor-care-plan-fast.jpg" alt="長照3.0個案管理師招募" /><figcaption>長照3.0個案管理師</figcaption></figure><div><p>需求評估、資源連結、家屬溝通與照顧計畫追蹤。</p></div></a>
+                <a href="/talent/"><figure><img src="assets/daycare-recruit-05-handover.png" alt="日間照顧中心業務負責人兼任護理師招募" /><figcaption>日照業務負責人兼護理師</figcaption></figure><div><p>中心營運、護理觀察、團隊管理與品質維持。</p></div></a>
+                <a href="/talent/"><figure><img src="assets/homepage-batch/12-community-health-class-fast.jpg" alt="失智症據點管理員招募" /><figcaption>失智症據點管理員</figcaption></figure><div><p>據點活動、家屬諮詢、社區資源與服務紀錄。</p></div></a>
+                <a href="/talent/"><figure><img src="assets/migrant-recruit-04-communication-fast.jpg" alt="菲律賓社群行銷企劃招募" /><figcaption>菲律賓社群行銷企劃</figcaption></figure><div><p>移工社群內容、活動推廣、課程宣傳與合作溝通。</p></div></a>
+                <a href="/talent/"><figure><img src="assets/quality-recruit-02-training-fast.jpg" alt="活動企劃專員招募" /><figcaption>活動企劃專員</figcaption></figure><div><p>課程活動、社區方案、徵才活動與品牌企劃執行。</p></div></a>
+                <a href="/talent/"><figure><img src="assets/admin-recruit-02-operations-fast.jpg" alt="桃園居家照顧機構業務負責人招募" /><figcaption>桃園居家業務負責人</figcaption></figure><div><p>桃園居家機構籌設、特約服務、團隊建立與營運管理。</p></div></a>
               </div>
             </aside>
           </div>
@@ -613,7 +633,7 @@
         </div>
         <div class="footer-sitemap">
           <div><h3>營業項目</h3><a href="#home-care">居家照顧</a><a href="#day-care">日間照顧</a><a href="#community">社區據點</a><a href="#nursing">護理復能</a><a href="#software">軟體系統</a></div>
-          <div><h3>合作入口</h3><a href="#talent">人才招募</a><a href="#land">土地招募</a><a href="#investor-recruiting">投資人招募</a><a href="#quality">教育品管</a></div>
+          <div><h3>合作入口</h3><a href="/talent/">人才招募</a><a href="/land/">土地招募</a><a href="/investor-recruiting/">投資人招募</a><a href="#quality">教育品管</a></div>
           <div><h3>資訊內容</h3><a href="#health">健康3.0</a><a href="#courses">課程報名</a><a href="#investors">投資人專區</a><a href="#ir-finance">財務資訊</a><a href="#contact">聯絡我們</a></div>
         </div>
       </div>

@@ -147,7 +147,10 @@ const routeHeroPreloads = {
   nursing: "assets/nursing-detail-02-walking-hero-fast.jpg",
   "migrant-training": "assets/migrant-detail-01-classroom-hero-fast.jpg",
   quality: "assets/quality-detail-04-improvement-hero-fast.jpg",
-  software: "assets/admin-recruit-02-operations-hero-fast.jpg"
+  software: "assets/admin-recruit-02-operations-hero-fast.jpg",
+  talent: "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
+  land: "assets/location-taipei-fast.jpg",
+  "investor-recruiting": "assets/admin-recruit-02-operations-hero-fast.jpg"
 };
 
 const routeSeoMap = {
@@ -263,9 +266,41 @@ function routeSlugFromPath(pathname = window.location.pathname) {
   return segments[0] || "home";
 }
 
+function isKnownRouteSlug(slug = "") {
+  return Boolean(routeSeoMap[slug]) || /^(article|care-story|master-talk)-/.test(slug);
+}
+
 function routeSlugFromLocation() {
   const hashSlug = window.location.hash.slice(1).split("?")[0];
+  const pathSlug = routeSlugFromPath();
+  if (hashSlug && pathSlug !== "home" && !isKnownRouteSlug(hashSlug)) return pathSlug;
   return hashSlug || routeSlugFromPath();
+}
+
+function scrollToCurrentPageAnchor(hashSlug = window.location.hash.slice(1).split("?")[0]) {
+  if (!hashSlug || isKnownRouteSlug(hashSlug)) return false;
+  const target = document.getElementById(hashSlug);
+  if (!target || !pageView?.contains(target)) return false;
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+  return true;
+}
+
+function normalizePublicHref(href = "#home") {
+  const raw = String(href || "#home").trim();
+  if (raw === "#talent") return "/talent/";
+  if (raw === "#land") return "/land/";
+  if (raw === "#investor-recruiting") return "/investor-recruiting/";
+  return raw || "#home";
+}
+
+function navigateToPublicHref(href = "#home") {
+  const target = normalizePublicHref(href);
+  if (!target) return;
+  if (target.startsWith("#")) {
+    location.hash = target.replace(/^#/, "");
+    return;
+  }
+  window.location.href = target;
 }
 
 function pathForPreload(src = "") {
@@ -3183,7 +3218,7 @@ function renderSupabaseRecruit(items) {
   recruitList.innerHTML = items.map((item) => {
     const image = getCmsModuleImage(item, "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg");
     return `
-      <a href="${escapeHTML(item.link_url || "#talent")}">
+      <a href="${escapeHTML(normalizePublicHref(item.link_url || "/talent/"))}">
         <figure>
           <img src="${escapeHTML(image)}" alt="${escapeHTML(item.title || "員工招募")}" />
           <figcaption>${escapeHTML(item.title || "員工招募")}</figcaption>
@@ -3433,7 +3468,7 @@ const defaultPrimaryNav = [
     { label: "軟體系統", href: "#software" }
   ] },
   { type: "group", label: "招募與合作", items: [
-    { label: "人才招募", href: "#talent" }, { label: "土地招募", href: "#land" }, { label: "投資人招募", href: "#investor-recruiting" }
+    { label: "人才招募", href: "/talent/" }, { label: "土地招募", href: "/land/" }, { label: "投資人招募", href: "/investor-recruiting/" }
   ] },
   { type: "link", label: "健康3.0", href: "#health" },
   { type: "link", label: "課程報名", href: "#courses" },
@@ -3451,8 +3486,8 @@ const defaultFooterColumns = [
     { label: "軟體系統", href: "#software" }
   ] },
   { title: "合作入口", items: [
-    { label: "人才招募", href: "#talent" }, { label: "土地招募", href: "#land" },
-    { label: "投資人招募", href: "#investor-recruiting" }, { label: "教育品管", href: "#quality" }
+    { label: "人才招募", href: "/talent/" }, { label: "土地招募", href: "/land/" },
+    { label: "投資人招募", href: "/investor-recruiting/" }, { label: "教育品管", href: "#quality" }
   ] },
   { title: "資訊內容", items: [
     { label: "健康3.0", href: "#health" }, { label: "課程報名", href: "#courses" },
@@ -3500,18 +3535,20 @@ function renderHeaderNav(items = defaultPrimaryNav) {
         <div class="nav-group">
           <button class="nav-trigger" type="button" aria-expanded="false">${escapeHTML(item.label || "選單")}</button>
           <div class="dropdown">
-            ${item.items.map((link) => `<a href="${escapeHTML(link.href || "#home")}">${escapeHTML(link.label || "未命名")}</a>`).join("")}
+            ${item.items.map((link) => `<a href="${escapeHTML(normalizePublicHref(link.href || "#home"))}">${escapeHTML(link.label || "未命名")}</a>`).join("")}
           </div>
         </div>
       `;
     }
     const className = item.type === "cta" ? ' class="nav-cta"' : "";
-    return `<a${className} href="${escapeHTML(item.href || "#home")}">${escapeHTML(item.label || "未命名")}</a>`;
+    return `<a${className} href="${escapeHTML(normalizePublicHref(item.href || "#home"))}">${escapeHTML(item.label || "未命名")}</a>`;
   }).join("");
   bindNavigationDropdowns();
   const current = `#${(routeSlugFromLocation() || "home")}`;
+  const currentPath = `/${routeSlugFromLocation() || "home"}/`.replace("/home/", "/");
   nav.querySelectorAll("a").forEach((link) => {
-    link.classList.toggle("active", link.getAttribute("href") === current);
+    const href = link.getAttribute("href");
+    link.classList.toggle("active", href === current || href === currentPath);
   });
 }
 
@@ -3521,7 +3558,7 @@ function renderFooterColumns(columns = defaultFooterColumns) {
   footerSitemap.innerHTML = columns.map((column) => `
     <div>
       <h3>${escapeHTML(column.title || "網站地圖")}</h3>
-      ${(column.items || []).map((item) => `<a href="${escapeHTML(item.href || "#home")}">${escapeHTML(item.label || "未命名")}</a>`).join("")}
+      ${(column.items || []).map((item) => `<a href="${escapeHTML(normalizePublicHref(item.href || "#home"))}">${escapeHTML(item.label || "未命名")}</a>`).join("")}
     </div>
   `).join("");
 }
@@ -5152,7 +5189,7 @@ function renderMilestonesPage() {
         <h2>下一段歲悅，會繼續把照顧變簡單。</h2>
         <p>我們會持續擴大照顧服務、人才招募、教育品管與合作網絡，讓更多家庭在需要照顧時，有一個清楚、親切、值得信任的入口。</p>
         <div class="hero-actions">
-          <a class="primary-button" href="#talent">加入歲悅</a>
+          <a class="primary-button" href="/talent/">加入歲悅</a>
           <a class="secondary-button" href="#contact">合作洽詢</a>
         </div>
       </section>
@@ -9571,7 +9608,7 @@ function renderArticleLayout(article) {
             <strong>家屬照顧課</strong>
             <p>把移位、用餐、跌倒預防變成看得懂的日常技巧。</p>
           </a>
-          <a class="article-ad" href="#talent">
+          <a class="article-ad" href="/talent/">
             <span>We want you</span>
             <strong>加入歲悅團隊</strong>
             <p>居服員、督導、日照照服員招募中。</p>
@@ -10202,7 +10239,7 @@ document.addEventListener("click", (event) => {
     event.stopPropagation();
     trackAnalyticsEvent("reservation_click", {
       label: recruitButton.dataset.openingTitle || recruitButton.textContent.trim(),
-      targetUrl: location.hash || "#talent"
+      targetUrl: location.hash || "/talent/"
     });
     openRecruitApply(recruitButton.dataset);
     return;
@@ -10414,7 +10451,7 @@ document.addEventListener("click", (event) => {
   const card = event.target.closest(".click-card, .health-preview, .story-slider article, .celebrity-slider article");
   if (!card || event.target.closest("a, button, input, select, textarea")) return;
   const href = card.dataset.href || card.querySelector("a[href]")?.getAttribute("href");
-  if (href) location.hash = href.replace(/^#/, "");
+  if (href) navigateToPublicHref(href);
 });
 
 document.addEventListener("keydown", (event) => {
@@ -10423,7 +10460,7 @@ document.addEventListener("keydown", (event) => {
   if (!card || event.target.closest("a, button, input, select, textarea")) return;
   event.preventDefault();
   const href = card.dataset.href;
-  if (href) location.hash = href.replace(/^#/, "");
+  if (href) navigateToPublicHref(href);
 });
 
 document.addEventListener("submit", (event) => {
@@ -10464,7 +10501,10 @@ if (sceneImages.length > 1) {
   }, 3600);
 }
 
-window.addEventListener("hashchange", () => renderPage(routeSlugFromLocation()));
+window.addEventListener("hashchange", () => {
+  if (routeSlugFromPath() !== "home" && scrollToCurrentPageAnchor()) return;
+  renderPage(routeSlugFromLocation());
+});
 window.addEventListener("scroll", () => {
   updateMilestoneProgress();
   updateScrollProgress();
@@ -10491,6 +10531,8 @@ window.addEventListener("resize", () => {
 window.addEventListener("pagehide", flushPageEngagement);
 updateScrollProgress();
 renderPage(routeSlugFromLocation());
+document.documentElement.dataset.appReady = "true";
+window.requestAnimationFrame(() => scrollToCurrentPageAnchor());
 loadSupabaseSiteSettings();
 loadSupabasePageContent("home");
 loadSupabaseHomeModules().then((loaded) => {

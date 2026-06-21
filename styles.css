@@ -1731,6 +1731,15 @@ h2 {
   gap: 10px;
   margin-top: 22px;
 }
+.health-cats {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.health-cats::-webkit-scrollbar {
+  display: none;
+}
 .health-cats span,
 .health-cats button,
 .course-filters span {
@@ -1742,6 +1751,7 @@ h2 {
   font-weight: 800;
 }
 .health-cats button {
+  flex: 0 0 auto;
   cursor: pointer;
 }
 .health-cats button.active {
