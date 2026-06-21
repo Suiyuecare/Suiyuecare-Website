@@ -108,6 +108,33 @@ const routes = [
     priority: "0.76"
   },
   {
+    slug: "talent",
+    path: "/talent/",
+    title: "人才招募｜歲悅長照集團",
+    description: "加入歲悅長照團隊，探索照顧服務員、督導、日照、教學品管與行政職涯機會。",
+    image: "/assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
+    preloadImage: "/assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
+    priority: "0.76"
+  },
+  {
+    slug: "land",
+    path: "/land/",
+    title: "土地招募｜歲悅長照集團",
+    description: "歲悅尋找適合日照、社區據點與複合式長照服務的土地或空間合作機會。",
+    image: "/assets/location-taipei-fast.jpg",
+    preloadImage: "/assets/location-taipei-fast.jpg",
+    priority: "0.72"
+  },
+  {
+    slug: "investor-recruiting",
+    path: "/investor-recruiting/",
+    title: "投資人招募｜歲悅長照集團",
+    description: "了解歲悅長照集團的展店模型、產業策略與投資合作機會。",
+    image: "/assets/admin-recruit-02-operations-hero-fast.jpg",
+    preloadImage: "/assets/admin-recruit-02-operations-hero-fast.jpg",
+    priority: "0.72"
+  },
+  {
     slug: "health",
     path: "/health/",
     title: "健康3.0｜歲悅長照照顧知識",
