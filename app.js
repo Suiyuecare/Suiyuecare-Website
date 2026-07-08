@@ -1724,6 +1724,10 @@ function findCmsSectionRoot(sectionKey) {
     .find((section) => section.dataset.cmsSection === sectionKey) || null;
 }
 
+function isStaticHomeHeroSection(section) {
+  return Boolean(section?.dataset?.cmsSection === "hero" && section.closest?.("#home"));
+}
+
 function applyCmsSection(section) {
   const root = findCmsSectionRoot(section.section_key);
   if (!root) return;
@@ -1778,9 +1782,10 @@ function applyCmsPage(page, sections) {
   const isCmsManaged = sections.length > 0 || pageContent.cms_mode === true || managedSections.length > 0;
   if (!isCmsManaged) return;
 
-  const sectionsToHide = managedSections.length
+  const sectionsToHide = (managedSections.length
     ? managedSections.map(findCmsSectionRoot).filter(Boolean)
-    : [...document.querySelectorAll("[data-cms-section]")];
+    : [...document.querySelectorAll("[data-cms-section]")])
+      .filter((section) => !(page.slug === "home" && isStaticHomeHeroSection(section)));
 
   sectionsToHide.forEach((section) => {
     section.hidden = true;
@@ -3432,6 +3437,12 @@ function renderSupabaseSectionSettings(items) {
     const selector = item.metadata?.selector || `[data-cms-section="${item.item_key}"]`;
     const root = document.querySelector(selector);
     if (!root) return;
+
+    if (isStaticHomeHeroSection(root)) {
+      root.hidden = false;
+      root.classList.remove("is-cms-hidden");
+      return;
+    }
 
     root.hidden = Boolean(item.metadata?.hidden);
     root.classList.toggle("is-cms-hidden", Boolean(item.metadata?.hidden));
