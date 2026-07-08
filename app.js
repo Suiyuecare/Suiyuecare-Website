@@ -1791,7 +1791,9 @@ function applyCmsPage(page, sections) {
     section.hidden = true;
     section.dataset.cmsLoaded = "false";
   });
-  sections.forEach(applyCmsSection);
+  sections
+    .filter((section) => !(page.slug === "home" && section.section_key === "hero"))
+    .forEach(applyCmsSection);
 }
 
 async function loadSupabasePageContent(slug) {
@@ -3671,7 +3673,7 @@ async function loadSupabaseHomeModules() {
 
     const groups = groupHomeModules(data);
     renderSupabaseSectionSettings(groups.section_setting);
-    renderSupabaseHero(groups.hero);
+    // Keep the homepage hero static so first paint, hydration, and CMS loading do not swap headers.
     renderSupabaseNews(groups.news, document.querySelector('[data-news-panel="news"]'));
     renderSupabaseNews(groups.awards, document.querySelector('[data-news-panel="awards"]'));
     renderSupabaseRecruit(groups.recruit);
