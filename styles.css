@@ -298,8 +298,8 @@ div {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(255, 248, 238, 0.72) 0%, rgba(255, 248, 238, 0.5) 38%, rgba(255, 248, 238, 0.12) 68%, rgba(255, 248, 238, 0) 100%),
-    linear-gradient(180deg, rgba(255, 248, 238, 0.06), rgba(255, 248, 238, 0.18)),
+    linear-gradient(90deg, rgba(255, 253, 248, 0.96) 0%, rgba(255, 248, 238, 0.88) 42%, rgba(255, 248, 238, 0.42) 70%, rgba(255, 248, 238, 0.08) 100%),
+    linear-gradient(180deg, rgba(255, 253, 248, 0.18), rgba(255, 239, 218, 0.28)),
     url("assets/hero-care-hero-fast.jpg") center / cover;
   transform: scale(1.03);
 }
@@ -337,12 +337,12 @@ h2 {
   line-height: 1.12;
 }
 .hero .eyebrow { color: var(--orange-dark); }
-.hero h1 { color: #fff; text-shadow: 0 22px 58px rgba(0,0,0,.54), 0 4px 18px rgba(63,33,13,.58); }
+.hero h1 { color: var(--brown); text-shadow: 0 2px 0 rgba(255,253,248,.72), 0 18px 46px rgba(255,248,238,.92); }
 .hero-copy > p:not(.eyebrow), .care-layout p, .section-head > p, .wall-side p, .service-grid p, .health-stack span, .contact-section p {
   color: var(--muted);
   line-height: 1.9;
 }
-.hero-copy > p:not(.eyebrow) { max-width: 680px; color: rgba(126,102,87,.92); font-size: 20px; text-shadow: none; }
+.hero-copy > p:not(.eyebrow) { max-width: 680px; color: #5f4534; font-size: 20px; font-weight: 850; text-shadow: 0 1px 18px rgba(255,253,248,.86); }
 .hero-slogan {
   display: inline-flex;
   margin: 0 0 18px;
@@ -8789,8 +8789,8 @@ input[name="_honey"] { display: none !important; }
   }
   .home-page .hero-bg {
     background-image:
-      linear-gradient(90deg, rgba(255,248,238,.76) 0%, rgba(255,248,238,.58) 42%, rgba(255,248,238,.12) 74%, rgba(255,248,238,0) 100%),
-      linear-gradient(180deg, rgba(255,248,238,.1), rgba(255,248,238,.34)),
+      linear-gradient(90deg, rgba(255,253,248,.96) 0%, rgba(255,248,238,.88) 46%, rgba(255,248,238,.46) 78%, rgba(255,248,238,.12) 100%),
+      linear-gradient(180deg, rgba(255,253,248,.18), rgba(255,239,218,.28)),
       url("assets/hero-care-hero-fast.jpg") !important;
   }
   .hero-copy {
@@ -8805,17 +8805,20 @@ input[name="_honey"] { display: none !important; }
   .hero h1 {
     max-width: 100%;
     margin-bottom: 14px;
-    color: #fff;
+    color: var(--brown);
     font-size: clamp(31px, 8.8vw, 38px);
     line-height: 1.1;
-    text-shadow: 0 12px 34px rgba(83,43,11,.48), 0 2px 10px rgba(63,33,13,.5);
+    text-shadow: 0 2px 0 rgba(255,253,248,.72), 0 16px 40px rgba(255,248,238,.92);
   }
   .hero-copy > p:not(.eyebrow) {
+    color: #5f4534;
     font-size: 17px;
+    font-weight: 850;
     line-height: 1.85;
+    text-shadow: 0 1px 16px rgba(255,253,248,.86);
   }
   .hero-actions .ghost-button {
-    display: none;
+    display: inline-flex;
   }
   .hero-copy > p[data-cms-field="body"] {
     display: block;
