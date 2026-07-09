@@ -67,42 +67,42 @@ values (
   null,
   'Services',
   '會計、人資、公文、專案、PDF 與長照業務系統。',
-  '#software',
+  '/software',
   '07',
   70,
   false,
   true,
   'published',
   now(),
-  '{"image_url":"assets/admin-recruit-02-operations.png","image_alt":"軟體系統營運儀表板情境"}'::jsonb
+  '{"image_url":"assets/admin-recruit-02-operations-hires.jpg","image_alt":"軟體系統營運儀表板情境"}'::jsonb
 );
 
 update public.site_settings
 set
   value_json = '[
     {"type":"group","label":"服務項目","items":[
-      {"label":"關於歲悅","href":"#about"},
-      {"label":"大記事","href":"#milestones"},
-      {"label":"居家照顧","href":"#home-care"},
-      {"label":"日間照顧","href":"#day-care"},
-      {"label":"社區據點","href":"#community"},
-      {"label":"護理復能","href":"#nursing"},
-      {"label":"移工培訓","href":"#migrant-training"},
-      {"label":"教育品管","href":"#quality"},
-      {"label":"軟體系統","href":"#software"}
+      {"label":"關於歲悅","href":"/about"},
+      {"label":"大記事","href":"/milestones"},
+      {"label":"居家照顧","href":"/home-care"},
+      {"label":"日間照顧","href":"/day-care"},
+      {"label":"社區據點","href":"/community"},
+      {"label":"護理復能","href":"/nursing"},
+      {"label":"移工培訓","href":"/migrant-training"},
+      {"label":"教育品管","href":"/quality"},
+      {"label":"軟體系統","href":"/software"}
     ]},
     {"type":"group","label":"招募與合作","items":[
-      {"label":"人才招募","href":"#talent"},
-      {"label":"土地招募","href":"#land"},
-      {"label":"投資人招募","href":"#investor-recruiting"}
+      {"label":"人才招募","href":"/talent"},
+      {"label":"土地招募","href":"/land"},
+      {"label":"投資人招募","href":"/investor-recruiting"}
     ]},
-    {"type":"link","label":"健康3.0","href":"#health"},
-    {"type":"link","label":"課程報名","href":"#courses"},
+    {"type":"link","label":"健康3.0","href":"/health"},
+    {"type":"link","label":"課程報名","href":"/courses"},
     {"type":"group","label":"投資人專區","items":[
-      {"label":"投資人首頁","href":"#investors"},
-      {"label":"財務資訊","href":"#ir-finance"},
-      {"label":"公司治理","href":"#ir-governance"},
-      {"label":"股東專區","href":"#ir-shareholders"}
+      {"label":"投資人首頁","href":"/investors"},
+      {"label":"財務資訊","href":"/ir-finance"},
+      {"label":"公司治理","href":"/ir-governance"},
+      {"label":"股東專區","href":"/ir-shareholders"}
     ]},
     {"type":"cta","label":"聯絡我們","href":"#contact"}
   ]'::jsonb,
@@ -113,23 +113,23 @@ update public.site_settings
 set
   value_json = '[
     {"title":"營業項目","items":[
-      {"label":"居家照顧","href":"#home-care"},
-      {"label":"日間照顧","href":"#day-care"},
-      {"label":"社區據點","href":"#community"},
-      {"label":"護理復能","href":"#nursing"},
-      {"label":"軟體系統","href":"#software"}
+      {"label":"居家照顧","href":"/home-care"},
+      {"label":"日間照顧","href":"/day-care"},
+      {"label":"社區據點","href":"/community"},
+      {"label":"護理復能","href":"/nursing"},
+      {"label":"軟體系統","href":"/software"}
     ]},
     {"title":"合作入口","items":[
-      {"label":"人才招募","href":"#talent"},
-      {"label":"土地招募","href":"#land"},
-      {"label":"投資人招募","href":"#investor-recruiting"},
-      {"label":"教育品管","href":"#quality"}
+      {"label":"人才招募","href":"/talent"},
+      {"label":"土地招募","href":"/land"},
+      {"label":"投資人招募","href":"/investor-recruiting"},
+      {"label":"教育品管","href":"/quality"}
     ]},
     {"title":"資訊內容","items":[
-      {"label":"健康3.0","href":"#health"},
-      {"label":"課程報名","href":"#courses"},
-      {"label":"投資人專區","href":"#investors"},
-      {"label":"財務資訊","href":"#ir-finance"},
+      {"label":"健康3.0","href":"/health"},
+      {"label":"課程報名","href":"/courses"},
+      {"label":"投資人專區","href":"/investors"},
+      {"label":"財務資訊","href":"/ir-finance"},
       {"label":"聯絡我們","href":"#contact"}
     ]}
   ]'::jsonb,

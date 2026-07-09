@@ -35,7 +35,7 @@ cross join (
       'System Modules',
       '會計、人資、電子公文交換、專案管理、PDF 工具，以及居家與日照業務系統，都能依照單位既有流程與權限分工調整。',
       jsonb_build_object(
-        'image_url', 'assets/admin-recruit-02-operations.png',
+        'image_url', 'assets/admin-recruit-02-operations-hires.jpg',
         'image_alt', '歲悅軟體系統營運儀表板示意',
         'image_usage', 'service_hero',
         'focal_point', 'center',
@@ -57,7 +57,7 @@ cross join (
       'Product Screens',
       '後台可放置實際系統截圖與說明，讓合作單位看得懂系統能解決哪些日常行政與服務管理問題。',
       jsonb_build_object(
-        'image_url', 'assets/admin-recruit-04-service.png',
+        'image_url', 'assets/homepage-batch/family-consultation-clear.jpg',
         'image_alt', '照顧服務系統畫面示意',
         'image_usage', 'card',
         'focal_point', 'center',

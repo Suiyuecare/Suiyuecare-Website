@@ -2,19 +2,19 @@
 -- while keeping the visual layout controlled by the frontend templates/CSS.
 with section_seed(slug, section_key, title, subtitle, eyebrow, body, layout, sort_order, content_json) as (
   values
-    ('home','hero','把長照變成家人看得懂、也放得下心的日常系統。','照顧就像去超商，買牛奶一樣簡單。','Professional Care Network','歲悅長照集團整合居家、日照、社區、復能、培訓與品質管理，讓每一次照顧都能被安排、被追蹤，也被溫柔地完成。','home_hero',10,'{"background_image_url":"assets/hero-care.png","button_text":"預約諮詢","button_href":"#contact","secondary_button_text":"觀看照顧系統","secondary_button_href":"#care-system"}'::jsonb),
+    ('home','hero','把長照變成家人看得懂、也放得下心的日常系統。','照顧就像去超商，買牛奶一樣簡單。','Professional Care Network','歲悅長照集團整合居家、日照、社區、復能、培訓與品質管理，讓每一次照顧都能被安排、被追蹤，也被溫柔地完成。','home_hero',10,'{"background_image_url":"assets/hero-care-hero-fast.jpg","button_text":"預約諮詢","button_href":"#contact","secondary_button_text":"觀看照顧系統","secondary_button_href":"#care-system"}'::jsonb),
     ('home','updates','最新動態',null,'Updates','最新消息、得標紀錄與員工招募可以由後台首頁模組管理。','home_updates',20,'{"managed_by":"content_modules","module_keys":["news","awards","recruit"]}'::jsonb),
-    ('home','care-system','我們相信，真正的照顧，是讓人重新感覺自己仍被生活溫柔接住。',null,'Care Philosophy','歲悅長照集團不只提供服務，而是用專業、尊嚴、陪伴與信任，承接家庭在照顧路上的不安。每一次服務都從理解人開始，讓長輩保有選擇、家屬保有喘息，照顧者也能被制度支持。','home_philosophy',30,'{"image_url":"assets/homepage-batch/02-daycare-group-exercise.png"}'::jsonb),
+    ('home','care-system','我們相信，真正的照顧，是讓人重新感覺自己仍被生活溫柔接住。',null,'Care Philosophy','歲悅長照集團不只提供服務，而是用專業、尊嚴、陪伴與信任，承接家庭在照顧路上的不安。每一次服務都從理解人開始，讓長輩保有選擇、家屬保有喘息，照顧者也能被制度支持。','home_philosophy',30,'{"image_url":"assets/homepage-batch/02-daycare-group-exercise-hires.jpg"}'::jsonb),
     ('home','video','單位影片',null,'Video','單位影片連結可由後台首頁模組管理。','home_video',40,'{"managed_by":"content_modules","module_key":"video"}'::jsonb),
     ('home','network','單位分佈',null,'Care Network','用居家站、日照中心、社區據點與護理復能團隊，形成多點支援的照顧網絡。','home_network',50,'{"managed_by":"content_modules","module_key":"location"}'::jsonb),
     ('home','services','營業項目',null,'Services','八大服務項目以固定版型呈現，文字、圖片、卡片、流程、FAQ 由服務頁模板欄位管理。','home_services',60,'{"managed_by":"page_template_fields","button_text":"我需要服務","button_href":"#contact"}'::jsonb),
     ('home','care-stories','真實照顧情境',null,'Care Stories','家屬最真實的安心，來自照顧被看見、被回報，也有人一起承擔。','home_stories',70,'{"managed_by":"care_stories"}'::jsonb),
-    ('home','home-health','照顧知識，也要讓家屬一看就懂。',null,'Health 3.0','健康3.0文章、影片與短影片由文章資料庫與分類管理。','home_health',80,'{"managed_by":"articles","button_text":"進入健康3.0","button_href":"#health"}'::jsonb),
+    ('home','home-health','照顧知識，也要讓家屬一看就懂。',null,'Health 3.0','健康3.0文章、影片與短影片由文章資料庫與分類管理。','home_health',80,'{"managed_by":"articles","button_text":"進入健康3.0","button_href":"/health"}'::jsonb),
     ('home','contact','先留下需求，讓我們協助判斷適合的照顧方向。',null,'Contact','服務諮詢、課程報名、人才招募、土地合作與投資洽談，都可以從這裡開始。','home_contact',90,'{"recipient":"generalaffairs@suiyuecare.com"}'::jsonb),
 
-    ('about','hero','關於歲悅','讓長照變成家庭看得懂、找得到、用得起，也能被追蹤的日常支持。','About Suiyuecare','歲悅長照集團以「歲月安心，悅享生活」為核心，整合多元長照服務，陪伴家庭走過照顧決策與日常執行。','detail_hero',10,'{"image_url":"assets/homepage-batch/04-admin-team-office.png","button_text":"聯絡我們","button_href":"#contact"}'::jsonb),
+    ('about','hero','關於歲悅','讓長照變成家庭看得懂、找得到、用得起，也能被追蹤的日常支持。','About Suiyuecare','歲悅長照集團以「歲月安心，悅享生活」為核心，整合多元長照服務，陪伴家庭走過照顧決策與日常執行。','detail_hero',10,'{"image_url":"assets/homepage-batch/04-admin-team-office-fast.jpg","button_text":"聯絡我們","button_href":"#contact"}'::jsonb),
     ('about','brand-values','品牌理念',null,'Brand Values','我們相信照顧不是單點服務，而是一套讓家屬看得懂、照顧者能執行、團隊可追蹤的系統。','detail_cards',20,'{"items":[{"title":"歲月安心","body":"用專業與制度守護長輩健康安全。"},{"title":"悅享生活","body":"讓長輩保有生活選擇與日常尊嚴。"},{"title":"陪伴成長","body":"與家庭、照顧者與合作夥伴一起前進。"}]}'::jsonb),
-    ('milestones','hero','大記事','一路往下看見歲悅如何把照顧網絡慢慢長出來。','Milestones','從服務據點、團隊建立到內容與品質系統，歲悅持續把照顧做得更清楚、更穩定。','detail_hero',10,'{"image_url":"assets/homepage-batch/16-taipei-service-office.png"}'::jsonb),
+    ('milestones','hero','大記事','一路往下看見歲悅如何把照顧網絡慢慢長出來。','Milestones','從服務據點、團隊建立到內容與品質系統，歲悅持續把照顧做得更清楚、更穩定。','detail_hero',10,'{"image_url":"assets/homepage-batch/16-taipei-service-office-fast.jpg"}'::jsonb),
     ('milestones','timeline','發展歷程',null,'Timeline','大記事版面保留互動式時間軸，後續可再拆成 milestones 資料表。','timeline',20,'{"items":[{"year":"2024","title":"服務網絡起步"},{"year":"2025","title":"北北桃服務布局"},{"year":"2026","title":"CMS 與健康3.0內容中心上線"}]}'::jsonb),
 
     ('home-care','hero','居家照顧',null,'Home Care','到宅服務、督導陪跑、家屬溝通與服務紀錄，串成家庭看得懂的照顧流程。','service_hero',10,'{"managed_by":"page_template_fields"}'::jsonb),

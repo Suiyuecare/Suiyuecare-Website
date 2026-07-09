@@ -10,6 +10,69 @@
 - `assets/`：前台圖片與合作單位 logo
 - `src/lib/supabaseClient.js`：Supabase browser client 基礎設定
 
+## Frontend Verification
+
+上線或推到前台前，建議先跑完整前台檢查：
+
+```bash
+pnpm verify:all
+```
+
+這會依序 build 網站、產生靜態路由、清理部署包未使用圖片，並檢查：
+
+- 非首頁深連結不會先閃出首頁或舊版內容
+- 公開路由清單在靜態產生、首屏驗證、正式站驗收、效能預算與快取設定中保持一致
+- 非同步頁面會先顯示 loading，資料完成後才顯示正式內容
+- 目前頁面的導覽連結有 `aria-current="page"`
+- 前台文案沒有殘留開發、後台或資料庫實作語氣
+- 產出的 HTML 內部連結、圖片路徑與外部新分頁安全屬性正確
+- 產出的 HTML 圖片、iframe、按鈕與表單欄位具備基本可及性資訊
+- 主要 HTML、JS、CSS 與 Hero 圖沒有超出前台效能預算
+- 基本安全設定與 robots/private path 防護存在
+- 目前前台引用圖片沒有 critical 尺寸問題，避免低解析 Hero 圖被部署
+
+## Image Quality Checks
+
+圖片是前台速度與觀感的主要風險。更新 Hero、服務圖卡、課程圖或文章封面後，請先跑：
+
+```bash
+pnpm audit:images
+```
+
+這會檢查目前前台有引用到的圖片尺寸與檔案大小。
+
+若要使用部署同等級的嚴格檢查，請跑：
+
+```bash
+pnpm audit:images:strict
+```
+
+若要檢視整個圖片庫，包含尚未被引用的舊圖：
+
+```bash
+pnpm audit:images:all
+```
+
+若要找出會拖慢部署包、但目前沒有被前台引用的大圖，請跑：
+
+```bash
+pnpm audit:images:unused
+```
+
+`public/assets` 內未使用的大圖仍可能被 Vite 複製到 `dist`，因此清理舊 PNG 或重複原圖時，優先處理 `audit:images:unused` 列出的 `public/assets` 檔案。
+
+正式 build 會自動執行：
+
+```bash
+node scripts/prune-unused-public-assets.mjs
+```
+
+這只會從 `dist` 移除未被目前前台引用的 `public/assets` 大圖，不會刪除原始素材。若未來確定要把所有未引用 public 圖片都排除在部署包外，可手動跑：
+
+```bash
+node scripts/prune-unused-public-assets.mjs --all
+```
+
 ## Supabase Setup
 
 本專案已加入 `@supabase/supabase-js`，後續可用 Supabase 管理 CMS 資料、登入驗證與圖片儲存。
@@ -342,37 +405,43 @@ git diff --check
 8. 新增分類並啟用，確認 `#health` 分類列自動出現
 9. 停用分類或文章，確認前台不顯示
 
-本機目前無法執行 `npm install`、`npm run build` 或 Vite dev server，因為目前環境找不到 `npm` / `npx` / `vite` 指令。部署到 Vercel 後會由 Vercel 依 `package.json` 安裝 `vite` 與 `@supabase/supabase-js` 後再 build。
-
 ## Local Development
 
 安裝套件：
 
 ```bash
-npm install
+pnpm install
 ```
 
 啟動開發伺服器：
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 建立正式輸出：
 
 ```bash
-npm run build
+pnpm build
+```
+
+上線前完整檢查：
+
+```bash
+pnpm verify:all
 ```
 
 ## Deployment Note
 
-目前 Vercel 使用 `vercel.json` 走標準 Vite build：
+目前 Vercel 使用 `vercel.json` 先跑完整前台品質檢查，再輸出 `dist`：
 
 ```json
-"buildCommand": "vite build"
+"buildCommand": "pnpm verify:all"
 ```
 
-這樣 `/admin/login`、`/admin` 與 `src/` 裡的 Supabase module 才會被正確打包。
+`verify:all` 會執行 `pnpm build`，因此 `/admin/login`、`/admin` 與 `src/` 裡的 Supabase module 仍會被正確打包；若路由首屏、防閃、前台文案、連結、基本可及性、效能預算、安全設定或圖片品質檢查失敗，部署會直接中止。
+
+公開靜態頁 HTML 也會透過 `vercel.json` 設定 `Cache-Control: no-cache, no-store, must-revalidate`，避免 `/talent`、`/land`、`/investor-recruiting` 等深連結在部署後繼續拿到舊版首頁殼。
 
 ## Launch Hardening
 
@@ -521,6 +590,42 @@ supabase/migrations/20260521000300_add_versions_publish_workflow_permissions.sql
 - Twitter card
 
 正式網域切到 Vercel 後，請確認 `https://suiyuecare.com/robots.txt` 與 `https://suiyuecare.com/sitemap.xml` 均可讀取。
+
+### 前台路由首屏檢查
+
+前台公開頁是由同一份網站殼載入，再由 JavaScript 切換內容。為避免 `/talent`、`/land`、服務頁、投資人頁等非首頁路由在第一個畫面先閃出首頁或舊版內容，build 後可執行：
+
+```bash
+pnpm verify:routes
+```
+
+這會檢查公開靜態輸出是否包含初始路由標記、首頁隱藏規則與讀取狀態。
+
+部署後若要確認正式站已經吃到新版 HTML，可執行：
+
+```bash
+pnpm verify:routes:production
+```
+
+這會直接檢查 `https://www.suiyuecare.com` 的公開深連結是否仍含舊首頁殼，並確認 HTML 回應帶有 no-cache 設定。若要檢查其他網址，可設定 `PRODUCTION_ORIGIN=https://your-preview-url`。
+
+若要在推到前台後一次驗收路由首屏與正式安全設定，可執行：
+
+```bash
+pnpm verify:production
+```
+
+這個指令會連到正式站與 Vercel live firewall/security 設定，應在部署完成後執行，不會放進一般 `verify:all`。
+
+### 前台效能預算檢查
+
+為避免首頁殼、JS/CSS bundle 或 Hero 圖在更新時意外變大，build 後可執行：
+
+```bash
+pnpm verify:performance
+```
+
+這會檢查公開路由 HTML、前台主要 JS/CSS chunk、Supabase client chunk 與關鍵 Hero 圖是否仍在預算內。
 
 ### 自動報表
 

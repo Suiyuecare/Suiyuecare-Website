@@ -89,11 +89,13 @@ set
 -- Use existing bundled site images as CMS media records.
 insert into public.media (bucket, storage_path, public_url, file_name, mime_type, alt_text, visibility, is_enabled, image_usage, focal_point)
 values
-  ('site-assets', 'assets/homepage-batch/18-health-fall-prevention-cover.png', '/assets/homepage-batch/18-health-fall-prevention-cover.png', '18-health-fall-prevention-cover.png', 'image/png', '長輩起身與跌倒預防照顧封面', 'public', true, 'article_cover', 'center'),
-  ('site-assets', 'assets/homepage-batch/17-health-nutrition-cover.png', '/assets/homepage-batch/17-health-nutrition-cover.png', '17-health-nutrition-cover.png', 'image/png', '長輩飲食營養照顧封面', 'public', true, 'article_cover', 'center'),
-  ('site-assets', 'assets/homepage-batch/19-health-dementia-cover.png', '/assets/homepage-batch/19-health-dementia-cover.png', '19-health-dementia-cover.png', 'image/png', '失智照顧陪伴封面', 'public', true, 'article_cover', 'center'),
-  ('site-assets', 'assets/homepage-batch/20-health-caregiver-stress-cover.png', '/assets/homepage-batch/20-health-caregiver-stress-cover.png', '20-health-caregiver-stress-cover.png', 'image/png', '家屬照顧壓力支持封面', 'public', true, 'article_cover', 'center'),
-  ('site-assets', 'assets/homepage-batch/10-family-consultation.png', '/assets/homepage-batch/10-family-consultation.png', '10-family-consultation.png', 'image/png', '照顧諮詢與名人講堂封面', 'public', true, 'article_cover', 'center')
+  ('site-assets', 'assets/homepage-batch/18-health-fall-prevention-cover-fast.jpg', '/assets/homepage-batch/18-health-fall-prevention-cover-fast.jpg', '18-health-fall-prevention-cover-fast.jpg', 'image/jpeg', '長輩起身與跌倒預防照顧封面', 'public', true, 'article_cover', 'center'),
+  ('site-assets', 'assets/homepage-batch/17-health-nutrition-cover-fast.jpg', '/assets/homepage-batch/17-health-nutrition-cover-fast.jpg', '17-health-nutrition-cover-fast.jpg', 'image/jpeg', '長輩飲食營養照顧封面', 'public', true, 'article_cover', 'center'),
+  ('site-assets', 'assets/homepage-batch/19-health-dementia-cover-fast.jpg', '/assets/homepage-batch/19-health-dementia-cover-fast.jpg', '19-health-dementia-cover-fast.jpg', 'image/jpeg', '失智照顧陪伴封面', 'public', true, 'article_cover', 'center'),
+  ('site-assets', 'assets/homepage-batch/20-health-caregiver-stress-cover-fast.jpg', '/assets/homepage-batch/20-health-caregiver-stress-cover-fast.jpg', '20-health-caregiver-stress-cover-fast.jpg', 'image/jpeg', '家屬照顧壓力支持封面', 'public', true, 'article_cover', 'center'),
+  ('site-assets', 'assets/homepage-batch/family-consultation-clear.jpg', '/assets/homepage-batch/family-consultation-clear.jpg', 'family-consultation-clear.jpg', 'image/jpeg', '照顧諮詢與名人講堂封面', 'public', true, 'article_cover', 'center'),
+  ('site-assets', 'assets/master-talk/cover-care-psychology-chou.jpg', '/assets/master-talk/cover-care-psychology-chou.jpg', 'cover-care-psychology-chou.jpg', 'image/jpeg', '照顧心理講師文章封面', 'public', true, 'article_cover', 'center'),
+  ('site-assets', 'assets/master-talk/portrait-care-psychology-chou.jpg', '/assets/master-talk/portrait-care-psychology-chou.jpg', 'portrait-care-psychology-chou.jpg', 'image/jpeg', '照顧心理講師周小姐人像', 'public', true, 'avatar', 'center')
 on conflict (bucket, storage_path) do update
 set
   public_url = excluded.public_url,
@@ -130,7 +132,7 @@ values
     '先穩定、再移動，讓每一次起身都更安全。',
     '家屬協助長輩起身時，先確認動線、支撐點與節奏，比用力拉起更重要。',
     '照顧長輩起身時，請先確認地面止滑、椅子穩定與長輩是否已坐穩。第二步是讓長輩雙腳踩實，照顧者站在側前方提供支撐。第三步是用口令建立節奏，不要突然拉扯。若長輩近期跌倒、頭暈或下肢無力，建議先諮詢專業人員。',
-    (select id from public.media where storage_path = 'assets/homepage-batch/18-health-fall-prevention-cover.png'),
+    (select id from public.media where storage_path = 'assets/homepage-batch/18-health-fall-prevention-cover-fast.jpg'),
     '歲悅照顧編輯部',
     array['跌倒預防','移位','居家安全'],
     10,
@@ -148,7 +150,7 @@ values
     '從食慾、體重、肌力與精神狀態快速觀察。',
     '長輩吃得少不一定只是胃口變差，也可能與疾病、藥物、牙口或情緒有關。',
     '家屬可以先觀察四件事：體重是否明顯下降、平常喜歡的食物是否也不想吃、走路與起身是否變弱、精神是否比平常差。如果狀況持續超過一週，建議紀錄飲食量並諮詢醫療或營養專業。',
-    (select id from public.media where storage_path = 'assets/homepage-batch/17-health-nutrition-cover.png'),
+    (select id from public.media where storage_path = 'assets/homepage-batch/17-health-nutrition-cover-fast.jpg'),
     '歲悅營養照顧小組',
     array['營養','食慾','肌力'],
     20,
@@ -166,7 +168,7 @@ values
     '理解不安，比急著糾正更重要。',
     '面對失智長輩重複提問，家屬可以用穩定語句與環境提示降低焦慮。',
     '重複提問的背後常常是不安、忘記或無法掌握時間。家屬可以先回應情緒，再提供簡短答案，例如「我知道你擔心，我們等一下三點出門」。也可以用白板、時鐘與固定流程提示，減少反覆拉扯。',
-    (select id from public.media where storage_path = 'assets/homepage-batch/19-health-dementia-cover.png'),
+    (select id from public.media where storage_path = 'assets/homepage-batch/19-health-dementia-cover-fast.jpg'),
     '歲悅照顧編輯部',
     array['失智','溝通','情緒安撫'],
     30,
@@ -184,7 +186,7 @@ values
     '照顧不能只靠一個人硬撐。',
     '先整理照顧時段、找到可替手的人，再尋求喘息或長照資源。',
     '當照顧者覺得自己快撐不住，第一步不是責備自己，而是把一天中最累的時段寫下來。第二步是找出哪些工作可以交給家人、照服員或日照中心。第三步是主動詢問長照服務與喘息資源，讓照顧變成可長期運作的系統。',
-    (select id from public.media where storage_path = 'assets/homepage-batch/20-health-caregiver-stress-cover.png'),
+    (select id from public.media where storage_path = 'assets/homepage-batch/20-health-caregiver-stress-cover-fast.jpg'),
     '歲悅家庭支持團隊',
     array['照顧者','喘息','家庭支持'],
     40,
@@ -202,7 +204,7 @@ values
     '照顧不是控制，而是重新建立安全與選擇。',
     '照顧心理講師分享家屬在照顧初期最需要的是可理解資訊與可求助系統。',
     '周小姐提醒，很多家庭不是不願意照顧，而是不知道下一步在哪裡。好的照顧系統要讓家屬知道誰可以問、何時該求助、哪些事情可以交給專業，讓長輩和家屬都保有生活感。',
-    (select id from public.media where storage_path = 'assets/homepage-batch/10-family-consultation.png'),
+    (select id from public.media where storage_path = 'assets/master-talk/cover-care-psychology-chou.jpg'),
     '歲悅名人講堂',
     array['名人講堂','照顧心理','家屬支持'],
     50,

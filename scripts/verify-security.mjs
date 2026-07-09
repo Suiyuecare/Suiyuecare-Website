@@ -3,8 +3,34 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
-const sensitiveMarkerPattern = "SUPABASE_SERVICE_ROLE_KEY|RESEND_API_KEY|OPENAI_API_KEY|CRON_SECRET|REPORT_CRON_SECRET|STATUS_SECRET|ADMIN_API_SECRET|service_role|saveWarning|emailSetupRequired";
+const sensitiveMarkerPattern = /SUPABASE_SERVICE_ROLE_KEY|RESEND_API_KEY|OPENAI_API_KEY|CRON_SECRET|REPORT_CRON_SECRET|STATUS_SECRET|ADMIN_API_SECRET|service_role|saveWarning|emailSetupRequired/;
 const cspValue = "object-src 'none'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests";
+const textFilePattern = /\.(js|mjs|cjs|html|css|json|txt|xml|svg|map)$/i;
+const htmlNoCacheValue = "no-cache, no-store, must-revalidate";
+const publicHtmlNoCacheSources = [
+  "/",
+  "/index.html",
+  "/about",
+  "/milestones",
+  "/home-care",
+  "/day-care",
+  "/community",
+  "/nursing",
+  "/migrant-training",
+  "/quality",
+  "/software",
+  "/courses",
+  "/talent",
+  "/land",
+  "/investor-recruiting",
+  "/health",
+  "/search",
+  "/investors",
+  "/ir-finance",
+  "/ir-governance",
+  "/ir-shareholders",
+  "/contact"
+];
 
 function assert(condition, message) {
   if (!condition) {
@@ -22,6 +48,34 @@ function readJson(filePath) {
 
 function readText(filePath) {
   return fs.readFileSync(path.resolve(root, filePath), "utf8");
+}
+
+function walkFiles(target, files = []) {
+  if (!fs.existsSync(target)) return files;
+  const stat = fs.statSync(target);
+  if (stat.isDirectory()) {
+    for (const entry of fs.readdirSync(target, { withFileTypes: true })) {
+      walkFiles(path.join(target, entry.name), files);
+    }
+    return files;
+  }
+  if (textFilePattern.test(target)) files.push(target);
+  return files;
+}
+
+function scanSensitiveMarkers(targets = []) {
+  const matches = [];
+  const files = targets.flatMap((target) => walkFiles(path.resolve(root, target)));
+  for (const file of files) {
+    const relative = path.relative(root, file);
+    const text = fs.readFileSync(file, "utf8");
+    text.split(/\r?\n/).forEach((line, index) => {
+      if (sensitiveMarkerPattern.test(line)) {
+        matches.push(`${relative}:${index + 1}: ${line.trim().slice(0, 180)}`);
+      }
+    });
+  }
+  return matches;
 }
 
 function run(command, args, options = {}) {
@@ -56,7 +110,7 @@ function verifyVercelConfig() {
   const config = readJson("vercel.json");
   assert(config.cleanUrls === true, "vercel.json should keep cleanUrls enabled.");
   assert(config.trailingSlash === false, "vercel.json should keep trailingSlash disabled.");
-  assert(config.buildCommand === "pnpm run build", "vercel.json buildCommand should use pnpm run build.");
+  assert(config.buildCommand === "pnpm verify:all", "vercel.json buildCommand should use pnpm verify:all.");
   assert(config.outputDirectory === "dist", "vercel.json outputDirectory should be dist.");
 
   for (const source of ["/:path*", "/", "/index.html"]) {
@@ -77,6 +131,32 @@ function verifyVercelConfig() {
     }
   }
 
+  for (const source of publicHtmlNoCacheSources) {
+    const entry = config.headers?.find((item) => item.source === source);
+    assert(entry, `Missing no-cache headers entry for public HTML route ${source}.`);
+    assertHeader(entry.headers, "Content-Security-Policy", cspValue);
+    assertHeader(entry.headers, "Strict-Transport-Security", "max-age=63072000; includeSubDomains");
+    assertHeader(entry.headers, "X-Content-Type-Options", "nosniff");
+    assertHeader(entry.headers, "X-Frame-Options", "SAMEORIGIN");
+    assertHeader(entry.headers, "Cache-Control", htmlNoCacheValue);
+  }
+
+  const rewriteSources = new Set((config.rewrites || []).map((rewrite) => rewrite.source));
+  for (const source of ["/article/:slug", "/care-story/:slug", "/master-talk/:slug"]) {
+    assert(rewriteSources.has(source), `Missing front-end content rewrite for ${source}.`);
+  }
+  const rewriteDestinations = new Map((config.rewrites || []).map((rewrite) => [rewrite.source, rewrite.destination]));
+  for (const source of [
+    "/article/assets/:path*",
+    "/care-story/assets/:path*",
+    "/master-talk/assets/:path*",
+    "/talent/assets/:path*",
+    "/land/assets/:path*",
+    "/investor-recruiting/assets/:path*"
+  ]) {
+    assert(rewriteDestinations.get(source) === "/assets/:path*", `Missing nested asset fallback rewrite for ${source}.`);
+  }
+
   log("vercel.json security headers are present");
 }
 
@@ -86,23 +166,34 @@ function verifyIgnoredArtifacts() {
     assert(vercelIgnore.includes(expected), `.vercelignore is missing ${expected}.`);
   }
 
-  const gitIgnore = readText(".gitignore");
-  for (const expected of ["/outputs/", "/assets/backups/", "/public/assets/backups/", "/*-check.png"]) {
-    assert(gitIgnore.includes(expected), `.gitignore is missing ${expected}.`);
+  const gitIgnorePath = path.resolve(root, ".gitignore");
+  if (fs.existsSync(gitIgnorePath)) {
+    const gitIgnore = readText(".gitignore");
+    for (const expected of ["/outputs/", "/assets/backups/", "/public/assets/backups/", "/*-check.png"]) {
+      assert(gitIgnore.includes(expected), `.gitignore is missing ${expected}.`);
+    }
+  } else {
+    assert(process.env.VERCEL, ".gitignore is missing.");
   }
 
   log("generated and backup artifacts are ignored");
 }
 
 function verifyRobots() {
-  for (const file of ["robots.txt", "public/robots.txt"]) {
+  const files = ["robots.txt", "public/robots.txt"];
+  if (fs.existsSync(path.resolve(root, "dist/robots.txt"))) files.push("dist/robots.txt");
+  for (const file of files) {
     const robots = readText(file);
     for (const expected of ["Disallow: /admin", "Disallow: /api", "Disallow: /portal", "Disallow: /assets/backups"]) {
       assert(robots.includes(expected), `${file} is missing ${expected}.`);
     }
+    assert(
+      robots.includes("Sitemap: https://www.suiyuecare.com/sitemap.xml"),
+      `${file} is missing the public sitemap URL.`
+    );
   }
 
-  log("robots files disallow private paths");
+  log("robots files disallow private paths and expose the sitemap");
 }
 
 function verifyPackage() {
@@ -111,6 +202,16 @@ function verifyPackage() {
   assert(String(pkg.devDependencies?.vite || "").startsWith("^8."), "package.json should use Vite 8.");
   assert(pkg.scripts?.["verify:security"], "package.json is missing verify:security.");
   assert(pkg.scripts?.["verify:security:production"], "package.json is missing verify:security:production.");
+  assert(pkg.scripts?.["verify:production"]?.includes("pnpm verify:routes:production"), "package.json verify:production should run production route checks.");
+  assert(pkg.scripts?.["verify:production"]?.includes("pnpm verify:security:production"), "package.json verify:production should run production security checks.");
+  assert(pkg.scripts?.["verify:all"]?.includes("pnpm build"), "package.json verify:all should run pnpm build.");
+  assert(pkg.scripts?.["verify:route-inventory"], "package.json is missing verify:route-inventory.");
+  assert(pkg.scripts?.["verify:all"]?.includes("pnpm verify:route-inventory"), "package.json verify:all should run route inventory checks.");
+  assert(pkg.scripts?.["verify:all"]?.includes("pnpm verify:routes"), "package.json verify:all should run route checks.");
+  assert(pkg.scripts?.["verify:all"]?.includes("pnpm verify:accessibility"), "package.json verify:all should run accessibility checks.");
+  assert(pkg.scripts?.["verify:performance"], "package.json is missing verify:performance.");
+  assert(pkg.scripts?.["verify:all"]?.includes("pnpm verify:performance"), "package.json verify:all should run performance budget checks.");
+  assert(pkg.scripts?.["verify:all"]?.includes("pnpm audit:images:strict"), "package.json verify:all should run strict image checks.");
   log("package security scripts and runtime constraints are present");
 }
 
@@ -134,11 +235,8 @@ function verifyDist() {
   }
 
   assert(!fs.existsSync(path.join(distDir, "assets/backups")), "dist/assets/backups must not exist.");
-  const scan = run("rg", ["-n", sensitiveMarkerPattern, "dist", "index.html", "app.js", "src", "public"], {
-    allowFailure: true,
-    capture: true
-  });
-  assert(scan.status === 1, `Sensitive marker scan found matches:\n${scan.stdout}${scan.stderr}`);
+  const matches = scanSensitiveMarkers(["dist", "index.html", "app.js", "src", "public"]);
+  assert(matches.length === 0, `Sensitive marker scan found matches:\n${matches.join("\n")}`);
   log("dist excludes backups and sensitive markers");
 }
 

@@ -54,17 +54,17 @@ values
   ('footer', 'footer_intro', 'Footer 服務描述', '服務諮詢、課程報名、人才合作與投資洽談', '{}'::jsonb, 'Footer 聯絡資訊下方描述。', 90, true),
   ('footer', 'copyright', '版權文字', '© 2026 Suiyuecare Corps. All rights reserved.', '{}'::jsonb, 'Footer 最下方版權文字。', 100, true),
   ('nav', 'primary_nav', '主選單結構', null, '[
-    {"type":"group","label":"服務項目","items":[{"label":"關於歲悅","href":"#about"},{"label":"大記事","href":"#milestones"},{"label":"居家照顧","href":"#home-care"},{"label":"日間照顧","href":"#day-care"},{"label":"社區據點","href":"#community"},{"label":"護理復能","href":"#nursing"},{"label":"移工培訓","href":"#migrant-training"},{"label":"教育品管","href":"#quality"}]},
-    {"type":"group","label":"招募與合作","items":[{"label":"人才招募","href":"#talent"},{"label":"土地招募","href":"#land"},{"label":"投資人招募","href":"#investor-recruiting"}]},
-    {"type":"link","label":"健康3.0","href":"#health"},
-    {"type":"link","label":"課程報名","href":"#courses"},
-    {"type":"group","label":"投資人專區","items":[{"label":"投資人首頁","href":"#investors"},{"label":"財務資訊","href":"#ir-finance"},{"label":"公司治理","href":"#ir-governance"},{"label":"股東專區","href":"#ir-shareholders"}]},
+    {"type":"group","label":"服務項目","items":[{"label":"關於歲悅","href":"/about"},{"label":"大記事","href":"/milestones"},{"label":"居家照顧","href":"/home-care"},{"label":"日間照顧","href":"/day-care"},{"label":"社區據點","href":"/community"},{"label":"護理復能","href":"/nursing"},{"label":"移工培訓","href":"/migrant-training"},{"label":"教育品管","href":"/quality"}]},
+    {"type":"group","label":"招募與合作","items":[{"label":"人才招募","href":"/talent"},{"label":"土地招募","href":"/land"},{"label":"投資人招募","href":"/investor-recruiting"}]},
+    {"type":"link","label":"健康3.0","href":"/health"},
+    {"type":"link","label":"課程報名","href":"/courses"},
+    {"type":"group","label":"投資人專區","items":[{"label":"投資人首頁","href":"/investors"},{"label":"財務資訊","href":"/ir-finance"},{"label":"公司治理","href":"/ir-governance"},{"label":"股東專區","href":"/ir-shareholders"}]},
     {"type":"cta","label":"聯絡我們","href":"#contact"}
   ]'::jsonb, '控制 Header 主選單，請維持 label/href/type 格式。', 110, true),
   ('footer', 'footer_columns', 'Footer 網站地圖', null, '[
-    {"title":"營業項目","items":[{"label":"居家照顧","href":"#home-care"},{"label":"日間照顧","href":"#day-care"},{"label":"社區據點","href":"#community"},{"label":"護理復能","href":"#nursing"}]},
-    {"title":"合作入口","items":[{"label":"人才招募","href":"#talent"},{"label":"土地招募","href":"#land"},{"label":"投資人招募","href":"#investor-recruiting"},{"label":"教育品管","href":"#quality"}]},
-    {"title":"資訊內容","items":[{"label":"健康3.0","href":"#health"},{"label":"課程報名","href":"#courses"},{"label":"投資人專區","href":"#investors"},{"label":"財務資訊","href":"#ir-finance"},{"label":"聯絡我們","href":"#contact"}]}
+    {"title":"營業項目","items":[{"label":"居家照顧","href":"/home-care"},{"label":"日間照顧","href":"/day-care"},{"label":"社區據點","href":"/community"},{"label":"護理復能","href":"/nursing"}]},
+    {"title":"合作入口","items":[{"label":"人才招募","href":"/talent"},{"label":"土地招募","href":"/land"},{"label":"投資人招募","href":"/investor-recruiting"},{"label":"教育品管","href":"/quality"}]},
+    {"title":"資訊內容","items":[{"label":"健康3.0","href":"/health"},{"label":"課程報名","href":"/courses"},{"label":"投資人專區","href":"/investors"},{"label":"財務資訊","href":"/ir-finance"},{"label":"聯絡我們","href":"#contact"}]}
   ]'::jsonb, '控制 Footer 網站地圖欄位。', 120, true)
 on conflict (setting_key) do update
 set
