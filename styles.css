@@ -9080,48 +9080,114 @@ input[name="_honey"] { display: none !important; }
     padding-bottom: 18px;
   }
   .care-day-section {
-    padding-block: 40px;
+    overflow: hidden;
+    padding-block: 44px;
   }
   .care-day-sticky {
-    gap: 24px;
+    gap: 22px;
   }
   .care-day-copy h2 {
     font-size: clamp(34px, 9vw, 48px);
-    margin-bottom: 16px;
+    margin-bottom: 0;
   }
   .care-day-copy > p {
     font-size: 16px;
     line-height: 1.8;
   }
   .care-day-progress {
-    margin: 24px 0 14px;
+    width: 100%;
+    margin: 14px 0 4px;
   }
   .care-day-markers {
-    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
   }
   .care-day-markers button {
-    min-height: 0;
-    padding: 0 0 7px;
-    border-radius: 0;
+    display: grid;
+    justify-items: start;
+    min-height: 54px;
+    padding: 10px 8px;
+    border: 1px solid rgba(240,138,36,.16);
+    border-radius: 16px;
+    background: rgba(255, 253, 248, .72);
   }
+  .care-day-markers button.active {
+    border-color: rgba(240,138,36,.48);
+    background: #fff8ee;
+    box-shadow: 0 12px 28px rgba(83,43,11,.08);
+  }
+  .care-day-markers span { font-size: 12px; }
+  .care-day-markers b { font-size: 12px; }
   .care-day-stage {
     grid-template-rows: auto auto;
+    gap: 14px;
   }
   .care-day-media {
     min-height: 0;
     aspect-ratio: 4 / 3;
-    border-radius: 22px;
+    border-radius: 26px;
+    box-shadow: 0 22px 54px rgba(83,43,11,.12);
+  }
+  .care-day-steps {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(284px, 86vw);
+    gap: 12px;
+    min-height: 0;
+    margin-inline: -20px;
+    padding: 2px 20px 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-padding-inline: 20px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .care-day-steps::-webkit-scrollbar {
+    display: none;
   }
   .care-day-step {
+    position: relative;
+    inset: auto;
+    align-content: start;
+    gap: 10px;
     min-height: 0;
-    padding: 22px 0;
-    border-top: 1px solid rgba(83,43,11,.12);
+    max-width: none;
+    padding: 18px;
+    border: 1px solid rgba(234, 210, 182, .9);
+    border-radius: 22px;
+    background: rgba(255,253,248,.94);
+    box-shadow: 0 18px 44px rgba(83,43,11,.08);
+    opacity: .55;
+    visibility: visible;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    pointer-events: auto;
+    transform: scale(.985);
+    transition: opacity .24s ease, transform .24s ease, border-color .24s ease, box-shadow .24s ease;
+  }
+  .care-day-step.active {
+    opacity: 1;
+    border-color: rgba(240,138,36,.45);
+    box-shadow: 0 22px 52px rgba(83,43,11,.12);
+    transform: scale(1);
+  }
+  .care-day-step span {
+    color: #c86010;
+    font-size: 12px;
+    letter-spacing: .06em;
   }
   .care-day-step strong {
-    font-size: 30px;
+    font-size: 25px;
+    line-height: 1.12;
   }
   .care-day-step p {
-    font-size: 16px;
+    color: #6e5140;
+    font-size: 15px;
+    font-weight: 780;
+    line-height: 1.72;
   }
   .one-minute-service-hero .service-detail-copy {
     gap: 0;

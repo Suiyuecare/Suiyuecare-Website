@@ -10440,6 +10440,11 @@ document.addEventListener("click", (event) => {
 
 const careDaySection = document.querySelector("[data-care-day]");
 let activeCareDayIndex = -1;
+let careDayRailFrame = 0;
+
+function isCareDayMobile() {
+  return window.innerWidth <= 640;
+}
 
 function setCareDayActive(index) {
   if (!careDaySection) return;
@@ -10451,7 +10456,11 @@ function setCareDayActive(index) {
   activeCareDayIndex = nextIndex;
   careDaySection.dataset.activeCareDayStep = String(nextIndex + 1).padStart(2, "0");
 
-  steps.forEach((step, stepIndex) => step.classList.toggle("active", stepIndex === nextIndex));
+  steps.forEach((step, stepIndex) => {
+    const isActive = stepIndex === nextIndex;
+    step.classList.toggle("active", isActive);
+    step.setAttribute("aria-current", isActive ? "step" : "false");
+  });
   images.forEach((image, imageIndex) => image.classList.toggle("active", imageIndex === nextIndex));
   markers.forEach((marker, markerIndex) => {
     const markerTarget = Number(marker.dataset.careDayMarker || markerIndex);
@@ -10460,6 +10469,48 @@ function setCareDayActive(index) {
     marker.classList.toggle("active", isActive);
     marker.setAttribute("aria-current", isActive ? "step" : "false");
   });
+}
+
+function setCareDayProgressFromIndex(index, total) {
+  if (!careDaySection || !total) return;
+  careDaySection.style.setProperty("--care-day-progress", `${Math.max(8, ((index + 1) / total) * 100)}%`);
+}
+
+function syncCareDayFromMobileRail() {
+  if (!careDaySection || !isCareDayMobile()) return;
+  const steps = [...careDaySection.querySelectorAll("[data-care-day-step]")];
+  const rail = careDaySection.querySelector(".care-day-steps");
+  if (!steps.length || !rail) return;
+  const railRect = rail.getBoundingClientRect();
+  const railCenter = railRect.left + railRect.width / 2;
+  let nextIndex = 0;
+  let closestDistance = Number.POSITIVE_INFINITY;
+
+  steps.forEach((step, index) => {
+    const rect = step.getBoundingClientRect();
+    const stepCenter = rect.left + rect.width / 2;
+    const distance = Math.abs(stepCenter - railCenter);
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      nextIndex = index;
+    }
+  });
+
+  setCareDayProgressFromIndex(nextIndex, steps.length);
+  setCareDayActive(nextIndex);
+}
+
+function scrollCareDayRailTo(index, behavior = "smooth") {
+  const rail = careDaySection?.querySelector(".care-day-steps");
+  const steps = [...(careDaySection?.querySelectorAll("[data-care-day-step]") || [])];
+  const target = steps[index];
+  if (!rail || !target) return false;
+  const railRect = rail.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const left = rail.scrollLeft + targetRect.left - railRect.left - (rail.clientWidth - targetRect.width) / 2;
+  rail.scrollTo({ left, behavior });
+  setCareDayProgressFromIndex(index, steps.length);
+  return true;
 }
 
 function updateCareDayPin(rect) {
@@ -10494,6 +10545,10 @@ function updateCareDayScroll() {
   if (!steps.length) return;
   const rect = careDaySection.getBoundingClientRect();
   updateCareDayPin(rect);
+  if (isCareDayMobile()) {
+    syncCareDayFromMobileRail();
+    return;
+  }
   const scrollable = Math.max(1, careDaySection.offsetHeight - window.innerHeight);
   const sectionTop = window.scrollY + rect.top;
   const progress = Math.max(0, Math.min(1, (window.scrollY - sectionTop) / scrollable));
@@ -10510,10 +10565,12 @@ function initCareDayScroll() {
   if (!careDaySection) return;
   const markers = [...careDaySection.querySelectorAll("[data-care-day-marker]")];
   const steps = [...careDaySection.querySelectorAll("[data-care-day-step]")];
+  const rail = careDaySection.querySelector(".care-day-steps");
   markers.forEach((marker, index) => {
     marker.addEventListener("click", () => {
       const targetIndex = Math.max(0, Math.min(Number(marker.dataset.careDayMarker || index), steps.length - 1));
       setCareDayActive(targetIndex);
+      if (isCareDayMobile() && scrollCareDayRailTo(targetIndex)) return;
       if (window.innerWidth <= 1180) {
         steps[targetIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
@@ -10525,6 +10582,11 @@ function initCareDayScroll() {
       window.scrollTo({ top: targetY, behavior: "smooth" });
     });
   });
+  rail?.addEventListener("scroll", () => {
+    if (!isCareDayMobile()) return;
+    window.cancelAnimationFrame(careDayRailFrame);
+    careDayRailFrame = window.requestAnimationFrame(syncCareDayFromMobileRail);
+  }, { passive: true });
   updateCareDayScroll();
 }
 
