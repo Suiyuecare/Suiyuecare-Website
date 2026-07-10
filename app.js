@@ -4678,7 +4678,7 @@ function renderHomeHealthArticles(articles = getHealthArticleList()) {
 
 function renderWordPressMasterTalk(posts) {
   const slider = document.querySelector(".celebrity-slider");
-  if (!posts.length || !slider) return;
+  if (!posts.length || posts.length < HOMEPAGE_MASTER_TALK_LIMIT || !slider) return false;
   const homepagePosts = posts.slice(0, HOMEPAGE_MASTER_TALK_LIMIT);
   slider.innerHTML = homepagePosts.map((post) => {
     const acf = post.acf || {};
@@ -4698,6 +4698,7 @@ function renderWordPressMasterTalk(posts) {
       </article>
     `;
   }).join("");
+  return true;
 }
 
 function groupHomeModules(items = []) {
@@ -4863,7 +4864,7 @@ function renderSupabaseStories(items) {
 
 function renderSupabaseMasterTalk(items) {
   const slider = document.querySelector(".celebrity-slider");
-  if (!items?.length || items.length < 3 || !slider) return false;
+  if (!items?.length || items.length < HOMEPAGE_MASTER_TALK_LIMIT || !slider) return false;
 
   const homepageItems = items.slice(0, HOMEPAGE_MASTER_TALK_LIMIT);
   slider.innerHTML = homepageItems.map((item) => {
@@ -5402,7 +5403,7 @@ function renderCareStorySlider(stories) {
 
 function renderExpertTalkSlider(talks) {
   const slider = document.querySelector(".celebrity-slider");
-  if (!talks?.length || talks.length < 3 || !slider) return false;
+  if (!talks?.length || talks.length < HOMEPAGE_MASTER_TALK_LIMIT || !slider) return false;
   const homepageTalks = talks.slice(0, HOMEPAGE_MASTER_TALK_LIMIT);
   slider.innerHTML = homepageTalks.map((talk) => `
     <article data-href="${escapeHTML(normalizePublicHref(talk.href))}">
