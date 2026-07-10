@@ -678,6 +678,13 @@ function verifyMasterTalkHomepageColumns(appSource, indexSource) {
   if (!appSource.includes("const HOMEPAGE_MASTER_TALK_LIMIT = 8")) {
     failures.push("app.js: dynamic homepage Master Talk rendering should limit the homepage to 8 article cards");
   }
+  if (
+    !appSource.includes("posts.length < HOMEPAGE_MASTER_TALK_LIMIT") ||
+    !appSource.includes("items.length < HOMEPAGE_MASTER_TALK_LIMIT") ||
+    !appSource.includes("talks.length < HOMEPAGE_MASTER_TALK_LIMIT")
+  ) {
+    failures.push("app.js: dynamic Master Talk sources should not replace the homepage grid unless 8 cards are available");
+  }
   for (const slug of expectedSlugs) {
     if (!appSource.includes(`"${slug}"`) || !indexSource.includes(`/article/${slug}`)) {
       failures.push(`Master Talk card is missing from app.js or homepage grid: ${slug}`);
