@@ -4781,13 +4781,37 @@ function renderSupabaseServices(items) {
   }).join("");
 }
 
+const locationImageFallbacks = {
+  shilin: "assets/homepage-batch/16-taipei-service-office-fast.jpg",
+  datong: "assets/homepage-batch/family-consultation-clear.jpg",
+  "wanhua-a": "assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg",
+  "wanhua-b": "assets/homepage-batch/14-care-notes-fast.jpg",
+  xinyi: "assets/homepage-batch/family-consultation-clear.jpg",
+  xindian: "assets/homepage-batch/12-community-health-class-hires.jpg",
+  xinzhuang: "assets/homepage-batch/12-community-health-class-hires.jpg",
+  luzhu: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg"
+};
+
+function locationImageFallbackForKey(key = "") {
+  const normalizedKey = String(key || "").replace(/-a$|-b$/g, "");
+  return locationImageFallbacks[key] || locationImageFallbacks[normalizedKey] || fallbackImages.serviceModule;
+}
+
+function normalizeLocationImage(item, key) {
+  const fallback = normalizeLocalAssetUrl(contentImageUrl(locationImageFallbackForKey(key)));
+  const image = normalizeLocalAssetUrl(contentImageUrl(item?.image?.public_url || item?.metadata?.image_url || fallback));
+  return { image, fallback };
+}
+
 function normalizeSupabaseLocation(item) {
   const metadata = item.metadata || {};
   const key = item.item_key || item.id;
   const email = metadata.email || "generalaffairs@suiyuecare.com";
   const phone = metadata.phone || item.link_text || "02-6604-5432";
+  const normalizedImage = normalizeLocationImage(item, key);
   return {
-    image: getCmsModuleImage(item, "assets/homepage-batch/16-taipei-service-office-fast.jpg"),
+    image: normalizedImage.image,
+    fallbackImage: normalizedImage.fallback,
     alt: metadata.image_alt || `${item.title}據點照片`,
     type: item.subtitle || metadata.type || "服務據點",
     name: item.title || "Suiyuecare Corps. 服務據點",
@@ -5377,8 +5401,11 @@ function updateLocation(locationKey) {
     : [];
   const showTabs = groupedLocations.length > 1;
 
-  detail.querySelector("img").src = data.image;
-  detail.querySelector("img").alt = data.alt;
+  const detailImage = detail.querySelector("img");
+  detailImage.dataset.fallbackApplied = "false";
+  detailImage.dataset.fallbackSrc = data.fallbackImage || data.image;
+  detailImage.src = data.image;
+  detailImage.alt = data.alt;
   document.querySelector("#locationType").textContent = data.type;
   document.querySelector("#locationName").textContent = data.name;
   document.querySelector("#locationDesc").textContent = data.desc;
