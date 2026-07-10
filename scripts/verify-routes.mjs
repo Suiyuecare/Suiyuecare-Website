@@ -535,8 +535,8 @@ function verifyHealthImageFallbacks(appSource) {
   if (!appSource.includes("function healthArticleImageAttrs")) {
     failures.push("app.js: Health 3.0 cards should render image attributes through healthArticleImageAttrs");
   }
-  if (!appSource.includes("assets/health3/hydration-low-appetite-elderly.jpg") || !appSource.includes("assets/health3/fall-prevention-home-checklist.jpg")) {
-    failures.push("app.js: Health 3.0 image fallback rules should include nutrition and fall-prevention photo assets");
+  if (!appSource.includes("assets/health3/generated/hydration-meal-observation-hero.jpg") || !appSource.includes("assets/health3/generated/fall-prevention-night-route-hero.jpg")) {
+    failures.push("app.js: Health 3.0 image fallback rules should include nutrition and fall-prevention generated photo assets");
   }
   if (!appSource.includes('data-fallback-src="${fallback}"')) {
     failures.push("app.js: Health 3.0 images should include data-fallback-src for broken CMS image URLs");
@@ -586,6 +586,105 @@ function verifyFooterLayout(styleSource) {
   }
   if (!/\.site-footer\s*\{[\s\S]*flex-shrink:\s*0;/.test(styleSource)) {
     failures.push("styles.css: .site-footer should not shrink inside the page layout");
+  }
+}
+
+function countMatches(source, pattern) {
+  return [...source.matchAll(pattern)].length;
+}
+
+function verifyHealthRouteStableFirstPaint(appSource) {
+  const block = extractFunctionBlock(appSource, "renderPage");
+  if (!block) {
+    failures.push("app.js: missing renderPage router for Health 3.0 first-paint verification");
+    return;
+  }
+  const healthBranch = block.match(/normalized === "health"[\s\S]*?\} else if \(normalized === "search"\)/)?.[0] || "";
+  if (!healthBranch) {
+    failures.push("app.js: missing Health 3.0 route branch");
+    return;
+  }
+  if (healthBranch.includes("loadSupabaseHealthArticles({ rerender: true })")) {
+    failures.push("app.js: /health must not rerender after Supabase articles load; it causes the visible page to swap versions");
+  }
+  if (healthBranch.includes("loadSupabaseArticleCategories({ rerender: true })")) {
+    failures.push("app.js: /health must not rerender after Supabase categories load; it causes the visible page to swap versions");
+  }
+  if (!healthBranch.includes("loadSupabaseHealthArticles({ rerender: false })") || !healthBranch.includes("loadSupabaseArticleCategories({ rerender: false })")) {
+    failures.push("app.js: /health should warm remote article and category caches without replacing the first paint");
+  }
+}
+
+function verifyServiceStoryCoverage(appSource, indexSource) {
+  const serviceSlugs = ["home-care", "day-care", "community", "nursing", "migrant-training", "quality", "software"];
+  for (let index = 0; index < serviceSlugs.length; index += 1) {
+    const slug = serviceSlugs[index];
+    const nextSlug = serviceSlugs[index + 1];
+    const key = slug.includes("-") ? `"${slug}"` : slug;
+    const nextKey = nextSlug ? (nextSlug.includes("-") ? `"${nextSlug}"` : nextSlug) : "";
+    const start = appSource.indexOf(`${key}: [`);
+    const end = nextKey ? appSource.indexOf(`\n  ${nextKey}: [`, start + 1) : appSource.indexOf("\n};", start + 1);
+    const block = start >= 0 && end > start ? appSource.slice(start, end) : "";
+    if (countMatches(block, /\bname:\s*"/g) < 6) {
+      failures.push(`app.js: ${slug} service page should include at least 6 care story testimonials`);
+    }
+  }
+
+  const homepageServices = ["居家照顧", "日間照顧", "社區據點", "護理復能", "移工培訓", "教育品管", "軟體系統"];
+  const storySection = indexSource.match(/<section class="story-section[\s\S]*?<\/section>/)?.[0] || "";
+  for (const service of homepageServices) {
+    const count = countMatches(storySection, new RegExp(`<em>${escapeRegExp(service)}<\\/em>`, "g"));
+    if (count < 2) {
+      failures.push(`index.html: homepage care stories should include at least 2 testimonials for ${service}`);
+    }
+  }
+  if (!appSource.includes("ensureHomepageStoryCoverage")) {
+    failures.push("app.js: dynamic homepage care stories should keep at least two testimonials for each service area");
+  }
+}
+
+function verifyHomeHealthLatestArticles(appSource, indexSource) {
+  if (!appSource.includes("function renderHomeHealthArticles") || !appSource.includes("sortHealthArticlesLatest(uniqueHealthArticles(articles))")) {
+    failures.push("app.js: homepage Health 3.0 block should render the latest local article list for family-friendly care knowledge");
+  }
+  for (const slug of [
+    "fall-prevention-home-checklist",
+    "hydration-low-appetite-elderly",
+    "dementia-evening-agitation",
+    "post-discharge-first-week",
+    "safe-bathing-care"
+  ]) {
+    if (!indexSource.includes(`/article/${slug}`)) {
+      failures.push(`index.html: homepage Health 3.0 block should link the latest article ${slug}`);
+    }
+  }
+}
+
+function verifyMasterTalkHomepageColumns(appSource, indexSource) {
+  const expectedSlugs = [
+    "master-talk-care-psychology",
+    "master-talk-senior-nutrition",
+    "master-talk-rehab-goals",
+    "master-talk-home-safety",
+    "master-talk-care-management",
+    "master-talk-dementia-care",
+    "master-talk-nursing-observation",
+    "master-talk-family-communication"
+  ];
+  const slider = indexSource.match(/<div class="celebrity-slider"[\s\S]*?<\/div>\s*<p class="celebrity-hint"/)?.[0] || "";
+  if (countMatches(slider, /<article>/g) !== 8) {
+    failures.push("index.html: homepage Master Talk should render exactly 8 visible article cards");
+  }
+  if (!appSource.includes("const HOMEPAGE_MASTER_TALK_LIMIT = 8")) {
+    failures.push("app.js: dynamic homepage Master Talk rendering should limit the homepage to 8 article cards");
+  }
+  for (const slug of expectedSlugs) {
+    if (!appSource.includes(`"${slug}"`) || !indexSource.includes(`/article/${slug}`)) {
+      failures.push(`Master Talk card is missing from app.js or homepage grid: ${slug}`);
+    }
+  }
+  if (!indexSource.includes('aria-label="名人講堂文章列表"')) {
+    failures.push("index.html: homepage Master Talk should expose an accessible article-list label");
   }
 }
 
@@ -679,6 +778,10 @@ if (!fs.existsSync(appFile)) {
   verifyInvestorRoutesUseSingleRenderer(appSource);
   verifyCourseImageFallbacks(appSource);
   verifyHealthImageFallbacks(appSource);
+  verifyHealthRouteStableFirstPaint(appSource);
+  verifyServiceStoryCoverage(appSource, indexSource);
+  verifyHomeHealthLatestArticles(appSource, indexSource);
+  verifyMasterTalkHomepageColumns(appSource, indexSource);
   verifyDynamicImagesUseRootRelativeAssets(appSource);
   verifyTalentImagesUseNormalizedAssets(appSource);
   verifyFooterLayout(styleSource);

@@ -243,12 +243,24 @@ const health30ArticleEnhancements = {
       ["第四步：跌倒預防要跟著狀態更新", ["長輩的體力、視力、藥物、睡眠和疾病狀態都會變。三個月前安全的動線，不代表現在一定安全。只要出現走路變慢、起身更吃力、夜間如廁變頻繁，就應該重新檢查一次。", "家屬也可以把跌倒、差點跌倒、頭暈、腳軟等事件記錄下來。不是要責備長輩，而是找出風險重複發生的位置，讓下一次可以被預防。"]]
     ],
     inlineImages: [
-      { afterSection: 1, src: "assets/health3/fall-prevention-home-checklist.jpg", alt: "長輩夜間居家動線檢查", caption: "先檢查床邊到浴室的路線，通常比一次添購很多設備更有用。" },
-      { afterSection: 3, src: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg", alt: "照顧者陪伴長輩練習穩定步行", caption: "跌倒預防也包含肌力、平衡與日常活動能力的維持。" }
+      { afterSection: 1, src: "assets/health3/generated/fall-prevention-night-route-inline.jpg", alt: "夜間床邊到浴室的安全動線", caption: "先檢查床邊到浴室的路線，通常比一次添購很多設備更有用。" }
     ],
     checklists: [{ title: "家中 8 個優先檢查點", items: ["床邊是否有穩定扶手或可支撐的家具。", "拖鞋是否合腳、防滑、不會太鬆。", "床邊到浴室是否有夜燈。", "走道是否有電線、地墊、雜物。", "浴室地面是否容易積水。", "馬桶旁是否有可安全扶持的位置。", "長輩半夜是否常頭暈或急著如廁。", "最近是否有新增藥物或睡眠變差。"] }],
     tables: [{ title: "跌倒風險快速對照", headers: ["觀察到的狀況", "可能代表什麼", "家屬下一步"], rows: [["半夜摸黑走路", "光線與固定物品位置不足", "補夜燈、固定水杯眼鏡與助行器位置"], ["浴室門口常滑", "止滑、排水或門檻問題", "先處理地面，再評估扶手或淋浴椅"], ["起身時頭暈", "血壓、用藥、睡眠或脫水可能相關", "記錄發生時間並諮詢醫療專業"]] }],
-    references: [{ name: "CDC Older Adult Fall Prevention", url: "https://www.cdc.gov/falls/prevention/index.html" }]
+    references: [
+      {
+        evidenceRank: 1,
+        pmid: "38833257",
+        citation: "Guirguis-Blake, J. M., Perdue, L. A., Coppola, E. L., & Bean, S. I. (2024). Interventions to prevent falls in older adults: Updated evidence report and systematic review for the US Preventive Services Task Force. JAMA, 332(1), 58-69. https://doi.org/10.1001/jama.2024.4166",
+        url: "https://pubmed.ncbi.nlm.nih.gov/38833257/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "37489124",
+        citation: "Lektip, C., Chaovalit, S., Wattanapisit, A., Lapmanee, S., Nawarat, J., & Yaemrattanakul, W. (2023). Home hazard modification programs for reducing falls in older adults: A systematic review and meta-analysis. PeerJ, 11, e15699. https://doi.org/10.7717/peerj.15699",
+        url: "https://pubmed.ncbi.nlm.nih.gov/37489124/"
+      }
+    ]
   },
   "hydration-low-appetite-elderly": {
     readingMinutes: 9,
@@ -263,12 +275,30 @@ const health30ArticleEnhancements = {
       ["把餐食調整放進照顧計畫", ["營養照顧不是單次買補品，而是一套每天能做得到的安排。包含餐點質地、用餐姿勢、備餐難度、照顧者時間、長輩偏好和醫療限制。", "若家庭已經照顧得很累，也可以考慮居家照顧、日照共餐或照顧諮詢，讓用餐觀察不只壓在某一位家屬身上。"]]
     ],
     inlineImages: [
-      { afterSection: 1, src: "assets/health3/hydration-low-appetite-elderly.jpg", alt: "長輩用餐與水分補充觀察", caption: "比起只問吃多少，更重要的是看一週的體重、精神和活動變化。" },
-      { afterSection: 3, src: "assets/daycare-detail-02-meal-fast.jpg", alt: "日間照顧共餐與用餐觀察", caption: "規律共餐和有人觀察，能讓飲食變化更早被看見。" }
+      { afterSection: 1, src: "assets/health3/generated/hydration-meal-observation-inline.jpg", alt: "長輩飲食水分與觀察紀錄", caption: "比起只問吃多少，更重要的是看一週的體重、精神和活動變化。" }
     ],
     checklists: [{ title: "一週飲食觀察表可以記這些", items: ["每餐大約吃了幾成。", "喝水或湯品是否會咳。", "是否常剩下肉類、青菜或較硬食物。", "今天精神與活動量如何。", "排便、尿量與尿色是否和平常不同。", "體重是否持續下降。"] }],
     tables: [{ title: "吃不下可能對應的線索", headers: ["線索", "可能原因", "建議下一步"], rows: [["肉類都咬很久", "牙口或咀嚼能力改變", "檢查牙齒、調整質地"], ["喝水常咳", "吞嚥安全風險", "先記錄並諮詢專業"], ["怕喝水", "擔心如廁或夜間跌倒", "檢查動線與如廁安排"]] }],
-    references: [{ name: "National Institute on Aging - Healthy Eating", url: "https://www.nia.nih.gov/health/healthy-eating-nutrition-and-diet/healthy-eating-you-get-older" }]
+    references: [
+      {
+        evidenceRank: 1,
+        pmid: "37330324",
+        citation: "Parkinson, E., Hooper, L., Fynn, J., Wilsher, S. H., Oladosu, T., Poland, F., Roberts, S., Van Hout, E., & Bunn, D. (2023). Low-intake dehydration prevalence in non-hospitalised older adults: Systematic review and meta-analysis. Clinical Nutrition, 42(8), 1510-1520. https://doi.org/10.1016/j.clnu.2023.06.010",
+        url: "https://pubmed.ncbi.nlm.nih.gov/37330324/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "36807868",
+        citation: "Fielding, R. A., Landi, F., Smoyer, K. E., Tarasenko, L., & Groarke, J. (2023). Association of anorexia/appetite loss with malnutrition and mortality in older populations: A systematic literature review. Journal of Cachexia, Sarcopenia and Muscle, 14(2), 706-729. https://doi.org/10.1002/jcsm.13186",
+        url: "https://pubmed.ncbi.nlm.nih.gov/36807868/"
+      },
+      {
+        evidenceRank: 2,
+        pmid: "30115460",
+        citation: "Reinders, I., Volkert, D., de Groot, L. C. P. G. M., Beck, A. M., Feldblum, I., Jobse, I., Neelemaat, F., de van der Schueren, M. A. E., Shahar, D. R., Smeets, E. T. H. C., Tieland, M., Twisk, J. W. R., Wijnhoven, H. A. H., & Visser, M. (2019). Effectiveness of nutritional interventions in older adults at risk of malnutrition across different health care settings: Pooled analyses of individual participant data from nine randomized controlled trials. Clinical Nutrition, 38(4), 1797-1806. https://doi.org/10.1016/j.clnu.2018.07.023",
+        url: "https://pubmed.ncbi.nlm.nih.gov/30115460/"
+      }
+    ]
   },
   "dementia-evening-agitation": {
     readingMinutes: 10,
@@ -283,12 +313,30 @@ const health30ArticleEnhancements = {
       ["照顧者要有喘息，不然很難一直穩定", ["傍晚通常也是家屬下班後最累的時候。當照顧者已經睡不好、整天緊繃，再要求自己每次都溫柔回應，其實非常困難。", "如果每天都在同一時段爆發衝突，可以考慮日照、居家照顧、喘息服務或家人輪替。支持照顧者，也是支持長輩。"]]
     ],
     inlineImages: [
-      { afterSection: 1, src: "assets/health3/dementia-evening-agitation.jpg", alt: "失智長輩傍晚情緒照顧", caption: "先安撫情緒，再用簡短提示帶回下一個動作。" },
-      { afterSection: 2, src: "assets/homepage-batch/11-elder-art-activity-fast.jpg", alt: "長輩參與熟悉活動", caption: "熟悉、低壓、可預期的活動，比反覆說理更能降低焦躁。" }
+      { afterSection: 2, src: "assets/health3/generated/dementia-evening-routine-inline.jpg", alt: "失智長輩傍晚安定流程", caption: "熟悉、低壓、可預期的活動，比反覆說理更能降低焦躁。" }
     ],
     checklists: [{ title: "傍晚前 30 分鐘可以先做", items: ["提前開柔和燈光。", "降低電視與背景聲。", "準備少量點心或水分。", "安排熟悉音樂或簡單活動。", "只由一位家人主要溝通。", "避免連續追問或急著糾正。"] }],
     tables: [{ title: "常見傍晚行為對照", headers: ["行為", "可能需求", "家屬可以嘗試"], rows: [["一直說要回家", "尋找安全感", "先說我陪你，再轉移到熟悉活動"], ["拒絕洗澡", "害怕、冷、覺得被控制", "改成分段、先洗手臉或換時間"], ["反覆問同一題", "記憶線索不足", "用白板、照片、固定短句"]] }],
-    references: [{ name: "National Institute on Aging - Alzheimer's Caregiving", url: "https://www.nia.nih.gov/health/alzheimers-caregiving" }]
+    references: [
+      {
+        evidenceRank: 1,
+        pmid: "31862527",
+        citation: "Leng, M., Zhao, Y., & Wang, Z. (2020). Comparative efficacy of non-pharmacological interventions on agitation in people with dementia: A systematic review and Bayesian network meta-analysis. International Journal of Nursing Studies, 102, 103489. https://doi.org/10.1016/j.ijnurstu.2019.103489",
+        url: "https://pubmed.ncbi.nlm.nih.gov/31862527/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "25452601",
+        citation: "Livingston, G., Kelly, L., Lewis-Holmes, E., Baio, G., Morris, S., Patel, N., Omar, R. Z., Katona, C., & Cooper, C. (2014). Non-pharmacological interventions for agitation in dementia: Systematic review of randomised controlled trials. The British Journal of Psychiatry, 205(6), 436-442. https://doi.org/10.1192/bjp.bp.113.141119",
+        url: "https://pubmed.ncbi.nlm.nih.gov/25452601/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "36924042",
+        citation: "Fong, K. N., Ge, X., Ting, K. H., Wei, M., & Cheung, H. (2023). The effects of light therapy on sleep, agitation and depression in people with dementia: A systematic review and meta-analysis of randomized controlled trials. American Journal of Alzheimer's Disease & Other Dementias, 38, 15333175231160682. https://doi.org/10.1177/15333175231160682",
+        url: "https://pubmed.ncbi.nlm.nih.gov/36924042/"
+      }
+    ]
   },
   "post-discharge-first-week": {
     readingMinutes: 10,
@@ -303,12 +351,30 @@ const health30ArticleEnhancements = {
       ["第一週就可以開始串接長照服務", ["很多家庭會等到主要照顧者崩潰才求助，但出院返家第一週其實就是最需要支持的時候。居家照顧可以協助生活照顧，護理復能可以協助活動與風險觀察，日照則可能在穩定後成為白天支持。", "服務不是取代家人，而是讓家庭不用從零摸索。當照顧紀錄、回報和服務分工建立起來，後續調整才有依據。"]]
     ],
     inlineImages: [
-      { afterSection: 1, src: "assets/health3/post-discharge-first-week.jpg", alt: "出院返家照顧紀錄", caption: "出院第一週先把資料、藥物、回診和每日觀察整理到同一份紀錄。" },
-      { afterSection: 4, src: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", alt: "照顧督導與家屬討論照顧計畫", caption: "服務進場越早，家屬越不需要靠猜測承擔所有照顧判斷。" }
+      { afterSection: 1, src: "assets/health3/generated/post-discharge-care-station-inline.jpg", alt: "出院返家照顧資料與用藥整理", caption: "出院第一週先把資料、藥物、回診和每日觀察整理到同一份紀錄。" }
     ],
     checklists: [{ title: "出院返家第一週每日紀錄", items: ["今天精神是否比昨天差。", "吃多少、喝多少、有沒有嗆咳。", "疼痛位置與程度。", "排便排尿是否和平常不同。", "可以走到哪裡、是否需要更多協助。", "藥物是否按時吃、有沒有不舒服。", "傷口或皮膚是否有紅腫熱痛。"] }],
     tables: [{ title: "第一週任務分工表", headers: ["任務", "誰負責", "何時確認"], rows: [["用藥整理", "主要照顧者或藥師協助", "出院當天與每次回診後"], ["安全動線", "家屬與照顧團隊", "返家 24 小時內"], ["服務諮詢", "家屬窗口", "返家第一週內"]] }],
-    references: [{ name: "衛生福利部 1966 長照服務專線", url: "https://1966.gov.tw/" }]
+    references: [
+      {
+        evidenceRank: 1,
+        pmid: "34823079",
+        citation: "Lee, J. Y., Yang, Y. S., & Cho, E. (2022). Transitional care from hospital to home for frail older adults: A systematic review and meta-analysis. Geriatric Nursing, 43, 64-76. https://doi.org/10.1016/j.gerinurse.2021.11.003",
+        url: "https://pubmed.ncbi.nlm.nih.gov/34823079/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "33419903",
+        citation: "Fønss Rasmussen, L., Grode, L. B., Lange, J., Barat, I., & Gregersen, M. (2021). Impact of transitional care interventions on hospital readmissions in older medical patients: A systematic review. BMJ Open, 11(1), e040057. https://doi.org/10.1136/bmjopen-2020-040057",
+        url: "https://pubmed.ncbi.nlm.nih.gov/33419903/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "36669435",
+        citation: "Joo, J. Y., & Liu, M. F. (2023). Transitional care interventions for supporting frail older adults discharged from hospitals: An umbrella review. Geriatric Nursing, 50, 80-89. https://doi.org/10.1016/j.gerinurse.2022.12.021",
+        url: "https://pubmed.ncbi.nlm.nih.gov/36669435/"
+      }
+    ]
   },
   "safe-bathing-care": {
     readingMinutes: 8,
@@ -323,12 +389,24 @@ const health30ArticleEnhancements = {
       ["如果家屬每次洗澡都很緊張，就該求助", ["洗澡照顧需要技巧和環境配合。若家屬每次都靠蠻力扶、長輩每次都害怕，代表不是家屬不努力，而是流程需要重新設計。", "居家照顧、復能建議或到宅安全檢視，都可以協助家庭把洗澡變成比較穩定的日常。"]]
     ],
     inlineImages: [
-      { afterSection: 1, src: "assets/health3/safe-bathing-care.jpg", alt: "浴室安全照顧檢查", caption: "洗澡前先確認地面、水溫、衣物和穩定坐姿。" },
-      { afterSection: 3, src: "assets/homepage-batch/health-video-bathroom-safety-clear-display.jpg", alt: "浴室扶手與止滑檢查", caption: "浴室安全不只看設備，也要看長輩實際怎麼移動。" }
+      { afterSection: 1, src: "assets/health3/generated/safe-bathing-preparation-inline.jpg", alt: "浴室扶手椅子與止滑安全配置", caption: "浴室安全不只看設備，也要看長輩實際怎麼移動。" }
     ],
     checklists: [{ title: "洗澡前中後檢查清單", items: ["毛巾、衣物、沐浴用品已放在手邊。", "地面排水良好且防滑。", "水溫已先測試。", "長輩坐姿穩定、腳能踩穩。", "過程中每一步先告知再動作。", "洗後觀察是否頭暈、喘或異常疲累。"] }],
     tables: [{ title: "洗澡常見風險與調整", headers: ["風險", "可能原因", "調整方向"], rows: [["洗到一半站不穩", "久站、地滑、體力不足", "改坐洗、縮短時間"], ["抗拒洗澡", "怕冷、怕跌倒、害羞", "先告知、分段洗、調整時段"], ["洗後很累", "耗能過高或水溫悶熱", "改局部清潔並諮詢專業"]] }],
-    references: [{ name: "CDC Older Adult Fall Prevention", url: "https://www.cdc.gov/falls/prevention/index.html" }]
+    references: [
+      {
+        evidenceRank: 1,
+        pmid: "37489124",
+        citation: "Lektip, C., Chaovalit, S., Wattanapisit, A., Lapmanee, S., Nawarat, J., & Yaemrattanakul, W. (2023). Home hazard modification programs for reducing falls in older adults: A systematic review and meta-analysis. PeerJ, 11, e15699. https://doi.org/10.7717/peerj.15699",
+        url: "https://pubmed.ncbi.nlm.nih.gov/37489124/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "38833257",
+        citation: "Guirguis-Blake, J. M., Perdue, L. A., Coppola, E. L., & Bean, S. I. (2024). Interventions to prevent falls in older adults: Updated evidence report and systematic review for the US Preventive Services Task Force. JAMA, 332(1), 58-69. https://doi.org/10.1001/jama.2024.4166",
+        url: "https://pubmed.ncbi.nlm.nih.gov/38833257/"
+      }
+    ]
   },
   "pressure-injury-prevention": {
     readingMinutes: 9,
@@ -343,12 +421,30 @@ const health30ArticleEnhancements = {
       ["把皮膚觀察寫進照顧紀錄", ["如果照顧者不只一位，皮膚變化一定要記錄。今天哪裡紅、多久退、是否有破皮、做了什麼處理，都應留下來。", "紀錄不是行政工作，而是讓家屬、照服員、督導和醫療人員能接續判斷，避免問題每次都重新開始。"]]
     ],
     inlineImages: [
-      { afterSection: 1, src: "assets/health3/pressure-injury-prevention.jpg", alt: "長輩皮膚照顧與壓傷預防", caption: "皮膚照顧要從每天觀察壓力點開始。" },
-      { afterSection: 4, src: "assets/homepage-batch/14-care-notes-fast.jpg", alt: "照顧紀錄協助追蹤皮膚變化", caption: "把皮膚變化寫進紀錄，才能讓不同照顧者接得上。" }
+      { afterSection: 1, src: "assets/health3/generated/pressure-injury-posture-care-inline.jpg", alt: "壓傷預防用品與照顧紀錄", caption: "把皮膚變化寫進紀錄，才能讓不同照顧者接得上。" }
     ],
     checklists: [{ title: "每日皮膚觀察重點", items: ["尾椎與臀部是否紅或破皮。", "腳跟是否有壓紅或疼痛。", "尿布區是否潮濕、泛紅。", "床單與衣物是否皺摺造成壓痕。", "今天是否有坐起或改變姿勢。", "飲食與水分是否明顯不足。"] }],
     tables: [{ title: "皮膚變化對照", headers: ["看到的變化", "可能風險", "建議"], rows: [["紅色壓痕很快退", "暫時受壓", "調整姿勢並持續觀察"], ["紅色壓痕不退", "壓傷早期警訊", "減壓並諮詢護理/醫療"], ["破皮或滲液", "傷口風險升高", "不要自行亂擦藥，請專業評估"]] }],
-    references: [{ name: "MedlinePlus - Pressure Injuries", url: "https://medlineplus.gov/pressuresores.html" }]
+    references: [
+      {
+        evidenceRank: 1,
+        pmid: "32924821",
+        citation: "Avsar, P., Moore, Z., Patton, D., O'Connor, T., Budri, A. M., & Nugent, L. (2020). Repositioning for preventing pressure ulcers: A systematic review and meta-analysis. Journal of Wound Care, 29(9), 496-508. https://doi.org/10.12968/jowc.2020.29.9.496",
+        url: "https://pubmed.ncbi.nlm.nih.gov/32924821/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "31835122",
+        citation: "Lin, F., Wu, Z., Song, B., Coyer, F., & Chaboyer, W. (2020). The effectiveness of multicomponent pressure injury prevention programs in adult intensive care patients: A systematic review. International Journal of Nursing Studies, 102, 103483. https://doi.org/10.1016/j.ijnurstu.2019.103483",
+        url: "https://pubmed.ncbi.nlm.nih.gov/31835122/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "16926357",
+        citation: "Reddy, M., Gill, S. S., & Rochon, P. A. (2006). Preventing pressure ulcers: A systematic review. JAMA, 296(8), 974-984. https://doi.org/10.1001/jama.296.8.974",
+        url: "https://pubmed.ncbi.nlm.nih.gov/16926357/"
+      }
+    ]
   },
   "medication-reminder-system": {
     readingMinutes: 8,
@@ -363,12 +459,30 @@ const health30ArticleEnhancements = {
       ["用藥流程要能交接", ["好的用藥系統，是主要照顧者不在家時，其他家人也能看懂。藥物清單、藥盒、提醒、異常紀錄和回診問題，最好集中在同一個位置。", "照顧服務進場時，也應讓照服員或督導知道提醒規則與注意事項，避免資訊只存在某一位家屬腦中。"]]
     ],
     inlineImages: [
-      { afterSection: 1, src: "assets/health3/medication-reminder-system.jpg", alt: "家庭用藥提醒系統", caption: "藥物清單、藥盒、提醒和紀錄要接在一起。" },
-      { afterSection: 3, src: "assets/nursing-detail-01-vitals-clear-display.jpg", alt: "護理觀察與用藥後反應追蹤", caption: "吃藥後的精神、步態和食慾變化，也應納入照顧紀錄。" }
+      { afterSection: 1, src: "assets/health3/generated/medication-reminder-family-system-inline.jpg", alt: "家庭用藥提醒與紀錄桌面", caption: "藥物清單、藥盒、提醒和紀錄要接在一起。" }
     ],
     checklists: [{ title: "家庭用藥清單至少包含", items: ["藥名與外觀。", "用途或治療問題。", "服用時間與劑量。", "開立醫療院所與日期。", "是否可磨粉、剝半或飯前飯後。", "吃藥後需要觀察的反應。"] }],
     tables: [{ title: "用藥管理工具怎麼搭配", headers: ["工具", "用途", "注意"], rows: [["藥盒", "分裝每日藥物", "仍需確認是否已吃"], ["手機提醒", "固定時間提醒", "文字要具體"], ["照顧紀錄", "交接和追蹤反應", "異常要帶回醫療諮詢"]] }],
-    references: [{ name: "National Institute on Aging - Medicines and You", url: "https://www.nia.nih.gov/health/medicines-and-medication-management/medicines-and-you-guide-older-adults" }]
+    references: [
+      {
+        evidenceRank: 1,
+        pmid: "38822740",
+        citation: "Carollo, M., Crisafulli, S., Vitturi, G., Besco, M., Hinek, D., Sartorio, A., Tanara, V., Spadacini, G., Selleri, M., Zanconato, V., Fava, C., Minuz, P., Zamboni, M., & Trifirò, G. (2024). Clinical impact of medication review and deprescribing in older inpatients: A systematic review and meta-analysis. Journal of the American Geriatrics Society, 72(10), 3219-3238. https://doi.org/10.1111/jgs.19035",
+        url: "https://pubmed.ncbi.nlm.nih.gov/38822740/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "38692414",
+        citation: "Roncal-Belzunce, V., Gutiérrez-Valencia, M., Leache, L., Saiz, L. C., Bell, J. S., Erviti, J., & Martínez-Velilla, N. (2024). Systematic review and meta-analysis on the effectiveness of multidisciplinary interventions to address polypharmacy in community-dwelling older adults. Ageing Research Reviews, 98, 102317. https://doi.org/10.1016/j.arr.2024.102317",
+        url: "https://pubmed.ncbi.nlm.nih.gov/38692414/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "36835915",
+        citation: "Verma, A., Saha, S., Jarl, J., Conlon, E., McGuinness, B., & Trépel, D. (2023). An overview of systematic reviews and meta-analyses on the effect of medication interventions targeting polypharmacy for frail older adults. Journal of Clinical Medicine, 12(4), 1379. https://doi.org/10.3390/jcm12041379",
+        url: "https://pubmed.ncbi.nlm.nih.gov/36835915/"
+      }
+    ]
   },
   "caregiver-burnout-signs": {
     readingMinutes: 9,
@@ -383,12 +497,30 @@ const health30ArticleEnhancements = {
       ["照顧者也要有自己的求助名單", ["把可以求助的人寫下來：家人、朋友、鄰里、長照窗口、照顧團隊、醫療人員。真正累到崩潰時，人很難臨時想起可以找誰。", "如果已經出現持續失眠、情緒失控、身體疼痛或對照顧產生強烈排斥，請把自己也當成需要被照顧的人，盡快尋求專業支持。"]]
     ],
     inlineImages: [
-      { afterSection: 1, src: "assets/health3/caregiver-burnout-signs.jpg", alt: "照顧者壓力與喘息支持", caption: "照顧者的身心狀態，也應該被放進照顧計畫。" },
-      { afterSection: 3, src: "assets/homepage-batch/family-consultation-clear-display.jpg", alt: "家庭照顧諮詢與服務分工", caption: "把壓力拆成時段，才比較能安排服務與家人分工。" }
+      { afterSection: 2, src: "assets/health3/generated/caregiver-respite-planning-inline.jpg", alt: "照顧者喘息與家庭分工規劃", caption: "把壓力拆成時段，才比較能安排服務與家人分工。" }
     ],
     checklists: [{ title: "照顧者耗竭警訊", items: ["連續睡不好或很難放鬆。", "容易對長輩或家人生氣。", "覺得沒有人理解自己。", "常常自責或想逃走。", "身體疼痛、頭痛、胃痛變多。", "工作和人際關係明顯受影響。"] }],
     tables: [{ title: "壓力時段與可能服務", headers: ["最卡的時段", "常見困難", "可討論的支持"], rows: [["洗澡", "怕跌倒、照顧者用力過度", "居家照顧、浴室安全檢視"], ["白天上班", "長輩獨處或作息混亂", "日間照顧、社區據點"], ["夜間", "頻繁如廁、日夜顛倒", "居家照顧、喘息、作息調整"]] }],
-    references: [{ name: "National Institute on Aging - Caregiving", url: "https://www.nia.nih.gov/health/caregiving" }]
+    references: [
+      {
+        evidenceRank: 1,
+        pmid: "30450915",
+        citation: "Williams, F., Moghaddam, N., Ramsden, S., & De Boos, D. (2019). Interventions for reducing levels of burden amongst informal carers of persons with dementia in the community: A systematic review and meta-analysis of randomised controlled trials. Aging & Mental Health, 23(12), 1629-1642. https://doi.org/10.1080/13607863.2018.1515886",
+        url: "https://pubmed.ncbi.nlm.nih.gov/30450915/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "33226434",
+        citation: "Walter, E., & Pinquart, M. (2020). How effective are dementia caregiver interventions? An updated comprehensive meta-analysis. The Gerontologist, 60(8), e609-e619. https://doi.org/10.1093/geront/gnz118",
+        url: "https://pubmed.ncbi.nlm.nih.gov/33226434/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "40015952",
+        citation: "Chen, F., Hu, Z., Li, Q., Zheng, X., Li, M., Salcher-Konrad, M., Comas-Herrera, A., Knapp, M., Shi, C., & STRiDE Consortium. (2025). Effectiveness of interventions to support carers of people with dementia in low- and middle-income countries: A systematic review and meta-analysis. International Journal of Geriatric Psychiatry, 40(3), e70054. https://doi.org/10.1002/gps.70054",
+        url: "https://pubmed.ncbi.nlm.nih.gov/40015952/"
+      }
+    ]
   },
   "day-care-transition": {
     readingMinutes: 8,
@@ -403,12 +535,30 @@ const health30ArticleEnhancements = {
       ["家屬需要穩定回報，才敢放心", ["日照不是送去就結束。家屬需要知道今天有沒有吃、活動參與如何、情緒如何、是否有特殊狀況。回報越清楚，家屬越能一起協助長輩適應。", "若前兩週有波動，請和中心討論，而不是立刻判斷失敗。照顧轉換需要時間，也需要家庭和團隊一起調整。"]]
     ],
     inlineImages: [
-      { afterSection: 1, src: "assets/health3/day-care-transition.jpg", alt: "長輩適應日間照顧中心", caption: "前兩週先建立熟悉感和安全感，不急著要求長輩立刻適應整天。" },
-      { afterSection: 4, src: "assets/daycare-detail-04-checkin-fast.jpg", alt: "日間照顧接送與到離場交接", caption: "接送與回報流程清楚，家屬和長輩都比較安心。" }
+      { afterSection: 1, src: "assets/health3/generated/day-care-adaptation-welcome-inline.jpg", alt: "日照中心初次適應與熟悉環境", caption: "接送與回報流程清楚，家屬和長輩都比較安心。" }
     ],
     checklists: [{ title: "前兩週可以這樣陪適應", items: ["先參觀廁所、休息區、用餐位置。", "用固定短句說明今天流程。", "帶一件熟悉小物。", "前期不要安排太滿。", "回家後問哪裡不舒服，而不是急著說服。", "看一到兩週趨勢，不只看第一天。"] }],
     tables: [{ title: "不適應原因與調整", headers: ["長輩反應", "可能原因", "可調整方式"], rows: [["一直問何時回家", "缺乏時間安全感", "固定說明回家時間與接送者"], ["不願參與活動", "活動太陌生或太難", "先旁觀或選熟悉活動"], ["午餐吃少", "環境或餐點不習慣", "回報偏好並逐步調整"]] }],
-    references: [{ name: "衛生福利部 1966 長照服務專線", url: "https://1966.gov.tw/" }]
+    references: [
+      {
+        evidenceRank: 1,
+        pmid: "39443968",
+        citation: "Nguyen, H., Rahman, A., Ubell, A., Goodarzi, Z., Maxwell, C. J., Allana, S., Tate, K., Symonds-Brown, H., Weeks, L., Caspar, S., Mann, J., & Hoben, M. (2024). Adult day programs and their effects on individuals with dementia and their caregivers (ADAPT-DemCare): A realist synthesis to develop program theories on the how and why. Systematic Reviews, 13(1), 265. https://doi.org/10.1186/s13643-024-02683-1",
+        url: "https://pubmed.ncbi.nlm.nih.gov/39443968/"
+      },
+      {
+        evidenceRank: 3,
+        pmid: "25815563",
+        citation: "Tretteteig, S., Vatne, S., & Rokstad, A. M. (2016). The influence of day care centres for people with dementia on family caregivers: An integrative review of the literature. Aging & Mental Health, 20(5), 450-462. https://doi.org/10.1080/13607863.2015.1023765",
+        url: "https://pubmed.ncbi.nlm.nih.gov/25815563/"
+      },
+      {
+        evidenceRank: 2,
+        pmid: "9750575",
+        citation: "Zarit, S. H., Stephens, M. A., Townsend, A., & Greene, R. (1998). Stress reduction for family caregivers: Effects of adult day care use. The Journals of Gerontology: Series B, 53B(5), S267-S277. https://doi.org/10.1093/geronb/53b.5.s267",
+        url: "https://pubmed.ncbi.nlm.nih.gov/9750575/"
+      }
+    ]
   },
   "swallowing-meal-safety": {
     readingMinutes: 9,
@@ -423,12 +573,30 @@ const health30ArticleEnhancements = {
       ["把用餐觀察變成照顧紀錄", ["記錄吃了多少、喝水是否咳、吃飯時間、精神狀態、是否發燒或體重下降。這些資訊能讓家屬、照服員和專業人員更快判斷風險。", "如果家庭照顧壓力很高，也可以透過居家照顧或日照共餐協助觀察，讓用餐安全不只靠一位家屬獨自承擔。"]]
     ],
     inlineImages: [
-      { afterSection: 1, src: "assets/health3/swallowing-meal-safety.jpg", alt: "吞嚥與用餐安全照顧", caption: "坐姿、清醒程度和一口份量，是用餐安全的基本條件。" },
-      { afterSection: 4, src: "assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg", alt: "照顧者準備適合長輩的餐食", caption: "餐食質地和餵食方式應依長輩狀態調整，必要時請專業評估。" }
+      { afterSection: 1, src: "assets/health3/generated/swallowing-safe-meal-inline.jpg", alt: "長輩吞嚥安全餐食質地觀察", caption: "餐食質地和餵食方式應依長輩狀態調整，必要時請專業評估。" }
     ],
     checklists: [{ title: "用餐安全觀察", items: ["吃飯前是否清醒。", "是否能坐直、腳踩穩。", "喝水或湯是否常咳。", "聲音是否變濕或常清喉嚨。", "吃飯時間是否明顯變長。", "是否體重下降或反覆發燒。"] }],
     tables: [{ title: "嗆咳線索對照", headers: ["線索", "可能代表", "下一步"], rows: [["喝水常咳", "液體吞嚥風險", "記錄並諮詢專業"], ["吃肉很久", "咀嚼或質地問題", "調整切小、軟硬並觀察"], ["飯後發燒", "吸入或感染風險", "儘快就醫評估"]] }],
-    references: [{ name: "MedlinePlus - Swallowing Disorders", url: "https://medlineplus.gov/swallowingdisorders.html" }]
+    references: [
+      {
+        evidenceRank: 1,
+        pmid: "35623866",
+        citation: "Hansen, T., Beck, A. M., Kjaersgaard, A., & Poulsen, I. (2022). Second update of a systematic review and evidence-based recommendations on texture modified foods and thickened liquids for adults (above 17 years) with oropharyngeal dysphagia. Clinical Nutrition ESPEN, 49, 551-555. https://doi.org/10.1016/j.clnesp.2022.03.039",
+        url: "https://pubmed.ncbi.nlm.nih.gov/35623866/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "25343878",
+        citation: "Steele, C. M., Alsanei, W. A., Ayanikalath, S., Barbon, C. E. A., Chen, J., Cichero, J. A. Y., Coutts, K., Dantas, R. O., Duivestein, J., Giosa, L., Hanson, B., Lam, P., Lecko, C., Leigh, C., Nagy, A., Namasivayam, A. M., Nascimento, W. V., Odendaal, I., Smith, C. H., & Wang, H. (2015). The influence of food texture and liquid consistency modification on swallowing physiology and function: A systematic review. Dysphagia, 30(1), 2-26. https://doi.org/10.1007/s00455-014-9578-x",
+        url: "https://pubmed.ncbi.nlm.nih.gov/25343878/"
+      },
+      {
+        evidenceRank: 1,
+        pmid: "27102184",
+        citation: "Brodsky, M. B., Suiter, D. M., González-Fernández, M., Michtalik, H. J., Frymark, T. B., Venediktov, R., & Schooling, T. (2016). Screening accuracy for aspiration using bedside water swallow tests: A systematic review and meta-analysis. Chest, 150(1), 148-163. https://doi.org/10.1016/j.chest.2016.03.059",
+        url: "https://pubmed.ncbi.nlm.nih.gov/27102184/"
+      }
+    ]
   }
 };
 

@@ -840,6 +840,7 @@ const WP_CATEGORIES = {
   health30: "health-30",
   masterTalk: "master-talk"
 };
+const HOMEPAGE_MASTER_TALK_LIMIT = 8;
 
 const articlePages = {
   "longterm-care-apply": {
@@ -1326,6 +1327,126 @@ Object.assign(articlePages, {
       ["督導追蹤讓服務可以持續改善", "當紀錄累積起來，督導可以看趨勢、發現重複問題，並回到訓練與服務調整。系統不是取代照顧者，而是讓每一次照顧更容易被接住。"]
     ],
     cta: "想了解歲悅照顧系統如何支援家屬與督導，歡迎預約諮詢。"
+  },
+  "master-talk-discharge-transition": {
+    category: "Master Talk",
+    title: "出院不是結束，是家庭照顧重新開始的第一週。",
+    dek: "出院準備顧問謝護理師談返家第一週的用藥、回診、移位與照顧分工。",
+    image: "assets/health3/generated/post-discharge-care-station-hero.jpg",
+    author: "出院準備顧問 謝護理師",
+    date: "2026.04.26",
+    readTime: "5 min read",
+    tags: ["名人講堂", "出院返家", "照顧銜接"],
+    summary: ["出院後第一週最需要清楚分工。", "用藥、回診、傷口與移位都要先整理。", "照顧計畫要讓家屬知道遇到狀況找誰。"],
+    content: [
+      ["返家第一週最容易手忙腳亂", "謝護理師分享，出院當天家庭常以為終於告一段落，但真正的照顧挑戰才剛開始。藥袋、回診單、傷口照護、復健建議與生活限制若沒有整理清楚，家人很快就會陷入猜測。"],
+      ["先把風險寫成清單", "返家前最好確認誰負責服藥提醒、誰陪同回診、誰觀察傷口或精神狀態，也要知道什麼情況需要立刻就醫。清單不是形式，而是讓家人能接手。"],
+      ["銜接服務能降低家庭壓力", "若長輩短期內需要移位、沐浴、備餐或復能支持，可以提早安排居家照顧與專業評估。照顧銜接越早開始，家屬越不需要靠臨場反應硬撐。"]
+    ],
+    inlineImages: [
+      { afterSection: 1, src: "assets/health3/generated/post-discharge-care-station-inline.jpg", alt: "出院返家照顧資料與用藥整理", caption: "第一週先把用藥、回診和每日觀察整理到同一份紀錄。" }
+    ],
+    references: [
+      { evidenceRank: 1, pmid: "34823079", citation: "Lee, J. Y., Yang, Y. S., & Cho, E. (2022). Transitional care from hospital to home for frail older adults: A systematic review and meta-analysis. Geriatric Nursing, 43, 64-76. https://doi.org/10.1016/j.gerinurse.2021.11.003", url: "https://pubmed.ncbi.nlm.nih.gov/34823079/" },
+      { evidenceRank: 1, pmid: "33419903", citation: "Fønss Rasmussen, L., Grode, L. B., Lange, J., Barat, I., & Gregersen, M. (2021). Impact of transitional care interventions on hospital readmissions in older medical patients: A systematic review. BMJ Open, 11(1), e040057. https://doi.org/10.1136/bmjopen-2020-040057", url: "https://pubmed.ncbi.nlm.nih.gov/33419903/" }
+    ],
+    cta: "家人即將出院返家時，歡迎讓歲悅協助整理第一週照顧安排。"
+  },
+  "master-talk-pressure-injury-care": {
+    category: "Master Talk",
+    title: "翻身不是例行公事，是在保護皮膚和尊嚴。",
+    dek: "傷口照護護理師洪護理師分享壓傷預防、皮膚觀察與床上照顧的細節。",
+    image: "assets/health3/generated/pressure-injury-posture-care-hero.jpg",
+    author: "傷口照護護理師 洪護理師",
+    date: "2026.04.25",
+    readTime: "5 min read",
+    tags: ["名人講堂", "壓傷預防", "皮膚照護"],
+    summary: ["久臥或久坐都需要留意壓力點。", "皮膚發紅、潮濕與摩擦是早期警訊。", "翻身、減壓與清潔要和長輩感受一起看。"],
+    content: [
+      ["壓傷常常不是突然發生", "洪護理師提醒，長輩活動量下降、長時間坐輪椅或臥床時，尾椎、腳跟、髖部和肩胛附近都容易承受壓力。若皮膚反覆發紅、破皮或潮濕，就要提早處理。"],
+      ["翻身要有節奏，也要有溝通", "協助翻身時，家屬常擔心弄痛長輩。可以先說明動作、準備枕頭支撐，再觀察長輩表情與呼吸。好的翻身不是把人轉過去，而是讓身體得到真正減壓。"],
+      ["床上照顧也需要專業眼睛", "尿布更換、擦澡、床單皺摺與衣物摩擦都會影響皮膚狀況。若已經有傷口，建議請護理專業協助評估，避免家屬用錯方式讓傷口更難恢復。"]
+    ],
+    inlineImages: [
+      { afterSection: 1, src: "assets/health3/generated/pressure-injury-posture-care-inline.jpg", alt: "壓傷預防用品與照顧紀錄", caption: "壓傷預防要把姿勢、減壓、清潔與紀錄放在同一個流程。" }
+    ],
+    references: [
+      { evidenceRank: 1, pmid: "32924821", citation: "Avsar, P., Moore, Z., Patton, D., O'Connor, T., Budri, A. M., & Nugent, L. (2020). Repositioning for preventing pressure ulcers: A systematic review and meta-analysis. Journal of Wound Care, 29(9), 496-508. https://doi.org/10.12968/jowc.2020.29.9.496", url: "https://pubmed.ncbi.nlm.nih.gov/32924821/" },
+      { evidenceRank: 1, pmid: "16926357", citation: "Reddy, M., Gill, S. S., & Rochon, P. A. (2006). Preventing pressure ulcers: A systematic review. JAMA, 296(8), 974-984. https://doi.org/10.1001/jama.296.8.974", url: "https://pubmed.ncbi.nlm.nih.gov/16926357/" }
+    ],
+    cta: "若長輩有臥床、久坐或皮膚破損狀況，可以先預約照護評估。"
+  },
+  "master-talk-daycare-transition": {
+    category: "Master Talk",
+    title: "第一次去日照，家屬要準備的是安心感。",
+    dek: "日照適應顧問盧社工談長輩初次到日照中心時，家庭可以怎麼陪伴與銜接。",
+    image: "assets/health3/generated/day-care-adaptation-welcome-hero.jpg",
+    author: "日照適應顧問 盧社工",
+    date: "2026.04.24",
+    readTime: "5 min read",
+    tags: ["名人講堂", "日照適應", "社區照顧"],
+    summary: ["第一次日照需要循序建立安全感。", "家屬可以準備生活習慣和喜好資訊。", "適應期重點是穩定，不是立刻表現完美。"],
+    content: [
+      ["抗拒不代表不適合", "盧社工分享，許多長輩第一次聽到日照會先拒絕，原因可能是不熟悉環境、擔心被安排、害怕失去自主。家屬可以先用參觀、短時間體驗和熟悉工作人員的方式慢慢銜接。"],
+      ["把生活習慣交給團隊", "長輩喜歡的稱呼、用餐偏好、如廁習慣、容易焦慮的情境，都能幫助日照團隊更快建立信任。這些小資訊，往往比長篇病史更能影響第一天的感受。"],
+      ["適應期先看情緒，再看活動量", "剛開始不一定要期待長輩參加所有活動。只要願意坐下、願意吃飯、願意和人互動一點點，就是好的開始。日照的目標，是讓長輩慢慢找回規律與連結。"]
+    ],
+    inlineImages: [
+      { afterSection: 1, src: "assets/health3/generated/day-care-adaptation-welcome-inline.jpg", alt: "日照中心初次適應與熟悉環境", caption: "前期先建立熟悉感和安全感，不急著要求長輩立刻適應整天。" }
+    ],
+    references: [
+      { evidenceRank: 1, pmid: "39443968", citation: "Nguyen, H., Rahman, A., Ubell, A., Goodarzi, Z., Maxwell, C. J., Allana, S., Tate, K., Symonds-Brown, H., Weeks, L., Caspar, S., Mann, J., & Hoben, M. (2024). Adult day programs and their effects on individuals with dementia and their caregivers (ADAPT-DemCare): A realist synthesis to develop program theories on the how and why. Systematic Reviews, 13(1), 265. https://doi.org/10.1186/s13643-024-02683-1", url: "https://pubmed.ncbi.nlm.nih.gov/39443968/" },
+      { evidenceRank: 2, pmid: "9750575", citation: "Zarit, S. H., Stephens, M. A., Townsend, A., & Greene, R. (1998). Stress reduction for family caregivers: Effects of adult day care use. The Journals of Gerontology: Series B, 53B(5), S267-S277. https://doi.org/10.1093/geronb/53b.5.s267", url: "https://pubmed.ncbi.nlm.nih.gov/9750575/" }
+    ],
+    cta: "正在評估日照或社區服務時，歲悅可以協助整理適合的銜接方式。"
+  },
+  "master-talk-caregiver-burnout": {
+    category: "Master Talk",
+    title: "照顧者不是超人，先被接住才有力氣照顧。",
+    dek: "照顧者支持心理師高心理師談疲憊、罪惡感與家庭支持如何被看見。",
+    image: "assets/health3/generated/caregiver-respite-planning-hero.jpg",
+    author: "照顧者支持心理師 高心理師",
+    date: "2026.04.23",
+    readTime: "5 min read",
+    tags: ["名人講堂", "照顧者支持", "家庭壓力"],
+    summary: ["疲憊不是不孝，而是壓力已經超載。", "照顧者需要被允許休息與求助。", "家庭分工要具體，不能只靠一句辛苦了。"],
+    content: [
+      ["很多照顧者累到不敢說累", "高心理師分享，長期照顧最難的地方，是身體疲累之外還有罪惡感。家屬常覺得只要自己停下來，就是對不起長輩，但照顧者若一直被消耗，照顧品質也會跟著下降。"],
+      ["先辨認超載訊號", "睡不好、容易生氣、對長輩失去耐心、對其他家人疏離，都是需要被看見的訊號。這不是個性變差，而是壓力已經超過一個人能承受的範圍。"],
+      ["支持要變成具體安排", "家人可以分擔接送、採買、陪診、夜間照顧或行政聯繫，也可以搭配喘息、日照與居家服務。真正的支持，是把一句辛苦了變成有人接手的時段。"]
+    ],
+    inlineImages: [
+      { afterSection: 2, src: "assets/health3/generated/caregiver-respite-planning-inline.jpg", alt: "照顧者喘息與家庭分工規劃", caption: "支持照顧者，需要把一句辛苦了變成有人接手的時段。" }
+    ],
+    references: [
+      { evidenceRank: 1, pmid: "30450915", citation: "Williams, F., Moghaddam, N., Ramsden, S., & De Boos, D. (2019). Interventions for reducing levels of burden amongst informal carers of persons with dementia in the community: A systematic review and meta-analysis of randomised controlled trials. Aging & Mental Health, 23(12), 1629-1642. https://doi.org/10.1080/13607863.2018.1515886", url: "https://pubmed.ncbi.nlm.nih.gov/30450915/" },
+      { evidenceRank: 1, pmid: "33226434", citation: "Walter, E., & Pinquart, M. (2020). How effective are dementia caregiver interventions? An updated comprehensive meta-analysis. The Gerontologist, 60(8), e609-e619. https://doi.org/10.1093/geront/gnz118", url: "https://pubmed.ncbi.nlm.nih.gov/33226434/" }
+    ],
+    cta: "如果照顧已經讓家人撐不住，歡迎讓歲悅一起整理可用支持。"
+  },
+  "master-talk-medication-reminder": {
+    category: "Master Talk",
+    title: "提醒吃藥不是催促，是幫長輩保留安全節奏。",
+    dek: "用藥安全顧問陳藥師分享多重用藥、提醒方式與家屬溝通的實用方法。",
+    image: "assets/health3/generated/medication-reminder-family-system-hero.jpg",
+    author: "用藥安全顧問 陳藥師",
+    date: "2026.04.22",
+    readTime: "5 min read",
+    tags: ["名人講堂", "用藥提醒", "照顧系統"],
+    summary: ["多重用藥需要清楚時間與用途。", "提醒方式要讓長輩感覺被尊重。", "異常狀況要能回報給家屬與專業人員。"],
+    content: [
+      ["藥袋越多，越需要整理成生活節奏", "陳藥師分享，長輩若同時看多科、服用多種藥物，最容易發生重複吃、漏吃或不知道某顆藥的用途。先把早中晚與睡前整理清楚，是安全的第一步。"],
+      ["提醒要避免變成衝突", "家屬常因擔心而一直催促，長輩卻可能覺得被管束。可以改用固定時間、藥盒、照片紀錄或服務人員回報，讓提醒變成日常節奏，而不是每次都要爭執。"],
+      ["把異常記錄下來", "服藥後嗜睡、頭暈、食慾改變或跌倒，都應該記錄並在回診時告知醫師或藥師。照顧系統若能保存紀錄，家屬就不必只靠記憶追問題。"]
+    ],
+    inlineImages: [
+      { afterSection: 1, src: "assets/health3/generated/medication-reminder-family-system-inline.jpg", alt: "家庭用藥提醒與紀錄桌面", caption: "藥物清單、藥盒、提醒和紀錄要接在一起。" }
+    ],
+    references: [
+      { evidenceRank: 1, pmid: "38822740", citation: "Carollo, M., Crisafulli, S., Vitturi, G., Besco, M., Hinek, D., Sartorio, A., Tanara, V., Spadacini, G., Selleri, M., Zanconato, V., Fava, C., Minuz, P., Zamboni, M., & Trifirò, G. (2024). Clinical impact of medication review and deprescribing in older inpatients: A systematic review and meta-analysis. Journal of the American Geriatrics Society, 72(10), 3219-3238. https://doi.org/10.1111/jgs.19035", url: "https://pubmed.ncbi.nlm.nih.gov/38822740/" },
+      { evidenceRank: 1, pmid: "38692414", citation: "Roncal-Belzunce, V., Gutiérrez-Valencia, M., Leache, L., Saiz, L. C., Bell, J. S., Erviti, J., & Martínez-Velilla, N. (2024). Systematic review and meta-analysis on the effectiveness of multidisciplinary interventions to address polypharmacy in community-dwelling older adults. Ageing Research Reviews, 98, 102317. https://doi.org/10.1016/j.arr.2024.102317", url: "https://pubmed.ncbi.nlm.nih.gov/38692414/" }
+    ],
+    cta: "需要協助建立用藥提醒與照顧回報流程時，可以和歲悅討論。"
   }
 });
 
@@ -1657,6 +1778,56 @@ healthArticles.push(
     author: "科技照顧產品經理 賴先生",
     date: "2026.04.27",
     keywords: "名人講堂 照顧系統 家屬回報 服務紀錄 督導追蹤"
+  },
+  {
+    href: articleHref("master-talk-discharge-transition"),
+    category: "專家專欄",
+    title: "出院不是結束，是家庭照顧重新開始的第一週。",
+    excerpt: "出院準備顧問談返家第一週的用藥、回診、移位與照顧分工。",
+    image: "assets/health3/generated/post-discharge-care-station-hero.jpg",
+    author: "出院準備顧問 謝護理師",
+    date: "2026.04.26",
+    keywords: "名人講堂 出院返家 照顧銜接 用藥 回診"
+  },
+  {
+    href: articleHref("master-talk-pressure-injury-care"),
+    category: "專家專欄",
+    title: "翻身不是例行公事，是在保護皮膚和尊嚴。",
+    excerpt: "傷口照護護理師分享壓傷預防、皮膚觀察與床上照顧的細節。",
+    image: "assets/health3/generated/pressure-injury-posture-care-hero.jpg",
+    author: "傷口照護護理師 洪護理師",
+    date: "2026.04.25",
+    keywords: "名人講堂 壓傷預防 皮膚照護 翻身 傷口"
+  },
+  {
+    href: articleHref("master-talk-daycare-transition"),
+    category: "專家專欄",
+    title: "第一次去日照，家屬要準備的是安心感。",
+    excerpt: "日照適應顧問談長輩初次到日照中心時，家庭可以怎麼陪伴與銜接。",
+    image: "assets/health3/generated/day-care-adaptation-welcome-hero.jpg",
+    author: "日照適應顧問 盧社工",
+    date: "2026.04.24",
+    keywords: "名人講堂 日照適應 社區照顧 日照中心 家屬"
+  },
+  {
+    href: articleHref("master-talk-caregiver-burnout"),
+    category: "專家專欄",
+    title: "照顧者不是超人，先被接住才有力氣照顧。",
+    excerpt: "照顧者支持心理師談疲憊、罪惡感與家庭支持如何被看見。",
+    image: "assets/health3/generated/caregiver-respite-planning-hero.jpg",
+    author: "照顧者支持心理師 高心理師",
+    date: "2026.04.23",
+    keywords: "名人講堂 照顧者支持 家庭壓力 喘息 罪惡感"
+  },
+  {
+    href: articleHref("master-talk-medication-reminder"),
+    category: "專家專欄",
+    title: "提醒吃藥不是催促，是幫長輩保留安全節奏。",
+    excerpt: "用藥安全顧問分享多重用藥、提醒方式與家屬溝通的實用方法。",
+    image: "assets/health3/generated/medication-reminder-family-system-hero.jpg",
+    author: "用藥安全顧問 陳藥師",
+    date: "2026.04.22",
+    keywords: "名人講堂 用藥提醒 照顧系統 多重用藥 藥盒"
   }
 );
 
@@ -1667,7 +1838,7 @@ const health30ArticlePack = [
     title: "夜間跌倒預防：家裡最該先改的 8 個地方",
     dek: "半夜起身、如廁、走到客廳，是許多家庭最緊張的時段。先從動線、照明與扶手把風險降下來。",
     excerpt: "把床邊到浴室的路線整理好，往往比一次買很多輔具更有效。",
-    image: "assets/health3/fall-prevention-home-checklist.jpg",
+    image: "assets/health3/generated/fall-prevention-night-route-hero.jpg",
     author: "歲悅居家安全團隊",
     date: "2026.07.04",
     readingMinutes: 5,
@@ -1680,8 +1851,8 @@ const health30ArticlePack = [
       ["扶手要裝在真正用力的位置", "扶手不是有裝就好，而是要符合長輩起身、轉身、坐下的動作。馬桶旁、淋浴區與床邊若需要扶持，建議請專業人員一起評估位置。"]
     ],
     cta: "想知道家裡哪裡最需要先改？可以預約歲悅居家安全檢視。",
-    sourceName: "CDC Older Adult Fall Prevention",
-    sourceUrl: "https://www.cdc.gov/falls/prevention/index.html",
+    sourceName: "PubMed PMID 38833257",
+    sourceUrl: "https://pubmed.ncbi.nlm.nih.gov/38833257/",
     keywords: "跌倒預防 夜間照顧 居家安全 浴室 床邊 長輩"
   },
   {
@@ -1690,7 +1861,7 @@ const health30ArticlePack = [
     title: "長輩喝水少、吃不下：家屬先觀察這 5 件事",
     dek: "吃得少不一定只是胃口差。體重、精神、排便、藥物與吞嚥狀況，都可能是照顧提醒。",
     excerpt: "比起一直勸吃，先把一週的飲食、水分與精神狀態記錄下來。",
-    image: "assets/health3/hydration-low-appetite-elderly.jpg",
+    image: "assets/health3/generated/hydration-meal-observation-hero.jpg",
     author: "歲悅營養照顧小組",
     date: "2026.07.04",
     readingMinutes: 5,
@@ -1703,8 +1874,8 @@ const health30ArticlePack = [
       ["不要只靠補品解決問題", "營養補充品可以是工具，但不應取代原因判斷。若出現明顯體重下降、反覆嗆咳、脫水疑慮或急性精神變化，請優先尋求醫療評估。"]
     ],
     cta: "如果家中長輩吃得越來越少，歲悅可以協助整理觀察紀錄與服務安排。",
-    sourceName: "National Institute on Aging - Healthy Eating",
-    sourceUrl: "https://www.nia.nih.gov/health/healthy-eating-nutrition-and-diet/healthy-eating-you-get-older",
+    sourceName: "PubMed PMID 37330324",
+    sourceUrl: "https://pubmed.ncbi.nlm.nih.gov/37330324/",
     keywords: "長輩 食慾 喝水 營養 體重 吞嚥"
   },
   {
@@ -1713,7 +1884,7 @@ const health30ArticlePack = [
     title: "失智傍晚變焦躁：先調整環境與作息",
     dek: "傍晚情緒起伏常讓家屬很挫折。與其一直說服，不如先降低刺激、建立固定節奏。",
     excerpt: "先回應情緒，再用簡短提示、光線與固定作息幫長輩找回安全感。",
-    image: "assets/health3/dementia-evening-agitation.jpg",
+    image: "assets/health3/generated/dementia-evening-routine-hero.jpg",
     author: "歲悅失智照顧編輯部",
     date: "2026.07.04",
     readingMinutes: 6,
@@ -1726,8 +1897,8 @@ const health30ArticlePack = [
       ["替家屬安排喘息也很重要", "傍晚常是家屬下班後最疲累的時段。若每天都在同一時段爆發衝突，可以考慮居家照顧、日照或喘息服務協助銜接。"]
     ],
     cta: "家中若常在傍晚卡住，歲悅可以陪你一起整理作息與服務分工。",
-    sourceName: "National Institute on Aging - Alzheimer's Caregiving",
-    sourceUrl: "https://www.nia.nih.gov/health/alzheimers-caregiving",
+    sourceName: "PubMed PMID 31862527",
+    sourceUrl: "https://pubmed.ncbi.nlm.nih.gov/31862527/",
     keywords: "失智 傍晚 焦躁 日落症候群 情緒安撫 家屬支持"
   },
   {
@@ -1736,7 +1907,7 @@ const health30ArticlePack = [
     title: "出院返家第一週：家屬每天要記錄的重點",
     dek: "剛出院最怕資訊斷掉。用簡單紀錄把用藥、飲食、活動、疼痛與回診提醒接起來。",
     excerpt: "第一週不用求完美，先把每天最重要的變化留下來。",
-    image: "assets/health3/post-discharge-first-week.jpg",
+    image: "assets/health3/generated/post-discharge-care-station-hero.jpg",
     author: "歲悅照顧管理團隊",
     date: "2026.07.04",
     readingMinutes: 6,
@@ -1749,8 +1920,8 @@ const health30ArticlePack = [
       ["服務進場越早，家屬越不需要亂猜", "居家照顧、護理復能或日照不一定要等家屬崩潰才開始。第一週先建立觀察與回報流程，後面調整會容易很多。"]
     ],
     cta: "剛出院不知道怎麼安排？留下狀況，讓歲悅協助判斷下一步。",
-    sourceName: "衛生福利部 1966 長照服務專線",
-    sourceUrl: "https://1966.gov.tw/",
+    sourceName: "PubMed PMID 34823079",
+    sourceUrl: "https://pubmed.ncbi.nlm.nih.gov/34823079/",
     keywords: "出院返家 照顧紀錄 用藥 回診 長照申請 居家照顧"
   },
   {
@@ -1759,7 +1930,7 @@ const health30ArticlePack = [
     title: "浴室安全照顧：洗澡前中後的檢查清單",
     dek: "浴室是家中跌倒高風險區。先把水溫、止滑、扶手、坐姿與保暖順序固定下來。",
     excerpt: "洗澡不是只有清潔，更是觀察皮膚、體力與安全風險的時刻。",
-    image: "assets/health3/safe-bathing-care.jpg",
+    image: "assets/health3/generated/safe-bathing-preparation-hero.jpg",
     author: "歲悅居家照顧團隊",
     date: "2026.07.04",
     readingMinutes: 5,
@@ -1772,8 +1943,8 @@ const health30ArticlePack = [
       ["洗澡也是皮膚觀察時間", "可以順便觀察皮膚紅腫、破皮、瘀青、腳趾縫濕疹或壓痕。若發現傷口、異常疼痛或感染徵象，應及早諮詢專業。"]
     ],
     cta: "想讓洗澡照顧更安全，可以預約歲悅到宅檢視浴室與動作流程。",
-    sourceName: "CDC Older Adult Fall Prevention",
-    sourceUrl: "https://www.cdc.gov/falls/prevention/index.html",
+    sourceName: "PubMed PMID 37489124",
+    sourceUrl: "https://pubmed.ncbi.nlm.nih.gov/37489124/",
     keywords: "浴室安全 洗澡照顧 淋浴椅 扶手 止滑 長輩"
   },
   {
@@ -1782,7 +1953,7 @@ const health30ArticlePack = [
     title: "久坐久躺的皮膚照顧：壓傷風險怎麼早點看見",
     dek: "皮膚紅、壓痕、潮濕與活動變少，都可能是壓傷提醒。越早看見，越容易處理。",
     excerpt: "照顧不是等傷口出現才處理，而是每天看皮膚、姿勢與濕度。",
-    image: "assets/health3/pressure-injury-prevention.jpg",
+    image: "assets/health3/generated/pressure-injury-posture-care-hero.jpg",
     author: "歲悅護理照護團隊",
     date: "2026.07.04",
     readingMinutes: 6,
@@ -1795,8 +1966,8 @@ const health30ArticlePack = [
       ["營養和水分也是皮膚照顧", "蛋白質、水分與整體營養狀況會影響皮膚修復。若食慾差、體重下降或傷口不易癒合，建議一併諮詢醫療或營養專業。"]
     ],
     cta: "若家中長輩久坐久躺，歲悅可以協助建立皮膚觀察與照顧紀錄。",
-    sourceName: "MedlinePlus - Pressure Injuries",
-    sourceUrl: "https://medlineplus.gov/pressuresores.html",
+    sourceName: "PubMed PMID 32924821",
+    sourceUrl: "https://pubmed.ncbi.nlm.nih.gov/32924821/",
     keywords: "壓傷 褥瘡 皮膚照顧 久坐 久躺 護理觀察"
   },
   {
@@ -1805,7 +1976,7 @@ const health30ArticlePack = [
     title: "用藥提醒不只靠記憶：家庭可以建立的小系統",
     dek: "把藥袋、藥盒、手機提醒與照顧紀錄接在一起，減少漏吃、重複吃與家人吵架。",
     excerpt: "用藥管理不是誰記性好，而是家裡有沒有一套不容易出錯的流程。",
-    image: "assets/health3/medication-reminder-system.jpg",
+    image: "assets/health3/generated/medication-reminder-family-system-hero.jpg",
     author: "歲悅照顧管理團隊",
     date: "2026.07.04",
     readingMinutes: 5,
@@ -1818,8 +1989,8 @@ const health30ArticlePack = [
       ["有疑問就問藥師或醫師", "藥變多、劑量改變、吃藥後頭暈嗜睡、食慾變差，都應回頭詢問專業。不要因為怕麻煩就自行停藥或混合調整。"]
     ],
     cta: "想建立用藥與照顧紀錄流程，歲悅可以協助把家中分工整理清楚。",
-    sourceName: "National Institute on Aging - Medicines and You",
-    sourceUrl: "https://www.nia.nih.gov/health/medicines-and-medication-management/medicines-and-you-guide-older-adults",
+    sourceName: "PubMed PMID 38822740",
+    sourceUrl: "https://pubmed.ncbi.nlm.nih.gov/38822740/",
     keywords: "用藥提醒 藥盒 藥物管理 照顧紀錄 家庭照顧"
   },
   {
@@ -1828,7 +1999,7 @@ const health30ArticlePack = [
     title: "照顧者快撐不住：不是不孝，是需要喘息",
     dek: "長期照顧會累，是因為責任太密、休息太少。先看見耗竭訊號，再把服務接進來。",
     excerpt: "喘息不是放棄家人，而是讓照顧關係有機會走得更久。",
-    image: "assets/health3/caregiver-burnout-signs.jpg",
+    image: "assets/health3/generated/caregiver-respite-planning-hero.jpg",
     author: "歲悅家庭支持團隊",
     date: "2026.07.04",
     readingMinutes: 6,
@@ -1841,8 +2012,8 @@ const health30ArticlePack = [
       ["不要等到崩潰才求助", "如果已經影響工作、健康或親密關係，建議盡快找長照窗口、社工、醫療或照顧團隊討論。越早接服務，越不需要用硬撐換安全。"]
     ],
     cta: "如果你已經快撐不住，先留下目前卡住的時段，歲悅協助你整理下一步。",
-    sourceName: "National Institute on Aging - Caregiving",
-    sourceUrl: "https://www.nia.nih.gov/health/caregiving",
+    sourceName: "PubMed PMID 30450915",
+    sourceUrl: "https://pubmed.ncbi.nlm.nih.gov/30450915/",
     keywords: "照顧者 壓力 喘息服務 家屬支持 長照 家庭照顧"
   },
   {
@@ -1851,7 +2022,7 @@ const health30ArticlePack = [
     title: "第一次去日照不適應：陪長輩度過前兩週",
     dek: "不適應不代表不適合。用參觀、短時間體驗、固定接送與回家後安撫，讓轉換更柔和。",
     excerpt: "前兩週的目標不是立刻愛上日照，而是建立安全感與可預期感。",
-    image: "assets/health3/day-care-transition.jpg",
+    image: "assets/health3/generated/day-care-adaptation-welcome-hero.jpg",
     author: "歲悅日照團隊",
     date: "2026.07.04",
     readingMinutes: 5,
@@ -1864,8 +2035,8 @@ const health30ArticlePack = [
       ["家屬也需要看見回報", "日照不是把人送去就結束。活動、用餐、精神狀況與特殊需求應該有回報，家屬才知道服務是否真的讓家庭變穩。"]
     ],
     cta: "想知道日照是否適合家中長輩，可以先預約參觀與需求討論。",
-    sourceName: "衛生福利部 1966 長照服務專線",
-    sourceUrl: "https://1966.gov.tw/",
+    sourceName: "PubMed PMID 39443968",
+    sourceUrl: "https://pubmed.ncbi.nlm.nih.gov/39443968/",
     keywords: "日間照顧 日照 適應 家庭喘息 接送 長照"
   },
   {
@@ -1874,7 +2045,7 @@ const health30ArticlePack = [
     title: "吃飯常嗆到：家屬該先觀察與避免的事",
     dek: "嗆咳不是小事。先看坐姿、食物質地、進食速度與精神狀態，必要時尋求吞嚥評估。",
     excerpt: "先不要急著餵快一點。吃飯安全的第一步，是讓長輩坐穩、慢慢吃、有人觀察。",
-    image: "assets/health3/swallowing-meal-safety.jpg",
+    image: "assets/health3/generated/swallowing-safe-meal-hero.jpg",
     author: "歲悅照顧編輯部",
     date: "2026.07.04",
     readingMinutes: 6,
@@ -1887,8 +2058,8 @@ const health30ArticlePack = [
       ["需要時請專業評估質地", "有些家庭會自行把食物打成泥或加稠，但不一定適合每位長輩。吞嚥困難建議由醫療、語言治療或營養專業一起判斷。"]
     ],
     cta: "如果家中長輩常嗆到，歲悅可以協助整理觀察重點並建議下一步資源。",
-    sourceName: "MedlinePlus - Swallowing Disorders",
-    sourceUrl: "https://medlineplus.gov/swallowingdisorders.html",
+    sourceName: "PubMed PMID 35623866",
+    sourceUrl: "https://pubmed.ncbi.nlm.nih.gov/35623866/",
     keywords: "吞嚥 嗆咳 飲食安全 長輩 吃飯 照顧技巧"
   }
 ];
@@ -2043,16 +2214,16 @@ function getHealthArticleThemeImage(article = {}) {
     ...(Array.isArray(article.tags) ? article.tags : [])
   ].filter(Boolean).join(" ").toLowerCase();
 
-  if (/bath|浴室|洗澡|沐浴/.test(text)) return "assets/health3/safe-bathing-care.jpg";
-  if (/fall|跌倒|夜間|起身|居家安全|床邊|扶手|廁所|如廁/.test(text)) return "assets/health3/fall-prevention-home-checklist.jpg";
-  if (/hydration|喝水|水分|食慾|吃不下|營養|食慾下降/.test(text)) return "assets/health3/hydration-low-appetite-elderly.jpg";
-  if (/swallow|吞嚥|嗆|嗆咳|吃飯常嗆|飲食安全/.test(text)) return "assets/health3/swallowing-meal-safety.jpg";
-  if (/dementia|失智|傍晚|焦躁|日落|重複提問/.test(text)) return "assets/health3/dementia-evening-agitation.jpg";
-  if (/discharge|出院|返家|回診|第一週/.test(text)) return "assets/health3/post-discharge-first-week.jpg";
-  if (/pressure|壓傷|褥瘡|久坐|久躺|皮膚/.test(text)) return "assets/health3/pressure-injury-prevention.jpg";
-  if (/medication|用藥|藥物|藥盒|提醒/.test(text)) return "assets/health3/medication-reminder-system.jpg";
-  if (/burnout|喘息|撐不住|照顧者|照顧壓力|家屬支持/.test(text)) return "assets/health3/caregiver-burnout-signs.jpg";
-  if (/day-care|daycare|日照|日間照顧|第一次去日照|適應/.test(text)) return "assets/health3/day-care-transition.jpg";
+  if (/bath|浴室|洗澡|沐浴/.test(text)) return "assets/health3/generated/safe-bathing-preparation-hero.jpg";
+  if (/fall|跌倒|夜間|起身|居家安全|床邊|扶手|廁所|如廁/.test(text)) return "assets/health3/generated/fall-prevention-night-route-hero.jpg";
+  if (/hydration|喝水|水分|食慾|吃不下|營養|食慾下降/.test(text)) return "assets/health3/generated/hydration-meal-observation-hero.jpg";
+  if (/swallow|吞嚥|嗆|嗆咳|吃飯常嗆|飲食安全/.test(text)) return "assets/health3/generated/swallowing-safe-meal-hero.jpg";
+  if (/dementia|失智|傍晚|焦躁|日落|重複提問/.test(text)) return "assets/health3/generated/dementia-evening-routine-hero.jpg";
+  if (/discharge|出院|返家|回診|第一週/.test(text)) return "assets/health3/generated/post-discharge-care-station-hero.jpg";
+  if (/pressure|壓傷|褥瘡|久坐|久躺|皮膚/.test(text)) return "assets/health3/generated/pressure-injury-posture-care-hero.jpg";
+  if (/medication|用藥|藥物|藥盒|提醒/.test(text)) return "assets/health3/generated/medication-reminder-family-system-hero.jpg";
+  if (/burnout|喘息|撐不住|照顧者|照顧壓力|家屬支持/.test(text)) return "assets/health3/generated/caregiver-respite-planning-hero.jpg";
+  if (/day-care|daycare|日照|日間照顧|第一次去日照|適應/.test(text)) return "assets/health3/generated/day-care-adaptation-welcome-hero.jpg";
   return "";
 }
 
@@ -4508,7 +4679,8 @@ function renderHomeHealthArticles(articles = getHealthArticleList()) {
 function renderWordPressMasterTalk(posts) {
   const slider = document.querySelector(".celebrity-slider");
   if (!posts.length || !slider) return;
-  slider.innerHTML = posts.map((post) => {
+  const homepagePosts = posts.slice(0, HOMEPAGE_MASTER_TALK_LIMIT);
+  slider.innerHTML = homepagePosts.map((post) => {
     const acf = post.acf || {};
     const speaker = [acf.speaker_title, acf.speaker_name].filter(Boolean).join(" ") || "名人講堂";
     const portrait = masterTalkPortraitUrl(post.slug, speaker, post.title?.rendered, getPostImage(post, "assets/master-talk/portrait-care-psychology-chou.jpg"));
@@ -4693,7 +4865,8 @@ function renderSupabaseMasterTalk(items) {
   const slider = document.querySelector(".celebrity-slider");
   if (!items?.length || items.length < 3 || !slider) return false;
 
-  slider.innerHTML = items.map((item) => {
+  const homepageItems = items.slice(0, HOMEPAGE_MASTER_TALK_LIMIT);
+  slider.innerHTML = homepageItems.map((item) => {
     const speaker = item.subtitle || item.metadata?.speaker || "名人講堂";
     const image = masterTalkPortraitUrl(item.key, speaker, item.title, item.body, getCmsDisplayModuleImage(item, "assets/master-talk/portrait-care-psychology-chou.jpg"));
     const href = normalizePublicHref(item.link_url || "/health");
@@ -5230,7 +5403,8 @@ function renderCareStorySlider(stories) {
 function renderExpertTalkSlider(talks) {
   const slider = document.querySelector(".celebrity-slider");
   if (!talks?.length || talks.length < 3 || !slider) return false;
-  slider.innerHTML = talks.map((talk) => `
+  const homepageTalks = talks.slice(0, HOMEPAGE_MASTER_TALK_LIMIT);
+  slider.innerHTML = homepageTalks.map((talk) => `
     <article data-href="${escapeHTML(normalizePublicHref(talk.href))}">
       <figure>
         <img src="${escapeHTML(talk.portrait || talk.image)}" alt="${escapeHTML(`${talk.titleLabel} ${talk.speaker}`)}" />
@@ -5268,7 +5442,7 @@ async function loadSupabaseStoryDatabases() {
         .lte("published_at", now)
         .order("is_featured", { ascending: false })
         .order("sort_order", { ascending: true })
-        .limit(12)
+        .limit(HOMEPAGE_MASTER_TALK_LIMIT)
     ]);
     if (storyError) throw storyError;
     if (talkError) throw talkError;
@@ -5291,7 +5465,7 @@ async function loadWordPressContent() {
     const [careStories, health30, masterTalk] = await Promise.all([
       fetchPostsByCategory(WP_CATEGORIES.careStories, 10),
       fetchPostsByCategory(WP_CATEGORIES.health30, 10),
-      fetchPostsByCategory(WP_CATEGORIES.masterTalk, 10)
+      fetchPostsByCategory(WP_CATEGORIES.masterTalk, HOMEPAGE_MASTER_TALK_LIMIT)
     ]);
 
     renderHomepageLatestUpdates();
@@ -9455,17 +9629,30 @@ function renderArticleTable(table = {}) {
 
 function renderArticleReferences(article) {
   const references = Array.isArray(article.references) ? article.references : [];
-  const legacySource = article.sourceName || article.sourceUrl
+  const legacySource = references.length === 0 && (article.sourceName || article.sourceUrl)
     ? [{ name: article.sourceName || article.sourceUrl, url: article.sourceUrl || "" }]
     : [];
-  const allReferences = [...references, ...legacySource].filter((item) => item?.name || item?.url);
+  const seenReferences = new Set();
+  const allReferences = [...references, ...legacySource]
+    .filter((item) => item?.citation || item?.name || item?.url)
+    .sort((a, b) => Number(a.evidenceRank || 99) - Number(b.evidenceRank || 99))
+    .filter((item) => {
+      const key = String(item.pmid || item.doi || item.url || item.citation || item.name || "")
+        .trim()
+        .toLowerCase()
+        .replace(/^https?:\/\/(www\.)?/, "")
+        .replace(/\/$/, "");
+      if (!key || seenReferences.has(key)) return false;
+      seenReferences.add(key);
+      return true;
+    });
   if (!allReferences.length) return "";
   return `
     <section class="article-references">
-      <h2>參考資料與延伸閱讀</h2>
+      <h2>參考資料</h2>
       <ol>
         ${allReferences.map((item) => `
-          <li>${item.url ? `<a href="${escapeHTML(item.url)}" target="_blank" rel="noopener">${escapeHTML(item.name || item.url)}</a>` : escapeHTML(item.name)}</li>
+          <li>${item.url ? `<a href="${escapeHTML(item.url)}" target="_blank" rel="noopener">${escapeHTML(item.citation || item.name || item.url)}</a>` : escapeHTML(item.citation || item.name)}</li>
         `).join("")}
       </ol>
     </section>
@@ -9543,21 +9730,6 @@ function renderArticleLayout(article) {
             ${renderArticleReferences(article)}
           </div>
 
-          <section class="article-related">
-            <div class="article-related-head">
-              <span>Related Articles</span>
-              <strong>延伸閱讀</strong>
-            </div>
-            <div class="article-related-grid">
-              ${related.map((item) => `
-                <a href="${escapeHTML(normalizePublicHref(item.href))}">
-                  <img ${healthArticleImageAttrs(item, { usage: "card", focalPoint: item.focalPoint })} />
-                  <span>${escapeHTML(item.category)}</span>
-                  <b>${escapeHTML(item.title)}</b>
-                </a>
-              `).join("")}
-            </div>
-          </section>
         </div>
 
         <aside class="article-ads" aria-label="側邊推薦">
@@ -9578,6 +9750,22 @@ function renderArticleLayout(article) {
             <p>居服員、督導、日照照服員招募中。</p>
           </a>
         </aside>
+
+        <section class="article-related">
+          <div class="article-related-head">
+            <span>Related Articles</span>
+            <strong>延伸閱讀</strong>
+          </div>
+          <div class="article-related-grid">
+            ${related.map((item) => `
+              <a href="${escapeHTML(normalizePublicHref(item.href))}">
+                <img ${healthArticleImageAttrs(item, { usage: "card", focalPoint: item.focalPoint })} />
+                <span>${escapeHTML(item.category)}</span>
+                <b>${escapeHTML(item.title)}</b>
+              </a>
+            `).join("")}
+          </div>
+        </section>
       </section>
     </article>
   `;
@@ -9924,8 +10112,9 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderHealthPage(searchParams.get("category") || "");
-    loadSupabaseHealthArticles({ rerender: true });
-    loadSupabaseArticleCategories({ rerender: true });
+    // Keep Health 3.0 first paint stable; remote data warms the cache without replacing the visible page.
+    loadSupabaseHealthArticles({ rerender: false });
+    loadSupabaseArticleCategories({ rerender: false });
   } else if (normalized === "search") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -10259,6 +10448,7 @@ function setCareDayActive(index) {
   const nextIndex = Math.max(0, Math.min(index, steps.length - 1));
   if (nextIndex === activeCareDayIndex) return;
   activeCareDayIndex = nextIndex;
+  careDaySection.dataset.activeCareDayStep = String(nextIndex + 1).padStart(2, "0");
 
   steps.forEach((step, stepIndex) => step.classList.toggle("active", stepIndex === nextIndex));
   images.forEach((image, imageIndex) => image.classList.toggle("active", imageIndex === nextIndex));
