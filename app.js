@@ -4947,11 +4947,11 @@ const defaultFooterColumns = [
   { title: "營業項目", items: [
     { label: "居家照顧", href: "/home-care" }, { label: "日間照顧", href: "/day-care" },
     { label: "社區據點", href: "/community" }, { label: "護理復能", href: "/nursing" },
-    { label: "軟體系統", href: "/software" }
+    { label: "教育品管", href: "/quality" }, { label: "軟體系統", href: "/software" }
   ] },
   { title: "合作入口", items: [
     { label: "人才招募", href: "/talent" }, { label: "土地招募", href: "/land" },
-    { label: "投資人招募", href: "/investor-recruiting" }, { label: "教育品管", href: "/quality" }
+    { label: "投資人招募", href: "/investor-recruiting" }
   ] },
   { title: "資訊內容", items: [
     { label: "健康3.0", href: "/health" }, { label: "課程報名", href: "/courses" },
@@ -4959,6 +4959,24 @@ const defaultFooterColumns = [
     { label: "聯絡我們", href: "#contact" }
   ] }
 ];
+
+function normalizeFooterColumns(columns = []) {
+  const sourceItems = [
+    ...(Array.isArray(columns) ? columns : []),
+    ...defaultFooterColumns
+  ].flatMap((column) => Array.isArray(column?.items) ? column.items : []);
+
+  return defaultFooterColumns.map((column) => ({
+    ...column,
+    items: column.items.map((defaultItem) => {
+      const sourceItem = sourceItems.find((item) => item?.label === defaultItem.label);
+      return {
+        label: defaultItem.label,
+        href: sourceItem?.href || defaultItem.href
+      };
+    })
+  }));
+}
 
 function getSiteText(key, fallback = "") {
   return siteSettings[key]?.value_text || fallback;
@@ -5028,8 +5046,9 @@ function renderHeaderNav(items = defaultPrimaryNav) {
 
 function renderFooterColumns(columns = defaultFooterColumns) {
   const footerSitemap = document.querySelector(".footer-sitemap");
-  if (!footerSitemap || !Array.isArray(columns) || !columns.length) return;
-  footerSitemap.innerHTML = columns.map((column) => `
+  const footerColumns = normalizeFooterColumns(columns);
+  if (!footerSitemap || !footerColumns.length) return;
+  footerSitemap.innerHTML = footerColumns.map((column) => `
     <div>
       <h3>${escapeHTML(column.title || "網站地圖")}</h3>
       ${(column.items || []).map((item) => `<a href="${escapeHTML(normalizePublicHref(item.href || "#home"))}">${escapeHTML(item.label || "未命名")}</a>`).join("")}

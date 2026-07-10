@@ -8370,6 +8370,7 @@ input[name="_honey"] { display: none !important; }
   padding: 48px clamp(32px,5vw,86px) 28px;
   background: #e7e7e4;
   color: var(--brown);
+  letter-spacing: 0;
 }
 .footer-main {
   display: grid;
@@ -8381,14 +8382,26 @@ input[name="_honey"] { display: none !important; }
   color: var(--muted);
   line-height: 1.8;
 }
+.footer-contact p,
+.footer-sitemap a,
+.footer-bottom span {
+  font-size: 18px;
+  font-weight: 820;
+  line-height: 1.85;
+  letter-spacing: 0;
+}
 .footer-contact h3,
 .footer-sitemap h3 {
   margin: 0 0 16px;
   color: var(--brown);
+  font-size: 22px;
+  font-weight: 1000;
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 .footer-sitemap { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }
 .footer-sitemap h3 { margin: 0 0 16px; color: var(--brown); }
-.footer-sitemap a { display: block; margin: 11px 0; color: var(--muted); font-weight: 700; }
+.footer-sitemap a { display: block; margin: 11px 0; color: var(--muted); }
 .footer-bottom {
   display: flex;
   justify-content: space-between;
@@ -8397,7 +8410,6 @@ input[name="_honey"] { display: none !important; }
   padding-top: 22px;
   border-top: 1px solid var(--line);
   color: var(--muted);
-  font-size: 14px;
 }
 
 @media (max-width: 1180px) {
