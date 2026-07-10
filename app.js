@@ -2202,6 +2202,12 @@ function getPostImage(post, fallback = fallbackImages.healthArticle) {
 }
 
 function getHealthArticleThemeImage(article = {}) {
+  const identityText = [
+    article.slug,
+    article.category,
+    article.categorySlug,
+    article.title
+  ].filter(Boolean).join(" ").toLowerCase();
   const text = [
     article.slug,
     article.category,
@@ -2214,6 +2220,8 @@ function getHealthArticleThemeImage(article = {}) {
     ...(Array.isArray(article.tags) ? article.tags : [])
   ].filter(Boolean).join(" ").toLowerCase();
 
+  if (/safe-bathing|bath|浴室安全|洗澡|沐浴/.test(identityText)) return "assets/health3/generated/safe-bathing-preparation-hero.jpg";
+  if (/fall-prevention|跌倒|夜間|起身|居家安全|床邊|扶手/.test(identityText)) return "assets/health3/generated/fall-prevention-night-route-hero.jpg";
   if (/bath|浴室|洗澡|沐浴/.test(text)) return "assets/health3/generated/safe-bathing-preparation-hero.jpg";
   if (/fall|跌倒|夜間|起身|居家安全|床邊|扶手|廁所|如廁/.test(text)) return "assets/health3/generated/fall-prevention-night-route-hero.jpg";
   if (/hydration|喝水|水分|食慾|吃不下|營養|食慾下降/.test(text)) return "assets/health3/generated/hydration-meal-observation-hero.jpg";
@@ -2229,7 +2237,7 @@ function getHealthArticleThemeImage(article = {}) {
 
 function getHealthArticleImage(article = {}, cover = {}) {
   const themedImage = getHealthArticleThemeImage(article);
-  return normalizeLocalAssetUrl(contentImageUrl(themedImage || article.image || cover?.public_url || fallbackImages.healthArticle));
+  return normalizeLocalAssetUrl(contentImageUrl(article.image || cover?.public_url || themedImage || fallbackImages.healthArticle));
 }
 
 function healthArticleImageAttrs(article = {}, options = {}) {
@@ -5816,10 +5824,6 @@ function renderHealthPage(selectedCategorySlug = "") {
         <a href="#health">查看全部文章</a>
       </section>
       `}
-
-      <section class="health-topic-strip">
-        ${["長照2.0", "出院返家", "跌倒預防", "營養補充", "失智陪伴", "日間照顧", "復能訓練", "喘息服務"].map((keyword) => `<a href="#search?q=${encodeURIComponent(keyword)}"># ${keyword}</a>`).join("")}
-      </section>
 
       ${isCategoryView ? "" : `
       <section class="health-latest">
