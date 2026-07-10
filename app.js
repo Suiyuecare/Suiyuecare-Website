@@ -4623,16 +4623,34 @@ function renderSupabaseNews(items, panel) {
   renderHomeUpdateItems(items, panel);
 }
 
+function recruitCardFallbackImage(item = {}, index = 0) {
+  const text = `${item?.title || ""} ${item?.subtitle || ""} ${item?.body || ""} ${item?.link_url || ""}`;
+  if (/督導|supervisor/.test(text)) return "assets/homepage-batch/orange-polo-supervisor-clear-display.jpg";
+  if (/日照|日間|day.?care/.test(text)) return "assets/daycare-recruit-02-exercise-clear-display.jpg";
+  if (/個案|管理師|照顧計畫|case/.test(text)) return "assets/homepage-batch/03-supervisor-care-plan-fast.jpg";
+  if (/護理|nursing/.test(text)) return "assets/daycare-detail-04-checkin-fast.jpg";
+  if (/失智|社區|據點|community/.test(text)) return "assets/homepage-batch/12-community-health-class-hires.jpg";
+  if (/移工|菲律賓|migrant|philippines/i.test(text)) return "assets/migrant-recruit-04-communication-fast.jpg";
+  if (/活動|企劃|品管|訓練|quality|training/.test(text)) return "assets/quality-recruit-02-training-clear-display.jpg";
+  if (/業務負責|行政|營運|桃園|admin|operation/.test(text)) return "assets/admin-recruit-02-operations-hires.jpg";
+  return [
+    "assets/homepage-batch/orange-polo-caregiver-clear-display.jpg",
+    "assets/homepage-batch/orange-polo-supervisor-clear-display.jpg",
+    "assets/daycare-recruit-02-exercise-clear-display.jpg"
+  ][index] || "assets/homepage-batch/orange-polo-caregiver-clear-display.jpg";
+}
+
 function renderSupabaseRecruit(items) {
   const recruitList = document.querySelector(".recruit-list");
   if (!items?.length || !recruitList) return;
 
-  recruitList.innerHTML = items.map((item) => {
-    const image = getCmsDisplayModuleImage(item, "assets/homepage-batch/orange-polo-caregiver-clear.jpg");
+  recruitList.innerHTML = items.map((item, index) => {
+    const fallback = contentImageUrl(recruitCardFallbackImage(item, index));
+    const image = getCmsDisplayModuleImage(item, fallback);
     return `
       <a href="${escapeHTML(normalizePublicHref(item.link_url || "/talent"))}">
         <figure>
-          <img src="${escapeHTML(image)}" alt="${escapeHTML(item.title || "員工招募")}" />
+          <img src="${escapeHTML(image)}" alt="${escapeHTML(item.title || "員工招募")}" data-fallback-src="${escapeHTML(fallback)}" />
           <figcaption>${escapeHTML(item.title || "員工招募")}</figcaption>
         </figure>
         <div><p>${escapeHTML(item.body || item.subtitle || "")}</p></div>
