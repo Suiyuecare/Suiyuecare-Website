@@ -905,14 +905,15 @@ h2 {
   margin-top: 18px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(83,43,11,.14);
+  background: rgba(240,138,36,.18);
 }
 .care-day-progress-bar {
   position: absolute;
   inset: 0 auto 0 0;
   width: var(--care-day-progress, 8%);
   border-radius: inherit;
-  background: var(--brown);
+  background: linear-gradient(90deg, #f58a1f 0%, #ffad4f 100%);
+  box-shadow: 0 0 0 1px rgba(240,138,36,.12), 0 8px 18px rgba(240,138,36,.18);
   transition: width .34s ease;
 }
 .care-day-markers {
@@ -9080,11 +9081,16 @@ input[name="_honey"] { display: none !important; }
     padding-bottom: 18px;
   }
   .care-day-section {
-    overflow: hidden;
+    min-height: 560vh;
+    overflow: visible;
     padding-block: 44px;
   }
   .care-day-sticky {
+    position: sticky;
+    top: calc(var(--header-height, 72px) + 8px);
+    align-content: center;
     gap: 22px;
+    min-height: calc(100svh - var(--header-height, 72px) - 16px);
   }
   .care-day-copy h2 {
     font-size: clamp(34px, 9vw, 48px);

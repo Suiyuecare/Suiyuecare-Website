@@ -10445,6 +10445,7 @@ document.addEventListener("click", (event) => {
 const careDaySection = document.querySelector("[data-care-day]");
 let activeCareDayIndex = -1;
 let careDayRailFrame = 0;
+let careDayRailProgrammatic = false;
 
 function isCareDayMobile() {
   return window.innerWidth <= 640;
@@ -10504,7 +10505,7 @@ function syncCareDayFromMobileRail() {
   setCareDayActive(nextIndex);
 }
 
-function scrollCareDayRailTo(index, behavior = "smooth") {
+function scrollCareDayRailTo(index, behavior = "smooth", syncProgress = true) {
   const rail = careDaySection?.querySelector(".care-day-steps");
   const steps = [...(careDaySection?.querySelectorAll("[data-care-day-step]") || [])];
   const target = steps[index];
@@ -10512,8 +10513,12 @@ function scrollCareDayRailTo(index, behavior = "smooth") {
   const railRect = rail.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
   const left = rail.scrollLeft + targetRect.left - railRect.left - (rail.clientWidth - targetRect.width) / 2;
+  careDayRailProgrammatic = true;
   rail.scrollTo({ left, behavior });
-  setCareDayProgressFromIndex(index, steps.length);
+  window.setTimeout(() => {
+    careDayRailProgrammatic = false;
+  }, behavior === "auto" ? 80 : 420);
+  if (syncProgress) setCareDayProgressFromIndex(index, steps.length);
   return true;
 }
 
@@ -10549,10 +10554,6 @@ function updateCareDayScroll() {
   if (!steps.length) return;
   const rect = careDaySection.getBoundingClientRect();
   updateCareDayPin(rect);
-  if (isCareDayMobile()) {
-    syncCareDayFromMobileRail();
-    return;
-  }
   const scrollable = Math.max(1, careDaySection.offsetHeight - window.innerHeight);
   const sectionTop = window.scrollY + rect.top;
   const progress = Math.max(0, Math.min(1, (window.scrollY - sectionTop) / scrollable));
@@ -10563,6 +10564,7 @@ function updateCareDayScroll() {
     careDaySection.style.setProperty("--care-day-parallax", `${Math.round((progress - .5) * -28)}px`);
   }
   setCareDayActive(nextIndex);
+  if (isCareDayMobile()) scrollCareDayRailTo(nextIndex, "auto", false);
 }
 
 function initCareDayScroll() {
@@ -10574,7 +10576,15 @@ function initCareDayScroll() {
     marker.addEventListener("click", () => {
       const targetIndex = Math.max(0, Math.min(Number(marker.dataset.careDayMarker || index), steps.length - 1));
       setCareDayActive(targetIndex);
-      if (isCareDayMobile() && scrollCareDayRailTo(targetIndex)) return;
+      if (isCareDayMobile()) {
+        scrollCareDayRailTo(targetIndex);
+        const rect = careDaySection.getBoundingClientRect();
+        const sectionTop = window.scrollY + rect.top;
+        const scrollable = Math.max(1, careDaySection.offsetHeight - window.innerHeight);
+        const targetY = sectionTop + scrollable * (targetIndex / Math.max(1, steps.length - 1));
+        window.scrollTo({ top: targetY, behavior: "smooth" });
+        return;
+      }
       if (window.innerWidth <= 1180) {
         steps[targetIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
@@ -10587,7 +10597,7 @@ function initCareDayScroll() {
     });
   });
   rail?.addEventListener("scroll", () => {
-    if (!isCareDayMobile()) return;
+    if (!isCareDayMobile() || careDayRailProgrammatic) return;
     window.cancelAnimationFrame(careDayRailFrame);
     careDayRailFrame = window.requestAnimationFrame(syncCareDayFromMobileRail);
   }, { passive: true });
