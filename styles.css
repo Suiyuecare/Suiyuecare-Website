@@ -6505,6 +6505,7 @@ h2 {
 }
 .talent-job-detail-slot {
   position: relative;
+  align-self: stretch;
   min-width: 0;
   min-height: min(780px, calc(100vh - var(--header-height) - 36px));
 }
@@ -6698,6 +6699,14 @@ h2 {
   left: var(--talent-detail-left);
   z-index: 16;
   width: var(--talent-detail-width);
+}
+.talent-job-board.is-detail-docked .talent-job-detail {
+  position: absolute;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
 }
 .talent-job-detail article[hidden] {
   display: none;
@@ -9444,8 +9453,8 @@ input[name="_honey"] { display: none !important; }
   color: currentColor;
 }
 .slide-visual-icon svg {
-  width: 1em;
-  height: 1em;
+  width: 62%;
+  height: 62%;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;

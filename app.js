@@ -12554,6 +12554,7 @@ function resetTalentJobFilters(board) {
 
 function clearTalentJobDetailFixedState(board) {
   board.classList.remove("is-detail-fixed");
+  board.classList.remove("is-detail-docked");
   board.style.removeProperty("--talent-detail-left");
   board.style.removeProperty("--talent-detail-width");
   board.style.removeProperty("--talent-detail-top");
@@ -12578,17 +12579,33 @@ function updateTalentJobDetailPosition() {
     }
     const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 86;
     const topOffset = Math.round(headerHeight + 18);
+    const bottomGap = 18;
     const boardRect = board.getBoundingClientRect();
+    const layoutRect = layout.getBoundingClientRect();
     const slotRect = slot.getBoundingClientRect();
-    const shouldFix = boardRect.top <= topOffset && boardRect.bottom > topOffset + 220 && slotRect.width >= 320;
-    if (!shouldFix) {
+    const detailHeight = detail.getBoundingClientRect().height;
+    const canPin = boardRect.top <= topOffset && layoutRect.bottom > topOffset + detailHeight + bottomGap && slotRect.width >= 320;
+    const shouldDock = boardRect.top <= topOffset && layoutRect.bottom > topOffset + bottomGap && slotRect.width >= 320;
+    if (canPin) {
+      board.style.setProperty("--talent-detail-left", `${Math.round(slotRect.left)}px`);
+      board.style.setProperty("--talent-detail-width", `${Math.round(slotRect.width)}px`);
+      board.style.setProperty("--talent-detail-top", `${topOffset}px`);
+      board.classList.add("is-detail-fixed");
+      board.classList.remove("is-detail-docked");
+      return;
+    }
+    if (shouldDock) {
+      board.classList.remove("is-detail-fixed");
+      board.classList.add("is-detail-docked");
+      board.style.removeProperty("--talent-detail-left");
+      board.style.removeProperty("--talent-detail-width");
+      board.style.removeProperty("--talent-detail-top");
+      return;
+    }
+    if (!canPin) {
       clearTalentJobDetailFixedState(board);
       return;
     }
-    board.style.setProperty("--talent-detail-left", `${Math.round(slotRect.left)}px`);
-    board.style.setProperty("--talent-detail-width", `${Math.round(slotRect.width)}px`);
-    board.style.setProperty("--talent-detail-top", `${topOffset}px`);
-    board.classList.add("is-detail-fixed");
   });
 }
 
