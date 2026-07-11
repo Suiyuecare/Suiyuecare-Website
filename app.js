@@ -5168,7 +5168,7 @@ function renderTalentJobCard(job, index) {
 }
 
 function renderTalentJobBoard(page, model) {
-  const { jobs, departmentOptions, locationOptions, typeOptions } = model;
+  const { jobs, departmentOptions } = model;
   if (!jobs.length) {
     return `
       <section class="talent-job-board is-empty" id="career-openings" aria-label="職位一覽">
@@ -5185,41 +5185,6 @@ function renderTalentJobBoard(page, model) {
   return `
     <section class="talent-job-board" id="career-openings" aria-label="職位一覽" data-talent-job-board data-active-job="${escapeHTML(firstJob.key)}">
       <span class="talent-scroll-anchor" id="recruiting-openings" aria-hidden="true"></span>
-      <div class="talent-job-toolbar" role="search" aria-label="職缺搜尋與篩選">
-        <label class="talent-job-search-control">
-          <span>關鍵字搜尋</span>
-          <input type="search" placeholder="搜尋職稱、技能、地點" autocomplete="off" data-talent-job-search />
-        </label>
-        <div class="talent-job-filters">
-          <label>
-            <span>部門</span>
-            <select data-talent-filter="department">
-              ${renderTalentJobSelectOptions(departmentOptions, "全部部門")}
-            </select>
-          </label>
-          <label>
-            <span>地點</span>
-            <select data-talent-filter="location">
-              ${renderTalentJobSelectOptions(locationOptions, "全部地點")}
-            </select>
-          </label>
-          <label>
-            <span>職務類型</span>
-            <select data-talent-filter="type">
-              ${renderTalentJobSelectOptions(typeOptions, "全部類型")}
-            </select>
-          </label>
-          <label>
-            <span>排序</span>
-            <select data-talent-sort>
-              <option value="recommended">推薦排序</option>
-              <option value="newest">最新更新</option>
-              <option value="department">依部門排序</option>
-            </select>
-          </label>
-          <button class="secondary-button talent-clear-filter" type="button" data-talent-clear-filters>清除</button>
-        </div>
-      </div>
       <div class="talent-job-chip-row" aria-label="部門快速篩選">
         <button class="is-active" type="button" data-talent-chip="department" data-value="">全部職缺</button>
         ${departmentOptions.map((department) => `<button type="button" data-talent-chip="department" data-value="${escapeHTML(department)}">${escapeHTML(department)}</button>`).join("")}
@@ -5248,7 +5213,7 @@ function renderTalentJobBoard(page, model) {
       </div>
       <div class="talent-job-empty" data-talent-empty hidden>
         <h3>沒有符合條件的職缺</h3>
-        <p>可以調整關鍵字或清除篩選，再看看其他適合的角色。</p>
+        <p>可以切換部門或清除篩選，再看看其他適合的角色。</p>
         <button class="primary-button" type="button" data-talent-clear-filters>清除篩選</button>
       </div>
       <div class="talent-job-mobile-cta" data-talent-mobile-cta>
@@ -5265,7 +5230,7 @@ function renderTalentJobBoard(page, model) {
 function renderRecruitingJobListPanel(page, departments, openings, activeKey = "job-list") {
   const model = buildTalentJobBoardModel(page, departments, openings);
   const content = `
-    ${renderTalentPanelLead("Open Roles", "職位一覽", "像求職網站一樣先搜尋、篩選、比較，再展開完整內容；把地點、薪資、類型、福利與應徵入口放在同一個畫面。")}
+    ${renderTalentPanelLead("Open Roles", "職位一覽", "像求職網站一樣快速比較職缺，再展開完整內容；把地點、薪資、類型、福利與應徵入口放在同一個畫面。")}
     ${renderTalentJobBoard(page, model)}
   `;
   return renderTalentTabPanel("job-list", content, activeKey);
@@ -12672,10 +12637,13 @@ function sortTalentJobCards(board) {
 
 function applyTalentJobFilters(board) {
   if (!board) return;
+  const departmentFilter = board.querySelector('[data-talent-filter="department"]');
+  const locationFilter = board.querySelector('[data-talent-filter="location"]');
+  const typeFilter = board.querySelector('[data-talent-filter="type"]');
   const query = talentJobLower(board.querySelector("[data-talent-job-search]")?.value);
-  const department = talentJobLower(board.querySelector('[data-talent-filter="department"]')?.value);
-  const location = talentJobLower(board.querySelector('[data-talent-filter="location"]')?.value);
-  const type = talentJobLower(board.querySelector('[data-talent-filter="type"]')?.value);
+  const department = talentJobLower(departmentFilter ? departmentFilter.value : board.dataset.talentDepartmentFilter);
+  const location = talentJobLower(locationFilter ? locationFilter.value : board.dataset.talentLocationFilter);
+  const type = talentJobLower(typeFilter ? typeFilter.value : board.dataset.talentTypeFilter);
   const cards = [...board.querySelectorAll("[data-talent-job-card]")];
   let visibleCount = 0;
 
@@ -12696,7 +12664,7 @@ function applyTalentJobFilters(board) {
   if (emptyState) emptyState.hidden = visibleCount > 0;
   board.classList.toggle("has-no-results", visibleCount === 0);
 
-  const selectedDepartment = board.querySelector('[data-talent-filter="department"]')?.value || "";
+  const selectedDepartment = departmentFilter ? departmentFilter.value : board.dataset.talentDepartmentFilter || "";
   board.querySelectorAll('[data-talent-chip="department"]').forEach((chip) => {
     chip.classList.toggle("is-active", chip.dataset.value === selectedDepartment);
   });
@@ -12717,6 +12685,9 @@ function resetTalentJobFilters(board) {
   board.querySelectorAll("[data-talent-filter]").forEach((filter) => {
     filter.value = "";
   });
+  delete board.dataset.talentDepartmentFilter;
+  delete board.dataset.talentLocationFilter;
+  delete board.dataset.talentTypeFilter;
   const sort = board.querySelector("[data-talent-sort]");
   if (sort) sort.value = "recommended";
   applyTalentJobFilters(board);
@@ -12875,8 +12846,18 @@ document.addEventListener("click", (event) => {
   if (talentChip) {
     const board = talentChip.closest("[data-talent-job-board]");
     const filterName = talentChip.dataset.talentChip || "";
+    const filterValue = talentChip.dataset.value || "";
     const filter = [...(board?.querySelectorAll("[data-talent-filter]") || [])].find((item) => item.dataset.talentFilter === filterName);
-    if (filter) filter.value = talentChip.dataset.value || "";
+    if (filter) {
+      filter.value = filterValue;
+    } else if (board && filterName) {
+      const filterKey = `talent${filterName.charAt(0).toUpperCase()}${filterName.slice(1)}Filter`;
+      if (filterValue) {
+        board.dataset[filterKey] = filterValue;
+      } else {
+        delete board.dataset[filterKey];
+      }
+    }
     applyTalentJobFilters(board);
     return;
   }
