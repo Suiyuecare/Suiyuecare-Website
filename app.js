@@ -12600,6 +12600,13 @@ function clearTalentBenefitNavFixedState(layout) {
   layout.style.removeProperty("--talent-benefit-nav-top");
 }
 
+function getTalentStickyTopOffset(extraGap = 18) {
+  const cssHeaderHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 86;
+  const headerRect = document.querySelector(".site-header")?.getBoundingClientRect();
+  const visibleHeaderBottom = headerRect ? Math.max(0, headerRect.bottom) : 0;
+  return Math.round(Math.max(cssHeaderHeight, visibleHeaderBottom) + extraGap);
+}
+
 function updateTalentJobDetailPosition() {
   const isDesktop = window.matchMedia("(min-width: 901px)").matches;
   document.querySelectorAll("[data-talent-job-board]").forEach((board) => {
@@ -12610,15 +12617,14 @@ function updateTalentJobDetailPosition() {
       clearTalentJobDetailFixedState(board);
       return;
     }
-    const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 86;
-    const topOffset = Math.round(headerHeight + 18);
+    const topOffset = getTalentStickyTopOffset();
     const bottomGap = 18;
-    const boardRect = board.getBoundingClientRect();
     const layoutRect = layout.getBoundingClientRect();
     const slotRect = slot.getBoundingClientRect();
     const detailHeight = detail.getBoundingClientRect().height;
-    const canPin = boardRect.top <= topOffset && layoutRect.bottom > topOffset + detailHeight + bottomGap && slotRect.width >= 320;
-    const shouldDock = boardRect.top <= topOffset && layoutRect.bottom > topOffset + bottomGap && slotRect.width >= 320;
+    const hasEnteredJobLayout = layoutRect.top <= topOffset;
+    const canPin = hasEnteredJobLayout && layoutRect.bottom > topOffset + detailHeight + bottomGap && slotRect.width >= 320;
+    const shouldDock = hasEnteredJobLayout && layoutRect.bottom > topOffset + bottomGap && slotRect.width >= 320;
     if (canPin) {
       board.style.setProperty("--talent-detail-left", `${Math.round(slotRect.left)}px`);
       board.style.setProperty("--talent-detail-width", `${Math.round(slotRect.width)}px`);
@@ -12650,8 +12656,7 @@ function updateTalentBenefitNavPosition() {
       clearTalentBenefitNavFixedState(layout);
       return;
     }
-    const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 86;
-    const topOffset = Math.round(headerHeight + 18);
+    const topOffset = getTalentStickyTopOffset();
     const layoutRect = layout.getBoundingClientRect();
     const navRect = nav.getBoundingClientRect();
     const shouldFix = layoutRect.top <= topOffset && layoutRect.bottom > topOffset + navRect.height + 18 && navRect.width >= 160;
