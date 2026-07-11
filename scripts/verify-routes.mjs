@@ -63,7 +63,7 @@ const staleRecruitingShellMarkers = [
 const criticalMobileHeroAssets = {
   home: "/assets/hero-care-hero-fast-mobile.jpg",
   about: "/assets/homepage-batch/04-admin-team-office-fast-mobile.jpg",
-  milestones: "/assets/homepage-batch/16-taipei-service-office-fast-mobile.jpg",
+  milestones: "/assets/milestones/homecare-agency-launch.jpg",
   "home-care": "/assets/homecare-detail-01-greeting-hero-fast-mobile.jpg",
   "day-care": "/assets/daycare-detail-01-exercise-hero-fast-mobile.jpg",
   community: "/assets/community-detail-01-exercise-hero-hires-mobile.jpg",

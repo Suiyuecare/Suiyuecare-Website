@@ -57,9 +57,9 @@ const routes = [
     path: "/milestones",
     title: "大事記｜歲悅長照集團",
     description: "查看歲悅長照集團的重要里程碑、服務擴張、據點成立與合作紀錄。",
-    image: "/assets/homepage-batch/16-taipei-service-office-fast.jpg",
-    imageAlt: "歲悅服務據點與團隊里程碑",
-    preloadImage: "/assets/homepage-batch/16-taipei-service-office-fast.jpg",
+    image: "/assets/milestones/homecare-agency-launch.jpg",
+    imageAlt: "歲悅居家長照機構成立里程碑",
+    preloadImage: "/assets/milestones/homecare-agency-launch.jpg",
     priority: "0.9"
   },
   {

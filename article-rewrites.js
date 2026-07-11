@@ -225,6 +225,1288 @@ const staticArticleRewritePack = {
   }
 };
 
+const referenceLibrary = {
+  longTermCare1966: {
+    evidenceRank: 2,
+    citation: "衛生福利部長照專區：1966 長照服務專線與長照服務申請資訊",
+    url: "https://1966.gov.tw/"
+  },
+  longTermCareGov: {
+    evidenceRank: 2,
+    citation: "我的 E 政府：長照路上不孤單，政府提供照護資源與申請流程",
+    url: "https://www.gov.tw/News_Content_26_505332"
+  },
+  fallsJama2024: {
+    evidenceRank: 1,
+    pmid: "38833257",
+    citation: "Guirguis-Blake, J. M., Perdue, L. A., Coppola, E. L., & Bean, S. I. (2024). Interventions to prevent falls in older adults: Updated evidence report and systematic review for the US Preventive Services Task Force. JAMA, 332(1), 58-69. https://doi.org/10.1001/jama.2024.4166",
+    url: "https://pubmed.ncbi.nlm.nih.gov/38833257/"
+  },
+  homeHazards2023: {
+    evidenceRank: 1,
+    pmid: "37489124",
+    citation: "Lektip, C., Chaovalit, S., Wattanapisit, A., Lapmanee, S., Nawarat, J., & Yaemrattanakul, W. (2023). Home hazard modification programs for reducing falls in older adults: A systematic review and meta-analysis. PeerJ, 11, e15699. https://doi.org/10.7717/peerj.15699",
+    url: "https://pubmed.ncbi.nlm.nih.gov/37489124/"
+  },
+  dehydration2023: {
+    evidenceRank: 1,
+    pmid: "37330324",
+    citation: "Parkinson, E., Hooper, L., Fynn, J., Wilsher, S. H., Oladosu, T., Poland, F., Roberts, S., Van Hout, E., & Bunn, D. (2023). Low-intake dehydration prevalence in non-hospitalised older adults: Systematic review and meta-analysis. Clinical Nutrition, 42(8), 1510-1520. https://doi.org/10.1016/j.clnu.2023.06.010",
+    url: "https://pubmed.ncbi.nlm.nih.gov/37330324/"
+  },
+  appetite2023: {
+    evidenceRank: 1,
+    pmid: "36807868",
+    citation: "Fielding, R. A., Landi, F., Smoyer, K. E., Tarasenko, L., & Groarke, J. (2023). Association of anorexia/appetite loss with malnutrition and mortality in older populations: A systematic literature review. Journal of Cachexia, Sarcopenia and Muscle, 14(2), 706-729. https://doi.org/10.1002/jcsm.13186",
+    url: "https://pubmed.ncbi.nlm.nih.gov/36807868/"
+  },
+  dementiaAgitation2020: {
+    evidenceRank: 1,
+    pmid: "31862527",
+    citation: "Leng, M., Zhao, Y., & Wang, Z. (2020). Comparative efficacy of non-pharmacological interventions on agitation in people with dementia: A systematic review and Bayesian network meta-analysis. International Journal of Nursing Studies, 102, 103489. https://doi.org/10.1016/j.ijnurstu.2019.103489",
+    url: "https://pubmed.ncbi.nlm.nih.gov/31862527/"
+  },
+  caregiver2019: {
+    evidenceRank: 1,
+    pmid: "30450915",
+    citation: "Williams, F., Moghaddam, N., Ramsden, S., & De Boos, D. (2019). Interventions for reducing levels of burden amongst informal carers of persons with dementia in the community: A systematic review and meta-analysis of randomised controlled trials. Aging & Mental Health, 23(12), 1629-1642. https://doi.org/10.1080/13607863.2018.1515886",
+    url: "https://pubmed.ncbi.nlm.nih.gov/30450915/"
+  },
+  caregiver2020: {
+    evidenceRank: 1,
+    pmid: "33226434",
+    citation: "Walter, E., & Pinquart, M. (2020). How effective are dementia caregiver interventions? An updated comprehensive meta-analysis. The Gerontologist, 60(8), e609-e619. https://doi.org/10.1093/geront/gnz118",
+    url: "https://pubmed.ncbi.nlm.nih.gov/33226434/"
+  },
+  transitionalCare2022: {
+    evidenceRank: 1,
+    pmid: "34823079",
+    citation: "Lee, J. Y., Yang, Y. S., & Cho, E. (2022). Transitional care from hospital to home for frail older adults: A systematic review and meta-analysis. Geriatric Nursing, 43, 64-76. https://doi.org/10.1016/j.gerinurse.2021.11.003",
+    url: "https://pubmed.ncbi.nlm.nih.gov/34823079/"
+  },
+  pressureInjury2020: {
+    evidenceRank: 1,
+    pmid: "32924821",
+    citation: "Avsar, P., Moore, Z., Patton, D., O'Connor, T., Budri, A. M., & Nugent, L. (2020). Repositioning for preventing pressure ulcers: A systematic review and meta-analysis. Journal of Wound Care, 29(9), 496-508. https://doi.org/10.12968/jowc.2020.29.9.496",
+    url: "https://pubmed.ncbi.nlm.nih.gov/32924821/"
+  },
+  medicationReview2024: {
+    evidenceRank: 1,
+    pmid: "38822740",
+    citation: "Carollo, M., Crisafulli, S., Vitturi, G., Besco, M., Hinek, D., Sartorio, A., Tanara, V., Spadacini, G., Selleri, M., Zanconato, V., Fava, C., Minuz, P., Zamboni, M., & Trifirò, G. (2024). Clinical impact of medication review and deprescribing in older inpatients: A systematic review and meta-analysis. Journal of the American Geriatrics Society, 72(10), 3219-3238. https://doi.org/10.1111/jgs.19035",
+    url: "https://pubmed.ncbi.nlm.nih.gov/38822740/"
+  },
+  polypharmacy2024: {
+    evidenceRank: 1,
+    pmid: "38692414",
+    citation: "Roncal-Belzunce, V., Gutiérrez-Valencia, M., Leache, L., Saiz, L. C., Bell, J. S., Erviti, J., & Martínez-Velilla, N. (2024). Systematic review and meta-analysis on the effectiveness of multidisciplinary interventions to address polypharmacy in community-dwelling older adults. Ageing Research Reviews, 98, 102317. https://doi.org/10.1016/j.arr.2024.102317",
+    url: "https://pubmed.ncbi.nlm.nih.gov/38692414/"
+  },
+  dayPrograms2024: {
+    evidenceRank: 1,
+    pmid: "39443968",
+    citation: "Nguyen, H., Rahman, A., Ubell, A., Goodarzi, Z., Maxwell, C. J., Allana, S., Tate, K., Symonds-Brown, H., Weeks, L., Caspar, S., Mann, J., & Hoben, M. (2024). Adult day programs and their effects on individuals with dementia and their caregivers (ADAPT-DemCare): A realist synthesis to develop program theories on the how and why. Systematic Reviews, 13(1), 265. https://doi.org/10.1186/s13643-024-02683-1",
+    url: "https://pubmed.ncbi.nlm.nih.gov/39443968/"
+  },
+  swallowing2022: {
+    evidenceRank: 1,
+    pmid: "35623866",
+    citation: "Hansen, T., Beck, A. M., Kjaersgaard, A., & Poulsen, I. (2022). Second update of a systematic review and evidence-based recommendations on texture modified foods and thickened liquids for adults (above 17 years) with oropharyngeal dysphagia. Clinical Nutrition ESPEN, 49, 551-555. https://doi.org/10.1016/j.clnesp.2022.03.039",
+    url: "https://pubmed.ncbi.nlm.nih.gov/35623866/"
+  },
+  doctorVisitNia: {
+    evidenceRank: 2,
+    citation: "National Institute on Aging: Talking With Your Doctor and preparing medication lists and questions before visits",
+    url: "https://order.nia.nih.gov/sites/default/files/2021-06/talking-with-your-doctor.pdf"
+  },
+  chronicDiseaseCdc: {
+    evidenceRank: 2,
+    citation: "CDC: Living with a Chronic Condition and chronic disease self-management for older adults",
+    url: "https://www.cdc.gov/chronic-disease/living-with/index.html"
+  },
+  constipationOlderAdults: {
+    evidenceRank: 2,
+    pmid: "26371734",
+    citation: "American Family Physician: Management of constipation in older adults",
+    url: "https://pubmed.ncbi.nlm.nih.gov/26371734/"
+  },
+  constipationPrevalence2023: {
+    evidenceRank: 1,
+    pmid: "36826591",
+    citation: "Global prevalence of constipation in older adults: A systematic review and meta-analysis",
+    url: "https://pubmed.ncbi.nlm.nih.gov/36826591/"
+  },
+  painAssessmentOlderAdults: {
+    evidenceRank: 2,
+    citation: "Assessment and measurement of pain in older adults",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3097898/"
+  },
+  chronicPainOlderAdults: {
+    evidenceRank: 2,
+    citation: "Management of chronic pain in older adults",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4707527/"
+  },
+  oralHealthOlderAdults: {
+    evidenceRank: 1,
+    pmid: "30129220",
+    citation: "Oral health and dental care of older persons: A systematic map of systematic reviews",
+    url: "https://pubmed.ncbi.nlm.nih.gov/30129220/"
+  },
+  oralCareAspiration: {
+    evidenceRank: 2,
+    pmid: "22390255",
+    citation: "Oral health care and aspiration pneumonia in frail older people",
+    url: "https://pubmed.ncbi.nlm.nih.gov/22390255/"
+  },
+  urinaryIncontinenceNia: {
+    evidenceRank: 2,
+    citation: "National Institute on Aging: Urinary incontinence in older adults",
+    url: "https://www.nia.nih.gov/health/bladder-health-and-incontinence/urinary-incontinence-older-adults"
+  },
+  urinaryIncontinenceFalls: {
+    evidenceRank: 1,
+    citation: "The impact of urinary incontinence on falls: A systematic review and meta-analysis",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8133449/"
+  },
+  socialIsolationNia: {
+    evidenceRank: 2,
+    citation: "National Academies via NCBI Bookshelf: Social isolation and loneliness in older adults",
+    url: "https://www.ncbi.nlm.nih.gov/books/NBK557972/"
+  },
+  assistiveTechnologyFalls: {
+    evidenceRank: 1,
+    citation: "The influence of assistive technology and home modifications on falls in community-dwelling older adults",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC10629148/"
+  },
+  heatInjuryHpa: {
+    evidenceRank: 2,
+    citation: "衛生福利部國民健康署：預防熱傷害衛教專區",
+    url: "https://www.hpa.gov.tw/Pages/List.aspx?nodeid=440"
+  },
+  heatOlderAdultsCdc: {
+    evidenceRank: 2,
+    citation: "CDC: Heat and Older Adults (Aged 65+)",
+    url: "https://www.cdc.gov/heat-health/risk-factors/heat-and-older-adults-aged-65.html"
+  },
+  advanceCarePlanningNia: {
+    evidenceRank: 2,
+    citation: "National Institute on Aging: Advance care planning",
+    url: "https://www.nia.nih.gov/health/advance-care-planning"
+  },
+  careworkerMsds2020: {
+    evidenceRank: 1,
+    pmid: "32758908",
+    citation: "Musculoskeletal disorders in aged care workers: A systematic review of contributing factors and interventions",
+    url: "https://pubmed.ncbi.nlm.nih.gov/32758908/"
+  },
+  careworkerBurnout2024: {
+    evidenceRank: 1,
+    pmid: "39025823",
+    citation: "Burnout among care workers in long-term care institutions: A systematic review",
+    url: "https://pubmed.ncbi.nlm.nih.gov/39025823/"
+  },
+  homecareWorkplaceViolence: {
+    evidenceRank: 2,
+    citation: "Workplace violence against homecare workers and its relationship with workers health outcomes",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4308913/"
+  },
+  homecareWorkerHealthInterventions: {
+    evidenceRank: 1,
+    citation: "How to address the health of home care workers: A systematic review",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9996797/"
+  },
+  careworkerAssistiveToolsMol: {
+    evidenceRank: 2,
+    citation: "勞動部勞動及職業安全衛生研究所：有效運用工作輔具，減輕照服員作業負擔",
+    url: "https://www.ilosh.gov.tw/90734/90769/90771/167320/post"
+  },
+  longTermCareWorkerHealthManual: {
+    evidenceRank: 2,
+    citation: "勞動部職業安全衛生署：長期照顧機構勞工健康服務手冊",
+    url: "https://ws.yunlin.gov.tw/Download.ashx?n=6ZmE5Lu2MS3plbfmnJ%2FnhafpoafmqZ%2Fmp4vli57lt6XlgaXlurfmnI3li5nmiYvlhooucGRm&u=LzAwMS9VcGxvYWQvNTIwL3JlbGZpbGUvMTY1OTAvNDE4OTU4L2VhOGNkZDA4LTMwNWYtNDEzNS04MjdmLWJjZmQ2YzEyNmNmYi5wZGY%3D"
+  },
+  longWorkingHoursBurnout: {
+    evidenceRank: 2,
+    citation: "Long working hours and burnout in health care workers",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8101694/"
+  },
+  careAidesSupportCulture: {
+    evidenceRank: 2,
+    citation: "Care aides compassion fatigue, burnout, and the role of supportive working culture",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC12681364/"
+  }
+};
+
+function guide({
+  readingMinutes = 8,
+  targetAudience,
+  warning,
+  summary,
+  content,
+  inlineImages = [],
+  checklists = [],
+  tables = [],
+  references = [],
+  cta = ""
+}) {
+  return {
+    readingMinutes,
+    targetAudience,
+    warning,
+    summary,
+    content,
+    inlineImages,
+    checklists,
+    tables,
+    references,
+    cta
+  };
+}
+
+const staticArticleDepthEnhancements = {
+  "longterm-care-apply": guide({
+    readingMinutes: 9,
+    targetAudience: "第一次要申請長照服務，卻不知道如何描述需求的家庭",
+    warning: {
+      title: "申請前先避免三個常見誤會",
+      items: ["不用等到家屬完全撐不住才申請。", "不要只問補助多少，先把生活卡住的地方說清楚。", "若正在住院，可同步詢問出院準備銜接長照服務。"]
+    },
+    summary: ["長照申請的起點不是服務名稱，而是日常生活哪些動作需要協助。", "1966、各縣市照管中心與住院出院準備窗口都可作為入口。", "評估後仍可依長輩狀態和家庭壓力持續調整服務。"],
+    content: [
+      ["長照申請真正要回答的是：家裡哪裡卡住？", ["很多家庭第一次接觸長照，會先問能不能請人、補助多少、要排多久。但照管評估最需要的不是家屬背熟服務項目，而是知道長輩在一天裡哪些地方需要協助。", "建議先把起床、移位、洗澡、備餐、吃藥、外出、回診、夜間如廁和情緒照顧逐項寫下來。問題越具體，後續越容易轉成居家照顧、日照、喘息、專業服務或其他資源。"]],
+      ["申請流程可以想成四個步驟", ["第一步是提出申請，可撥打 1966、聯絡所在地長期照顧管理中心，或住院期間詢問出院準備銜接窗口。第二步是照管中心安排到府或相關評估，確認照顧需求。", "第三步是和個案管理人員討論照顧計畫，第四步才是開始使用服務。也就是說，家屬不需要在第一通電話就知道答案，真正重要的是把需求打開。"]],
+      ["評估時要說生活情境，不只說診斷名稱", ["同樣是中風、失智或衰弱，每個家庭卡住的地方可能完全不同。有人是白天無人陪伴，有人是洗澡太危險，有人是半夜一直起身，也有人是主要照顧者已經不能睡。", "評估時可以描述一週中最困難的三個時段，並說明家中誰能照顧、誰要上班、是否有人輪替。這些資訊不是抱怨，而是讓計畫更接近真實生活。"]],
+      ["服務不是一次排滿，而是先處理最急的風險", ["如果最危險的是浴室，就先談沐浴和居家安全；如果白天沒人陪，就評估日照或社區據點；如果剛出院，就先把用藥、復能和照顧紀錄接上。", "長照申請不是一次考試，而是一段持續調整。長輩狀態、家庭人力、費用承擔和情緒壓力都會變，服務也應該跟著回看。"]],
+      ["家屬壓力本身也是照顧需求", ["很多主要照顧者會把自己的疲憊放到最後，但照顧計畫若不處理照顧者耗竭，很容易很快失效。睡眠、工作、輪替、交通和情緒狀態，都應該放進討論。", "好的長照安排，是讓長輩安全，也讓家屬能繼續生活。當家庭不再只靠一個人硬撐，照顧才比較有機會走得久。"]]
+    ],
+    checklists: [{ title: "申請前可先整理的資料", items: ["長輩基本疾病、用藥與回診資訊。", "每天需要協助的動作與時段。", "是否曾跌倒、嗆咳、走失或夜間不穩。", "主要照顧者能承擔的時間。", "目前最想先解決的三個問題。", "住院或出院後的照顧銜接需求。"] }],
+    tables: [{ title: "需求怎麼轉成服務討論", headers: ["家中情境", "可能需要討論", "下一步"], rows: [["洗澡很危險", "居家照顧、浴室安全", "說明浴室動線與移位狀況"], ["白天無人陪", "日照、社區據點", "評估交通、作息與適應"], ["剛出院返家", "出院銜接、復能、用藥紀錄", "整理醫囑與第一週觀察"]] }],
+    references: [referenceLibrary.longTermCare1966, referenceLibrary.longTermCareGov]
+  }),
+  "family-care-story": guide({
+    readingMinutes: 8,
+    targetAudience: "家中長輩剛出院，家屬每天都擔心漏看變化的家庭",
+    warning: {
+      title: "出院返家後這些狀況不要只在家觀察",
+      items: ["突然喘、胸痛、意識改變或明顯虛弱。", "傷口紅腫熱痛、滲液惡化或發燒。", "跌倒後持續疼痛、嘔吐、嗜睡或走路異常。"]
+    },
+    summary: ["出院後最難的是把醫院資訊轉成每天可做的觀察。", "照顧紀錄能讓上班家屬、照服員和督導站在同一頁。", "服務介入的價值不只是多一雙手，而是讓變化能被看見並調整。"],
+    content: [
+      ["出院當天不代表照顧壓力結束", ["林小姐回想，爸爸出院時家裡拿到一疊藥單、回診單和注意事項，大家都知道要小心，卻不知道回家第一天到底先看什麼。這種不安，是許多家庭共同的經驗。", "醫院裡有護理師和醫師協助判斷，回家後卻常變成家屬自己猜。歲悅團隊進場後，先把用餐、用藥、疼痛、精神、移位和睡眠整理成每日觀察重點。"]],
+      ["照顧紀錄把焦慮變成可以討論的資料", ["每一次服務後，照服員不只回報今天做了什麼，也記錄爸爸吃了多少、走路穩不穩、情緒如何、哪裡需要注意。對下班後才回家的家人來說，這些紀錄像是一條接得上的線。", "有紀錄後，家屬不再只能問「今天還好嗎」。他們可以看到趨勢：食量是否變少、走路是否變慢、某個時段是否特別不舒服，接著再和督導討論調整。"]],
+      ["最有幫助的不是一次解決全部，而是知道下一步", ["剛返家時，家庭很容易想把所有事情一次做好：復健、營養、用藥、洗澡、回診、情緒安撫。但實際上，照顧需要先排優先順序。", "歲悅先處理最影響安全和家屬壓力的項目，再慢慢把復能、居家安全和日常作息接上。這讓家人知道今天先做什麼，明天再看什麼。"]],
+      ["團隊回報讓家屬不用自己扛判斷", ["當照服員發現爸爸狀態和平常不同，會回報督導一起看。督導再和家屬討論是否需要調整服務方式、提醒回診或銜接其他資源。", "這種支持讓照顧不再只靠主要照顧者的直覺。家屬仍然參與決定，但背後有團隊協助整理資訊，壓力會小很多。"]],
+      ["真正的安心，是每天都有被接住的感覺", ["林小姐說，最安心的不是有人把所有事情保證好，而是當爸爸狀態有變化時，家人知道可以找誰討論。照顧不再像在黑暗中摸索，而是一步一步有回應。", "對出院返家的家庭來說，服務的深度不只是服務時數，而是觀察、回報、調整和陪家屬理解變化的能力。"]]
+    ],
+    checklists: [{ title: "出院返家家屬每日可看", items: ["今天吃喝是否比昨天少。", "用藥是否按時間完成。", "疼痛、喘、頭暈或睡眠是否改變。", "走路、移位和如廁是否更不穩。", "傷口或皮膚是否紅腫破皮。", "家屬是否已經累到無法休息。"] }],
+    tables: [{ title: "紀錄怎麼幫助照顧判斷", headers: ["紀錄內容", "能看見什麼", "可能調整"], rows: [["食量連續下降", "營養或疾病變化", "詢問醫療/營養並調整餐食"], ["移位越來越不穩", "跌倒風險升高", "檢查動線、安排復能"], ["夜間頻繁起身", "睡眠與安全問題", "調整照明、如廁與服務時段"]] }],
+    references: [referenceLibrary.transitionalCare2022, referenceLibrary.longTermCare1966]
+  }),
+  "master-talk-care-psychology": guide({
+    readingMinutes: 8,
+    targetAudience: "長期照顧家人，開始覺得煩躁、愧疚或生活被壓縮的家屬",
+    warning: {
+      title: "照顧者也可能需要立即支持",
+      items: ["長期失眠、恐慌、憂鬱或身體疼痛。", "對長輩或自己出現傷害念頭。", "照顧壓力已經影響長輩安全或家庭關係。"]
+    },
+    summary: ["照顧中的煩躁常不是不愛，而是壓力長期沒有出口。", "能執行的小步驟比大量建議更能支持家庭。", "保留生活感不是奢侈，而是照顧能持續的條件。"],
+    content: [
+      ["照顧情緒常被誤解成不孝", ["周小姐觀察，許多家屬一邊照顧、一邊責備自己：為什麼會不耐煩，為什麼會想逃，為什麼看到電話響就緊張。但長期照顧會消耗睡眠、工作、社交和自我感，情緒反應並不代表家屬不愛。", "如果家庭一直要求主要照顧者保持耐心，卻沒有給他休息和分工，再善良的人也會被壓垮。照顧心理的第一步，是承認照顧者也是人。"]],
+      ["焦慮很多時候來自不知道下一步", ["家屬最怕的不是做很多事，而是不知道做得對不對。今天吃少是不是危險？半夜一直起來要不要就醫？洗澡抗拒是情緒還是身體不舒服？資訊不清楚，焦慮就會一直長大。", "因此照顧建議要變成今天做得到的事：先固定用藥提醒，先清空夜間動線，先把最累的時段請人分擔。可執行，才會有安全感。"]],
+      ["家庭需要的是支持系統，不只是道理", ["很多照顧衝突表面上是在爭服務要不要請、費用誰付、長輩要不要去日照，本質上卻是責任和恐懼沒有被說清楚。", "若能把照顧任務、費用、服務回報和緊急決策寫下來，家庭比較不會只靠情緒溝通。外部服務也能成為共同工具，而不是某一位家屬的選擇。"]],
+      ["生活感是照顧品質的一部分", ["好的照顧不該把家變成病房。長輩仍然需要偏好、選擇、熟悉物品和被尊重的節奏；家屬也需要工作、休息和自己的生活。", "當安全和生活能同時存在，照顧關係才不會只剩任務。這也是照顧心理最核心的提醒：照顧不是把一個人犧牲掉來保護另一個人。"]],
+      ["壓力升高時，先找最小可改變點", ["如果家屬已經很累，不需要立刻做家庭大改革。可以先選一件最常引爆衝突的事，例如洗澡、吃藥、夜間如廁或回診接送，設計一個比較穩的流程。", "每一個小流程穩下來，家屬就會少一點恐慌。照顧不是變完美，而是讓每天多一點可預期。"]]
+    ],
+    checklists: [{ title: "照顧心理壓力自我檢查", items: ["是否常因小事爆怒或哭泣。", "是否覺得只有自己在承擔。", "是否長期睡不好或身體疼痛。", "是否對長輩產生強烈排斥或罪惡感。", "是否不知道遇到問題可以找誰。", "是否已經沒有自己的生活時間。"] }],
+    tables: [{ title: "把壓力翻譯成可處理任務", headers: ["感覺", "可能背後問題", "先做一件事"], rows: [["我快撐不住", "缺乏喘息與輪替", "列出最累三個時段"], ["家人都不懂", "分工不清", "開家庭會議分任務"], ["每天都怕出事", "缺少觀察流程", "建立紀錄與求助名單"]] }],
+    references: [referenceLibrary.caregiver2019, referenceLibrary.caregiver2020]
+  }),
+  "safe-transfer-tips": guide({
+    readingMinutes: 8,
+    targetAudience: "需要協助長輩起身、移位、如廁或從床椅轉換的家庭",
+    warning: {
+      title: "移位前先判斷是否適合移動",
+      items: ["長輩頭暈、胸悶、呼吸急促或意識不清時先不要勉強。", "跌倒後疼痛、疑似骨折或無法承重時應先就醫。", "照顧者需要用蠻力拉人才完成時，代表流程需要重新評估。"]
+    },
+    summary: ["安全起身不是把人拉起來，而是讓長輩找回腳、手和重心。", "環境高度、扶持位置、口令與停頓都會影響跌倒風險。", "每天固定同一套流程，長輩和照顧者都會更穩。"],
+    content: [
+      ["起身前先看環境，不是先伸手拉人", ["床太低、椅子太軟、腳踩不到地，長輩就很難安全起身。照顧者協助前，先確認雙腳能踩穩，旁邊是否有固定扶手或穩定支撐。", "地面上的拖鞋、電線、滑動地墊和輪椅煞車，都應該先處理。很多跌倒不是因為長輩完全不能站，而是起身那一刻環境沒有準備好。"]],
+      ["身體要先往前，重心才站得起來", ["直接拉手臂很容易讓長輩肩膀受傷，也會把重心拉歪。較安全的方式，是提醒長輩腳往後收、身體微微前傾、手扶穩，再慢慢站。", "照顧者的位置是保護和引導，不是代替長輩用力。能讓長輩參與的動作，就不要全部包辦，這也是保留肌力和自信的方式。"]],
+      ["口令越短越好，節奏越固定越好", ["長輩在緊張或體力差時，很難一次聽懂複雜指令。可以固定用同一組口令：「腳踩穩、身體往前、手扶好、慢慢站」。", "不同家人最好使用相同說法。語句一致，長輩比較容易理解，也能減少每次移位都重新適應。"]],
+      ["站起來不是結束，穩住才算完成", ["剛站起來時，長輩可能頭暈、腳軟或還沒抓到平衡。建議站起後停幾秒，觀察表情、呼吸、腳步和是否有暈眩，再開始轉身或走路。", "從坐到站、從站到走、從走到轉身，每一段都應分開確認。把這個停頓變成習慣，能降低很多跌倒風險。"]],
+      ["如果移位越來越吃力，該重新評估照顧計畫", ["長輩能力會改變，三個月前能做的動作，不代表現在仍然安全。若最近起身變慢、需要更多扶持、常說腳沒力或照顧者腰背痛，就應重新看床椅高度、輔具和復能需求。", "到宅安全檢視、復能建議或照服員示範，都能讓家庭少靠蠻力，多靠流程。"]]
+    ],
+    checklists: [{ title: "安全起身前 7 個確認", items: ["雙腳能踩到地。", "床椅高度不會太低。", "附近有穩定支撐。", "輪椅煞車已固定。", "地面沒有滑動物或電線。", "長輩清醒且沒有頭暈。", "照顧者知道要用的口令。"] }],
+    tables: [{ title: "移位問題快速對照", headers: ["狀況", "可能原因", "建議"], rows: [["站起時往後倒", "腳未收回或重心未前移", "先練坐姿前傾與腳踩穩"], ["一拉就喊痛", "拉扯手臂或肩部", "改用口令與軀幹保護"], ["站起後發呆不動", "頭暈或平衡未穩", "停幾秒觀察再移動"]] }],
+    references: [referenceLibrary.fallsJama2024, referenceLibrary.homeHazards2023]
+  }),
+  "nutrition-warning": guide({
+    readingMinutes: 8,
+    targetAudience: "長輩近期吃得少、體重下降、喝水少或用餐變慢的家庭",
+    warning: {
+      title: "這些營養與水分訊號不要拖",
+      items: ["體重快速下降、衣服明顯變鬆或站立困難。", "反覆嗆咳、發燒、聲音濕濕的。", "尿量少、意識混亂、精神突然變差或疑似脫水。"]
+    },
+    summary: ["長輩吃得少可能和牙口、吞嚥、藥物、便秘、情緒或疾病變化有關。", "一週紀錄比單餐追問更有用。", "餐食調整要能被家庭持續執行，必要時應尋求醫療或營養專業。"],
+    content: [
+      ["吃得少不一定只是胃口差", ["家屬常說長輩年紀大本來就吃少，但如果食量下降伴隨體重變輕、走路變慢、白天嗜睡或活動意願下降，就不能只用老化解釋。", "吃不下可能來自牙齒痛、假牙不合、吞嚥困難、便秘、藥物副作用、情緒低落、活動量下降或急性疾病。先找原因，才不會只剩一直勸吃。"]],
+      ["先記一週，不要每天在餐桌上拉扯", ["每天追問「你怎麼又不吃」常讓長輩更有壓力。比較有效的是記錄一週：每餐吃幾成、喝水多少、哪類食物剩最多、吃飯花多久、是否嗆咳。", "紀錄的目的不是監控，而是看趨勢。當家屬帶著具體資料諮詢醫療或營養專業，對方更容易判斷下一步。"]],
+      ["喝水少常常和如廁擔心有關", ["有些長輩不是不渴，而是怕尿急、怕夜間如廁跌倒、怕尿失禁，所以刻意少喝。這時候只提醒多喝水，常常無法解決真正原因。", "可以把水分拆成小份量、多時段，搭配安全如廁動線。若長輩有心臟、腎臟或其他水分限制，補水策略要先問醫療專業。"]],
+      ["用餐安全比硬塞份量更重要", ["若喝水常咳、聲音變濕、吃飯時間拉長或吃完容易累，可能有吞嚥風險。這時候不要急著餵快一點，也不要自行大幅改變食物質地。", "先記錄哪些食物最容易嗆、什麼時段最吃不下，再尋求醫療、語言治療或營養專業評估。"]],
+      ["餐食調整要能做得到，才會持續", ["高標準菜單如果家裡做不了，很快就會中斷。可以先從少量多餐、調整質地、增加長輩熟悉口味、安排共餐和固定用餐時間開始。", "如果主要照顧者已經很累，也可以透過居家照顧、日照共餐或照顧諮詢，把用餐觀察變成團隊一起承擔。"]]
+    ],
+    checklists: [{ title: "一週飲食觀察可以記", items: ["每餐大約吃幾成。", "喝水、湯品或飲料是否咳。", "體重或衣服鬆緊是否改變。", "是否挑掉肉類、青菜或較硬食物。", "排便與尿量是否和平常不同。", "精神、活動量和睡眠是否下降。"] }],
+    tables: [{ title: "吃不下線索對照", headers: ["觀察", "可能原因", "下一步"], rows: [["肉咬很久", "牙口或咀嚼能力改變", "調整質地並檢查牙口"], ["喝水會咳", "吞嚥安全風險", "記錄並諮詢專業"], ["怕喝水", "擔心如廁或跌倒", "改善動線與如廁安排"]] }],
+    references: [referenceLibrary.dehydration2023, referenceLibrary.appetite2023]
+  }),
+  "dementia-response": guide({
+    readingMinutes: 8,
+    targetAudience: "家中失智長輩反覆提問、焦躁或常要求回家的家庭",
+    warning: {
+      title: "行為突然改變時，先排除身體因素",
+      items: ["突然混亂、發燒、疼痛、喘或尿痛。", "短時間內行為明顯惡化或攻擊性增加。", "疑似跌倒、感染、脫水或新藥影響。"]
+    },
+    summary: ["反覆提問背後常是安全感不足，不只是忘記答案。", "先回應情緒，再用固定短句回答。", "環境提示、固定流程和照顧者喘息，能減少每天拉扯。"],
+    content: [
+      ["重複提問通常不是故意找麻煩", ["失智長輩可能忘記剛剛聽過的答案，但不安的感覺還留著。家屬若只想證明自己已經回答過，很容易越講越急，長輩也越來越焦慮。", "先把問題看成安全感的求救，而不是辯論題。當長輩問「我要回家嗎」或「你是誰」時，背後常是需要確認自己有人陪。"]],
+      ["先接情緒，再回答事實", ["可以先說「你有點擔心，我在這裡」，再用短句說明下一步。若直接糾正「你剛剛問過了」，通常只會讓長輩更挫折。", "回答要短、慢、固定。越複雜的解釋，越可能讓長輩抓不到重點，家屬也更容易失去耐心。"]],
+      ["建立全家共同使用的固定說法", ["家中每個人如果都用不同答案，長輩更難理解。可以為常見問題設計固定句子，例如「你今天在家，晚餐後我們休息」、「我陪你看一下」。", "固定說法不是敷衍，而是降低記憶負擔。每次用同一句，長輩比較容易抓到熟悉線索。"]],
+      ["讓環境幫忙說明一部分事情", ["白板、日曆、照片、門牌、固定位置的包包、水杯和時鐘，都能成為提示。不要期待長輩靠記憶硬撐，而是讓家裡提供線索。", "例如今日流程、回家時間、家人照片和重要物品位置，都可以視覺化。環境能說一部分，照顧者就少一點重複消耗。"]],
+      ["照顧者也需要輪替，技巧才用得出來", ["如果同一個問題一天出現數十次，任何人都會累。失智照顧不只需要溝通技巧，也需要喘息、日照、居家服務或家人輪替。", "當照顧者有休息，才比較能用穩定語氣回應。支持照顧者，就是支持長輩的情緒安全。"]]
+    ],
+    checklists: [{ title: "反覆提問時可以先做", items: ["先放慢語速。", "先說出情緒，不急著講道理。", "使用固定短句。", "用白板或照片補線索。", "減少同時多人說話。", "記錄一天中最常發生的時段。"] }],
+    tables: [{ title: "常見問題與回應方向", headers: ["長輩說", "可能需求", "回應方向"], rows: [["我要回家", "尋找安全感", "先陪伴，再帶到熟悉活動"], ["你是誰", "辨識困難與不安", "用名字和關係短句提醒"], ["東西不見了", "失控感或記憶落差", "一起找，不急著指責"]] }],
+    references: [referenceLibrary.dementiaAgitation2020, referenceLibrary.caregiver2020]
+  }),
+  "caregiver-support": guide({
+    readingMinutes: 8,
+    targetAudience: "主要照顧者已經睡不好、情緒緊繃或工作生活受影響的家庭",
+    warning: {
+      title: "照顧者危機不是意志力問題",
+      items: ["有傷害自己或他人的念頭時，請立即求助。", "長期失眠、憂鬱、恐慌或身體明顯不適時，請尋求專業支持。", "若壓力已影響長輩安全，應立刻安排分工或服務介入。"]
+    },
+    summary: ["照顧者累不是不孝，而是責任太密、休息太少。", "先把壓力拆成具體時段，才知道要接什麼服務。", "喘息、居家照顧、日照和家人分工可以一起使用。"],
+    content: [
+      ["先承認你已經很累", ["很多主要照顧者會把疲憊藏起來，直到失眠、易怒、身體疼痛或工作受影響才發現自己快撐不住。照顧累不是不孝，而是照顧工作真的太長、太密、太少人分擔。", "如果每天都在擔心長輩跌倒、忘記吃藥、夜間起身或情緒失控，大腦其實很少真正休息。這種長期警戒會讓人越來越耗竭。"]],
+      ["不要只說整天都累，要找出最卡的時段", ["請先寫下最難的三個時段：洗澡、夜間如廁、備餐、回診、下班後交接、長輩傍晚焦躁。當困難被拆成時段，就比較能安排服務。", "例如洗澡可以談居家照顧和浴室安全，白天無人陪可以談日照，夜間問題可以先看動線、睡眠和家人輪替。"]],
+      ["喘息不是放棄，而是預防崩潰", ["很多家屬覺得使用喘息服務像是在把責任丟出去，但照顧者若完全不能休息，最後照顧品質和家庭關係都會受傷。", "喘息的目的，是讓家屬能睡覺、工作、看醫生、處理其他家庭責任。這不是退出照顧，而是讓照顧能繼續。"]],
+      ["家庭分工要具體，不要只停在口頭支持", ["一句「有需要跟我說」常常不夠。比較有效的是明確列出誰負責回診、誰負責採買、誰負責費用整理、誰固定哪一天陪伴。", "若家人意見不同，可以用照顧紀錄和服務建議作為討論基礎，減少把所有問題都變成孝不孝順的爭論。"]],
+      ["把主要照顧者也放進照顧計畫", ["一個家庭要走得久，不能只看長輩有沒有被照顧，也要看照顧者有沒有睡眠、喘息和求助窗口。", "服務介入不是把家人的責任拿走，而是讓責任被分散、被支持、被追蹤。當照顧者被接住，長輩也會更安全。"]]
+    ],
+    checklists: [{ title: "照顧者可能已經過載", items: ["連續多天睡不好。", "容易因小事爆怒。", "常感到罪惡或無望。", "身體疼痛或腸胃不適變多。", "工作、人際或婚姻受到影響。", "覺得沒有人可以求助。"] }],
+    tables: [{ title: "把壓力接上服務", headers: ["壓力來源", "可討論的支持", "先準備"], rows: [["洗澡", "居家照顧、浴室安全", "浴室照片與目前流程"], ["白天無人陪", "日照、社區據點", "作息、交通和長輩喜好"], ["夜間如廁", "動線調整、喘息", "起身次數與跌倒史"]] }],
+    references: [referenceLibrary.caregiver2019, referenceLibrary.caregiver2020]
+  }),
+  "family-care-course": guide({
+    readingMinutes: 7,
+    targetAudience: "第一次照顧長輩，或想把照顧技巧練到更穩的家屬",
+    warning: {
+      title: "課程不是要家屬包辦所有專業",
+      items: ["長輩有急性疼痛、喘、意識改變或跌倒後異常時，應先就醫。", "移位、吞嚥、傷口或失智行為問題若持續惡化，應尋求專業評估。", "家屬學技巧的目的，是知道怎麼做，也知道何時該求助。"]
+    },
+    summary: ["家屬課應該從家中真實場景出發。", "技巧要拆成看得懂、做得到、能交接的步驟。", "課後若風險高，應銜接居家照顧、復能、日照或督導諮詢。"],
+    content: [
+      ["家屬需要的不是更多名詞，而是今天做得到的方法", ["很多家人是在壓力中邊做邊學，第一次扶起、第一次洗澡、第一次面對嗆咳或失智焦躁，常常只能靠直覺。家屬課的價值，是把直覺變成比較安全的流程。", "課程不該只講概念，而是把起身、移位、用餐、跌倒預防、用藥提醒和溝通拆成具體步驟。"]],
+      ["用家裡會發生的情境練習", ["浴室狹小、床邊沒有扶手、餐桌高度不合、半夜光線不足，這些才是家庭真正會遇到的問題。課程若離生活太遠，回家就用不上。", "因此練習應該圍繞床邊、浴室、餐桌、夜間如廁和回診準備，讓家屬知道在有限空間和有限人力下怎麼做。"]],
+      ["技巧要能被下一位照顧者接手", ["很多家庭不是只有一個人照顧，而是家人、照服員、移工或日照中心輪流接。課程也要教家屬如何留下紀錄和交接，而不是每次都靠口頭說明。", "例如移位口令、用藥時間、嗆咳觀察、跌倒風險和長輩偏好，都可以整理成家中共同使用的照顧卡。"]],
+      ["學會技巧，也要學會辨認風險邊界", ["家屬不是治療師，也不是護理師。能自己做的事要做穩，超出能力的事要知道何時求助，這才是負責任的照顧。", "如果長輩狀態快速下降、跌倒頻率增加、吞嚥變差或照顧者已經過載，就應該把課程學到的觀察帶去和專業討論。"]],
+      ["課程之後要接得上服務", ["一次課程能建立方向，但家庭照顧會持續變化。課後若能銜接居家照顧、護理復能、日照、喘息或督導諮詢，學到的技巧才不會停在課堂。", "真正有效的教育，是讓家屬回家後少一點慌，遇到變化時知道下一步。"]]
+    ],
+    checklists: [{ title: "家屬照顧課應包含", items: ["安全起身與移位。", "浴室與夜間跌倒預防。", "用餐與嗆咳觀察。", "用藥提醒與紀錄。", "失智溝通與情緒安撫。", "何時需要醫療或專業協助。"] }],
+    tables: [{ title: "課程主題與回家應用", headers: ["主題", "家中可用在哪裡", "注意"], rows: [["移位", "床邊、廁所、輪椅", "不用拉手臂硬起身"], ["飲食", "餐桌、喝水、服藥", "觀察嗆咳與精神"], ["溝通", "失智、抗拒洗澡", "先安撫再說明"]] }],
+    references: [referenceLibrary.fallsJama2024, referenceLibrary.caregiver2020]
+  }),
+  "day-care-respite": guide({
+    readingMinutes: 8,
+    targetAudience: "正在考慮日間照顧，希望白天有人陪長輩、家屬也能喘息的家庭",
+    warning: {
+      title: "參觀日不只看空間，也要看照顧流程",
+      items: ["若長輩近期急性不適或狀態突然改變，先處理健康問題。", "若擔心適應，應詢問前期是否可短時間或漸進銜接。", "家屬要確認回報、接送、用藥與緊急應變方式。"]
+    },
+    summary: ["日照不是把長輩送走，而是讓白天有節奏、社交和照顧支持。", "參觀時要看動線、活動、餐食、午休、回報和緊急處理。", "日照也支持家屬工作、休息與照顧分工。"],
+    content: [
+      ["日照的一天，要看得見照顧邏輯", ["參觀日不是只看空間漂亮不漂亮，也要看長輩進出動線、廁所位置、活動安排、餐食照顧、午休方式和緊急應變。這些細節決定長輩每天來是否安心。", "好的日照會把活動、用餐、休息、如廁和回家銜接成一個節奏，而不是讓長輩只是被放在同一個空間裡。"]],
+      ["白天有陪伴，晚上仍回到熟悉的家", ["日間照顧能讓長輩維持社交和活動，也讓家屬白天可以工作、休息或處理其他責任。對許多家庭來說，這是在家照顧與機構住宿之外的平衡。", "長輩白天有固定地方去，晚上仍回到熟悉的家，常能同時保留安全感和生活連結。"]],
+      ["活動不是熱鬧就好，要看是否適合長輩狀態", ["活動設計應考量體力、認知、情緒和社交需求。有些長輩需要肢體活動，有些需要認知刺激，有些則先需要熟悉環境。", "家屬參觀時可以問：不想參加活動時怎麼陪？吃飯慢怎麼處理？午休睡不好怎麼調整？這些答案比活動表本身更重要。"]],
+      ["回報機制決定家屬能不能放心", ["家屬需要知道今天吃得如何、活動參與如何、精神和情緒是否穩定。好的日照服務不只照顧現場，也會讓家庭接得上長輩回家後的狀態。", "若家屬每天都還要猜，日照的支持就少了一半。回報清楚，家屬才能一起協助長輩適應。"]],
+      ["喘息是讓家庭照顧走得久的安排", ["日照不只是長輩的服務，也是一種家屬支持。主要照顧者白天能上班、睡一段、看醫生或處理家務，晚上才比較有力氣陪伴。", "當家庭把日照放進長期計畫，照顧就不再只靠一個人硬撐，而是有固定節奏可以依靠。"]]
+    ],
+    checklists: [{ title: "日照參觀時可以問", items: ["接送時間與突發狀況怎麼處理。", "如廁、用藥、午休和餐食怎麼照顧。", "長輩不適應時如何漸進銜接。", "每日回報包含哪些內容。", "活動如何依能力調整。", "家屬有問題時找誰討論。"] }],
+    tables: [{ title: "適合討論日照的情境", headers: ["家庭狀況", "日照可能幫助", "評估重點"], rows: [["白天無人陪", "固定照顧與活動", "接送與適應"], ["家屬上班壓力大", "白天喘息", "回報是否清楚"], ["長輩缺乏社交", "共餐與活動", "活動是否符合能力"]] }],
+    references: [referenceLibrary.dayPrograms2024, referenceLibrary.caregiver2019]
+  }),
+  "reablement-workshop": guide({
+    readingMinutes: 8,
+    targetAudience: "希望長輩重新練習起身、行走、如廁或日常生活動作的家庭",
+    warning: {
+      title: "復能練習前先確認安全",
+      items: ["胸痛、喘、頭暈、發燒或急性疼痛時不要勉強練習。", "跌倒後尚未確認傷勢時，先就醫或詢問專業。", "練習造成明顯疼痛或恐懼時，應調整目標和方式。"]
+    },
+    summary: ["復能的目標不是動作漂亮，而是生活任務更有把握。", "把大目標拆成小步驟，長輩更容易累積信心。", "家屬要學會安全陪伴，而不是催快或硬拉。"],
+    content: [
+      ["復能要先問生活目標", ["長輩想要的可能不是多走幾公尺，而是能自己走到餐桌、到浴室、出門曬太陽，或再次參加家庭聚餐。當目標回到生活，練習才會有意義。", "工作坊的核心不是把每個動作做成標準答案，而是幫家屬和長輩找出現在最值得練的一件事。"]],
+      ["大目標要拆成小步驟", ["站起、扶穩、轉身、走幾步，每個動作都可以拆開練。當長輩感覺自己做得到，就比較願意持續，而不是因為一次失敗就放棄。", "例如想練走到浴室，可以先練床邊坐起、腳踩穩、站立幾秒、扶著走到門口，再慢慢延伸距離。"]],
+      ["家屬要學會保護，而不是催促", ["家屬不是治療師，但可以學會安全站位、清楚口令、觀察疲累和避免硬拉。催快一點通常沒有幫助，反而增加焦慮和跌倒風險。", "陪練時要看長輩表情、呼吸、疼痛和意願。能穩定陪伴，比一次練很久更重要。"]],
+      ["環境會決定復能能不能回家落地", ["如果床太低、椅子太軟、走道雜物多，長輩就算在課堂上練得好，回家也可能卡住。復能需要和居家安全一起看。", "家屬可以拍下家中床邊、浴室、餐桌和常走路線，讓專業人員協助判斷練習如何放回生活。"]],
+      ["復能也需要紀錄和回頭調整", ["今天站了幾次、走到哪裡、是否頭暈、是否害怕，都可以簡單記錄。這些不是成績單，而是幫助團隊知道是否該加量、維持或退一步。", "長輩狀態會波動，好的復能不是一路往前衝，而是能依狀態調整節奏。"]]
+    ],
+    checklists: [{ title: "家屬陪練前先確認", items: ["長輩今天精神是否穩定。", "是否有頭暈、胸悶或疼痛。", "地面和動線是否清空。", "旁邊是否有穩定支撐。", "口令是否簡短一致。", "練習後是否記錄反應。"] }],
+    tables: [{ title: "生活目標與練習拆解", headers: ["想做到", "可拆成", "注意"], rows: [["走到餐桌", "坐起、站立、短距離走", "先確認椅子高度"], ["安全如廁", "轉身、坐下、起身", "看扶手與夜燈"], ["出門曬太陽", "穿鞋、走到門口、上下車", "不要一次拉太遠"]] }],
+    references: [referenceLibrary.fallsJama2024, referenceLibrary.homeHazards2023]
+  }),
+  "fall-observation": guide({
+    readingMinutes: 7,
+    targetAudience: "長輩剛跌倒，或家中曾發生差點跌倒事件的家庭",
+    warning: {
+      title: "跌倒後這些狀況請儘快就醫",
+      items: ["撞到頭後嗜睡、頭痛、嘔吐或意識改變。", "髖部、背部、手腕疼痛或無法承重站立。", "服用抗凝血藥物、瘀青快速擴大或傷口不止血。"]
+    },
+    summary: ["跌倒後不要急著扶起，先確認意識、呼吸、疼痛和是否變形。", "接下來 24 小時要持續看精神、頭痛、嘔吐、走路和疼痛變化。", "每一次跌倒都要回頭檢查環境、用藥、鞋子、夜間路線和照顧流程。"],
+    content: [
+      ["跌倒當下先停一下，不要急著扶起", ["照顧者第一個反應常是趕快把人扶起來，但如果長輩撞到頭、說很痛、無法清楚回答或肢體變形，硬拉起來可能讓傷害更嚴重。", "先確認意識、呼吸、出血、疼痛位置和是否能動。若懷疑骨折、頭部外傷或嚴重疼痛，應求助醫療。"]],
+      ["接下來一天要看變化", ["有些頭部撞擊、肌肉拉傷或骨折不是當下最明顯。家屬要留意頭痛、嘔吐、嗜睡、走路不穩、情緒改變、食慾下降或疼痛加劇。", "若長輩本來就表達困難，更要看精神、臉色、動作和食慾是否和平常不同。"]],
+      ["跌倒後不要只問有沒有受傷，也要問為什麼會跌倒", ["是光線不夠、地墊滑、拖鞋太鬆、急著如廁、起身頭暈，還是新藥讓人嗜睡？原因不同，預防方式也不同。", "把跌倒發生時間、地點、當時動作和後續症狀記下來，會比只說「他跌倒了」更能幫助專業人員判斷。"]],
+      ["差點跌倒也要當成警訊", ["長輩扶了一下牆、腳滑了一下、起身晃很大，雖然沒有真的倒下，也代表風險正在出現。這些事件若被忽略，下一次可能就真的受傷。", "家屬可以把差點跌倒記在同一張表，找出重複出現的位置或時段。"]],
+      ["跌倒預防要回到日常路線", ["處理完當下狀況後，要檢查光線、拖鞋、地墊、浴室、床邊高度、用藥和夜間如廁路線。", "跌倒不是單一事件，而是重新檢視環境和照顧流程的提醒。越早調整，越能避免下一次。"]]
+    ],
+    checklists: [{ title: "跌倒後 24 小時觀察", items: ["是否撞到頭。", "是否嗜睡、嘔吐或意識改變。", "疼痛是否增加。", "是否能正常承重和走路。", "瘀青、腫脹或傷口是否擴大。", "食慾、精神和情緒是否不同。"] }],
+    tables: [{ title: "跌倒原因追蹤", headers: ["發生情境", "可能原因", "下一步"], rows: [["半夜如廁", "光線、急尿、鞋子", "補夜燈、固定鞋與路線"], ["站起時暈", "血壓、用藥、脫水", "記錄時間並諮詢醫療"], ["浴室門口滑", "積水或地墊", "先處理止滑與排水"]] }],
+    references: [referenceLibrary.fallsJama2024, referenceLibrary.homeHazards2023]
+  }),
+  "bathroom-safety": guide({
+    readingMinutes: 7,
+    targetAudience: "擔心長輩洗澡、如廁或進出浴室跌倒的家庭",
+    warning: {
+      title: "浴室安全要先於清潔效率",
+      items: ["長輩頭暈、喘、胸悶或精神差時不要勉強洗澡。", "浴室地面濕滑、椅子不穩或需要硬拉時，先暫停調整。", "若浴室跌倒後疼痛、撞頭或無法站立，請儘快就醫。"]
+    },
+    summary: ["浴室安全不是裝一支扶手就好，要看進門、轉身、坐下、洗澡、擦乾每一步。", "止滑、扶手、淋浴椅、照明和置物位置都要配合長輩實際動作。", "洗澡後頭暈、喘、虛弱或皮膚變化也要納入觀察。"],
+    content: [
+      ["先從進出浴室那一步看起", ["很多跌倒發生在浴室門口、門檻、地墊和積水處。長輩不是只在洗澡時會滑倒，也可能在跨進、跨出或轉身拿毛巾時失去平衡。", "家屬可以陪長輩完整走一次流程：進門、脫衣、坐下、洗澡、起身、擦乾、穿衣。每個轉身點都要看有沒有支撐。"]],
+      ["設備要放在用得到的位置", ["扶手、淋浴椅、防滑墊和置物架都要配合長輩動作。若扶手裝太遠、椅子不穩或用品放太高，照顧者還是會在現場臨時補救，風險不會真的下降。", "購買設備前，最好先看長輩手會自然扶哪裡、腳會踩哪裡、哪個角度最容易轉身。"]],
+      ["洗澡前把物品和溫度都準備好", ["毛巾、衣物、沐浴用品、防滑鞋和椅子都先定位。不要洗到一半才拿東西，因為臨時轉身常是跌倒高風險。", "水溫先由照顧者測試，浴室可以保暖但不要悶熱。對體力較差的長輩，洗澡本身就是一次耗能活動。"]],
+      ["洗澡後也要觀察身體反應", ["洗完後先坐一下、擦乾保暖、觀察臉色、呼吸和是否頭暈。若洗澡後常非常累，可能需要縮短時間、分段清潔或調整時段。", "洗澡也是看皮膚的好時機。紅腫、破皮、瘀青、壓痕或腳趾縫潮濕，都應記錄並視情況諮詢專業。"]],
+      ["夜間如廁也屬於浴室安全", ["許多浴室跌倒發生在半夜。床邊到浴室的燈光、止滑鞋、路線雜物、門檻和馬桶旁支撐，都應一起檢查。", "不要只改善浴室裡面，從床邊到浴室的整條路線才是完整風險。"]]
+    ],
+    checklists: [{ title: "浴室 8 個優先檢查點", items: ["門口是否有門檻或積水。", "地墊是否會滑動或捲邊。", "淋浴椅是否穩定且高度合適。", "扶手是否在真正用力的位置。", "沐浴用品是否放在伸手可及處。", "洗後是否有地方安全坐下擦乾。", "夜間路線是否有照明。", "馬桶旁是否有支撐。"] }],
+    tables: [{ title: "浴室風險與調整", headers: ["風險", "可能原因", "調整方向"], rows: [["門口常滑", "地墊或積水", "移除滑墊、改善排水"], ["起身不穩", "椅子低或無扶手", "調整椅高與扶手"], ["洗後頭暈", "悶熱、久站、耗能", "坐洗、縮短時間、觀察"]] }],
+    references: [referenceLibrary.homeHazards2023, referenceLibrary.fallsJama2024]
+  }),
+  "master-talk-senior-nutrition": guide({
+    readingMinutes: 8,
+    targetAudience: "想理解長輩食慾、體重、肌力和照顧品質關係的家庭",
+    warning: {
+      title: "營養下降常先出現在生活裡",
+      items: ["衣服變鬆、走路變慢或起身更吃力。", "反覆嗆咳、喝水會咳或吃飯時間明顯拉長。", "精神變差、尿量少或疑似脫水時應及早評估。"]
+    },
+    summary: ["餐盤只是線索，真正要看體重、肌力、精神和活動量。", "吃不下常是牙口、吞嚥、藥物、便秘、情緒與活動量交互影響。", "營養建議要能放進家庭日常，才會持續。"],
+    content: [
+      ["不要只問今天吃幾口", ["李先生提醒，長輩的營養狀態常常先反映在生活裡：走路變慢、起身變吃力、白天更累、衣服變鬆。餐盤上的份量重要，但不能單獨解讀。", "若家屬每天只盯著一餐吃多少，很容易讓餐桌變成壓力現場。比較好的方法是看一週趨勢。"]],
+      ["食慾下降背後常不只一個原因", ["牙口、吞嚥、便秘、藥物、情緒、活動量和用餐環境都會影響食慾。家屬可以先記錄哪些食物剩最多、哪個時段吃得比較好。", "若喝水常咳、吃飯很久或聲音變濕，要把吞嚥安全納入評估，而不是只增加份量。"]],
+      ["肌力和營養是互相影響的", ["吃得少會讓體力下降，體力下降又讓活動變少，活動變少後食慾也可能更差。這是一個容易往下滑的循環。", "因此營養照顧不只是餐點，也包含安全活動、日照共餐、固定作息和家屬陪伴。"]],
+      ["家裡做得到的調整最重要", ["高標準菜單如果準備不了，很快就會中斷。從質地、少量多餐、水分補充和長輩喜歡的味道開始，往往比一次大改更能持續。", "如果家庭已經忙不過來，可以考慮餐食服務、日照共餐或照顧團隊協助觀察。"]],
+      ["營養問題需要被交接和追蹤", ["食慾、體重、喝水和排便狀況若只靠一位家屬記憶，很容易漏掉。用簡單表格記錄，能讓家人、照服員和醫療專業一起看趨勢。", "營養不是單點建議，而是照顧品質的一部分。"]]
+    ],
+    checklists: [{ title: "家屬可觀察的營養訊號", items: ["體重或衣服鬆緊。", "每餐吃幾成。", "喝水是否咳。", "走路和起身是否變慢。", "白天精神和活動量。", "排便與尿量變化。"] }],
+    tables: [{ title: "餐盤以外的營養線索", headers: ["線索", "可能代表", "下一步"], rows: [["起身變吃力", "肌力下降", "看食量和活動量"], ["常剩肉類", "咀嚼困難", "調整質地與牙口檢查"], ["喝水變少", "怕如廁或脫水風險", "分次補水與看動線"]] }],
+    references: [referenceLibrary.dehydration2023, referenceLibrary.appetite2023]
+  }),
+  "master-talk-rehab-goals": guide({
+    readingMinutes: 8,
+    targetAudience: "想幫長輩設定復能目標，但不確定該練什麼的家庭",
+    warning: {
+      title: "復能目標要先守住安全",
+      items: ["急性疼痛、喘、胸悶、頭暈時不要硬練。", "跌倒後尚未確認傷勢前，不要直接加強訓練。", "練習若讓長輩恐懼或抗拒，應重新拆小目標。"]
+    },
+    summary: ["復能不是訓練長輩聽話，而是找回想做的生活動作。", "目標越貼近日常，越容易被長輩理解。", "家屬陪練時重點是安全站位、口令和觀察疲累。"],
+    content: [
+      ["復能先從生活願望開始", ["許小姐分享，長輩願意練習，常常不是因為想達成某個數字，而是想自己走到廁所、坐到餐桌、和家人出門。復能目標越貼近生活，越容易被理解。", "如果只說每天要練腿，長輩可能覺得被要求；如果說我們練到能安全走到窗邊看花，意義就不同。"]],
+      ["把動作拆小，挫折就會少一點", ["站起來可以拆成坐到床緣、腳踩穩、身體前傾、手扶好、慢慢站。當每一步都能完成，長輩會比較有信心。", "小步驟不是進步慢，而是降低失敗感。對體力下降的長輩來說，成功經驗比一次練很多更重要。"]],
+      ["家屬要學會陪，不是催", ["陪練時最重要的是安全站位、清楚口令和觀察疲累。催快一點通常沒有幫助，穩定陪伴反而能讓長輩願意多試一次。", "若家屬每次都用力拉，長輩可能越來越怕。好的陪伴是讓長輩知道自己仍然有參與能力。"]],
+      ["家中環境會影響復能成效", ["床太低、椅子太軟、地面滑、浴室沒有支撐，會讓復能成果難以回到生活。家屬要把環境和動作一起看。", "有時候微調椅高、增加夜燈、移除地墊，比單純增加練習次數更能改善日常安全。"]],
+      ["復能需要紀錄趨勢，而不是每天考試", ["記錄今天能站幾次、走到哪裡、是否害怕或疼痛，可以幫助專業人員調整目標。", "長輩狀態有好有壞，不要把退步的一天當失敗。看趨勢，才能走得長。"]]
+    ],
+    checklists: [{ title: "復能目標設定可以問", items: ["長輩最想重新做到哪件事。", "目前卡在哪個步驟。", "家中環境是否支持。", "練習是否會疼痛或害怕。", "家屬是否知道安全站位。", "多久回頭檢查一次目標。"] }],
+    tables: [{ title: "生活目標拆解", headers: ["目標", "拆小步驟", "家屬注意"], rows: [["走到廁所", "坐起、站穩、走短距離", "路線清空、夜燈"], ["坐到餐桌", "站起、轉身、坐下", "椅子高度和扶手"], ["出門", "穿鞋、開門、上下車", "不要一次拉太長"]] }],
+    references: [referenceLibrary.fallsJama2024, referenceLibrary.homeHazards2023]
+  }),
+  "master-talk-home-safety": guide({
+    readingMinutes: 8,
+    targetAudience: "想降低家中跌倒風險，卻不知道先改哪裡的家庭",
+    warning: {
+      title: "最熟悉的路線最容易被忽略",
+      items: ["曾跌倒、差點跌倒或半夜如廁不穩，應優先檢查動線。", "扶手、燈光、止滑和床椅高度要依長輩實際動作調整。", "若跌倒後撞頭、疼痛或行走異常，應先就醫。"]
+    },
+    summary: ["居家安全先從最高頻路線開始，不必一開始全面翻修。", "床邊到浴室、客廳到餐桌、浴室進出通常是優先檢查點。", "安全設備要讓長輩願意用、用得到。"],
+    content: [
+      ["危險常藏在每天經過的地方", ["張先生看過很多家庭，客廳很整齊，但床邊到浴室卻有地墊、延長線和昏暗轉角。因為每天都走，家人反而習慣了風險。", "居家安全不是一次買很多設備，而是看長輩每天實際怎麼移動。"]],
+      ["先選一條路線做完整檢查", ["不必一開始就全面翻修。先陪長輩從床邊走到浴室，觀察哪裡需要扶、哪裡會轉身、哪裡需要跨過、哪裡看不清楚。", "改好一條高頻路線，就能先降一大段風險。尤其夜間如廁，是許多家庭最該先處理的路線。"]],
+      ["設備位置比設備本身更重要", ["扶手、防滑墊、椅子和夜燈若位置不對，長輩可能根本用不到，甚至因為伸手太遠更不穩。", "家屬要看長輩手自然會抓哪裡、腳會踩哪裡、轉身時身體往哪邊偏。設備要配合動作，不是動作配合設備。"]],
+      ["家中安全要跟著狀態更新", ["長輩的視力、肌力、用藥、睡眠和疾病狀態都會變。半年前安全的環境，現在不一定仍然安全。", "只要出現走路變慢、起身更吃力、夜間如廁變頻繁或新藥讓人嗜睡，就應重新檢查。"]],
+      ["安全調整也要尊重長輩生活習慣", ["有些長輩不願意換拖鞋、不喜歡移動家具、覺得夜燈刺眼。若調整方式不符合習慣，最後仍會回到原本高風險做法。", "與其一次要求全部改變，不如先處理最危險的一兩個點，讓長輩感覺安全也保有主體感。"]]
+    ],
+    checklists: [{ title: "一條路線完整檢查", items: ["起點是否能安全坐起。", "鞋子是否合腳止滑。", "路線是否有地墊、電線或雜物。", "轉角和門檻是否看得清楚。", "終點是否有支撐。", "夜間是否有柔和照明。"] }],
+    tables: [{ title: "居家安全優先順序", headers: ["位置", "常見風險", "先做"], rows: [["床邊", "起身頭暈、鞋子亂放", "固定鞋和夜燈"], ["走道", "地墊、電線、雜物", "清空路線"], ["浴室", "濕滑、門檻、轉身", "止滑、扶手、坐洗"]] }],
+    references: [referenceLibrary.homeHazards2023, referenceLibrary.fallsJama2024]
+  }),
+  "master-talk-care-management": guide({
+    readingMinutes: 8,
+    targetAudience: "照顧責任集中在一個人身上，想重新分工的家庭",
+    warning: {
+      title: "照顧計畫不是等崩潰才開始",
+      items: ["主要照顧者長期失眠或情緒失控時，應安排支援。", "長輩安全風險上升時，不要只靠家人輪流補位。", "服務、費用、緊急決策都應寫清楚。"]
+    },
+    summary: ["照顧最難的是責任沒有邊界。", "把任務拆成時段、內容和負責人，家庭才有辦法合作。", "喘息是預防，不是補救；紀錄則讓家人站在同一頁。"],
+    content: [
+      ["照顧最難的是責任沒有邊界", ["陳小姐觀察，家庭常說大家都會幫忙，但真正出事時還是落在主要照顧者身上。照顧需要被拆成明確任務，包含誰負責、什麼時段、做到什麼程度。", "如果分工不清，主要照顧者永遠在補洞，其他家人也很難知道自己該接哪一段。"]],
+      ["先把照顧變成一週表", ["把洗澡、備餐、回診、用藥、採買、夜間照顧、服務聯絡和費用整理放進一週表，就能看見壓力集中在哪裡。", "一週表不是要讓家庭變成公司，而是讓責任有形。看得見，才有辦法分。"]],
+      ["喘息不是補救，而是預防", ["等到家屬崩潰才安排服務，通常已經傷到家庭關係。若能提早把日照、居家照顧、短暫喘息或家人輪替放進計畫，照顧比較能長期維持。", "喘息應該是固定安排，而不是某一次家人吵架後的臨時方案。"]],
+      ["紀錄讓家庭不必一直重問", ["服務紀錄、用藥紀錄和異常提醒，能讓不同家人站在同一頁。資訊清楚，爭執就會少一點，照顧決策也會更有依據。", "如果每次都靠口頭轉述，最後很容易變成誰記錯、誰沒說、誰沒做。"]],
+      ["好的管理，是讓下一步變清楚", ["照顧狀態會變，計畫也要定期回看。長輩出院、跌倒、食慾下降、失智行為變多或家屬工作改變，都可能需要重排服務。", "照顧管理的價值，就是讓家庭在變化中知道下一步在哪裡。"]]
+    ],
+    checklists: [{ title: "家庭照顧分工表應包含", items: ["每日固定照顧任務。", "每週回診、採買和行政事項。", "費用與補助聯絡窗口。", "緊急狀況決策人。", "主要照顧者休息時段。", "服務紀錄查閱方式。"] }],
+    tables: [{ title: "任務拆解範例", headers: ["任務", "負責人", "確認方式"], rows: [["用藥", "主要照顧者/照服員", "藥盒和紀錄"], ["回診", "指定家屬", "行前問題清單"], ["夜間", "家人輪替或服務", "起身次數紀錄"]] }],
+    references: [referenceLibrary.caregiver2019, referenceLibrary.longTermCare1966]
+  }),
+  "master-talk-dementia-care": guide({
+    readingMinutes: 8,
+    targetAudience: "照顧失智長輩，常面對重複提問、焦躁或生活節奏混亂的家庭",
+    warning: {
+      title: "失智行為改變不一定只是退化",
+      items: ["突然混亂、發燒、疼痛或尿痛時，先排除身體問題。", "行為短時間明顯惡化，應諮詢醫療或照顧專業。", "照顧者若已經過載，也需要安排喘息。"]
+    },
+    summary: ["重複提問常是安全感掉線，不是故意挑戰家屬。", "先穩住情緒，再給簡短答案。", "固定提示、日常節奏和照顧者支持，是失智照顧的基礎。"],
+    content: [
+      ["問題反覆出現，通常是安全感反覆掉線", ["林先生說，失智長輩可能忘記剛剛得到的答案，但不安的感覺還在。家屬若一直糾正，很容易讓長輩更焦慮，也讓自己更疲憊。", "理解這一點，家屬比較能把重點從誰對誰錯，轉到如何讓現場降溫。"]],
+      ["先穩住情緒，再給簡短答案", ["可以先說「我在這裡」、「你現在很安全」，再用固定短句說明下一步。越複雜的解釋，越可能讓長輩抓不到重點。", "如果長輩已經焦躁，先安撫身體和環境，比繼續說理更有效。"]],
+      ["用固定日常降低不確定感", ["失智長輩對變化更敏感。固定起床、用餐、活動、休息、洗澡和睡前流程，可以減少每天重新理解世界的負擔。", "傍晚前開燈、降低噪音、準備點心和熟悉音樂，也能幫助情緒穩定。"]],
+      ["環境提示可以分擔家屬壓力", ["白板、照片、日曆、門口提示、固定座位和熟悉物品，都能讓長輩少靠記憶硬撐。", "提示不是為了要求長輩自己記住，而是讓他反覆看見線索，降低不安。"]],
+      ["把照顧壓力分散出去", ["當同一個問題一天出現很多次，家屬需要的不只是技巧，也需要有人輪替、日照活動或居家服務協助。照顧者能休息，回應才有餘裕。", "失智照顧是長期工程，不能只靠主要照顧者的耐心。"]]
+    ],
+    checklists: [{ title: "失智日常穩定元素", items: ["固定起床與睡前流程。", "簡短一致的說法。", "今日流程白板。", "低刺激的傍晚環境。", "熟悉音樂或物品。", "家屬輪替與喘息安排。"] }],
+    tables: [{ title: "失智照顧情境對照", headers: ["情境", "先理解", "可嘗試"], rows: [["一直問問題", "安全感不足", "固定短句與提示物"], ["傍晚焦躁", "疲累與刺激過多", "開燈、降噪、點心"], ["拒絕洗澡", "害怕或被控制感", "分段、告知、改時段"]] }],
+    references: [referenceLibrary.dementiaAgitation2020, referenceLibrary.caregiver2020]
+  }),
+  "master-talk-nursing-observation": guide({
+    readingMinutes: 8,
+    targetAudience: "想知道長輩日常健康變化該觀察什麼、怎麼記錄的家庭",
+    warning: {
+      title: "連續變化比單次數字更值得注意",
+      items: ["發燒、喘、意識改變、胸痛或急性疼痛應優先就醫。", "血壓、血糖、體溫或傷口連續異常，應諮詢醫療專業。", "食慾、精神、睡眠和排泄突然改變也要記錄。"]
+    },
+    summary: ["日常觀察不是緊張，而是讓變化更早被看見。", "不要只看單次數字，要看趨勢和伴隨症狀。", "紀錄是交接，也是照顧品質的一部分。"],
+    content: [
+      ["身體變化常先藏在日常裡", ["黃小姐提醒，長輩可能不是突然生病，而是先出現食慾下降、睡不好、走路變慢、皮膚發紅或白天更累。這些小變化如果被記下來，就能早一點處理。", "家屬不需要每天過度緊張，但需要知道哪些變化和平常不同。"]],
+      ["不要被單次數字嚇到，也不要忽略連續變化", ["血壓、體溫或血糖一次異常不一定代表嚴重，但如果連續幾天都和平常不同，就需要提高警覺。觀察重點是趨勢和伴隨症狀。", "例如血壓高加上頭痛、嗜睡或胸悶，就比單純一次數值高更需要注意。"]],
+      ["皮膚、排泄和食慾都是健康訊號", ["長輩若久坐久躺，皮膚紅腫、破皮、潮濕或壓痕都要看。排便、尿量、尿色、食慾和喝水也能反映身體狀態。", "這些內容看似瑣碎，但常是及早發現感染、脫水、營養下降或壓傷風險的線索。"]],
+      ["紀錄要簡單，才會長期做得下去", ["紀錄不需要像病歷，只要寫日期、狀況、處理方式和是否改善。重點是讓下一位照顧者快速知道今天和昨天有什麼不同。", "如果欄位太多，家屬很快就會放棄。簡單但持續，比精美但做不了更重要。"]],
+      ["紀錄是交接，也是照顧品質", ["家屬、照服員、督導和醫療人員若看得到同一份紀錄，就不必每次從頭問起。", "當資訊不斷線，服務調整、回診溝通和風險預防都會更有依據。"]]
+    ],
+    checklists: [{ title: "每日健康觀察可包含", items: ["精神和平常比如何。", "食慾和喝水量。", "睡眠、排便和排尿。", "走路、起身和疼痛。", "皮膚是否紅腫破皮。", "量測數值與伴隨症狀。"] }],
+    tables: [{ title: "觀察重點對照", headers: ["變化", "可能代表", "下一步"], rows: [["連續吃少", "營養或疾病變化", "記錄並諮詢"], ["皮膚紅不退", "壓傷風險", "減壓並請專業看"], ["睡眠突然亂", "疼痛、用藥或失智變化", "看伴隨症狀"]] }],
+    references: [referenceLibrary.pressureInjury2020, referenceLibrary.transitionalCare2022]
+  }),
+  "master-talk-family-communication": guide({
+    readingMinutes: 8,
+    targetAudience: "照顧分工常吵架、主要照顧者覺得沒有人理解的家庭",
+    warning: {
+      title: "家庭溝通要從任務開始，不只談感受",
+      items: ["若主要照顧者已經過載，先安排實際支援。", "費用、回診、夜間照顧和緊急決策要寫清楚。", "不要把所有討論都變成誰比較孝順。"]
+    },
+    summary: ["很多照顧衝突不是不愛，而是責任和期待沒有說清楚。", "家庭會議要具體到任務、時段、費用和回頭檢查。", "外部服務可以成為共同工具，降低互相指責。"],
+    content: [
+      ["最累的人常常也是最不敢開口的人", ["吳先生分享，主要照顧者常覺得自己說出口就像在抱怨，但不說清楚，其他家人也不知道真正需要什麼。照顧分工要被說出來，才有機會被承擔。", "沉默常讓照顧責任越集中，最後變成爆發式爭吵。"]],
+      ["家庭會議要具體到可以執行", ["比起討論誰比較孝順，更有用的是列出回診、費用、夜間照顧、採買、服務聯絡和緊急決策。每一項都要有人負責，並設定多久回頭檢查。", "會議最好有一張表，不只是聊天。把任務寫下來，才知道誰接了哪一段。"]],
+      ["期待要說明白，才不會互相猜", ["有些家屬以為匯錢就是支持，有些人覺得陪診才算照顧，有些人希望有人接電話。期待不同，衝突就容易發生。", "把期待翻成任務，例如每週一次陪診、每月費用整理、每日晚間電話關心，會比抽象指責更有效。"]],
+      ["把外部服務當成共同工具", ["居家照顧、日照、復能和課程不是某一位家屬的選擇，而是整個家庭的支援系統。當家人都理解服務內容，照顧分工就比較不會變成互相指責。", "服務紀錄也能成為家庭討論基礎，減少只靠個人感覺判斷。"]],
+      ["定期回頭看，避免分工失效", ["長輩狀態會變，家人工作和生活也會變。照顧分工若半年都不回看，很容易失去現實性。", "建議固定每月或每季檢查一次：哪些任務太重，哪些服務要調整，主要照顧者是否仍能休息。"]]
+    ],
+    checklists: [{ title: "家庭會議議程", items: ["長輩目前最主要需求。", "主要照顧者最累的時段。", "回診、費用、採買和用藥分工。", "服務是否需要新增或調整。", "緊急狀況由誰決定。", "下次回頭檢查日期。"] }],
+    tables: [{ title: "把一句幫忙變具體", headers: ["模糊說法", "具體任務", "確認方式"], rows: [["我會幫忙", "每週三陪診", "行事曆確認"], ["我出錢", "每月整理費用", "共享表單"], ["有事找我", "晚上八點接電話", "固定聯絡"]] }],
+    references: [referenceLibrary.caregiver2019, referenceLibrary.caregiver2020]
+  }),
+  "master-talk-community-health": guide({
+    readingMinutes: 7,
+    targetAudience: "希望長輩重新出門、共餐、活動，減少孤立的家庭",
+    warning: {
+      title: "社區活動也要看安全和適配",
+      items: ["近期跌倒、急性不適或精神明顯改變時，先確認健康狀態。", "活動強度要符合長輩體力，不要只看熱鬧。", "接送、如廁、用餐和回報流程都要先問清楚。"]
+    },
+    summary: ["社區活動不是單純熱鬧，而是讓長輩重新有被邀請出門的理由。", "共餐能同時看營養、社交、情緒和健康變化。", "社區據點可成為家庭照顧之外的另一組穩定眼睛。"],
+    content: [
+      ["長輩需要一個被期待的地方", ["鄭小姐說，許多長輩不是完全不想出門，而是不知道去哪裡、誰在等他、去了能做什麼。固定活動和熟悉人群，能讓生活重新有節奏。", "被邀請出門這件事本身，就可能讓長輩重新感覺自己仍然和社會有連結。"]],
+      ["共餐是很自然的照顧入口", ["一起吃飯不只是營養，也包含社交、情緒和觀察。當工作人員熟悉長輩，就比較容易看見食慾、精神或行動能力的變化。", "家屬也能透過共餐回報知道長輩最近是否吃得少、變沉默或走路不穩。"]],
+      ["活動要符合能力，而不是越多越好", ["社區活動可以包含健康促進、認知活動、手作、歌唱、伸展或衛教，但重點是長輩是否願意、是否安全、是否有成就感。", "對久未出門的長輩來說，先能固定出門坐一坐，也是一個重要起點。"]],
+      ["社區支持能減少家庭孤立", ["家屬如果只有自己在看長輩狀態，壓力會很大。社區據點提供另一組穩定眼睛和陪伴，讓家庭知道有人一起留意。", "當社區工作者看見變化，也能提醒家屬及早處理。"]],
+      ["出門習慣需要慢慢建立", ["一開始不要期待長輩立刻每次都開心。可以先固定短時間、熟悉路線、熟悉工作人員，再慢慢增加參與。", "家屬的態度也很重要。把活動說成去被照顧，可能增加抗拒；說成去吃飯、見朋友、做喜歡的事，接受度常會更高。"]]
+    ],
+    checklists: [{ title: "選社區活動可先問", items: ["活動頻率與時間。", "是否有共餐或交通協助。", "如廁和休息怎麼安排。", "活動是否可依能力調整。", "家屬如何得知參與狀況。", "長輩不適應時如何處理。"] }],
+    tables: [{ title: "社區參與可能帶來的支持", headers: ["需求", "社區活動的角色", "家屬可觀察"], rows: [["缺乏社交", "固定人群互動", "回家後情緒"], ["食慾下降", "共餐與觀察", "吃飯份量"], ["活動量少", "安全伸展與出門", "步態與疲累"]] }],
+    references: [referenceLibrary.dayPrograms2024, referenceLibrary.caregiver2019]
+  }),
+  "master-talk-longterm-policy": guide({
+    readingMinutes: 8,
+    targetAudience: "想理解長照資源入口、申請流程和服務銜接的家庭",
+    warning: {
+      title: "政策資訊要回到實際生活需求",
+      items: ["補助和資格可能隨政策調整，申請時仍以官方與照管中心說明為準。", "不要只問能拿多少，先說清楚最困難的生活時段。", "若住院中，應及早詢問出院銜接。"]
+    },
+    summary: ["家庭最需要的是下一步，而不是一串服務名詞。", "1966、地方照管中心、出院準備窗口都是長照入口。", "好的服務會把家庭情境和制度資源翻譯成可執行的照顧計畫。"],
+    content: [
+      ["家屬需要的是路線圖", ["王先生說，長照資源很多，但家庭在壓力中最想知道的是：現在先找誰、先準備什麼、哪一種服務能解決眼前問題。沒有路線圖，資源再多也像迷宮。", "政策介紹若只停在名詞，家屬很難使用。真正有幫助的是把服務放回情境。"]],
+      ["用情境理解服務，比背名詞更有效", ["如果困難是白天無人陪伴，就談日照或社區；如果是洗澡和備餐，就談居家照顧；如果是剛出院，就談復能、護理和紀錄。", "從生活問題出發，才能把制度資源翻譯成家庭聽得懂的選項。"]],
+      ["申請流程是開始，不是全部答案", ["申請後會有評估、照顧計畫和服務連結。家屬不需要在一開始就決定所有服務，但需要準備好真實需求。", "把一週中最困難的時段、家屬能承擔的時間、長輩風險和醫療資訊整理好，會讓後續討論更有效。"]],
+      ["好的服務會持續接下一步", ["家庭需求會改變，長輩狀態也會變。真正有用的長照支持，不只是一次介紹，而是有人定期追蹤、調整和提醒下一個可用資源。", "例如從出院返家接到居家照顧，再接到復能或日照，這些轉換都需要有人協助判斷。"]],
+      ["費用和自費也要透明討論", ["政策補助能減輕負擔，但家庭仍可能遇到自費、額度、頻率和服務搭配問題。越早說清楚，越不容易在家人之間形成爭執。", "費用不是最後才談的尷尬問題，而是照顧計畫能否持續的重要條件。"]]
+    ],
+    checklists: [{ title: "和長照窗口溝通前可準備", items: ["長輩目前疾病與用藥。", "日常活動需要協助的項目。", "最危險或最累的三個時段。", "目前家屬人力與工作狀況。", "是否正在住院或剛出院。", "希望先解決的第一個問題。"] }],
+    tables: [{ title: "政策資源怎麼回到情境", headers: ["生活問題", "可討論資源", "要補充的資訊"], rows: [["白天獨處", "日照、社區據點", "作息、交通、認知狀態"], ["洗澡困難", "居家照顧", "浴室和移位狀況"], ["出院返家", "出院銜接、復能", "醫囑與照顧限制"]] }],
+    references: [referenceLibrary.longTermCare1966, referenceLibrary.longTermCareGov]
+  }),
+  "master-talk-medication-safety": guide({
+    readingMinutes: 8,
+    targetAudience: "長輩藥物種類多、跨院所看診或家人輪流照顧的家庭",
+    warning: {
+      title: "用藥安全的底線",
+      items: ["不要自行停藥、加量、減量或混合不同藥袋。", "保健品、中藥、外用藥也要列入清單。", "新藥後出現頭暈、嗜睡、跌倒、皮疹或食慾變差，要記錄並諮詢。"]
+    },
+    summary: ["用藥安全不是吃完，而是吃對、看懂、能交接。", "所有藥物要整理到同一張清單。", "吃藥後的反應也要記錄，回診才有線索。"],
+    content: [
+      ["先讓藥物資訊集中", ["蔡藥師說，很多家庭的藥分散在藥袋、抽屜、不同醫院和不同家人記憶裡。要降低錯誤，第一步是把藥名、用途、時間和劑量整理成同一份清單。", "清單也要包含保健品、中藥、外用藥和臨時止痛藥，因為這些都可能影響安全。"]],
+      ["不要只確認有沒有吃", ["頭暈、嗜睡、食慾變差、便秘、皮膚疹或跌倒，都可能和用藥變化有關。家屬若能記錄吃藥後的反應，回診時就能更精準地討論。", "尤其剛出院、剛換藥或新增藥物後，前幾天更需要觀察精神、步態和食慾。"]],
+      ["藥盒、提醒和紀錄要接在一起", ["藥盒能降低混亂，但不能取代確認。手機提醒也有幫助，但提醒文字要具體，例如早餐後白色藥袋，而不是只寫吃藥。", "誰確認、幾點吃、有沒有漏吃或不舒服，最好都有簡單紀錄，讓下一位照顧者接得上。"]],
+      ["回診前先整理問題", ["家屬常在診間才想問題，很容易漏掉。可以先寫下最近頭暈、嗜睡、跌倒、便秘、食慾和睡眠變化，並帶著藥物清單詢問。", "若不同科別開藥，回診時更要讓醫師或藥師知道目前所有藥物。"]],
+      ["用藥流程要能被下一個人接手", ["如果只有主要照顧者知道怎麼吃藥，風險就集中在一個人身上。藥盒、提醒、紀錄和回診問題應放在同一套流程裡。", "照顧服務進場時，也要讓照服員和督導知道提醒方式與異常回報規則。"]]
+    ],
+    checklists: [{ title: "家庭藥物清單應包含", items: ["藥名和外觀。", "用途和服用時間。", "劑量與飯前飯後。", "開立院所與日期。", "是否可磨粉或剝半。", "需要觀察的副作用。"] }],
+    tables: [{ title: "用藥工具搭配", headers: ["工具", "用途", "注意"], rows: [["藥盒", "分裝每日藥物", "仍要確認是否已吃"], ["手機提醒", "固定時間提醒", "文字要具體"], ["紀錄表", "交接與回診", "記反應不只記吃了沒"]] }],
+    references: [referenceLibrary.medicationReview2024, referenceLibrary.polypharmacy2024]
+  }),
+  "master-talk-frailty-prevention": guide({
+    readingMinutes: 8,
+    targetAudience: "發現長輩走路變慢、起身吃力或外出變少的家庭",
+    warning: {
+      title: "退化訊號不要等到跌倒才處理",
+      items: ["近期跌倒、體重快速下降或明顯虛弱，應諮詢專業。", "胸悶、喘、頭暈或急性疼痛時不要勉強活動。", "練習要符合能力，避免一次增加太多。"]
+    },
+    summary: ["衰弱通常不是一天發生，而是從活動量、肌力、食慾和外出意願慢慢下降。", "預防失能要把練習放進日常，不一定是正式運動。", "越早看見變化，越有機會保留長輩的選擇。"],
+    content: [
+      ["退化通常不是一天發生的", ["郭教練說，家屬常在跌倒或住院後才發現長輩變弱，但其實訊號很早就出現：不想出門、走路變慢、起身要扶、容易累。", "這些變化如果被看見，就能在失能變嚴重前先介入。"]],
+      ["生活力比運動口號更重要", ["失能預防不是要求長輩變年輕，而是保留能選擇的生活。能自己走到餐桌、到門口、參加活動，都是生活力。", "當目標回到生活，長輩比較願意嘗試，家屬也比較知道為什麼要陪練。"]],
+      ["把練習放進每天會做的事", ["不一定要安排正式運動，安全起身、短距離走路、站立平衡、餐前伸展和規律出門，都能成為保留生活力的練習。", "重點是安全、規律、做得到。一次練太多，反而容易放棄。"]],
+      ["營養、睡眠和社交也會影響衰弱", ["吃得少、睡不好、長期不出門，都會讓體力下降更快。預防失能不能只看腿力，也要看食慾、情緒和生活節奏。", "日照、社區活動、共餐和家屬陪伴，都可能是支持活動量的方式。"]],
+      ["預防的目的，是讓長輩少失去一點", ["保留能力不是追求年輕，而是讓長輩還能選擇自己想做的事。越早看見衰弱，越有機會把照顧從補救變成支持。", "家屬可以把小變化記下來，並和復能或照顧團隊討論下一步。"]]
+    ],
+    checklists: [{ title: "衰弱早期訊號", items: ["走路速度變慢。", "起身需要扶更多次。", "外出意願下降。", "容易疲累或白天嗜睡。", "食慾或體重下降。", "最近差點跌倒或真的跌倒。"] }],
+    tables: [{ title: "日常練習入口", headers: ["生活動作", "可練什麼", "注意"], rows: [["餐前起身", "腿力和重心", "椅子穩定"], ["走到門口", "短距離步行", "路線清空"], ["社區活動", "外出和社交", "強度適合"]] }],
+    references: [referenceLibrary.fallsJama2024, referenceLibrary.appetite2023]
+  }),
+  "master-talk-swallowing-care": guide({
+    readingMinutes: 8,
+    targetAudience: "長輩吃飯喝水常嗆咳、吃很慢或體重下降的家庭",
+    warning: {
+      title: "吞嚥安全需要及早處理",
+      items: ["反覆嗆咳、發燒、肺炎或體重下降。", "喝水常咳、聲音濕濕的、吃完喘。", "精神很差或半睡半醒時，不要勉強餵食。"]
+    },
+    summary: ["吃得安心，比硬是吃很多更重要。", "嗆咳、清喉嚨、聲音濕、吃飯變久都值得觀察。", "質地調整不要全靠猜，必要時尋求專業評估。"],
+    content: [
+      ["嗆咳是身體給的提醒", ["何小姐說，長輩吃飯喝水常咳、清喉嚨變多、聲音濕濕的，或吃完容易累，這些都不該只用吃太快解釋。", "偶爾咳一下不一定嚴重，但若反覆出現，就要把吞嚥安全放進照顧計畫。"]],
+      ["用餐安全從姿勢開始", ["坐直、腳踩穩、頭頸不後仰，能讓吞嚥比較安全。照顧者也要避免一口接一口催促，應讓長輩吞完再給下一口。", "若長輩精神很差、喘或一直咳，先不要勉強吃完。安全比份量更優先。"]],
+      ["觀察不只看咳不咳", ["聲音濕、清喉嚨、吃很久、害怕喝水、吃完發燒或體重下降，都可能是線索。", "家屬可以記錄哪些食物容易出問題：水、湯、乾飯、肉塊或藥物。這些資料對專業評估很有幫助。"]],
+      ["質地調整不要全靠猜", ["把食物打泥或加稠不一定適合每個人。不同吞嚥問題需要不同質地，過度簡化也可能影響營養和食慾。", "若嗆咳頻繁、體重下降或反覆發燒，建議記錄狀況並尋求醫療、語言治療或營養專業評估。"]],
+      ["用餐照顧也要能交接", ["家屬、照服員或日照中心若照顧同一位長輩，應使用一致的用餐提醒、食物質地和觀察紀錄。", "吞嚥安全最怕資訊斷掉。今天嗆了什麼、怎麼處理、是否發燒，都應留下來。"]]
+    ],
+    checklists: [{ title: "吞嚥觀察重點", items: ["吃飯前是否清醒。", "是否能坐直且腳踩穩。", "喝水或湯是否咳。", "聲音是否濕或常清喉嚨。", "吃飯時間是否變長。", "體重、發燒或精神是否改變。"] }],
+    tables: [{ title: "用餐風險線索", headers: ["線索", "可能代表", "下一步"], rows: [["喝水常咳", "液體吞嚥風險", "記錄並諮詢"], ["吃肉很久", "咀嚼或質地問題", "切小調軟並觀察"], ["飯後發燒", "吸入風險", "儘快就醫評估"]] }],
+    references: [referenceLibrary.swallowing2022, referenceLibrary.appetite2023]
+  }),
+  "master-talk-sleep-rhythm": guide({
+    readingMinutes: 8,
+    targetAudience: "長輩半夜頻繁起身、日夜顛倒，家屬也睡不好的家庭",
+    warning: {
+      title: "夜間問題也可能是身體警訊",
+      items: ["突然失眠、混亂、跌倒、疼痛、喘或尿痛時，應先排除身體原因。", "夜間如廁變多且伴隨頭暈或跌倒，應記錄並諮詢。", "照顧者長期睡不好，也需要被納入照顧計畫。"]
+    },
+    summary: ["夜裡不穩，常常會拖垮白天所有照顧。", "夜間問題常從白天活動、午睡、光線、晚間飲水和用藥開始。", "先把跌倒風險降下來，再調整睡眠節奏和家屬喘息。"],
+    content: [
+      ["夜裡的問題，常從白天開始", ["曾小姐說，日夜顛倒、半夜頻繁起身，常和白天活動量、午睡長度、光線、晚間飲水和用藥有關。只處理晚上，常常不夠。", "如果白天幾乎沒有活動、午睡太久、晚上又缺乏固定流程，夜間自然更容易不穩。"]],
+      ["先把夜間跌倒風險降下來", ["床邊夜燈、止滑鞋、通往廁所的路線、扶手位置和常用物品，都要固定。夜間照顧不只關於睡眠，也關於安全。", "半夜起身時，長輩視線和反應都比較慢。床到浴室這條路，是最該先整理的路線。"]],
+      ["晚間流程要可預期", ["固定時間洗漱、關燈、減少電視刺激、把水杯和眼鏡放固定位置，都能讓夜間比較穩。", "若長輩失智，傍晚提前開燈、降低噪音和固定短句，也能降低焦躁。"]],
+      ["夜間頻尿或睡不好要看原因", ["可能和晚間飲水、藥物、尿路問題、疼痛、焦慮或日夜節奏有關。家屬可以記錄起身時間、次數、是否頭暈和是否急著如廁。", "若突然變多或合併不舒服，不要只當成老化。"]],
+      ["家屬也要有睡覺的權利", ["主要照顧者長期睡不好，白天就更難判斷和溝通。日照、居家服務、家人輪替或喘息安排，都可以放進夜間照顧計畫。", "照顧者能休息，才有力氣面對第二天。"]]
+    ],
+    checklists: [{ title: "夜間安全與作息檢查", items: ["床邊到浴室是否有夜燈。", "拖鞋是否止滑合腳。", "路線是否清空。", "白天是否有活動和日照。", "午睡是否過長。", "夜間起身次數是否有紀錄。"] }],
+    tables: [{ title: "夜間問題對照", headers: ["狀況", "可能原因", "先做"], rows: [["半夜摸黑", "光線不足", "補夜燈"], ["頻繁如廁", "飲水、藥物或泌尿問題", "記錄並諮詢"], ["日夜顛倒", "白天活動不足", "增加白天光照與活動"]] }],
+    references: [referenceLibrary.fallsJama2024, referenceLibrary.dementiaAgitation2020]
+  }),
+  "master-talk-care-subsidy": guide({
+    readingMinutes: 8,
+    targetAudience: "擔心長照費用、補助、自費和服務組合的家庭",
+    warning: {
+      title: "費用資訊請以申請當下官方與服務單位說明為準",
+      items: ["補助資格、額度和部分負擔可能隨政策調整。", "不要只追求用滿額度，應先看家庭最需要減壓的時段。", "自費不是失敗，而是補足制度與生活需求之間的落差。"]
+    },
+    summary: ["家庭害怕的常常不是花錢，而是不知道會花多少。", "補助和自費要回到最痛的照顧時段討論。", "費用透明是信任的一部分，也能降低家人爭執。"],
+    content: [
+      ["家庭害怕的是不確定", ["楊先生說，很多家屬不是完全不願意花錢，而是不知道會花多少、補助能用在哪裡、自費會不會越滾越多。資訊不清楚，就很難做決定。", "費用討論若太晚才出現，家人之間也容易開始猜測和責怪。"]],
+      ["先理解服務需求，再討論補助怎麼用", ["補助不是拿滿就好，而是要用在真正減壓的地方。洗澡、備餐、日照、復能、接送或喘息，都應依家庭最困難的情境安排。", "如果最痛的是主要照顧者白天無法上班，就先看白天服務；如果最危險的是洗澡，就先把居家照顧和浴室安全排進計畫。"]],
+      ["自費不是失敗，而是照顧組合的一部分", ["有些需求超出補助範圍或頻率，家庭若經濟能負擔，可以用自費補足。重點是讓家屬知道為什麼要多這一段、能減少哪個風險。", "自費應該被說明清楚，而不是讓家屬在壓力下被動接受。"]],
+      ["費用透明可以降低家庭衝突", ["好的服務窗口會先說明哪些可補助、哪些需自費、可能頻率和替代方案。當家人都看懂，照顧安排就比較不容易變成爭吵。", "建議家庭把每月照顧費用、政府資源、自費服務和家人分攤方式寫下來。"]],
+      ["費用要定期回頭看", ["長輩狀態變化、家屬工作改變、服務頻率調整，都會影響費用。不要以為第一次規劃就是永久答案。", "每一段時間回頭看支出和照顧效果，才能讓安排更可持續。"]]
+    ],
+    checklists: [{ title: "討論費用前先整理", items: ["目前最需要服務的時段。", "已核定或正在申請的長照資源。", "家中可承擔的自費範圍。", "哪些服務是安全必要。", "哪些服務可逐步增加。", "家人分攤與決策方式。"] }],
+    tables: [{ title: "服務組合思考", headers: ["家庭痛點", "可能服務", "費用討論重點"], rows: [["洗澡危險", "居家照顧", "頻率與自費補足"], ["白天無人陪", "日照", "接送與每月支出"], ["照顧者過載", "喘息", "固定休息時段"]] }],
+    references: [referenceLibrary.longTermCare1966, referenceLibrary.longTermCareGov]
+  }),
+  "master-talk-careworker-training": guide({
+    readingMinutes: 8,
+    targetAudience: "想了解照服員訓練、服務品質與家屬回報如何連在一起的家庭",
+    warning: {
+      title: "高風險照顧不能只靠經驗",
+      items: ["移位、沐浴、翻身、餵食和失智溝通都需要標準流程。", "服務中若出現跌倒、嗆咳、皮膚破損或急性不適，應立即回報。", "紀錄不是行政負擔，而是品質追蹤的基礎。"]
+    },
+    summary: ["照服員的專業不只在技術，也在每一次靠近長輩的方式。", "越高風險，越需要標準流程、督導和紀錄。", "好的培訓會把現場經驗帶回教材與服務改善。"],
+    content: [
+      ["照顧品質從第一句話開始", ["蘇小姐分享，照服員進門如何問候、是否先告知下一步、是否尊重長輩習慣，都會影響服務能不能順利進行。專業不是冷冰冰，而是穩定而有界線。", "長輩感覺被尊重，移位、沐浴和用餐等動作才比較容易被接受。"]],
+      ["越高風險，越需要標準流程", ["移位、沐浴、翻身、餵食都不能只靠經驗。環境確認、口令、支撐位置、長輩反應和事後紀錄，都需要被訓練和督導追蹤。", "標準流程不是把人變僵硬，而是讓不同人接手時仍能守住安全。"]],
+      ["照服員要學技術，也要學觀察", ["今天吃少、走路變慢、皮膚紅、情緒不穩，都是服務現場可能看見的變化。照服員若能觀察並回報，家屬和督導就能早一點調整。", "照顧不是完成清單，而是看見人正在變化。"]],
+      ["紀錄讓訓練不只停在課堂", ["服務紀錄可以看見現場問題，也能回頭調整教材和督導方式。好的培訓，是把每一次服務經驗轉成下一次更穩的照顧。", "如果同一類問題反覆出現，團隊就應回頭看流程、教材和督導支持。"]],
+      ["家屬也應知道服務標準", ["家屬若知道照服員會觀察什麼、回報什麼、哪些狀況需要升級處理，就比較能信任服務。", "透明的標準能讓家屬、照服員和督導站在同一頁。"]]
+    ],
+    checklists: [{ title: "高風險服務訓練重點", items: ["進門告知與取得同意。", "移位前環境確認。", "沐浴安全與保暖。", "用餐嗆咳觀察。", "皮膚與傷口變化。", "服務後紀錄與異常回報。"] }],
+    tables: [{ title: "訓練如何轉成品質", headers: ["訓練項目", "現場表現", "紀錄重點"], rows: [["移位", "口令一致、避免拉手臂", "是否頭暈或不穩"], ["沐浴", "備物、止滑、保暖", "皮膚與疲累"], ["用餐", "小口慢速、觀察嗆咳", "吃幾成與反應"]] }],
+    references: [referenceLibrary.fallsJama2024, referenceLibrary.swallowing2022]
+  }),
+  "master-talk-care-technology": guide({
+    readingMinutes: 8,
+    targetAudience: "想讓照顧紀錄、家屬回報和督導追蹤更清楚的家庭或長照單位",
+    warning: {
+      title: "照顧科技的重點不是增加欄位",
+      items: ["系統應讓資訊更容易被理解，而不是讓前線更忙。", "異常狀況、用藥、飲食、跌倒和皮膚變化要能被追蹤。", "家屬看到的回報要能回答今天是否安全、下一步要注意什麼。"]
+    },
+    summary: ["系統不是取代人，而是讓照顧資訊不遺漏。", "資訊最容易斷在交接那一刻。", "資料累積後，督導才能看趨勢、追問題、改善訓練。"],
+    content: [
+      ["資訊最容易斷在交接那一刻", ["賴先生說，長照服務有很多角色：家屬、照服員、督導、行政和專業人員。若所有資訊都靠口頭轉述，吃飯、用藥、活動和異常狀況很容易漏掉。", "系統的第一個價值，是讓今天發生的事不只存在某個人的記憶裡。"]],
+      ["系統要把複雜變簡單", ["家屬不需要看一堆後台欄位，而是要快速知道今天狀況如何、是否有提醒、下次要注意什麼。好的系統會把照顧資訊整理成可以理解的訊號。", "對前線人員來說，紀錄流程也要順手。若紀錄太複雜，最後就會回到口頭交代。"]],
+      ["異常狀況要能被升級處理", ["跌倒、嗆咳、皮膚破損、用藥漏吃、食慾下降，不應只是寫在備註裡，而要能提醒督導或家屬。", "照顧系統若能把高風險事件標記出來，就能縮短問題被看見的時間。"]],
+      ["資料累積後，品質才有辦法追蹤", ["當紀錄不再散在 LINE、紙本和口頭交代裡，督導就能看趨勢、找出重複問題、回到訓練和服務調整。系統不是讓人更忙，而是讓照顧更穩。", "例如同一位長輩連續吃少、夜間起身變多或跌倒風險升高，都能從資料中被看見。"]],
+      ["科技最終仍要回到人", ["照顧科技不是取代照顧者，而是讓照顧者少一點資訊焦慮，讓家屬更清楚，讓督導更早介入。", "真正好的系統，是讓每個角色都更容易做對的事。"]]
+    ],
+    checklists: [{ title: "照顧系統應該回答", items: ["今天長輩吃喝如何。", "活動、移位和情緒是否穩定。", "是否有異常需要追蹤。", "下一位照顧者要注意什麼。", "家屬是否看得懂回報。", "督導能否看見趨勢。"] }],
+    tables: [{ title: "資訊斷點與系統支持", headers: ["斷點", "常見後果", "系統應做"], rows: [["口頭交接", "漏掉異常", "固定欄位與提醒"], ["家屬追問", "焦慮與重複溝通", "清楚摘要"], ["督導晚知道", "問題累積", "高風險標記"]] }],
+    references: [referenceLibrary.transitionalCare2022, referenceLibrary.caregiver2020]
+  }),
+  "master-talk-discharge-transition": guide({
+    readingMinutes: 9,
+    targetAudience: "長輩即將出院或剛返家，家屬需要建立第一週照顧流程的家庭",
+    warning: {
+      title: "出院後若出現這些變化，請優先就醫或聯絡醫療單位",
+      items: ["胸痛、呼吸困難、意識改變。", "傷口紅腫熱痛、滲液惡化或發燒。", "跌倒、持續疼痛、無法進食喝水或用藥錯亂。"]
+    },
+    summary: ["出院不是結束，而是照顧轉換的開始。", "第一週要把用藥、回診、傷口、移位和家屬分工整理清楚。", "照顧銜接越早開始，家屬越不需要靠臨場反應硬撐。"],
+    content: [
+      ["返家第一週最容易手忙腳亂", ["謝護理師分享，出院當天家庭常以為終於告一段落，但真正的照顧挑戰才剛開始。藥袋、回診單、傷口照護、復健建議與生活限制若沒有整理清楚，家人很快就會陷入猜測。", "在醫院有人協助觀察，回家後這些判斷常突然落到家屬身上。第一週先求穩，不求一次恢復全部生活。"]],
+      ["先把風險寫成清單", ["返家前最好確認誰負責服藥提醒、誰陪同回診、誰觀察傷口或精神狀態，也要知道什麼情況需要立刻就醫。清單不是形式，而是讓家人能接手。", "出院摘要、藥袋、回診單、緊急聯絡方式和每日觀察表最好放在同一處。"]],
+      ["家裡能不能安全生活，要在第一天先看", ["床邊、浴室、廁所、走道、餐桌和常坐的椅子，都要確認長輩是否能安全使用。若每一步都需要家屬用力扶，代表服務和復能要更早介入。", "常用物品放固定位置，夜間路線要有燈，地面雜物先清空。"]],
+      ["每天固定看幾件事", ["精神、食慾水分、疼痛、排便排尿、活動能力、睡眠和用藥，是第一週很實用的觀察項目。每項一句話即可，重點是看今天和昨天有什麼不同。", "有紀錄，回診時更容易溝通；家人交接時也不會每次從頭問起。"]],
+      ["銜接服務能降低家庭壓力", ["若長輩短期內需要移位、沐浴、備餐或復能支持，可以提早安排居家照顧與專業評估。照顧銜接越早開始，家屬越不需要靠臨場反應硬撐。", "服務不是取代家人，而是幫家庭把第一週最容易混亂的部分接住。"]]
+    ],
+    inlineImages: [
+      { afterSection: 1, src: "assets/health3/generated/post-discharge-care-station-inline.jpg", alt: "出院返家照顧資料與用藥整理", caption: "第一週先把用藥、回診和每日觀察整理到同一份紀錄。" }
+    ],
+    checklists: [{ title: "出院返家第一週檢查", items: ["出院藥和原本藥是否整合。", "回診日期和問題是否寫下。", "傷口或皮膚照顧方式是否清楚。", "床邊到浴室是否安全。", "家人分工是否明確。", "異常時要找誰是否清楚。"] }],
+    tables: [{ title: "第一週照顧任務", headers: ["任務", "目的", "確認方式"], rows: [["用藥整理", "避免漏吃或重複吃", "藥單與紀錄"], ["安全動線", "降低跌倒", "床邊到浴室走一次"], ["每日觀察", "看見趨勢", "簡短表格"]] }],
+    references: [referenceLibrary.transitionalCare2022, referenceLibrary.longTermCare1966]
+  }),
+  "master-talk-pressure-injury-care": guide({
+    readingMinutes: 9,
+    targetAudience: "長輩久坐、久躺、使用尿布或皮膚容易紅破的家庭",
+    warning: {
+      title: "皮膚已破、滲液或發黑時不要自行硬處理",
+      items: ["壓紅不退、破皮、滲液、異味或發燒。", "皮膚摸起來熱、長輩喊痛或範圍擴大。", "糖尿病、營養不良或臥床者傷口變化更要及早處理。"]
+    },
+    summary: ["翻身不是例行公事，是在保護皮膚和尊嚴。", "壓傷常從紅、熱、痛、潮濕與壓痕開始。", "預防需要姿勢、減壓、清潔、營養和紀錄一起做。"],
+    content: [
+      ["壓傷常常不是突然發生", ["洪護理師提醒，長輩活動量下降、長時間坐輪椅或臥床時，尾椎、腳跟、髖部和肩胛附近都容易承受壓力。若皮膚反覆發紅、破皮或潮濕，就要提早處理。", "家屬若等到傷口出現才處理，常會變得更辛苦。預防要從每天觀察開始。"]],
+      ["翻身要有節奏，也要有溝通", ["協助翻身時，家屬常擔心弄痛長輩。可以先說明動作、準備枕頭支撐，再觀察長輩表情與呼吸。好的翻身不是把人轉過去，而是讓身體得到真正減壓。", "長輩如果知道下一步要做什麼，緊張和抗拒會少很多。"]],
+      ["清潔、乾爽和床單平整都重要", ["尿布更換、擦澡、床單皺摺與衣物摩擦都會影響皮膚狀況。潮濕會讓皮膚更脆弱，皺摺也可能造成壓痕。", "每次清潔時順便看皮膚，是最自然的觀察時機。"]],
+      ["營養和活動量會影響皮膚修復", ["蛋白質、水分和整體營養不足，會讓皮膚更不容易修復。若長輩吃少、體重下降或傷口不易好，要把營養一起放進照顧計畫。", "若能力允許，床邊坐起、短時間站立或安全活動，也有助於減少長時間受壓。"]],
+      ["床上照顧也需要專業眼睛", ["若已經有傷口，建議請護理專業協助評估，避免家屬用錯方式讓傷口更難恢復。", "照顧紀錄能讓家屬、照服員、督導和醫療人員一起看變化，避免每次都重新猜。"]]
+    ],
+    inlineImages: [
+      { afterSection: 1, src: "assets/health3/generated/pressure-injury-posture-care-inline.jpg", alt: "壓傷預防用品與照顧紀錄", caption: "壓傷預防要把姿勢、減壓、清潔與紀錄放在同一個流程。" }
+    ],
+    checklists: [{ title: "每日壓傷觀察", items: ["尾椎、臀部、腳跟是否發紅。", "皮膚是否潮濕、破皮或有異味。", "床單與衣物是否皺摺。", "尿布區是否泛紅。", "今天是否有改變姿勢。", "食慾與水分是否足夠。"] }],
+    tables: [{ title: "皮膚變化對照", headers: ["變化", "可能風險", "下一步"], rows: [["紅很快退", "短暫壓迫", "調整姿勢"], ["紅不退或熱痛", "壓傷早期", "減壓並諮詢"], ["破皮滲液", "傷口風險", "請專業評估"]] }],
+    references: [referenceLibrary.pressureInjury2020, referenceLibrary.appetite2023]
+  }),
+  "master-talk-daycare-transition": guide({
+    readingMinutes: 8,
+    targetAudience: "準備讓長輩第一次嘗試日照，擔心抗拒或不適應的家庭",
+    warning: {
+      title: "適應期先看原因，不急著判斷失敗",
+      items: ["急性身體不適或精神狀態突然改變時，先處理健康問題。", "若抗拒來自陌生、害怕或不理解流程，可用短時間與陪同逐步銜接。", "持續高度焦慮時，應和中心討論調整。"]
+    },
+    summary: ["第一次去日照，家屬要準備的是安心感。", "抗拒不代表不適合，常是陌生和不確定造成。", "前期先建立熟悉感、固定接送和清楚回報。"],
+    content: [
+      ["抗拒不代表不適合", ["盧社工分享，許多長輩第一次聽到日照會先拒絕，原因可能是不熟悉環境、擔心被安排、害怕失去自主。家屬可以先用參觀、短時間體驗和熟悉工作人員的方式慢慢銜接。", "前期目標不是立刻喜歡，而是知道自己會安全回家。"]],
+      ["把生活習慣交給團隊", ["長輩喜歡的稱呼、用餐偏好、如廁習慣、容易焦慮的情境，都能幫助日照團隊更快建立信任。這些小資訊，往往比長篇病史更能影響第一天的感受。", "如果長輩討厭午睡、怕吵或不喜歡某類活動，提早說明能減少適應摩擦。"]],
+      ["前幾天不要塞太滿", ["剛開始不一定要期待長輩參加所有活動。只要願意坐下、願意吃飯、願意和人互動一點點，就是好的開始。", "若條件允許，可從短時間或較熟悉活動開始，再慢慢延長。"]],
+      ["固定接送建立安全感", ["長輩最常擔心的是不知道誰接、幾點回家、家人是不是不要他。每天用同一句話說明流程，會比反覆說服更有效。", "可以搭配照片、簡單時鐘或今日流程卡，讓長輩有線索可看。"]],
+      ["家屬也需要回報來安心", ["日照的目標，是讓長輩慢慢找回規律與連結，也讓家屬白天能工作和休息。活動、用餐、精神和特殊狀況若能清楚回報，家屬就比較能陪長輩度過適應期。", "適應不是單方面要求長輩配合，而是家庭和中心一起調整。"]]
+    ],
+    inlineImages: [
+      { afterSection: 1, src: "assets/health3/generated/day-care-adaptation-welcome-inline.jpg", alt: "日照中心初次適應與熟悉環境", caption: "前期先建立熟悉感和安全感，不急著要求長輩立刻適應整天。" }
+    ],
+    checklists: [{ title: "日照適應前兩週", items: ["先參觀廁所、休息區和用餐區。", "提供長輩習慣與偏好。", "用固定短句說明接送。", "前期活動不要安排太滿。", "回家後先聽感受。", "看一到兩週趨勢，不只看第一天。"] }],
+    tables: [{ title: "抗拒原因與調整", headers: ["反應", "可能原因", "可調整"], rows: [["一直問回家", "時間安全感不足", "固定說明回家時間"], ["不參與活動", "太陌生或太難", "先旁觀或選熟悉活動"], ["吃很少", "環境不習慣", "回報偏好並調整"]] }],
+    references: [referenceLibrary.dayPrograms2024, referenceLibrary.caregiver2019]
+  }),
+  "master-talk-caregiver-burnout": guide({
+    readingMinutes: 8,
+    targetAudience: "長期照顧家人，已經疲憊、愧疚或情緒緊繃的照顧者",
+    warning: {
+      title: "照顧者若出現危機感，請立即求助",
+      items: ["有傷害自己或他人的念頭。", "長期失眠、恐慌、憂鬱或身體明顯不適。", "照顧壓力已經影響長輩安全。"]
+    },
+    summary: ["照顧者不是超人，先被接住才有力氣照顧。", "疲憊不是不孝，而是壓力已經超載。", "真正的支持要把一句辛苦了變成有人接手的時段。"],
+    content: [
+      ["很多照顧者累到不敢說累", ["高心理師分享，長期照顧最難的地方，是身體疲累之外還有罪惡感。家屬常覺得只要自己停下來，就是對不起長輩，但照顧者若一直被消耗，照顧品質也會跟著下降。", "照顧者需要先被允許承認：我累了，我需要幫忙。"]],
+      ["先辨認超載訊號", ["睡不好、容易生氣、對長輩失去耐心、對其他家人疏離，都是需要被看見的訊號。這不是個性變差，而是壓力已經超過一個人能承受的範圍。", "若身體疼痛、頭痛、胃痛或心悸變多，也可能是壓力正在身體化。"]],
+      ["把壓力拆成時段", ["不要只說整天都很累。先找出最困難的三個時段：洗澡、夜間如廁、用餐、回診、傍晚焦躁。", "當壓力變成具體時段，家人和服務才比較能接手。"]],
+      ["支持要變成具體安排", ["家人可以分擔接送、採買、陪診、夜間照顧或行政聯繫，也可以搭配喘息、日照與居家服務。真正的支持，是把一句辛苦了變成有人接手的時段。", "若家人不知道怎麼幫，主要照顧者可以先提出最需要被替換的任務，而不是等待對方猜中。"]],
+      ["照顧者也需要自己的求助名單", ["把可以求助的人和單位寫下來：家人、朋友、社工、長照窗口、醫療人員、照顧團隊。真正累到崩潰時，人很難臨時想起可以找誰。", "照顧者被接住，長輩才有機會被穩定照顧。"]]
+    ],
+    inlineImages: [
+      { afterSection: 2, src: "assets/health3/generated/caregiver-respite-planning-inline.jpg", alt: "照顧者喘息與家庭分工規劃", caption: "支持照顧者，需要把一句辛苦了變成有人接手的時段。" }
+    ],
+    checklists: [{ title: "照顧者耗竭警訊", items: ["連續睡不好。", "常常自責或想逃。", "對長輩越來越沒有耐心。", "身體疼痛或胃痛變多。", "工作和關係受影響。", "覺得沒有人能幫忙。"] }],
+    tables: [{ title: "壓力與支持安排", headers: ["壓力", "可能支持", "先做"], rows: [["夜間睡不好", "家人輪替、喘息", "記錄夜間次數"], ["洗澡太累", "居家照顧", "描述浴室和流程"], ["白天無法上班", "日照", "評估接送與適應"]] }],
+    references: [referenceLibrary.caregiver2019, referenceLibrary.caregiver2020]
+  }),
+  "master-talk-medication-reminder": guide({
+    readingMinutes: 8,
+    targetAudience: "長輩多重用藥、常漏吃或家屬提醒吃藥常變成衝突的家庭",
+    warning: {
+      title: "提醒吃藥前，先確保藥物資訊正確",
+      items: ["不要自行停藥、加量、減量或混用藥袋。", "換藥後頭暈、嗜睡、跌倒、食慾改變要記錄。", "提醒方式若造成衝突，應調整成固定流程而不是反覆催促。"]
+    },
+    summary: ["提醒吃藥不是催促，是幫長輩保留安全節奏。", "多重用藥需要清楚時間、用途與回診問題。", "藥盒、提醒、照片或服務回報要接成一套流程。"],
+    content: [
+      ["藥袋越多，越需要整理成生活節奏", ["陳藥師分享，長輩若同時看多科、服用多種藥物，最容易發生重複吃、漏吃或不知道某顆藥的用途。先把早中晚與睡前整理清楚，是安全的第一步。", "清單要包含藥名、時間、用途、劑量和注意事項，家人看到同一份資料，才不會各說各話。"]],
+      ["提醒要避免變成衝突", ["家屬常因擔心而一直催促，長輩卻可能覺得被管束。可以改用固定時間、藥盒、照片紀錄或服務人員回報，讓提醒變成日常節奏，而不是每次都要爭執。", "提醒文字越具體越好，例如早餐後藥袋，而不是只說快吃藥。"]],
+      ["把異常記錄下來", ["服藥後嗜睡、頭暈、食慾改變或跌倒，都應該記錄並在回診時告知醫師或藥師。照顧系統若能保存紀錄，家屬就不必只靠記憶追問題。", "尤其剛出院或換藥後，要多看幾天精神、步態和食慾。"]],
+      ["藥盒不是答案的全部", ["藥盒能協助分裝，但仍需有人確認是否已吃、是否漏吃、是否吃錯。若長輩自己會重複拿藥，藥盒和保存位置更要設計。", "家中若有照服員或多位家屬輪流照顧，藥盒旁最好有簡單紀錄。"]],
+      ["用藥提醒也是家屬溝通", ["提醒吃藥不該只落在最焦慮的家屬身上。家人可以分工準備藥盒、確認回診、更新清單和追蹤異常。", "當流程清楚，提醒就比較不會變成每天的衝突來源。"]]
+    ],
+    inlineImages: [
+      { afterSection: 1, src: "assets/health3/generated/medication-reminder-family-system-inline.jpg", alt: "家庭用藥提醒與紀錄桌面", caption: "藥物清單、藥盒、提醒和紀錄要接在一起。" }
+    ],
+    checklists: [{ title: "用藥提醒流程", items: ["所有藥物集中成一張清單。", "藥盒依時段分裝。", "提醒文字具體。", "吃完有確認方式。", "異常反應有紀錄。", "回診前整理問題。"] }],
+    tables: [{ title: "提醒方式比較", headers: ["方式", "優點", "注意"], rows: [["藥盒", "一眼看出時段", "仍要確認是否已吃"], ["手機提醒", "固定時間", "避免太多聲音"], ["服務回報", "家屬可追蹤", "異常要升級"]] }],
+    references: [referenceLibrary.medicationReview2024, referenceLibrary.polypharmacy2024]
+  })
+};
+
+const additionalArticleDepthEnhancements = {
+  "chronic-disease-visit-prep": guide({
+    readingMinutes: 9,
+    targetAudience: "長輩有高血壓、糖尿病、心臟病或多重慢病，家屬常陪同回診的家庭",
+    warning: {
+      title: "回診前若有急性變化，不要等到預約日",
+      items: ["胸痛、喘、單側無力、意識改變、嚴重低血糖或跌倒後持續疼痛。", "血壓、血糖或體溫和以往差很多，且合併不舒服。", "新藥後出現嚴重頭暈、嗜睡、皮疹、食慾明顯下降。"]
+    },
+    summary: ["回診品質取決於家屬能不能把一個月的變化整理成重點。", "用藥、生命徵象、跌倒、食慾、睡眠與功能變化都應放進同一張清單。", "每次回診只要帶 3 到 5 個最重要問題，醫師較容易協助判斷。"],
+    content: [
+      ["不要只帶健保卡，也要帶生活變化", ["慢病回診常常時間有限，家屬如果只說最近還好，醫師很難知道長輩在家真正發生什麼事。血壓血糖數字重要，但食慾、睡眠、走路、跌倒、精神和用藥後反應也同樣是線索。", "回診前一週，建議把最明顯的變化寫下來。不是要做複雜報告，而是讓醫療人員看見趨勢。"]],
+      ["用藥清單一定要包含保健品和中藥", ["很多長輩同時看多科，藥物可能來自不同醫院、藥局、保健品或親友建議。若回診時只帶某一科藥袋，醫師和藥師就很難判斷重複用藥或交互作用。", "清單至少寫藥名、劑量、時間、用途、何時開始和吃完後是否不舒服。看不懂藥名時，可以直接帶藥袋或拍照。"]],
+      ["數字要看趨勢，不要只看單次高低", ["血壓、血糖或體重一次異常不一定代表病情惡化，但連續幾天和平常不同，就值得被提出來。家屬可以用簡單表格記錄日期、數值、當天精神、飲食和是否有特殊事件。", "例如血糖偏低是否發生在早餐前、血壓偏低是否伴隨頭暈、體重下降是否同時吃少，這些搭配資訊比單一數字更有用。"]],
+      ["把功能變化說清楚", ["醫療照顧不只看檢驗值，也要看長輩能不能生活。最近是否更難起身、走路變慢、洗澡更不穩、夜間如廁變多，都是重要回診問題。", "如果家屬覺得每次都說不清楚，可以把一週中最卡的三個時段寫下來，回診時直接詢問是否需要復能、用藥調整或長照服務銜接。"]],
+      ["回診後要把醫囑翻譯成家裡做得到的流程", ["看完診後，家屬要確認藥物是否改變、何時回診、哪些狀況要提前就醫、每天要觀察什麼。醫囑如果只留在紙上，很快就會在家中照顧裡斷掉。", "建議回家後更新照顧清單，讓其他家人、照服員或日照中心都知道新規則。慢病照顧不是一次回診，而是回診和日常互相接上。"]]
+    ],
+    checklists: [{ title: "回診前 10 分鐘整理", items: ["完整用藥、保健品、中藥清單。", "最近一週血壓、血糖、體重或體溫紀錄。", "跌倒、嗆咳、頭暈、疼痛或急診事件。", "食慾、睡眠、排便排尿變化。", "日常功能是否退步。", "這次最想問的 3 到 5 個問題。"] }],
+    tables: [{ title: "回診問題怎麼問", headers: ["家中觀察", "可問醫師或藥師", "回家後要做"], rows: [["換藥後頭暈", "是否和藥物或血壓有關", "記錄發生時間"], ["體重下降", "是否需營養或吞嚥評估", "記錄餐量"], ["夜間如廁變多", "是否與疾病、藥物或泌尿問題有關", "檢查夜間動線"]] }],
+    references: [referenceLibrary.doctorVisitNia, referenceLibrary.chronicDiseaseCdc, referenceLibrary.medicationReview2024]
+  }),
+  "elder-constipation-care": guide({
+    readingMinutes: 8,
+    targetAudience: "長輩排便變少、解便費力、腹脹或常依賴軟便藥的家庭",
+    warning: {
+      title: "便祕合併這些狀況，請優先就醫",
+      items: ["腹痛劇烈、嘔吐、肚子明顯脹、發燒。", "糞便帶血、黑便、體重下降或貧血。", "突然排便習慣大幅改變，尤其過去沒有便祕史。"]
+    },
+    summary: ["便祕常和水分、纖維、活動量、藥物、疼痛與如廁環境一起相關。", "先記錄頻率、形狀、費力程度和伴隨症狀，比急著買藥更重要。", "長期依賴瀉藥或突然變嚴重時，應和醫療專業討論。"],
+    content: [
+      ["便祕不是只看幾天沒上廁所", ["有些長輩每天都有排便，卻很硬、很費力、解不乾淨；也有人兩三天一次但不痛不脹。家屬要看的是和平常相比有沒有改變，以及是否影響食慾、睡眠和活動。", "若只是問有沒有大便，很容易漏掉真正困擾。建議把便便形狀、是否費力、是否腹脹、是否需要用藥都記下來。"]],
+      ["水分和活動量常常一起下降", ["長輩怕夜尿、怕漏尿或怕走到廁所跌倒，可能會刻意少喝水。水分少、活動少、吃得少，腸胃蠕動就更容易變慢。", "協助便祕不能只叫長輩多喝水，要同時處理如廁安全與活動量。白天分次補水、飯後短距離走動或坐姿活動，都比一次要求很多更容易持續。"]],
+      ["藥物也可能是原因之一", ["止痛藥、鐵劑、部分降血壓藥、抗憂鬱或安眠相關藥物，都可能影響排便。家屬不要自行停藥，但可以把便祕發生時間和用藥變化一起帶去詢問醫師或藥師。", "若長輩同時多科用藥，便祕紀錄也應放進用藥清單裡，讓專業人員判斷是否需要調整。"]],
+      ["如廁環境會影響願不願意去廁所", ["廁所太遠、坐下起身困難、門檻高、沒有扶手或冬天太冷，都會讓長輩忍住不去。久了之後，排便反射變弱，問題會更難處理。", "可以先檢查馬桶高度、扶手、夜燈、防滑和隱私。讓長輩安心坐穩，比一直催促更有幫助。"]],
+      ["建立固定觀察，不把排便變成衝突", ["照顧者很容易每天追問有沒有上，長輩也可能覺得被控制。比較好的方式，是固定在照顧紀錄裡寫下排便情況，必要時再討論。", "若便祕反覆影響食慾、腹脹、疼痛或情緒，請帶紀錄諮詢醫療專業。處理便祕的目標不是追求每天一次，而是安全、舒服、穩定。"]]
+    ],
+    checklists: [{ title: "便祕觀察重點", items: ["幾天一次，和平常差多少。", "是否很硬、很費力或解不乾淨。", "是否腹痛、腹脹、嘔吐或食慾下降。", "最近水分與活動量是否下降。", "近期是否換藥或增加止痛藥。", "如廁是否害怕跌倒或起身困難。"] }],
+    tables: [{ title: "常見原因與照顧方向", headers: ["線索", "可能原因", "可先做"], rows: [["怕喝水", "擔心夜尿或漏尿", "白天分次補水並檢查動線"], ["久坐少動", "腸胃蠕動下降", "飯後安全走動或坐姿活動"], ["新藥後變嚴重", "藥物副作用可能", "記錄並問醫師藥師"]] }],
+    references: [referenceLibrary.constipationOlderAdults, referenceLibrary.constipationPrevalence2023, referenceLibrary.dehydration2023]
+  }),
+  "pain-observation-elderly": guide({
+    readingMinutes: 9,
+    targetAudience: "長輩常喊痛、走路變慢，或因失智、失語而說不清楚疼痛的家庭",
+    warning: {
+      title: "疼痛突然變嚴重時不要只在家觀察",
+      items: ["跌倒後髖部、背部、手腕或頭部持續疼痛。", "胸痛、喘、冒冷汗、單側無力或意識改變。", "疼痛合併發燒、紅腫熱痛、無法承重或夜間痛醒。"]
+    },
+    summary: ["長輩疼痛可能表現在臉色、姿勢、食慾、睡眠、活動量和情緒上。", "失智長輩不一定會說痛，抗拒照顧也可能是疼痛訊號。", "疼痛紀錄要包含位置、時間、動作、強度和處理後是否改善。"],
+    content: [
+      ["痛不一定會被說出口", ["有些長輩習慣忍痛，有些則因失智、失語或聽力問題說不清楚。家屬如果只等長輩主動說痛，可能會漏掉關節、牙齒、傷口、泌尿感染或跌倒後的問題。", "疼痛常表現在生活裡：不想下床、走路變慢、吃飯變少、晚上睡不好、洗澡時抗拒、脾氣變急。這些都值得被記錄。"]],
+      ["先看疼痛和動作的關係", ["如果起身痛、走路痛、翻身痛或碰到某處才痛，線索就不同。家屬可以觀察長輩在哪個動作皺眉、縮手、護著身體或突然不願意配合。", "照顧者不要用力拉扯測試疼痛。比較安全的是停止動作、詢問位置、觀察表情，再決定是否需要醫療評估。"]],
+      ["用簡單量表幫助溝通", ["能回答的長輩，可以問 0 到 10 分現在有多痛；不能清楚回答時，可以用臉部表情、聲音、姿勢、防衛動作和生活變化來判斷。", "重點不是把疼痛分數算得很精準，而是追蹤趨勢。今天比昨天痛嗎？吃藥或休息後有改善嗎？是否影響走路、睡眠或食慾？"]],
+      ["不要把抗拒都解讀成不配合", ["失智長輩拒絕洗澡、換衣或移位，背後可能是怕痛、關節僵硬、皮膚破損或曾經有不舒服經驗。若只靠說服或加快動作，衝突會更高。", "先放慢、告知下一步、檢查姿勢和支撐點，必要時請護理、復能或醫療專業協助判斷。"]],
+      ["疼痛紀錄能幫醫療人員更快找到方向", ["回診或急診時，家屬若能說清楚痛的位置、開始時間、誘發動作、伴隨症狀和處理結果，判斷會更有效率。", "尤其長輩多重用藥時，不要自行增加止痛藥或混用成藥。把疼痛和用藥一起整理，請醫師或藥師確認安全。"]]
+    ],
+    checklists: [{ title: "疼痛觀察紀錄", items: ["疼痛位置與範圍。", "何時開始，是否突然發生。", "哪個動作會加重。", "0 到 10 分疼痛強度或表情變化。", "是否影響睡眠、食慾、走路、洗澡。", "休息、熱敷、藥物或姿勢調整後是否改善。"] }],
+    tables: [{ title: "看見這些變化時可以怎麼想", headers: ["變化", "可能線索", "下一步"], rows: [["不願站起", "髖膝痛、頭暈或害怕跌倒", "先停下並觀察疼痛位置"], ["洗澡抗拒", "肩痛、皮膚痛或害怕", "改分段並檢查皮膚"], ["夜裡痛醒", "疼痛控制不足或新問題", "記錄並諮詢醫療"]] }],
+    references: [referenceLibrary.painAssessmentOlderAdults, referenceLibrary.chronicPainOlderAdults]
+  }),
+  "oral-care-aspiration-prevention": guide({
+    readingMinutes: 8,
+    targetAudience: "長輩戴假牙、口乾、吃飯常嗆咳，或家屬不知道如何協助口腔清潔的家庭",
+    warning: {
+      title: "口腔問題合併這些狀況要及早處理",
+      items: ["牙齦腫痛、口腔潰瘍、假牙磨破皮或出血。", "吃飯喝水常嗆咳、聲音變濕、反覆發燒。", "口腔疼痛導致拒食、體重下降或精神變差。"]
+    },
+    summary: ["口腔清潔影響進食意願、吞嚥安全、口氣、感染與生活尊嚴。", "飯後清潔、假牙清潔、舌苔與口乾觀察都應納入日常照顧。", "若反覆嗆咳或口腔疼痛，應銜接牙科、醫療或吞嚥專業。"],
+    content: [
+      ["口腔清潔不只是刷牙乾不乾淨", ["長輩如果口腔疼痛、假牙不合、舌苔厚或口乾，很容易吃得少、咬不動、吞不順，也可能在照顧時變得抗拒。口腔是用餐安全的入口，也是照顧尊嚴的一部分。", "家屬常把口腔清潔排在最後，但對臥床、失智、吞嚥困難或戴假牙的長輩來說，這件事需要固定流程。"]],
+      ["先確認假牙和口腔有沒有傷口", ["假牙不是戴得上就好。若假牙鬆、磨破、藏食物殘渣或清潔不乾淨，長輩可能因為痛而吃少，卻不一定會主動說。", "照顧時可以觀察嘴角、牙齦、舌頭、上顎、假牙接觸處是否紅腫破皮。若看到傷口或出血，不要只靠漱口水掩蓋。"]],
+      ["飯後清潔比睡前一次更實用", ["吃完飯後，口中殘渣若留太久，可能增加口腔異味與感染風險，也會讓下一餐更不舒服。能漱口的長輩先漱口，不能漱口者則需要安全的口腔擦拭方式。", "照顧者要避免讓長輩平躺清潔口腔，以免嗆咳。能坐起就坐起，不能坐起也要依專業建議調整姿勢。"]],
+      ["口乾和藥物也會影響口腔", ["有些長輩因水分不足、張口呼吸或藥物影響而口乾。口乾會降低食慾，也會讓吞嚥和說話更不舒服。", "家屬可以記錄口乾發生時段、喝水情況、是否新換藥，再於回診時詢問。不要自行停藥，但要讓醫療人員知道口腔變化。"]],
+      ["把口腔清潔變成固定交接項目", ["如果家中有家屬、照服員或日照中心輪流照顧，口腔清潔要能交接：今天是否清潔、假牙是否取下、是否有傷口、是否嗆咳。", "口腔照顧做得好，常能改善吃飯意願，也讓家屬更早看見吞嚥和感染風險。"]]
+    ],
+    checklists: [{ title: "每日口腔照顧可看", items: ["飯後是否有食物殘渣。", "假牙是否鬆動、磨破或清潔。", "牙齦、舌頭、口腔黏膜是否紅腫破皮。", "是否口乾、口臭或拒絕刷牙。", "喝水吃飯是否嗆咳。", "清潔時姿勢是否安全。"] }],
+    tables: [{ title: "口腔線索與照顧方向", headers: ["線索", "可能影響", "下一步"], rows: [["假牙磨破", "疼痛與拒食", "牙科評估"], ["飯後常殘渣", "口腔感染與嗆咳風險", "建立飯後清潔"], ["聲音濕濕的", "吞嚥安全疑慮", "記錄並諮詢專業"]] }],
+    references: [referenceLibrary.oralHealthOlderAdults, referenceLibrary.oralCareAspiration, referenceLibrary.swallowing2022]
+  }),
+  "urinary-incontinence-night-care": guide({
+    readingMinutes: 9,
+    targetAudience: "長輩漏尿、夜尿頻繁、使用尿布，或家屬因夜間如廁很緊張的家庭",
+    warning: {
+      title: "泌尿變化合併這些狀況要就醫",
+      items: ["尿痛、血尿、發燒、下腹痛或突然意識混亂。", "突然完全尿不出來，或尿量明顯變少。", "夜間頻繁起身造成跌倒，或皮膚紅破滲液。"]
+    },
+    summary: ["漏尿不是只換尿布，要找出時間、誘因、用藥、飲水和動線問題。", "夜尿會增加跌倒風險，床邊到廁所的路線要優先整理。", "尿布使用要同時照顧皮膚、尊嚴與感染警訊。"],
+    content: [
+      ["先把漏尿當成照顧線索，而不是麻煩", ["長輩漏尿或夜尿變多，家屬常第一反應是換尿布、少喝水或責備怎麼又來不及。但尿失禁可能和泌尿感染、便祕、藥物、行動變慢、認知退化或夜間動線有關。", "先觀察什麼時段最常發生、是否伴隨尿痛、是否突然變嚴重，比直接增加尿布更有幫助。"]],
+      ["夜尿最怕的是急著起身跌倒", ["半夜醒來時，長輩可能還沒完全清醒，血壓和步態也較不穩。若又因為怕來不及而急著走，就會讓跌倒風險升高。", "床邊夜燈、止滑鞋、固定助行器位置、清空路線和馬桶旁扶手，是夜間照顧很實際的第一步。"]],
+      ["不要為了怕尿而整天少喝水", ["有些家庭會要求長輩少喝水，短期看似減少如廁，卻可能增加脫水、便祕、泌尿問題和精神混亂風險。水分安排應依疾病限制和醫囑調整，而不是直接壓低。", "可以把水分集中在白天分次補充，晚餐後視狀況減少大量飲水，並記錄夜尿次數再和醫療人員討論。"]],
+      ["尿布使用要保護皮膚和尊嚴", ["尿布不是越厚越好，也不是穿了就不用如廁。長時間潮濕會讓皮膚脆弱，若長輩仍能部分如廁，應保留能力並安排固定提醒。", "更換時觀察皮膚紅疹、破皮、異味和尿色。清潔動作要先告知，保留遮蔽和尊重，避免讓長輩覺得被羞辱。"]],
+      ["記錄能幫助判斷是否需要醫療或復能介入", ["家屬可以記錄尿量大約多少、發生時間、是否咳嗽或站起時漏尿、是否來不及走到廁所、是否有尿痛發燒。", "這些資訊能幫醫師判斷可能原因，也能讓照顧團隊討論如廁訓練、動線調整、皮膚照顧和夜間照顧分工。"]]
+    ],
+    checklists: [{ title: "漏尿與夜尿觀察", items: ["白天或夜間哪個時段最常發生。", "是否尿痛、血尿、異味或發燒。", "最近是否新換藥或便祕。", "是否怕來不及而急著起身。", "尿布區皮膚是否紅破。", "水分是否過少或集中在晚上。"] }],
+    tables: [{ title: "不同情境的下一步", headers: ["情境", "可能風險", "先處理"], rows: [["夜尿頻繁", "跌倒與睡眠不足", "整理夜間路線"], ["尿布區泛紅", "皮膚破損", "增加更換與減壓"], ["突然尿痛發燒", "感染可能", "儘快就醫"]] }],
+    references: [referenceLibrary.urinaryIncontinenceNia, referenceLibrary.urinaryIncontinenceFalls, referenceLibrary.fallsJama2024]
+  }),
+  "social-isolation-depression-signs": guide({
+    readingMinutes: 8,
+    targetAudience: "長輩越來越不出門、少說話、活動量下降，家屬擔心孤立或憂鬱的家庭",
+    warning: {
+      title: "情緒與安全危機請立即求助",
+      items: ["長輩表達不想活、想傷害自己或拒絕基本進食喝水。", "短時間內意識混亂、幻覺、劇烈行為改變或疑似譫妄。", "持續憂鬱、失眠、體重下降或生活功能明顯退步。"]
+    },
+    summary: ["不出門不一定是懶，可能是體力下降、聽力視力退化、喪偶、疼痛或憂鬱。", "孤立常和食慾、睡眠、活動量、慢病控制與照顧者壓力交織。", "家屬可以先從固定邀請、低壓活動和社區支持開始。"],
+    content: [
+      ["越來越安靜，可能不是個性變了", ["長輩少出門、少說話、拒絕聚會，家屬常以為只是年紀大了。但背後可能是走路怕跌倒、聽不清楚、視力變差、疼痛、喪偶失落、失智早期變化或憂鬱。", "如果同時出現吃少、睡不好、對原本喜歡的事沒興趣、常說自己沒用，就需要更認真看待。"]],
+      ["先找出不出門的真正阻力", ["不要只說你要多出去走走。先問或觀察卡在哪裡：怕廁所不方便、怕走不動、怕被問身體、聽不清楚、沒有人陪、活動太陌生。", "阻力越具體，支持才越能落地。也許不是安排大型活動，而是先從樓下散步、社區共餐、固定來訪或短時間日照開始。"]],
+      ["社交支持要低壓、固定、可預期", ["孤立中的長輩不一定能突然接受很多人和很多活動。固定時間、熟悉人物、簡單任務，反而比較容易建立安全感。", "例如每週固定一次共餐、每天同一時間電話問候、在日照中心先參與半天活動。重點是規律，不是熱鬧。"]],
+      ["身體問題也會讓人退回家裡", ["疼痛、漏尿、便祕、聽力視力退化、吞嚥困難或走路不穩，都會讓長輩避免出門。若只從心理勸說，可能會讓長輩更挫折。", "因此要同時檢查身體功能、居家安全、輔具、交通和照顧者陪伴，而不是把所有問題都歸因為心情不好。"]],
+      ["家屬也需要支持，不然很難長期陪伴", ["陪伴孤立或憂鬱長輩需要耐心，家屬很容易被拒絕幾次後感到挫折。這時候可以讓服務、社區據點、日照或親友輪替加入。", "照顧的目標不是逼長輩變開朗，而是讓他重新感覺生活有連結、有選擇、有人穩定在。"]]
+    ],
+    checklists: [{ title: "孤立與憂鬱警訊", items: ["原本喜歡的活動都不想做。", "食慾下降或體重下降。", "睡眠明顯變多或變少。", "常說自己沒用、拖累家人。", "不願洗澡、換衣或回診。", "出門意願下降伴隨疼痛、漏尿或怕跌倒。"] }],
+    tables: [{ title: "把孤立拆成可處理問題", headers: ["表面反應", "可能原因", "可嘗試"], rows: [["不想出門", "怕跌倒或廁所不便", "先短路線陪走"], ["不想聊天", "聽力差或怕被問", "一對一低壓陪伴"], ["活動都拒絕", "陌生焦慮", "固定熟人邀請"]] }],
+    references: [referenceLibrary.socialIsolationNia, referenceLibrary.caregiver2020, referenceLibrary.dayPrograms2024]
+  }),
+  "assistive-device-selection": guide({
+    readingMinutes: 9,
+    targetAudience: "準備購買助行器、扶手、便盆椅、洗澡椅或其他居家輔具的家庭",
+    warning: {
+      title: "輔具不合適也可能增加風險",
+      items: ["助行器高度不對、煞車不會用、輪子太滑。", "扶手裝在抓不到或承重不足的位置。", "長輩跌倒後、體力快速下降或認知改變時，應重新評估輔具。"]
+    },
+    summary: ["輔具要從長輩實際動作出發，不是看商品功能表。", "起身、轉身、如廁、洗澡、外出，每一個場景需要的支撐不同。", "最好由復能、職能治療、護理或居家安全專業一起評估。"],
+    content: [
+      ["先看長輩怎麼動，再談買什麼", ["很多家庭一開始就問該買哪一款助行器或扶手，但更重要的是長輩在哪個動作卡住。是站不起來、轉身不穩、走太遠會累、廁所起身困難，還是洗澡怕滑？", "同一種輔具在不同家庭效果可能完全不同。空間大小、門寬、地面材質、長輩手力和理解能力，都會影響安全。"]],
+      ["助行器不是拿了就會安全", ["助行器高度、握把、煞車、輪子、轉彎空間都要確認。若長輩只把助行器推很遠，身體跟不上，反而可能失去重心。", "使用前最好有人教怎麼站進去、怎麼轉身、怎麼坐下前鎖煞車。家屬也要觀察長輩是否真的願意用，而不是買了放在旁邊。"]],
+      ["扶手位置要配合用力方向", ["浴室、馬桶旁、床邊和走道扶手，不是裝越多越好。位置太遠、太高、太低或牆面承重不足，都可能讓長輩抓不到或抓了不穩。", "建議讓長輩實際做一次起身、坐下、轉身動作，再看手自然伸向哪裡。真正用得到的位置，才值得施工。"]],
+      ["便盆椅和洗澡椅要看尊嚴與清潔", ["便盆椅不只是解決走不到廁所，也牽涉隱私、清潔、異味和家屬照顧負擔。洗澡椅則要看高度、止滑、排水、扶手和進出浴室動線。", "若輔具讓長輩覺得丟臉或不舒服，使用率會很低。家屬要把尊嚴和生活習慣也放進選擇。"]],
+      ["狀態改變時，輔具也要重評估", ["跌倒後、住院後、失智進展、視力變差、體力下降或家中照顧者更換，都可能讓原本安全的輔具變得不適合。", "輔具不是一次購買就結束，而是照顧計畫的一部分。定期回看使用情況，才能真正降低風險。"]]
+    ],
+    checklists: [{ title: "買輔具前先確認", items: ["長輩卡住的是起身、走路、轉身、如廁或洗澡。", "家中門寬與動線是否容得下。", "長輩手力、視力、理解能力是否能配合。", "輔具高度與煞車是否會使用。", "清潔、收納和家屬照顧負擔是否可承受。", "是否需要專業到宅評估。"] }],
+    tables: [{ title: "常見輔具選擇邏輯", headers: ["情境", "可能考慮", "先確認"], rows: [["走路不穩", "助行器、拐杖", "高度與煞車"], ["馬桶起身難", "扶手、增高座", "牆面與用力方向"], ["洗澡怕跌", "洗澡椅、防滑、扶手", "排水與轉身空間"]] }],
+    references: [referenceLibrary.assistiveTechnologyFalls, referenceLibrary.homeHazards2023, referenceLibrary.fallsJama2024]
+  }),
+  "home-emergency-care-folder": guide({
+    readingMinutes: 8,
+    targetAudience: "家中長輩常回診、多重用藥，或家人、照服員、移工輪流照顧的家庭",
+    warning: {
+      title: "急症發生時資料夾不能取代就醫",
+      items: ["胸痛、喘、意識改變、嚴重跌倒或疑似中風，請立即啟動緊急就醫。", "資料夾用途是讓交接更快，不是讓家屬自行診斷。", "資料需定期更新，舊藥單或舊醫囑可能造成誤判。"]
+    },
+    summary: ["照顧資料夾能讓急診、回診、請假交接和服務進場更穩。", "內容包含疾病、用藥、過敏、醫療限制、聯絡人、回診和日常照顧重點。", "最好同時有紙本和手機照片版本，並固定每次回診後更新。"],
+    content: [
+      ["真正慌亂時，人很難臨時想資料", ["長輩突然跌倒、喘、發燒或要去急診時，家屬常會被問：有什麼病、吃什麼藥、對什麼過敏、最近有沒有住院。平常知道的事，在緊張時也可能說不完整。", "照顧資料夾的目的，是把重要資訊放在同一處，讓不同家人都能快速接手。"]],
+      ["第一頁放最重要的緊急資訊", ["第一頁建議只放最核心內容：姓名、出生年月日、主要疾病、藥物過敏、緊急聯絡人、主要醫院、重大醫療提醒。越急的時候，越需要簡短。", "若長輩有吞嚥限制、不能自行站立、失智走失風險或特殊醫囑，也應放在醒目位置。"]],
+      ["用藥清單要每次回診後更新", ["藥物最容易過期。出院、換科別、換藥或新增保健品後，都要更新。只留舊藥單，可能讓下一位照顧者照錯規則。", "清單可以包含藥名、用途、時間、劑量、醫院和注意事項。若不確定，可以請藥師協助整理。"]],
+      ["日常照顧重點也要寫", ["資料夾不只給醫療人員，也給家人、照服員、移工和日照中心。長輩怎麼移位、吃飯會不會嗆、洗澡怕什麼、夜間會不會起身、情緒安撫方式，都可以簡短寫下。", "這些生活資訊能讓照顧更連續，避免每個人重新摸索。"]],
+      ["資料夾要放在找得到的位置", ["紙本可放在客廳或固定抽屜，手機可拍照放在家族群組或主要照顧者相簿。重點是其他人知道在哪裡，而不是只有一個人知道。", "建議每月或每次回診後更新一次。照顧資料夾不是行政作業，而是家庭在混亂時的安全繩。"]]
+    ],
+    checklists: [{ title: "照顧資料夾內容", items: ["基本資料與緊急聯絡人。", "疾病、手術、過敏、醫療限制。", "最新用藥與保健品清單。", "回診日期與主要醫療院所。", "移位、用餐、吞嚥、洗澡、夜間照顧重點。", "長照服務、日照或照服員聯絡方式。"] }],
+    tables: [{ title: "資料放哪裡最有用", headers: ["資料", "用途", "更新時機"], rows: [["用藥清單", "急診與回診", "每次換藥後"], ["照顧限制", "服務交接", "狀態改變後"], ["聯絡人", "突發事件", "家人分工改變後"]] }],
+    references: [referenceLibrary.doctorVisitNia, referenceLibrary.medicationReview2024, referenceLibrary.transitionalCare2022]
+  }),
+  "heat-injury-older-adults": guide({
+    readingMinutes: 8,
+    targetAudience: "夏季高溫期間照顧長輩、慢病患者或行動不便家人的家庭",
+    warning: {
+      title: "疑似熱中暑請立即降溫並就醫",
+      items: ["體溫很高、意識混亂、昏倒、抽搐或停止流汗。", "頭暈、噁心、虛弱、心跳快，且移到陰涼處仍未改善。", "長輩有心臟、腎臟疾病或服用利尿劑等藥物時，更要提前諮詢醫療人員。"]
+    },
+    summary: ["長輩對熱的調節能力較差，不要等到口渴才補水。", "高溫照顧要同時看室溫、通風、衣著、水分、尿量、精神和用藥。", "熱傷害預防不是只靠冷氣，而是把降溫和觀察排進每日流程。"],
+    content: [
+      ["長輩不一定會主動喊熱", ["老化、慢性疾病、行動不便、認知退化和部分藥物，都可能讓長輩對高溫反應變慢。等到長輩說很不舒服時，可能已經累積一段時間。", "家屬要主動看室內溫度、流汗情況、精神、尿量和食慾。高溫天氣下，照顧不能只問渴不渴。"]],
+      ["先把家中最熱的時段找出來", ["有些房間上午很熱，有些下午西曬嚴重。家屬可以觀察長輩平常待最多的地方，是否通風、是否有遮陽、是否能安全使用電風扇或冷氣。", "若長輩捨不得開冷氣，可以設定固定高溫時段開啟，或安排到較涼的房間、公共空間、日照中心或親友家。"]],
+      ["水分要分次補，也要看疾病限制", ["高溫時水分需求可能上升，但心臟、腎臟疾病或醫師限制水分者，不能自行大幅增加。一般家庭可用少量多次方式，並觀察尿色、尿量、口乾和精神。", "若長輩因怕夜尿而白天也少喝，便祕、頭暈和泌尿問題都可能跟著增加。白天分段補水比晚上一次喝很多更適合多數家庭。"]],
+      ["衣著、洗澡和活動時間也要調整", ["選擇透氣、寬鬆、好穿脫的衣物，避免中午前後外出或運動。洗澡水不宜過熱，洗完後也要注意是否頭暈或疲累。", "若需要外出回診，盡量安排交通接駁、遮陽、補水和休息點，不要讓長輩在戶外久等。"]],
+      ["把熱傷害警訊交給所有照顧者", ["家中若有照服員、移工、日照或不同家人輪流照顧，大家都要知道高溫天氣要看什麼：精神變差、頭暈、尿少、皮膚熱、噁心、喘或意識改變。", "只要懷疑熱傷害，先移到陰涼處、鬆開衣物、降溫補水；若意識不清或症狀嚴重，應立即就醫。"]]
+    ],
+    checklists: [{ title: "高溫照顧每日檢查", items: ["長輩常待房間是否通風或降溫。", "水分是否分次補充。", "尿量、尿色、口乾是否和平常不同。", "精神、食慾、頭暈是否變化。", "外出是否避開高溫時段。", "所有照顧者是否知道熱傷害警訊。"] }],
+    tables: [{ title: "熱傷害警訊", headers: ["看到的狀況", "可能代表", "先做"], rows: [["頭暈虛弱", "熱衰竭可能", "移到陰涼、補水觀察"], ["意識混亂", "熱中暑危險", "立即降溫並就醫"], ["尿量變少", "水分不足可能", "評估補水並諮詢"]] }],
+    references: [referenceLibrary.heatInjuryHpa, referenceLibrary.heatOlderAdultsCdc, referenceLibrary.dehydration2023]
+  }),
+  "family-care-meeting-guide": guide({
+    readingMinutes: 9,
+    targetAudience: "家人對照顧分工、費用、服務使用或醫療決策常有歧見的家庭",
+    warning: {
+      title: "家庭會議不適合在危機中臨時開",
+      items: ["長輩急性不適時，先處理醫療安全，再討論分工。", "若家庭衝突涉及暴力、財務剝削或照顧疏忽，應尋求專業協助。", "重要醫療決策應尊重長輩意願，並與醫療專業討論。"]
+    },
+    summary: ["家庭照顧會議不是要說服誰，而是把任務、費用、決策和備援寫清楚。", "最有效的會議從具體時段和具體任務開始，不從誰比較孝順開始。", "照顧分工要定期回看，因為長輩狀態和家屬能力都會變。"],
+    content: [
+      ["不要等吵架才開會", ["很多家庭會議是在某個人撐不住、費用爆開或長輩出事後才開始，這時每個人都很緊繃，很難好好討論。比較好的時機，是在出院前、申請長照前、主要照顧者快超載前就先談。", "會議目標不是找出誰錯，而是把照顧變成可分工、可追蹤、可調整的計畫。"]],
+      ["從任務開始，不從情緒開始", ["先列出一週照顧任務：陪診、備餐、洗澡、夜間照顧、採買、費用整理、服務聯絡、緊急接送。每項任務都要有人負責或找外部服務補上。", "如果只說大家要多幫忙，最後通常還是主要照顧者補位。任務越具體，分工越有機會落地。"]],
+      ["費用要透明，才不會變成猜忌", ["居家服務、日照、輔具、尿布、營養品、交通、看護和醫療自費，都可能變成壓力來源。家人最好把固定費用和可能突發費用分開列出。", "討論錢不是冷血，而是讓照顧安排能持續。若能搭配長照補助、自費上限和每月結算方式，爭執會少一點。"]],
+      ["醫療決策要早一點談", ["當長輩意識清楚時，就應該理解他的偏好：希望在哪裡照顧、誰陪診、重大醫療決策誰協助、不能表達時要怎麼辦。這些問題越晚談，家屬壓力越大。", "家庭會議可以先整理問題，再帶到回診或專業諮詢中確認。長輩的意願應該被放在中心，而不是只由家人替他猜。"]],
+      ["會議後要有紀錄和下一次檢查", ["開完會若沒有紀錄，很快又會回到口頭承諾。建議寫下任務、負責人、期限、費用方式、下次回看日期。", "照顧分工不是一次定案。長輩狀態、家人工作、服務 availability 都會變，固定回看比一次談到完美更重要。"]]
+    ],
+    checklists: [{ title: "家庭照顧會議議程", items: ["目前最困難的三個照顧時段。", "每週固定任務和負責人。", "醫療回診、用藥和緊急聯絡分工。", "每月固定費用與突發費用。", "是否需要居家、日照、喘息或輔具。", "下次檢查日期和備援方案。"] }],
+    tables: [{ title: "把幫忙變成任務", headers: ["模糊說法", "可執行版本", "追蹤方式"], rows: [["有空幫忙", "每週三陪診", "行事曆"], ["一起分擔錢", "每月 5 日結算", "共享表格"], ["多關心長輩", "每晚 8 點電話", "家族群組回報"]] }],
+    references: [referenceLibrary.advanceCarePlanningNia, referenceLibrary.caregiver2020, referenceLibrary.longTermCare1966]
+  })
+};
+
+const careworkerHardshipDepthEnhancements = {
+  "careworker-hard-work-overview": guide({
+    readingMinutes: 9,
+    targetAudience: "想理解照顧服務員工作內容、家屬如何尊重第一線人員的讀者",
+    warning: {
+      title: "辛苦不應被浪漫化，應該被制度接住",
+      items: ["照服員若長期疼痛、睡眠不足或情緒耗竭，會影響人員健康與照顧安全。", "家屬額外要求、服務界線不清和缺乏督導支持，都會讓壓力累積。", "尊重照服員，不只是說謝謝，也包含合理任務、清楚溝通與安全環境。"]
+    },
+    summary: ["照服員的工作同時包含身體勞動、情緒勞動、風險判斷與服務紀錄。", "最耗力的不是單一動作，而是每天反覆在陌生環境中維持安全與尊重。", "家屬、督導和機構若能共同支持，照顧服務才有機會穩定。"],
+    content: [
+      ["照服員不是來家裡幫忙做雜事的人", ["居家照顧看起來像一連串日常動作：協助洗澡、備餐、移位、陪伴、提醒用藥。但每一個動作背後都需要判斷：長輩今天能不能站、浴室會不會滑、吃飯會不會嗆、情緒是否穩定。", "真正辛苦的地方，是照服員要在短短服務時間內，同時維持安全、尊嚴、效率和家屬期待。這不是單純勞力，而是高度情境判斷。"]],
+      ["身體勞動每天都在累積", ["協助翻身、扶站、轉位、洗澡和更換衣物，常常需要彎腰、蹲下、扶持和保持警覺。若家中空間狹窄、沒有扶手或缺少輔具，照服員更容易用身體硬扛。", "腰背、肩頸、手腕和膝蓋的負擔不是一天形成，而是一次一次服務累積起來。把照服員的身體安全納入照顧計畫，是長照品質的一部分。"]],
+      ["情緒勞動常常更不容易被看見", ["照服員可能要面對長輩拒絕洗澡、失智重複提問、家屬焦慮追問、臨時改需求，甚至被誤解為不夠用心。這些狀況需要穩定語氣和專業界線。", "每一次溫和回應背後，都是情緒調節。若沒有督導支持和團隊討論，照服員很容易把壓力帶回家。"]],
+      ["照顧品質需要紀錄和團隊，不是靠個人硬撐", ["好的照顧不是照服員一個人默默完成所有事，而是現場觀察能被記錄，異常能被回報，督導能協助調整服務計畫。", "當紀錄被家屬理解、被督導追蹤，照服員就不需要獨自承擔所有判斷。服務也比較能從今天做完，變成下一次更安全。"]],
+      ["家屬能做的支持很具體", ["準備安全動線、尊重服務時間、提前說明特殊狀況、把額外需求交給督導討論，都是支持照服員的方式。", "照服員被尊重，長輩才更容易得到穩定照顧。長照不是把辛苦推給某一位人員，而是讓家庭和團隊一起把辛苦分散。"]]
+    ],
+    checklists: [{ title: "家屬支持照服員的做法", items: ["服務前先整理環境動線。", "把高風險狀況提前告知。", "額外需求透過督導討論。", "尊重服務時間與任務界線。", "看見異常紀錄時一起追蹤。", "避免把情緒壓力直接丟給第一線人員。"] }],
+    tables: [{ title: "照服員辛苦的不同面向", headers: ["面向", "常見情境", "需要的支持"], rows: [["身體負荷", "移位、沐浴、翻身", "輔具與安全動線"], ["情緒負荷", "拒絕照顧、家屬焦慮", "督導支持與界線"], ["責任負荷", "異常判斷、紀錄", "清楚回報流程"]] }],
+    references: [referenceLibrary.careworkerMsds2020, referenceLibrary.careworkerBurnout2024, referenceLibrary.homecareWorkerHealthInterventions]
+  }),
+  "careworker-back-pain-transfer": guide({
+    readingMinutes: 8,
+    targetAudience: "關心照服員腰背痛、移位安全與工作輔具使用的家庭或長照單位",
+    warning: {
+      title: "移位照顧不能只靠照服員用力",
+      items: ["長輩跌倒後、體力快速下降或無法承重時，應重新評估移位方式。", "家中空間太窄、床椅高度不合或缺少扶手，會增加照服員受傷風險。", "照服員持續腰背痛、手麻、膝痛時，應及早回報與調整工作方式。"]
+    },
+    summary: ["翻身、扶站、轉位和沐浴是照服員肌肉骨骼負荷最高的情境。", "輔具、動線、床椅高度和兩人協助，比單靠經驗更能降低風險。", "家屬若理解移位風險，就比較不會把快速完成當成唯一標準。"],
+    content: [
+      ["腰背痛不是照服員應該習慣的代價", ["許多照服員長期面對彎腰、扶抱、轉身和半蹲動作。若案家缺少扶手、床太低、浴室濕滑或長輩突然腿軟，身體負荷會更高。", "照顧工作需要體力，但不代表職業傷害是必然。真正專業的照顧，應該包含保護長輩，也保護照服員。"]],
+      ["最危險的是急、擠、滑、沒有支撐", ["趕時間、空間太小、地面濕滑、沒有穩定扶手，是移位照顧常見風險。照服員如果為了完成任務而硬拉硬扶，長輩和照服員都可能受傷。", "服務前應先確認地面、鞋子、椅子高度、床邊空間和長輩當天體力。這些檢查看似多花時間，其實是在預防更大的事故。"]],
+      ["輔具不是偷懶，是專業工具", ["移位帶、助行器、洗澡椅、扶手、滑移墊或電動床，都能在合適情境下減少徒手負荷。問題不是有沒有輔具，而是能不能正確選擇、使用和維護。", "家屬若覺得用輔具很麻煩，可以請督導或復能專業示範。當工具用對，長輩會更穩，照服員也不必用身體硬扛。"]],
+      ["移位口令和長輩參與很重要", ["安全移位不是把人搬過去，而是讓長輩能參與多少就參與多少。短句口令、腳的位置、手扶哪裡、站起後停幾秒，都會影響安全。", "若長輩完全無法配合，服務計畫就要重新討論，不應要求單一照服員獨自完成高風險移位。"]],
+      ["把腰背痛回報制度化", ["照服員若因為怕被認為不耐操而不敢說痛，問題會越拖越嚴重。單位應鼓勵回報高風險動作、疼痛、需要輔具或需要兩人協助的情境。", "家屬也可以一起看：是不是床椅高度要調、浴室要加扶手、服務時間要重新安排。減少照服員受傷，就是穩定照顧品質。"]]
+    ],
+    checklists: [{ title: "移位前風險檢查", items: ["長輩今天是否能承重。", "地面是否乾燥止滑。", "床椅高度是否適合。", "扶手或支撐點是否穩固。", "是否需要移位帶、洗澡椅或兩人協助。", "照服員是否有疼痛或不適需要回報。"] }],
+    tables: [{ title: "常見高負荷動作", headers: ["動作", "風險", "改善方向"], rows: [["床上翻身", "彎腰扭轉", "床高、滑移墊、口令"], ["扶站轉位", "突然腿軟", "移位帶、扶手、停頓"], ["沐浴協助", "濕滑與久蹲", "洗澡椅、防滑、分段"]] }],
+    references: [referenceLibrary.careworkerMsds2020, referenceLibrary.careworkerAssistiveToolsMol, referenceLibrary.longTermCareWorkerHealthManual]
+  }),
+  "careworker-emotional-labor": guide({
+    readingMinutes: 8,
+    targetAudience: "想理解照服員情緒壓力、家屬溝通與督導支持重要性的讀者",
+    warning: {
+      title: "情緒耗竭不是個人修養問題",
+      items: ["長期被責備、被誤解或面對高衝突家庭，會累積心理壓力。", "照服員若出現失眠、恐懼進案家、情緒麻木或想離職，應被支持。", "涉及辱罵、威脅、性騷擾或暴力時，應啟動不法侵害處理流程。"]
+    },
+    summary: ["照服員要穩住長輩，也常要穩住家屬焦慮，這是高度情緒勞動。", "服務界線、督導陪談和異常回報，能降低情緒壓力被個人化。", "家屬理解照服員不是出氣筒，服務關係才會長久。"],
+    content: [
+      ["每天保持溫和，本身就是勞動", ["照服員進到案家，常要在短時間內辨識長輩情緒、家屬期待和現場風險。即使被拒絕、被催促或被質疑，也要保持穩定語氣。", "這種情緒調節不容易被看見，卻是照顧品質的重要部分。若只把它當成服務態度，就會忽略人員需要支持。"]],
+      ["家屬焦慮有時會轉成壓力", ["家屬擔心長輩很自然，但焦慮若變成反覆指責、臨時加工作、要求超出服務範圍，就會讓照服員被夾在情感和制度中間。", "清楚服務計畫和督導溝通，可以避免照服員每次都在現場獨自協商。"]],
+      ["失智與精神行為症狀會增加情緒負荷", ["照服員可能面對重複提問、拒絕洗澡、懷疑被偷、言語攻擊或突然激動。這些狀況不應要求照服員靠忍耐處理。", "需要的是失智照顧訓練、固定回應方式、環境調整和家屬一致配合。"]],
+      ["被看見，比被要求正向更重要", ["當照服員說某個案家壓力很大，督導若只說再忍一下，會讓人員更孤立。比較好的做法是一起回顧情境、調整服務流程、必要時陪同溝通。", "支持不是替照服員抱怨，而是把情緒壓力轉成可處理的工作問題。"]],
+      ["家屬可以讓服務關係更安全", ["家屬若能用具體需求取代情緒指責，照服員比較能回應。例如說明今天長輩哪裡不舒服，而不是直接說你怎麼沒做好。", "照顧關係中，尊重不是客套話。它會影響照服員是否願意留下，也影響長輩是否能持續得到熟悉的人照顧。"]]
+    ],
+    checklists: [{ title: "降低情緒勞動傷害", items: ["服務範圍先說清楚。", "高衝突案家由督導介入。", "失智行為有固定回應方式。", "辱罵、威脅、騷擾要正式回報。", "照服員有定期督導或同儕支持。", "家屬用具體需求取代情緒指責。"] }],
+    tables: [{ title: "情緒壓力來源與支持", headers: ["來源", "常見情境", "支持方式"], rows: [["家屬焦慮", "反覆追問、臨時要求", "督導統一溝通"], ["長輩抗拒", "拒洗、拒食、拒移位", "失智照顧策略"], ["不安全互動", "辱罵或威脅", "不法侵害流程"]] }],
+    references: [referenceLibrary.careworkerBurnout2024, referenceLibrary.homecareWorkplaceViolence, referenceLibrary.careAidesSupportCulture]
+  }),
+  "home-careworker-travel-between-homes": guide({
+    readingMinutes: 8,
+    targetAudience: "想理解居服員到宅服務、交通奔波、排班壓力與工時管理的家庭",
+    warning: {
+      title: "交通與時間壓力也是職業安全問題",
+      items: ["雨天、夜間、偏遠案家或連續趕場都會增加事故風險。", "服務時間被延長或臨時取消，會影響後續案家與人員收入。", "排班過密會讓照服員沒有休息和紀錄時間。"]
+    },
+    summary: ["居服員辛苦不只在案家內，也在案家與案家之間。", "交通、停車、天候、臨時取消、電梯與門禁，都會影響服務品質。", "合理排班和家屬準時配合，是尊重到宅服務的重要一環。"],
+    content: [
+      ["到宅服務不是按一個鈴就開始", ["居服員的一天可能穿梭多個案家，中間要趕車、找停車、等電梯、聯絡家屬、確認門禁。這些時間常常不被看見，卻是工作的一部分。", "若前一戶臨時拖延，下一戶可能也會受影響。居服員不是不願意多幫忙，而是後面還有另一位長輩在等。"]],
+      ["雨天和高溫會讓奔波更吃力", ["照服員可能騎車、搭車或步行到案家。大雨、高溫、寒流、交通事故和停車困難，都會增加身體負擔和安全風險。", "家屬若能理解這些外部條件，就比較能用合作態度面對偶發延遲，而不是只把它看成服務不準時。"]],
+      ["臨時取消也會造成連鎖影響", ["案家若臨時取消服務，照服員可能已經出門或無法臨時補到其他時段。對人員收入、交通安排和後續排班都會有影響。", "當然家庭有急事可以理解，但若經常臨時變動，就需要和單位討論更適合的服務時段和通知規則。"]],
+      ["服務時間內要包含交接和紀錄", ["照服員服務不是做完動作就走，還要觀察長輩狀態、回報異常、整理環境、完成紀錄。若所有時間都被塞滿動作，紀錄和風險判斷就會被壓縮。", "家屬看到照服員寫紀錄，不應只覺得那不是照顧。紀錄讓下一位照顧者接得上，也保護長輩安全。"]],
+      ["合理排班是照顧品質的一部分", ["單位安排服務時，需要考慮交通距離、服務強度、休息時間和人員技能。太密的排班看似效率高，實際上容易造成疲勞和錯誤。", "好的到宅服務，是讓長輩準時被照顧，也讓照服員有足夠時間安全移動、整理紀錄和恢復體力。"]]
+    ],
+    checklists: [{ title: "家屬可協助到宅服務更順", items: ["門禁、鑰匙或聯絡方式提前確認。", "若需取消，盡早通知。", "服務前整理基本動線。", "避免臨時追加大量任務。", "理解交通與天候可能造成延遲。", "把特殊狀況提前告知督導。"] }],
+    tables: [{ title: "案家間奔波的隱形工作", headers: ["情境", "造成影響", "改善做法"], rows: [["臨時取消", "收入與排班受影響", "建立通知規則"], ["連續趕場", "疲勞與紀錄不足", "保留移動時間"], ["門禁不清", "服務延遲", "提前提供資訊"]] }],
+    references: [referenceLibrary.homecareWorkerHealthInterventions, referenceLibrary.longTermCareWorkerHealthManual, referenceLibrary.longWorkingHoursBurnout]
+  }),
+  "careworker-service-boundaries-family": guide({
+    readingMinutes: 8,
+    targetAudience: "使用居家服務、想和照服員建立良好合作關係的家屬",
+    warning: {
+      title: "服務界線不清，最後常傷害雙方信任",
+      items: ["要求照服員做未列入計畫的高風險動作，可能危及長輩和人員。", "把家務、照顧、陪伴、醫療判斷混在一起，容易造成誤會。", "若需求改變，應透過督導調整服務計畫。"]
+    },
+    summary: ["照服員不是萬能幫手，而是依照服務計畫提供照顧支持。", "界線清楚不是冷漠，而是保障長輩安全、人員權益和服務品質。", "額外需求應回到督導與照顧計畫討論。"],
+    content: [
+      ["很多衝突來自一開始沒說清楚", ["家屬可能以為照服員來了就是什麼都能幫，照服員卻必須依照服務計畫、時間和安全規範執行。雙方期待不同，就容易累積不滿。", "服務開始前，把哪些能做、哪些不能做、遇到變化找誰討論說清楚，反而能讓合作更輕鬆。"]],
+      ["界線不是不近人情，是安全規則", ["例如長輩今天突然無法站立，家屬希望照服員抱去浴室，但這可能已經超出原本安全條件。照服員拒絕硬做，不是不幫忙，而是在避免跌倒和職業傷害。", "高風險需求要回報督導，必要時改服務方式、增加輔具或安排專業評估。"]],
+      ["家務協助也要有範圍", ["居家服務中可能包含必要生活支持，但不代表全家大掃除、照顧非服務對象或處理私人雜務。若界線不清，照服員會被拉進越來越多額外工作。", "家屬可以把需求列出來，由單位判斷哪些屬於服務範圍，哪些需要另行安排。"]],
+      ["尊重照服員的專業判斷", ["照服員在現場看見風險時，可能會建議暫停某個動作、調整順序或回報督導。家屬若只以快點完成為目標，容易忽略安全。", "好的合作是家屬提供長輩習慣，照服員提供現場判斷，督導協助把兩者整合成可執行計畫。"]],
+      ["需求改變就調計畫，不要現場硬拗", ["長輩狀態會變，家庭需求也會變。當服務不夠用，最好的方式不是每次臨時拜託，而是正式檢討服務內容。", "界線清楚，照服員能安心工作，家屬也知道該找誰調整。這是長期合作的基礎。"]]
+    ],
+    checklists: [{ title: "服務界線溝通", items: ["服務項目與時間是否清楚。", "哪些需求需先問督導。", "長輩狀態變差時如何回報。", "家務範圍是否明確。", "高風險移位是否有輔具或兩人協助。", "家屬期待是否已寫進照顧計畫。"] }],
+    tables: [{ title: "常見誤會", headers: ["家屬想法", "照服員限制", "建議做法"], rows: [["順便多做一下", "後面還有案家", "透過督導調整"], ["今天抱去洗澡", "高風險移位", "重新評估"], ["幫全家打掃", "非服務範圍", "另行安排"]] }],
+    references: [referenceLibrary.homecareWorkerHealthInterventions, referenceLibrary.homecareWorkplaceViolence, referenceLibrary.longTermCare1966]
+  }),
+  "dementia-careworker-safety": guide({
+    readingMinutes: 9,
+    targetAudience: "照服員、家屬與督導需要共同照顧失智長輩的服務場景",
+    warning: {
+      title: "失智照顧出現安全風險時，要回報而不是硬撐",
+      items: ["長輩出現攻擊、推擠、拿物品威脅或疑似走失風險。", "拒絕照顧導致無法進食、清潔、服藥或安全移位。", "照服員感到人身安全受威脅，應立即聯絡督導。"]
+    },
+    summary: ["失智照顧不是靠膽子大，而是靠固定流程、環境線索和團隊一致說法。", "照服員在現場承受的風險，需要家屬提供病程與誘因資訊。", "督導應把高風險行為轉成具體服務策略。"],
+    content: [
+      ["失智照顧最怕每個人說法不同", ["長輩若容易焦慮、懷疑、抗拒洗澡或重複提問，照服員需要知道家中固定說法和有效安撫方式。若家屬、照服員、日照中心各說各的，長輩會更混亂。", "一致的短句、固定流程和熟悉物品，比現場臨時說服更有效。"]],
+      ["拒絕照顧背後常有原因", ["拒絕洗澡可能是怕冷、怕跌、害羞或曾經不舒服；拒絕吃飯可能是吞嚥、牙口或情緒問題。照服員需要時間找原因，不應只被要求快點完成。", "家屬若能提供長輩偏好、禁忌和過去經驗，照服員比較能找到入口。"]],
+      ["人身安全要放在服務品質之前", ["照服員遇到推打、威脅、性騷擾或無法安全離開的情境，不應被要求忍耐。居家環境是工作場所，也需要職場安全。", "單位應有回報流程、風險分級、必要時雙人服務或暫停調整服務的機制。"]],
+      ["失智照顧需要事前劇本", ["例如長輩傍晚焦躁時先開燈、準備點心、降低電視音量；洗澡前先說明順序、讓他選毛巾或衣服。這些小流程能降低衝突。", "照服員不是每次都靠臨場反應，而是依照共同劇本操作，再把有效或無效的方式記錄下來。"]],
+      ["家屬和照服員是同隊，不是互相檢討", ["失智行為讓家庭很累，也讓第一線人員很辛苦。若發生不順，重點是一起找誘因，而不是立刻責怪誰沒做好。", "把事件、時間、前後發生什麼、怎麼處理寫下來，才能逐步找到比較穩定的照顧方式。"]]
+    ],
+    checklists: [{ title: "失智案家交接重點", items: ["長輩容易焦慮的時段。", "有效安撫語句與禁忌說法。", "洗澡、用餐、服藥的偏好。", "是否曾有攻擊、走失或拒絕照顧。", "家中危險物品與逃生動線。", "緊急時督導與家屬聯絡方式。"] }],
+    tables: [{ title: "高風險行為與流程", headers: ["情境", "照服員先做", "團隊後續"], rows: [["拒洗", "暫停、保暖、改分段", "調整洗澡時段"], ["激動", "保持距離、降低刺激", "回報風險"], ["遊走", "確認門鎖與陪伴", "建立安全計畫"]] }],
+    references: [referenceLibrary.dementiaAgitation2020, referenceLibrary.homecareWorkplaceViolence, referenceLibrary.careworkerBurnout2024]
+  }),
+  "careworker-shift-sleep-fatigue": guide({
+    readingMinutes: 8,
+    targetAudience: "關心照服員疲勞、輪班、工時與照顧安全的家屬與長照管理者",
+    warning: {
+      title: "疲勞不是撐一下就好",
+      items: ["連續工時過長、睡眠不足和高強度服務會影響判斷。", "疲勞時進行移位、沐浴或夜間照顧，事故風險上升。", "照服員若長期失眠、心悸、情緒失控或疼痛，應調整工作與就醫諮詢。"]
+    },
+    summary: ["照服員疲勞會影響反應、移位安全、紀錄品質和情緒穩定。", "合理排班、休息、交接和服務強度分配，是照顧安全的一部分。", "家屬臨時加時或頻繁改時段，也會讓疲勞累積。"],
+    content: [
+      ["照顧工作需要持續警覺", ["照服員在服務中要注意長輩臉色、步態、皮膚、嗆咳、環境風險和情緒變化。這需要注意力，不是機械式完成任務。", "當人員疲勞時，最先受影響的可能是判斷和反應速度。移位少停幾秒、紀錄少寫一項，都可能讓風險累積。"]],
+      ["早班、晚班和臨時加班都會壓縮恢復時間", ["有些照服員早上很早出門，晚上還有服務；有些則因案家臨時需求而延後下班。若中間沒有足夠休息，身體和情緒都會被消耗。", "疲勞不是個人意志力問題，而是排班和工作設計問題。"]],
+      ["高強度服務不能連續塞滿", ["沐浴、移位、臥床照顧、失智高衝突案家，都比一般陪伴或備餐更耗能。若一天排滿高強度案家，受傷和情緒耗竭風險都會增加。", "督導排班時應考慮服務強度，家屬也要理解不是每個時段都能臨時增加高負荷任務。"]],
+      ["交接和紀錄需要時間", ["服務結束後，照服員需要整理現場、確認長輩安全、寫紀錄、回報異常，再移動到下一戶。若所有時間都被壓縮，交接品質會下降。", "把紀錄時間視為照顧工作的一部分，才能讓後續團隊接得上。"]],
+      ["照服員休息，是照顧安全的一部分", ["家屬可能擔心人員休假造成服務中斷，但熟悉人員若長期沒有休息，也很難維持品質。單位應建立替班、交接和督導支持，而不是讓同一人無限硬撐。", "穩定的服務不是不休息，而是有人能接手、資訊能延續、照服員能恢復。"]]
+    ],
+    checklists: [{ title: "疲勞風險訊號", items: ["連續高強度服務。", "常常臨時加時或改班。", "服務間移動時間不足。", "照服員出現疼痛、失眠或情緒低落。", "紀錄常被壓縮到最後。", "案家需求變多但計畫未調整。"] }],
+    tables: [{ title: "疲勞與照顧安全", headers: ["疲勞來源", "可能影響", "改善"], rows: [["排班過密", "趕場與漏紀錄", "保留移動時間"], ["高強度連排", "受傷風險", "分散案型"], ["臨時加時", "睡眠不足", "正式調整計畫"]] }],
+    references: [referenceLibrary.longWorkingHoursBurnout, referenceLibrary.careworkerBurnout2024, referenceLibrary.longTermCareWorkerHealthManual]
+  }),
+  "careworker-records-supervision-support": guide({
+    readingMinutes: 8,
+    targetAudience: "想理解照顧紀錄、督導制度與照服員支持如何影響服務品質的家庭",
+    warning: {
+      title: "只要求照服員自己判斷，風險會被留在現場",
+      items: ["跌倒、嗆咳、皮膚破損、情緒激動等異常要有回報流程。", "紀錄若只被視為行政作業，督導就不容易早期介入。", "照服員遇到不確定狀況時，應有可以立即詢問的窗口。"]
+    },
+    summary: ["紀錄不是多餘表格，而是讓照服員、家屬和督導站在同一頁。", "好的督導支持能降低照服員孤立感，也能提升異常處理速度。", "家屬看懂紀錄，服務關係會更透明。"],
+    content: [
+      ["紀錄是照服員把現場帶回團隊的方式", ["照服員在案家看見很多細節：今天吃少、走路變慢、皮膚紅、情緒不穩、家屬壓力增加。這些若只存在記憶裡，很快就會消失。", "紀錄讓變化可以被追蹤，也讓督導能判斷是否需要調整服務。"]],
+      ["家屬看到紀錄，焦慮會少一點", ["很多家屬下班後最想知道的是今天還好嗎。若紀錄只寫完成服務，家屬仍然不知道長輩狀態。好的紀錄會簡短說明精神、食慾、活動、異常和下一步。", "透明回報能減少反覆追問，也讓家屬比較能信任照服員。"]],
+      ["督導不是只排班，也是在接住風險", ["照服員遇到高風險移位、失智激動、家屬衝突或皮膚傷口時，需要有人討論。督導能協助判斷、陪同溝通、調整服務計畫。", "如果督導只在出事後才出現，照服員平常就會覺得自己獨自扛責任。"]],
+      ["紀錄要簡單到能持續", ["太複雜的表格會讓照服員在趕場中難以完成；太簡略又看不出變化。好的紀錄應該抓住核心欄位，並讓異常能被快速標記。", "系統設計的目標不是增加行政，而是讓重要訊息不掉落。"]],
+      ["把紀錄變成教育和改善材料", ["當同一類問題反覆出現，例如浴室危險、用餐嗆咳、夜間跌倒風險，就能回到教育訓練和服務調整。", "照服員的經驗如果能被團隊學習，就不只是辛苦一次，而是讓下一次照顧更穩。"]]
+    ],
+    checklists: [{ title: "好的照顧紀錄應包含", items: ["今天完成哪些主要照顧。", "精神、食慾、活動和情緒。", "跌倒、嗆咳、皮膚、疼痛等異常。", "家屬或長輩提出的新需求。", "照服員覺得需要督導協助的地方。", "下一次服務要注意什麼。"] }],
+    tables: [{ title: "紀錄如何支持照服員", headers: ["紀錄內容", "團隊可做", "家屬可理解"], rows: [["吃少", "追蹤營養", "不是單次情緒"], ["移位不穩", "調整輔具", "先不要催快"], ["家屬衝突", "督導介入", "回到服務計畫"]] }],
+    references: [referenceLibrary.homecareWorkerHealthInterventions, referenceLibrary.careAidesSupportCulture, referenceLibrary.longTermCareWorkerHealthManual]
+  }),
+  "careworker-respect-retention": guide({
+    readingMinutes: 9,
+    targetAudience: "關心長照人力、照服員留任、服務品質與職場支持的管理者與家屬",
+    warning: {
+      title: "留不住照服員，照顧關係也會一直重來",
+      items: ["高離職會讓長輩不斷適應新人，家屬也反覆交代。", "只用使命感要求照服員，無法抵消職業傷害、低尊重和高壓力。", "留任需要薪資、排班、職安、督導和成長路徑一起改善。"]
+    },
+    summary: ["照服員留任不是只靠熱情，而是靠可持續的工作條件。", "尊重、合理排班、輔具、督導、訓練和回饋制度都會影響是否留下。", "家屬也能透過合作態度和清楚溝通，成為留任環境的一部分。"],
+    content: [
+      ["一句辛苦了很重要，但不夠", ["照服員需要被感謝，但如果每天面對高負荷、低尊重、臨時加工作和缺乏支持，光靠感謝很難留下來。", "長照人力穩定，靠的是工作條件能不能讓人長期做下去。這包含薪資，也包含安全、尊嚴和專業成長。"]],
+      ["合理排班能保護人員，也保護長輩", ["熟悉的照服員離職，長輩要重新適應，家屬要重新交代，服務風險也會增加。排班若長期過密或高強度案家集中，很容易讓人員疲勞。", "管理者應看見服務強度，不只看時數。"]],
+      ["職安輔具是留任的一部分", ["如果照服員每次移位都靠腰背硬撐，久了很難不受傷。輔具、動線改善、兩人協助和到宅評估，都是留住人員的基礎投資。", "職業安全不是成本，而是服務品質的地基。"]],
+      ["督導文化會決定照服員敢不敢說實話", ["照服員遇到困難時，如果說了只得到責備或忍耐，就會慢慢不回報，或直接離開。好的督導會把困難轉成可調整的計畫。", "人員願意說現場問題，代表團隊還有修正機會。"]],
+      ["家屬尊重也會影響留任", ["照服員是否感覺被尊重，常常在日常互動裡：是否準時、是否理解服務界線、是否把問題交給督導而不是現場責備。", "當案家合作，照服員更能把專業放在照顧上，而不是消耗在防衛和壓力中。"]]
+    ],
+    checklists: [{ title: "留住照服員的條件", items: ["薪資與交通時間合理。", "高強度服務不連續塞滿。", "有可用輔具與職安教育。", "督導能即時支持。", "遇到衝突有正式處理流程。", "有進修、升遷或專業認可。"] }],
+    tables: [{ title: "從辛苦到留任", headers: ["問題", "若不處理", "改善方向"], rows: [["長期疼痛", "受傷離職", "輔具與工法"], ["家屬不尊重", "情緒耗竭", "督導溝通"], ["看不到成長", "流動率高", "訓練與職涯"]] }],
+    references: [referenceLibrary.careworkerBurnout2024, referenceLibrary.careAidesSupportCulture, referenceLibrary.careworkerAssistiveToolsMol]
+  }),
+  "new-careworker-first-year": guide({
+    readingMinutes: 8,
+    targetAudience: "新手照服員、照顧服務單位、正在思考加入長照工作的讀者",
+    warning: {
+      title: "新手不是不夠努力，而是需要安全的學習環境",
+      items: ["第一次遇到高風險移位、失智激動或家屬衝突時，不應獨自處理。", "缺乏陪跑和回饋，會讓新手把挫折誤解成自己不適合。", "訓練應包含技術、溝通、紀錄、職安和求助流程。"]
+    },
+    summary: ["新手照服員第一年最需要的是陪跑、回饋和可求助的督導。", "技術可以練，但現場判斷、界線和情緒調節需要經驗支持。", "把第一年留住，長照才有機會累積成熟人力。"],
+    content: [
+      ["第一次進案家，壓力常比想像大", ["課堂上學過移位、沐浴和溝通，但真正進到案家時，空間、家屬期待、長輩狀態都不會像教材一樣整齊。新手很容易緊張，也怕自己做錯。", "這不是能力差，而是照顧工作本來就高度情境化。新手需要的是陪跑和回饋，不是被丟進現場自己適應。"]],
+      ["技術之外，最難的是判斷何時求助", ["新手常以為專業就是什麼都能自己處理，但真正的專業也包括知道何時不能硬做。長輩今天站不穩、家屬臨時要求高風險動作、失智長輩激動，都應回報。", "單位要讓新手知道：求助不是丟臉，而是安全流程的一部分。"]],
+      ["第一次被拒絕或責備，需要有人接住", ["長輩拒洗、家屬質疑、服務中出錯，都可能讓新手很挫折。如果沒有督導討論，新手會把事件變成自我否定。", "督導陪談可以協助拆解：哪裡是技巧要練，哪裡是服務計畫要調，哪裡是家屬溝通要介入。"]],
+      ["紀錄和回報是新手成長的工具", ["新手若能把現場觀察寫下來，督導才看得到他如何判斷。紀錄不是為了抓錯，而是讓經驗變成可討論的材料。", "例如今天移位哪一步卡住、長輩哪句話有效、家屬哪個需求超出範圍，都能成為下一次更好的依據。"]],
+      ["第一年留住人，靠團隊而不是靠熱血", ["很多新手帶著想幫人的心進入長照，但若很快被高壓和孤立磨掉，就很難留下。穩定陪跑、合理案型、職安教育和同儕支持，能讓新手慢慢變成熟手。", "長照人力不是招進來就算成功。真正重要的是讓新手在第一年感覺自己正在變好，也有人一起面對困難。"]]
+    ],
+    checklists: [{ title: "新手照服員第一年需要", items: ["進案前案例說明。", "高風險服務有示範或陪同。", "明確求助與回報窗口。", "定期督導回饋。", "職安與輔具訓練。", "遇到衝突後有情緒支持。"] }],
+    tables: [{ title: "新手常見挫折", headers: ["挫折", "可能原因", "支持方式"], rows: [["動作不順", "現場環境複雜", "陪同示範"], ["被家屬質疑", "期待不清", "督導溝通"], ["遇到失智抗拒", "策略不足", "案例討論"]] }],
+    references: [referenceLibrary.homecareWorkerHealthInterventions, referenceLibrary.careAidesSupportCulture, referenceLibrary.careworkerBurnout2024]
+  })
+};
+
+const deepStaticArticleRewritePack = Object.fromEntries(
+  Object.entries({ ...staticArticleRewritePack, ...staticArticleDepthEnhancements, ...additionalArticleDepthEnhancements, ...careworkerHardshipDepthEnhancements })
+    .map(([slug, rewrite]) => [
+      slug,
+      {
+        ...(staticArticleRewritePack[slug] || {}),
+        ...(staticArticleDepthEnhancements[slug] || {}),
+        ...(additionalArticleDepthEnhancements[slug] || {}),
+        ...(careworkerHardshipDepthEnhancements[slug] || rewrite)
+      }
+    ])
+);
+
 
 const health30ArticleEnhancements = {
   "fall-prevention-home-checklist": {
@@ -600,5 +1882,45 @@ const health30ArticleEnhancements = {
   }
 };
 
+const articleRewriteAliases = {
+  "daily-hydration-care": "hydration-low-appetite-elderly",
+  "night-fall-prevention": "fall-prevention-home-checklist",
+  "meal-appetite-support": "hydration-low-appetite-elderly",
+  "caregiver-burnout-signs": "caregiver-burnout-signs",
+  "dementia-bathing-refusal": "safe-bathing-care",
+  "home-reablement-routine": "master-talk-rehab-goals",
+  "daycare-first-week": "day-care-transition",
+  "migrant-care-handover": "family-care-course",
+  "hospital-discharge-checklist": "post-discharge-first-week",
+  "family-meeting-care-plan": "master-talk-family-communication",
+  "care-transfer-safe-home": "safe-transfer-tips",
+  "nutrition-soft-food-guide": "swallowing-meal-safety",
+  "dementia-evening-anxiety": "dementia-evening-agitation",
+  "family-care-report-rhythm": "master-talk-care-technology",
+  "longterm-care-apply-checklist-2026": "longterm-care-apply",
+  "community-health-class-family-day": "master-talk-community-health",
+  "home-care-video-guide-communication": "master-talk-care-technology",
+  "short-video-bathroom-safety-3-tips": "bathroom-safety",
+  "master-talk-care-communication": "master-talk-family-communication",
+  "reablement-walking-home-practice": "master-talk-rehab-goals",
+  "day-care-video-guide": "day-care-respite",
+  "home-care-video-guide": "family-care-story",
+  "safe-transfer-three-reminders": "safe-transfer-tips",
+  "elder-nutrition-warning": "nutrition-warning",
+  "dementia-repeated-question": "dementia-response",
+  "caregiver-burnout-first-steps": "caregiver-support"
+};
+
+const articleRewriteAliasPack = Object.entries(articleRewriteAliases).reduce((acc, [slug, sourceSlug]) => {
+  const source = deepStaticArticleRewritePack[sourceSlug] || health30ArticleEnhancements[sourceSlug];
+  if (source) acc[slug] = { ...source, contentRevisionAliasOf: sourceSlug };
+  return acc;
+}, {});
+
+const aliasedArticleRewritePack = {
+  ...articleRewriteAliasPack,
+  ...deepStaticArticleRewritePack
+};
+
 export { health30ArticleEnhancements };
-export default staticArticleRewritePack;
+export default aliasedArticleRewritePack;

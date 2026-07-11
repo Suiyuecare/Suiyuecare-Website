@@ -933,7 +933,7 @@ h2 {
   border-bottom: 1px solid transparent;
   border-radius: 0;
   background: transparent;
-  color: rgba(83,43,11,.48);
+  color: rgba(183,104,44,.48);
   cursor: pointer;
   text-align: left;
   transition: color .22s ease, border-color .22s ease;
@@ -941,8 +941,8 @@ h2 {
 .care-day-markers button:hover,
 .care-day-markers button:focus-visible,
 .care-day-markers button.active {
-  color: var(--brown);
-  border-color: rgba(83,43,11,.55);
+  color: #c86010;
+  border-color: rgba(240,138,36,.72);
 }
 .care-day-markers span {
   color: inherit;
@@ -2002,16 +2002,20 @@ h2 {
 }
 .health-search input {
   flex: 1;
+  min-width: 0;
   border: 0;
   padding: 0 18px;
   background: transparent;
 }
 .health-search button {
+  flex: 0 0 auto;
+  min-width: 72px;
   border: 0;
   padding: 0 20px;
   background: var(--orange);
   color: #fff;
   font-weight: 900;
+  white-space: nowrap;
 }
 .health-cats,
 .course-filters {
@@ -3477,7 +3481,7 @@ h2 {
   .about-culture-section,
   .about-members-section {
     max-width: 390px;
-    margin-left: 0;
+    margin-left: auto;
     margin-right: auto;
     padding-inline: 20px;
     padding-block: 30px;
@@ -3514,30 +3518,6 @@ h2 {
   background: #fffaf2;
   color: var(--brown);
 }
-.milestone-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(420px, .58fr);
-  gap: 28px;
-  align-items: stretch;
-  min-height: min(640px, calc(100vh - 92px));
-  padding: 54px clamp(32px,5vw,86px) 38px;
-  background:
-    radial-gradient(circle at 12% 18%, rgba(240,138,36,.16), transparent 34%),
-    linear-gradient(135deg, #fffdf9 0%, #fff2df 100%);
-}
-.milestone-hero h1 {
-  margin: 10px 0 18px;
-  font-size: clamp(54px, 6.8vw, 100px);
-  line-height: 1;
-  letter-spacing: 0;
-}
-.milestone-hero p {
-  max-width: 820px;
-  color: var(--muted);
-  font-size: 18px;
-  font-weight: 850;
-  line-height: 1.9;
-}
 .milestone-scroll-cue {
   display: inline-flex;
   align-items: center;
@@ -3572,47 +3552,6 @@ h2 {
   0% { opacity: 0; transform: translate(-50%, 0); }
   35% { opacity: 1; }
   100% { opacity: 0; transform: translate(-50%, 22px); }
-}
-.milestone-hero-card {
-  position: relative;
-  min-height: clamp(360px, 34vw, 480px);
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 28px;
-  background: var(--brown);
-  box-shadow: 0 22px 58px rgba(83,43,11,.12);
-}
-.milestone-hero-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 42%, rgba(63,33,13,.9));
-}
-.milestone-hero-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.milestone-hero-card div {
-  position: absolute;
-  z-index: 1;
-  left: 30px;
-  right: 30px;
-  bottom: 30px;
-}
-.milestone-hero-card span {
-  color: #ffd3a1;
-  font-size: 13px;
-  font-weight: 1000;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-.milestone-hero-card strong {
-  display: block;
-  margin-top: 10px;
-  color: #fff;
-  font-size: clamp(30px, 3vw, 48px);
-  line-height: 1.18;
 }
 .milestone-stats {
   display: grid;
@@ -3672,26 +3611,6 @@ h2 {
   border-radius: inherit;
   background: linear-gradient(180deg, var(--orange), var(--orange-dark));
   transition: height .18s ease-out;
-}
-.milestone-intro {
-  position: sticky;
-  top: 124px;
-  align-self: start;
-  min-height: calc(100vh - 180px);
-  display: grid;
-  align-content: center;
-}
-.milestone-intro h2 {
-  margin: 8px 0 18px;
-  color: var(--brown);
-  font-size: clamp(34px, 4vw, 64px);
-  line-height: 1.08;
-}
-.milestone-intro p:not(.eyebrow) {
-  margin: 0;
-  color: var(--muted);
-  font-weight: 850;
-  line-height: 1.85;
 }
 .milestone-list {
   position: relative;
@@ -8463,7 +8382,7 @@ input[name="_honey"] { display: none !important; }
   .primary-nav { gap: 16px; font-size: 14px; letter-spacing: .06em; }
   .primary-nav > a, .nav-trigger { padding-inline: 8px; }
   .nav-cta { min-height: 48px !important; padding: 10px 16px !important; }
-  .hero, .audience-path-grid, .news-service-layout, .care-layout, .content-wall, .care-values, .network-board, .redesigned-network, .video-section, .contact-section, .footer-main, .courses-hero, .article-row, .celebrity-row, .article-hero, .article-layout, .investor-hero, .finance-grid, .shareholder-grid, .investor-section-head, .ir-sub-hero, .finance-dashboard, .cms-chart-grid, .analysis-grid, .report-layout, .annual-grid, .governance-news-grid, .whistle-layout, .risk-layout, .integrity-layout, .shareholder-info-grid, .meeting-layout, .conference-layout, .faq-layout, .career-hero, .career-section-head, .career-dept-layout, .about-hero, .about-section-head, .about-story, .about-system, .about-quality-board, .milestone-hero, .milestone-journey, .service-detail-hero, .service-section-head, .land-evaluation-section, .land-area-board, .investor-growth-section, .software-screen-grid { grid-template-columns: 1fr; }
+  .hero, .audience-path-grid, .news-service-layout, .care-layout, .content-wall, .care-values, .network-board, .redesigned-network, .video-section, .contact-section, .footer-main, .courses-hero, .article-row, .celebrity-row, .article-hero, .article-layout, .investor-hero, .finance-grid, .shareholder-grid, .investor-section-head, .ir-sub-hero, .finance-dashboard, .cms-chart-grid, .analysis-grid, .report-layout, .annual-grid, .governance-news-grid, .whistle-layout, .risk-layout, .integrity-layout, .shareholder-info-grid, .meeting-layout, .conference-layout, .faq-layout, .career-hero, .career-section-head, .career-dept-layout, .about-hero, .about-section-head, .about-story, .about-system, .about-quality-board, .milestone-journey, .service-detail-hero, .service-section-head, .land-evaluation-section, .land-area-board, .investor-growth-section, .software-screen-grid { grid-template-columns: 1fr; }
   .about-operating-grid,
   .about-stakeholder-board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -8663,10 +8582,6 @@ input[name="_honey"] { display: none !important; }
   }
   .milestone-rail {
     display: none;
-  }
-  .milestone-intro {
-    position: static;
-    min-height: 0;
   }
   .milestone-year-heading {
     grid-template-columns: 1fr;
@@ -8997,12 +8912,6 @@ input[name="_honey"] { display: none !important; }
     display: grid;
     margin-inline: 20px;
   }
-  .milestone-hero {
-    min-height: auto;
-  }
-  .milestone-hero-card {
-    min-height: 440px;
-  }
   .milestone-card {
     --milestone-image-size: min(100%, 360px);
     grid-template-columns: 1fr;
@@ -9067,7 +8976,7 @@ input[name="_honey"] { display: none !important; }
   .brand strong { max-width: calc(100vw - 148px); font-size: 18px; }
   h1 { font-size: clamp(34px, 9.6vw, 40px); line-height: 1.12; }
   h2 { font-size: clamp(30px, 8.6vw, 38px); }
-  .hero, .section, .detail-hero, .detail-content, .site-footer, .health-hero, .health-grid, .courses-hero, .course-list, .article-topbar, .article-layout, .investor-hero, .investor-panel, .ir-sub-hero, .ir-tab-panel, .career-hero, .career-tab-panel, .career-openings, .about-hero, .about-story, .about-belief, .about-principles, .about-system, .about-team-section, .about-method, .about-quality-section, .about-future, .about-stats, .milestone-hero, .milestone-stats, .milestone-journey, .service-detail-hero, .service-detail-section { padding-inline: 20px; }
+  .hero, .section, .detail-hero, .detail-content, .site-footer, .health-hero, .health-grid, .courses-hero, .course-list, .article-topbar, .article-layout, .investor-hero, .investor-panel, .ir-sub-hero, .ir-tab-panel, .career-hero, .career-tab-panel, .career-openings, .about-hero, .about-story, .about-belief, .about-principles, .about-system, .about-team-section, .about-method, .about-quality-section, .about-future, .about-stats, .milestone-stats, .milestone-journey, .service-detail-hero, .service-detail-section { padding-inline: 20px; }
   .one-minute-service-hero,
   .one-minute-service-summary,
   .two-minute-scenes,
@@ -9079,6 +8988,21 @@ input[name="_honey"] { display: none !important; }
   .one-minute-service-hero {
     padding-top: 32px;
     padding-bottom: 18px;
+  }
+  .health-search {
+    width: 100%;
+    max-width: 100%;
+    min-height: 48px;
+  }
+  .health-search input {
+    padding-inline: 16px 10px;
+    font-size: 16px;
+  }
+  .health-search button {
+    flex-basis: 68px;
+    min-width: 68px;
+    padding-inline: 12px;
+    font-size: 16px;
   }
   .care-day-section {
     min-height: 560vh;
@@ -9414,6 +9338,11 @@ input[name="_honey"] { display: none !important; }
     align-items: start;
     background: #2d1709;
   }
+  .home-page .hero {
+    min-height: clamp(610px, calc(100svh - var(--header-height)), 680px);
+    padding: 0 20px 24px;
+    align-items: end;
+  }
   .hero-bg {
     position: absolute;
     inset: 0;
@@ -9453,6 +9382,10 @@ input[name="_honey"] { display: none !important; }
     padding-top: clamp(205px, 31vh, 270px);
     padding-right: 0;
   }
+  .home-page .hero-copy {
+    max-width: 100%;
+    padding-top: clamp(150px, 23svh, 188px);
+  }
   .hero .eyebrow { display: none; }
   .hero h1 {
     max-width: 100%;
@@ -9463,12 +9396,26 @@ input[name="_honey"] { display: none !important; }
     overflow-wrap: break-word;
     text-shadow: 0 2px 0 rgba(255,253,248,.72), 0 16px 40px rgba(255,248,238,.92);
   }
+  .home-page .hero h1 {
+    margin-bottom: 12px;
+    font-size: clamp(30px, 8.4vw, 35px);
+    line-height: 1.08;
+  }
   .hero-copy > p:not(.eyebrow) {
     color: #5f4534;
     font-size: 17px;
     font-weight: 850;
     line-height: 1.85;
     text-shadow: 0 1px 16px rgba(255,253,248,.86);
+  }
+  .home-page .hero-actions {
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .home-page .hero-actions .primary-button,
+  .home-page .hero-actions .ghost-button {
+    min-height: 48px;
+    padding: 11px 18px;
   }
   .hero-actions .ghost-button {
     display: inline-flex;
@@ -9483,11 +9430,22 @@ input[name="_honey"] { display: none !important; }
     line-height: 1.72;
     text-shadow: 0 1px 16px rgba(255, 248, 238, .62);
   }
+  .home-page .hero-copy > p[data-cms-field="body"] {
+    max-width: 340px;
+    margin-bottom: 14px;
+    font-size: 13.5px;
+    line-height: 1.64;
+  }
   .hero-slogan {
     margin-bottom: 14px;
     padding: 10px 16px;
     font-size: 14px !important;
     line-height: 1.35 !important;
+  }
+  .home-page .hero-slogan {
+    margin-bottom: 12px;
+    padding: 9px 14px;
+    font-size: 13px !important;
   }
   .hero-dashboard {
     min-height: auto;
@@ -10072,7 +10030,7 @@ input[name="_honey"] { display: none !important; }
   .about-three-minute-page .about-members-section {
     width: 100%;
     max-width: 390px;
-    margin-left: 0;
+    margin-left: auto;
     margin-right: auto;
     padding-left: 20px;
     padding-right: 20px;
@@ -10119,7 +10077,7 @@ input[name="_honey"] { display: none !important; }
 
 @media (max-width: 760px) {
   .milestones-page .milestones-full-hero.one-minute-service-hero {
-    min-height: 680px;
+    min-height: 620px;
     height: auto;
   }
   .milestones-page .milestones-full-hero .hero-copy.service-detail-copy {
@@ -10133,65 +10091,106 @@ input[name="_honey"] { display: none !important; }
     max-width: 100%;
   }
   .milestones-page .milestone-journey {
-    --timeline-x: 24px;
-    padding: 34px 20px 48px;
+    --timeline-x: 0;
+    padding: 34px 20px 50px;
   }
   .milestones-page .milestone-rail {
-    left: calc(20px + var(--timeline-x));
-    top: 58px;
-    bottom: 64px;
-  }
-  .milestones-page .milestone-list {
-    gap: 30px;
-  }
-  .milestones-page .milestone-year-heading {
-    top: var(--header-height);
-    grid-template-columns: 1fr;
-    padding-left: 54px;
-  }
-  .milestones-page .milestone-year-heading p {
     display: none;
   }
+  .milestones-page .milestone-list {
+    gap: 34px;
+  }
+  .milestones-page .milestone-year-group {
+    gap: 14px;
+  }
+  .milestones-page .milestone-year-heading {
+    position: relative;
+    top: auto;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+  }
+  .milestones-page .milestone-year-heading p {
+    display: block;
+    max-width: 100%;
+    margin: 6px 0 0;
+    color: #7a5c49;
+    font-size: 14px;
+    line-height: 1.7;
+  }
   .milestones-page .milestone-year-heading::before {
-    left: calc(var(--timeline-x) - 10px);
-    bottom: 28px;
+    display: none;
   }
   .milestones-page .milestone-year-heading span {
-    padding-left: 0;
-    font-size: 48px;
+    display: inline-flex;
+    width: fit-content;
+    padding: 8px 14px;
+    border: 1px solid rgba(240,138,36,.22);
+    border-radius: 999px;
+    background: #fff1df;
+    box-shadow: 0 12px 28px rgba(83,43,11,.06);
+    font-size: 36px;
+    line-height: 1;
   }
   .milestones-page .milestone-card {
     --milestone-image-size: 100%;
     grid-template-columns: 1fr;
-    margin-left: 54px;
-    padding: 12px;
-  }
-  .milestones-page .milestone-card::before {
-    left: calc((var(--timeline-x) * -1) - 39px);
-    top: 36px;
+    gap: 0;
+    min-height: 0;
+    margin-left: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 26px;
+    background: #fff;
+    opacity: 1;
     transform: none;
+    box-shadow: 0 18px 46px rgba(83,43,11,.09);
   }
+  .milestones-page .milestone-card::before,
   .milestones-page .milestone-card::after {
-    left: calc((var(--timeline-x) * -1) - 13px);
-    top: 46px;
-    width: 34px;
-    transform: none;
-  }
-  .milestones-page .milestone-card.active::before,
-  .milestones-page .milestone-card:hover::before {
-    transform: scale(1.08);
+    display: none;
   }
   .milestones-page .milestone-year {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     min-height: 0;
-    padding: 8px 10px 0;
+    padding: 16px 18px 12px;
+  }
+  .milestones-page .milestone-year span {
+    font-size: 24px;
+  }
+  .milestones-page .milestone-year b {
+    font-size: 13px;
+    letter-spacing: .12em;
   }
   .milestones-page .milestone-card figure {
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 3;
+    border-radius: 0;
+    aspect-ratio: 16 / 11;
   }
   .milestones-page .milestone-copy {
-    padding: 6px 10px 18px;
+    padding: 18px 18px 22px;
+  }
+  .milestones-page .milestone-copy small {
+    gap: 8px;
+    font-size: 12px;
+  }
+  .milestones-page .milestone-copy h3 {
+    margin: 12px 0 12px;
+    font-size: clamp(25px, 7vw, 32px);
+  }
+  .milestones-page .milestone-copy p {
+    font-size: 15px;
+    line-height: 1.76;
+  }
+  .milestones-page .milestone-next {
+    margin: 0 20px 52px;
+    padding: 24px;
+    border-radius: 26px;
   }
 }
 

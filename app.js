@@ -88,7 +88,7 @@ const pages = {
   health: {
     eyebrow: "Health 3.0",
     title: "健康3.0",
-    intro: "長照內容農場，提供家屬照顧知識、疾病照護、復能觀念、營養衛教與長照政策整理。",
+    intro: "照顧知識專欄，整理疾病徵兆、飲食營養、復能運動、失智照顧與家屬實用技巧。",
     focus: ["照顧知識文章", "健康衛教內容", "家屬常見問題"],
     features: ["文章分類", "專題企劃", "可分享的照顧指南"]
   },
@@ -154,7 +154,7 @@ const YOUTUBE_IFRAME_ALLOW = "accelerometer; autoplay; clipboard-write; encrypte
 const routeHeroPreloads = {
   home: HOME_HERO_INSTANT_IMAGE,
   about: "assets/homepage-batch/04-admin-team-office-fast.jpg",
-  milestones: "assets/homepage-batch/16-taipei-service-office-fast.jpg",
+  milestones: "assets/milestones/homecare-agency-launch.jpg",
   "home-care": "assets/homecare-detail-01-greeting-hero-fast.jpg",
   "day-care": "assets/daycare-detail-01-exercise-hero-fast.jpg",
   community: "assets/community-detail-01-exercise-hero-hires.jpg",
@@ -169,7 +169,7 @@ const routeHeroPreloads = {
 const routeHeroMobilePreloads = {
   home: HOME_HERO_MOBILE_IMAGE,
   about: "assets/homepage-batch/04-admin-team-office-fast-mobile.jpg",
-  milestones: "assets/homepage-batch/16-taipei-service-office-fast-mobile.jpg",
+  milestones: "assets/milestones/homecare-agency-launch.jpg",
   "home-care": "assets/homecare-detail-01-greeting-hero-fast-mobile.jpg",
   "day-care": "assets/daycare-detail-01-exercise-hero-fast-mobile.jpg",
   community: "assets/community-detail-01-exercise-hero-hires-mobile.jpg",
@@ -194,8 +194,8 @@ const routeSeoMap = {
   milestones: {
     title: "大事記｜歲悅長照集團",
     description: "查看歲悅長照集團的重要里程碑、服務擴張、據點成立與合作紀錄。",
-    image: "assets/homepage-batch/16-taipei-service-office-fast.jpg",
-    imageAlt: "歲悅服務據點與團隊里程碑"
+    image: "assets/milestones/homecare-agency-launch.jpg",
+    imageAlt: "歲悅居家長照機構成立里程碑"
   },
   "home-care": {
     title: "居家照顧｜歲悅長照集團",
@@ -1452,9 +1452,11 @@ Object.assign(articlePages, {
 
 let staticArticleRewritePackPromise = null;
 let staticArticleRewritePackLoaded = false;
+const articleRewriteFields = {};
 
 function applyStaticArticleRewritePack(pack = {}) {
   Object.entries(pack).forEach(([slug, rewrite]) => {
+    articleRewriteFields[slug] = { ...rewrite, contentRevision: "2026-07-10-full-rewrite" };
     if (articlePages[slug]) Object.assign(articlePages[slug], rewrite, { contentRevision: "2026-07-10-full-rewrite" });
   });
 }
@@ -1830,6 +1832,266 @@ healthArticles.push(
     keywords: "名人講堂 用藥提醒 照顧系統 多重用藥 藥盒"
   }
 );
+
+const additionalHealthArticles = [
+  {
+    slug: "chronic-disease-visit-prep",
+    href: articleHref("chronic-disease-visit-prep"),
+    category: "慢病照顧",
+    title: "長輩慢病回診前，家屬最好先整理這張清單",
+    excerpt: "把血壓血糖、用藥、跌倒、食慾與生活變化整理好，回診才不會只剩一句最近還好。",
+    image: "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg",
+    author: "歲悅護理照顧小組",
+    date: "2026.07.11",
+    keywords: "慢病 回診 用藥 照顧紀錄 血壓 血糖"
+  },
+  {
+    slug: "elder-constipation-care",
+    href: articleHref("elder-constipation-care"),
+    category: "飲食營養",
+    title: "長輩便祕不是小事：家屬可以先觀察的 6 個線索",
+    excerpt: "從水分、活動量、藥物、疼痛到排便習慣，先找原因，再決定怎麼協助。",
+    image: "assets/health3/generated/hydration-meal-observation-hero.jpg",
+    author: "歲悅營養照顧小組",
+    date: "2026.07.11",
+    keywords: "便祕 水分 活動量 飲食 照顧紀錄"
+  },
+  {
+    slug: "pain-observation-elderly",
+    href: articleHref("pain-observation-elderly"),
+    category: "護理觀察",
+    title: "長輩說不清楚哪裡痛，家人該怎麼觀察？",
+    excerpt: "疼痛可能藏在表情、走路、睡眠、食慾與情緒裡，尤其失智長輩更需要系統化觀察。",
+    image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+    author: "歲悅護理復能團隊",
+    date: "2026.07.11",
+    keywords: "疼痛觀察 失智照顧 行動能力 睡眠 護理"
+  },
+  {
+    slug: "oral-care-aspiration-prevention",
+    href: articleHref("oral-care-aspiration-prevention"),
+    category: "照顧技巧",
+    title: "口腔清潔不只是刷牙，也和吞嚥與肺炎風險有關",
+    excerpt: "假牙、舌苔、口乾、嗆咳與飯後清潔，都會影響長輩每天吃飯和感染風險。",
+    image: "assets/service-journey-06-oral-exercise.jpg",
+    author: "歲悅照顧編輯部",
+    date: "2026.07.11",
+    keywords: "口腔清潔 假牙 吞嚥 肺炎 飯後照顧"
+  },
+  {
+    slug: "urinary-incontinence-night-care",
+    href: articleHref("urinary-incontinence-night-care"),
+    category: "夜間照顧",
+    title: "長輩漏尿、夜尿變多，家屬不要只急著換尿布",
+    excerpt: "先觀察尿量、疼痛、飲水、藥物與夜間動線，才能降低皮膚、跌倒與照顧衝突。",
+    image: "assets/health3/generated/fall-prevention-night-route-hero.jpg",
+    author: "歲悅居家安全團隊",
+    date: "2026.07.11",
+    keywords: "漏尿 夜尿 尿失禁 跌倒 尿布 皮膚照顧"
+  },
+  {
+    slug: "social-isolation-depression-signs",
+    href: articleHref("social-isolation-depression-signs"),
+    category: "心理支持",
+    title: "長輩越來越不出門，是懶得動還是孤立與憂鬱警訊？",
+    excerpt: "少說話、少吃、睡眠變化、拒絕活動，可能都在提醒家屬需要把社交支持放回照顧。",
+    image: "assets/homepage-batch/11-elder-art-activity-fast.jpg",
+    author: "歲悅家庭支持團隊",
+    date: "2026.07.11",
+    keywords: "孤立 憂鬱 社交 長輩活動 家屬支持"
+  },
+  {
+    slug: "assistive-device-selection",
+    href: articleHref("assistive-device-selection"),
+    category: "居家安全",
+    title: "助行器、扶手、便盆椅怎麼選？先看長輩真正怎麼動",
+    excerpt: "輔具不是買越多越安全，要看起身、轉身、如廁、洗澡與家中空間能不能配合。",
+    image: "assets/nursing-detail-03-home-safety-fast.jpg",
+    author: "歲悅居家安全團隊",
+    date: "2026.07.11",
+    keywords: "輔具 助行器 扶手 便盆椅 居家安全"
+  },
+  {
+    slug: "home-emergency-care-folder",
+    href: articleHref("home-emergency-care-folder"),
+    category: "家庭準備",
+    title: "家中照顧資料夾：急診、請假、交接時都用得到",
+    excerpt: "把疾病、用藥、過敏、照顧限制、聯絡人與回診資訊集中，意外發生時家人比較不慌。",
+    image: "assets/homepage-batch/14-care-notes-fast.jpg",
+    author: "歲悅照顧編輯部",
+    date: "2026.07.11",
+    keywords: "照顧資料夾 急診 用藥 交接 家庭照顧"
+  },
+  {
+    slug: "heat-injury-older-adults",
+    href: articleHref("heat-injury-older-adults"),
+    category: "季節照顧",
+    title: "高溫天氣照顧長輩：不要等口渴才補水",
+    excerpt: "長輩、慢病患者與服用部分藥物者更容易受熱傷害影響，家屬要把降溫和觀察排進日常。",
+    image: "assets/homepage-batch/15-phone-consultation-fast.jpg",
+    author: "歲悅照顧編輯部",
+    date: "2026.07.11",
+    keywords: "熱傷害 高溫 長輩 補水 慢病 季節照顧"
+  },
+  {
+    slug: "family-care-meeting-guide",
+    href: articleHref("family-care-meeting-guide"),
+    category: "家屬支持",
+    title: "家庭照顧會議怎麼開，才不會每次都變成吵架？",
+    excerpt: "把任務、費用、醫療決策、緊急聯絡和喘息安排說清楚，照顧才不會只靠一個人撐。",
+    image: "assets/homepage-batch/family-consultation-clear.jpg",
+    author: "歲悅家庭支持團隊",
+    date: "2026.07.11",
+    keywords: "家庭會議 照顧分工 家屬溝通 喘息 醫療決策"
+  }
+];
+
+healthArticles.push(...additionalHealthArticles);
+Object.assign(articlePages, Object.fromEntries(additionalHealthArticles.map((article) => [
+  article.slug,
+  {
+    category: article.category,
+    title: article.title,
+    dek: article.excerpt,
+    image: article.image,
+    author: article.author,
+    date: article.date,
+    readTime: "8 min read",
+    tags: article.keywords.split(" ").filter(Boolean),
+    summary: [article.excerpt],
+    content: [["文章內容更新中", article.excerpt]]
+  }
+])));
+
+const careworkerHardshipArticles = [
+  {
+    slug: "careworker-hard-work-overview",
+    href: articleHref("careworker-hard-work-overview"),
+    category: "照服員辛苦談",
+    title: "照顧服務員辛苦在哪裡？不是做家事，是把安全扛在身上",
+    excerpt: "從移位、沐浴、情緒安撫到服務紀錄，看見照服員每天承擔的身體與心理負荷。",
+    image: "assets/homepage-batch/orange-polo-caregiver-clear.jpg",
+    author: "歲悅教育品管",
+    date: "2026.07.12",
+    keywords: "照顧服務員 居服員 辛苦談 長照工作 情緒勞動"
+  },
+  {
+    slug: "careworker-back-pain-transfer",
+    href: articleHref("careworker-back-pain-transfer"),
+    category: "照服員辛苦談",
+    title: "腰痠背痛不是職業必然：照服員移位照顧為何這麼耗力",
+    excerpt: "翻身、扶站、轉位、沐浴都需要技術與輔具，不能只靠照服員硬撐。",
+    image: "assets/homecare-detail-03-safe-transfer-fast.jpg",
+    author: "歲悅復能與職安小組",
+    date: "2026.07.12",
+    keywords: "照服員 腰背痛 移位 翻身 輔具 職業傷害"
+  },
+  {
+    slug: "careworker-emotional-labor",
+    href: articleHref("careworker-emotional-labor"),
+    category: "照服員辛苦談",
+    title: "照服員最累的，有時不是身體，是每天都要穩住情緒",
+    excerpt: "面對焦慮家屬、失智長輩、拒絕照顧與臨時變化，情緒勞動也需要被支持。",
+    image: "assets/homepage-batch/10-family-consultation-fast.jpg",
+    author: "歲悅家庭支持團隊",
+    date: "2026.07.12",
+    keywords: "照服員 情緒勞動 家屬溝通 失智照顧 督導支持"
+  },
+  {
+    slug: "home-careworker-travel-between-homes",
+    href: articleHref("home-careworker-travel-between-homes"),
+    category: "照服員辛苦談",
+    title: "居服員的一天，常常辛苦在兩個案家之間",
+    excerpt: "交通、停車、雨天、臨時取消與時間壓力，都是到宅服務不容易被看見的勞動。",
+    image: "assets/homepage-batch/15-phone-consultation-fast.jpg",
+    author: "歲悅居家服務團隊",
+    date: "2026.07.12",
+    keywords: "居服員 到宅服務 交通 排班 工時 長照"
+  },
+  {
+    slug: "careworker-service-boundaries-family",
+    href: articleHref("careworker-service-boundaries-family"),
+    category: "照服員辛苦談",
+    title: "照服員不是萬能幫手：服務界線說清楚，家屬和人員都比較安心",
+    excerpt: "把照顧任務、家務協助、額外要求與風險回報說明白，才能避免誤會累積。",
+    image: "assets/service-journey-13-family-system.jpg",
+    author: "歲悅服務督導團隊",
+    date: "2026.07.12",
+    keywords: "服務界線 照服員 家屬溝通 居家服務 長照"
+  },
+  {
+    slug: "dementia-careworker-safety",
+    href: articleHref("dementia-careworker-safety"),
+    category: "照服員辛苦談",
+    title: "照服員照顧失智長輩時，最需要的是安全流程而不是膽子大",
+    excerpt: "拒絕照顧、重複提問、遊走、情緒激動，都需要團隊支持與清楚處理流程。",
+    image: "assets/homepage-batch/19-health-dementia-cover-fast.jpg",
+    author: "歲悅失智照顧小組",
+    date: "2026.07.12",
+    keywords: "失智照顧 照服員 安全流程 遊走 情緒安撫"
+  },
+  {
+    slug: "careworker-shift-sleep-fatigue",
+    href: articleHref("careworker-shift-sleep-fatigue"),
+    category: "照服員辛苦談",
+    title: "輪班、早班、臨時加班：照服員疲勞也會影響照顧安全",
+    excerpt: "長時間工作和睡眠不足不只是個人問題，也會影響判斷、移位安全與服務品質。",
+    image: "assets/homecare-detail-04-daily-support-fast.jpg",
+    author: "歲悅教育品管",
+    date: "2026.07.12",
+    keywords: "照服員 疲勞 輪班 睡眠 工作負荷 照顧安全"
+  },
+  {
+    slug: "careworker-records-supervision-support",
+    href: articleHref("careworker-records-supervision-support"),
+    category: "照服員辛苦談",
+    title: "照顧紀錄不是行政負擔，是照服員被團隊接住的方式",
+    excerpt: "好的紀錄能讓異常被看見、督導能介入、家屬能理解，也讓照服員不用獨自扛責任。",
+    image: "assets/homepage-batch/14-care-notes-fast.jpg",
+    author: "歲悅服務督導團隊",
+    date: "2026.07.12",
+    keywords: "照顧紀錄 督導支持 照服員 服務品質 家屬回報"
+  },
+  {
+    slug: "careworker-respect-retention",
+    href: articleHref("careworker-respect-retention"),
+    category: "照服員辛苦談",
+    title: "留住照服員，不能只靠一句辛苦了",
+    excerpt: "尊重、合理排班、職安輔具、督導支持與清楚升遷，才是讓長照人力穩定的關鍵。",
+    image: "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg",
+    author: "歲悅人才發展團隊",
+    date: "2026.07.12",
+    keywords: "照服員 留任 尊重 薪資 排班 督導 長照人力"
+  },
+  {
+    slug: "new-careworker-first-year",
+    href: articleHref("new-careworker-first-year"),
+    category: "照服員辛苦談",
+    title: "新手照服員第一年，最需要的是有人陪跑",
+    excerpt: "從第一次進案家、第一次協助沐浴到第一次遇到突發狀況，新手需要訓練也需要心理安全。",
+    image: "assets/quality-recruit-02-training-clear-display.jpg",
+    author: "歲悅教育訓練團隊",
+    date: "2026.07.12",
+    keywords: "新手照服員 教育訓練 督導 陪跑 心理安全 長照"
+  }
+];
+
+healthArticles.push(...careworkerHardshipArticles);
+Object.assign(articlePages, Object.fromEntries(careworkerHardshipArticles.map((article) => [
+  article.slug,
+  {
+    category: article.category,
+    title: article.title,
+    dek: article.excerpt,
+    image: article.image,
+    author: article.author,
+    date: article.date,
+    readTime: "8 min read",
+    tags: article.keywords.split(" ").filter(Boolean),
+    summary: [article.excerpt],
+    content: [["文章內容更新中", article.excerpt]]
+  }
+])));
 
 const health30ArticlePack = [
   {
@@ -2697,7 +2959,7 @@ function getHealthCategoryList() {
 }
 
 function getArticleRewriteFields(slug = "") {
-  const rewrite = articlePages[slug];
+  const rewrite = articlePages[slug] || articleRewriteFields[slug];
   if (!rewrite?.contentRevision) return null;
   const fields = {};
   [
@@ -5770,7 +6032,7 @@ function renderHealthPage(selectedCategorySlug = "") {
           <div>
             <p class="eyebrow">Health 3.0</p>
             <h1>健康3.0</h1>
-            <p>長照內容農場，整理疾病症狀、飲食營養、復能運動、失智照顧與家屬照顧技巧。</p>
+            <p>照顧知識專欄，整理疾病徵兆、飲食營養、復能運動、失智照顧與家屬實用技巧。</p>
           </div>
           <form class="health-search">
             <input name="q" type="search" placeholder="搜尋跌倒、失智、營養、復能" />
@@ -6780,31 +7042,26 @@ function renderAboutPageThreeMinute() {
 }
 
 function renderMilestonesPage() {
-  const heroImage = heroImageForViewport("/assets/homepage-batch/16-taipei-service-office-fast.jpg");
+  const heroImage = heroImageForViewport("/assets/milestones/homecare-agency-launch.jpg");
   const milestoneStats = [
-    ["3", "核心服務城市", "臺北、新北、桃園逐步建立照顧網絡"],
-    ["6", "照顧服務模組", "居家、日照、社區、復能、培訓與品管"],
-    ["10+", "合作與服務節點", "持續擴大服務半徑與專業支援"],
-    ["1", "共同使命", "讓照顧變得更容易理解、更容易開始"]
+    ["12", "重要歷程", "從機構成立、政府計畫到系統模組逐步展開"],
+    ["8", "服務行政區", "臺北士林、北投、南港、萬華，以及新北新店、中和、永和等區域"],
+    ["5", "公共計畫與標案", "串接移工培訓、雇主支持、青年就業與失智社區服務"],
+    ["3", "系統模組上線", "會計、專案管理與電子用印模組陸續完成"]
   ];
   const timeline = [
-    ["2025", "01", "北區服務藍圖盤點", "Planning", "整理臺北、新北、桃園家庭照顧需求，確認居家、日照、社區與復能服務的發展方向。", "/assets/homepage-batch/family-consultation-clear.jpg", "已完成"],
-    ["2025", "02", "居家照顧流程標準化", "Home Care", "建立個案建檔、服務媒合、派案、照顧紀錄與家屬回報的基礎流程。", "/assets/homepage-batch/care-home-greeting-clear.jpg", "已完成"],
-    ["2025", "03", "督導陪跑制度啟動", "Quality", "把督導訪視、異常回報、服務品質檢核與照服員支持放進日常管理。", "/assets/homepage-batch/03-supervisor-care-plan-fast.jpg", "已完成"],
-    ["2025", "04", "日間照顧場域規劃", "Day Care", "規劃長輩白天活動、餐食、休息、健康觀察與家屬回報的中心營運節奏。", "/assets/homepage-batch/02-daycare-group-exercise-hires.jpg", "已完成"],
-    ["2025", "05", "社區據點服務設計", "Community", "盤點健康促進、家屬課程、照顧諮詢與社區活動，讓照顧支持更靠近生活圈。", "/assets/homepage-batch/12-community-health-class-hires.jpg", "已完成"],
-    ["2025", "06", "護理復能協作模型成形", "Reablement", "整合護理觀察、復能訓練與照顧陪伴，讓長輩能在生活裡重新練回能力。", "/assets/homepage-batch/13-rehab-walking-practice-fast.jpg", "已完成"],
-    ["2025", "07", "移工照顧培訓課程開發", "Training", "將移位、沐浴、用餐、溝通與安全照顧拆成可演練的課程內容。", "/assets/migrant-detail-02-transfer-fast.jpg", "已完成"],
-    ["2025", "08", "教育品管教材整理", "Education", "把第一線服務經驗轉化為教材、檢核表與案例討論，讓照顧品質可以被複製。", "/assets/quality-recruit-04-quality-meeting-clear.jpg", "已完成"],
-    ["2025", "09", "北北桃據點資料盤點", "Network", "整理士林、大同、萬華、信義、新店、新莊與蘆竹等服務節點資訊。", "/assets/north-service-map-fast.jpg", "已完成"],
-    ["2025", "10", "人才招募制度擴充", "Recruiting", "建立居家、日照、移工培訓、教學品管與行政部門的職缺內容與發展路徑。", "/assets/homepage-batch/orange-polo-supervisor-clear.jpg", "已完成"],
-    ["2025", "11", "後台內容管理架構規劃", "CMS", "規劃文章、圖片、課程、表單、檔案下載與頁面文案的後台管理方式。", "/assets/homepage-batch/04-admin-team-office-fast.jpg", "已完成"],
-    ["2025", "12", "年度服務與合作成果整理", "Review", "彙整服務據點、合作單位、得標紀錄與年度營運成果，作為 2026 擴展基礎。", "/assets/homepage-batch/16-taipei-service-office-fast.jpg", "已完成"],
-    ["2026", "01", "健康 3.0 內容中心上線", "Health 3.0", "建立文章、懶人包、活動專區、影音與短影片內容，讓家屬更容易理解照顧知識。", "/assets/homepage-batch/18-health-fall-prevention-cover-fast.jpg", "已完成"],
-    ["2026", "02", "課程報名與表單留存完成", "Courses", "課程卡片、報名彈窗、表單資料留存與後台課程管理逐步串接。", "/assets/homepage-batch/12-community-health-class-hires.jpg", "已完成"],
-    ["2026", "03", "投資人專區資料化", "Investor", "將公告、財報、下載檔與圖表資料改為後台可管理，提升對外資訊透明度。", "/assets/homepage-batch/04-admin-team-office-fast.jpg", "已完成"],
-    ["2026", "04", "服務八大子頁模板化", "Service Pages", "居家、日照、社區、護理復能、移工培訓、教育品管、關於與大事記版型統一整理。", "/assets/homepage-batch/09-nurse-blood-pressure-hires.jpg", "已完成"],
-    ["2026", "05", "網站上線前總檢與內容補強", "Launch Check", "檢查前後台資料、SEO、RWD、表單寄信、圖片裁切、權限與內容健康檢查。", "/assets/homepage-batch/15-phone-consultation-fast.jpg", "進行中"],
+    ["2025", "06", "成立臺北市歲悅居家長照機構", "成立", "士林、北投、南港區居家長照服務啟動，建立到宅照顧、督導管理與家庭支持的服務基礎。", "/assets/milestones/homecare-agency-launch.jpg", "已完成"],
+    ["2025", "10", "得標高雄市家庭看護工作補充訓練計畫", "得標", "得標高雄市政府勞工局 115 年度「外國人從事家庭看護工作補充訓練計畫」，推動家庭看護照顧技能訓練。", "/assets/milestones/kaohsiung-caregiver-training.jpg", "已完成"],
+    ["2025", "12", "設立臺北市歲悅社區長照機構萬華一館", "設立", "萬華一館完成設立，作為社區長照服務的重要起點，提供長輩日間支持與家屬照顧資源。", "/assets/milestones/wanhua-community-care-one.jpg", "已完成"],
+    ["2026", "02", "得標勞動部移工數位學習計畫", "得標", "得標勞動部勞動力發展署 115-116 年度「移工數位學習計劃」，推動移工照顧技能數位化學習。", "/assets/milestones/migrant-digital-learning.jpg", "已完成"],
+    ["2026", "03", "參與 Team Taipei 挺就業青年畢業啟航", "參與", "參與臺北市勞工局 115 年度 Team Taipei 挺就業-青年畢業啟航，與青年人才交流長照職涯與服務現場。", "/assets/milestones/youth-employment-event.jpg", "已完成"],
+    ["2026", "04", "得標臺北市雇主安心計畫集中訓練", "得標", "得標臺北市勞動力重建運用處 115 年度「雇主安心計畫-集中訓練」，協助家庭雇主與看護工作者提升照顧品質。", "/assets/milestones/employer-training.jpg", "已完成"],
+    ["2026", "05", "歲悅長照系統會計模組上線", "上線", "會計模組正式上線，串接財務、行政與照顧營運資料，強化內部管理與服務紀錄銜接。", "/assets/milestones/accounting-module.jpg", "已完成"],
+    ["2026", "06", "設立臺北市歲悅社區長照機構萬華二館", "設立", "萬華二館完成設立，延伸社區長照服務量能，讓臺北市西區家庭有更多在地支持。", "/assets/milestones/wanhua-community-care-two.jpg", "已完成"],
+    ["2026", "06", "得標臺北市失智社區服務據點", "得標", "得標士林、大同、信義區失智社區服務據點，提供失智友善活動、家屬諮詢與社區支持。", "/assets/milestones/dementia-community-point.jpg", "已完成"],
+    ["2026", "07", "併購新北市愛無限居家長照機構與好窩居家職能治療所", "併購", "整合新店、中和、永和居家照顧服務，並納入復能與個案管理專業，擴大新北照顧服務網絡。", "/assets/milestones/newtaipei-integration.jpg", "已完成"],
+    ["2026", "08", "歲悅長照系統專案管理模組上線", "上線", "專案管理模組正式上線，協助照顧服務、政府計畫、內部任務與跨部門進度更清楚被追蹤。", "/assets/milestones/project-management-module.jpg", "已完成"],
+    ["2026", "08", "歲悅長照系統電子用印模組上線", "上線", "電子用印模組導入行政流程，讓文件申請、核准、用印與紀錄留存更有效率。", "/assets/milestones/e-seal-module.jpg", "已完成"],
   ].map(([year, month, title, tag, copy, image, status]) => ({ year, month, title, tag, copy, image, status }));
   const sortedTimeline = [...timeline].sort((a, b) => Number(b.year) - Number(a.year) || Number(b.month) - Number(a.month));
   const timelineGroups = [...new Set(sortedTimeline.map((item) => item.year))]
@@ -10554,6 +10811,10 @@ function updateCareDayScroll() {
   if (!steps.length) return;
   const rect = careDaySection.getBoundingClientRect();
   updateCareDayPin(rect);
+  if (isCareDayMobile()) {
+    syncCareDayFromMobileRail();
+    return;
+  }
   const scrollable = Math.max(1, careDaySection.offsetHeight - window.innerHeight);
   const sectionTop = window.scrollY + rect.top;
   const progress = Math.max(0, Math.min(1, (window.scrollY - sectionTop) / scrollable));
