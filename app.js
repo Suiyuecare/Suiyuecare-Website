@@ -9963,829 +9963,91 @@ function renderTalentPage() {
   const heroImage = heroImageForViewport("assets/career-team-hero-hd.jpg");
   const talentAsset = (url) => escapeHTML(normalizeLocalAssetUrl(url));
   const talentContactAttrs = `data-contact-need="人才招募" data-contact-message="我想了解歲悅長照職缺或投遞應徵資料，請協助安排招募窗口聯繫。"`;
-  const openings = [
-    ["居家照顧服務員", "居家照顧部門", "到宅身體照顧、生活支持、陪伴與服務紀錄。", "assets/homepage-batch/orange-polo-caregiver-clear.jpg"],
-    ["居家服務督導", "居家照顧部門", "服務媒合、品質追蹤、照服員支持與家屬溝通。", "assets/homepage-batch/orange-polo-supervisor-clear.jpg"],
-    ["日照照顧服務員", "日間照顧部", "長輩活動陪伴、餐食照顧、生活支持與安全觀察。", "assets/homepage-batch/02-daycare-group-exercise-hires.jpg"]
-  ];
-  const careerSteps = [
-    ["0-3 個月", "新人陪跑", "完成基礎訓練、服務倫理、紀錄回報與安全照顧流程，由督導陪同熟悉第一線情境。"],
-    ["3-6 個月", "穩定上線", "能獨立完成服務紀錄、家庭溝通與異常回報，並建立穩定服務品質。"],
-    ["6-12 個月", "專業進階", "依部門選修失智照顧、復能陪伴、日照活動、移工培訓、行政營運等模組。"],
-    ["12 個月以上", "帶教與管理", "通過評核後可成為帶教員、服務督導、內訓講師、品管幹部或部門管理人才。"]
-  ];
-  const careerTracks = [
-    ["前線專業線", ["照顧服務員", "資深照服員", "照顧帶教員", "專科照顧師"]],
-    ["督導管理線", ["服務督導助理", "居服督導", "資深督導", "區域督導"]],
-    ["教育品管線", ["課務助教", "內訓講師", "品管專員", "教育品管主管"]],
-    ["行政營運線", ["行政專員", "營運協調", "專案管理", "部門主管"]]
-  ];
-  const promotionCriteria = [
-    ["服務品質", "服務紀錄完整、家屬回饋穩定、異常事件能即時回報與追蹤。"],
-    ["專業能力", "完成核心訓練與進階照顧模組，能把照顧流程做得穩、做得細。"],
-    ["團隊協作", "能與督導、行政、照服員、家屬共同解決問題，讓服務不中斷。"],
-    ["帶教潛力", "能整理經驗、協助新人上線，把個人能力轉化成團隊能力。"]
-  ];
-  const benefits = [
-    ["薪酬與獎金", "透明薪資、服務津貼、績效獎金、年終獎金與特殊服務加給，讓努力被清楚看見。", ["服務津貼", "績效獎金", "年終獎金"]],
-    ["排班與生活", "依服務區域、交通條件與個人狀態安排班表，降低跨區奔波，保留生活彈性。", ["彈性排班", "區域媒合", "休假協調"]],
-    ["訓練與證照", "新人訓練、在職教育、專業模組、證照補助與情境演練，讓照顧專業能持續升級。", ["新人訓練", "證照補助", "進階課程"]],
-    ["督導與安全", "第一線遇到照顧困難不單打獨鬥，督導、行政與品管一起支援回報、溝通與調整。", ["督導陪跑", "異常支援", "安全回報"]],
-    ["健康與保障", "提供勞健保、團保規劃、健康關懷與工作安全提醒，讓照顧者也被照顧。", ["勞健保", "團體保險", "健康關懷"]],
-    ["團隊與歸屬", "定期聚會、表揚制度、跨部門交流與照顧故事分享，讓好服務不只是個人撐起來。", ["夥伴聚會", "表揚制度", "團隊交流"]]
-  ];
-  const benefitHighlights = [
-    ["照顧者支持率", "100%", "每位新人都有督導陪跑與回饋"],
-    ["年度訓練模組", "12+", "涵蓋居家、日照、復能與家庭溝通"],
-    ["發展方向", "4 線", "前線、督導、教育品管、行政營運"]
-  ];
-  const benefitSystems = [
-    ["基本保障", ["勞保、健保、勞退提撥", "團體保險規劃", "依法給假與特休制度"]],
-    ["工作支持", ["區域媒合與排班溝通", "督導即時支援", "服務紀錄與異常回報工具"]],
-    ["成長補助", ["新人教育訓練", "在職進修與證照補助", "內訓講師與帶教培力"]],
-    ["團隊文化", ["定期團隊會議", "優良服務表揚", "照顧案例分享與跨部門交流"]]
-  ];
-  const homeCareRecruit = {
-    highlights: [
-      ["服務範圍", "士林、北投、大同、南港、萬華、新店、中永和、新莊、蘆竹"],
-      ["工作特色", "到宅服務、督導陪跑、家屬溝通、服務紀錄與跨專業協作"],
-      ["適合對象", "喜歡與長輩相處、重視細節、願意穩定累積照顧專業的夥伴"]
-    ],
-    gallery: [
-      ["assets/homepage-batch/care-home-greeting-clear.jpg", "到宅服務前，用問候建立安心感。"],
-      ["assets/homepage-batch/orange-polo-caregiver-clear.jpg", "照顧服務員是家庭最靠近現場的支持。"],
-      ["assets/homepage-batch/03-supervisor-care-plan-fast.jpg", "督導與家屬討論照顧計畫。"],
-      ["assets/homepage-batch/14-care-notes-fast.jpg", "服務紀錄讓照顧變得可追蹤。"],
-      ["assets/homepage-batch/family-consultation-clear.jpg", "把家庭的擔心轉成清楚可執行的安排。"]
-    ],
-    roles: [
-      {
-        title: "居家照顧服務員",
-        tag: "一線服務",
-        image: "assets/recruit-home-care-worker-fast.jpg",
-        summary: "到宅提供身體照顧、生活支持、陪伴與服務紀錄，是長輩與家屬最直接的安心來源。",
-        duties: ["身體照顧、備餐、陪同活動與安全觀察", "依服務計畫完成服務紀錄與回報", "與督導配合調整照顧細節"],
-        requirements: ["具照顧服務員訓練結業證明或相關經驗佳", "願意學習服務紀錄、家屬溝通與安全照顧流程", "有耐心、守時、重視長輩尊嚴"],
-        support: ["新人陪跑", "區域排班", "服務津貼"]
-      },
-      {
-        title: "居家服務督導",
-        tag: "服務管理",
-        image: "assets/recruit-home-care-supervisor-fast.jpg",
-        summary: "負責服務媒合、品質追蹤、照服員支持與家屬溝通，把照顧現場變成穩定系統。",
-        duties: ["評估服務需求並安排合適照服員", "追蹤服務品質、異常事件與家屬回饋", "支持照服員工作狀況與教育訓練"],
-        requirements: ["具居服督導、社工、護理或長照相關經驗佳", "能清楚溝通、整理紀錄並追蹤問題", "願意在前線與行政之間協調資源"],
-        support: ["督導培訓", "管理津貼", "跨部門支援"]
-      },
-      {
-        title: "個案服務協調員",
-        tag: "家庭窗口",
-        image: "assets/homepage-batch/family-consultation-clear.jpg",
-        summary: "協助家庭理解服務內容、建立照顧安排，讓需求、資源與實際執行能順利接起來。",
-        duties: ["接洽家庭諮詢並整理需求", "協助服務說明、派案前資料確認", "追蹤服務開始後的家屬回饋"],
-        requirements: ["具客服、行政、長照或社福溝通經驗佳", "文字紀錄清楚，能穩定追蹤細節", "面對家屬焦慮時能保持同理與秩序"],
-        support: ["話術訓練", "行政工具", "主管陪談"]
-      },
-      {
-        title: "居家護理復能夥伴",
-        tag: "專業協作",
-        image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
-        summary: "與護理、復能與照顧團隊合作，協助長輩把日常動作重新練回生活裡。",
-        duties: ["協助復能活動與安全陪伴", "觀察長輩身體狀況並回報團隊", "配合專業人員執行居家支持建議"],
-        requirements: ["具護理、復健、職能、照顧服務或運動指導背景佳", "能重視安全、節奏與長輩意願", "願意與跨專業團隊合作"],
-        support: ["專業督導", "復能訓練", "案例討論"]
-      },
-      {
-        title: "居家行政調度專員",
-        tag: "營運支援",
-        image: "assets/homepage-batch/04-admin-team-office-fast.jpg",
-        summary: "負責班表、服務紀錄、文件與行政追蹤，讓前線照顧能順利運作、不被雜事卡住。",
-        duties: ["協助排班、服務異動與資料整理", "追蹤服務紀錄、文件與行政流程", "支援督導與客服窗口回覆"],
-        requirements: ["熟悉文書、表格與資料整理", "細心、穩定，能處理多項進度", "具長照行政或客服經驗佳"],
-        support: ["行政訓練", "流程模板", "固定工時"]
-      }
-    ]
-  };
-  const dayCareRecruit = {
-    highlights: [
-      ["服務場域", "長輩白天來到中心，有規律作息、共餐、活動、休息與安全照顧"],
-      ["工作特色", "團體照顧、活動帶領、餐食支持、身心觀察、家屬回報與團隊交班"],
-      ["適合對象", "喜歡團隊合作、擅長帶動氣氛，也能細心觀察長輩狀態的夥伴"]
-    ],
-    gallery: [
-      ["assets/daycare-detail-04-checkin-fast.jpg", "早晨報到與健康關懷，讓長輩安心開始一天。"],
-      ["assets/daycare-recruit-02-exercise-clear.jpg", "帶領團體活動，讓生活重新有節奏與期待。"],
-      ["assets/daycare-detail-02-meal-fast.jpg", "餐食與營養支持，是日照照顧的重要細節。"],
-      ["assets/daycare-recruit-02-exercise-clear.jpg", "認知活動與陪伴，讓互動不只是消磨時間。"],
-      ["assets/daycare-detail-04-checkin-fast.jpg", "交班與紀錄，讓團隊照顧能持續接住每位長輩。"]
-    ],
-    roles: [
-      {
-        title: "日照照顧服務員",
-        tag: "一線照顧",
-        image: "assets/daycare-recruit-02-exercise-clear.jpg",
-        summary: "陪伴長輩在日照中心完成活動、餐食、休息與生活照顧，是現場最重要的穩定力量。",
-        duties: ["協助長輩活動參與、餐食、如廁、休息與安全觀察", "完成日常服務紀錄與異常回報", "與護理、社工、督導配合調整照顧安排"],
-        requirements: ["具照顧服務員訓練結業證明佳", "能主動觀察長輩狀態並清楚回報", "喜歡與長輩互動，重視尊嚴與安全"],
-        support: ["新人帶教", "日照排班", "活動訓練"]
-      },
-      {
-        title: "日照活動帶領員",
-        tag: "活動設計",
-        image: "assets/daycare-recruit-02-exercise-clear.jpg",
-        summary: "規劃健康促進、認知刺激、手作、音樂與社交活動，讓長輩白天有參與感與成就感。",
-        duties: ["設計與帶領日照團體活動", "觀察活動反應並調整難度", "整理活動紀錄、照片與家屬回饋素材"],
-        requirements: ["具活動帶領、社工、職能、教育或長照經驗佳", "能掌握現場氣氛與長輩安全", "願意把活動設計成可複製的課程模組"],
-        support: ["活動教材", "課程共備", "講師培力"]
-      },
-      {
-        title: "日照護理人員",
-        tag: "健康照護",
-        image: "assets/daycare-detail-02-meal-fast.jpg",
-        summary: "負責健康評估、用藥與身體狀況觀察，協助團隊把日常照顧做得更安全。",
-        duties: ["長輩健康狀況觀察、量測與紀錄", "協助用藥提醒、傷口與慢病照護追蹤", "與家屬、照服員與外部醫療資源溝通"],
-        requirements: ["具護理師或護士證照", "熟悉長者照護、慢病管理或日照場域佳", "能把專業資訊轉成團隊看得懂的照顧提醒"],
-        support: ["護理支援", "案例討論", "專業進修"]
-      },
-      {
-        title: "日照個案管理員",
-        tag: "家庭窗口",
-        image: "assets/daycare-detail-04-checkin-fast.jpg",
-        summary: "協助家庭完成服務說明、長輩適應、照顧計畫追蹤與家屬溝通，是中心與家庭之間的橋樑。",
-        duties: ["接洽家庭諮詢並整理長輩需求", "追蹤長輩適應狀況與服務目標", "定期彙整家屬回饋與團隊照顧建議"],
-        requirements: ["具社工、長照、客服或個案管理經驗佳", "擅長傾聽、紀錄與跨角色溝通", "能在家庭焦慮時提供清楚流程與支持"],
-        support: ["溝通模板", "督導陪談", "個案會議"]
-      },
-      {
-        title: "日照行政營運專員",
-        tag: "營運支援",
-        image: "assets/daycare-detail-04-checkin-fast.jpg",
-        summary: "處理出缺勤、交通、耗材、文件、課程與現場行政，讓日照中心每天穩定運作。",
-        duties: ["協助中心行政、文件、物資與課表安排", "追蹤出缺勤、交通接送與家屬通知", "支援主管完成營運報表與品質資料"],
-        requirements: ["熟悉文書、表格與流程追蹤", "細心穩定，能處理多項現場需求", "具長照行政、課務或客服經驗佳"],
-        support: ["行政流程", "固定工時", "跨部門支援"]
-      }
-    ]
-  };
-  const migrantRecruit = {
-    highlights: [
-      ["培訓定位", "把家庭照顧技能拆成聽得懂、練得到、帶回家能執行的課程"],
-      ["工作特色", "照顧技能教學、跨文化溝通、情境演練、教材設計與課後追蹤"],
-      ["適合對象", "擅長教學、溝通清楚、尊重不同文化，也重視照顧安全的夥伴"]
-    ],
-    gallery: [
-      ["assets/homepage-batch/service-card-05-migrant-training-clear.jpg", "從照顧流程開始，讓每位學員知道為什麼要這樣做。"],
-      ["assets/migrant-detail-02-transfer-fast.jpg", "移位與安全照顧，需要反覆示範與實作。"],
-      ["assets/migrant-detail-03-meal-fast.jpg", "備餐與營養訓練，讓家庭照顧更穩定。"],
-      ["assets/migrant-recruit-04-communication-fast.jpg", "溝通演練把照顧指令變成聽得懂的行動。"],
-      ["assets/quality-recruit-04-quality-meeting-clear.jpg", "培訓紀錄與結訓追蹤，讓學習能被延續。"]
-    ],
-    roles: [
-      {
-        title: "移工照顧培訓講師",
-        tag: "課程教學",
-        image: "assets/homepage-batch/service-card-05-migrant-training-clear.jpg",
-        summary: "負責設計與帶領移工照顧課程，把照顧流程、服務安全與家庭溝通轉成可練習的教學內容。",
-        duties: ["帶領照顧技能、移位安全、備餐與溝通課程", "依學員程度調整教學節奏與示範方式", "整理教材、評量與課後改善建議"],
-        requirements: ["具長照、護理、社工、職能或照顧教學經驗佳", "能清楚示範照顧步驟並耐心修正動作", "尊重多元文化，能用簡單語言說明複雜流程"],
-        support: ["講師培力", "教材模板", "課程共備"]
-      },
-      {
-        title: "照顧技能實作教練",
-        tag: "實作訓練",
-        image: "assets/migrant-detail-02-transfer-fast.jpg",
-        summary: "專注於移位、翻身、沐浴、用餐與安全照顧演練，讓學員不是只聽懂，而是真的做得出來。",
-        duties: ["進行照顧動作示範、分組演練與姿勢修正", "協助建立安全檢核表與實作評量", "回報學員學習狀況與需要補強的技能"],
-        requirements: ["具照顧服務、護理、復健或實作教學經驗佳", "熟悉身體力學與長者安全照顧原則", "能細心觀察動作風險並即時提醒"],
-        support: ["實作教案", "安全訓練", "案例討論"]
-      },
-      {
-        title: "跨文化溝通輔導員",
-        tag: "溝通支持",
-        image: "assets/migrant-recruit-04-communication-fast.jpg",
-        summary: "協助移工、家庭與照顧團隊理解彼此需求，降低溝通誤會，讓照顧指令可以被正確執行。",
-        duties: ["協助照顧情境溝通演練與用語整理", "支援家庭照顧規則、禁忌與回報方式說明", "收集學員困難並回饋課程設計"],
-        requirements: ["具移工服務、語言教學、社福、客服或跨文化工作經驗佳", "能同理不同文化背景與家庭壓力", "文字整理與口語表達清楚"],
-        support: ["溝通腳本", "主管陪談", "情境卡教材"]
-      },
-      {
-        title: "培訓課務專員",
-        tag: "課務行政",
-        image: "assets/quality-recruit-04-quality-meeting-clear.jpg",
-        summary: "負責開課行政、學員資料、課程通知、簽到評量與結訓文件，讓每一堂課順利運作。",
-        duties: ["處理課程報名、通知、簽到與教材準備", "整理學員資料、評量結果與結訓紀錄", "支援講師、場地、物資與課後回饋追蹤"],
-        requirements: ["熟悉文書、表格與課務行政流程", "細心穩定，能處理多項課程進度", "具教育訓練、行政或長照課務經驗佳"],
-        support: ["課務流程", "表單模板", "固定工時"]
-      },
-      {
-        title: "家庭照顧課程企劃",
-        tag: "內容企劃",
-        image: "assets/migrant-detail-03-meal-fast.jpg",
-        summary: "把家庭照顧常見問題整理成課程、懶人包與實作教材，協助家庭與移工建立共同照顧語言。",
-        duties: ["規劃照顧課程主題、教材架構與活動流程", "整理照顧知識、圖卡、評量與課後提醒", "與講師、督導、行政協作優化課程品質"],
-        requirements: ["具課程企劃、教材設計、長照或健康教育經驗佳", "能把複雜知識轉成簡單可操作內容", "重視使用者理解與實際照顧情境"],
-        support: ["教材素材庫", "跨部門共備", "企劃培訓"]
-      }
-    ]
-  };
-  const qualityRecruit = {
-    highlights: [
-      ["部門任務", "把前線經驗整理成教材、訓練、稽核與改善流程，讓服務品質能被複製"],
-      ["工作特色", "教材設計、內訓帶領、服務紀錄檢核、品質稽核、數據追蹤與改善專案"],
-      ["適合對象", "重視細節、善於整理知識、能把現場問題轉成方法與制度的夥伴"]
-    ],
-    gallery: [
-      ["assets/quality-detail-01-materials-fast.jpg", "把照顧經驗整理成教材，讓好服務可以被學會。"],
-      ["assets/quality-recruit-02-training-clear.jpg", "內訓不是上課而已，而是讓現場做法更一致。"],
-      ["assets/quality-detail-03-audit-fast.jpg", "服務紀錄檢核，讓照顧品質被看見也被追蹤。"],
-      ["assets/quality-recruit-04-quality-meeting-clear.jpg", "從問題到改善，讓團隊一起把流程變好。"],
-      ["assets/quality-recruit-04-quality-meeting-clear.jpg", "現場回饋要具體、友善，也要能真正幫上忙。"]
-    ],
-    roles: [
-      {
-        title: "教育品管專員",
-        tag: "品質管理",
-        image: "assets/quality-detail-03-audit-fast.jpg",
-        summary: "負責服務紀錄、照顧流程與品質資料檢核，把前線服務轉化為可追蹤、可改善的品質系統。",
-        duties: ["檢核服務紀錄、異常回報與品管表單", "追蹤品質指標、改善事項與結案進度", "協助督導整理服務品質回饋與教育需求"],
-        requirements: ["具長照、護理、社工、品管或行政稽核經驗佳", "細心、邏輯清楚，能穩定追蹤多項資料", "能把問題整理成具體可執行的改善建議"],
-        support: ["品管模板", "督導共作", "數據工具"]
-      },
-      {
-        title: "內訓講師",
-        tag: "教育訓練",
-        image: "assets/quality-recruit-02-training-clear.jpg",
-        summary: "帶領新人訓練與在職教育，把照顧倫理、服務流程、情境處理與紀錄回報教到能落地。",
-        duties: ["規劃並執行新人訓練、在職教育與情境演練", "依服務問題設計補強課程與測驗", "追蹤學員學習成果與現場應用狀況"],
-        requirements: ["具照顧教學、護理、社工、督導或教育訓練經驗佳", "表達清楚，能把複雜流程拆成好理解步驟", "願意和前線團隊共同修正教材"],
-        support: ["講師培力", "課程共備", "教材素材庫"]
-      },
-      {
-        title: "教材設計企劃",
-        tag: "內容設計",
-        image: "assets/quality-detail-01-materials-fast.jpg",
-        summary: "把照顧知識、服務流程與案例整理成簡報、圖卡、手冊與線上教材，讓知識更容易被吸收。",
-        duties: ["設計長照教材、流程圖、照顧圖卡與課程簡報", "整理案例、FAQ 與標準作業說明", "與講師、督導、行政協作更新教材版本"],
-        requirements: ["具教材設計、內容企劃、教育、長照或健康知識背景佳", "能把文字、圖像與流程整理得清楚易懂", "重視學習者視角與實際現場使用"],
-        support: ["設計模板", "案例資料庫", "跨部門共備"]
-      },
-      {
-        title: "服務稽核人員",
-        tag: "稽核改善",
-        image: "assets/quality-recruit-04-quality-meeting-clear.jpg",
-        summary: "透過現場觀察、紀錄檢查與團隊訪談，協助服務單位發現風險、修正流程並維持品質。",
-        duties: ["執行服務流程、紀錄與現場品質檢核", "整理稽核結果與改善追蹤表", "用支持性的方式給予前線具體回饋"],
-        requirements: ["具長照服務、督導、品管、稽核或護理背景佳", "能客觀觀察、清楚記錄並友善溝通", "重視安全、倫理與服務一致性"],
-        support: ["稽核工具", "主管陪同", "改善會議"]
-      },
-      {
-        title: "品質改善專案管理",
-        tag: "專案推進",
-        image: "assets/quality-recruit-04-quality-meeting-clear.jpg",
-        summary: "把服務問題、數據與跨部門需求整合成改善專案，讓品管不只是檢查，而是推動變好。",
-        duties: ["規劃品質改善專案、時程與追蹤指標", "整合督導、行政、講師與前線回饋", "製作改善報告、會議資料與成果追蹤"],
-        requirements: ["具專案管理、營運、品管或長照管理經驗佳", "能整理資料、掌握進度並推動跨部門合作", "喜歡把混亂問題變成清楚流程"],
-        support: ["專案模板", "資料儀表板", "管理培力"]
-      }
-    ]
-  };
-  const adminRecruit = {
-    highlights: [
-      ["部門任務", "支援人資、財務、總務、客服、營運與投資人窗口，讓前線照顧能穩定運作"],
-      ["工作特色", "資料整理、流程管理、跨部門協作、電話諮詢、文件追蹤與營運報表"],
-      ["適合對象", "細心穩定、溝通清楚、能整理複雜資訊，也願意支援照顧現場的夥伴"]
-    ],
-    gallery: [
-      ["assets/homepage-batch/orange-polo-supervisor-clear.jpg", "人資招募與新人報到，是讓好夥伴加入團隊的第一步。"],
-      ["assets/admin-recruit-02-operations-hires.jpg", "營運調度讓服務、人力與資料能順利接上。"],
-      ["assets/admin-recruit-02-operations-hires.jpg", "財務行政把數字、文件與報表整理清楚。"],
-      ["assets/homepage-batch/family-consultation-clear.jpg", "客服總務承接家庭問題，也支援前線服務。"],
-      ["assets/admin-recruit-05-meeting-clear.jpg", "跨部門會議讓每個專案都有進度與負責人。"]
-    ],
-    roles: [
-      {
-        title: "人資招募專員",
-        tag: "人才招募",
-        image: "assets/homepage-batch/orange-polo-supervisor-clear.jpg",
-        summary: "負責招募、面談安排、新人報到與員工關懷，協助歲悅找到願意長久投入照顧的夥伴。",
-        duties: ["發布職缺、履歷篩選、面談安排與錄取通知", "協助新人報到、資料建檔與入職流程", "追蹤新人適應狀況與部門人力需求"],
-        requirements: ["具人資、招募、行政或客服經驗佳", "溝通親切、紀錄清楚，能穩定追蹤進度", "認同長照服務，願意理解前線工作型態"],
-        support: ["招募模板", "面談流程", "新人關懷"]
-      },
-      {
-        title: "營運行政專員",
-        tag: "營運支援",
-        image: "assets/admin-recruit-02-operations-hires.jpg",
-        summary: "協助服務資料、排程、跨部門需求與營運進度追蹤，讓每天的照顧服務不被行政流程卡住。",
-        duties: ["整理服務資料、排程異動與跨部門需求", "追蹤營運專案、會議待辦與改善進度", "支援主管製作營運報表與流程文件"],
-        requirements: ["熟悉表格、文件與資料整理", "能同時管理多項進度並主動回報", "具長照、醫療、教育或服務業行政經驗佳"],
-        support: ["流程模板", "主管帶教", "跨部門協作"]
-      },
-      {
-        title: "財務行政專員",
-        tag: "財務文件",
-        image: "assets/admin-recruit-02-operations-hires.jpg",
-        summary: "負責請款、收支資料、發票憑證、報表整理與行政核對，讓公司營運數據穩定清楚。",
-        duties: ["整理收支、請款、發票、憑證與對帳資料", "協助月報、專案報表與合約文件歸檔", "追蹤付款時程、費用申請與行政核銷"],
-        requirements: ["具財務、會計、行政或出納經驗佳", "細心、守時，對數字與文件有耐心", "熟悉試算表與基本文書工具"],
-        support: ["報表格式", "核銷流程", "財務主管支援"]
-      },
-      {
-        title: "客服總務專員",
-        tag: "服務窗口",
-        image: "assets/homepage-batch/family-consultation-clear.jpg",
-        summary: "承接電話、信箱、一般諮詢與總務事項，協助家庭、合作單位與內部團隊快速找到對的人。",
-        duties: ["接聽電話、回覆信箱與初步分類需求", "協助總務採購、文件收發與環境物資管理", "追蹤諮詢案件、轉介窗口與回覆進度"],
-        requirements: ["具客服、總務、行政或服務窗口經驗佳", "說明清楚、態度穩定，能面對焦急詢問", "能整理資訊並確實追蹤到結案"],
-        support: ["回覆腳本", "總務清單", "窗口訓練"]
-      },
-      {
-        title: "投資人與專案行政",
-        tag: "專案窗口",
-        image: "assets/admin-recruit-05-meeting-clear.jpg",
-        summary: "支援投資人資料、合作提案、專案文件與會議進度，讓外部合作與內部執行有清楚節奏。",
-        duties: ["整理投資人資料、簡報、會議紀錄與追蹤事項", "協助合作提案、標案文件與專案時程管理", "彙整各部門進度，製作對外與內部報告"],
-        requirements: ["具專案行政、企劃、投資人關係或秘書經驗佳", "文字整理清楚，能掌握會議重點與時程", "具保密意識與跨部門溝通能力"],
-        support: ["簡報模板", "專案管理", "主管共作"]
-      }
-    ]
-  };
-  const departments = {
-    "home-care-team": {
-      eyebrow: "Home Care Team",
+  const staticDepartmentList = [
+    {
+      id: "home-care-team",
+      department_slug: "home-care-team",
       title: "居家照顧部門",
-      image: "assets/homepage-batch/care-home-greeting-clear.jpg",
-      intro: "到長輩熟悉的家中提供照顧，讓安全、尊嚴與家屬安心都被穩定承接。",
-      roles: ["居家照顧服務員", "居家服務督導", "個案服務協調"],
-      skills: ["身體照顧與生活支持", "服務紀錄與家屬溝通", "異常事件回報"]
+      eyebrow: "Home Care Team",
+      description: "到宅服務、居服督導、個案管理與區域服務支援，是歲悅最靠近家庭的一線團隊。",
+      image_url: talentAsset("assets/homepage-batch/care-home-greeting-clear.jpg"),
+      highlights: ["居服員招募", "居服督導", "個案管理"]
     },
-    "day-care-team": {
-      eyebrow: "Day Care Team",
+    {
+      id: "day-care-team",
+      department_slug: "day-care-team",
       title: "日間照顧部",
-      image: "assets/homepage-batch/12-community-health-class-hires.jpg",
-      intro: "陪長輩白天有規律作息、活動參與、共餐與社交，也讓家庭有喘息空間。",
-      roles: ["日照照顧服務員", "活動帶領員", "照顧班表協調"],
-      skills: ["團體活動陪伴", "餐食與休息照顧", "日常安全觀察"]
+      eyebrow: "Day Care Team",
+      description: "讓長輩白天有活動、共餐、陪伴與安全照顧，也讓家庭有穩定喘息。",
+      image_url: talentAsset("assets/daycare-recruit-02-exercise-clear.jpg"),
+      highlights: ["日照照服員", "中心主任", "活動照顧"]
     },
-    "migrant-team": {
-      eyebrow: "Migrant Training",
+    {
+      id: "migrant-team",
+      department_slug: "migrant-team",
       title: "移工培訓部",
-      image: "assets/homepage-batch/11-elder-art-activity-hires.jpg",
-      intro: "把家庭照顧技能拆解成可理解、可練習、可追蹤的課程內容。",
-      roles: ["移工培訓講師", "課務助教", "家庭照顧課程企劃"],
-      skills: ["照顧技能教學", "跨文化溝通", "課程教材製作"]
+      eyebrow: "Migrant Training",
+      description: "把照顧技能、跨文化溝通與課程活動整理成移工與家庭都能理解的學習支持。",
+      image_url: talentAsset("assets/homepage-batch/service-card-05-migrant-training-clear.jpg"),
+      highlights: ["社群行銷", "活動企劃", "培訓課程"]
     },
-    "quality-team": {
-      eyebrow: "Teaching Quality",
+    {
+      id: "quality-team",
+      department_slug: "quality-team",
       title: "教學品管部",
-      image: "assets/homepage-batch/14-care-notes-fast.jpg",
-      intro: "把前線經驗整理成教材、稽核與改善流程，讓服務品質可以被複製。",
-      roles: ["教育品管專員", "內訓講師", "服務稽核人員"],
-      skills: ["教材設計", "服務紀錄檢核", "品管改善追蹤"]
+      eyebrow: "Teaching Quality",
+      description: "將前線經驗轉成教材、內訓、稽核與改善流程，讓服務品質能被複製。",
+      image_url: talentAsset("assets/quality-recruit-02-training-clear.jpg"),
+      highlights: ["教育訓練", "服務檢核", "品質改善"]
     },
-    "admin-team": {
-      eyebrow: "Administration",
+    {
+      id: "admin-team",
+      department_slug: "admin-team",
       title: "行政部",
-      image: "assets/homepage-batch/04-admin-team-office-fast.jpg",
-      intro: "支援營運、人資、財務、總務與投資人關係，讓前線照顧能穩定運作。",
-      roles: ["行政總務", "人資招募", "財務行政", "客服與投資人窗口"],
-      skills: ["跨部門協作", "資料整理與流程管理", "溝通與問題追蹤"]
-    }
-  };
-
-  const departmentPanel = (key) => {
-    const item = departments[key];
-    const departmentHero = ({ eyebrow, title, copy, highlights, image, imageAlt, coverClass = "", coverEyebrow, coverTitle }) => `
-            <section class="homecare-intro ${coverClass ? `${coverClass}-intro` : ""}">
-              <div>
-                <p class="eyebrow">${eyebrow}</p>
-                <h2>${title}</h2>
-                <p>${copy}</p>
-                <div class="homecare-highlight-row">
-                  ${highlights.map(([highlightTitle, highlightCopy]) => `<article><span>${highlightTitle}</span><strong>${highlightCopy}</strong></article>`).join("")}
-                </div>
-              </div>
-              <aside class="${coverClass ? `${coverClass}-cover` : ""}">
-                <img src="${talentAsset(image)}" alt="${imageAlt}" />
-                <div><span>${coverEyebrow}</span><strong>${coverTitle}</strong></div>
-              </aside>
-            </section>
-    `;
-    if (key === "home-care-team") {
-      return `
-        <section class="career-tab-panel" data-career-panel="${key}">
-          <div class="homecare-recruit">
-            ${departmentHero({
-              eyebrow: "Home Care Team",
-              title: "居家照顧部門",
-              copy: "居家照顧是歲悅最靠近家庭的一線服務。我們進到長輩熟悉的家，把身體照顧、生活支持、家屬溝通與服務紀錄串成一套穩定流程，讓家庭不用自己猜、照顧者也不是單打獨鬥。",
-              highlights: homeCareRecruit.highlights,
-              image: "assets/homepage-batch/care-home-greeting-clear.jpg",
-              imageAlt: "歲悅居家照顧服務情境",
-              coverEyebrow: "Suiyuecare Home Care",
-              coverTitle: "把照顧帶進家裡，也把安心留在家裡。"
-            })}
-
-            <section class="homecare-gallery" aria-label="居家照顧工作情境">
-              ${homeCareRecruit.gallery.map(([image, caption]) => `<figure><img src="${talentAsset(image)}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
-            </section>
-
-            <section class="homecare-role-section">
-              <div class="career-section-head compact">
-                <p class="eyebrow">Open Roles</p>
-                <h2>居家照顧部門職缺</h2>
-                <span>點開每一個職位，可以看到工作內容、應徵條件、公司支持與申請入口。</span>
-              </div>
-              <div class="homecare-role-grid">
-                ${homeCareRecruit.roles.map((role, index) => `
-                  <details class="homecare-role-card" ${index === 0 ? "open" : ""}>
-                    <summary>
-                      <img src="${talentAsset(role.image)}" alt="${role.title}" />
-                      <div>
-                        <span>${role.tag}</span>
-                        <h3>${role.title}</h3>
-                        <p>${role.summary}</p>
-                      </div>
-                      <b>查看內容</b>
-                    </summary>
-                    <div class="homecare-role-detail">
-                      <article>
-                        <h4>工作內容</h4>
-                        <ul>${role.duties.map((duty) => `<li>${duty}</li>`).join("")}</ul>
-                      </article>
-                      <article>
-                        <h4>應徵條件</h4>
-                        <ul>${role.requirements.map((requirement) => `<li>${requirement}</li>`).join("")}</ul>
-                      </article>
-                      <div class="homecare-role-support">
-                        ${role.support.map((support) => `<span>${support}</span>`).join("")}
-                      </div>
-                      <a class="primary-button" href="#contact" ${talentContactAttrs}>申請應徵</a>
-                    </div>
-                  </details>
-                `).join("")}
-              </div>
-            </section>
-          </div>
-        </section>
-      `;
-    }
-    if (key === "day-care-team") {
-      return `
-        <section class="career-tab-panel" data-career-panel="${key}">
-          <div class="homecare-recruit daycare-recruit">
-            ${departmentHero({
-              eyebrow: "Day Care Team",
-              title: "日間照顧部",
-              copy: "日間照顧是讓長輩白天有安全、有活動、有同伴，也讓家庭有喘息空間的服務。歲悅的日照團隊把作息、餐食、活動、健康觀察與家屬回報整合在一起，讓每一天都被好好安排。",
-              highlights: dayCareRecruit.highlights,
-              image: "assets/daycare-recruit-02-exercise-clear.jpg",
-              imageAlt: "歲悅日間照顧團體活動情境",
-              coverClass: "daycare",
-              coverEyebrow: "Suiyuecare Day Care",
-              coverTitle: "讓長輩白天被陪伴，也讓家庭晚上更安心。"
-            })}
-
-            <section class="homecare-gallery daycare-gallery" aria-label="日間照顧工作情境">
-              ${dayCareRecruit.gallery.map(([image, caption]) => `<figure><img src="${talentAsset(image)}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
-            </section>
-
-            <section class="homecare-role-section">
-              <div class="career-section-head compact">
-                <p class="eyebrow">Open Roles</p>
-                <h2>日間照顧部職缺</h2>
-                <span>點開每一個職位，可以看到工作內容、應徵條件、公司支持與申請入口。</span>
-              </div>
-              <div class="homecare-role-grid">
-                ${dayCareRecruit.roles.map((role, index) => `
-                  <details class="homecare-role-card daycare-role-card" ${index === 0 ? "open" : ""}>
-                    <summary>
-                      <img src="${talentAsset(role.image)}" alt="${role.title}" />
-                      <div>
-                        <span>${role.tag}</span>
-                        <h3>${role.title}</h3>
-                        <p>${role.summary}</p>
-                      </div>
-                      <b>查看內容</b>
-                    </summary>
-                    <div class="homecare-role-detail">
-                      <article>
-                        <h4>工作內容</h4>
-                        <ul>${role.duties.map((duty) => `<li>${duty}</li>`).join("")}</ul>
-                      </article>
-                      <article>
-                        <h4>應徵條件</h4>
-                        <ul>${role.requirements.map((requirement) => `<li>${requirement}</li>`).join("")}</ul>
-                      </article>
-                      <div class="homecare-role-support">
-                        ${role.support.map((support) => `<span>${support}</span>`).join("")}
-                      </div>
-                      <a class="primary-button" href="#contact" ${talentContactAttrs}>申請應徵</a>
-                    </div>
-                  </details>
-                `).join("")}
-              </div>
-            </section>
-          </div>
-        </section>
-      `;
-    }
-    if (key === "migrant-team") {
-      return `
-        <section class="career-tab-panel" data-career-panel="${key}">
-          <div class="homecare-recruit migrant-recruit">
-            ${departmentHero({
-              eyebrow: "Migrant Training",
-              title: "移工培訓部",
-              copy: "移工培訓部把家庭照顧常見的身體照顧、移位安全、備餐營養、溝通回報與照顧紀錄，整理成可以聽懂、看懂、練習、回家後能執行的課程。這個部門不只是教技能，更是在家庭、移工與照顧團隊之間建立共同語言。",
-              highlights: migrantRecruit.highlights,
-              image: "assets/homepage-batch/service-card-05-migrant-training-clear.jpg",
-              imageAlt: "歲悅移工培訓課堂情境",
-              coverClass: "migrant",
-              coverEyebrow: "Suiyuecare Training",
-              coverTitle: "把照顧教到會，也把家庭接得更穩。"
-            })}
-
-            <section class="homecare-gallery migrant-gallery" aria-label="移工培訓工作情境">
-              ${migrantRecruit.gallery.map(([image, caption]) => `<figure><img src="${talentAsset(image)}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
-            </section>
-
-            <section class="homecare-role-section">
-              <div class="career-section-head compact">
-                <p class="eyebrow">Open Roles</p>
-                <h2>移工培訓部職缺</h2>
-                <span>點開每一個職位，可以看到工作內容、應徵條件、公司支持與申請入口。</span>
-              </div>
-              <div class="homecare-role-grid">
-                ${migrantRecruit.roles.map((role, index) => `
-                  <details class="homecare-role-card migrant-role-card" ${index === 0 ? "open" : ""}>
-                    <summary>
-                      <img src="${talentAsset(role.image)}" alt="${role.title}" />
-                      <div>
-                        <span>${role.tag}</span>
-                        <h3>${role.title}</h3>
-                        <p>${role.summary}</p>
-                      </div>
-                      <b>查看內容</b>
-                    </summary>
-                    <div class="homecare-role-detail">
-                      <article>
-                        <h4>工作內容</h4>
-                        <ul>${role.duties.map((duty) => `<li>${duty}</li>`).join("")}</ul>
-                      </article>
-                      <article>
-                        <h4>應徵條件</h4>
-                        <ul>${role.requirements.map((requirement) => `<li>${requirement}</li>`).join("")}</ul>
-                      </article>
-                      <div class="homecare-role-support">
-                        ${role.support.map((support) => `<span>${support}</span>`).join("")}
-                      </div>
-                      <a class="primary-button" href="#contact" ${talentContactAttrs}>申請應徵</a>
-                    </div>
-                  </details>
-                `).join("")}
-              </div>
-            </section>
-          </div>
-        </section>
-      `;
-    }
-    if (key === "quality-team") {
-      return `
-        <section class="career-tab-panel" data-career-panel="${key}">
-          <div class="homecare-recruit quality-recruit">
-            ${departmentHero({
-              eyebrow: "Teaching Quality",
-              title: "教學品管部",
-              copy: "教學品管部把前線照顧經驗變成可被學習、檢核與改善的系統。從新人訓練、教材設計、服務紀錄檢核到品質改善專案，這個部門讓歲悅的服務不是只靠個人努力，而是靠制度穩定變好。",
-              highlights: qualityRecruit.highlights,
-              image: "assets/quality-recruit-04-quality-meeting-clear.jpg",
-              imageAlt: "歲悅教學品管品質會議情境",
-              coverClass: "quality",
-              coverEyebrow: "Suiyuecare Quality",
-              coverTitle: "把好的照顧整理成方法，再讓方法長成制度。"
-            })}
-
-            <section class="homecare-gallery quality-gallery" aria-label="教學品管工作情境">
-              ${qualityRecruit.gallery.map(([image, caption]) => `<figure><img src="${talentAsset(image)}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
-            </section>
-
-            <section class="homecare-role-section">
-              <div class="career-section-head compact">
-                <p class="eyebrow">Open Roles</p>
-                <h2>教學品管部職缺</h2>
-                <span>點開每一個職位，可以看到工作內容、應徵條件、公司支持與申請入口。</span>
-              </div>
-              <div class="homecare-role-grid">
-                ${qualityRecruit.roles.map((role, index) => `
-                  <details class="homecare-role-card quality-role-card" ${index === 0 ? "open" : ""}>
-                    <summary>
-                      <img src="${talentAsset(role.image)}" alt="${role.title}" />
-                      <div>
-                        <span>${role.tag}</span>
-                        <h3>${role.title}</h3>
-                        <p>${role.summary}</p>
-                      </div>
-                      <b>查看內容</b>
-                    </summary>
-                    <div class="homecare-role-detail">
-                      <article>
-                        <h4>工作內容</h4>
-                        <ul>${role.duties.map((duty) => `<li>${duty}</li>`).join("")}</ul>
-                      </article>
-                      <article>
-                        <h4>應徵條件</h4>
-                        <ul>${role.requirements.map((requirement) => `<li>${requirement}</li>`).join("")}</ul>
-                      </article>
-                      <div class="homecare-role-support">
-                        ${role.support.map((support) => `<span>${support}</span>`).join("")}
-                      </div>
-                      <a class="primary-button" href="#contact" ${talentContactAttrs}>申請應徵</a>
-                    </div>
-                  </details>
-                `).join("")}
-              </div>
-            </section>
-          </div>
-        </section>
-      `;
-    }
-    if (key === "admin-team") {
-      return `
-        <section class="career-tab-panel" data-career-panel="${key}">
-          <div class="homecare-recruit admin-recruit">
-            ${departmentHero({
-              eyebrow: "Administration",
-              title: "行政部",
-              copy: "行政部是讓歲悅前線服務能穩定運作的後勤核心。從人資招募、營運調度、財務行政、客服總務到投資人與專案支援，每一個看似細節的流程，都會影響照顧是否能準時、清楚、持續地被交付。",
-              highlights: adminRecruit.highlights,
-              image: "assets/admin-recruit-05-meeting-clear.jpg",
-              imageAlt: "歲悅行政部跨部門會議情境",
-              coverClass: "admin",
-              coverEyebrow: "Suiyuecare Admin",
-              coverTitle: "讓後勤有秩序，前線照顧才有餘裕。"
-            })}
-
-            <section class="homecare-gallery admin-gallery" aria-label="行政部工作情境">
-              ${adminRecruit.gallery.map(([image, caption]) => `<figure><img src="${talentAsset(image)}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
-            </section>
-
-            <section class="homecare-role-section">
-              <div class="career-section-head compact">
-                <p class="eyebrow">Open Roles</p>
-                <h2>行政部職缺</h2>
-                <span>點開每一個職位，可以看到工作內容、應徵條件、公司支持與申請入口。</span>
-              </div>
-              <div class="homecare-role-grid">
-                ${adminRecruit.roles.map((role, index) => `
-                  <details class="homecare-role-card admin-role-card" ${index === 0 ? "open" : ""}>
-                    <summary>
-                      <img src="${talentAsset(role.image)}" alt="${role.title}" />
-                      <div>
-                        <span>${role.tag}</span>
-                        <h3>${role.title}</h3>
-                        <p>${role.summary}</p>
-                      </div>
-                      <b>查看內容</b>
-                    </summary>
-                    <div class="homecare-role-detail">
-                      <article>
-                        <h4>工作內容</h4>
-                        <ul>${role.duties.map((duty) => `<li>${duty}</li>`).join("")}</ul>
-                      </article>
-                      <article>
-                        <h4>應徵條件</h4>
-                        <ul>${role.requirements.map((requirement) => `<li>${requirement}</li>`).join("")}</ul>
-                      </article>
-                      <div class="homecare-role-support">
-                        ${role.support.map((support) => `<span>${support}</span>`).join("")}
-                      </div>
-                      <a class="primary-button" href="#contact" ${talentContactAttrs}>申請應徵</a>
-                    </div>
-                  </details>
-                `).join("")}
-              </div>
-            </section>
-          </div>
-        </section>
-      `;
-    }
-    return `
-      <section class="career-tab-panel" data-career-panel="${key}">
-        <div class="career-dept-layout">
-          <article class="career-dept-image">
-            <img src="${talentAsset(item.image)}" alt="${item.title}招募情境" />
-            <div><span>${item.eyebrow}</span><h3>${item.title}</h3></div>
-          </article>
-          <div class="career-dept-content">
-            <p class="eyebrow">${item.eyebrow}</p>
-            <h2>${item.title}</h2>
-            <p>${item.intro}</p>
-            <div class="career-role-grid">
-              ${item.roles.map((role) => `<article><span>Role</span><strong>${role}</strong></article>`).join("")}
-            </div>
-            <div class="career-skill-list">
-              ${item.skills.map((skill) => `<span>${skill}</span>`).join("")}
-            </div>
-            <a class="primary-button" href="#contact" ${talentContactAttrs}>我要應徵</a>
-          </div>
-        </div>
-      </section>
-    `;
-  };
-
-  const staticRecruitGroups = [
-    {
-      key: "home-care-team",
-      department: {
-        ...departments["home-care-team"],
-        description: "居家照顧是歲悅最靠近家庭的一線服務，把身體照顧、生活支持、家屬溝通與服務紀錄串成穩定流程。",
-        image_url: "assets/homepage-batch/care-home-greeting-clear.jpg",
-        highlights: homeCareRecruit.highlights.map((item) => item[1])
-      },
-      roles: homeCareRecruit.roles
-    },
-    {
-      key: "day-care-team",
-      department: {
-        ...departments["day-care-team"],
-        description: "日間照顧讓長輩白天有安全、有活動、有同伴，也讓家庭有喘息空間。",
-        image_url: "assets/daycare-recruit-02-exercise-clear.jpg",
-        highlights: dayCareRecruit.highlights.map((item) => item[1])
-      },
-      roles: dayCareRecruit.roles
-    },
-    {
-      key: "migrant-team",
-      department: {
-        ...departments["migrant-team"],
-        description: "移工培訓部把家庭照顧常見技能整理成能聽懂、看懂、練習、回家能執行的課程。",
-        image_url: "assets/homepage-batch/service-card-05-migrant-training-clear.jpg",
-        highlights: migrantRecruit.highlights.map((item) => item[1])
-      },
-      roles: migrantRecruit.roles
-    },
-    {
-      key: "quality-team",
-      department: {
-        ...departments["quality-team"],
-        description: "教學品管部把前線照顧經驗變成可被學習、檢核與改善的系統。",
-        image_url: "assets/quality-recruit-02-training-clear.jpg",
-        highlights: qualityRecruit.highlights.map((item) => item[1])
-      },
-      roles: qualityRecruit.roles
-    },
-    {
-      key: "admin-team",
-      department: {
-        ...departments["admin-team"],
-        description: "行政部支援人資、營運、財務、總務、客服與專案流程，讓前線照顧能穩定運作。",
-        image_url: "assets/admin-recruit-05-meeting-clear.jpg",
-        highlights: adminRecruit.highlights.map((item) => item[1])
-      },
-      roles: adminRecruit.roles
+      eyebrow: "Administration",
+      description: "支援人資、營運、財務、客服、投資人與專案流程，讓前線照顧穩定運作。",
+      image_url: talentAsset("assets/admin-recruit-05-meeting-clear.jpg"),
+      highlights: ["品牌行銷", "營運支援", "行政協作"]
     }
   ];
-  const staticDepartmentList = staticRecruitGroups.map(({ key, department }) => ({
-    id: key,
-    department_slug: key,
-    title: department.title,
-    eyebrow: department.eyebrow,
-    description: department.description,
-    image_url: department.image_url,
-    highlights: department.highlights
-  }));
-  const staticOpenings = staticRecruitGroups.flatMap((group, groupIndex) => group.roles.map((role, roleIndex) => {
-    const locationMap = {
-      "home-care-team": "臺北、新北、桃園",
-      "day-care-team": "臺北 / 新北據點",
-      "migrant-team": "臺北 / 線上",
-      "quality-team": "臺北辦公室",
-      "admin-team": "臺北辦公室"
-    };
-    return {
-      id: `${group.key}-${roleIndex + 1}`,
-      page_slug: "talent",
-      department_id: group.key,
-      opening_slug: `${group.key}-${roleIndex + 1}`,
-      title: role.title,
-      subtitle: role.tag || group.department.title,
-      summary: role.summary,
-      employment_type: roleIndex === 0 && group.key === "home-care-team" ? "全職 / 兼職" : "全職",
-      location: locationMap[group.key] || "依職缺安排",
-      salary_text: "面議 / 依經驗核定",
-      capacity_label: roleIndex === 0 ? "持續招募" : "1-2 名",
-      image_url: role.image,
-      duties: role.duties,
-      requirements: role.requirements,
-      benefits: role.support,
-      apply_button_text: "申請應徵",
-      apply_form_enabled: true,
-      metadata: { form_type: "recruiting" },
-      sort_order: groupIndex * 100 + roleIndex * 10,
-      is_featured: groupIndex === 0 && roleIndex < 2,
-      updated_at: null
-    };
+  const caregiverDistricts = [
+    ["臺北市", "士林區", "230-420", 10, true],
+    ["臺北市", "北投區", "230-420", 20],
+    ["臺北市", "南港區", "230-420", 30],
+    ["新北市", "中和區", "235-420", 40],
+    ["新北市", "永和區", "235-420", 50],
+    ["新北市", "新店區", "235-420", 60],
+    ["新北市", "淡水區", "235-420", 70],
+    ["桃園市", "大園區", "235-420", 80],
+    ["桃園市", "蘆竹區", "235-420", 90]
+  ];
+  const staticOpeningRows = [
+    ...caregiverDistricts.map(([city, district, hourly, sortOrder, isFeatured = false]) => [
+      "home-care-team", `${city}居家照顧服務員（${district}）`, "居服員",
+      "全職 / 兼職", `${city}${district}`, `時薪 ${hourly} 元`, "持續招募", sortOrder, isFeatured
+    ]),
+    ["day-care-team", "萬華日照中心照顧服務員", "日照照服員", "全職", "臺北市萬華區", "月薪 33,000-35,000 元", "1-2 名", 100, true],
+    ["home-care-team", "臺北市居家服務督導員", "居服督導", "全職", "臺北市士林區", "月薪 38,000-42,000 元", "1-2 名", 110, true],
+    ["migrant-team", "全職社群行銷專員（菲律賓）", "菲律賓社群", "全職", "新北市新莊區", "月薪 35,000-38,000 元", "1 名", 120, true],
+    ["migrant-team", "活動企劃專員", "移工培訓活動", "全職", "新北市新莊區", "月薪 38,000-42,000 元", "1 名", 130],
+    ["admin-team", "社群媒體行銷企劃", "品牌行銷", "全職", "臺北市信義區", "月薪 36,000-42,000 元", "1 名", 140],
+    ["day-care-team", "臺北市日間照顧中心主任（純白班、儲備主管職）", "中心主任", "全職", "臺北市萬華區", "月薪 50,000 元以上", "1 名", 150, true],
+    ["home-care-team", "新北市居家服務督導員（新店／中和／永和區）", "居服督導", "全職", "新北市新店區", "月薪 38,000-42,000 元", "1-2 名", 160, true],
+    ["home-care-team", "新北市個案管理師（新店區）", "個案管理", "全職", "新北市新店區", "月薪 40,000-65,000 元", "1-2 名", 170, true]
+  ];
+  const staticOpenings = staticOpeningRows.map(([departmentId, title, subtitle, employmentType, location, salaryText, capacityLabel, sortOrder, isFeatured], index) => ({
+    id: `${departmentId}-${index + 1}`,
+    page_slug: "talent",
+    department_id: departmentId,
+    title,
+    subtitle,
+    employment_type: employmentType,
+    location,
+    salary_text: salaryText,
+    capacity_label: capacityLabel,
+    apply_form_enabled: true,
+    sort_order: sortOrder,
+    is_featured: isFeatured
   }));
   const staticTalentPage = {
     page_slug: "talent",
