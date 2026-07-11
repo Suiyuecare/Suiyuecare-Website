@@ -4924,19 +4924,6 @@ function buildTalentJobBoardModel(page = {}, departments = [], openings = []) {
     const imageProfile = getRecruitingImageProfile(opening, getRecruitingImage(department, fallbackImages.recruiting));
     const formType = opening.metadata?.form_type || page.metadata?.form_type || "recruiting";
     const contactMessage = `我想了解「${title}」職缺或留下應徵資料，請協助安排招募窗口聯繫。`;
-    const searchText = [
-      title,
-      departmentTitle,
-      opening.subtitle,
-      summary,
-      employmentType,
-      locationText,
-      salaryText,
-      capacityText,
-      duties.join(" "),
-      requirements.join(" "),
-      benefits.join(" ")
-    ].filter(Boolean).join(" ").toLowerCase();
     return {
       id: String(opening.id || openingSlug || jobKey),
       key: jobKey,
@@ -4968,17 +4955,14 @@ function buildTalentJobBoardModel(page = {}, departments = [], openings = []) {
       sortOrder: Number(opening.sort_order || index * 10),
       updatedMs,
       updatedLabel: formatTalentUpdatedAt(opening.updated_at || opening.published_at || opening.created_at),
-      searchText,
       contactNeed: "人才招募",
       contactMessage
     };
-  }).sort(compareTalentJobs).map((job, index) => ({ ...job, defaultRank: index }));
+  }).sort(compareTalentJobs);
 
   return {
     jobs,
-    departmentOptions: talentUniqueOptions(jobs.map((job) => job.departmentTitle)),
-    locationOptions: talentUniqueOptions(jobs.map((job) => job.location)),
-    typeOptions: talentUniqueOptions(jobs.map((job) => job.employmentType))
+    departmentOptions: talentUniqueOptions(jobs.map((job) => job.departmentTitle))
   };
 }
 
@@ -5006,13 +4990,6 @@ function renderTalentApplyControl(job, className = "primary-button", label = job
     <button class="${escapeHTML(className)}" type="button" data-recruit-apply ${talentApplyAttributes(job)}>
       ${escapeHTML(label)}
     </button>
-  `;
-}
-
-function renderTalentJobSelectOptions(options, placeholder) {
-  return `
-    <option value="">${escapeHTML(placeholder)}</option>
-    ${options.map((option) => `<option value="${escapeHTML(option)}">${escapeHTML(option)}</option>`).join("")}
   `;
 }
 
@@ -5119,13 +5096,7 @@ function renderTalentJobCard(job, index) {
       aria-controls="talent-job-detail-${escapeHTML(job.key)}"
       data-talent-job-card
       data-job-id="${escapeHTML(job.key)}"
-      data-talent-search="${escapeHTML(job.searchText)}"
       data-talent-department="${escapeHTML(job.departmentTitle)}"
-      data-talent-location="${escapeHTML(job.location)}"
-      data-talent-type="${escapeHTML(job.employmentType)}"
-      data-default-rank="${job.defaultRank}"
-      data-updated-rank="${job.updatedMs}"
-      data-department-rank="${escapeHTML(job.departmentTitle)}"
       data-apply-text="${escapeHTML(job.applyButtonText)}"
       data-form-type="${escapeHTML(job.formType)}"
       data-page-slug="${escapeHTML(job.pageSlug)}"
@@ -5185,6 +5156,10 @@ function renderTalentJobBoard(page, model) {
   return `
     <section class="talent-job-board" id="career-openings" aria-label="職位一覽" data-talent-job-board data-active-job="${escapeHTML(firstJob.key)}">
       <span class="talent-scroll-anchor" id="recruiting-openings" aria-hidden="true"></span>
+      <select hidden data-talent-filter="department" aria-hidden="true" tabindex="-1">
+        <option value="">全部職缺</option>
+        ${departmentOptions.map((department) => `<option value="${escapeHTML(department)}">${escapeHTML(department)}</option>`).join("")}
+      </select>
       <div class="talent-job-chip-row" aria-label="部門快速篩選">
         <button class="is-active" type="button" data-talent-chip="department" data-value="">全部職缺</button>
         ${departmentOptions.map((department) => `<button type="button" data-talent-chip="department" data-value="${escapeHTML(department)}">${escapeHTML(department)}</button>`).join("")}
@@ -12584,10 +12559,6 @@ function activateCareerTab(tabName, options = {}) {
   requestAnimationFrame(updateTalentBenefitNavPosition);
 }
 
-function talentJobLower(value = "") {
-  return String(value || "").trim().toLowerCase();
-}
-
 function selectTalentJob(board, jobId, options = {}) {
   if (!board) return;
   const cards = [...board.querySelectorAll("[data-talent-job-card]")];
@@ -12616,55 +12587,25 @@ function selectTalentJob(board, jobId, options = {}) {
   requestAnimationFrame(updateTalentJobDetailPosition);
 }
 
-function sortTalentJobCards(board) {
-  const list = board.querySelector(".talent-job-list");
-  if (!list) return;
-  const sortMode = board.querySelector("[data-talent-sort]")?.value || "recommended";
-  const cards = [...list.querySelectorAll("[data-talent-job-card]")];
-  cards.sort((a, b) => {
-    if (sortMode === "newest") {
-      return Number(b.dataset.updatedRank || 0) - Number(a.dataset.updatedRank || 0)
-        || Number(a.dataset.defaultRank || 0) - Number(b.dataset.defaultRank || 0);
-    }
-    if (sortMode === "department") {
-      return String(a.dataset.departmentRank || "").localeCompare(String(b.dataset.departmentRank || ""), "zh-Hant")
-        || Number(a.dataset.defaultRank || 0) - Number(b.dataset.defaultRank || 0);
-    }
-    return Number(a.dataset.defaultRank || 0) - Number(b.dataset.defaultRank || 0);
-  });
-  cards.forEach((card) => list.append(card));
-}
-
 function applyTalentJobFilters(board) {
   if (!board) return;
-  const departmentFilter = board.querySelector('[data-talent-filter="department"]');
-  const locationFilter = board.querySelector('[data-talent-filter="location"]');
-  const typeFilter = board.querySelector('[data-talent-filter="type"]');
-  const query = talentJobLower(board.querySelector("[data-talent-job-search]")?.value);
-  const department = talentJobLower(departmentFilter ? departmentFilter.value : board.dataset.talentDepartmentFilter);
-  const location = talentJobLower(locationFilter ? locationFilter.value : board.dataset.talentLocationFilter);
-  const type = talentJobLower(typeFilter ? typeFilter.value : board.dataset.talentTypeFilter);
+  const department = board.querySelector('[data-talent-filter="department"]')?.value || "";
   const cards = [...board.querySelectorAll("[data-talent-job-card]")];
   let visibleCount = 0;
 
   cards.forEach((card) => {
-    const matchesQuery = !query || talentJobLower(card.dataset.talentSearch).includes(query);
-    const matchesDepartment = !department || talentJobLower(card.dataset.talentDepartment) === department;
-    const matchesLocation = !location || talentJobLower(card.dataset.talentLocation) === location;
-    const matchesType = !type || talentJobLower(card.dataset.talentType) === type;
-    const isVisible = matchesQuery && matchesDepartment && matchesLocation && matchesType;
+    const isVisible = !department || card.dataset.talentDepartment === department;
     card.hidden = !isVisible;
     if (isVisible) visibleCount += 1;
   });
 
-  sortTalentJobCards(board);
   const countTarget = board.querySelector("[data-talent-result-count]");
   if (countTarget) countTarget.textContent = String(visibleCount);
   const emptyState = board.querySelector("[data-talent-empty]");
   if (emptyState) emptyState.hidden = visibleCount > 0;
   board.classList.toggle("has-no-results", visibleCount === 0);
 
-  const selectedDepartment = departmentFilter ? departmentFilter.value : board.dataset.talentDepartmentFilter || "";
+  const selectedDepartment = board.querySelector('[data-talent-filter="department"]')?.value || "";
   board.querySelectorAll('[data-talent-chip="department"]').forEach((chip) => {
     chip.classList.toggle("is-active", chip.dataset.value === selectedDepartment);
   });
@@ -12680,16 +12621,9 @@ function applyTalentJobFilters(board) {
 
 function resetTalentJobFilters(board) {
   if (!board) return;
-  const search = board.querySelector("[data-talent-job-search]");
-  if (search) search.value = "";
   board.querySelectorAll("[data-talent-filter]").forEach((filter) => {
     filter.value = "";
   });
-  delete board.dataset.talentDepartmentFilter;
-  delete board.dataset.talentLocationFilter;
-  delete board.dataset.talentTypeFilter;
-  const sort = board.querySelector("[data-talent-sort]");
-  if (sort) sort.value = "recommended";
   applyTalentJobFilters(board);
 }
 
@@ -12808,18 +12742,6 @@ document.addEventListener("keydown", (event) => {
   selectTalentJob(jobCard.closest("[data-talent-job-board]"), jobCard.dataset.jobId, { focus: true, scrollDetail: true });
 });
 
-document.addEventListener("input", (event) => {
-  const search = event.target.closest?.("[data-talent-job-search]");
-  if (!search) return;
-  applyTalentJobFilters(search.closest("[data-talent-job-board]"));
-});
-
-document.addEventListener("change", (event) => {
-  const control = event.target.closest?.("[data-talent-filter], [data-talent-sort]");
-  if (!control) return;
-  applyTalentJobFilters(control.closest("[data-talent-job-board]"));
-});
-
 document.addEventListener("click", (event) => {
   const carouselButton = event.target.closest("[data-scroll-carousel]");
   if (carouselButton) {
@@ -12846,18 +12768,8 @@ document.addEventListener("click", (event) => {
   if (talentChip) {
     const board = talentChip.closest("[data-talent-job-board]");
     const filterName = talentChip.dataset.talentChip || "";
-    const filterValue = talentChip.dataset.value || "";
     const filter = [...(board?.querySelectorAll("[data-talent-filter]") || [])].find((item) => item.dataset.talentFilter === filterName);
-    if (filter) {
-      filter.value = filterValue;
-    } else if (board && filterName) {
-      const filterKey = `talent${filterName.charAt(0).toUpperCase()}${filterName.slice(1)}Filter`;
-      if (filterValue) {
-        board.dataset[filterKey] = filterValue;
-      } else {
-        delete board.dataset[filterKey];
-      }
-    }
+    if (filter) filter.value = talentChip.dataset.value || "";
     applyTalentJobFilters(board);
     return;
   }
