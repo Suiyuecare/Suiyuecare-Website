@@ -4197,16 +4197,123 @@ function attachRecruitingImage(item, mediaMap) {
   };
 }
 
-function getRecruitingImage(item, fallback = fallbackImages.recruiting) {
-  const fallbackImage = fallbackImageForText(`${item?.page_slug || ""} ${item?.department_slug || ""} ${item?.title || ""} ${item?.subtitle || ""} ${item?.summary || ""}`, fallback);
-  const url = item?.image?.public_url || item?.hero_image?.public_url || item?.image_url || item?.hero_image_url || fallbackImage;
-  return normalizeRecruitingAssetUrl(url);
-}
-
 function normalizeRecruitingAssetUrl(url = "") {
-  const normalized = fastAssetUrl(url);
+  const normalized = contentImageUrl(url);
   if (location.protocol === "file:") return String(normalized).replace(/^\/assets\//, "assets/");
   return String(normalized).replace(/^assets\//, "/assets/");
+}
+
+const recruitingImageProfiles = [
+  {
+    pattern: /社群|媒體|行銷|內容|短影音|facebook|instagram|tiktok|菲律賓.*社群|social|marketing|media/i,
+    image: "assets/migrant-recruit-04-communication-fast.jpg",
+    label: "跨文化社群與內容製作",
+    caption: "適合需要對外溝通、社群經營與內容企劃的職務。"
+  },
+  {
+    pattern: /日照|日間照顧|日間照護|日照中心|萬華|day.?care/i,
+    image: "assets/daycare-recruit-02-exercise-clear-display.jpg",
+    label: "日照中心服務現場",
+    caption: "以團體活動、生活支持與長輩互動為核心的日照職務。"
+  },
+  {
+    pattern: /督導|服務督導|個案管理|個案服務|個管|協調員|家庭窗口|照顧計畫|a單位|aa01|aa02|派案|家訪|電訪|supervisor|case.?manager/i,
+    image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg",
+    label: "督導與個案管理",
+    caption: "串接家庭、照服員與服務紀錄，讓照顧品質被穩定追蹤。"
+  },
+  {
+    pattern: /居家照顧服務員|居家照顧員|居服員|居家服務員|照顧服務員|到宅|身體照顧|生活支持|caregiver|home.?care/i,
+    image: "assets/homepage-batch/orange-polo-caregiver-clear-display.jpg",
+    label: "居家照顧服務現場",
+    caption: "到宅陪伴長輩與家庭，把照顧做得穩定、清楚、有紀錄。"
+  },
+  {
+    pattern: /移工|外籍看護|廠工|培訓|課程|活動企劃|雇主安心|教學|菲律賓|migrant|training|course/i,
+    image: "assets/migrant-recruit-01-classroom-fast.jpg",
+    label: "移工培訓與課程活動",
+    caption: "把照顧技能、溝通情境與課程活動整理成可學習的流程。"
+  },
+  {
+    pattern: /品管|品質|教育訓練|內訓|教材|稽核|紀錄審查|改善|quality|audit/i,
+    image: "assets/quality-recruit-02-training-clear-display.jpg",
+    label: "教育品管與服務改善",
+    caption: "把前線經驗整理成教材、稽核與改善節奏。"
+  },
+  {
+    pattern: /人資|招募|面試|人才|hr|recruit/i,
+    image: "assets/admin-recruit-01-hr-fast.jpg",
+    label: "人資招募與人才支持",
+    caption: "協助夥伴進到對的位置，也讓團隊穩定長大。"
+  },
+  {
+    pattern: /行政|專案|投資人|財務|會計|總務|客服|營運|辦公室|公文|秘書|operations|admin|finance|project/i,
+    image: "assets/admin-recruit-05-meeting-clear-display.jpg",
+    label: "行政營運與專案協作",
+    caption: "支援跨部門流程、資料整理與營運節奏，讓前線服務更穩。"
+  }
+];
+
+function recruitingImageText(item = {}) {
+  return [
+    item?.page_slug,
+    item?.department_slug,
+    item?.opening_slug,
+    item?.title,
+    item?.subtitle,
+    item?.summary,
+    item?.employment_type,
+    item?.location,
+    item?.salary_text,
+    item?.capacity_label,
+    JSON.stringify(item?.duties || ""),
+    JSON.stringify(item?.requirements || ""),
+    JSON.stringify(item?.benefits || item?.support || ""),
+    JSON.stringify(item?.metadata || {})
+  ].filter(Boolean).join(" ");
+}
+
+function recruitingImagePriorityText(item = {}) {
+  return [
+    item?.title,
+    item?.subtitle,
+    item?.opening_slug,
+    item?.department_slug,
+    item?.employment_type
+  ].filter(Boolean).join(" ");
+}
+
+function getRecruitingImageRule(text = "") {
+  const normalized = String(text || "");
+  return recruitingImageProfiles.find((profile) => profile.pattern.test(normalized));
+}
+
+function getRecruitingImageProfileForText(text = "", fallback = fallbackImages.recruiting, priorityText = "") {
+  const matched = getRecruitingImageRule(priorityText) || getRecruitingImageRule(text);
+  if (matched) return matched;
+  const normalized = String(text || "");
+  const image = fallbackImageForText(normalized, fallback);
+  return {
+    image,
+    label: "歲悅工作情境",
+    caption: "依職缺內容安排合適的團隊與服務現場。"
+  };
+}
+
+function getRecruitingImageProfile(item, fallback = fallbackImages.recruiting) {
+  const text = recruitingImageText(item);
+  const profile = getRecruitingImageProfileForText(text, fallback, recruitingImagePriorityText(item));
+  const explicitUrl = item?.image?.public_url || item?.hero_image?.public_url || item?.image_url || item?.hero_image_url;
+  const fallbackSrc = normalizeRecruitingAssetUrl(profile.image || fallback);
+  return {
+    ...profile,
+    src: normalizeRecruitingAssetUrl(explicitUrl || profile.image || fallback),
+    fallbackSrc
+  };
+}
+
+function getRecruitingImage(item, fallback = fallbackImages.recruiting) {
+  return getRecruitingImageProfile(item, fallback).src;
 }
 
 function normalizeRecruitingList(value) {
@@ -4814,6 +4921,7 @@ function buildTalentJobBoardModel(page = {}, departments = [], openings = []) {
     const salaryText = talentText(opening.salary_text, talentJobFallbacks.salary);
     const capacityText = talentText(opening.capacity_label, talentJobFallbacks.capacity);
     const summary = talentText(opening.summary, duties[0] || "歡迎與招募窗口聊聊職務內容與適合度。");
+    const imageProfile = getRecruitingImageProfile(opening, getRecruitingImage(department, fallbackImages.recruiting));
     const formType = opening.metadata?.form_type || page.metadata?.form_type || "recruiting";
     const contactMessage = `我想了解「${title}」職缺或留下應徵資料，請協助安排招募窗口聯繫。`;
     const searchText = [
@@ -4852,7 +4960,11 @@ function buildTalentJobBoardModel(page = {}, departments = [], openings = []) {
       pageSlug: page.page_slug || opening.page_slug || "talent",
       departmentId: department.id || opening.department_id || "",
       openingSlug,
-      image: getRecruitingImage(opening, getRecruitingImage(department, fallbackImages.recruiting)),
+      image: imageProfile.src,
+      imageFallback: imageProfile.fallbackSrc,
+      imageLabel: imageProfile.label,
+      imageCaption: imageProfile.caption,
+      imageAlt: `${title}工作情境：${imageProfile.label}`,
       sortOrder: Number(opening.sort_order || index * 10),
       updatedMs,
       updatedLabel: formatTalentUpdatedAt(opening.updated_at || opening.published_at || opening.created_at),
@@ -4925,6 +5037,24 @@ function renderTalentJobCompactMeta(job) {
   `;
 }
 
+function renderTalentJobImage(job, className, loading = "lazy") {
+  return `
+    <figure class="${escapeHTML(className)}">
+      <img
+        src="${escapeHTML(job.image)}"
+        alt="${escapeHTML(job.imageAlt || `${job.title}工作情境`)}"
+        loading="${escapeHTML(loading)}"
+        decoding="async"
+        data-fallback-src="${escapeHTML(job.imageFallback || fallbackImages.recruiting)}"
+      />
+      <figcaption>
+        <span>${escapeHTML(job.imageLabel || "工作情境")}</span>
+        <strong>${escapeHTML(job.departmentTitle)}</strong>
+      </figcaption>
+    </figure>
+  `;
+}
+
 function renderTalentJobDetail(job, inline = false) {
   return `
     <div class="${inline ? "talent-job-inline-detail-inner" : "talent-job-detail-inner"}">
@@ -4936,6 +5066,7 @@ function renderTalentJobDetail(job, inline = false) {
         </div>
         ${renderTalentApplyControl(job)}
       </div>
+      ${renderTalentJobImage(job, `talent-job-detail-media${inline ? " is-inline" : ""}`, inline ? "lazy" : "eager")}
       ${renderTalentJobMeta(job)}
       <section class="talent-job-detail-summary">
         <h4>職缺摘要</h4>
@@ -4945,6 +5076,7 @@ function renderTalentJobDetail(job, inline = false) {
           <span>${escapeHTML(job.updatedLabel)}</span>
           ${job.isFeatured ? `<span>重點職缺</span>` : ""}
         </div>
+        <small>${escapeHTML(job.imageCaption || "依職缺內容安排合適的團隊與服務現場。")}</small>
       </section>
       <div class="talent-job-detail-sections">
         <section>
@@ -5003,25 +5135,30 @@ function renderTalentJobCard(job, index) {
       data-opening-slug="${escapeHTML(job.openingSlug)}"
       data-opening-title="${escapeHTML(job.title)}"
     >
-      <div class="talent-job-card-top">
-        <span class="talent-job-department">${escapeHTML(job.departmentTitle)}</span>
-        <time>${escapeHTML(job.updatedLabel)}</time>
-      </div>
-      <div class="talent-job-title-row">
-        <div>
-          <h3>${escapeHTML(job.title)}</h3>
-          <p>${escapeHTML(job.subtitle)}</p>
+      <div class="talent-job-card-shell">
+        ${renderTalentJobImage(job, "talent-job-card-media")}
+        <div class="talent-job-card-copy">
+          <div class="talent-job-card-top">
+            <span class="talent-job-department">${escapeHTML(job.departmentTitle)}</span>
+            <time>${escapeHTML(job.updatedLabel)}</time>
+          </div>
+          <div class="talent-job-title-row">
+            <div>
+              <h3>${escapeHTML(job.title)}</h3>
+              <p>${escapeHTML(job.subtitle)}</p>
+            </div>
+            ${job.isFeatured ? `<strong>重點</strong>` : ""}
+          </div>
+          ${renderTalentJobCompactMeta(job)}
+          <p class="talent-job-summary">${escapeHTML(job.summary)}</p>
+          <div class="talent-job-tags" aria-label="福利與支持">
+            ${job.benefits.slice(0, 2).map((item) => `<span>${escapeHTML(item)}</span>`).join("")}
+          </div>
+          <div class="talent-job-card-actions">
+            <button class="text-button" type="button" data-talent-select-job="${escapeHTML(job.key)}">查看詳情</button>
+            ${renderTalentApplyControl(job, "primary-button compact")}
+          </div>
         </div>
-        ${job.isFeatured ? `<strong>重點</strong>` : ""}
-      </div>
-      ${renderTalentJobCompactMeta(job)}
-      <p class="talent-job-summary">${escapeHTML(job.summary)}</p>
-      <div class="talent-job-tags" aria-label="福利與支持">
-        ${job.benefits.slice(0, 2).map((item) => `<span>${escapeHTML(item)}</span>`).join("")}
-      </div>
-      <div class="talent-job-card-actions">
-        <button class="text-button" type="button" data-talent-select-job="${escapeHTML(job.key)}">查看詳情</button>
-        ${renderTalentApplyControl(job, "primary-button compact")}
       </div>
       <div class="talent-job-mobile-detail" id="talent-job-mobile-detail-${escapeHTML(job.key)}">
         ${renderTalentJobDetail(job, true)}

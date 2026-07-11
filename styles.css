@@ -6609,6 +6609,63 @@ h2 {
 .talent-job-card[hidden] {
   display: none;
 }
+.talent-job-card-shell {
+  display: grid;
+  grid-template-columns: clamp(104px, 12vw, 136px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.talent-job-card-copy {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.talent-job-card-media,
+.talent-job-detail-media {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(82,58,36,.1);
+  border-radius: 8px;
+  background: rgba(255,248,238,.72);
+}
+.talent-job-card-media {
+  aspect-ratio: 4 / 3;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.45);
+}
+.talent-job-card-media img,
+.talent-job-detail-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.talent-job-detail-media img {
+  object-position: center 16%;
+}
+.talent-job-card-media figcaption {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  left: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255,253,248,.92);
+  color: var(--brown);
+  font-size: 11px;
+  font-weight: 1000;
+  line-height: 1.2;
+  text-align: center;
+  box-shadow: 0 8px 18px rgba(83,43,11,.12);
+}
+.talent-job-card-media figcaption strong {
+  display: none;
+}
 .talent-job-card-top,
 .talent-job-title-row,
 .talent-job-card-actions,
@@ -6793,6 +6850,37 @@ h2 {
   gap: 14px;
   padding: 22px;
 }
+.talent-job-detail-media {
+  height: clamp(150px, 21vh, 210px);
+}
+.talent-job-detail-media::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 58%;
+  background: linear-gradient(180deg, rgba(63,33,13,0), rgba(63,33,13,.66));
+  content: "";
+  pointer-events: none;
+}
+.talent-job-detail-media figcaption {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  left: 16px;
+  z-index: 1;
+  display: grid;
+  gap: 4px;
+  color: #fff;
+  text-shadow: 0 1px 14px rgba(63,33,13,.5);
+}
+.talent-job-detail-media figcaption span {
+  font-size: 12px;
+  font-weight: 1000;
+}
+.talent-job-detail-media figcaption strong {
+  font-size: 18px;
+  font-weight: 1000;
+  line-height: 1.25;
+}
 .talent-job-detail-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -6852,6 +6940,12 @@ h2 {
   color: var(--sky);
   font-size: 12px;
   font-weight: 1000;
+}
+.talent-job-detail-summary small {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 830;
+  line-height: 1.55;
 }
 .talent-job-detail-sections {
   display: grid;
@@ -6924,6 +7018,9 @@ h2 {
   .talent-job-layout {
     grid-template-columns: minmax(0, 1fr) minmax(320px, .78fr);
   }
+  .talent-job-card-shell {
+    grid-template-columns: 104px minmax(0, 1fr);
+  }
   .talent-job-detail .talent-job-meta {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -6982,6 +7079,9 @@ h2 {
   .talent-job-inline-detail-inner {
     padding: 0;
   }
+  .talent-job-detail-media.is-inline {
+    height: clamp(150px, 34vw, 220px);
+  }
   .talent-job-detail-head {
     grid-template-columns: 1fr;
   }
@@ -7029,6 +7129,18 @@ h2 {
   .talent-job-card {
     padding: 14px;
   }
+  .talent-job-card-shell {
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 11px;
+  }
+  .talent-job-card-media figcaption {
+    right: 5px;
+    bottom: 5px;
+    left: 5px;
+    min-height: 24px;
+    padding-inline: 6px;
+    font-size: 10px;
+  }
   .talent-job-card-top,
   .talent-job-title-row,
   .talent-job-card-actions,
@@ -7042,6 +7154,9 @@ h2 {
   }
   .talent-job-title-row strong {
     align-self: flex-start;
+  }
+  .talent-job-compact-meta {
+    gap: 6px 9px;
   }
   .talent-job-card-actions .text-button,
   .talent-job-card-actions .primary-button {
