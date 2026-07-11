@@ -9430,6 +9430,9 @@ input[name="_honey"] { display: none !important; }
   display: grid;
   min-height: 590px;
   padding: 28px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   background:
     radial-gradient(circle at 16% 18%, rgba(61, 132, 182, .16), transparent 30%),
     radial-gradient(circle at 88% 12%, rgba(77, 143, 133, .2), transparent 26%),
@@ -9453,6 +9456,8 @@ input[name="_honey"] { display: none !important; }
   grid-template-rows: auto auto 1fr auto;
   gap: 20px;
   min-height: 100%;
+  min-width: 0;
+  max-width: 100%;
   padding: 28px;
   border: 1px solid rgba(255, 255, 255, .88);
   border-radius: 8px;
@@ -9490,6 +9495,7 @@ input[name="_honey"] { display: none !important; }
   grid-template-columns: 76px minmax(0, 1fr);
   gap: 18px;
   align-items: center;
+  min-width: 0;
 }
 .slide-visual-title .slide-visual-icon {
   width: 76px;
@@ -9505,6 +9511,8 @@ input[name="_honey"] { display: none !important; }
   font-size: 38px;
   font-weight: 950;
   line-height: 1.08;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .slide-visual-title small {
   display: block;
@@ -9513,6 +9521,8 @@ input[name="_honey"] { display: none !important; }
   font-size: 16px;
   font-weight: 900;
   line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .slide-visual-main {
   display: grid;
@@ -9589,6 +9599,8 @@ input[name="_honey"] { display: none !important; }
   font-size: 26px;
   font-weight: 950;
   line-height: 1.05;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .slide-visual-card span {
   display: block;
@@ -9597,6 +9609,8 @@ input[name="_honey"] { display: none !important; }
   font-size: 15px;
   font-weight: 900;
   line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .slide-visual-card.tone-danger {
   border-color: rgba(217,91,67,.28);
