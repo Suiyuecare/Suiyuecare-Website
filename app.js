@@ -5107,7 +5107,6 @@ function renderTalentJobCard(job, index) {
       data-opening-title="${escapeHTML(job.title)}"
     >
       <div class="talent-job-card-shell">
-        ${renderTalentJobImage(job, "talent-job-card-media")}
         <div class="talent-job-card-copy">
           <div class="talent-job-card-top">
             <span class="talent-job-department">${escapeHTML(job.departmentTitle)}</span>
@@ -5126,7 +5125,6 @@ function renderTalentJobCard(job, index) {
             ${job.benefits.slice(0, 2).map((item) => `<span>${escapeHTML(item)}</span>`).join("")}
           </div>
           <div class="talent-job-card-actions">
-            <button class="text-button" type="button" data-talent-select-job="${escapeHTML(job.key)}">查看詳情</button>
             ${renderTalentApplyControl(job, "primary-button compact")}
           </div>
         </div>
@@ -12771,12 +12769,6 @@ document.addEventListener("click", (event) => {
     const filter = [...(board?.querySelectorAll("[data-talent-filter]") || [])].find((item) => item.dataset.talentFilter === filterName);
     if (filter) filter.value = talentChip.dataset.value || "";
     applyTalentJobFilters(board);
-    return;
-  }
-
-  const talentSelectButton = event.target.closest("[data-talent-select-job]");
-  if (talentSelectButton) {
-    selectTalentJob(talentSelectButton.closest("[data-talent-job-board]"), talentSelectButton.dataset.talentSelectJob, { scrollDetail: true });
     return;
   }
 
