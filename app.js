@@ -10010,45 +10010,89 @@ function renderTalentPage() {
       highlights: ["品牌行銷", "營運支援", "行政協作"]
     }
   ];
+  const talentOpeningProfiles = {
+    caregiver: {
+      image: "/assets/recruit-home-care-worker-fast.jpg",
+      duties: ["依照顧計畫到宅提供身體照顧、備餐、家務或陪同外出等支持", "完成服務紀錄、異常回報與家屬溝通", "配合督導安排排班、調班、教育訓練與品質追蹤"],
+      requirements: ["具照顧服務員訓練結業證明或長照小卡佳", "守時、重視安全與長輩尊嚴", "可配合服務區域排班並完成手機紀錄"],
+      benefits: ["BA 碼拆帳", "AA 碼拆帳", "缺工獎勵可申請", "公發工作包"]
+    },
+    supervisor: {
+      image: "/assets/recruit-home-care-supervisor-fast.jpg",
+      duties: ["安排居家服務個案、照服員媒合與服務異動", "定期家訪或電訪，處理家屬回饋與服務問題", "支援照服員培訓、評鑑資料與內部品質管理"],
+      requirements: ["具居督、社工、護理或長照相關背景佳", "熟悉長照 2.0、BA 碼與照顧計畫尤佳", "能在家屬、照服員與照管中心間清楚協調"],
+      benefits: ["保障月薪", "業績獎金", "督導培訓", "開發獎金"]
+    },
+    dayCare: {
+      image: "/assets/daycare-recruit-02-exercise-clear.jpg",
+      duties: ["協助日照長輩活動、用餐、如廁、休息與生活支持", "完成服務紀錄、交班、異常觀察與團隊回報", "配合護理、社工、督導執行照顧計畫與中心活動"],
+      requirements: ["具照顧服務員訓練結業證明佳", "能觀察長輩狀態並重視安全、尊嚴與交班", "喜歡團體照顧場域與固定作息"],
+      benefits: ["月薪制", "新人帶教", "缺工獎勵可申請", "日照活動訓練"]
+    },
+    planning: {
+      image: "/assets/admin-recruit-05-meeting-clear.jpg",
+      duties: ["規劃社群、課程、活動或專案內容", "協調素材、時程、現場執行與成效追蹤", "整理企劃文件、活動紀錄與跨部門需求"],
+      requirements: ["具企劃、行銷、課務或跨文化溝通經驗佳", "文字清楚，能掌握時程與細節", "能與設計、講師、業務或營運窗口合作"],
+      benefits: ["內容企劃", "跨部門協作", "成長訓練", "AI 工具支持"]
+    },
+    manager: {
+      image: "/assets/homepage-batch/family-consultation-clear.jpg",
+      duties: ["統籌中心營運、個案流程或服務品質追蹤", "串接家庭、照管中心與跨專業資源", "管理紀錄、進度、法規或評鑑需求"],
+      requirements: ["具長照、社工、護理或管理經驗佳", "能掌握資料、溝通與服務品質", "具主管、個案管理或 A 單位經驗尤佳"],
+      benefits: ["保障月薪", "管理培訓", "發展機會", "跨部門資源"]
+    }
+  };
   const caregiverDistricts = [
-    ["臺北市", "士林區", "230-420", 10, true],
-    ["臺北市", "北投區", "230-420", 20],
-    ["臺北市", "南港區", "230-420", 30],
-    ["新北市", "中和區", "235-420", 40],
-    ["新北市", "永和區", "235-420", 50],
-    ["新北市", "新店區", "235-420", 60],
-    ["新北市", "淡水區", "235-420", 70],
-    ["桃園市", "大園區", "235-420", 80],
-    ["桃園市", "蘆竹區", "235-420", 90]
+    ["taipei-shilin", "臺北市", "士林區", "230-420", 10, true],
+    ["taipei-beitou", "臺北市", "北投區", "230-420", 20],
+    ["taipei-nangang", "臺北市", "南港區", "230-420", 30],
+    ["new-taipei-zhonghe", "新北市", "中和區", "235-420", 40],
+    ["new-taipei-yonghe", "新北市", "永和區", "235-420", 50],
+    ["new-taipei-xindian", "新北市", "新店區", "235-420", 60],
+    ["new-taipei-tamsui", "新北市", "淡水區", "235-420", 70],
+    ["taoyuan-dayuan", "桃園市", "大園區", "235-420", 80],
+    ["taoyuan-luzhu", "桃園市", "蘆竹區", "235-420", 90]
   ];
   const staticOpeningRows = [
-    ...caregiverDistricts.map(([city, district, hourly, sortOrder, isFeatured = false]) => [
-      "home-care-team", `${city}居家照顧服務員（${district}）`, "居服員",
-      "全職 / 兼職", `${city}${district}`, `時薪 ${hourly} 元`, "持續招募", sortOrder, isFeatured
+    ...caregiverDistricts.map(([slugPrefix, city, district, hourly, sortOrder, isFeatured = false]) => [
+      "caregiver", "home-care-team", `${slugPrefix}-home-caregiver`, `${city}居家照顧服務員（${district}）`, "居服員",
+      `在${city}${district}到宅服務，提供身體照顧、生活支持、陪伴與服務紀錄，協助家庭把日常照顧接穩。`,
+      "全職 / 兼職", `${city}${district}`, `時薪 ${hourly} 元`, "持續招募", sortOrder, isFeatured, "2026-07-08"
     ]),
-    ["day-care-team", "萬華日照中心照顧服務員", "日照照服員", "全職", "臺北市萬華區", "月薪 33,000-35,000 元", "1-2 名", 100, true],
-    ["home-care-team", "臺北市居家服務督導員", "居服督導", "全職", "臺北市士林區", "月薪 38,000-42,000 元", "1-2 名", 110, true],
-    ["migrant-team", "全職社群行銷專員（菲律賓）", "菲律賓社群", "全職", "新北市新莊區", "月薪 35,000-38,000 元", "1 名", 120, true],
-    ["migrant-team", "活動企劃專員", "移工培訓活動", "全職", "新北市新莊區", "月薪 38,000-42,000 元", "1 名", 130],
-    ["admin-team", "社群媒體行銷企劃", "品牌行銷", "全職", "臺北市信義區", "月薪 36,000-42,000 元", "1 名", 140],
-    ["day-care-team", "臺北市日間照顧中心主任（純白班、儲備主管職）", "中心主任", "全職", "臺北市萬華區", "月薪 50,000 元以上", "1 名", 150, true],
-    ["home-care-team", "新北市居家服務督導員（新店／中和／永和區）", "居服督導", "全職", "新北市新店區", "月薪 38,000-42,000 元", "1-2 名", 160, true],
-    ["home-care-team", "新北市個案管理師（新店區）", "個案管理", "全職", "新北市新店區", "月薪 40,000-65,000 元", "1-2 名", 170, true]
+    ["dayCare", "day-care-team", "wanhua-day-care-caregiver", "萬華日照中心照顧服務員", "日照照服員", "在萬華日照中心陪伴長輩完成活動、餐食、休息與生活照顧，讓白天作息安全、有節奏。", "全職", "臺北市萬華區", "月薪 33,000-35,000 元", "1-2 名", 100, true, "2026-07-08"],
+    ["supervisor", "home-care-team", "taipei-home-care-supervisor", "臺北市居家服務督導員", "居服督導", "負責台北居家服務派案、品質追蹤、家訪電訪、照服員支持與補助核銷資料，讓服務穩定接上家庭需求。", "全職", "臺北市士林區", "月薪 38,000-42,000 元", "1-2 名", 110, true, "2026-07-08"],
+    ["planning", "migrant-team", "filipino-social-marketing-specialist", "全職社群行銷專員（菲律賓）", "菲律賓社群", "經營菲律賓語系社群、短影音與招募溝通，讓移工培訓服務被更多家庭與學員看見。", "全職", "新北市新莊區", "月薪 35,000-38,000 元", "1 名", 120, true, "2026-07-08"],
+    ["planning", "migrant-team", "migrant-training-event-planner", "活動企劃專員", "移工培訓活動", "規劃移工培訓課程、節慶活動、交流活動與多語教材，協助課程順利執行。", "全職", "新北市新莊區", "月薪 38,000-42,000 元", "1 名", 130, false, "2026-07-08"],
+    ["planning", "admin-team", "social-media-marketing-planner", "社群媒體行銷企劃", "品牌行銷", "規劃社群內容、品牌故事與招募溝通，讓長照服務與職缺被穩定看見。", "全職", "臺北市信義區", "月薪 36,000-42,000 元", "1 名", 140, false, "2026-07-08"],
+    ["manager", "day-care-team", "taipei-day-care-director", "臺北市日間照顧中心主任（純白班、儲備主管職）", "中心主任", "負責日照中心營運、人員管理、招生社區關係、法規評鑑與服務品質。", "全職", "臺北市萬華區", "月薪 50,000 元以上", "1 名", 150, true, "2026-07-08"],
+    ["supervisor", "home-care-team", "new-taipei-home-care-supervisor", "新北市居家服務督導員（新店／中和／永和區）", "居服督導", "負責新店、中和、永和居家服務個案管理、照服員督導與品質追蹤。", "全職", "新北市新店區", "月薪 38,000-42,000 元", "1-2 名", 160, true, "2026-07-07"],
+    ["manager", "home-care-team", "new-taipei-case-manager", "新北市個案管理師（新店區）", "個案管理", "負責 A 單位個案管理、照顧計畫、AA01/AA02 追蹤與跨資源溝通。", "全職", "新北市新店區", "月薪 40,000-65,000 元", "1-2 名", 170, true, "2026-07-09"]
   ];
-  const staticOpenings = staticOpeningRows.map(([departmentId, title, subtitle, employmentType, location, salaryText, capacityLabel, sortOrder, isFeatured], index) => ({
+  const staticOpenings = staticOpeningRows.map(([profileKey, departmentId, openingSlug, title, subtitle, summary, employmentType, location, salaryText, capacityLabel, sortOrder, isFeatured, updatedAt], index) => {
+    const profile = talentOpeningProfiles[profileKey] || talentOpeningProfiles.caregiver;
+    return {
     id: `${departmentId}-${index + 1}`,
     page_slug: "talent",
     department_id: departmentId,
+    opening_slug: openingSlug,
     title,
     subtitle,
+    summary,
     employment_type: employmentType,
     location,
     salary_text: salaryText,
     capacity_label: capacityLabel,
+    image_url: profile.image,
+    duties: profile.duties,
+    requirements: profile.requirements,
+    benefits: profile.benefits,
+    apply_button_text: "申請應徵",
     apply_form_enabled: true,
     sort_order: sortOrder,
-    is_featured: isFeatured
-  }));
+    is_featured: isFeatured,
+    updated_at: updatedAt
+    };
+  });
   const staticTalentPage = {
     page_slug: "talent",
     title: "人才招募",
