@@ -11983,10 +11983,17 @@ function updateTalentBenefitNavState(layout) {
     .filter((item) => item.target);
   if (!sections.length) return;
 
-  const readingLine = getTalentStickyTopOffset(window.matchMedia("(max-width: 900px)").matches ? 110 : 42);
+  const readingLine = Math.max(
+    getTalentStickyTopOffset(window.matchMedia("(max-width: 900px)").matches ? 118 : 72),
+    Math.round(window.innerHeight * 0.32)
+  );
   let active = sections[0];
   sections.forEach((section) => {
     const rect = section.target.getBoundingClientRect();
+    if (rect.top <= readingLine && rect.bottom > readingLine) {
+      active = section;
+      return;
+    }
     if (rect.top <= readingLine) active = section;
   });
 
