@@ -5290,10 +5290,11 @@ function renderTalentBenefitsPanel(activeKey = "job-list") {
         ${talentBenefitCategories.map((category) => `
           <a href="#benefit-${escapeHTML(category.key)}">${escapeHTML(category.title)}</a>
         `).join("")}
+        <a href="#benefit-caregiver-exclusive">照服員專屬支持</a>
       </nav>
       <div class="talent-benefit-content">
         ${talentBenefitCategories.map(renderTalentBenefitCategory).join("")}
-        <section class="talent-caregiver-benefit-panel" aria-labelledby="caregiver-benefits-title">
+        <section class="talent-caregiver-benefit-panel" id="benefit-caregiver-exclusive" aria-labelledby="caregiver-benefits-title">
           <div class="talent-caregiver-benefit-copy">
             <span>Caregiver Only</span>
             <h3 id="caregiver-benefits-title">照服員專屬支持</h3>
@@ -11970,6 +11971,36 @@ function clearTalentBenefitNavFixedState(layout) {
   layout.style.removeProperty("--talent-benefit-nav-top");
 }
 
+function updateTalentBenefitNavState(layout) {
+  const nav = layout?.querySelector(".talent-benefit-nav");
+  if (!nav || layout.offsetParent === null) return;
+  const links = [...nav.querySelectorAll('a[href^="#"]')];
+  const sections = links
+    .map((link) => {
+      const id = decodeURIComponent(link.getAttribute("href").slice(1));
+      return { id, link, target: document.getElementById(id) };
+    })
+    .filter((item) => item.target);
+  if (!sections.length) return;
+
+  const readingLine = getTalentStickyTopOffset(window.matchMedia("(max-width: 900px)").matches ? 110 : 42);
+  let active = sections[0];
+  sections.forEach((section) => {
+    const rect = section.target.getBoundingClientRect();
+    if (rect.top <= readingLine) active = section;
+  });
+
+  links.forEach((link) => {
+    const isActive = link === active.link;
+    link.classList.toggle("is-active", isActive);
+    if (isActive) {
+      link.setAttribute("aria-current", "true");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+}
+
 function getTalentStickyTopOffset(extraGap = 18) {
   const cssHeaderHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 86;
   const headerRect = document.querySelector(".site-header")?.getBoundingClientRect();
@@ -12022,6 +12053,7 @@ function updateTalentBenefitNavPosition() {
   const isDesktop = window.matchMedia("(min-width: 901px)").matches;
   document.querySelectorAll(".talent-benefit-layout").forEach((layout) => {
     const nav = layout.querySelector(".talent-benefit-nav");
+    updateTalentBenefitNavState(layout);
     if (!nav || !isDesktop || layout.offsetParent === null) {
       clearTalentBenefitNavFixedState(layout);
       return;

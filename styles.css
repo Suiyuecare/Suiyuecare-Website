@@ -7644,7 +7644,7 @@ h2 {
   color: var(--brown);
   font-size: 14px;
   font-weight: 1000;
-  transition: background .18s ease, border-color .18s ease, color .18s ease;
+  transition: background .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease;
 }
 .talent-benefit-nav a:hover,
 .talent-benefit-nav a:focus-visible {
@@ -7652,6 +7652,19 @@ h2 {
   background: rgba(22,143,171,.08);
   color: var(--sky);
   outline: none;
+}
+.talent-benefit-nav a.is-active,
+.talent-benefit-nav a[aria-current="true"] {
+  border-color: rgba(209,94,0,.35);
+  background: linear-gradient(135deg, rgba(240,138,36,.2), rgba(209,94,0,.1));
+  color: var(--orange-dark);
+  box-shadow: inset 4px 0 0 rgba(240,138,36,.92), 0 10px 20px rgba(209,94,0,.08);
+}
+.talent-benefit-nav a.is-active:focus-visible,
+.talent-benefit-nav a[aria-current="true"]:focus-visible {
+  border-color: rgba(209,94,0,.5);
+  background: linear-gradient(135deg, rgba(240,138,36,.24), rgba(209,94,0,.12));
+  color: var(--orange-dark);
 }
 .talent-benefit-content {
   grid-column: 2;
