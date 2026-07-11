@@ -10168,6 +10168,7 @@ function renderTalentPage() {
       ${renderTalentGrowthPanel(activeKey)}
       ${renderTalentOrganizationPanel(staticDepartmentList, activeKey)}
       ${renderTalentMissionPanel({ title: "人才招募" }, staticDepartmentList, [], activeKey)}
+      ${renderRecruitingApplicationModal(staticTalentPage)}
     </div>
   `;
 }
