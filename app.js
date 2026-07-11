@@ -10901,7 +10901,123 @@ function renderArticleTable(table = {}) {
   `;
 }
 
+function safeClassToken(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "")
+    .slice(0, 48);
+}
+
+function renderSlideVisualIcon(name = "pulse") {
+  const icons = {
+    pulse: `<svg viewBox="0 0 48 48" focusable="false"><path d="M5 25h8l5-12 8 24 6-16h11"/><path d="M36 8a12 12 0 0 1 0 24"/></svg>`,
+    gauge: `<svg viewBox="0 0 48 48" focusable="false"><path d="M9 34a17 17 0 1 1 30 0"/><path d="M24 34l10-14"/><path d="M16 34h16"/></svg>`,
+    calendar: `<svg viewBox="0 0 48 48" focusable="false"><rect x="9" y="11" width="30" height="28" rx="4"/><path d="M16 7v8M32 7v8M9 20h30M16 27h5M27 27h5M16 34h5M27 34h5"/></svg>`,
+    clock: `<svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="24" r="16"/><path d="M24 15v10l7 4"/></svg>`,
+    sun: `<svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="24" r="8"/><path d="M24 5v7M24 36v7M5 24h7M36 24h7M10.5 10.5l5 5M32.5 32.5l5 5M37.5 10.5l-5 5M15.5 32.5l-5 5"/></svg>`,
+    moon: `<svg viewBox="0 0 48 48" focusable="false"><path d="M32 38A16 16 0 0 1 27 7a13 13 0 1 0 5 31Z"/></svg>`,
+    warning: `<svg viewBox="0 0 48 48" focusable="false"><path d="M24 7 43 40H5L24 7Z"/><path d="M24 18v10M24 34h.1"/></svg>`,
+    phone: `<svg viewBox="0 0 48 48" focusable="false"><path d="M16 8h7l3 8-4 3a23 23 0 0 0 8 8l3-4 8 3v7c0 4-3 7-7 7A27 27 0 0 1 9 15c0-4 3-7 7-7Z"/></svg>`,
+    pill: `<svg viewBox="0 0 48 48" focusable="false"><path d="M18 35 35 18a9 9 0 0 0-13-13L5 22a9 9 0 0 0 13 13Z"/><path d="m14 26 8 8"/></svg>`,
+    note: `<svg viewBox="0 0 48 48" focusable="false"><path d="M13 7h16l8 8v26H13Z"/><path d="M29 7v9h8M18 24h14M18 31h14M18 38h8"/></svg>`,
+    person: `<svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="13" r="6"/><path d="M14 41c1-9 5-14 10-14s9 5 10 14"/></svg>`,
+    walk: `<svg viewBox="0 0 48 48" focusable="false"><circle cx="25" cy="8" r="4"/><path d="M22 17 17 29l-4 10M25 18l6 8 8 2M22 28l8 4 2 9"/></svg>`,
+    shield: `<svg viewBox="0 0 48 48" focusable="false"><path d="M24 5 39 11v11c0 10-6 17-15 21C15 39 9 32 9 22V11Z"/><path d="m16 24 5 5 11-12"/></svg>`,
+    home: `<svg viewBox="0 0 48 48" focusable="false"><path d="M7 22 24 8l17 14"/><path d="M13 20v21h22V20"/><path d="M20 41V29h8v12"/></svg>`,
+    heart: `<svg viewBox="0 0 48 48" focusable="false"><path d="M24 40S8 30 8 18A9 9 0 0 1 24 12a9 9 0 0 1 16 6c0 12-16 22-16 22Z"/><path d="M15 25h6l3-6 4 12 3-6h5"/></svg>`,
+    brain: `<svg viewBox="0 0 48 48" focusable="false"><path d="M18 39a8 8 0 0 1-8-8 8 8 0 0 1 3-6 8 8 0 0 1 4-15 9 9 0 0 1 7-4 9 9 0 0 1 7 4 8 8 0 0 1 4 15 8 8 0 0 1-5 14"/><path d="M24 10v29M17 19h7M24 24h8M16 30h8"/></svg>`,
+    kidney: `<svg viewBox="0 0 48 48" focusable="false"><path d="M18 10c-6 0-10 6-10 14s4 15 10 15c5 0 7-4 7-9 0-4-3-5-3-8 0-3 2-4 2-7 0-3-2-5-6-5Z"/><path d="M30 10c6 0 10 6 10 14s-4 15-10 15c-5 0-7-4-7-9 0-4 3-5 3-8 0-3-2-4-2-7 0-3 2-5 6-5Z"/></svg>`,
+    team: `<svg viewBox="0 0 48 48" focusable="false"><circle cx="18" cy="16" r="5"/><circle cx="31" cy="14" r="6"/><path d="M8 40c1-8 5-13 10-13s9 5 10 13"/><path d="M23 27c2-3 5-5 8-5 5 0 9 6 10 18"/></svg>`,
+    checklist: `<svg viewBox="0 0 48 48" focusable="false"><rect x="10" y="6" width="28" height="36" rx="4"/><path d="m16 18 3 3 6-7M28 19h5M16 30l3 3 6-7M28 31h5"/></svg>`
+  };
+  return `<span class="slide-visual-icon" aria-hidden="true">${icons[name] || icons.pulse}</span>`;
+}
+
+function renderInfographicMetric(visual = {}) {
+  if (!visual.metric && !visual.metricLabel) return "";
+  return `
+    <div class="slide-visual-metric">
+      ${visual.metric ? `<strong>${escapeHTML(visual.metric)}</strong>` : ""}
+      ${visual.metricLabel ? `<span>${escapeHTML(visual.metricLabel)}</span>` : ""}
+    </div>
+  `;
+}
+
+function renderInfographicCards(cards = []) {
+  if (!Array.isArray(cards) || cards.length === 0) return "";
+  return `
+    <div class="slide-visual-cards">
+      ${cards.slice(0, 6).map((card) => {
+        const tone = safeClassToken(card.tone);
+        return `
+          <div class="slide-visual-card ${tone ? `tone-${tone}` : ""}">
+            ${renderSlideVisualIcon(card.icon)}
+            <div>
+              ${card.value ? `<b>${escapeHTML(card.value)}</b>` : ""}
+              ${card.label ? `<span>${escapeHTML(card.label)}</span>` : ""}
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderInfographicFlow(flow = []) {
+  if (!Array.isArray(flow) || flow.length === 0) return "";
+  return `
+    <div class="slide-visual-flow">
+      ${flow.slice(0, 4).map((step, index) => `
+        <div class="slide-visual-step">
+          <i>${String(index + 1).padStart(2, "0")}</i>
+          ${renderSlideVisualIcon(step.icon)}
+          <span>${escapeHTML(step.label || "")}</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderInfographicAlerts(alerts = []) {
+  if (!Array.isArray(alerts) || alerts.length === 0) return "";
+  return `
+    <div class="slide-visual-alerts">
+      ${alerts.slice(0, 4).map((alert) => `<span>${renderSlideVisualIcon(alert.icon || "warning")}${escapeHTML(alert.label || alert)}</span>`).join("")}
+    </div>
+  `;
+}
+
+function renderArticleInfographicVisual(slide = {}, article = {}) {
+  const visual = slide.visual || {};
+  const tone = safeClassToken(visual.tone || slide.tone);
+  return `
+    <figure class="article-slide-visual article-slide-visual--infographic ${tone ? `tone-${tone}` : ""}">
+      <div class="slide-infographic-canvas">
+        <div class="slide-visual-top">
+          <span>${escapeHTML(visual.eyebrow || slide.eyebrow || "Visual")}</span>
+          ${visual.badge ? `<b>${escapeHTML(visual.badge)}</b>` : ""}
+        </div>
+        <div class="slide-visual-title">
+          ${renderSlideVisualIcon(visual.icon)}
+          <div>
+            <strong>${escapeHTML(visual.title || slide.title || article.title || "")}</strong>
+            ${visual.subtitle ? `<small>${escapeHTML(visual.subtitle)}</small>` : ""}
+          </div>
+        </div>
+        <div class="slide-visual-main">
+          ${renderInfographicMetric(visual)}
+          ${renderInfographicCards(visual.cards)}
+          ${renderInfographicFlow(visual.flow)}
+          ${renderInfographicAlerts(visual.alerts)}
+        </div>
+        ${visual.caption ? `<figcaption>${escapeHTML(visual.caption)}</figcaption>` : ""}
+      </div>
+    </figure>
+  `;
+}
+
 function renderArticleSlideVisual(slide = {}, article = {}) {
+  if (slide.visual) return renderArticleInfographicVisual(slide, article);
   const image = slide.image || article.image;
   if (!image) return "";
   const imageSrc = normalizeLocalAssetUrl(contentImageUrl(image));
@@ -10916,41 +11032,52 @@ function renderArticleSlideVisual(slide = {}, article = {}) {
 function renderArticleSlideDeck(article) {
   const slides = Array.isArray(article.slides) ? article.slides.filter(Boolean).slice(0, 10) : [];
   if (slides.length < 1) return "";
+  const deckHint = article.visualFormat === "ppt-icon-pack"
+    ? "70% 圖解、icon、短句，像簡報一樣快速抓重點。"
+    : "大圖、短句、清單，快速抓重點。";
   return `
     <section class="article-slide-deck" aria-label="${escapeHTML(article.title)} PPT式懶人包">
       <div class="article-slide-deck-head">
         <span>PPT式懶人包</span>
         <strong>${slides.length} 頁速讀</strong>
-        <p>大圖、短句、清單，快速抓重點。</p>
+        <p>${deckHint}</p>
       </div>
       <nav class="article-slide-jump" aria-label="懶人包頁面索引">
         ${slides.map((slide, index) => `<a href="#slide-${escapeHTML(article.slug)}-${index + 1}">${String(index + 1).padStart(2, "0")}</a>`).join("")}
       </nav>
       <div class="article-slides">
-        ${slides.map((slide, index) => `
-          <section class="article-slide ${slide.tone ? `tone-${escapeHTML(slide.tone)}` : ""}" id="slide-${escapeHTML(article.slug)}-${index + 1}">
-            ${renderArticleSlideVisual(slide, article)}
-            <div class="article-slide-copy">
-              <div class="article-slide-kicker">
-                <span>${String(index + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}</span>
-                ${slide.eyebrow ? `<em>${escapeHTML(slide.eyebrow)}</em>` : ""}
-              </div>
-              <h2>${escapeHTML(slide.title || "")}</h2>
-              ${slide.lede ? `<p class="article-slide-lede">${escapeHTML(slide.lede)}</p>` : ""}
-              ${slide.stat || slide.statLabel ? `
-                <div class="article-slide-stat">
-                  ${slide.stat ? `<b>${escapeHTML(slide.stat)}</b>` : ""}
-                  ${slide.statLabel ? `<span>${escapeHTML(slide.statLabel)}</span>` : ""}
+        ${slides.map((slide, index) => {
+          const slideClasses = [
+            "article-slide",
+            article.visualFormat === "ppt-icon-pack" ? "is-icon-pack" : "",
+            slide.visual ? "has-infographic" : "",
+            slide.tone ? `tone-${safeClassToken(slide.tone)}` : ""
+          ].filter(Boolean).join(" ");
+          return `
+            <section class="${slideClasses}" id="slide-${escapeHTML(article.slug)}-${index + 1}">
+              ${renderArticleSlideVisual(slide, article)}
+              <div class="article-slide-copy">
+                <div class="article-slide-kicker">
+                  <span>${String(index + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}</span>
+                  ${slide.eyebrow ? `<em>${escapeHTML(slide.eyebrow)}</em>` : ""}
                 </div>
-              ` : ""}
-              ${Array.isArray(slide.points) && slide.points.length ? `
-                <ul>
-                  ${slide.points.slice(0, 4).map((point) => `<li>${escapeHTML(point)}</li>`).join("")}
-                </ul>
-              ` : ""}
-            </div>
-          </section>
-        `).join("")}
+                <h2>${escapeHTML(slide.title || "")}</h2>
+                ${slide.lede ? `<p class="article-slide-lede">${escapeHTML(slide.lede)}</p>` : ""}
+                ${slide.stat || slide.statLabel ? `
+                  <div class="article-slide-stat">
+                    ${slide.stat ? `<b>${escapeHTML(slide.stat)}</b>` : ""}
+                    ${slide.statLabel ? `<span>${escapeHTML(slide.statLabel)}</span>` : ""}
+                  </div>
+                ` : ""}
+                ${Array.isArray(slide.points) && slide.points.length ? `
+                  <ul>
+                    ${slide.points.slice(0, 4).map((point) => `<li>${escapeHTML(point)}</li>`).join("")}
+                  </ul>
+                ` : ""}
+              </div>
+            </section>
+          `;
+        }).join("")}
       </div>
     </section>
   `;
