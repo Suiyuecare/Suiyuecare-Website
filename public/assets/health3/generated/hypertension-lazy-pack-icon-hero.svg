@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">高血壓懶人包 icon 資訊圖</title>
+  <desc id="desc">以血壓計、722量測、心臟、腦部、腎臟、用藥與家庭照顧流程組成的簡報式資訊圖。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff8ed"/>
+      <stop offset=".52" stop-color="#eef7f6"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#3d1f0c" flood-opacity=".14"/>
+    </filter>
+    <style>
+      .dark{fill:#321606}.muted{fill:#655247}.orange{fill:#ff8a1f}.blue{fill:#3d84b6}.teal{fill:#4d8f85}.red{fill:#d95b43}.soft{fill:#fff}.line{fill:none;stroke:currentColor;stroke-width:10;stroke-linecap:round;stroke-linejoin:round}.label{font-family:Arial,'Noto Sans TC',sans-serif;font-weight:900}.small{font-size:42px}.mid{font-size:70px}.big{font-size:116px}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="210" cy="160" r="150" fill="#3d84b6" opacity=".12"/>
+  <circle cx="1360" cy="140" r="170" fill="#4d8f85" opacity=".16"/>
+  <circle cx="1360" cy="760" r="180" fill="#ff8a1f" opacity=".12"/>
+  <g filter="url(#shadow)">
+    <rect x="120" y="120" width="1360" height="660" rx="44" fill="#ffffff" opacity=".86"/>
+    <rect x="120" y="120" width="1360" height="660" rx="44" fill="none" stroke="#ffffff" stroke-width="8"/>
+  </g>
+  <g transform="translate(190 190)">
+    <text class="label small orange" x="0" y="0">HEALTH 3.0 LAZY PACK</text>
+    <text class="label big dark" x="0" y="120">高血壓</text>
+    <text class="label mid blue" x="0" y="205">看趨勢，不看一秒</text>
+    <text class="label small muted" x="0" y="285">722量測｜紅旗症狀｜用藥流程｜家庭分工</text>
+  </g>
+  <g transform="translate(865 185)">
+    <rect x="0" y="0" width="430" height="260" rx="34" fill="#eef7fb"/>
+    <g color="#3d84b6" transform="translate(58 52)">
+      <path class="line" d="M0 126a126 126 0 1 1 252 0"/>
+      <path class="line" d="M126 126 202 45"/>
+      <path class="line" d="M76 126h100"/>
+    </g>
+    <text class="label mid dark" x="58" y="205">722</text>
+    <text class="label small muted" x="210" y="200">家庭量測</text>
+  </g>
+  <g transform="translate(200 560)">
+    <g>
+      <rect x="0" y="0" width="220" height="140" rx="26" fill="#fff1dc"/>
+      <g color="#ff8a1f" transform="translate(28 27) scale(1.15)">
+        <path class="line" d="M10 44h18l12-28 18 56 14-38h25"/>
+      </g>
+      <text class="label small dark" x="28" y="112">趨勢</text>
+    </g>
+    <g transform="translate(255 0)">
+      <rect x="0" y="0" width="220" height="140" rx="26" fill="#fff0ec"/>
+      <g color="#d95b43" transform="translate(38 28) scale(1.1)">
+        <path class="line" d="M48 4 92 82H4L48 4Z"/>
+        <path class="line" d="M48 30v22M48 67h1"/>
+      </g>
+      <text class="label small dark" x="28" y="112">紅旗</text>
+    </g>
+    <g transform="translate(510 0)">
+      <rect x="0" y="0" width="220" height="140" rx="26" fill="#ecf8f4"/>
+      <g color="#4d8f85" transform="translate(42 25) scale(1.05)">
+        <path class="line" d="M48 96S8 70 8 34A22 22 0 0 1 48 20a22 22 0 0 1 40 14c0 36-40 62-40 62Z"/>
+      </g>
+      <text class="label small dark" x="28" y="112">心腦腎</text>
+    </g>
+    <g transform="translate(765 0)">
+      <rect x="0" y="0" width="220" height="140" rx="26" fill="#eef7fb"/>
+      <g color="#3d84b6" transform="translate(42 26) scale(1.05)">
+        <path class="line" d="M26 86 86 26a25 25 0 0 0-36-36L-10 50a25 25 0 0 0 36 36Z" transform="translate(20 6)"/>
+        <path class="line" d="m25 50 28 28"/>
+      </g>
+      <text class="label small dark" x="28" y="112">用藥</text>
+    </g>
+  </g>
+  <g transform="translate(1295 540)">
+    <rect x="0" y="0" width="108" height="108" rx="34" fill="#3d84b6"/>
+    <rect x="40" y="74" width="28" height="74" rx="14" fill="#3d84b6"/>
+    <circle cx="54" cy="38" r="20" fill="#fff"/>
+    <path d="M35 72c4-21 13-32 27-32s23 11 27 32" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+  </g>
+</svg>
