@@ -1620,8 +1620,8 @@ const elderDiseaseLazyPackArticles = [
     slug: "elderly-hypertension-lazy-pack",
     category: "懶人包",
     title: "高血壓懶人包：血壓要看趨勢",
-    excerpt: "三分鐘看懂高血壓為什麼常沒有症狀、家裡怎麼量、哪些變化要帶去回診討論。",
-    image: "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg",
+    excerpt: "用 7 頁圖解看懂高血壓：趨勢、722、紅旗症狀、用藥和家庭分工。",
+    image: "assets/health3/generated/hypertension-lazy-pack-icon-hero.svg",
     author: "歲悅護理照顧小組",
     date: "2026.07.11",
     readingMinutes: 3,
@@ -1981,11 +1981,11 @@ const elderDiseaseLazyPackDepthEnhancements = {
   })
 };
 
-function pptLazyPack({ summary = [], slides = [], references = [], cta = "" }) {
+function pptLazyPack({ summary = [], slides = [], references = [], cta = "", visualFormat = "ppt-lazy-pack" }) {
   return guide({
     readingMinutes: 2,
     targetAudience: "家屬與主要照顧者",
-    visualFormat: "ppt-lazy-pack",
+    visualFormat,
     summary,
     content: [],
     checklists: [],
@@ -1999,15 +1999,149 @@ function pptLazyPack({ summary = [], slides = [], references = [], cta = "" }) {
 
 const elderDiseaseLazyPackSlideEnhancements = {
   "elderly-hypertension-lazy-pack": pptLazyPack({
-    summary: ["高血壓常沒有症狀，家屬要看一週趨勢。", "量測方式比單次數字更重要。", "合併胸痛、喘、神經症狀時要先就醫。"],
+    visualFormat: "ppt-icon-pack",
+    summary: ["高血壓常沒有感覺，先看一週趨勢。", "722 量法讓回診更有根據。", "胸痛、喘、神經症狀先就醫。"],
     slides: [
-      { eyebrow: "先看結論", title: "血壓要看趨勢", lede: "長輩可能完全沒感覺，但血壓長期偏高會增加中風、心臟病與腎臟病風險。", stat: "趨勢", statLabel: "比單次數字更重要", image: "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg", visualLabel: "固定時間、固定姿勢，才看得出變化。", points: ["不要只看一次高或一次低。", "把量測時間、姿勢和不舒服一起記。", "回診時帶紀錄，不靠記憶描述。"] },
-      { eyebrow: "紅旗", title: "有症狀先就醫", lede: "血壓數字要和症狀一起看；有急性不舒服，先排除急症。", tone: "danger", image: "assets/nursing-detail-01-vitals-fast.jpg", points: ["胸痛、喘、冒冷汗或昏厥。", "突然臉歪、手腳無力、說話不清。", "劇烈頭痛、意識改變或視力突然異常。"] },
-      { eyebrow: "量測法", title: "用 722 做紀錄", lede: "連續紀錄能讓醫師看見平常狀態，而不是只看診間當下。", stat: "7-2-2", statLabel: "7天、早晚2回、每回2次", image: "assets/homepage-batch/14-care-notes-fast.jpg", points: ["量前先安靜休息。", "手臂高度、袖帶位置固定。", "兩次數值都記下來，不只挑正常的。"] },
-      { eyebrow: "家中觀察", title: "看三件事：頭暈、跌倒、生活力", lede: "長輩血壓控制要放回生活：走路穩不穩、起身會不會暈、精神是否下降。", image: "assets/homepage-batch/08-orange-apron-walking-fast.jpg", points: ["起身頭暈要記時間與情境。", "夜間如廁跌倒風險要一起處理。", "食慾、活動力下降也要帶去回診。"] },
-      { eyebrow: "用藥", title: "不要因為沒症狀就自己停藥", lede: "高血壓常安靜存在，用藥調整應由醫師判斷。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["藥袋、保健品、止痛藥一起整理。", "頭暈或水腫不要自行加減藥。", "每次回診更新藥物清單。"] },
-      { eyebrow: "回診", title: "把一週紀錄帶去，比一句還好更有用", lede: "回診前整理數字、症狀和生活變化，醫師更容易調整計畫。", image: "assets/homepage-batch/family-consultation-clear.jpg", points: ["血壓、脈搏、量測時間。", "頭暈、胸悶、喘、跌倒。", "最近是否換藥、睡不好或吃比較少。"] },
-      { eyebrow: "下一步", title: "家屬的任務是建立流程，不是每天緊張", lede: "把量測、用藥、回診和紅旗寫成固定流程，照顧會穩很多。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["固定誰量、誰記、誰陪回診。", "異常先看是否合併不舒服。", "不能取代診斷；急性惡化請就醫。"] }
+      {
+        eyebrow: "先看結論",
+        title: "不要只看一次數字",
+        visual: {
+          eyebrow: "Blood pressure",
+          badge: "趨勢優先",
+          icon: "gauge",
+          title: "血壓看一週，不看一秒",
+          subtitle: "同時間、同姿勢、同一本紀錄",
+          metric: "趨勢",
+          metricLabel: "比單次高低更有用",
+          cards: [
+            { icon: "clock", value: "固定時間", label: "早晚量測", tone: "orange" },
+            { icon: "person", value: "固定姿勢", label: "坐穩再量" },
+            { icon: "note", value: "固定紀錄", label: "回診帶去", tone: "calm" }
+          ],
+          caption: "高血壓常沒有明顯症狀，紀錄能補上感覺看不到的風險。"
+        },
+        points: ["看連續變化。", "不要只挑正常值。"]
+      },
+      {
+        eyebrow: "紅旗",
+        title: "有急性症狀先就醫",
+        tone: "danger",
+        visual: {
+          eyebrow: "Red flags",
+          badge: "先求助",
+          icon: "warning",
+          title: "數字很高＋不舒服",
+          subtitle: "不要在家等看看",
+          alerts: [
+            { icon: "heart", label: "胸痛、喘" },
+            { icon: "brain", label: "臉歪手弱" },
+            { icon: "warning", label: "劇烈頭痛" },
+            { icon: "phone", label: "意識改變" }
+          ],
+          caption: "胸痛、喘、神經症狀或意識改變，請優先就醫。"
+        },
+        points: ["症狀比數字更急。", "不確定就先求助。"]
+      },
+      {
+        eyebrow: "量測法",
+        title: "722 是家庭版 SOP",
+        visual: {
+          eyebrow: "Home BP",
+          badge: "722",
+          icon: "calendar",
+          title: "7天｜早晚｜每回2次",
+          subtitle: "讓醫師看到平常狀態",
+          metric: "7-2-2",
+          metricLabel: "連續7天，早晚各量，每回2次",
+          flow: [
+            { icon: "calendar", label: "連續7天" },
+            { icon: "sun", label: "早上" },
+            { icon: "moon", label: "晚上" },
+            { icon: "note", label: "兩次都記" }
+          ],
+          caption: "量前先安靜休息，袖帶位置與手臂高度保持一致。"
+        },
+        points: ["量前先休息。", "兩次都記下。"]
+      },
+      {
+        eyebrow: "家中觀察",
+        title: "數字旁邊要寫感覺",
+        visual: {
+          eyebrow: "Observe",
+          badge: "數字＋狀態",
+          icon: "checklist",
+          title: "血壓紀錄不是只有 mmHg",
+          subtitle: "把生活變化放在同一頁",
+          cards: [
+            { icon: "gauge", value: "血壓", label: "早晚數字" },
+            { icon: "pulse", value: "脈搏", label: "快慢不規則" },
+            { icon: "walk", value: "頭暈", label: "起身或走路" },
+            { icon: "shield", value: "跌倒", label: "差點跌也算", tone: "danger" },
+            { icon: "heart", value: "胸悶", label: "活動後更明顯", tone: "danger" },
+            { icon: "person", value: "精神", label: "食慾與活動力", tone: "calm" }
+          ],
+          caption: "長輩說不清楚時，症狀時間點和生活變化特別重要。"
+        },
+        points: ["數字旁寫症狀。", "跌倒和頭暈也記。"]
+      },
+      {
+        eyebrow: "用藥",
+        title: "沒症狀也不要自行停藥",
+        visual: {
+          eyebrow: "Medication",
+          badge: "勿自行調藥",
+          icon: "pill",
+          title: "高血壓常安靜存在",
+          subtitle: "用藥調整交給醫師",
+          cards: [
+            { icon: "pill", value: "藥袋", label: "固定整理", tone: "orange" },
+            { icon: "checklist", value: "清單", label: "保健品也列入" },
+            { icon: "warning", value: "副作用", label: "頭暈水腫要回報", tone: "danger" },
+            { icon: "note", value: "回診", label: "每次更新", tone: "calm" }
+          ],
+          caption: "頭暈、水腫或血壓變化，先記錄並回診討論，不自行加減藥。"
+        },
+        points: ["藥物清單固定更新。", "不自行停藥加藥。"]
+      },
+      {
+        eyebrow: "生活",
+        title: "生活調整要看做得到",
+        visual: {
+          eyebrow: "Lifestyle",
+          badge: "可持續",
+          icon: "heart",
+          title: "降壓不是只靠意志力",
+          subtitle: "把每天能做的先固定",
+          cards: [
+            { icon: "home", value: "低鹽", label: "湯汁醬料少一點", tone: "orange" },
+            { icon: "walk", value: "活動", label: "安全分段動" },
+            { icon: "shield", value: "戒菸酒", label: "降低心血管風險", tone: "calm" },
+            { icon: "clock", value: "睡眠", label: "作息與壓力一起看" }
+          ],
+          caption: "長者的生活調整要配合體力、用藥與其他慢性病。"
+        },
+        points: ["先做能持續的。", "三高一起管理。"]
+      },
+      {
+        eyebrow: "下一步",
+        title: "建立流程，不是天天緊張",
+        tone: "calm",
+        visual: {
+          eyebrow: "Care flow",
+          badge: "家庭分工",
+          icon: "team",
+          title: "誰量、誰記、誰陪診",
+          subtitle: "流程清楚，家裡就不靠臨場反應",
+          flow: [
+            { icon: "gauge", label: "固定量" },
+            { icon: "note", label: "固定記" },
+            { icon: "team", label: "陪回診" },
+            { icon: "phone", label: "紅旗求助" }
+          ],
+          caption: "這份懶人包不能取代診斷；急性惡化請先就醫。"
+        },
+        points: ["分工寫下來。", "紅旗先就醫。"]
+      }
     ],
     references: [referenceLibrary.hpaHypertension, referenceLibrary.hpaHypertension722, referenceLibrary.chronicDiseaseCdc]
   }),
