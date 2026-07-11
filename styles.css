@@ -8893,6 +8893,46 @@ h2 {
   color: var(--orange-dark);
   font-weight: 900;
 }
+.recruit-apply-form {
+  gap: 14px;
+}
+.recruit-apply-context {
+  margin: -4px 0 2px;
+  color: #7b6658;
+  font-weight: 800;
+}
+.recruit-apply-context strong {
+  color: var(--brown);
+}
+.recruit-resume-field span {
+  color: var(--orange-dark);
+  font-size: 14px;
+}
+.recruit-apply-form input[type="file"] {
+  min-height: 56px;
+  padding: 8px;
+  font: inherit;
+}
+.recruit-apply-form input[type="file"]::file-selector-button {
+  min-height: 36px;
+  margin-right: 10px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #fff1df;
+  color: var(--orange-dark);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+.recruit-resume-hint,
+.recruit-privacy-note {
+  margin: -6px 0 0;
+  color: #7b6658;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+}
 
 .contact-section {
   display: grid;

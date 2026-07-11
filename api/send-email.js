@@ -1,3 +1,5 @@
+const crypto = require("node:crypto");
+
 const FORM_RECIPIENTS = {
   contact: process.env.CONTACT_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
   course_signup: process.env.COURSE_NOTIFY_EMAIL || "edu.control@suiyuecare.com",
@@ -21,6 +23,13 @@ const FORM_LABELS = {
 const FORM_RATE_LIMIT_WINDOW_MS = Number(process.env.FORM_RATE_LIMIT_WINDOW_MS || 10 * 60 * 1000);
 const FORM_RATE_LIMIT_MAX_PER_IP = Number(process.env.FORM_RATE_LIMIT_MAX_PER_IP || 8);
 const FORM_RATE_LIMIT_MAX_PER_CONTACT = Number(process.env.FORM_RATE_LIMIT_MAX_PER_CONTACT || 3);
+const RECRUITING_RESUME_BUCKET = "recruiting-resumes";
+const RECRUITING_RESUME_MAX_BYTES = Number(process.env.RECRUITING_RESUME_MAX_BYTES || 3 * 1024 * 1024);
+const RECRUITING_RESUME_MIME_TYPES = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+]);
 const formRateLimitStore = globalThis.__suiyuecareFormRateLimitStore || new Map();
 globalThis.__suiyuecareFormRateLimitStore = formRateLimitStore;
 
@@ -39,6 +48,30 @@ function createHttpError(statusCode, message) {
 
 function sanitize(value, maxLength = 2000) {
   return String(value || "").trim().slice(0, maxLength);
+}
+
+function normalizeRecruitingResume(value) {
+  if (!value || typeof value !== "object") return null;
+  const fileName = sanitize(value.file_name, 180).replace(/[\\/\u0000]/g, "_");
+  const mimeType = sanitize(value.mime_type, 140).toLowerCase();
+  const dataBase64 = String(value.data_base64 || "").replace(/\s/g, "");
+  const maxBase64Length = Math.ceil(RECRUITING_RESUME_MAX_BYTES * 4 / 3) + 8;
+  if (!fileName || !mimeType || !dataBase64) throw createHttpError(400, "履歷檔案格式不完整，請重新選擇檔案。");
+  if (!RECRUITING_RESUME_MIME_TYPES.has(mimeType)) throw createHttpError(400, "履歷僅支援 PDF、DOC、DOCX 檔案。");
+  if (dataBase64.length > maxBase64Length) throw createHttpError(413, "履歷檔案請控制在 3 MB 以內。");
+  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(dataBase64)) throw createHttpError(400, "履歷檔案格式無法辨識，請重新選擇檔案。");
+
+  const buffer = Buffer.from(dataBase64, "base64");
+  const declaredSize = Number(value.size_bytes || 0);
+  if (!buffer.length || buffer.length > RECRUITING_RESUME_MAX_BYTES || (declaredSize && declaredSize !== buffer.length)) {
+    throw createHttpError(413, "履歷檔案請控制在 3 MB 以內。");
+  }
+  return { fileName, mimeType, sizeBytes: buffer.length, buffer };
+}
+
+function recruitingResumePath(fileName) {
+  const extension = fileName.match(/\.(pdf|doc|docx)$/i)?.[0]?.toLowerCase() || ".file";
+  return `applications/${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}${extension}`;
 }
 
 function requestBody(request) {
@@ -233,6 +266,38 @@ function serviceRoleProjectMatches() {
   return Boolean(payload?.role === "service_role" && payload?.ref === projectRefFromSupabaseUrl(supabaseUrl()));
 }
 
+async function uploadRecruitingResume(resume) {
+  const url = supabaseUrl();
+  const serviceKey = supabaseServiceKey();
+  if (!url || !serviceKey || !serviceRoleProjectMatches()) {
+    throw createHttpError(503, "履歷上傳暫時無法使用，請先不附檔送出資料或稍後再試。");
+  }
+
+  const storagePath = recruitingResumePath(resume.fileName);
+  const encodedPath = storagePath.split("/").map((part) => encodeURIComponent(part)).join("/");
+  const response = await fetch(`${url}/storage/v1/object/${encodeURIComponent(RECRUITING_RESUME_BUCKET)}/${encodedPath}`, {
+    method: "POST",
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      "Content-Type": resume.mimeType,
+      "x-upsert": "false"
+    },
+    body: resume.buffer
+  });
+  if (!response.ok) {
+    console.error("Recruiting resume upload failed", await response.text());
+    throw createHttpError(503, "履歷上傳暫時無法使用，請先不附檔送出資料或稍後再試。");
+  }
+  return {
+    bucket: RECRUITING_RESUME_BUCKET,
+    storage_path: storagePath,
+    file_name: resume.fileName,
+    mime_type: resume.mimeType,
+    size_bytes: resume.sizeBytes
+  };
+}
+
 function normalizeSubmissionId(value) {
   if (Array.isArray(value)) return normalizeSubmissionId(value[0]?.id || value[0]);
   if (value && typeof value === "object") return String(value.id || value.submission_id || "").replace(/^"|"$/g, "");
@@ -377,6 +442,7 @@ function renderEmailHtml(payload) {
     ["內容", payload.message],
     ["部門/分類", payload.metadata.department_title],
     ["職缺/項目", payload.metadata.opening_title],
+    ["履歷", payload.metadata.resume?.file_name],
     ["來源頁面", payload.source_path],
     ["送出時間", payload.metadata.submitted_at]
   ];
@@ -473,22 +539,27 @@ module.exports = async function handler(request, response) {
     enforceAllowedPublicOrigin(request);
     const body = requestBody(request);
     const payload = buildSubmissionPayload(body);
+    const resume = normalizeRecruitingResume(body.resume);
     if (sanitize(body._honey, 120)) {
       return json(response, 200, { ok: true, message: "資料已送出。" });
     }
-    if (!payload.name || !payload.phone || !payload.email) {
-      return json(response, 400, { ok: false, message: "請填寫姓名、電話與 Email。" });
+    if (resume && payload.form_type !== "recruiting") {
+      return json(response, 400, { ok: false, message: "只有人才招募表單可上傳履歷。" });
     }
-    if (!isValidEmail(payload.email)) {
+    if (!payload.name || !payload.phone || (payload.form_type !== "recruiting" && !payload.email)) {
+      return json(response, 400, { ok: false, message: payload.form_type === "recruiting" ? "請填寫姓名與電話。" : "請填寫姓名、電話與 Email。" });
+    }
+    if (payload.form_type !== "recruiting" && !isValidEmail(payload.email)) {
       return json(response, 400, { ok: false, message: "請填寫有效的 Email。" });
     }
     if (!isValidPhone(payload.phone)) {
       return json(response, 400, { ok: false, message: "請填寫有效的聯絡電話。" });
     }
-    if (body.privacy_consent !== true && body.privacy_consent !== "on") {
+    if (payload.form_type !== "recruiting" && body.privacy_consent !== true && body.privacy_consent !== "on") {
       return json(response, 400, { ok: false, message: "請先同意個人資料使用告知。" });
     }
     enforceRateLimit(request, payload);
+    if (resume) payload.metadata.resume = await uploadRecruitingResume(resume);
 
     let submissionId = null;
     try {

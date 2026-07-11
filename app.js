@@ -745,6 +745,7 @@ async function recordFormSubmission(form, formType = "contact") {
 
 async function sendBackendForm(form, formType = "contact") {
   const formData = new FormData(form);
+  const resume = formType === "recruiting" ? await serializeRecruitingResume(formData.get("resume")) : null;
   const payload = {
     form_type: formType,
     name: formDataValue(formData, ["姓名", "您的大名", "name"]),
@@ -761,6 +762,7 @@ async function sendBackendForm(form, formType = "contact") {
     opening_title: formDataValue(formData, ["opening_title"]),
     opening_slug: formDataValue(formData, ["opening_slug"]),
     privacy_consent: formData.get("privacy_consent") === "on",
+    resume,
     _honey: formDataValue(formData, ["_honey"]),
     source_path: location.hash || "#home",
     page_title: document.title,
@@ -782,6 +784,23 @@ async function sendBackendForm(form, formType = "contact") {
     throw new Error(result.message || "表單送出失敗，請稍後再試。");
   }
   return result;
+}
+
+async function serializeRecruitingResume(file) {
+  if (!file || typeof file !== "object" || !file.name || !file.size) return null;
+  const dataBase64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+  if (!dataBase64) throw new Error("履歷檔案讀取失敗，請重新選擇檔案。");
+  return {
+    file_name: file.name,
+    mime_type: file.type,
+    size_bytes: file.size,
+    data_base64: dataBase64
+  };
 }
 
 function flushPageEngagement() {
@@ -4947,7 +4966,6 @@ function buildTalentJobBoardModel(page = {}, departments = [], openings = []) {
     const summary = talentText(opening.summary, duties[0] || "歡迎與招募窗口聊聊職務內容與適合度。");
     const imageProfile = getRecruitingImageProfile(opening, getRecruitingImage(department, fallbackImages.recruiting));
     const formType = opening.metadata?.form_type || page.metadata?.form_type || "recruiting";
-    const contactMessage = `我想了解「${title}」職缺或留下應徵資料，請協助安排招募窗口聯繫。`;
     return {
       id: String(opening.id || openingSlug || jobKey),
       key: jobKey,
@@ -4978,9 +4996,7 @@ function buildTalentJobBoardModel(page = {}, departments = [], openings = []) {
       imageAlt: `${title}工作情境：${imageProfile.label}`,
       sortOrder: Number(opening.sort_order || index * 10),
       updatedMs,
-      updatedLabel: formatTalentUpdatedAt(opening.updated_at || opening.published_at || opening.created_at),
-      contactNeed: "人才招募",
-      contactMessage
+      updatedLabel: formatTalentUpdatedAt(opening.updated_at || opening.published_at || opening.created_at)
     };
   }).sort(compareTalentJobs);
 
@@ -5002,14 +5018,8 @@ function talentApplyAttributes(job) {
   ].join(" ");
 }
 
-function talentContactAttributes(job) {
-  return `data-contact-need="${escapeHTML(job.contactNeed)}" data-contact-message="${escapeHTML(job.contactMessage)}"`;
-}
-
 function renderTalentApplyControl(job, className = "primary-button", label = job.applyButtonText) {
-  if (!job.applyFormEnabled) {
-    return `<a class="${escapeHTML(className)}" href="#contact" ${talentContactAttributes(job)}>留下資料</a>`;
-  }
+  if (!job.applyFormEnabled) return "";
   return `
     <button class="${escapeHTML(className)}" type="button" data-recruit-apply ${talentApplyAttributes(job)}>
       ${escapeHTML(label)}
@@ -5102,7 +5112,6 @@ function renderTalentJobDetail(job, inline = false) {
         </ol>
       </section>
       <div class="talent-job-detail-actions">
-        <a class="secondary-button" href="#contact" ${talentContactAttributes(job)}>稍後詢問</a>
         ${renderTalentApplyControl(job, "primary-button", job.applyButtonText)}
       </div>
     </div>
@@ -5464,18 +5473,30 @@ function renderRecruitingApplicationModal(page) {
   const confirmText = isTalent
     ? "送出後，資料會寄到歲悅招募窗口並留存在系統，窗口原則上 1 個工作天內回覆。"
     : "送出後，資料會寄到歲悅合作窗口並留存在系統，窗口原則上 1 個工作天內回覆。";
-  return `
-    <div class="course-signup-modal recruiting-apply-modal" id="recruitApplyModal" hidden>
-      <div class="course-signup-dialog">
-        <button class="course-modal-close" type="button" data-recruit-close aria-label="關閉">×</button>
-        <p class="eyebrow">Apply</p>
-        <h2>${escapeHTML(isTalent ? "申請應徵" : "提交洽談資料")}</h2>
-        <form id="recruitApplyForm">
+  const fields = isTalent ? `
+          <p class="recruit-apply-context">申請職缺：<strong id="recruitApplyContext"></strong></p>
+          <label>您的大名<input name="姓名" type="text" required autocomplete="name" placeholder="請輸入姓名" /></label>
+          <label>您的電話<input name="電話" type="tel" required autocomplete="tel" inputmode="tel" placeholder="請輸入電話" /></label>
+          <label class="recruit-resume-field">履歷上傳 <span>非必填</span><input name="resume" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" /></label>
+          <p class="recruit-resume-hint">支援 PDF、DOC、DOCX，檔案上限 3 MB。</p>
+          <input name="subject" id="recruitApplyTitle" type="hidden" />
+  ` : `
           <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
           <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
           <label>Email<input name="Email" type="email" required placeholder="請輸入 Email" /></label>
           <label>申請項目<input name="subject" id="recruitApplyTitle" type="text" readonly /></label>
           <label>補充說明<textarea name="說明" rows="4" placeholder="可填寫可聯絡時間、經歷、場域資料或合作想法"></textarea></label>
+  `;
+  const privacy = isTalent
+    ? `<p class="recruit-privacy-note">送出資料即表示同意歲悅長照集團為招募與後續聯繫目的使用所提供資料。</p>`
+    : `<label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為應徵、合作洽談與後續聯繫目的，使用我填寫的個人資料。</label>`;
+  return `
+    <div class="course-modal recruiting-apply-modal" id="recruitApplyModal" hidden role="dialog" aria-modal="true" aria-labelledby="recruitApplyHeading">
+      <form class="course-modal-card recruit-apply-form" id="recruitApplyForm">
+        <button class="course-modal-close" type="button" data-recruit-close aria-label="關閉">×</button>
+        <p class="eyebrow">Apply</p>
+        <h2 id="recruitApplyHeading">${escapeHTML(isTalent ? "申請應徵" : "提交洽談資料")}</h2>
+          ${fields}
           <input name="recruiting_page" id="recruitApplyPage" type="hidden" />
           <input name="department_id" id="recruitApplyDepartmentId" type="hidden" />
           <input name="department_title" id="recruitApplyDepartmentTitle" type="hidden" />
@@ -5483,12 +5504,11 @@ function renderRecruitingApplicationModal(page) {
           <input name="opening_slug" id="recruitApplyOpeningSlug" type="hidden" />
           <input name="opening_title" id="recruitApplyOpeningTitle" type="hidden" />
           <input name="_honey" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為應徵、合作洽談與後續聯繫目的，使用我填寫的個人資料。</label>
+          ${privacy}
           <p class="course-confirm-text">${escapeHTML(confirmText)}</p>
           <button class="primary-button" type="submit">${escapeHTML(submitText)}</button>
-          <span id="recruitApplyStatus"></span>
-        </form>
-      </div>
+          <p class="course-modal-status" id="recruitApplyStatus" role="status" aria-live="polite"></p>
+      </form>
     </div>
   `;
 }
@@ -11592,6 +11612,8 @@ function openRecruitApply(dataset = {}) {
   setValue("#recruitApplyOpeningId", dataset.openingId || "");
   setValue("#recruitApplyOpeningSlug", dataset.openingSlug || "");
   setValue("#recruitApplyOpeningTitle", dataset.openingTitle || "");
+  const context = document.querySelector("#recruitApplyContext");
+  if (context) context.textContent = dataset.openingTitle || "職缺申請";
   if (status) status.textContent = "";
   modal.hidden = false;
   document.body.classList.add("modal-open");

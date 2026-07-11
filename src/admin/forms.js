@@ -138,8 +138,9 @@ function renderDetail(item) {
   editorForm.elements.internal_note.value = item.internal_note || "";
   renderTimeline(item);
   detailTitle.textContent = `${typeLabels[item.form_type] || item.form_type}｜${item.name || "未填姓名"}`;
+  const resume = item.metadata?.resume && typeof item.metadata.resume === "object" ? item.metadata.resume : null;
   const metadataRows = item.metadata && typeof item.metadata === "object"
-    ? Object.entries(item.metadata).filter(([, value]) => value)
+    ? Object.entries(item.metadata).filter(([key, value]) => key !== "resume" && value)
     : [];
   detailBox.className = "admin-form-readonly admin-field-wide";
   detailBox.innerHTML = `
@@ -155,9 +156,32 @@ function renderDetail(item) {
       <div><dt>優先度</dt><dd>${escapeHTML(meta.priority)}</dd></div>
       <div><dt>下一步</dt><dd>${escapeHTML(meta.next_action || "-")}</dd></div>
       <div><dt>下次追蹤</dt><dd>${meta.next_follow_up_at ? formatUpdatedAt(meta.next_follow_up_at) : "-"}</dd></div>
+      ${resume?.storage_path ? `<div><dt>履歷</dt><dd><button type="button" class="admin-inline-action" data-download-resume data-resume-bucket="${escapeHTML(resume.bucket || "recruiting-resumes")}" data-resume-path="${escapeHTML(resume.storage_path)}">下載 ${escapeHTML(resume.file_name || "履歷檔案")}</button></dd></div>` : ""}
       ${metadataRows.map(([key, value]) => `<div><dt>${escapeHTML(key)}</dt><dd>${escapeHTML(String(value))}</dd></div>`).join("")}
     </dl>
   `;
+  detailBox.querySelector("[data-download-resume]")?.addEventListener("click", downloadResume);
+}
+
+async function downloadResume(event) {
+  const button = event.currentTarget;
+  const bucket = button.dataset.resumeBucket || "recruiting-resumes";
+  const storagePath = button.dataset.resumePath || "";
+  if (!storagePath) return;
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "準備下載...";
+  try {
+    const { data, error } = await supabase.storage.from(bucket).createSignedUrl(storagePath, 90, { download: true });
+    if (error) throw error;
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  } catch (error) {
+    console.error("Failed to create resume download URL", error);
+    setStatus(`履歷下載失敗：${error.message}`, "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
 }
 
 async function loadSubmissions() {

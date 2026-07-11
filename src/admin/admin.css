@@ -2701,6 +2701,20 @@ img[data-image-usage="map"],
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
+.admin-inline-action {
+  padding: 8px 12px;
+  border: 1px solid var(--admin-orange);
+  border-radius: 8px;
+  background: #fff7ed;
+  color: var(--admin-orange-dark, #b65b0b);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+.admin-inline-action:disabled {
+  cursor: wait;
+  opacity: .7;
+}
 
 .admin-module-list {
   display: grid;
