@@ -4328,7 +4328,7 @@ h2 {
   padding: 0;
   list-style: none;
 }
-.service-info-grid li {
+.service-info-grid > li {
   display: grid;
   align-content: start;
   gap: 10px;
@@ -4339,7 +4339,7 @@ h2 {
   background: rgba(255,255,255,.9);
   box-shadow: 0 16px 38px rgba(83,43,11,.065);
 }
-.service-info-grid span {
+.service-info-grid > li > span {
   display: inline-grid;
   width: 46px;
   height: 46px;
@@ -4350,17 +4350,93 @@ h2 {
   font-size: 13px;
   font-weight: 1000;
 }
-.service-info-grid strong {
+.service-info-grid > li > strong {
   color: var(--brown);
   font-size: 22px;
   line-height: 1.25;
 }
-.service-info-grid p {
+.service-info-grid > li > p {
   margin: 0;
   color: var(--muted);
   font-size: 15px;
   font-weight: 820;
   line-height: 1.72;
+}
+.service-fee-section .service-info-grid {
+  grid-template-columns: minmax(260px, .82fr) minmax(0, 1.18fr);
+  align-items: stretch;
+}
+.service-fee-section .service-info-grid > li {
+  min-height: 0;
+  padding: 24px;
+  border-color: rgba(227,205,176,.9);
+  border-radius: 8px;
+  box-shadow: 0 14px 30px rgba(83,43,11,.055);
+}
+.service-fee-section .service-info-grid > li:nth-child(2) {
+  grid-row: span 2;
+}
+.service-fee-section .service-info-grid > li.is-featured {
+  background: #fff7eb;
+}
+.service-fee-section .service-info-grid > li.has-cta {
+  background: linear-gradient(135deg, #fffdf8, #fff1df);
+}
+.service-fee-section .service-info-grid > li > span {
+  width: 40px;
+  height: 40px;
+  font-size: 12px;
+}
+.service-fee-section .service-info-grid > li > strong {
+  font-size: 20px;
+}
+.service-info-points {
+  display: grid;
+  gap: 10px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.service-info-points li {
+  position: relative;
+  padding: 10px 12px 10px 34px;
+  border: 1px solid rgba(234,211,179,.72);
+  border-radius: 8px;
+  background: rgba(255,255,255,.72);
+  color: var(--muted);
+  font-size: 14.5px;
+  font-weight: 820;
+  line-height: 1.58;
+  overflow-wrap: anywhere;
+}
+.service-info-points li::before {
+  position: absolute;
+  top: 16px;
+  left: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--orange);
+  content: "";
+}
+.service-info-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--orange);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 950;
+  text-decoration: none;
+  box-shadow: 0 12px 24px rgba(240,138,36,.2);
+}
+.service-info-link:hover {
+  transform: translateY(-1px);
 }
 .service-motion {
   opacity: 0;
@@ -10881,10 +10957,28 @@ input[name="_honey"] { display: none !important; }
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  .service-info-grid li {
+  .service-info-grid > li {
     min-height: 0;
     padding: 18px;
     border-radius: 20px;
+  }
+  .service-fee-section .service-info-grid {
+    grid-template-columns: 1fr;
+  }
+  .service-fee-section .service-info-grid > li {
+    padding: 18px;
+  }
+  .service-fee-section .service-info-grid > li:nth-child(2) {
+    grid-row: auto;
+  }
+  .service-info-points li {
+    padding: 9px 10px 9px 30px;
+    font-size: 13.5px;
+    line-height: 1.52;
+  }
+  .service-info-points li::before {
+    top: 15px;
+    left: 12px;
   }
   .two-minute-scene-grid {
     grid-template-columns: 1fr;
@@ -11571,6 +11665,10 @@ input[name="_honey"] { display: none !important; }
     grid-template-columns: 1fr;
     min-height: 0;
     width: 100%;
+  }
+  .article-slide.has-infographic {
+    grid-template-columns: 1fr;
+    min-height: 0;
   }
   .article-slide-visual,
   .article-slide-visual img {
