@@ -8782,17 +8782,23 @@ function renderServiceStorySection(service, slug) {
 
 function renderServicePlainList(items = []) {
   return items.map((item, index) => `
-    <li>
+    <li class="${item.featured ? "is-featured" : ""} ${item.cta ? "has-cta" : ""}">
       <span>${String(index + 1).padStart(2, "0")}</span>
       <strong>${escapeHTML(item.title)}</strong>
-      <p>${escapeHTML(item.text)}</p>
+      ${item.text ? `<p>${escapeHTML(item.text)}</p>` : ""}
+      ${Array.isArray(item.points) && item.points.length ? `
+        <ul class="service-info-points">
+          ${item.points.map((point) => `<li>${escapeHTML(point)}</li>`).join("")}
+        </ul>
+      ` : ""}
+      ${item.cta ? `<a class="service-info-link" href="${escapeHTML(item.href || "#service-contact")}" data-service-scroll="${escapeHTML(item.href || "#service-contact")}">${escapeHTML(item.cta)}</a>` : ""}
     </li>
   `).join("");
 }
 
 function serviceFeeBody(slug) {
   if (slug === "home-care" || slug === "day-care" || slug === "nursing") {
-    return "金額依長照照顧組合表，格式為一般給（支）付價格／原民區或離島支付價格；實際自付額仍依補助資格、身分別與照顧計畫核定。";
+    return "實際自付額會依長照等級、補助身分、核定額度與使用頻率不同，我們可先協助初步試算。";
   }
   return "實際費用會依服務內容、補助資格、區域與頻率確認，先留下需求即可協助試算。";
 }
@@ -8800,26 +8806,52 @@ function serviceFeeBody(slug) {
 function serviceFeeItems(service, slug) {
   if (slug === "home-care") {
     return [
-      { title: "BA 碼居家照顧服務", text: "BA01-BA24 涵蓋基本身體清潔、日常照顧、餐食、沐浴、家務、陪同外出就醫、管路清潔、陪伴與排泄協助等；常規項目給（支）付價格 NT$35-685／NT$40-825。" },
-      { title: "到宅沐浴車服務", text: "BA09 第一型給（支）付價格 NT$2,200／NT$2,640；BA09a 第二型給（支）付價格 NT$2,500／NT$3,000。" },
-      { title: "常用 BA 項目示例", text: "BA01 基本身體清潔 NT$260／NT$310、BA02 基本日常照顧 NT$195／NT$235、BA07 協助沐浴及洗頭 NT$325／NT$385、BA14 陪同就醫 NT$685／NT$825、BA15 家務協助 NT$195／NT$235。" },
-      { title: "安排前確認自付額", text: "窗口會依長照等級、核定額度、服務頻率、時段與是否有加計項目，協助確認可用補助與實際自付額。" }
+      { title: "先看補助與照顧計畫", text: "居家照顧不是每項都要全額自費。窗口會先確認長照等級、核定額度、身分別與你想安排的頻率，再估算每月可能自付額。", featured: true },
+      {
+        title: "常見居家項目參考",
+        text: "以下為長照給（支）付價格參考，格式為一般價格／原民區或離島價格，實際自付額會再依補助比例計算。",
+        points: [
+          "BA01 基本身體清潔：NT$260／NT$310",
+          "BA02 基本日常照顧：NT$195／NT$235",
+          "BA07 協助沐浴及洗頭：NT$325／NT$385",
+          "BA14 陪同就醫：NT$685／NT$825",
+          "BA15 家務協助：NT$195／NT$235"
+        ]
+      },
+      { title: "想知道每月大概多少？", text: "留下長輩狀況、所在地區、每週想安排幾次服務，我們會協助抓出比較貼近家庭日常的試算範圍。", cta: "請窗口協助試算", href: "#service-contact" }
     ];
   }
   if (slug === "day-care") {
     return [
-      { title: "BB 碼日間照顧", text: "BB01-BB14 依長照需要等級二至八級與全日／半日計價。全日給（支）付價格 NT$675-1,285／NT$810-1,540；半日 NT$340-645／NT$405-770。" },
-      { title: "BB 全日／半日示例", text: "等級二：BB01 全日 NT$675／NT$810、BB02 半日 NT$340／NT$405；等級八：BB13 全日 NT$1,285／NT$1,540、BB14 半日 NT$645／NT$770。使用交通接送者另計。" },
-      { title: "BD 碼日照中心附加服務", text: "BD01 社區式協助沐浴 NT$200／NT$240、BD02 社區式晚餐 NT$150／NT$180、BD03 社區式服務交通接送 NT$100／NT$120（十公里內、以一趟為單位）。" },
-      { title: "安排前試算", text: "中心會依長照等級、出席天數、接送需求、補助資格與核定額度，協助確認可用補助與實際自付額。" }
+      { title: "先看等級、全日或半日", text: "日間照顧會依長照需要等級、全日或半日、每週出席天數來估算。若需要接送、晚餐或沐浴等中心附加服務，會再一起確認。", featured: true },
+      {
+        title: "日照常見價格範圍",
+        text: "以下為長照給（支）付價格參考，格式為一般價格／原民區或離島價格；交通接送與附加服務需依中心安排另行確認。",
+        points: [
+          "BB01/BB02 等級二：全日 NT$675／NT$810、半日 NT$340／NT$405",
+          "BB13/BB14 等級八：全日 NT$1,285／NT$1,540、半日 NT$645／NT$770",
+          "BD01 協助沐浴：NT$200／NT$240，實際需要時可能另計",
+          "BD02 晚餐：NT$150／NT$180；BD03 接送：NT$100／NT$120，符合條件時可能另計"
+        ]
+      },
+      { title: "想估一週去幾天的費用？", text: "告訴我們長照等級、想安排全日或半日、每週天數與是否需要接送，中心窗口可以先幫你抓大概自付額。", cta: "請中心協助試算", href: "#service-contact" }
     ];
   }
   if (slug === "nursing") {
     return [
-      { title: "CA 碼復能照護", text: "CA07 IADLs／ADLs 復能照護：三次措施（含評估）NT$4,500／NT$5,400；CA08 個別化服務計畫（ISP）擬定與執行：四次措施 NT$6,000／NT$7,200。" },
-      { title: "CB 碼專業照護", text: "CB01 營養照護四次措施 NT$4,000／NT$4,800；CB02 進食與吞嚥照護六次措施 NT$9,000／NT$10,800；CB03 困擾行為照護三次措施 NT$4,500／NT$5,400。" },
-      { title: "臥床或活動受限照護", text: "CB04 臥床或長期活動受限照護：六次措施（含評估）給（支）付價格 NT$9,000／NT$10,800。" },
-      { title: "服務前評估", text: "護理復能須依照顧計畫與專業目標安排，實際自付額依補助資格、核定額度與服務次數確認。" }
+      { title: "先訂專業目標", text: "護理復能不是把所有項目都排上去，而是先看長輩目前最需要改善的生活能力、營養吞嚥或照護風險，再確認適合的服務組合。", featured: true },
+      {
+        title: "專業服務價格參考",
+        text: "以下為長照給（支）付價格參考，格式為一般價格／原民區或離島價格；實際自付額依補助資格、核定額度與服務次數確認。",
+        points: [
+          "CA07 IADLs／ADLs 復能：3 次措施 NT$4,500／NT$5,400",
+          "CA08 個別化服務計畫（ISP）：4 次措施 NT$6,000／NT$7,200",
+          "CB01 營養照護：4 次措施 NT$4,000／NT$4,800",
+          "CB02 進食與吞嚥照護、CB04 臥床或長期活動受限照護：6 次措施 NT$9,000／NT$10,800",
+          "CB03 困擾行為照護：3 次措施 NT$4,500／NT$5,400"
+        ]
+      },
+      { title: "不確定適合哪一項？", text: "先描述診斷、出院時間、行走能力、飲食吞嚥或目前最擔心的狀況，我們會協助判斷是否適合安排護理復能。", cta: "請專人協助判斷", href: "#service-contact" }
     ];
   }
   return [
@@ -8959,7 +8991,7 @@ function renderOneMinuteServicePage(slug) {
 
       ${renderServiceInfoSection({
         eyebrow: "Pricing",
-        title: "收費標準",
+        title: "費用怎麼算",
         body: serviceFeeBody(slug),
         items: serviceFeeItems(service, slug),
         className: "service-fee-section"
