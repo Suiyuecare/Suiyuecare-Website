@@ -330,6 +330,14 @@ body > main {
   max-width: 920px;
   padding-right: 0;
 }
+.home-page .hero {
+  align-items: end;
+  padding-top: clamp(70px, 8vh, 108px);
+  padding-bottom: clamp(18px, 3vh, 38px);
+}
+.home-page .hero-copy {
+  align-self: end;
+}
 .eyebrow {
   margin: 0 0 14px;
   color: var(--orange-dark);
