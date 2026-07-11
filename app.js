@@ -1461,6 +1461,32 @@ function applyStaticArticleRewritePack(pack = {}) {
   });
 }
 
+function applyHealthArticleCards(articles = []) {
+  const existingSlugs = new Set(healthArticles.map((article) => article.slug).filter(Boolean));
+  const nextArticles = articles
+    .filter((article) => article?.slug && !existingSlugs.has(article.slug))
+    .map((article) => ({
+      ...article,
+      href: article.href || articleHref(article.slug),
+      keywords: article.keywords || article.category || ""
+    }));
+  healthArticles.push(...nextArticles);
+  Object.assign(articlePages, Object.fromEntries(nextArticles.map((article) => [
+    article.slug,
+    {
+      category: article.category,
+      title: article.title,
+      dek: article.excerpt,
+      image: article.image,
+      author: article.author,
+      date: article.date,
+      tags: String(article.keywords || "").split(" ").filter(Boolean),
+      summary: [article.excerpt],
+      content: [["文章內容更新中", article.excerpt]]
+    }
+  ])));
+}
+
 function applyHealth30ArticleEnhancements(enhancements = {}) {
   health30ArticlePack.forEach((article) => {
     Object.assign(article, enhancements[article.slug] || {});
@@ -1474,6 +1500,7 @@ async function ensureStaticArticleRewrites() {
   if (!staticArticleRewritePackPromise) {
     staticArticleRewritePackPromise = import("./article-rewrites.js")
       .then((module) => {
+        applyHealthArticleCards(module.elderDiseaseLazyPackArticles || []);
         applyStaticArticleRewritePack(module.default || {});
         applyHealth30ArticleEnhancements(module.health30ArticleEnhancements || {});
         staticArticleRewritePackLoaded = true;
@@ -2972,6 +2999,9 @@ function getArticleRewriteFields(slug = "") {
     "warning",
     "checklists",
     "tables",
+    "slides",
+    "visualFormat",
+    "faq",
     "references",
     "targetAudience",
     "readingMinutes",
@@ -3321,13 +3351,15 @@ function normalizeSupabaseArticlePage(article, category, cover) {
     ctaUrl: article.cta_url || article.content_json?.cta_url || "",
     sourceName: article.source_name || article.content_json?.source_name || rewrite?.sourceName || "",
     sourceUrl: article.source_url || article.content_json?.source_url || rewrite?.sourceUrl || "",
-    faq: Array.isArray(article.faq_json) ? article.faq_json : [],
+    faq: rewrite?.faq || (Array.isArray(article.faq_json) ? article.faq_json : []),
     relatedSlugs: Array.isArray(article.content_json?.related_slugs) ? article.content_json.related_slugs : [],
     content,
     inlineImages: rewrite?.inlineImages || [],
     warning: rewrite?.warning,
     checklists: rewrite?.checklists || [],
     tables: rewrite?.tables || [],
+    slides: rewrite?.slides || (Array.isArray(article.content_json?.slides) ? article.content_json.slides : []),
+    visualFormat: rewrite?.visualFormat || article.content_json?.visual_format || "",
     references: rewrite?.references || [],
     contentRevision: rewrite?.contentRevision || "",
     seoTitle: article.seo_title || "",
@@ -4182,6 +4214,326 @@ function normalizeRecruitingList(value) {
   return [];
 }
 
+const talentRecruitingTabs = [
+  ["job-list", "職位一覽"],
+  ["benefits", "公司福利制度"],
+  ["career-growth", "公司升遷發展"],
+  ["organization", "公司組織圖"],
+  ["department-mission", "部門使命"]
+];
+
+const talentCareerSteps = [
+  ["0-3 個月", "新人陪跑", "完成基礎訓練、服務倫理、紀錄回報與安全照顧流程，由督導陪同熟悉第一線情境。"],
+  ["3-6 個月", "穩定上線", "能獨立完成服務紀錄、家庭溝通與異常回報，並建立穩定服務品質。"],
+  ["6-12 個月", "專業進階", "依部門選修失智照顧、復能陪伴、日照活動、移工培訓、行政營運等模組。"],
+  ["12 個月以上", "帶教與管理", "通過評核後可成為帶教員、服務督導、內訓講師、品管幹部或部門管理人才。"]
+];
+
+const talentCareerTracks = [
+  ["前線專業線", ["照顧服務員", "資深照服員", "照顧帶教員", "專科照顧師"]],
+  ["督導管理線", ["服務督導助理", "居服督導", "資深督導", "區域督導"]],
+  ["教育品管線", ["課務助教", "內訓講師", "品管專員", "教育品管主管"]],
+  ["行政營運線", ["行政專員", "營運協調", "專案管理", "部門主管"]]
+];
+
+const talentPromotionCriteria = [
+  ["服務品質", "服務紀錄完整、家屬回饋穩定、異常事件能即時回報與追蹤。"],
+  ["專業能力", "完成核心訓練與進階照顧模組，能把照顧流程做得穩、做得細。"],
+  ["團隊協作", "能與督導、行政、照服員、家屬共同解決問題，讓服務不中斷。"],
+  ["帶教潛力", "能整理經驗、協助新人上線，把個人能力轉化成團隊能力。"]
+];
+
+const talentBenefitHighlights = [
+  {
+    title: "教育訓練津貼",
+    value: "4,000",
+    unit: "元/年",
+    copy: "每年支持夥伴持續進修，把照顧專業穩定累積起來。"
+  },
+  {
+    title: "健康檢查",
+    value: "1",
+    unit: "次/年",
+    copy: "每人每年安排一次健康檢查，照顧者也要被好好照顧。"
+  },
+  {
+    title: "生日禮金",
+    value: "1,000",
+    unit: "元",
+    copy: "生日當月提供禮金，讓重要日子被團隊記得。"
+  },
+  {
+    title: "節慶禮金",
+    value: "800",
+    unit: "元/節",
+    copy: "端午與中秋每節 800 元，並提供節慶禮盒。"
+  }
+];
+
+const talentBenefitCategories = [
+  {
+    key: "learning",
+    title: "學習成長",
+    summary: "用津貼與課程把照顧能力補起來，讓新人和資深夥伴都能持續升級。",
+    items: [
+      {
+        title: "教育訓練津貼",
+        value: "4,000 元/年",
+        tags: ["全體員工"],
+        copy: "每年提供教育訓練津貼，支持外部課程、專業進修與在職學習。"
+      },
+      {
+        title: "身障 / 失智課程",
+        value: "20 小時免費上",
+        tags: ["全體員工"],
+        copy: "身障與失智照顧 20 小時課程由公司支持，協助夥伴補足現場照顧能力。"
+      }
+    ]
+  },
+  {
+    key: "bonus",
+    title: "獎金禮金",
+    summary: "把固定禮金、年度獎金與表現獎勵分開呈現，知道哪些是固定支持、哪些依辦法核定。",
+    items: [
+      {
+        title: "節慶禮金",
+        value: "每節 800 元 + 禮盒",
+        tags: ["全體員工"],
+        copy: "端午與中秋每節提供 800 元禮金與禮盒。"
+      },
+      {
+        title: "生日禮金",
+        value: "1,000 元",
+        tags: ["全體員工"],
+        copy: "生日當月發放 1,000 元生日禮金。"
+      },
+      {
+        title: "年終獎金",
+        value: "依年終管理辦法核定",
+        tags: ["依辦法核定"],
+        copy: "年終獎金依公司年終管理辦法與年度營運、個人狀況核定。"
+      },
+      {
+        title: "績效獎勵",
+        value: "另案評核發放",
+        tags: ["依辦法核定"],
+        copy: "依個人表現與專案狀況另案評核發放。"
+      },
+      {
+        title: "留任獎金",
+        value: "最高 5,000 元",
+        tags: ["照服員適用", "依辦法核定"],
+        copy: "照服員滿 1 年 1,000 元、滿 2 年 2,000 元，依此類推最高至 5,000 元。"
+      }
+    ]
+  },
+  {
+    key: "insurance",
+    title: "保險保障",
+    summary: "基礎保險與照顧現場需要的責任保障一次看清楚。",
+    items: [
+      {
+        title: "勞健保及勞退",
+        value: "每三個月檢視與調整",
+        tags: ["全體員工"],
+        copy: "勞保、健保與勞退每三個月檢視與調整，確保基礎保障跟上工作狀態。"
+      },
+      {
+        title: "健康檢查",
+        value: "每人每年 1 次",
+        tags: ["全體員工"],
+        copy: "每人每年安排一次健康檢查，協助夥伴掌握自己的身體狀態。"
+      },
+      {
+        title: "長照機構責任險",
+        value: "公司全額負擔",
+        tags: ["全體員工"],
+        copy: "由公司全額負擔，支援長照服務場域的責任保障。"
+      },
+      {
+        title: "僱主補償責任險",
+        value: "公司全額負擔",
+        tags: ["全體員工"],
+        copy: "由公司全額負擔，補足工作風險相關保障。"
+      },
+      {
+        title: "團體意外險",
+        value: "公司全額負擔",
+        tags: ["全體員工"],
+        copy: "公司提供團體意外險，增加工作與生活中的基本安全網。"
+      },
+      {
+        title: "照顧服務員責任險",
+        value: "公司全額負擔",
+        tags: ["照服員適用"],
+        copy: "照服員適用，由公司全額負擔，協助第一線夥伴安心服務。"
+      }
+    ]
+  },
+  {
+    key: "flexibility",
+    title: "工作彈性",
+    summary: "遇到補班日與颱風日，用遠距安排降低通勤負擔與安全風險。",
+    items: [
+      {
+        title: "補班日遠距辦公",
+        value: "補班日適用",
+        tags: ["全體員工"],
+        copy: "補班日採遠距辦公安排，降低額外通勤壓力。"
+      },
+      {
+        title: "颱風日遠距辦公",
+        value: "颱風日適用",
+        tags: ["全體員工"],
+        copy: "颱風日採遠距辦公安排，以夥伴安全為優先。"
+      }
+    ]
+  },
+  {
+    key: "family-care",
+    title: "家庭照顧支持",
+    summary: "公司本身做長照，也把照顧支持延伸到夥伴家人。",
+    items: [
+      {
+        title: "自家人使用長照服務",
+        value: "部分負擔減免",
+        tags: ["全體員工", "依辦法核定"],
+        copy: "員工家屬使用長照服務可享部分負擔減免，依員工家屬照護福利管理辦法辦理。"
+      }
+    ]
+  },
+  {
+    key: "future",
+    title: "生活與未來",
+    summary: "把團隊生活、公司成長與 AI 工具支持放在一起，呈現歲悅的長期工作環境。",
+    items: [
+      {
+        title: "國內、國外旅遊",
+        value: "團隊旅遊支持",
+        tags: ["全體員工"],
+        copy: "提供國內與國外旅遊相關安排，讓團隊有一起充電與交流的時間。"
+      },
+      {
+        title: "IPO 股份分配",
+        value: "上市前發放股份",
+        tags: ["依辦法核定"],
+        copy: "公司上市前將發放股份予員工，依歲悅集團股利分配管理辦法辦理。"
+      },
+      {
+        title: "AI 工具使用支持",
+        value: "工具使用支持",
+        tags: ["全體員工"],
+        copy: "公司提供 ChatGPT、Claude Code、Gemini 等 AI 軟體使用支持，協助行政、企劃與服務流程提效。"
+      }
+    ]
+  }
+];
+
+const talentCaregiverExclusiveBenefits = [
+  {
+    title: "留任獎金",
+    value: "滿 1 年 1,000 元，逐年增加最高 5,000 元",
+    tags: ["照服員適用", "依辦法核定"],
+    copy: "照服員滿 1 年 1,000 元、滿 2 年 2,000 元，依此類推，最高至 5,000 元。"
+  },
+  {
+    title: "照顧服務員責任險",
+    value: "公司全額負擔",
+    tags: ["照服員適用"],
+    copy: "第一線照服員適用，協助服務現場有更完整的責任保障。"
+  }
+];
+
+const talentOrgPillars = [
+  ["營運管理中心", "人資、行政、客服、財務與專案管理，負責讓制度、資源與日常流程穩定運作。"],
+  ["照顧服務體系", "居家照顧、日間照顧、護理復能與社區服務，負責把照顧交付到每個家庭與長輩身邊。"],
+  ["教育品管與人才發展", "新人訓練、內訓教材、服務稽核與升遷培力，負責讓專業能力持續長出來。"]
+];
+
+const defaultTalentMissionDepartments = [
+  {
+    department_slug: "home-care-team",
+    title: "居家照顧部門",
+    description: "到長輩熟悉的家中提供照顧，讓安全、尊嚴與家屬安心都被穩定承接。",
+    image_url: "assets/homepage-batch/care-home-greeting-clear.jpg",
+    highlights: ["到宅服務", "督導陪跑", "家屬溝通"]
+  },
+  {
+    department_slug: "day-care-team",
+    title: "日間照顧部",
+    description: "陪長輩白天有規律作息、活動參與、共餐與社交，也讓家庭有喘息空間。",
+    image_url: "assets/daycare-recruit-02-exercise-clear.jpg",
+    highlights: ["團體照顧", "活動帶領", "生活支持"]
+  },
+  {
+    department_slug: "quality-team",
+    title: "教學品管部",
+    description: "把前線經驗整理成教材、稽核與改善流程，讓服務品質可以被複製。",
+    image_url: "assets/quality-recruit-02-training-clear-display.jpg",
+    highlights: ["教育訓練", "品質稽核", "改善專案"]
+  },
+  {
+    department_slug: "admin-team",
+    title: "行政部",
+    description: "支援營運、人資、財務、總務與投資人關係，讓前線照顧能穩定運作。",
+    image_url: "assets/homepage-batch/04-admin-team-office-fast.jpg",
+    highlights: ["人資招募", "營運調度", "跨部門協作"]
+  }
+];
+
+function talentPanelId(key) {
+  return `talent-panel-${key}`;
+}
+
+function talentTabId(key) {
+  return `talent-tab-${key}`;
+}
+
+function renderTalentTabNav(activeKey = "job-list") {
+  return `
+    <nav class="career-tabs recruiting-experience-tabs" role="tablist" aria-label="人才招募分頁">
+      ${talentRecruitingTabs.map(([key, label]) => `
+        <button
+          class="${key === activeKey ? "active" : ""}"
+          id="${escapeHTML(talentTabId(key))}"
+          type="button"
+          role="tab"
+          aria-selected="${key === activeKey ? "true" : "false"}"
+          aria-controls="${escapeHTML(talentPanelId(key))}"
+          tabindex="${key === activeKey ? "0" : "-1"}"
+          data-career-tab="${escapeHTML(key)}"
+        >${escapeHTML(label)}</button>
+      `).join("")}
+    </nav>
+  `;
+}
+
+function renderTalentTabPanel(key, content, activeKey = "job-list") {
+  const isActive = key === activeKey;
+  return `
+    <section
+      class="career-tab-panel talent-tab-panel ${isActive ? "active" : ""}"
+      id="${escapeHTML(talentPanelId(key))}"
+      role="tabpanel"
+      aria-labelledby="${escapeHTML(talentTabId(key))}"
+      data-career-panel="${escapeHTML(key)}"
+      ${isActive ? "" : "hidden"}
+    >
+      ${content}
+    </section>
+  `;
+}
+
+function renderTalentPanelLead(eyebrow, title, copy) {
+  return `
+    <div class="career-section-head talent-panel-head">
+      <p class="eyebrow">${escapeHTML(eyebrow)}</p>
+      <h2>${escapeHTML(title)}</h2>
+      <span>${escapeHTML(copy)}</span>
+    </div>
+  `;
+}
+
 function renderRecruitingHero(page) {
   const fallback = page.page_slug === "investor-recruiting" ? fallbackImages.investor : fallbackImages.recruiting;
   const image = heroImageForViewport(getRecruitingImage(page, fallback));
@@ -4340,6 +4692,637 @@ function renderRecruitingOpeningCard(page, department, opening, index) {
   `;
 }
 
+function departmentTalentKey(department, index = 0) {
+  return String(department?.department_slug || department?.slug || department?.id || `department-${index + 1}`)
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "") || `department-${index + 1}`;
+}
+
+function buildRecruitingOpeningGroups(departments = [], openings = []) {
+  const departmentById = new Map(departments.map((department, index) => [department.id, { department, key: departmentTalentKey(department, index) }]));
+  const groups = departments.map((department, index) => {
+    const key = departmentTalentKey(department, index);
+    return {
+      key,
+      department,
+      openings: openings.filter((opening) => opening.department_id === department.id)
+    };
+  }).filter((group) => group.openings.length);
+  const assignedIds = new Set(departments.map((department) => department.id).filter(Boolean));
+  const unassignedOpenings = openings.filter((opening) => !assignedIds.has(opening.department_id));
+  if (unassignedOpenings.length) {
+    groups.push({
+      key: "other",
+      department: { id: "", title: "其他招募職位", department_slug: "other", description: "尚未歸類到特定部門的招募項目。" },
+      openings: unassignedOpenings
+    });
+  }
+  if (!groups.length && openings.length) {
+    groups.push({
+      key: "all",
+      department: departmentById.values().next().value?.department || { id: "", title: "職位一覽", department_slug: "all" },
+      openings
+    });
+  }
+  return groups;
+}
+
+const talentJobFallbacks = {
+  salary: "面議 / 依經驗核定",
+  location: "依職缺安排",
+  employmentType: "全職 / 排班依職缺",
+  capacity: "持續招募"
+};
+
+function talentText(value, fallback = "") {
+  const text = String(value || "").trim();
+  return text || fallback;
+}
+
+function talentListItems(value, fallback = []) {
+  const items = normalizeRecruitingList(value)
+    .map((item) => talentText(item?.title || item?.label || item))
+    .filter(Boolean);
+  return items.length ? items : fallback;
+}
+
+function talentSafeKey(value, fallback = "job") {
+  return String(value || fallback)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "") || fallback;
+}
+
+function talentUniqueOptions(items = []) {
+  const seen = new Set();
+  return items
+    .map((item) => talentText(item))
+    .filter(Boolean)
+    .filter((item) => {
+      const key = item.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function formatTalentUpdatedAt(value) {
+  if (!value) return "近期更新";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "近期更新";
+  return `更新 ${new Intl.DateTimeFormat("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit" }).format(date).replace(/\//g, ".")}`;
+}
+
+function compareTalentJobs(a, b) {
+  const featuredDiff = Number(Boolean(b.isFeatured)) - Number(Boolean(a.isFeatured));
+  if (featuredDiff) return featuredDiff;
+  const sortDiff = Number(a.sortOrder || 0) - Number(b.sortOrder || 0);
+  if (sortDiff) return sortDiff;
+  return Number(b.updatedMs || 0) - Number(a.updatedMs || 0);
+}
+
+function buildTalentJobBoardModel(page = {}, departments = [], openings = []) {
+  const departmentById = new Map(departments.map((department, index) => [
+    department.id,
+    {
+      ...department,
+      key: departmentTalentKey(department, index)
+    }
+  ]));
+  const fallbackDepartment = departments[0]
+    ? { ...departments[0], key: departmentTalentKey(departments[0], 0) }
+    : { id: "", key: "talent", title: page.title || "職位一覽", department_slug: "talent" };
+  const jobs = openings.map((opening, index) => {
+    const department = departmentById.get(opening.department_id) || {
+      ...fallbackDepartment,
+      title: opening.subtitle || fallbackDepartment.title || "職位一覽"
+    };
+    const openingSlug = talentSafeKey(opening.opening_slug || opening.id || opening.title || `opening-${index + 1}`, `opening-${index + 1}`);
+    const jobKey = `${talentSafeKey(department.department_slug || department.key || department.id || "department")}-${openingSlug}-${index + 1}`;
+    const title = talentText(opening.title, "未命名職缺");
+    const departmentTitle = talentText(department.title || opening.subtitle, "職位一覽");
+    const duties = talentListItems(opening.duties, ["依職缺內容安排主要工作，面談時會由招募窗口完整說明。"]);
+    const requirements = talentListItems(opening.requirements, ["願意學習、重視溝通與服務品質，相關經驗或證照尤佳。"]);
+    const benefits = talentListItems(opening.benefits || opening.support, ["新人訓練", "督導支持", "團隊陪跑"]);
+    const updatedDate = new Date(opening.updated_at || opening.published_at || opening.created_at || "");
+    const updatedMs = Number.isNaN(updatedDate.getTime()) ? 0 : updatedDate.getTime();
+    const employmentType = talentText(opening.employment_type, talentJobFallbacks.employmentType);
+    const locationText = talentText(opening.location, talentJobFallbacks.location);
+    const salaryText = talentText(opening.salary_text, talentJobFallbacks.salary);
+    const capacityText = talentText(opening.capacity_label, talentJobFallbacks.capacity);
+    const summary = talentText(opening.summary, duties[0] || "歡迎與招募窗口聊聊職務內容與適合度。");
+    const formType = opening.metadata?.form_type || page.metadata?.form_type || "recruiting";
+    const contactMessage = `我想了解「${title}」職缺或留下應徵資料，請協助安排招募窗口聯繫。`;
+    const searchText = [
+      title,
+      departmentTitle,
+      opening.subtitle,
+      summary,
+      employmentType,
+      locationText,
+      salaryText,
+      capacityText,
+      duties.join(" "),
+      requirements.join(" "),
+      benefits.join(" ")
+    ].filter(Boolean).join(" ").toLowerCase();
+    return {
+      id: String(opening.id || openingSlug || jobKey),
+      key: jobKey,
+      title,
+      subtitle: talentText(opening.subtitle, departmentTitle),
+      summary,
+      department,
+      departmentTitle,
+      departmentKey: talentSafeKey(department.department_slug || department.key || department.id || departmentTitle),
+      employmentType,
+      location: locationText,
+      salary: salaryText,
+      capacity: capacityText,
+      duties,
+      requirements,
+      benefits,
+      isFeatured: Boolean(opening.is_featured),
+      applyFormEnabled: opening.apply_form_enabled !== false,
+      applyButtonText: talentText(opening.apply_button_text, "申請應徵"),
+      formType,
+      pageSlug: page.page_slug || opening.page_slug || "talent",
+      departmentId: department.id || opening.department_id || "",
+      openingSlug,
+      image: getRecruitingImage(opening, getRecruitingImage(department, fallbackImages.recruiting)),
+      sortOrder: Number(opening.sort_order || index * 10),
+      updatedMs,
+      updatedLabel: formatTalentUpdatedAt(opening.updated_at || opening.published_at || opening.created_at),
+      searchText,
+      contactNeed: "人才招募",
+      contactMessage
+    };
+  }).sort(compareTalentJobs).map((job, index) => ({ ...job, defaultRank: index }));
+
+  return {
+    jobs,
+    departmentOptions: talentUniqueOptions(jobs.map((job) => job.departmentTitle)),
+    locationOptions: talentUniqueOptions(jobs.map((job) => job.location)),
+    typeOptions: talentUniqueOptions(jobs.map((job) => job.employmentType))
+  };
+}
+
+function talentApplyAttributes(job) {
+  return [
+    `data-form-type="${escapeHTML(job.formType)}"`,
+    `data-page-slug="${escapeHTML(job.pageSlug)}"`,
+    `data-department-id="${escapeHTML(job.departmentId)}"`,
+    `data-department-title="${escapeHTML(job.departmentTitle)}"`,
+    `data-opening-id="${escapeHTML(job.id)}"`,
+    `data-opening-slug="${escapeHTML(job.openingSlug)}"`,
+    `data-opening-title="${escapeHTML(job.title)}"`
+  ].join(" ");
+}
+
+function talentContactAttributes(job) {
+  return `data-contact-need="${escapeHTML(job.contactNeed)}" data-contact-message="${escapeHTML(job.contactMessage)}"`;
+}
+
+function renderTalentApplyControl(job, className = "primary-button", label = job.applyButtonText) {
+  if (!job.applyFormEnabled) {
+    return `<a class="${escapeHTML(className)}" href="#contact" ${talentContactAttributes(job)}>留下資料</a>`;
+  }
+  return `
+    <button class="${escapeHTML(className)}" type="button" data-recruit-apply ${talentApplyAttributes(job)}>
+      ${escapeHTML(label)}
+    </button>
+  `;
+}
+
+function renderTalentJobSelectOptions(options, placeholder) {
+  return `
+    <option value="">${escapeHTML(placeholder)}</option>
+    ${options.map((option) => `<option value="${escapeHTML(option)}">${escapeHTML(option)}</option>`).join("")}
+  `;
+}
+
+function renderTalentJobMeta(job) {
+  return `
+    <dl class="talent-job-meta" aria-label="${escapeHTML(job.title)}職缺資訊">
+      <div><dt>薪資</dt><dd>${escapeHTML(job.salary)}</dd></div>
+      <div><dt>地點</dt><dd>${escapeHTML(job.location)}</dd></div>
+      <div><dt>類型</dt><dd>${escapeHTML(job.employmentType)}</dd></div>
+      <div><dt>名額</dt><dd>${escapeHTML(job.capacity)}</dd></div>
+    </dl>
+  `;
+}
+
+function renderTalentJobCompactMeta(job) {
+  return `
+    <dl class="talent-job-compact-meta" aria-label="${escapeHTML(job.title)}職缺重點">
+      <div><dt>薪資</dt><dd>${escapeHTML(job.salary)}</dd></div>
+      <div><dt>地點</dt><dd>${escapeHTML(job.location)}</dd></div>
+      <div><dt>類型</dt><dd>${escapeHTML(job.employmentType)}</dd></div>
+    </dl>
+  `;
+}
+
+function renderTalentJobDetail(job, inline = false) {
+  return `
+    <div class="${inline ? "talent-job-inline-detail-inner" : "talent-job-detail-inner"}">
+      <div class="talent-job-detail-head">
+        <div>
+          <span>${job.isFeatured ? "重點職缺" : "職缺詳情"}</span>
+          <h3>${escapeHTML(job.title)}</h3>
+          <p>${escapeHTML(job.summary)}</p>
+        </div>
+        ${renderTalentApplyControl(job)}
+      </div>
+      ${renderTalentJobMeta(job)}
+      <section class="talent-job-detail-summary">
+        <h4>職缺摘要</h4>
+        <p>${escapeHTML(job.summary)}</p>
+        <div>
+          <span>${escapeHTML(job.departmentTitle)}</span>
+          <span>${escapeHTML(job.updatedLabel)}</span>
+          ${job.isFeatured ? `<span>重點職缺</span>` : ""}
+        </div>
+      </section>
+      <div class="talent-job-detail-sections">
+        <section>
+          <h4>工作內容</h4>
+          <ul>${job.duties.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>
+        </section>
+        <section>
+          <h4>應徵條件</h4>
+          <ul>${job.requirements.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>
+        </section>
+      </div>
+      <section class="talent-job-support">
+        <h4>福利支持</h4>
+        <div>${job.benefits.map((item) => `<span>${escapeHTML(item)}</span>`).join("")}</div>
+      </section>
+      <section class="talent-job-process">
+        <h4>應徵流程</h4>
+        <ol>
+          <li>送出應徵資料，招募窗口確認職缺與可服務區域。</li>
+          <li>安排電話或面談，了解經驗、期待與排班條件。</li>
+          <li>媒合部門主管，說明工作內容、訓練與到職安排。</li>
+        </ol>
+      </section>
+      <div class="talent-job-detail-actions">
+        <a class="secondary-button" href="#contact" ${talentContactAttributes(job)}>稍後詢問</a>
+        ${renderTalentApplyControl(job, "primary-button", job.applyButtonText)}
+      </div>
+    </div>
+  `;
+}
+
+function renderTalentJobCard(job, index) {
+  const isActive = index === 0;
+  return `
+    <article
+      class="talent-job-card ${isActive ? "is-active" : ""}"
+      role="option"
+      tabindex="0"
+      aria-selected="${isActive ? "true" : "false"}"
+      aria-controls="talent-job-detail-${escapeHTML(job.key)}"
+      data-talent-job-card
+      data-job-id="${escapeHTML(job.key)}"
+      data-talent-search="${escapeHTML(job.searchText)}"
+      data-talent-department="${escapeHTML(job.departmentTitle)}"
+      data-talent-location="${escapeHTML(job.location)}"
+      data-talent-type="${escapeHTML(job.employmentType)}"
+      data-default-rank="${job.defaultRank}"
+      data-updated-rank="${job.updatedMs}"
+      data-department-rank="${escapeHTML(job.departmentTitle)}"
+      data-apply-text="${escapeHTML(job.applyButtonText)}"
+      data-form-type="${escapeHTML(job.formType)}"
+      data-page-slug="${escapeHTML(job.pageSlug)}"
+      data-department-id="${escapeHTML(job.departmentId)}"
+      data-department-title="${escapeHTML(job.departmentTitle)}"
+      data-opening-id="${escapeHTML(job.id)}"
+      data-opening-slug="${escapeHTML(job.openingSlug)}"
+      data-opening-title="${escapeHTML(job.title)}"
+    >
+      <div class="talent-job-card-top">
+        <span class="talent-job-department">${escapeHTML(job.departmentTitle)}</span>
+        <time>${escapeHTML(job.updatedLabel)}</time>
+      </div>
+      <div class="talent-job-title-row">
+        <div>
+          <h3>${escapeHTML(job.title)}</h3>
+          <p>${escapeHTML(job.subtitle)}</p>
+        </div>
+        ${job.isFeatured ? `<strong>重點</strong>` : ""}
+      </div>
+      ${renderTalentJobCompactMeta(job)}
+      <p class="talent-job-summary">${escapeHTML(job.summary)}</p>
+      <div class="talent-job-tags" aria-label="福利與支持">
+        ${job.benefits.slice(0, 2).map((item) => `<span>${escapeHTML(item)}</span>`).join("")}
+      </div>
+      <div class="talent-job-card-actions">
+        <button class="text-button" type="button" data-talent-select-job="${escapeHTML(job.key)}">查看詳情</button>
+        ${renderTalentApplyControl(job, "primary-button compact")}
+      </div>
+      <div class="talent-job-mobile-detail" id="talent-job-mobile-detail-${escapeHTML(job.key)}">
+        ${renderTalentJobDetail(job, true)}
+      </div>
+    </article>
+  `;
+}
+
+function renderTalentJobBoard(page, model) {
+  const { jobs, departmentOptions, locationOptions, typeOptions } = model;
+  if (!jobs.length) {
+    return `
+      <section class="talent-job-board is-empty" id="career-openings" aria-label="職位一覽">
+        <span class="talent-scroll-anchor" id="recruiting-openings" aria-hidden="true"></span>
+        <div class="health-empty-state">
+          <h2>職缺整理中</h2>
+          <p>可以先留下應徵資料，我們會依照你的經驗與期待安排招募窗口回覆。</p>
+          <a class="primary-button" href="#contact" data-contact-need="人才招募" data-contact-message="我想了解歲悅長照職缺或投遞應徵資料，請協助安排招募窗口聯繫。">留下應徵資料</a>
+        </div>
+      </section>
+    `;
+  }
+  const firstJob = jobs[0];
+  return `
+    <section class="talent-job-board" id="career-openings" aria-label="職位一覽" data-talent-job-board data-active-job="${escapeHTML(firstJob.key)}">
+      <span class="talent-scroll-anchor" id="recruiting-openings" aria-hidden="true"></span>
+      <div class="talent-job-toolbar" role="search" aria-label="職缺搜尋與篩選">
+        <label class="talent-job-search-control">
+          <span>關鍵字搜尋</span>
+          <input type="search" placeholder="搜尋職稱、技能、地點" autocomplete="off" data-talent-job-search />
+        </label>
+        <div class="talent-job-filters">
+          <label>
+            <span>部門</span>
+            <select data-talent-filter="department">
+              ${renderTalentJobSelectOptions(departmentOptions, "全部部門")}
+            </select>
+          </label>
+          <label>
+            <span>地點</span>
+            <select data-talent-filter="location">
+              ${renderTalentJobSelectOptions(locationOptions, "全部地點")}
+            </select>
+          </label>
+          <label>
+            <span>職務類型</span>
+            <select data-talent-filter="type">
+              ${renderTalentJobSelectOptions(typeOptions, "全部類型")}
+            </select>
+          </label>
+          <label>
+            <span>排序</span>
+            <select data-talent-sort>
+              <option value="recommended">推薦排序</option>
+              <option value="newest">最新更新</option>
+              <option value="department">依部門排序</option>
+            </select>
+          </label>
+          <button class="secondary-button talent-clear-filter" type="button" data-talent-clear-filters>清除</button>
+        </div>
+      </div>
+      <div class="talent-job-chip-row" aria-label="部門快速篩選">
+        <button class="is-active" type="button" data-talent-chip="department" data-value="">全部職缺</button>
+        ${departmentOptions.map((department) => `<button type="button" data-talent-chip="department" data-value="${escapeHTML(department)}">${escapeHTML(department)}</button>`).join("")}
+      </div>
+      <div class="talent-job-result-line" aria-live="polite">
+        <strong data-talent-result-count>${jobs.length}</strong>
+        <span>個職缺符合條件</span>
+      </div>
+      <div class="talent-job-layout">
+        <div class="talent-job-list" role="listbox" aria-label="職缺列表">
+          ${jobs.map((job, index) => renderTalentJobCard(job, index)).join("")}
+        </div>
+        <div class="talent-job-detail-slot">
+          <aside class="talent-job-detail" aria-live="polite" aria-label="職缺詳情">
+            ${jobs.map((job, index) => `
+              <article
+                id="talent-job-detail-${escapeHTML(job.key)}"
+                data-talent-job-detail="${escapeHTML(job.key)}"
+                ${index === 0 ? "" : "hidden"}
+              >
+                ${renderTalentJobDetail(job)}
+              </article>
+            `).join("")}
+          </aside>
+        </div>
+      </div>
+      <div class="talent-job-empty" data-talent-empty hidden>
+        <h3>沒有符合條件的職缺</h3>
+        <p>可以調整關鍵字或清除篩選，再看看其他適合的角色。</p>
+        <button class="primary-button" type="button" data-talent-clear-filters>清除篩選</button>
+      </div>
+      <div class="talent-job-mobile-cta" data-talent-mobile-cta>
+        ${jobs.map((job, index) => `
+          <div data-talent-mobile-cta-item="${escapeHTML(job.key)}" ${index === 0 ? "" : "hidden"}>
+            ${renderTalentApplyControl(job)}
+          </div>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderRecruitingJobListPanel(page, departments, openings, activeKey = "job-list") {
+  const model = buildTalentJobBoardModel(page, departments, openings);
+  const content = `
+    ${renderTalentPanelLead("Open Roles", "職位一覽", "像求職網站一樣先搜尋、篩選、比較，再展開完整內容；把地點、薪資、類型、福利與應徵入口放在同一個畫面。")}
+    ${renderTalentJobBoard(page, model)}
+  `;
+  return renderTalentTabPanel("job-list", content, activeKey);
+}
+
+function renderTalentBenefitTags(tags = []) {
+  return `
+    <div class="talent-benefit-tags" aria-label="適用標籤">
+      ${tags.map((tag) => `<span>${escapeHTML(tag)}</span>`).join("")}
+    </div>
+  `;
+}
+
+function renderTalentBenefitCard(item) {
+  return `
+    <article class="talent-benefit-card">
+      <div class="talent-benefit-card-head">
+        <span>Benefit</span>
+        <h4>${escapeHTML(item.title)}</h4>
+      </div>
+      <strong>${escapeHTML(item.value)}</strong>
+      ${renderTalentBenefitTags(item.tags)}
+      <p>${escapeHTML(item.copy)}</p>
+    </article>
+  `;
+}
+
+function renderTalentBenefitCategory(category, index) {
+  const categoryId = `benefit-${category.key}`;
+  return `
+    <section class="talent-benefit-category" id="${escapeHTML(categoryId)}" aria-labelledby="${escapeHTML(categoryId)}-title">
+      <div class="talent-benefit-category-head">
+        <span>${String(index + 1).padStart(2, "0")}</span>
+        <div>
+          <h3 id="${escapeHTML(categoryId)}-title">${escapeHTML(category.title)}</h3>
+          <p>${escapeHTML(category.summary)}</p>
+        </div>
+      </div>
+      <div class="talent-benefit-card-grid">
+        ${category.items.map(renderTalentBenefitCard).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderTalentBenefitsPanel(activeKey = "job-list") {
+  const content = `
+    ${renderTalentPanelLead("Benefits", "公司福利制度", "先用重點數字掌握福利，再依分類查看金額、適用對象與制度條件。")}
+    <section class="talent-benefit-dashboard" aria-label="福利亮點儀表板">
+      ${talentBenefitHighlights.map((item) => `
+        <article class="talent-benefit-metric">
+          <span>${escapeHTML(item.title)}</span>
+          <strong>${escapeHTML(item.value)}<b>${escapeHTML(item.unit)}</b></strong>
+          <p>${escapeHTML(item.copy)}</p>
+        </article>
+      `).join("")}
+    </section>
+    <div class="talent-benefit-layout">
+      <nav class="talent-benefit-nav" aria-label="福利分類">
+        ${talentBenefitCategories.map((category) => `
+          <a href="#benefit-${escapeHTML(category.key)}">${escapeHTML(category.title)}</a>
+        `).join("")}
+      </nav>
+      <div class="talent-benefit-content">
+        ${talentBenefitCategories.map(renderTalentBenefitCategory).join("")}
+        <section class="talent-caregiver-benefit-panel" aria-labelledby="caregiver-benefits-title">
+          <div class="talent-caregiver-benefit-copy">
+            <span>Caregiver Only</span>
+            <h3 id="caregiver-benefits-title">照服員專屬支持</h3>
+            <p>把第一線照顧工作最需要的留任與責任保障獨立整理，讓照服員能快速確認自己適用的福利。</p>
+          </div>
+          <div class="talent-caregiver-benefit-list">
+            ${talentCaregiverExclusiveBenefits.map(renderTalentBenefitCard).join("")}
+          </div>
+        </section>
+      </div>
+    </div>
+  `;
+  return renderTalentTabPanel("benefits", content, activeKey);
+}
+
+function renderTalentGrowthPanel(activeKey = "job-list") {
+  const content = `
+    ${renderTalentPanelLead("Career Path", "公司升遷發展", "歲悅不把升遷只交給年資，而是把品質、能力、帶教與責任感變成清楚可追蹤的發展路徑。")}
+    <div class="career-growth-intro">
+      <article>
+        <span>Promotion System</span>
+        <h3>讓照顧者知道自己正在往哪裡前進。</h3>
+        <p>每位夥伴入職後會有新人陪跑、月度回饋、教育訓練紀錄與職能評核。當服務品質穩定、能處理現場問題，也能支持其他夥伴時，就會進入下一階段培力。</p>
+      </article>
+      <div>
+        <b>4</b><span>發展路徑</span>
+        <b>12+</b><span>進階訓練月期</span>
+        <b>100%</b><span>督導陪跑</span>
+      </div>
+    </div>
+    <div class="career-timeline">
+      ${talentCareerSteps.map(([period, title, copy], index) => `<article><span>${String(index + 1).padStart(2, "0")}｜${escapeHTML(period)}</span><h3>${escapeHTML(title)}</h3><p>${escapeHTML(copy)}</p></article>`).join("")}
+    </div>
+    <div class="career-track-map">
+      ${talentCareerTracks.map(([track, stages]) => `
+        <article class="career-track-card">
+          <h3>${escapeHTML(track)}</h3>
+          <div class="career-stage-list">
+            ${stages.map((stage, index) => `<span><i>${index + 1}</i>${escapeHTML(stage)}</span>`).join("")}
+          </div>
+        </article>
+      `).join("")}
+    </div>
+    <div class="career-evaluation-grid">
+      ${talentPromotionCriteria.map(([title, copy]) => `<article><span>Evaluation</span><h3>${escapeHTML(title)}</h3><p>${escapeHTML(copy)}</p></article>`).join("")}
+    </div>
+    <div class="career-growth-board">
+      <article><b>3 個月</b><span>新人陪跑與第一次回饋</span></article>
+      <article><b>6 個月</b><span>進階模組與職能確認</span></article>
+      <article><b>12 個月</b><span>帶教、督導或講師培力</span></article>
+      <article><b>18 個月</b><span>跨部門專案與管理職準備</span></article>
+    </div>
+  `;
+  return renderTalentTabPanel("career-growth", content, activeKey);
+}
+
+function normalizeTalentDepartmentsForDisplay(departments = []) {
+  return departments.length ? departments : defaultTalentMissionDepartments;
+}
+
+function renderTalentOrganizationPanel(departments = [], activeKey = "job-list") {
+  const displayDepartments = normalizeTalentDepartmentsForDisplay(departments);
+  const content = `
+    ${renderTalentPanelLead("Organization", "公司組織圖", "用求職者看得懂的方式呈現歲悅團隊：誰支持前線、誰負責品質、各部門如何一起把服務交付到家庭。")}
+    <div class="talent-org-chart" aria-label="歲悅人才招募組織圖">
+      <article class="talent-org-node talent-org-root">
+        <span>Suiyuecare Corps.</span>
+        <strong>歲悅長照集團</strong>
+        <p>以照顧服務、人才培育、品質管理與營運支援形成同一套長照工作系統。</p>
+      </article>
+      <div class="talent-org-pillars">
+        ${talentOrgPillars.map(([title, copy]) => `
+          <article class="talent-org-node">
+            <span>Function</span>
+            <strong>${escapeHTML(title)}</strong>
+            <p>${escapeHTML(copy)}</p>
+          </article>
+        `).join("")}
+      </div>
+      <div class="talent-org-units">
+        ${displayDepartments.map((department, index) => `
+          <article class="talent-org-unit">
+            <span>${String(index + 1).padStart(2, "0")}</span>
+            <strong>${escapeHTML(department.title || "招募部門")}</strong>
+            <p>${escapeHTML(department.description || "負責把部門專業接進日常服務與團隊協作。")}</p>
+          </article>
+        `).join("")}
+      </div>
+    </div>
+  `;
+  return renderTalentTabPanel("organization", content, activeKey);
+}
+
+function renderTalentMissionPanel(page, departments = [], openings = [], activeKey = "job-list") {
+  const displayDepartments = normalizeTalentDepartmentsForDisplay(departments);
+  const groups = buildRecruitingOpeningGroups(displayDepartments, openings);
+  const openingCountByKey = new Map(groups.map((group) => [group.key, group.openings.length]));
+  const content = `
+    ${renderTalentPanelLead("Department Mission", "部門使命", "每個部門的工作都不是孤立的職稱，而是在長照現場承接不同責任；了解使命後，再回到職缺一覽選擇適合自己的位置。")}
+    <div class="talent-mission-grid">
+      ${displayDepartments.map((department, index) => {
+        const key = departmentTalentKey(department, index);
+        const image = getRecruitingImage(department, fallbackImages.recruiting);
+        const highlights = normalizeRecruitingList(department.highlights).slice(0, 3);
+        return `
+          <article class="talent-mission-card">
+            <figure>
+              <img src="${escapeHTML(image)}" alt="${escapeHTML(department.title || page.title)}" />
+            </figure>
+            <div>
+              <span>${escapeHTML(department.eyebrow || "Mission")}</span>
+              <h3>${escapeHTML(department.title || page.title)}</h3>
+              <p>${escapeHTML(department.description || "把部門專業放進照顧現場，讓長輩、家屬與團隊都能被穩定支持。")}</p>
+              ${highlights.length ? `<ul>${highlights.map((item) => `<li>${escapeHTML(item.title || item)}</li>`).join("")}</ul>` : ""}
+              <button
+                class="secondary-button compact"
+                type="button"
+                data-career-jump-tab="job-list"
+                data-career-jump-target="#talent-openings-${escapeHTML(key)}"
+              >查看相關職缺${openingCountByKey.has(key) ? ` ${openingCountByKey.get(key)}` : ""}</button>
+            </div>
+          </article>
+        `;
+      }).join("")}
+    </div>
+  `;
+  return renderTalentTabPanel("department-mission", content, activeKey);
+}
+
 function renderRecruitingOpportunityPage(page, departments, openings) {
   const primaryDepartment = departments[0] || { id: "", title: page.title, department_slug: page.page_slug };
   return `
@@ -4359,15 +5342,16 @@ function renderRecruitingOpportunityPage(page, departments, openings) {
 }
 
 function renderRecruitingTalentPage(page, departments, openings) {
-  const panels = departments.map((department, index) => {
-    const departmentOpenings = openings.filter((opening) => opening.department_id === department.id);
-    return renderRecruitingDepartmentPanel(page, department, departmentOpenings, index);
-  }).join("");
+  const activeKey = "job-list";
   return `
     <div class="career-page recruiting-cms-page">
       ${renderRecruitingHero(page)}
-      ${renderRecruitingDepartmentTabs(departments)}
-      ${panels || `<section class="service-detail-section"><div class="health-empty-state"><h2>招募內容整理中</h2><p>可以先留下資料，我們會依照你的應徵或合作方向安排窗口回覆。</p></div></section>`}
+      ${renderTalentTabNav(activeKey)}
+      ${renderRecruitingJobListPanel(page, departments, openings, activeKey)}
+      ${renderTalentBenefitsPanel(activeKey)}
+      ${renderTalentGrowthPanel(activeKey)}
+      ${renderTalentOrganizationPanel(departments, activeKey)}
+      ${renderTalentMissionPanel(page, departments, openings, activeKey)}
       ${renderRecruitingApplicationModal(page)}
     </div>
   `;
@@ -6040,9 +7024,9 @@ function renderHealthPage(selectedCategorySlug = "") {
           </form>
         </div>
         <div class="health-cats">
-          <button class="click-card ${activeCategory ? "" : "active"}" type="button" data-href="#health">全部文章</button>
+          <button class="click-card ${activeCategory ? "" : "active"}" type="button" data-href="#search">全部文章</button>
           ${categories.map((category) => `
-            <button class="click-card ${activeCategory === category.slug ? "active" : ""}" type="button" data-href="#health?category=${encodeURIComponent(category.slug)}">${escapeHTML(category.name)}</button>
+            <button class="click-card ${activeCategory === category.slug ? "active" : ""}" type="button" data-href="#search?q=${encodeURIComponent(category.name)}">${escapeHTML(category.name)}</button>
           `).join("")}
         </div>
       </section>
@@ -6148,7 +7132,7 @@ function renderSearchPage(query = "") {
   const normalizedKeyword = keyword.toLowerCase();
   const articles = getHealthArticleList();
   const results = normalizedKeyword
-    ? articles.filter((post) => `${post.title} ${post.subtitle || ""} ${post.excerpt} ${post.category} ${post.keywords}`.toLowerCase().includes(normalizedKeyword))
+    ? articles.filter((post) => `${post.title} ${post.subtitle || ""} ${post.excerpt} ${post.category} ${post.categorySlug || ""} ${post.keywords || ""} ${(post.tags || []).join(" ")}`.toLowerCase().includes(normalizedKeyword))
     : articles;
 
   return `
@@ -7804,12 +8788,36 @@ function renderServicePlainList(items = []) {
   `).join("");
 }
 
+function serviceFeeBody(slug) {
+  if (slug === "home-care" || slug === "day-care" || slug === "nursing") {
+    return "金額依長照照顧組合表，格式為一般給（支）付價格／原民區或離島支付價格；實際自付額仍依補助資格、身分別與照顧計畫核定。";
+  }
+  return "實際費用會依服務內容、補助資格、區域與頻率確認，先留下需求即可協助試算。";
+}
+
 function serviceFeeItems(service, slug) {
+  if (slug === "home-care") {
+    return [
+      { title: "BA 碼居家照顧服務", text: "BA01-BA24 涵蓋基本身體清潔、日常照顧、餐食、沐浴、家務、陪同外出就醫、管路清潔、陪伴與排泄協助等；常規項目給（支）付價格 NT$35-685／NT$40-825。" },
+      { title: "到宅沐浴車服務", text: "BA09 第一型給（支）付價格 NT$2,200／NT$2,640；BA09a 第二型給（支）付價格 NT$2,500／NT$3,000。" },
+      { title: "常用 BA 項目示例", text: "BA01 基本身體清潔 NT$260／NT$310、BA02 基本日常照顧 NT$195／NT$235、BA07 協助沐浴及洗頭 NT$325／NT$385、BA14 陪同就醫 NT$685／NT$825、BA15 家務協助 NT$195／NT$235。" },
+      { title: "安排前確認自付額", text: "窗口會依長照等級、核定額度、服務頻率、時段與是否有加計項目，協助確認可用補助與實際自付額。" }
+    ];
+  }
   if (slug === "day-care") {
     return [
-      { title: "政府補助", text: "依長照等級、照顧計畫與中心可服務名額確認補助與自付額。" },
-      { title: "自費項目", text: "接送、餐食或延伸服務會依實際需求與中心規範另外確認。" },
-      { title: "先評估再報價", text: "我們會先理解照顧頻率、出席天數與接送需求，再協助試算。" }
+      { title: "BB 碼日間照顧", text: "BB01-BB14 依長照需要等級二至八級與全日／半日計價。全日給（支）付價格 NT$675-1,285／NT$810-1,540；半日 NT$340-645／NT$405-770。" },
+      { title: "BB 全日／半日示例", text: "等級二：BB01 全日 NT$675／NT$810、BB02 半日 NT$340／NT$405；等級八：BB13 全日 NT$1,285／NT$1,540、BB14 半日 NT$645／NT$770。使用交通接送者另計。" },
+      { title: "BD 碼日照中心附加服務", text: "BD01 社區式協助沐浴 NT$200／NT$240、BD02 社區式晚餐 NT$150／NT$180、BD03 社區式服務交通接送 NT$100／NT$120（十公里內、以一趟為單位）。" },
+      { title: "安排前試算", text: "中心會依長照等級、出席天數、接送需求、補助資格與核定額度，協助確認可用補助與實際自付額。" }
+    ];
+  }
+  if (slug === "nursing") {
+    return [
+      { title: "CA 碼復能照護", text: "CA07 IADLs／ADLs 復能照護：三次措施（含評估）NT$4,500／NT$5,400；CA08 個別化服務計畫（ISP）擬定與執行：四次措施 NT$6,000／NT$7,200。" },
+      { title: "CB 碼專業照護", text: "CB01 營養照護四次措施 NT$4,000／NT$4,800；CB02 進食與吞嚥照護六次措施 NT$9,000／NT$10,800；CB03 困擾行為照護三次措施 NT$4,500／NT$5,400。" },
+      { title: "臥床或活動受限照護", text: "CB04 臥床或長期活動受限照護：六次措施（含評估）給（支）付價格 NT$9,000／NT$10,800。" },
+      { title: "服務前評估", text: "護理復能須依照顧計畫與專業目標安排，實際自付額依補助資格、核定額度與服務次數確認。" }
     ];
   }
   return [
@@ -7950,7 +8958,7 @@ function renderOneMinuteServicePage(slug) {
       ${renderServiceInfoSection({
         eyebrow: "Pricing",
         title: "收費標準",
-        body: "實際費用會依服務內容、補助資格、區域與頻率確認，先留下需求即可協助試算。",
+        body: serviceFeeBody(slug),
         items: serviceFeeItems(service, slug),
         className: "service-fee-section"
       })}
@@ -9576,6 +10584,106 @@ function renderTalentPage() {
     `;
   };
 
+  const staticRecruitGroups = [
+    {
+      key: "home-care-team",
+      department: {
+        ...departments["home-care-team"],
+        description: "居家照顧是歲悅最靠近家庭的一線服務，把身體照顧、生活支持、家屬溝通與服務紀錄串成穩定流程。",
+        image_url: "assets/homepage-batch/care-home-greeting-clear.jpg",
+        highlights: homeCareRecruit.highlights.map((item) => item[1])
+      },
+      roles: homeCareRecruit.roles
+    },
+    {
+      key: "day-care-team",
+      department: {
+        ...departments["day-care-team"],
+        description: "日間照顧讓長輩白天有安全、有活動、有同伴，也讓家庭有喘息空間。",
+        image_url: "assets/daycare-recruit-02-exercise-clear.jpg",
+        highlights: dayCareRecruit.highlights.map((item) => item[1])
+      },
+      roles: dayCareRecruit.roles
+    },
+    {
+      key: "migrant-team",
+      department: {
+        ...departments["migrant-team"],
+        description: "移工培訓部把家庭照顧常見技能整理成能聽懂、看懂、練習、回家能執行的課程。",
+        image_url: "assets/homepage-batch/service-card-05-migrant-training-clear.jpg",
+        highlights: migrantRecruit.highlights.map((item) => item[1])
+      },
+      roles: migrantRecruit.roles
+    },
+    {
+      key: "quality-team",
+      department: {
+        ...departments["quality-team"],
+        description: "教學品管部把前線照顧經驗變成可被學習、檢核與改善的系統。",
+        image_url: "assets/quality-recruit-02-training-clear.jpg",
+        highlights: qualityRecruit.highlights.map((item) => item[1])
+      },
+      roles: qualityRecruit.roles
+    },
+    {
+      key: "admin-team",
+      department: {
+        ...departments["admin-team"],
+        description: "行政部支援人資、營運、財務、總務、客服與專案流程，讓前線照顧能穩定運作。",
+        image_url: "assets/admin-recruit-05-meeting-clear.jpg",
+        highlights: adminRecruit.highlights.map((item) => item[1])
+      },
+      roles: adminRecruit.roles
+    }
+  ];
+  const staticDepartmentList = staticRecruitGroups.map(({ key, department }) => ({
+    id: key,
+    department_slug: key,
+    title: department.title,
+    eyebrow: department.eyebrow,
+    description: department.description,
+    image_url: department.image_url,
+    highlights: department.highlights
+  }));
+  const staticOpenings = staticRecruitGroups.flatMap((group, groupIndex) => group.roles.map((role, roleIndex) => {
+    const locationMap = {
+      "home-care-team": "臺北、新北、桃園",
+      "day-care-team": "臺北 / 新北據點",
+      "migrant-team": "臺北 / 線上",
+      "quality-team": "臺北辦公室",
+      "admin-team": "臺北辦公室"
+    };
+    return {
+      id: `${group.key}-${roleIndex + 1}`,
+      page_slug: "talent",
+      department_id: group.key,
+      opening_slug: `${group.key}-${roleIndex + 1}`,
+      title: role.title,
+      subtitle: role.tag || group.department.title,
+      summary: role.summary,
+      employment_type: roleIndex === 0 && group.key === "home-care-team" ? "全職 / 兼職" : "全職",
+      location: locationMap[group.key] || "依職缺安排",
+      salary_text: "面議 / 依經驗核定",
+      capacity_label: roleIndex === 0 ? "持續招募" : "1-2 名",
+      image_url: role.image,
+      duties: role.duties,
+      requirements: role.requirements,
+      benefits: role.support,
+      apply_button_text: "申請應徵",
+      apply_form_enabled: true,
+      metadata: { form_type: "recruiting" },
+      sort_order: groupIndex * 100 + roleIndex * 10,
+      is_featured: groupIndex === 0 && roleIndex < 2,
+      updated_at: null
+    };
+  }));
+  const staticTalentPage = {
+    page_slug: "talent",
+    title: "人才招募",
+    metadata: { form_type: "recruiting" }
+  };
+  const activeKey = "job-list";
+
   return `
     <div class="career-page">
       <section class="hero service-detail-hero one-minute-service-hero talent-recruit-hero">
@@ -9593,108 +10701,12 @@ function renderTalentPage() {
         </div>
       </section>
 
-      <nav class="career-tabs" aria-label="人才招募分頁">
-        <button class="active" type="button" data-career-tab="career-growth">公司升遷發展制度</button>
-        <button type="button" data-career-tab="benefits">公司福利制度</button>
-        <button type="button" data-career-tab="home-care-team">居家照顧部門</button>
-        <button type="button" data-career-tab="day-care-team">日間照顧部</button>
-        <button type="button" data-career-tab="migrant-team">移工培訓部</button>
-        <button type="button" data-career-tab="quality-team">教學品管部</button>
-        <button type="button" data-career-tab="admin-team">行政部</button>
-      </nav>
-
-      <section class="career-tab-panel active" data-career-panel="career-growth">
-        <div class="career-section-head">
-          <p class="eyebrow">Career Path</p>
-          <h2>公司升遷發展制度</h2>
-          <span>歲悅不把升遷只交給年資，而是把品質、能力、帶教與責任感變成清楚可追蹤的發展路徑。</span>
-        </div>
-        <div class="career-growth-intro">
-          <article>
-            <span>Promotion System</span>
-            <h3>讓照顧者知道自己正在往哪裡前進。</h3>
-            <p>每位夥伴入職後會有新人陪跑、月度回饋、教育訓練紀錄與職能評核。當服務品質穩定、能處理現場問題，也能支持其他夥伴時，就會進入下一階段培力。</p>
-          </article>
-          <div>
-            <b>4</b><span>發展路徑</span>
-            <b>12+</b><span>進階訓練月期</span>
-            <b>100%</b><span>督導陪跑</span>
-          </div>
-        </div>
-        <div class="career-timeline">
-          ${careerSteps.map(([period, title, copy], index) => `<article><span>${String(index + 1).padStart(2, "0")}｜${period}</span><h3>${title}</h3><p>${copy}</p></article>`).join("")}
-        </div>
-        <div class="career-track-map">
-          ${careerTracks.map(([track, stages]) => `
-            <article class="career-track-card">
-              <h3>${track}</h3>
-              <div class="career-stage-list">
-                ${stages.map((stage, index) => `<span><i>${index + 1}</i>${stage}</span>`).join("")}
-              </div>
-            </article>
-          `).join("")}
-        </div>
-        <div class="career-evaluation-grid">
-          ${promotionCriteria.map(([title, copy]) => `<article><span>Evaluation</span><h3>${title}</h3><p>${copy}</p></article>`).join("")}
-        </div>
-        <div class="career-growth-board">
-          <article><b>3 個月</b><span>新人陪跑與第一次回饋</span></article>
-          <article><b>6 個月</b><span>進階模組與職能確認</span></article>
-          <article><b>12 個月</b><span>帶教、督導或講師培力</span></article>
-          <article><b>18 個月</b><span>跨部門專案與管理職準備</span></article>
-        </div>
-      </section>
-
-      <section class="career-tab-panel" data-career-panel="benefits">
-        <div class="career-section-head">
-          <p class="eyebrow">Benefits</p>
-          <h2>公司福利制度</h2>
-          <span>福利不只是項目，而是讓照顧者能穩定工作、放心成長、被團隊接住的支持系統。</span>
-        </div>
-        <div class="benefit-hero-board">
-          <article class="benefit-hero-copy">
-            <span>Suiyuecare Benefits</span>
-            <h3>照顧者被好好支持，長輩才會被好好照顧。</h3>
-            <p>歲悅把福利設計成一套可以落地的工作支持：薪資獎金、排班溝通、督導陪跑、教育訓練、健康保障與團隊歸屬，讓夥伴不用靠硬撐完成照顧工作。</p>
-          </article>
-          <aside class="benefit-highlight-grid">
-            ${benefitHighlights.map(([label, value, copy]) => `<div><strong>${value}</strong><span>${label}</span><p>${copy}</p></div>`).join("")}
-          </aside>
-        </div>
-        <div class="benefit-grid">
-          ${benefits.map(([title, copy, tags]) => `<article><span>Benefit</span><h3>${title}</h3><p>${copy}</p><div>${tags.map((tag) => `<em>${tag}</em>`).join("")}</div></article>`).join("")}
-        </div>
-        <div class="benefit-system-board">
-          ${benefitSystems.map(([title, items]) => `
-            <article>
-              <h3>${title}</h3>
-              <ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>
-            </article>
-          `).join("")}
-        </div>
-      </section>
-
-      ${departmentPanel("home-care-team")}
-      ${departmentPanel("day-care-team")}
-      ${departmentPanel("migrant-team")}
-      ${departmentPanel("quality-team")}
-      ${departmentPanel("admin-team")}
-
-      <section class="career-openings" id="career-openings">
-        <div class="career-section-head">
-          <p class="eyebrow">Open Roles</p>
-          <h2>熱門招募職缺</h2>
-          <span>先看目前主要招募方向，若沒有完全符合的職缺，也可以留下資料讓招募窗口協助確認。</span>
-        </div>
-        <div class="opening-grid">
-          ${openings.map(([title, dept, copy, image]) => `
-            <article>
-              <img src="${talentAsset(image)}" alt="${title}" />
-              <div><span>${dept}</span><h3>${title}</h3><p>${copy}</p><a href="#contact" ${talentContactAttrs}>立即應徵</a></div>
-            </article>
-          `).join("")}
-        </div>
-      </section>
+      ${renderTalentTabNav(activeKey)}
+      ${renderRecruitingJobListPanel(staticTalentPage, staticDepartmentList, staticOpenings, activeKey)}
+      ${renderTalentBenefitsPanel(activeKey)}
+      ${renderTalentGrowthPanel(activeKey)}
+      ${renderTalentOrganizationPanel(staticDepartmentList, activeKey)}
+      ${renderTalentMissionPanel({ title: "人才招募" }, staticDepartmentList, [], activeKey)}
     </div>
   `;
 }
@@ -9889,6 +10901,61 @@ function renderArticleTable(table = {}) {
   `;
 }
 
+function renderArticleSlideVisual(slide = {}, article = {}) {
+  const image = slide.image || article.image;
+  if (!image) return "";
+  const imageSrc = normalizeLocalAssetUrl(contentImageUrl(image));
+  return `
+    <figure class="article-slide-visual">
+      <img src="${escapeHTML(imageSrc)}" alt="${escapeHTML(slide.alt || slide.title || article.title || "懶人包視覺頁")}" loading="lazy" decoding="async" />
+      ${slide.visualLabel ? `<figcaption>${escapeHTML(slide.visualLabel)}</figcaption>` : ""}
+    </figure>
+  `;
+}
+
+function renderArticleSlideDeck(article) {
+  const slides = Array.isArray(article.slides) ? article.slides.filter(Boolean).slice(0, 10) : [];
+  if (slides.length < 1) return "";
+  return `
+    <section class="article-slide-deck" aria-label="${escapeHTML(article.title)} PPT式懶人包">
+      <div class="article-slide-deck-head">
+        <span>PPT式懶人包</span>
+        <strong>${slides.length} 頁速讀</strong>
+        <p>大圖、短句、清單，快速抓重點。</p>
+      </div>
+      <nav class="article-slide-jump" aria-label="懶人包頁面索引">
+        ${slides.map((slide, index) => `<a href="#slide-${escapeHTML(article.slug)}-${index + 1}">${String(index + 1).padStart(2, "0")}</a>`).join("")}
+      </nav>
+      <div class="article-slides">
+        ${slides.map((slide, index) => `
+          <section class="article-slide ${slide.tone ? `tone-${escapeHTML(slide.tone)}` : ""}" id="slide-${escapeHTML(article.slug)}-${index + 1}">
+            ${renderArticleSlideVisual(slide, article)}
+            <div class="article-slide-copy">
+              <div class="article-slide-kicker">
+                <span>${String(index + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}</span>
+                ${slide.eyebrow ? `<em>${escapeHTML(slide.eyebrow)}</em>` : ""}
+              </div>
+              <h2>${escapeHTML(slide.title || "")}</h2>
+              ${slide.lede ? `<p class="article-slide-lede">${escapeHTML(slide.lede)}</p>` : ""}
+              ${slide.stat || slide.statLabel ? `
+                <div class="article-slide-stat">
+                  ${slide.stat ? `<b>${escapeHTML(slide.stat)}</b>` : ""}
+                  ${slide.statLabel ? `<span>${escapeHTML(slide.statLabel)}</span>` : ""}
+                </div>
+              ` : ""}
+              ${Array.isArray(slide.points) && slide.points.length ? `
+                <ul>
+                  ${slide.points.slice(0, 4).map((point) => `<li>${escapeHTML(point)}</li>`).join("")}
+                </ul>
+              ` : ""}
+            </div>
+          </section>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function renderArticleReferences(article) {
   const references = Array.isArray(article.references) ? article.references : [];
   const legacySource = references.length === 0 && (article.sourceName || article.sourceUrl)
@@ -9923,6 +10990,7 @@ function renderArticleReferences(article) {
 
 function renderArticleLayout(article) {
   const related = getRelatedArticles(article.slug);
+  const hasSlideDeck = Array.isArray(article.slides) && article.slides.length > 0;
 
   return `
     <article class="article-page">
@@ -9960,31 +11028,33 @@ function renderArticleLayout(article) {
             </section>
           ` : ""}
 
-          ${article.summary?.length ? `
-            <div class="article-summary">
-              <strong>本文重點</strong>
-              <ul>${article.summary.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>
-            </div>
-          ` : ""}
+          ${hasSlideDeck
+            ? renderArticleSlideDeck(article)
+            : `${article.summary?.length ? `
+              <div class="article-summary">
+                <strong>本文重點</strong>
+                <ul>${article.summary.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>
+              </div>
+            ` : ""}`}
 
-          <div class="article-body">
-            ${renderArticleCallout(article.warning)}
-            ${Array.isArray(article.content)
+          <div class="article-body ${hasSlideDeck ? "article-body-compact" : ""}">
+            ${hasSlideDeck ? "" : renderArticleCallout(article.warning)}
+            ${hasSlideDeck ? "" : (Array.isArray(article.content)
               ? article.content.map((section, index) => renderArticleContentSection(section, index, article.inlineImages || [])).join("")
-              : renderMarkdownContent(article.content)}
-            ${Array.isArray(article.checklists) ? article.checklists.map(renderArticleChecklist).join("") : ""}
-            ${Array.isArray(article.tables) ? article.tables.map(renderArticleTable).join("") : ""}
-            ${Array.isArray(article.faq) && article.faq.length ? `
-              <section class="article-faq">
-                <h2>常見問題</h2>
-                ${article.faq.map((item) => `
-                  <details>
-                    <summary>${escapeHTML(item.question || "")}</summary>
-                    <p>${escapeHTML(item.answer || "")}</p>
-                  </details>
-                `).join("")}
-              </section>
-            ` : ""}
+              : renderMarkdownContent(article.content))}
+            ${hasSlideDeck ? "" : (Array.isArray(article.checklists) ? article.checklists.map(renderArticleChecklist).join("") : "")}
+            ${hasSlideDeck ? "" : (Array.isArray(article.tables) ? article.tables.map(renderArticleTable).join("") : "")}
+            ${hasSlideDeck ? "" : (Array.isArray(article.faq) && article.faq.length ? `
+                <section class="article-faq">
+                  <h2>常見問題</h2>
+                  ${article.faq.map((item) => `
+                    <details>
+                      <summary>${escapeHTML(item.question || "")}</summary>
+                      <p>${escapeHTML(item.answer || "")}</p>
+                    </details>
+                  `).join("")}
+                </section>
+              ` : "")}
             <div class="article-cta">
               <p>${escapeHTML(article.cta || "不確定下一步怎麼安排？留下需求，讓歲悅協助判斷。")}</p>
               <a href="${escapeHTML(article.ctaUrl || "#contact")}">${escapeHTML(article.ctaText || "預約照顧諮詢")}</a>
@@ -10051,6 +11121,9 @@ function renderStaticArticlePage(slug) {
     inlineImages: article.inlineImages,
     checklists: article.checklists,
     tables: article.tables,
+    slides: article.slides,
+    visualFormat: article.visualFormat,
+    faq: article.faq,
     references: article.references,
     cta: article.cta,
     ctaText: article.ctaText,
@@ -10374,6 +11447,10 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderHealthPage(searchParams.get("category") || "");
+    ensureStaticArticleRewrites().then(() => {
+      const [currentRoute, currentQuery = ""] = routeSlugFromLocation().split("?");
+      if (currentRoute === "health") pageView.innerHTML = renderHealthPage(new URLSearchParams(currentQuery).get("category") || "");
+    });
     // Keep Health 3.0 first paint stable; remote data warms the cache without replacing the visible page.
     loadSupabaseHealthArticles({ rerender: false });
     loadSupabaseArticleCategories({ rerender: false });
@@ -10381,6 +11458,10 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     pageView.innerHTML = renderSearchPage(searchParams.get("q") || "");
+    ensureStaticArticleRewrites().then(() => {
+      const [currentRoute, currentQuery = ""] = routeSlugFromLocation().split("?");
+      if (currentRoute === "search") pageView.innerHTML = renderSearchPage(new URLSearchParams(currentQuery).get("q") || "");
+    });
     loadSupabaseHealthArticles({ rerender: true });
   } else if (normalized === "courses") {
     renderCoursesPageFromCms();
@@ -10703,6 +11784,7 @@ const careDaySection = document.querySelector("[data-care-day]");
 let activeCareDayIndex = -1;
 let careDayRailFrame = 0;
 let careDayRailProgrammatic = false;
+let careDayLastPageScrollAt = 0;
 
 function isCareDayMobile() {
   return window.innerWidth <= 640;
@@ -10735,7 +11817,8 @@ function setCareDayActive(index) {
 
 function setCareDayProgressFromIndex(index, total) {
   if (!careDaySection || !total) return;
-  careDaySection.style.setProperty("--care-day-progress", `${Math.max(8, ((index + 1) / total) * 100)}%`);
+  const progress = total <= 1 ? 1 : index / (total - 1);
+  careDaySection.style.setProperty("--care-day-progress", `${Math.max(0, Math.min(100, progress * 100))}%`);
 }
 
 function syncCareDayFromMobileRail() {
@@ -10811,21 +11894,21 @@ function updateCareDayScroll() {
   if (!steps.length) return;
   const rect = careDaySection.getBoundingClientRect();
   updateCareDayPin(rect);
-  if (isCareDayMobile()) {
-    syncCareDayFromMobileRail();
-    return;
-  }
   const scrollable = Math.max(1, careDaySection.offsetHeight - window.innerHeight);
   const sectionTop = window.scrollY + rect.top;
   const progress = Math.max(0, Math.min(1, (window.scrollY - sectionTop) / scrollable));
   const nextIndex = Math.min(steps.length - 1, Math.floor(progress * steps.length));
-  careDaySection.style.setProperty("--care-day-progress", `${Math.max(8, progress * 100)}%`);
+  careDaySection.style.setProperty("--care-day-progress", `${progress * 100}%`);
 
   if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     careDaySection.style.setProperty("--care-day-parallax", `${Math.round((progress - .5) * -28)}px`);
   }
   setCareDayActive(nextIndex);
-  if (isCareDayMobile()) scrollCareDayRailTo(nextIndex, "auto", false);
+  if (isCareDayMobile()) {
+    careDayLastPageScrollAt = performance.now();
+    scrollCareDayRailTo(nextIndex, "auto", false);
+    return;
+  }
 }
 
 function initCareDayScroll() {
@@ -10859,6 +11942,7 @@ function initCareDayScroll() {
   });
   rail?.addEventListener("scroll", () => {
     if (!isCareDayMobile() || careDayRailProgrammatic) return;
+    if (performance.now() - careDayLastPageScrollAt < 420) return;
     window.cancelAnimationFrame(careDayRailFrame);
     careDayRailFrame = window.requestAnimationFrame(syncCareDayFromMobileRail);
   }, { passive: true });
@@ -11212,6 +12296,238 @@ document.addEventListener("submit", (event) => {
   });
 }, true);
 
+function activateCareerTab(tabName, options = {}) {
+  const buttons = [...document.querySelectorAll("[data-career-tab]")];
+  const panels = [...document.querySelectorAll("[data-career-panel]")];
+  if (!buttons.length || !panels.length) return;
+  buttons.forEach((button) => {
+    const isActive = button.dataset.careerTab === tabName;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-selected", isActive ? "true" : "false");
+    button.setAttribute("tabindex", isActive ? "0" : "-1");
+    if (isActive && options.focus) button.focus({ preventScroll: true });
+  });
+  panels.forEach((panel) => {
+    const isActive = panel.dataset.careerPanel === tabName;
+    panel.classList.toggle("active", isActive);
+    if (isActive) {
+      panel.removeAttribute("hidden");
+    } else {
+      panel.setAttribute("hidden", "");
+    }
+  });
+  requestAnimationFrame(updateTalentJobDetailPosition);
+  requestAnimationFrame(updateTalentBenefitNavPosition);
+}
+
+function talentJobLower(value = "") {
+  return String(value || "").trim().toLowerCase();
+}
+
+function selectTalentJob(board, jobId, options = {}) {
+  if (!board) return;
+  const cards = [...board.querySelectorAll("[data-talent-job-card]")];
+  const visibleCards = cards.filter((card) => !card.hidden);
+  const targetCard = visibleCards.find((card) => card.dataset.jobId === jobId) || visibleCards[0];
+  cards.forEach((card) => {
+    const isActive = Boolean(targetCard && card === targetCard);
+    card.classList.toggle("is-active", isActive);
+    card.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
+  board.querySelectorAll("[data-talent-job-detail]").forEach((panel) => {
+    panel.hidden = !targetCard || panel.dataset.talentJobDetail !== targetCard.dataset.jobId;
+  });
+  board.querySelectorAll("[data-talent-mobile-cta-item]").forEach((item) => {
+    item.hidden = !targetCard || item.dataset.talentMobileCtaItem !== targetCard.dataset.jobId;
+  });
+  if (!targetCard) {
+    delete board.dataset.activeJob;
+    return;
+  }
+  board.dataset.activeJob = targetCard.dataset.jobId || "";
+  if (options.focus) targetCard.focus({ preventScroll: true });
+  if (options.scrollDetail && window.matchMedia("(min-width: 901px)").matches) {
+    board.querySelector(".talent-job-detail")?.scrollIntoView({ block: "nearest", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+  requestAnimationFrame(updateTalentJobDetailPosition);
+}
+
+function sortTalentJobCards(board) {
+  const list = board.querySelector(".talent-job-list");
+  if (!list) return;
+  const sortMode = board.querySelector("[data-talent-sort]")?.value || "recommended";
+  const cards = [...list.querySelectorAll("[data-talent-job-card]")];
+  cards.sort((a, b) => {
+    if (sortMode === "newest") {
+      return Number(b.dataset.updatedRank || 0) - Number(a.dataset.updatedRank || 0)
+        || Number(a.dataset.defaultRank || 0) - Number(b.dataset.defaultRank || 0);
+    }
+    if (sortMode === "department") {
+      return String(a.dataset.departmentRank || "").localeCompare(String(b.dataset.departmentRank || ""), "zh-Hant")
+        || Number(a.dataset.defaultRank || 0) - Number(b.dataset.defaultRank || 0);
+    }
+    return Number(a.dataset.defaultRank || 0) - Number(b.dataset.defaultRank || 0);
+  });
+  cards.forEach((card) => list.append(card));
+}
+
+function applyTalentJobFilters(board) {
+  if (!board) return;
+  const query = talentJobLower(board.querySelector("[data-talent-job-search]")?.value);
+  const department = talentJobLower(board.querySelector('[data-talent-filter="department"]')?.value);
+  const location = talentJobLower(board.querySelector('[data-talent-filter="location"]')?.value);
+  const type = talentJobLower(board.querySelector('[data-talent-filter="type"]')?.value);
+  const cards = [...board.querySelectorAll("[data-talent-job-card]")];
+  let visibleCount = 0;
+
+  cards.forEach((card) => {
+    const matchesQuery = !query || talentJobLower(card.dataset.talentSearch).includes(query);
+    const matchesDepartment = !department || talentJobLower(card.dataset.talentDepartment) === department;
+    const matchesLocation = !location || talentJobLower(card.dataset.talentLocation) === location;
+    const matchesType = !type || talentJobLower(card.dataset.talentType) === type;
+    const isVisible = matchesQuery && matchesDepartment && matchesLocation && matchesType;
+    card.hidden = !isVisible;
+    if (isVisible) visibleCount += 1;
+  });
+
+  sortTalentJobCards(board);
+  const countTarget = board.querySelector("[data-talent-result-count]");
+  if (countTarget) countTarget.textContent = String(visibleCount);
+  const emptyState = board.querySelector("[data-talent-empty]");
+  if (emptyState) emptyState.hidden = visibleCount > 0;
+  board.classList.toggle("has-no-results", visibleCount === 0);
+
+  const selectedDepartment = board.querySelector('[data-talent-filter="department"]')?.value || "";
+  board.querySelectorAll('[data-talent-chip="department"]').forEach((chip) => {
+    chip.classList.toggle("is-active", chip.dataset.value === selectedDepartment);
+  });
+
+  const activeCard = cards.find((card) => card.dataset.jobId === board.dataset.activeJob);
+  if (!activeCard || activeCard.hidden) {
+    selectTalentJob(board);
+  } else {
+    selectTalentJob(board, activeCard.dataset.jobId);
+  }
+  requestAnimationFrame(updateTalentJobDetailPosition);
+}
+
+function resetTalentJobFilters(board) {
+  if (!board) return;
+  const search = board.querySelector("[data-talent-job-search]");
+  if (search) search.value = "";
+  board.querySelectorAll("[data-talent-filter]").forEach((filter) => {
+    filter.value = "";
+  });
+  const sort = board.querySelector("[data-talent-sort]");
+  if (sort) sort.value = "recommended";
+  applyTalentJobFilters(board);
+}
+
+function clearTalentJobDetailFixedState(board) {
+  board.classList.remove("is-detail-fixed");
+  board.style.removeProperty("--talent-detail-left");
+  board.style.removeProperty("--talent-detail-width");
+  board.style.removeProperty("--talent-detail-top");
+}
+
+function clearTalentBenefitNavFixedState(layout) {
+  layout.classList.remove("is-nav-fixed");
+  layout.style.removeProperty("--talent-benefit-nav-left");
+  layout.style.removeProperty("--talent-benefit-nav-width");
+  layout.style.removeProperty("--talent-benefit-nav-top");
+}
+
+function updateTalentJobDetailPosition() {
+  const isDesktop = window.matchMedia("(min-width: 901px)").matches;
+  document.querySelectorAll("[data-talent-job-board]").forEach((board) => {
+    const slot = board.querySelector(".talent-job-detail-slot");
+    const detail = board.querySelector(".talent-job-detail");
+    const layout = board.querySelector(".talent-job-layout");
+    if (!slot || !detail || !layout || !isDesktop || !board.getClientRects().length) {
+      clearTalentJobDetailFixedState(board);
+      return;
+    }
+    const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 86;
+    const topOffset = Math.round(headerHeight + 18);
+    const boardRect = board.getBoundingClientRect();
+    const slotRect = slot.getBoundingClientRect();
+    const shouldFix = boardRect.top <= topOffset && boardRect.bottom > topOffset + 220 && slotRect.width >= 320;
+    if (!shouldFix) {
+      clearTalentJobDetailFixedState(board);
+      return;
+    }
+    board.style.setProperty("--talent-detail-left", `${Math.round(slotRect.left)}px`);
+    board.style.setProperty("--talent-detail-width", `${Math.round(slotRect.width)}px`);
+    board.style.setProperty("--talent-detail-top", `${topOffset}px`);
+    board.classList.add("is-detail-fixed");
+  });
+}
+
+function updateTalentBenefitNavPosition() {
+  const isDesktop = window.matchMedia("(min-width: 901px)").matches;
+  document.querySelectorAll(".talent-benefit-layout").forEach((layout) => {
+    const nav = layout.querySelector(".talent-benefit-nav");
+    if (!nav || !isDesktop || layout.offsetParent === null) {
+      clearTalentBenefitNavFixedState(layout);
+      return;
+    }
+    const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 86;
+    const topOffset = Math.round(headerHeight + 18);
+    const layoutRect = layout.getBoundingClientRect();
+    const navRect = nav.getBoundingClientRect();
+    const shouldFix = layoutRect.top <= topOffset && layoutRect.bottom > topOffset + navRect.height + 18 && navRect.width >= 160;
+    if (!shouldFix) {
+      clearTalentBenefitNavFixedState(layout);
+      return;
+    }
+    layout.style.setProperty("--talent-benefit-nav-left", `${Math.round(layoutRect.left)}px`);
+    layout.style.setProperty("--talent-benefit-nav-width", `${Math.round(navRect.width)}px`);
+    layout.style.setProperty("--talent-benefit-nav-top", `${topOffset}px`);
+    layout.classList.add("is-nav-fixed");
+  });
+}
+
+document.addEventListener("keydown", (event) => {
+  const eventTarget = event.target instanceof Element ? event.target : null;
+  const currentTab = eventTarget?.closest("[data-career-tab]");
+  if (!currentTab) return;
+  const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+  if (!keys.includes(event.key)) return;
+  const tablist = currentTab.closest('[role="tablist"], .career-tabs');
+  const tabs = [...(tablist?.querySelectorAll("[data-career-tab]") || [])];
+  if (!tabs.length) return;
+  const currentIndex = tabs.indexOf(currentTab);
+  let nextIndex = currentIndex;
+  if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
+  if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+  if (event.key === "Home") nextIndex = 0;
+  if (event.key === "End") nextIndex = tabs.length - 1;
+  event.preventDefault();
+  const nextTab = tabs[nextIndex];
+  activateCareerTab(nextTab.dataset.careerTab, { focus: true });
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const eventTarget = event.target instanceof Element ? event.target : null;
+  const jobCard = eventTarget?.closest("[data-talent-job-card]");
+  if (!jobCard || eventTarget?.closest("a, button, input, select, textarea")) return;
+  event.preventDefault();
+  selectTalentJob(jobCard.closest("[data-talent-job-board]"), jobCard.dataset.jobId, { focus: true, scrollDetail: true });
+});
+
+document.addEventListener("input", (event) => {
+  const search = event.target.closest?.("[data-talent-job-search]");
+  if (!search) return;
+  applyTalentJobFilters(search.closest("[data-talent-job-board]"));
+});
+
+document.addEventListener("change", (event) => {
+  const control = event.target.closest?.("[data-talent-filter], [data-talent-sort]");
+  if (!control) return;
+  applyTalentJobFilters(control.closest("[data-talent-job-board]"));
+});
+
 document.addEventListener("click", (event) => {
   const carouselButton = event.target.closest("[data-scroll-carousel]");
   if (carouselButton) {
@@ -11228,15 +12544,50 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  const talentClearFilters = event.target.closest("[data-talent-clear-filters]");
+  if (talentClearFilters) {
+    resetTalentJobFilters(talentClearFilters.closest("[data-talent-job-board]"));
+    return;
+  }
+
+  const talentChip = event.target.closest("[data-talent-chip]");
+  if (talentChip) {
+    const board = talentChip.closest("[data-talent-job-board]");
+    const filterName = talentChip.dataset.talentChip || "";
+    const filter = [...(board?.querySelectorAll("[data-talent-filter]") || [])].find((item) => item.dataset.talentFilter === filterName);
+    if (filter) filter.value = talentChip.dataset.value || "";
+    applyTalentJobFilters(board);
+    return;
+  }
+
+  const talentSelectButton = event.target.closest("[data-talent-select-job]");
+  if (talentSelectButton) {
+    selectTalentJob(talentSelectButton.closest("[data-talent-job-board]"), talentSelectButton.dataset.talentSelectJob, { scrollDetail: true });
+    return;
+  }
+
+  const talentJobCard = event.target.closest("[data-talent-job-card]");
+  if (talentJobCard && !event.target.closest("a, button, input, select, textarea")) {
+    selectTalentJob(talentJobCard.closest("[data-talent-job-board]"), talentJobCard.dataset.jobId, { scrollDetail: true });
+    return;
+  }
+
+  const careerJump = event.target.closest("[data-career-jump-tab]");
+  if (careerJump) {
+    const targetTab = careerJump.dataset.careerJumpTab;
+    activateCareerTab(targetTab);
+    const targetSelector = careerJump.dataset.careerJumpTarget;
+    if (targetSelector) {
+      requestAnimationFrame(() => {
+        document.querySelector(targetSelector)?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      });
+    }
+    return;
+  }
+
   const careerTab = event.target.closest("[data-career-tab]");
   if (careerTab) {
-    const tabName = careerTab.dataset.careerTab;
-    document.querySelectorAll("[data-career-tab]").forEach((button) => {
-      button.classList.toggle("active", button === careerTab);
-    });
-    document.querySelectorAll("[data-career-panel]").forEach((panel) => {
-      panel.classList.toggle("active", panel.dataset.careerPanel === tabName);
-    });
+    activateCareerTab(careerTab.dataset.careerTab);
     return;
   }
 
@@ -11261,6 +12612,13 @@ document.addEventListener("click", (event) => {
     document.querySelectorAll("[data-investor-panel]").forEach((panel) => {
       panel.classList.toggle("active", panel.dataset.investorPanel === tabName);
     });
+    return;
+  }
+
+  const routeButton = event.target.closest("button[data-href]");
+  if (routeButton && !routeButton.disabled) {
+    event.preventDefault();
+    navigateToPublicHref(routeButton.dataset.href);
     return;
   }
 
@@ -11325,6 +12683,8 @@ window.addEventListener("scroll", () => {
   updateMilestoneProgress();
   updateCareDayScroll();
   updateScrollProgress();
+  updateTalentJobDetailPosition();
+  updateTalentBenefitNavPosition();
 }, { passive: true });
 window.addEventListener("error", (event) => {
   trackFrontendError("window_error", {
@@ -11345,12 +12705,16 @@ window.addEventListener("resize", () => {
   updateMilestoneProgress();
   updateCareDayScroll();
   updateScrollProgress();
+  updateTalentJobDetailPosition();
+  updateTalentBenefitNavPosition();
 });
 window.addEventListener("pagehide", flushPageEngagement);
 initCareDayScroll();
 updateScrollProgress();
 optimizeImageLoading(document);
 renderPage(routeSlugFromLocation());
+requestAnimationFrame(updateTalentJobDetailPosition);
+requestAnimationFrame(updateTalentBenefitNavPosition);
 renderHomeHealthArticles();
 document.documentElement.dataset.appReady = "true";
 window.requestAnimationFrame(() => scrollToCurrentPageAnchor());

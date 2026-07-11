@@ -434,6 +434,121 @@ const referenceLibrary = {
     evidenceRank: 2,
     citation: "Care aides compassion fatigue, burnout, and the role of supportive working culture",
     url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC12681364/"
+  },
+  hpaHypertension: {
+    evidenceRank: 2,
+    citation: "衛生福利部國民健康署：高血壓",
+    url: "https://www.hpa.gov.tw/Pages/List.aspx?nodeid=1463"
+  },
+  hpaHypertension722: {
+    evidenceRank: 2,
+    citation: "衛生福利部國民健康署：血壓控管就靠「722」定期量測",
+    url: "https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=4576&pid=15615"
+  },
+  hpaDiabetes: {
+    evidenceRank: 2,
+    citation: "衛生福利部國民健康署：糖尿病",
+    url: "https://www.hpa.gov.tw/Pages/List.aspx?nodeid=359"
+  },
+  hpaDiabetesGuide: {
+    evidenceRank: 2,
+    citation: "衛生福利部國民健康署：糖尿病與我",
+    url: "https://www.hpa.gov.tw/Pages/List.aspx?nodeid=1205"
+  },
+  niaDiabetesOlder: {
+    evidenceRank: 2,
+    citation: "National Institute on Aging: Diabetes in Older People",
+    url: "https://www.nia.nih.gov/health/diabetes/diabetes-older-people"
+  },
+  niaAlzheimers: {
+    evidenceRank: 2,
+    citation: "National Institute on Aging: Alzheimer's Disease Fact Sheet",
+    url: "https://www.nia.nih.gov/health/alzheimers-and-dementia/alzheimers-disease-fact-sheet"
+  },
+  niaAlzheimersBehavior: {
+    evidenceRank: 2,
+    citation: "National Institute on Aging: Alzheimer's caregiving and behavior changes",
+    url: "https://www.nia.nih.gov/health/alzheimers-changes-behavior-and-communication/alzheimers-caregiving-managing-personality-and"
+  },
+  cdcStrokeSigns: {
+    evidenceRank: 2,
+    citation: "CDC: Signs and Symptoms of Stroke",
+    url: "https://www.cdc.gov/stroke/signs-symptoms/index.html"
+  },
+  cdcStrokeFacts: {
+    evidenceRank: 2,
+    citation: "CDC: Stroke Facts",
+    url: "https://www.cdc.gov/stroke/data-research/facts-stats/index.html"
+  },
+  cdcHeartDisease: {
+    evidenceRank: 2,
+    citation: "CDC: About Heart Disease",
+    url: "https://www.cdc.gov/heart-disease/about/index.html"
+  },
+  cdcHeartAttack: {
+    evidenceRank: 2,
+    citation: "CDC: About Heart Attack Symptoms, Risk, and Recovery",
+    url: "https://www.cdc.gov/heart-disease/about/heart-attack.html"
+  },
+  cdcHeartFailure: {
+    evidenceRank: 2,
+    citation: "CDC: About Heart Failure",
+    url: "https://www.cdc.gov/heart-disease/about/heart-failure.html"
+  },
+  cdcCopd: {
+    evidenceRank: 2,
+    citation: "CDC: About COPD",
+    url: "https://www.cdc.gov/copd/about/index.html"
+  },
+  cdcCopdOlderAdults: {
+    evidenceRank: 2,
+    citation: "CDC: COPD Chronic Disease Indicators",
+    url: "https://www.cdc.gov/cdi/indicator-definitions/chronic-obstructive-pulmonary-disease.html"
+  },
+  niamsOsteoporosis: {
+    evidenceRank: 2,
+    citation: "NIAMS: Osteoporosis Causes, Risk Factors, and Symptoms",
+    url: "https://www.niams.nih.gov/health-topics/osteoporosis"
+  },
+  niamsOsteoporosisTreatment: {
+    evidenceRank: 2,
+    citation: "NIAMS: Osteoporosis Diagnosis, Treatment, and Steps to Take",
+    url: "https://www.niams.nih.gov/health-topics/osteoporosis/diagnosis-treatment-and-steps-to-take"
+  },
+  niamsOsteoarthritis: {
+    evidenceRank: 2,
+    citation: "NIAMS: Osteoarthritis Symptoms, Causes, and Risk Factors",
+    url: "https://www.niams.nih.gov/health-topics/osteoarthritis"
+  },
+  niamsOsteoarthritisTreatment: {
+    evidenceRank: 2,
+    citation: "NIAMS: Osteoarthritis Diagnosis, Treatment, and Steps to Take",
+    url: "https://www.niams.nih.gov/health-topics/osteoarthritis/diagnosis-treatment-and-steps-to-take"
+  },
+  niaParkinson: {
+    evidenceRank: 2,
+    citation: "National Institute on Aging: Parkinson's Disease",
+    url: "https://www.nia.nih.gov/health/parkinsons-disease"
+  },
+  niaParkinsonSymptoms: {
+    evidenceRank: 2,
+    citation: "National Institute on Aging: Parkinson's disease causes, symptoms, and treatments",
+    url: "https://www.nia.nih.gov/health/parkinsons-disease/parkinsons-disease-causes-symptoms-and-treatments"
+  },
+  niddkCkd: {
+    evidenceRank: 2,
+    citation: "NIDDK: What Is Chronic Kidney Disease in Adults?",
+    url: "https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/what-is-chronic-kidney-disease"
+  },
+  niddkCkdCauses: {
+    evidenceRank: 2,
+    citation: "NIDDK: Causes of Chronic Kidney Disease in Adults",
+    url: "https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/causes"
+  },
+  niddkCkdManagement: {
+    evidenceRank: 2,
+    citation: "NIDDK: Managing Chronic Kidney Disease",
+    url: "https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/managing"
   }
 };
 
@@ -446,6 +561,9 @@ function guide({
   inlineImages = [],
   checklists = [],
   tables = [],
+  slides = [],
+  visualFormat = "",
+  faq = [],
   references = [],
   cta = ""
 }) {
@@ -458,6 +576,9 @@ function guide({
     inlineImages,
     checklists,
     tables,
+    slides,
+    visualFormat,
+    faq,
     references,
     cta
   };
@@ -1494,15 +1615,532 @@ const careworkerHardshipDepthEnhancements = {
   })
 };
 
+const elderDiseaseLazyPackArticles = [
+  {
+    slug: "elderly-hypertension-lazy-pack",
+    category: "懶人包",
+    title: "高血壓懶人包：血壓要看趨勢",
+    excerpt: "三分鐘看懂高血壓為什麼常沒有症狀、家裡怎麼量、哪些變化要帶去回診討論。",
+    image: "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg",
+    author: "歲悅護理照顧小組",
+    date: "2026.07.11",
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    keywords: "懶人包 高血壓 血壓量測 三高 回診 慢病照顧"
+  },
+  {
+    slug: "elderly-diabetes-lazy-pack",
+    category: "懶人包",
+    title: "糖尿病懶人包：先防低血糖",
+    excerpt: "把血糖、飲食、藥物、足部與感染風險整理成家屬看得懂的日常觀察清單。",
+    image: "assets/health3/generated/hydration-meal-observation-hero.jpg",
+    author: "歲悅營養照顧小組",
+    date: "2026.07.11",
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    keywords: "懶人包 糖尿病 血糖 低血糖 飲食 足部照顧"
+  },
+  {
+    slug: "elderly-dementia-lazy-pack",
+    category: "懶人包",
+    title: "失智症懶人包：看生活變化",
+    excerpt: "從記憶、情緒、日常功能與安全風險，快速掌握家屬該觀察與記錄的重點。",
+    image: "assets/health3/generated/dementia-evening-routine-hero.jpg",
+    author: "歲悅失智照顧小組",
+    date: "2026.07.11",
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    keywords: "懶人包 失智症 阿茲海默症 記憶 行為照顧 安全"
+  },
+  {
+    slug: "elderly-stroke-lazy-pack",
+    category: "懶人包",
+    title: "中風懶人包：突然就要快",
+    excerpt: "把急性警訊、返家後復能、吞嚥、跌倒與再中風風險整理給家屬快速判斷。",
+    image: "assets/nursing-detail-02-walking-hero-fast.jpg",
+    author: "歲悅護理復能團隊",
+    date: "2026.07.11",
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    keywords: "懶人包 中風 FAST 復能 吞嚥 跌倒 急救"
+  },
+  {
+    slug: "elderly-heart-disease-lazy-pack",
+    category: "懶人包",
+    title: "心臟病懶人包：看喘與腳腫",
+    excerpt: "用日常線索看懂心臟警訊，知道哪些症狀需要立即就醫，哪些要帶去回診。",
+    image: "assets/nursing-detail-01-vitals-fast.jpg",
+    author: "歲悅護理照顧小組",
+    date: "2026.07.11",
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    keywords: "懶人包 心臟病 心衰竭 胸悶 喘 腳腫 急診"
+  },
+  {
+    slug: "elderly-copd-lazy-pack",
+    category: "懶人包",
+    title: "COPD 懶人包：看咳痰喘",
+    excerpt: "整理慢性咳嗽、痰、喘、感染與吸入藥使用，協助家屬看懂呼吸照顧重點。",
+    image: "assets/community-detail-01-exercise-fast.jpg",
+    author: "歲悅護理照顧小組",
+    date: "2026.07.11",
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    keywords: "懶人包 COPD 慢性阻塞性肺病 喘 咳嗽 痰 呼吸照顧"
+  },
+  {
+    slug: "elderly-osteoporosis-lazy-pack",
+    category: "懶人包",
+    title: "骨質疏鬆懶人包：先防跌倒",
+    excerpt: "從骨密度、跌倒預防、鈣質維生素 D、運動與骨折警訊，快速整理家庭照顧重點。",
+    image: "assets/health3/generated/fall-prevention-night-route-hero.jpg",
+    author: "歲悅居家安全團隊",
+    date: "2026.07.11",
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    keywords: "懶人包 骨質疏鬆 骨折 跌倒 鈣質 維生素D 骨密度"
+  },
+  {
+    slug: "elderly-osteoarthritis-lazy-pack",
+    category: "懶人包",
+    title: "關節炎懶人包：痛也要安全動",
+    excerpt: "用疼痛、僵硬、腫脹與活動能力來判斷，協助家屬安排安全活動與減少跌倒。",
+    image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+    author: "歲悅復能照顧團隊",
+    date: "2026.07.11",
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    keywords: "懶人包 退化性關節炎 膝蓋痛 關節僵硬 復能 活動"
+  },
+  {
+    slug: "elderly-parkinson-lazy-pack",
+    category: "懶人包",
+    title: "巴金森懶人包：不只手抖",
+    excerpt: "整理動作變慢、僵硬、平衡、吞嚥、用藥時間與居家安全，讓家屬知道怎麼觀察。",
+    image: "assets/health3/generated/swallowing-safe-meal-hero.jpg",
+    author: "歲悅復能照顧團隊",
+    date: "2026.07.11",
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    keywords: "懶人包 巴金森氏症 手抖 動作慢 跌倒 吞嚥 用藥"
+  },
+  {
+    slug: "elderly-chronic-kidney-disease-lazy-pack",
+    category: "懶人包",
+    title: "腎臟病懶人包：三高也要顧",
+    excerpt: "快速整理腎功能、血壓、血糖、用藥、水分與飲食限制，協助家屬準備回診問題。",
+    image: "assets/homepage-batch/14-care-notes-fast.jpg",
+    author: "歲悅護理照顧小組",
+    date: "2026.07.11",
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    keywords: "懶人包 慢性腎臟病 腎功能 血壓 血糖 水腫 回診"
+  }
+];
+
+const elderDiseaseLazyPackDepthEnhancements = {
+  "elderly-hypertension-lazy-pack": guide({
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    warning: {
+      title: "血壓異常合併急性症狀，不要只在家觀察",
+      body: "本文提供照顧與觀察方向，不能取代醫師診斷或調藥；若有急性惡化，請立即就醫或求助緊急醫療。",
+      items: ["胸痛、喘、單側無力、說話不清、劇烈頭痛或意識改變。", "血壓很高且合併不舒服，或反覆量測仍異常。", "自行停藥、加藥或混用成藥前，應先詢問醫師或藥師。"]
+    },
+    summary: ["高血壓常沒有明顯症狀，家屬要看長期趨勢，不是只看單次數字。", "居家量血壓要固定時間、固定姿勢，紀錄比口頭描述更有用。", "頭痛、胸悶、喘、單側無力或意識改變，要優先排除急症。"],
+    content: [
+      ["高血壓是什麼？", ["高血壓不是長輩緊張一下而已，而是血管長期承受較高壓力。它和中風、心臟病、腎臟病等風險有關，但很多人早期沒有明顯感覺，所以才容易被忽略。", "家屬照顧長輩時，重點不是每天追著問有沒有頭暈，而是建立量測和回診紀錄。只靠感覺判斷，很容易錯過真正需要處理的變化。"]],
+      ["家屬在家怎麼觀察？", ["建議把血壓、脈搏、量測時間、當天不舒服、是否忘記吃藥一起寫下來。若只有一串數字，醫師很難判斷是量測誤差、白袍效應、藥效不足，還是生活型態變化。", "量血壓前先坐著休息，避免剛運動、剛喝咖啡、剛洗澡或邊說話邊量。每天固定早晚或依醫囑量，會比想到才量更能看出趨勢。"]],
+      ["日常照顧先做哪些事？", ["先確認藥物有沒有規律使用，長輩是否因為覺得沒症狀就自行停藥。也要看鹽分、加工食品、睡眠、活動量、酒精與壓力，這些都可能讓血壓管理變得不穩。", "如果長輩同時有糖尿病、腎臟病或心臟病，不要自行套用一般人的目標值。回診時帶紀錄，請醫師依整體狀態判斷。"]],
+      ["什麼時候要找專業？", ["若連續多天血壓偏高、忽高忽低、合併頭暈跌倒、胸悶喘或藥物副作用，就應回診討論。若出現疑似中風或心臟急症，不要等下一次門診。", "家屬最有價值的角色，是把散落的生活線索整理成醫療團隊看得懂的資訊，讓治療不是靠猜。"]]
+    ],
+    checklists: [{ title: "居家血壓紀錄清單", items: ["早晚量測時間是否固定。", "血壓與脈搏是否一起記錄。", "是否有胸悶、喘、頭暈、頭痛或無力。", "當天是否忘記吃藥或自行停藥。", "鹽分、睡眠、壓力與活動量是否變化。", "回診時是否帶完整紀錄。"] }],
+    tables: [{ title: "血壓照顧快速對照", headers: ["看到的狀況", "可能代表", "下一步"], rows: [["偶爾一次偏高", "量測情境或短暫壓力", "休息後重測並記錄"], ["連續多天偏高", "控制可能不穩", "帶紀錄回診"], ["高血壓合併單側無力", "疑似急症", "立即就醫"]] }],
+    faq: [
+      { question: "長輩沒有不舒服，還需要量血壓嗎？", answer: "需要。高血壓常沒有明顯症狀，規律量測和回診紀錄才能提早看出趨勢。" },
+      { question: "血壓一高可以自己多吃一顆藥嗎？", answer: "不建議。降壓藥種類和劑量要由醫師判斷，尤其長輩常合併多重用藥。" },
+      { question: "家屬最該帶什麼去回診？", answer: "帶一週以上血壓紀錄、用藥清單、症狀發生時間，以及是否跌倒或頭暈。" }
+    ],
+    references: [referenceLibrary.hpaHypertension, referenceLibrary.hpaHypertension722, referenceLibrary.chronicDiseaseCdc]
+  }),
+  "elderly-diabetes-lazy-pack": guide({
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    warning: {
+      title: "低血糖、感染或意識變化要優先處理",
+      body: "本文提供照顧與觀察方向，不能取代醫師診斷或調藥；若有急性惡化，請立即就醫或求助緊急醫療。",
+      items: ["冒冷汗、手抖、嗜睡、意識混亂或無法進食，可能和低血糖有關。", "發燒、傷口紅腫流膿、尿痛或精神快速變差。", "自行調整胰島素、降血糖藥或停藥前，應先詢問醫療團隊。"]
+    },
+    summary: ["長輩糖尿病照顧不只看血糖，也要看吃飯、用藥、活動、感染和足部。", "低血糖對長輩很危險，家屬要知道症狀和處理流程。", "回診前整理血糖、飲食與不舒服時間，會比只說最近比較高更有幫助。"],
+    content: [
+      ["糖尿病是什麼？", ["糖尿病是血糖調節出問題，長期控制不好會影響眼睛、腎臟、神經、心血管和傷口癒合。長輩常同時有多種疾病，因此控糖不能只追求數字漂亮。", "真正重要的是穩定生活：吃得下、藥物正確、活動安全、沒有反覆低血糖或感染。家屬要把血糖放回日常情境裡看。"]],
+      ["家屬在家怎麼觀察？", ["記錄血糖時，也要寫下當餐吃多少、是否延後吃飯、是否活動增加、是否漏藥或剛換藥。血糖高低常和當天生活有關，單看數字容易誤判。", "每天檢查足部和皮膚也很重要。若長輩感覺變差、視力不好或不容易說痛，小傷口可能拖到感染才被發現。"]],
+      ["日常照顧先做哪些事？", ["先讓用餐、用藥和量血糖時間有規律，尤其使用胰島素或可能造成低血糖藥物者，更要避免吃太少卻照常用藥。", "餐食不必追求極端控制，而是依營養師或醫療團隊建議，讓主食、蛋白質、蔬菜和水分穩定。長輩若食慾下降，要先找原因，不要只責備不配合。"]],
+      ["什麼時候要找專業？", ["反覆低血糖、血糖長期偏高、體重明顯下降、傷口不癒合、尿路感染、視力變化或腎功能問題，都要回診討論。", "家屬可以帶血糖紀錄、飲食狀況、藥袋與保健品清單，讓醫療團隊判斷是否需要調整。"]]
+    ],
+    checklists: [{ title: "糖尿病居家觀察清單", items: ["血糖、吃飯量和用藥時間是否一起記錄。", "是否有冒冷汗、手抖、嗜睡或混亂。", "足部是否有傷口、紅腫、破皮或水泡。", "尿量、尿痛、發燒或精神是否變化。", "是否有視力模糊或傷口久不癒合。", "是否帶藥袋與血糖紀錄回診。"] }],
+    tables: [{ title: "控糖照顧快速對照", headers: ["看到的狀況", "可能代表", "下一步"], rows: [["吃很少仍照常用藥", "低血糖風險", "依醫囑處理並諮詢"], ["足部小傷口", "感染風險", "清潔觀察並及早就醫"], ["血糖忽高忽低", "飲食藥物需檢視", "帶紀錄回診"]] }],
+    faq: [
+      { question: "長輩血糖偶爾高，是不是少吃飯就好？", answer: "不一定。少吃可能造成營養不足或低血糖，應回頭看餐食、藥物、活動和感染等原因。" },
+      { question: "糖尿病長輩為什麼要看腳？", answer: "糖尿病可能影響神經感覺和傷口癒合，小傷口若沒發現，可能演變成感染。" },
+      { question: "家屬可以自己調藥嗎？", answer: "不建議。尤其長輩常有腎功能、食慾和多重用藥問題，調藥應由醫療團隊評估。" }
+    ],
+    references: [referenceLibrary.hpaDiabetes, referenceLibrary.hpaDiabetesGuide, referenceLibrary.niaDiabetesOlder]
+  }),
+  "elderly-dementia-lazy-pack": guide({
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    warning: {
+      title: "突然混亂不一定是失智退化",
+      body: "本文提供照顧與觀察方向，不能取代醫師診斷；若有急性惡化，請立即就醫或求助緊急醫療。",
+      items: ["短時間內突然混亂、嗜睡、發燒、跌倒或意識改變。", "出現走失、攻擊、自傷或無法安全在家。", "幻覺、妄想或睡眠嚴重混亂，讓照顧者無法休息。"]
+    },
+    summary: ["失智不是單純健忘，而是記憶、判斷、語言、行為和生活能力逐漸改變。", "家屬要記錄功能變化和風險事件，不要只和長輩爭辯記不記得。", "固定作息、簡短說法與安全環境，比反覆說理更有用。"],
+    content: [
+      ["失智症是什麼？", ["失智症會影響記憶、思考、判斷和日常生活能力。長輩可能忘記剛問過的事，也可能開始不會處理金錢、迷路、懷疑東西被偷或對熟悉活動失去興趣。", "家屬常以為長輩是故意、固執或不講理，但很多行為其實是大腦處理訊息的能力下降。理解這點，照顧方式才會從責備改成協助。"]],
+      ["家屬在家怎麼觀察？", ["記錄的不只是忘了什麼，而是生活功能有沒有變：做飯是否忘火、吃藥是否重複、外出是否迷路、洗澡是否拒絕、夜裡是否遊走。", "也要看變化速度。若短時間突然混亂，可能是感染、藥物、脫水、疼痛或其他急性問題，不能直接歸因於失智。"]],
+      ["日常照顧先做哪些事？", ["把家中說法固定，使用短句和可預期流程。例如同一句提醒、固定放鑰匙、固定用藥位置、白板寫今天安排。環境能幫忙提示，就能減少家屬一直用情緒提醒。", "面對重複提問，先接住不安，再給簡短答案。比起證明剛剛說過，讓長輩感覺安全更能降低衝突。"]],
+      ["什麼時候要找專業？", ["若長輩開始走失、攻擊、跌倒、吞嚥變差、明顯憂鬱或家屬快撐不住，就需要醫療與長照資源一起介入。", "失智照顧不是靠一個人忍耐。日照、居家服務、喘息、照顧者支持和安全評估，都可以成為照顧計畫的一部分。"]]
+    ],
+    checklists: [{ title: "失智照顧觀察清單", items: ["是否反覆問同一件事且更焦慮。", "是否忘記吃藥、關火或繳費。", "是否曾迷路、走失或夜間遊走。", "是否拒絕洗澡、吃飯或換衣。", "是否突然混亂或精神明顯變差。", "主要照顧者是否長期睡不好。"] }],
+    tables: [{ title: "失智行為快速對照", headers: ["看到的狀況", "可能代表", "下一步"], rows: [["重複提問", "不安或記憶斷線", "先安撫再短句回答"], ["突然混亂", "急性身體問題可能", "評估就醫"], ["夜間遊走", "安全風險", "調整環境與求助"]] }],
+    faq: [
+      { question: "失智和正常老化健忘差在哪？", answer: "正常健忘通常提醒後能想起，失智則可能影響判斷、生活能力和安全，且變化會逐漸擴大。" },
+      { question: "長輩一直問同一句，要一直糾正嗎？", answer: "不建議反覆辯論。先穩定情緒，再用固定短句和提示物協助。" },
+      { question: "家屬撐不住是不是不孝？", answer: "不是。失智照顧需要團隊與喘息資源，主要照顧者也需要被照顧。" }
+    ],
+    references: [referenceLibrary.niaAlzheimers, referenceLibrary.niaAlzheimersBehavior, referenceLibrary.dementiaAgitation2020]
+  }),
+  "elderly-stroke-lazy-pack": guide({
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    warning: {
+      title: "疑似中風請立刻叫救護車",
+      body: "本文提供照顧與觀察方向，不能取代醫師診斷；若有急性惡化，請立即就醫或求助緊急醫療。",
+      items: ["臉歪、單側手腳無力、說話不清、突然看不清或走路不穩。", "突然劇烈頭痛、意識改變或抽搐。", "症狀即使幾分鐘後改善，也應由醫療人員評估。"]
+    },
+    summary: ["中風警訊常是突然發生，家屬不要等看看。", "返家後照顧重點是復能、吞嚥、用藥、跌倒預防和再中風風險管理。", "家屬要記錄功能變化，讓醫療和復能團隊能調整目標。"],
+    content: [
+      ["中風是什麼？", ["中風是腦部血流受阻或出血造成腦功能受損。它可能影響說話、吞嚥、走路、手部功能、情緒和認知，不只是能不能走路而已。", "急性期最重要的是時間。突然臉歪、手無力、講話不清，應立即叫救護車，不要先按摩、放血或睡一下觀察。"]],
+      ["家屬在家怎麼觀察？", ["返家後要看每天的功能：能不能安全起身、走到廁所、吃飯會不會嗆、說話是否更清楚、情緒是否低落。這些線索比一句恢復得還可以更有用。", "也要注意再中風警訊。若原本穩定的長輩突然又變無力、說話變差、吞嚥變差或意識改變，應立即就醫。"]],
+      ["日常照顧先做哪些事？", ["把復能目標放回生活動作，例如從床到椅子、走到餐桌、上廁所、自己拿杯子。目標越貼近日常，長輩越能理解為什麼要練。", "吞嚥安全也要重視。若喝水嗆咳、聲音濕濕的、吃飯很久或反覆肺炎，應請專業評估，不要只把食物切小。"]],
+      ["什麼時候要找專業？", ["跌倒、嗆咳、體重下降、情緒低落、復能停滯、照顧者無法安全移位，都需要回診或諮詢復能、護理與長照團隊。", "中風照顧是長期調整，不是出院就結束。家屬的紀錄能幫助團隊判斷下一步要加強復能、輔具或居家服務。"]]
+    ],
+    checklists: [{ title: "中風返家觀察清單", items: ["是否有新的臉歪、手腳無力或說話不清。", "起身、轉位和走路是否比前一週穩。", "喝水或吃飯是否嗆咳。", "是否依醫囑服藥與回診。", "情緒、睡眠和動機是否明顯下降。", "家屬是否能安全協助移位。"] }],
+    tables: [{ title: "中風照顧快速對照", headers: ["看到的狀況", "可能代表", "下一步"], rows: [["突然單側無力", "急性中風警訊", "立即叫救護車"], ["喝水常嗆", "吞嚥風險", "請專業評估"], ["走路更不穩", "復能或疾病變化", "回診並檢查環境"]] }],
+    faq: [
+      { question: "症狀一下子好了，還要就醫嗎？", answer: "要。短暫改善仍可能代表暫時性腦缺血或其他風險，應由醫療人員評估。" },
+      { question: "中風後是不是多休息就好？", answer: "休息需要，但復能和安全活動也很重要，應依醫療與復能團隊建議逐步進行。" },
+      { question: "吃飯嗆咳可以只改成稀飯嗎？", answer: "不一定。吞嚥問題需要看質地、姿勢、餵食速度與口腔狀態，必要時請專業評估。" }
+    ],
+    references: [referenceLibrary.cdcStrokeSigns, referenceLibrary.cdcStrokeFacts, referenceLibrary.transitionalCare2022]
+  }),
+  "elderly-heart-disease-lazy-pack": guide({
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    warning: {
+      title: "胸痛、喘或意識改變要先排除急症",
+      body: "本文提供照顧與觀察方向，不能取代醫師診斷或調藥；若有急性惡化，請立即就醫或求助緊急醫療。",
+      items: ["胸痛胸悶、冒冷汗、喘不過氣、暈厥或意識改變。", "呼吸困難、躺下更喘、腳腫快速增加。", "心跳很快、很慢或不規則，且合併頭暈或不舒服。"]
+    },
+    summary: ["長輩心臟病警訊不一定是典型胸痛，也可能是喘、疲倦、腳腫或食慾變差。", "家屬要觀察活動耐受度、體重、腫脹、呼吸和用藥。", "急性胸悶喘或昏厥不要等門診，應立即就醫。"],
+    content: [
+      ["心臟病要看什麼？", ["心臟病包含冠心病、心律不整、心衰竭等不同問題。長輩不一定會清楚說胸痛，有時只說悶、累、喘、胃不舒服或走幾步就不想走。", "家屬要把症狀和活動連在一起看：以前能走到巷口，現在走到門口就喘；以前晚上能平躺，現在要墊高枕頭，這些都值得記錄。"]],
+      ["家屬在家怎麼觀察？", ["每天看呼吸、腳踝腫脹、體重變化、精神、食慾和尿量。若有醫囑量血壓、脈搏或體重，就固定時間做，才能看出趨勢。", "也要確認藥物是否規律使用。利尿劑、降血壓藥、抗凝血藥等都不應自行停用或增減。"]],
+      ["日常照顧先做哪些事？", ["安排活動時採分段、慢起身、避免過熱或過冷。吃飯避免一次太飽，鹽分與水分限制則依醫師或營養師建議，不要自行極端限制。", "若長輩怕喘而完全不動，肌力會更快下降；但若活動後胸悶喘明顯，也不能硬撐。最安全的做法是帶著症狀紀錄回診討論活動範圍。"]],
+      ["什麼時候要找專業？", ["胸痛、喘不過氣、暈厥、冒冷汗或意識改變，應立即就醫。若腳腫、體重快速增加、夜間喘或活動能力下降，也應盡快回診。", "心臟照顧不是只看一次心電圖，而是看長輩每天的耐受度和風險是否正在改變。"]]
+    ],
+    checklists: [{ title: "心臟病居家觀察清單", items: ["胸悶、胸痛或喘發生在什麼時候。", "能走的距離是否變短。", "是否躺下更喘或夜間咳醒。", "腳踝、小腿或腹部是否腫脹。", "體重是否短時間增加。", "藥物是否按醫囑使用。"] }],
+    tables: [{ title: "心臟警訊快速對照", headers: ["看到的狀況", "可能代表", "下一步"], rows: [["胸痛冒冷汗", "心臟急症可能", "立即就醫"], ["躺下更喘", "心衰竭惡化可能", "盡快回診"], ["腳腫體重增", "水分滯留可能", "記錄並諮詢"]] }],
+    faq: [
+      { question: "長輩只說胃悶，也可能是心臟問題嗎？", answer: "有可能。長輩心臟急症表現不一定典型，若合併喘、冒冷汗、虛弱或胸背不適，應優先就醫。" },
+      { question: "腳腫可以自己多吃利尿劑嗎？", answer: "不建議。利尿劑會影響血壓、腎功能和電解質，應由醫師調整。" },
+      { question: "心臟病長輩是不是不能運動？", answer: "不一定。活動量要依病情與醫囑調整，重點是安全、分段和觀察症狀。" }
+    ],
+    references: [referenceLibrary.cdcHeartDisease, referenceLibrary.cdcHeartAttack, referenceLibrary.cdcHeartFailure]
+  }),
+  "elderly-copd-lazy-pack": guide({
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    warning: {
+      title: "喘到說不出話或嘴唇發紫，要立即就醫",
+      body: "本文提供照顧與觀察方向，不能取代醫師診斷或調藥；若有急性惡化，請立即就醫或求助緊急醫療。",
+      items: ["呼吸困難快速加劇、嘴唇發紫、意識混亂或胸痛。", "痰量、痰色、發燒或喘的程度明顯惡化。", "吸入藥使用後仍無法緩解，或不確定如何使用吸入器。"]
+    },
+    summary: ["COPD 不只是咳嗽，是慢性氣流受限造成的呼吸問題。", "家屬要看咳、痰、喘、活動耐受度、感染警訊和吸入藥使用方式。", "不要把長輩喘都當老化，喘的變化本身就是重要訊號。"],
+    content: [
+      ["COPD 是什麼？", ["COPD 常見於長期抽菸或暴露於刺激物後，可能表現為慢性咳嗽、痰多、喘和活動力下降。長輩可能會說走路比較累，而不是直接說呼吸困難。", "這種疾病通常需要長期管理。照顧重點不是要求長輩忍耐，而是早點看出惡化，維持安全活動和正確用藥。"]],
+      ["家屬在家怎麼觀察？", ["看三件事：咳嗽是否變多、痰是否變濃或變色、平常活動是否更容易喘。若以前能洗完澡，現在洗到一半要停下來，就是重要變化。", "也要注意感染風險。發燒、痰變多、食慾下降、嗜睡或喘惡化，都可能需要醫療評估。"]],
+      ["日常照顧先做哪些事？", ["確認吸入器使用方式。很多長輩不是不配合，而是吸入節奏、裝置操作或手部力量不夠。回診時可以請醫護人員看一次實際操作。", "家中要避免菸味、香氛、粉塵和空氣刺激。活動採分段慢走、休息和呼吸節奏練習，不要因為怕喘就完全不動。"]],
+      ["什麼時候要找專業？", ["喘突然變嚴重、嘴唇發紫、意識混亂、胸痛或吸入藥無效，應立即就醫。若咳痰和活動能力逐週變差，也應提前回診。", "COPD 照顧也要談疫苗、營養、復能和急性惡化計畫，讓家屬知道什麼狀況該用藥、回診或急診。"]]
+    ],
+    checklists: [{ title: "COPD 居家觀察清單", items: ["咳嗽是否比平常多。", "痰量、痰色或濃稠度是否改變。", "走路、洗澡、吃飯是否更喘。", "是否發燒、嗜睡或食慾下降。", "吸入器是否正確使用。", "家中是否有菸味、粉塵或刺激氣味。"] }],
+    tables: [{ title: "呼吸照顧快速對照", headers: ["看到的狀況", "可能代表", "下一步"], rows: [["活動更容易喘", "控制變差或感染", "記錄並回診"], ["痰變黃綠且發燒", "感染可能", "盡快就醫"], ["嘴唇發紫", "缺氧危險", "立即就醫"]] }],
+    faq: [
+      { question: "長輩喘是年紀大正常嗎？", answer: "不應直接當正常老化。若喘影響日常活動，或咳痰變化明顯，應請醫療人員評估。" },
+      { question: "COPD 長輩要完全避免活動嗎？", answer: "不一定。安全、分段、依能力調整的活動有助維持功能，但急性喘或感染時要先就醫評估。" },
+      { question: "吸入器沒效果是不是藥沒用？", answer: "可能是裝置使用方式不正確，也可能病情惡化。建議回診時請醫護人員確認操作。" }
+    ],
+    references: [referenceLibrary.cdcCopd, referenceLibrary.cdcCopdOlderAdults, referenceLibrary.chronicDiseaseCdc]
+  }),
+  "elderly-osteoporosis-lazy-pack": guide({
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    warning: {
+      title: "跌倒後髖部、背部或手腕痛，不要硬扶硬走",
+      body: "本文提供照顧與觀察方向，不能取代醫師診斷；若有急性惡化，請立即就醫或求助緊急醫療。",
+      items: ["跌倒後無法站立、髖部痛、背痛加劇或手腕變形。", "身高變矮、駝背加重或突然背痛。", "服用骨鬆藥物前後若有疑問，應和醫師或藥師確認。"]
+    },
+    summary: ["骨質疏鬆常沒有症狀，很多人是骨折後才發現。", "家屬照顧重點是預防跌倒、追蹤骨密度、確認營養與藥物。", "髖部、脊椎和手腕骨折會大幅影響長輩獨立生活能力。"],
+    content: [
+      ["骨質疏鬆是什麼？", ["骨質疏鬆會讓骨頭變脆，早期通常不痛不癢，因此被稱為沉默疾病。真正造成生活衝擊的，往往是跌倒後髖部、脊椎或手腕骨折。", "家屬不要等長輩喊骨頭痛才注意。曾骨折、停經後女性、高齡、體重過輕、長期使用類固醇或容易跌倒者，都應和醫師討論風險。"]],
+      ["家屬在家怎麼觀察？", ["觀察身高是否變矮、駝背是否加重、背痛是否突然出現，也要記錄跌倒或差點跌倒的地點和時間。骨鬆照顧和跌倒預防幾乎分不開。", "若長輩跌倒後說只是扭到，但不敢承重、痛點明顯或走路變形，不要硬扶走路，應就醫排除骨折。"]],
+      ["日常照顧先做哪些事？", ["先檢查床邊到浴室、浴室地面、拖鞋、夜燈和扶手。骨質疏鬆本身不一定能立刻感覺，但跌倒是可以先降低的風險。", "營養上依專業建議補足蛋白質、鈣質和維生素 D；活動上以安全負重、肌力和平衡訓練為方向，避免完全不動。"]],
+      ["什麼時候要找專業？", ["若曾低衝擊骨折、反覆跌倒、背痛變明顯、身高下降或不確定是否需骨密度檢查，應回診討論。", "骨鬆藥物需要規律使用和追蹤，不建議因為沒有感覺就自行停藥。家屬可協助提醒回診與用藥。"]]
+    ],
+    checklists: [{ title: "骨鬆與跌倒預防清單", items: ["是否曾跌倒或差點跌倒。", "夜間動線是否有燈光與扶手。", "拖鞋是否防滑合腳。", "是否曾骨折或突然背痛。", "營養是否有蛋白質、鈣質與維生素 D。", "是否按醫囑追蹤骨密度與用藥。"] }],
+    tables: [{ title: "骨鬆照顧快速對照", headers: ["看到的狀況", "可能代表", "下一步"], rows: [["跌倒後髖部痛", "骨折可能", "不要硬走，立即就醫"], ["身高變矮駝背", "脊椎壓迫可能", "回診評估"], ["夜間常起身", "跌倒風險", "改善動線與照明"]] }],
+    faq: [
+      { question: "骨質疏鬆會痛嗎？", answer: "早期通常沒有症狀，很多人是骨折或脊椎壓迫後才發現，因此風險評估很重要。" },
+      { question: "補鈣就可以治療骨鬆嗎？", answer: "補足營養是基礎，但是否需要藥物、骨密度追蹤或復能訓練，應由醫療團隊評估。" },
+      { question: "骨鬆長輩是不是不能運動？", answer: "不是完全不能動。需選擇安全、適合狀態的負重、肌力和平衡活動，必要時請專業指導。" }
+    ],
+    references: [referenceLibrary.niamsOsteoporosis, referenceLibrary.niamsOsteoporosisTreatment, referenceLibrary.fallsJama2024]
+  }),
+  "elderly-osteoarthritis-lazy-pack": guide({
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    warning: {
+      title: "關節突然紅腫熱痛或無法承重，要就醫評估",
+      body: "本文提供照顧與觀察方向，不能取代醫師診斷；若有急性惡化，請立即就醫或求助緊急醫療。",
+      items: ["關節突然紅、腫、熱、痛，或合併發燒。", "跌倒後疼痛明顯、無法承重或關節變形。", "止痛藥、貼布或保健品使用前，應注意腎功能、胃部和用藥交互作用。"]
+    },
+    summary: ["退化性關節炎常見於膝、髖、手等關節，疼痛和僵硬會影響活動。", "完全不動會讓肌力下降，安全活動和體重管理反而很重要。", "家屬要看疼痛如何影響走路、上下樓、如廁和跌倒風險。"],
+    content: [
+      ["退化性關節炎是什麼？", ["退化性關節炎是關節結構變化造成的疼痛、僵硬、腫脹和活動限制。長輩常說膝蓋卡卡、上下樓痛、早上起來僵硬一陣子。", "它不是單純年紀大就只能忍。透過活動調整、肌力訓練、體重管理、止痛策略和輔具，可以減少疼痛對生活的影響。"]],
+      ["家屬在家怎麼觀察？", ["觀察疼痛在什麼時候發生：起身、上下樓、走遠、蹲下、上廁所或晚上睡覺。也要看長輩是否因怕痛而減少活動，導致肌力更差。", "如果關節突然紅腫熱痛、疼痛和以往不同，或跌倒後無法站立，就不應只當退化處理。"]],
+      ["日常照顧先做哪些事？", ["把活動拆小：先暖身、分段走、避免長時間蹲跪，必要時使用扶手、手杖或助行器。椅子高度也很重要，太低會讓起身更痛。", "關節炎照顧不是叫長輩不要動，而是找出能動、敢動、動完不惡化的方式。若不確定，可以請復能專業評估。"]],
+      ["什麼時候要找專業？", ["疼痛影響睡眠、如廁、外出或反覆跌倒，就該回診或復能評估。若長輩長期自行吃止痛藥，也需要醫師確認安全性。", "家屬可以帶一週疼痛紀錄，寫下痛的位置、時間、活動、用藥和效果，讓專業更快判斷。"]]
+    ],
+    checklists: [{ title: "關節炎居家觀察清單", items: ["疼痛發生在哪個動作或時段。", "早晨僵硬大約多久。", "上下樓、起身、如廁是否受影響。", "是否因怕痛而活動變少。", "是否跌倒或差點跌倒。", "止痛藥、貼布或保健品是否自行使用。"] }],
+    tables: [{ title: "關節疼痛快速對照", headers: ["看到的狀況", "可能代表", "下一步"], rows: [["走路痛但休息改善", "退化性疼痛可能", "調整活動並回診"], ["紅腫熱痛發燒", "感染或發炎可能", "盡快就醫"], ["起身很困難", "肌力與椅高問題", "評估復能與輔具"]] }],
+    faq: [
+      { question: "膝蓋退化是不是越動越磨？", answer: "不一定。適合的低衝擊活動和肌力訓練可減少疼痛與僵硬，完全不動反而可能讓功能下降。" },
+      { question: "長輩痛就一直貼貼布可以嗎？", answer: "貼布也可能有副作用或交互作用，若長期使用仍痛，應就醫評估。" },
+      { question: "什麼時候需要輔具？", answer: "走路不穩、疼痛造成代償或害怕外出時，可請專業評估手杖、助行器或環境調整。" }
+    ],
+    references: [referenceLibrary.niamsOsteoarthritis, referenceLibrary.niamsOsteoarthritisTreatment, referenceLibrary.assistiveTechnologyFalls]
+  }),
+  "elderly-parkinson-lazy-pack": guide({
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    warning: {
+      title: "跌倒、吞嚥惡化或意識改變要及早處理",
+      body: "本文提供照顧與觀察方向，不能取代醫師診斷或調藥；若有急性惡化，請立即就醫或求助緊急醫療。",
+      items: ["突然跌倒增加、吞嚥明顯變差、反覆嗆咳或疑似吸入性肺炎。", "幻覺、混亂、嗜睡或行為明顯改變。", "巴金森用藥時間與劑量不應自行調整。"]
+    },
+    summary: ["巴金森氏症不只手抖，也會有動作慢、僵硬、平衡、吞嚥和睡眠問題。", "家屬要觀察用藥時間和身體狀態的關係。", "居家照顧重點是防跌、維持活動、吞嚥安全和規律回診。"],
+    content: [
+      ["巴金森氏症是什麼？", ["巴金森氏症是一種神經退化疾病，常見表現包括動作變慢、僵硬、手抖、姿勢不穩和平衡變差。長輩也可能有便祕、睡眠、情緒和吞嚥問題。", "家屬不要只盯著手抖。真正影響生活的，常是起身困難、步伐變小、轉身不穩、吃飯嗆咳和跌倒風險。"]],
+      ["家屬在家怎麼觀察？", ["記錄一天中什麼時候動作最好、什麼時候卡住，和用藥時間是否有關。若藥效前後差很多，這些紀錄對醫師很有幫助。", "也要看吞嚥、說話、表情、便祕、睡眠和情緒。巴金森照顧不是只有走路訓練，而是整體生活節奏管理。"]],
+      ["日常照顧先做哪些事？", ["家中先處理跌倒風險：移除地墊、加強夜燈、保持走道清楚，轉身和起身時給足時間，不要催促。", "活動要規律但安全，可依復能建議做伸展、步態、平衡和肌力練習。吃飯若常嗆，應調整姿勢、速度和食物質地，必要時請吞嚥評估。"]],
+      ["什麼時候要找專業？", ["跌倒變多、吞嚥惡化、幻覺混亂、藥效波動明顯、日常活動快速退步，都應回診討論。", "家屬可帶用藥時間表、症狀紀錄和影片，讓醫師看見真實生活中的卡住時刻。"]]
+    ],
+    checklists: [{ title: "巴金森居家觀察清單", items: ["動作慢或僵硬是否和用藥時間有關。", "是否常小碎步、凍住或轉身不穩。", "是否跌倒或差點跌倒。", "吃飯喝水是否嗆咳。", "便祕、睡眠、幻覺或情緒是否變化。", "家中動線是否清楚且有夜燈。"] }],
+    tables: [{ title: "巴金森照顧快速對照", headers: ["看到的狀況", "可能代表", "下一步"], rows: [["小碎步轉身不穩", "跌倒風險", "環境調整與復能"], ["藥前動不了", "藥效波動可能", "記錄後回診"], ["喝水常嗆", "吞嚥風險", "請專業評估"]] }],
+    faq: [
+      { question: "巴金森一定會手抖嗎？", answer: "不一定。動作變慢、僵硬和平衡問題也很常見，家屬要看整體生活功能。" },
+      { question: "用藥時間差一點有關係嗎？", answer: "可能有。巴金森用藥常和活動狀態有關，應依醫囑規律使用，不自行調整。" },
+      { question: "長輩走路卡住時可以用力拉嗎？", answer: "不建議硬拉。可先停下、給簡短口令或視覺提示，並請復能專業教安全方式。" }
+    ],
+    references: [referenceLibrary.niaParkinson, referenceLibrary.niaParkinsonSymptoms, referenceLibrary.swallowing2022]
+  }),
+  "elderly-chronic-kidney-disease-lazy-pack": guide({
+    readingMinutes: 3,
+    targetAudience: "家屬與主要照顧者",
+    warning: {
+      title: "腎臟病合併喘、意識變化或嚴重水腫要就醫",
+      body: "本文提供照顧與觀察方向，不能取代醫師診斷或調藥；若有急性惡化，請立即就醫或求助緊急醫療。",
+      items: ["喘、胸悶、意識混亂、尿量明顯變少或全身水腫。", "血壓或血糖明顯失控，合併不舒服。", "止痛藥、保健品、中草藥或利尿劑使用前，應先詢問醫師或藥師。"]
+    },
+    summary: ["慢性腎臟病早期可能沒有症狀，常需要靠抽血、尿液和回診追蹤。", "高血壓和糖尿病是重要風險，家屬要一起管理血壓、血糖和用藥。", "水腫、尿量改變、喘、食慾下降和疲倦，都值得記錄並帶去回診。"],
+    content: [
+      ["慢性腎臟病是什麼？", ["慢性腎臟病是腎臟過濾功能長期受損，廢物和水分調節可能受到影響。早期常沒有明顯症狀，所以很多人靠檢查才知道。", "長輩若有高血壓、糖尿病、心臟病或長期使用多種藥物，家屬更要協助規律追蹤腎功能。"]],
+      ["家屬在家怎麼觀察？", ["看水腫、尿量、尿色、喘、食慾、疲倦、皮膚癢和體重變化。這些不是用來自己診斷，而是幫醫療團隊判斷變化。", "也要整理所有藥物、止痛藥、保健品和中草藥。腎功能不好時，有些藥物需要調整或避免。"]],
+      ["日常照顧先做哪些事？", ["控制血壓和血糖是保護腎臟的重要方向。家屬可協助固定量測、提醒用藥、準備回診紀錄，而不是只在檢驗報告出來時緊張。", "飲食和水分限制要依腎臟科、營養師或醫師建議，不要自行大幅限水、限蛋白或亂補。過度限制可能造成營養和脫水問題。"]],
+      ["什麼時候要找專業？", ["尿量明顯減少、喘、水腫快速增加、血壓很高、食慾和精神快速下降，應盡快就醫。", "回診前可整理血壓血糖、體重、水腫、尿量、藥物和最近症狀，讓醫師更容易判斷是否需要調整。"]]
+    ],
+    checklists: [{ title: "腎臟病回診前整理", items: ["最近血壓與血糖紀錄。", "體重、水腫和尿量變化。", "所有藥物、止痛藥、保健品和中草藥。", "食慾、疲倦、皮膚癢或喘的狀況。", "是否有感染、腹瀉、脫水或住院。", "飲食和水分限制是否不確定。"] }],
+    tables: [{ title: "腎臟照顧快速對照", headers: ["看到的狀況", "可能代表", "下一步"], rows: [["腳腫體重增加", "水分滯留可能", "記錄並回診"], ["尿量明顯變少", "腎功能或水分問題", "盡快就醫"], ["亂吃止痛藥", "腎臟負擔風險", "先問醫師藥師"]] }],
+    faq: [
+      { question: "腎臟病沒有症狀，是不是就不嚴重？", answer: "不一定。慢性腎臟病早期可能沒有症狀，仍需要靠檢查和回診追蹤。" },
+      { question: "腎臟不好就要少喝水嗎？", answer: "不一定。水分限制要依醫囑，不能自行過度限水或大量補水。" },
+      { question: "保健品比較天然，可以放心吃嗎？", answer: "不一定。腎功能不好時，保健品、中草藥和止痛藥都可能有風險，應先詢問醫師或藥師。" }
+    ],
+    references: [referenceLibrary.niddkCkd, referenceLibrary.niddkCkdCauses, referenceLibrary.niddkCkdManagement]
+  })
+};
+
+function pptLazyPack({ summary = [], slides = [], references = [], cta = "" }) {
+  return guide({
+    readingMinutes: 2,
+    targetAudience: "家屬與主要照顧者",
+    visualFormat: "ppt-lazy-pack",
+    summary,
+    content: [],
+    checklists: [],
+    tables: [],
+    faq: [],
+    slides,
+    references,
+    cta: cta || "這份懶人包不能取代醫師診斷；若長輩出現急性惡化或你不確定風險，請先就醫或諮詢專業。"
+  });
+}
+
+const elderDiseaseLazyPackSlideEnhancements = {
+  "elderly-hypertension-lazy-pack": pptLazyPack({
+    summary: ["高血壓常沒有症狀，家屬要看一週趨勢。", "量測方式比單次數字更重要。", "合併胸痛、喘、神經症狀時要先就醫。"],
+    slides: [
+      { eyebrow: "先看結論", title: "血壓要看趨勢", lede: "長輩可能完全沒感覺，但血壓長期偏高會增加中風、心臟病與腎臟病風險。", stat: "趨勢", statLabel: "比單次數字更重要", image: "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg", visualLabel: "固定時間、固定姿勢，才看得出變化。", points: ["不要只看一次高或一次低。", "把量測時間、姿勢和不舒服一起記。", "回診時帶紀錄，不靠記憶描述。"] },
+      { eyebrow: "紅旗", title: "有症狀先就醫", lede: "血壓數字要和症狀一起看；有急性不舒服，先排除急症。", tone: "danger", image: "assets/nursing-detail-01-vitals-fast.jpg", points: ["胸痛、喘、冒冷汗或昏厥。", "突然臉歪、手腳無力、說話不清。", "劇烈頭痛、意識改變或視力突然異常。"] },
+      { eyebrow: "量測法", title: "用 722 做紀錄", lede: "連續紀錄能讓醫師看見平常狀態，而不是只看診間當下。", stat: "7-2-2", statLabel: "7天、早晚2回、每回2次", image: "assets/homepage-batch/14-care-notes-fast.jpg", points: ["量前先安靜休息。", "手臂高度、袖帶位置固定。", "兩次數值都記下來，不只挑正常的。"] },
+      { eyebrow: "家中觀察", title: "看三件事：頭暈、跌倒、生活力", lede: "長輩血壓控制要放回生活：走路穩不穩、起身會不會暈、精神是否下降。", image: "assets/homepage-batch/08-orange-apron-walking-fast.jpg", points: ["起身頭暈要記時間與情境。", "夜間如廁跌倒風險要一起處理。", "食慾、活動力下降也要帶去回診。"] },
+      { eyebrow: "用藥", title: "不要因為沒症狀就自己停藥", lede: "高血壓常安靜存在，用藥調整應由醫師判斷。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["藥袋、保健品、止痛藥一起整理。", "頭暈或水腫不要自行加減藥。", "每次回診更新藥物清單。"] },
+      { eyebrow: "回診", title: "把一週紀錄帶去，比一句還好更有用", lede: "回診前整理數字、症狀和生活變化，醫師更容易調整計畫。", image: "assets/homepage-batch/family-consultation-clear.jpg", points: ["血壓、脈搏、量測時間。", "頭暈、胸悶、喘、跌倒。", "最近是否換藥、睡不好或吃比較少。"] },
+      { eyebrow: "下一步", title: "家屬的任務是建立流程，不是每天緊張", lede: "把量測、用藥、回診和紅旗寫成固定流程，照顧會穩很多。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["固定誰量、誰記、誰陪回診。", "異常先看是否合併不舒服。", "不能取代診斷；急性惡化請就醫。"] }
+    ],
+    references: [referenceLibrary.hpaHypertension, referenceLibrary.hpaHypertension722, referenceLibrary.chronicDiseaseCdc]
+  }),
+  "elderly-diabetes-lazy-pack": pptLazyPack({
+    summary: ["糖尿病照顧要看血糖、飲食、用藥與低血糖。", "長輩更需要避免跌倒、感染與足部傷口。", "血糖目標與飲食限制應依醫囑，不自行調整。"],
+    slides: [
+      { eyebrow: "先看結論", title: "控糖看一整天", lede: "吃飯、活動、藥物和身體不舒服，都會影響長輩血糖。", image: "assets/health3/generated/hydration-meal-observation-hero.jpg", points: ["看血糖，也看有沒有吃下去。", "記錄低血糖、跌倒、感染。", "目標值要依醫師設定。"] },
+      { eyebrow: "紅旗", title: "先防低血糖", lede: "低血糖可能出現冒汗、發抖、無力、混亂，嚴重時會抽搐或失去意識。", tone: "danger", stat: "<70", statLabel: "低血糖常用警戒值 mg/dL", image: "assets/nursing-detail-01-vitals-fast.jpg", points: ["血糖低且清醒，依醫囑處理。", "不清醒、抽搐或吞嚥不安全，立即求助。", "反覆低血糖要回診調整。"] },
+      { eyebrow: "餐桌", title: "先看吃多少，再談血糖漂亮不漂亮", lede: "長輩食量不穩時，藥物和餐食若沒有同步調整，風險會上升。", image: "assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg", points: ["記錄餐量、點心、喝水。", "生病、吃少、活動多都要留意。", "不要自行大幅節食或停藥。"] },
+      { eyebrow: "足部", title: "腳的小傷口，可能變成大問題", lede: "糖尿病會增加足部傷口與感染風險，家屬要協助看見長輩看不到的地方。", image: "assets/homecare-detail-03-safe-transfer-fast.jpg", points: ["每天看腳底、趾縫、鞋內異物。", "紅腫熱痛、破皮不癒合要就醫。", "鞋襪合腳，比赤腳走路安全。"] },
+      { eyebrow: "感染", title: "發燒、嗜睡、尿味變重，都要連到血糖看", lede: "感染或脫水會讓血糖更不穩，也可能讓長輩精神快速變差。", image: "assets/health3/generated/post-discharge-care-station-hero.jpg", points: ["看體溫、精神、食慾、尿量。", "血糖突然失控要找原因。", "生病期間用藥規則先問醫療團隊。"] },
+      { eyebrow: "回診", title: "回診帶三張表：血糖、餐量、事件", lede: "用紀錄讓醫師看見生活，不只是看抽血報告。", image: "assets/homepage-batch/14-care-notes-fast.jpg", points: ["空腹、飯後或醫囑指定時間。", "低血糖、跌倒、感染、傷口。", "藥物、保健品和飲食改變。"] },
+      { eyebrow: "下一步", title: "家屬不是糖尿病警察，是流程設計師", lede: "把吃飯、量測、用藥和求助流程排好，長輩比較能穩定生活。", tone: "calm", image: "assets/homepage-batch/10-family-consultation-fast.jpg", points: ["用固定餐次降低混亂。", "分工確認誰補藥、誰陪回診。", "不能取代診斷；急性惡化請就醫。"] }
+    ],
+    references: [referenceLibrary.hpaDiabetes, referenceLibrary.hpaDiabetesGuide, referenceLibrary.niaDiabetesOlder]
+  }),
+  "elderly-dementia-lazy-pack": pptLazyPack({
+    summary: ["失智不是正常忘記，而是認知與生活功能逐漸受影響。", "家屬要觀察記憶、方向感、判斷、情緒和安全。", "突然混亂或急性變化要先排除身體疾病。"],
+    slides: [
+      { eyebrow: "先看結論", title: "看生活變化", lede: "記憶、判斷、語言、方向感和日常功能都可能慢慢改變。", image: "assets/health3/generated/dementia-evening-routine-hero.jpg", points: ["不要只問記不記得。", "看吃藥、繳費、出門、煮飯是否變難。", "早期評估比互相責備更有用。"] },
+      { eyebrow: "早期警訊", title: "如果忘記開始影響生活，就值得評估", lede: "重複問、迷路、東西放錯、判斷變差，都是家屬可以記錄的線索。", image: "assets/health3/dementia-evening-agitation.jpg", points: ["常忘近期事件或約定。", "熟悉路線也會迷失。", "情緒、個性或衛生習慣明顯改變。"] },
+      { eyebrow: "紅旗", title: "突然變混亂，不一定是失智惡化", lede: "感染、藥物、脫水、疼痛或睡眠問題，都可能讓長輩突然變亂。", tone: "danger", image: "assets/nursing-detail-01-vitals-fast.jpg", points: ["突然嗜睡、混亂、發燒要就醫。", "跌倒撞頭後變怪要提高警覺。", "急性變化不要只當退化。"] },
+      { eyebrow: "傍晚", title: "黃昏焦躁先降刺激，不急著講道理", lede: "傍晚光線、疲累、飢餓和環境噪音，可能讓不安變強。", image: "assets/health3/generated/dementia-evening-routine-inline.jpg", points: ["開柔和燈光，降低背景聲。", "給固定短句和熟悉活動。", "先安撫情緒，再談下一步。"] },
+      { eyebrow: "環境", title: "家裡要會提示，不只靠家人一直提醒", lede: "白板、照片、標籤和固定位置，可以替長輩補上線索。", image: "assets/homepage-batch/14-care-notes-fast.jpg", points: ["藥盒、水杯、鑰匙固定位置。", "門口和廁所用清楚提示。", "減少地墊、門檻與夜間風險。"] },
+      { eyebrow: "溝通", title: "一次只說一件事，成功率會高很多", lede: "失智溝通不是說服比賽，而是讓長輩感到安全。", image: "assets/homepage-batch/family-consultation-clear.jpg", points: ["短句、慢速、一個選擇。", "不要連續糾正或追問。", "用照片、動作和固定流程補語言。"] },
+      { eyebrow: "照顧者", title: "照顧者需要輪替，回應才有餘裕", lede: "失智照顧很消耗，喘息、日照和家人分工是照顧計畫的一部分。", tone: "calm", image: "assets/health3/generated/caregiver-respite-planning-hero.jpg", points: ["列出最累時段。", "安排日照、居服或家人接手。", "不能取代診斷；急性惡化請就醫。"] }
+    ],
+    references: [referenceLibrary.niaAlzheimers, referenceLibrary.niaAlzheimersBehavior, referenceLibrary.dementiaAgitation2020]
+  }),
+  "elderly-stroke-lazy-pack": pptLazyPack({
+    summary: ["中風警訊是突然發生，請立即叫救護車。", "返家後重點是復能、吞嚥、跌倒預防與再中風管理。", "症狀短暫改善仍應由醫療人員評估。"],
+    slides: [
+      { eyebrow: "先看結論", title: "中風最怕等看看", lede: "臉歪、手無力、說話不清或突然走不穩，都要把時間當成重點。", tone: "danger", image: "assets/nursing-detail-02-walking-hero-fast.jpg", points: ["突然發生就先叫救護車。", "不要先按摩、放血或睡一下。", "症狀好了也要評估。"] },
+      { eyebrow: "BE FAST", title: "平衡、眼睛、臉、手、說話、時間", lede: "把警訊背成一張圖，家人比較不會慌到忘記。", stat: "FAST", statLabel: "越快處理越好", image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg", points: ["突然失去平衡或看不清。", "臉歪、單側手腳無力。", "說話不清或聽不懂。"] },
+      { eyebrow: "吞嚥", title: "返家後吃飯安全要重新確認", lede: "喝水嗆、聲音濕、吃很久或反覆發燒，都可能和吞嚥風險有關。", image: "assets/health3/generated/swallowing-safe-meal-hero.jpg", points: ["吃飯坐直，慢慢來。", "記錄容易嗆的食物。", "需要時請吞嚥或復能專業評估。"] },
+      { eyebrow: "復能", title: "復健目標要回到生活動作", lede: "走到餐桌、上廁所、拿杯子，比只說多走一點更清楚。", image: "assets/nursing-detail-02-walking-fast.jpg", points: ["把動作拆成小步驟。", "不要硬拉患側手臂。", "疲累、頭暈、疼痛要停下觀察。"] },
+      { eyebrow: "安全", title: "跌倒預防是中風照顧的日常任務", lede: "偏癱、注意力、視野和腳步都可能影響居家安全。", image: "assets/health3/generated/fall-prevention-night-route-hero.jpg", points: ["床邊到廁所先清空。", "加夜燈、扶手、穩定椅子。", "助行器和鞋子要固定位置。"] },
+      { eyebrow: "再中風", title: "用藥、血壓、血糖，要一起追蹤", lede: "再中風風險管理不是一句有吃藥，而是規律回診與生活紀錄。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["不要自行停抗凝血或降壓藥。", "量血壓、血糖依醫囑。", "記錄新的無力、語言或吞嚥變化。"] },
+      { eyebrow: "下一步", title: "家屬帶紀錄，團隊才知道怎麼調整", lede: "把每天能做到什麼、卡在哪裡寫下來，復能目標會更貼近生活。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["功能、吞嚥、跌倒、情緒都記。", "回診帶影片或照片更清楚。", "不能取代診斷；急性惡化請就醫。"] }
+    ],
+    references: [referenceLibrary.cdcStrokeSigns, referenceLibrary.cdcStrokeFacts, referenceLibrary.transitionalCare2022]
+  }),
+  "elderly-heart-disease-lazy-pack": pptLazyPack({
+    summary: ["長輩心臟病警訊可能是胸悶、喘、疲倦或腳腫。", "急性胸痛、喘不過氣、昏厥應立即就醫。", "家屬要記錄活動耐受度、體重、腫脹與用藥。"],
+    slides: [
+      { eyebrow: "先看結論", title: "看喘、累、腳腫", lede: "不一定喊胸痛，也可能說悶、累、喘、胃不舒服或走一下就停。", image: "assets/nursing-detail-01-vitals-fast.jpg", points: ["把症狀和活動連在一起看。", "以前能走多遠，現在能走多遠。", "突然下降比單次抱怨更重要。"] },
+      { eyebrow: "紅旗", title: "胸痛、喘、昏厥，先排除急症", lede: "合併冒冷汗、噁心、虛弱、意識改變時，不要等門診。", tone: "danger", image: "assets/homepage-batch/15-phone-consultation-fast.jpg", points: ["胸痛胸悶或上半身不適。", "喘不過氣、冒冷汗、暈厥。", "心跳很亂且頭暈不舒服。"] },
+      { eyebrow: "心衰竭", title: "腳腫和體重增加，是水分警訊", lede: "呼吸、體重、腳踝腫脹和躺下喘，要一起觀察。", image: "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg", points: ["固定時間量體重。", "看鞋襪是否變緊。", "夜間咳醒或墊高枕頭要記錄。"] },
+      { eyebrow: "活動", title: "不是完全不能動，是要看耐受度", lede: "怕喘而完全不動會退化；硬撐到胸悶也危險。", image: "assets/community-detail-01-exercise-fast.jpg", points: ["活動分段，保留休息。", "熱、冷、太飽後避免勉強。", "症狀出現時停下並記錄。"] },
+      { eyebrow: "用藥", title: "利尿劑、抗凝血、降壓藥都別自行調", lede: "心臟用藥牽涉血壓、腎功能與出血風險，調整要由醫師判斷。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["藥物清單固定更新。", "瘀青、黑便、頭暈要回報。", "腳腫不要自己加利尿劑。"] },
+      { eyebrow: "飲食", title: "鹽分和水分限制要照醫囑", lede: "不同心臟狀態限制不同，家屬不要自行極端限水或限鹽。", image: "assets/health3/generated/hydration-meal-observation-hero.jpg", points: ["記錄食慾和水分。", "外食、湯品、醬料要留意。", "有腎臟病更要先問專業。"] },
+      { eyebrow: "下一步", title: "回診前整理四個變化", lede: "呼吸、體重、腫脹、活動力，是家屬最容易觀察的心臟線索。", tone: "calm", image: "assets/homepage-batch/14-care-notes-fast.jpg", points: ["何時喘、走多遠會喘。", "體重和腳腫是否增加。", "不能取代診斷；急性惡化請就醫。"] }
+    ],
+    references: [referenceLibrary.cdcHeartDisease, referenceLibrary.cdcHeartAttack, referenceLibrary.cdcHeartFailure]
+  }),
+  "elderly-copd-lazy-pack": pptLazyPack({
+    summary: ["COPD 觀察重點是咳、痰、喘與活動能力。", "喘快速惡化、嘴唇發紫或意識混亂要立即就醫。", "吸入器使用方式、避菸與感染預防很重要。"],
+    slides: [
+      { eyebrow: "先看結論", title: "喘要看變化", lede: "COPD 會讓氣流受限，常見是咳、痰、喘和日常活動變困難。", image: "assets/community-detail-01-exercise-fast.jpg", points: ["看比平常更喘，不只看有沒有喘。", "咳嗽、痰色、痰量一起記。", "洗澡、走路、吃飯都能反映耐受度。"] },
+      { eyebrow: "紅旗", title: "喘到說不出話，先就醫", lede: "呼吸快速惡化、嘴唇發紫、胸痛或混亂，不要只加吸入藥觀察。", tone: "danger", image: "assets/nursing-detail-01-vitals-fast.jpg", points: ["嘴唇發紫、意識混亂。", "喘到無法完整說話。", "吸入藥後仍無法緩解。"] },
+      { eyebrow: "咳痰", title: "痰變多、變濃、變色，要提高警覺", lede: "感染或急性惡化常先表現在痰和活動力。", image: "assets/homepage-batch/15-phone-consultation-fast.jpg", points: ["痰色、痰量、發燒一起看。", "食慾下降、嗜睡也要記。", "不要把所有變化都歸因老化。"] },
+      { eyebrow: "吸入器", title: "藥要進到肺裡，操作比有拿到藥更重要", lede: "吸入器需要手部力量、吸氣節奏和步驟記憶，長輩常需要重複確認。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["回診時帶吸入器請醫護看一次。", "確認吸完是否漱口或清潔。", "裝置換了，教學也要重做。"] },
+      { eyebrow: "環境", title: "菸味、粉塵、香氛都可能讓喘變糟", lede: "家裡的刺激物越少，呼吸照顧越穩。", image: "assets/homepage-batch/care-home-greeting-clear.jpg", points: ["戒菸並避開二手、三手菸。", "少用香氛、薰香和粉塵用品。", "空氣差時減少外出或戴口罩。"] },
+      { eyebrow: "活動", title: "安全活動能保留體力", lede: "因怕喘完全不動，肌力和耐受度會更快下降。", image: "assets/daycare-detail-01-exercise-fast.jpg", points: ["分段活動，保留休息。", "練習呼吸節奏和慢走。", "急性惡化時先就醫評估。"] },
+      { eyebrow: "下一步", title: "家裡要有急性惡化計畫", lede: "家屬要知道什麼狀況回診、急診、用藥或聯絡照顧團隊。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["把平常咳痰喘基準寫下。", "疫苗、洗手、避開感染源。", "不能取代診斷；急性惡化請就醫。"] }
+    ],
+    references: [referenceLibrary.cdcCopd, referenceLibrary.cdcCopdOlderAdults, referenceLibrary.chronicDiseaseCdc]
+  }),
+  "elderly-osteoporosis-lazy-pack": pptLazyPack({
+    summary: ["骨質疏鬆常無症狀，骨折後才被發現。", "家屬照顧重點是防跌、營養、運動與追蹤骨密度。", "跌倒後髖部或背部痛，不要硬扶硬走。"],
+    slides: [
+      { eyebrow: "先看結論", title: "先防跌倒骨折", lede: "骨頭變脆時，生活衝擊常從髖部、脊椎或手腕骨折開始。", image: "assets/health3/generated/fall-prevention-night-route-hero.jpg", points: ["早期可能完全沒感覺。", "曾骨折或常跌倒要評估。", "防跌就是骨鬆照顧核心。"] },
+      { eyebrow: "紅旗", title: "跌倒後髖痛、背痛，不要硬走", lede: "長輩可能說還好，但無法承重、疼痛加劇或變形都要就醫。", tone: "danger", image: "assets/homepage-batch/health-video-fall-observation-clear.jpg", points: ["跌倒後無法站或走。", "髖部、背部、手腕明顯痛。", "身高變矮、駝背突然加重。"] },
+      { eyebrow: "風險", title: "不是只有女性會骨鬆", lede: "高齡、曾骨折、體重過輕、類固醇、少動和跌倒風險都要放進討論。", image: "assets/nursing-detail-02-walking-fast.jpg", points: ["回診問是否需要骨密度檢查。", "整理過去骨折和跌倒史。", "不要只靠感覺判斷骨頭好不好。"] },
+      { eyebrow: "居家", title: "先改床邊到浴室這條路", lede: "夜間起身、浴室濕滑和拖鞋不合，是可先處理的風險。", image: "assets/health3/generated/fall-prevention-night-route-inline.jpg", points: ["清地墊、電線、雜物。", "加夜燈、扶手、防滑鞋。", "椅子高度要好起身。"] },
+      { eyebrow: "營養活動", title: "蛋白質、鈣、維生素 D 和肌力要一起看", lede: "骨頭需要營養，防跌也需要肌肉和平衡。", image: "assets/health3/generated/hydration-meal-observation-hero.jpg", points: ["營養補充依醫師或營養師建議。", "安全負重、肌力和平衡活動。", "避免因怕骨折而完全不動。"] },
+      { eyebrow: "用藥", title: "骨鬆藥物沒感覺，也不能自己停", lede: "骨鬆治療需要追蹤與規律，家屬可協助提醒回診和服藥方式。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["確認藥物吃法與禁忌。", "副作用或牙科治療先告知醫師。", "追蹤骨密度和跌倒事件。"] },
+      { eyebrow: "下一步", title: "每一次差點跌倒，都值得記下來", lede: "差點跌倒是提前修正環境的機會。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["記地點、時間、原因。", "先處理重複發生的位置。", "不能取代診斷；急性惡化請就醫。"] }
+    ],
+    references: [referenceLibrary.niamsOsteoporosis, referenceLibrary.niamsOsteoporosisTreatment, referenceLibrary.fallsJama2024]
+  }),
+  "elderly-osteoarthritis-lazy-pack": pptLazyPack({
+    summary: ["退化性關節炎會造成疼痛、僵硬與功能限制。", "完全不動會讓肌力下降，安全活動很重要。", "突然紅腫熱痛或無法承重，要就醫評估。"],
+    slides: [
+      { eyebrow: "先看結論", title: "痛也要安全動", lede: "退化性關節炎要找的是能安全活動的方式，而不是只剩忍痛或躺著。", image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg", points: ["看疼痛，也看功能。", "起身、上下樓、如廁最能反映困難。", "活動調整比硬撐更重要。"] },
+      { eyebrow: "紅旗", title: "關節突然紅、腫、熱、痛，不要當普通退化", lede: "如果合併發燒、跌倒或無法承重，需要就醫排除其他問題。", tone: "danger", image: "assets/nursing-detail-02-walking-fast.jpg", points: ["突然紅腫熱痛或發燒。", "跌倒後疼痛明顯。", "關節變形或無法承重。"] },
+      { eyebrow: "疼痛地圖", title: "把痛畫出來，醫師更快判斷", lede: "痛的位置、時間、動作和緩解方式，比只說很痛更有用。", image: "assets/homepage-batch/14-care-notes-fast.jpg", points: ["早晨僵硬多久。", "上下樓、蹲跪、走遠是否痛。", "休息、熱敷、藥物後是否改善。"] },
+      { eyebrow: "環境", title: "椅子太低，膝蓋會更辛苦", lede: "座椅高度、扶手、浴室和樓梯，會直接影響疼痛和跌倒風險。", image: "assets/nursing-detail-03-home-safety-fast.jpg", points: ["椅子要穩、不要太低。", "馬桶旁和浴室扶手要好抓。", "必要時評估手杖或助行器。"] },
+      { eyebrow: "活動", title: "低衝擊、分段、能持續才是重點", lede: "安全活動能維持肌力與關節活動度，完全不動可能更退化。", image: "assets/daycare-detail-01-exercise-fast.jpg", points: ["先暖身，再慢慢增加。", "分段走路，避免長時間蹲跪。", "疼痛明顯惡化就回頭調整。"] },
+      { eyebrow: "用藥", title: "貼布和止痛藥也要注意安全", lede: "長輩可能有腎臟、胃部、心血管或多重用藥問題，不能長期自己試。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["長期吃止痛藥要告知醫師。", "保健品也可能有交互作用。", "疼痛影響睡眠或外出要回診。"] },
+      { eyebrow: "下一步", title: "照顧目標是少痛一點，也多生活一點", lede: "把安全活動、環境調整和復能放在一起，長輩才敢動。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["先選一個最卡動作改善。", "用一週疼痛紀錄討論治療。", "不能取代診斷；急性惡化請就醫。"] }
+    ],
+    references: [referenceLibrary.niamsOsteoarthritis, referenceLibrary.niamsOsteoarthritisTreatment, referenceLibrary.assistiveTechnologyFalls]
+  }),
+  "elderly-parkinson-lazy-pack": pptLazyPack({
+    summary: ["巴金森氏症不只手抖，也影響動作、平衡、吞嚥和睡眠。", "家屬要觀察用藥時間和身體狀態的關係。", "跌倒變多、吞嚥惡化或混亂要及早處理。"],
+    slides: [
+      { eyebrow: "先看結論", title: "不只看手抖", lede: "動作慢、僵硬、小碎步、轉身不穩和吞嚥問題，常更影響生活。", image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg", points: ["看走路、起身、轉身。", "看吃飯喝水是否嗆。", "看睡眠、便祕、情緒和幻覺。"] },
+      { eyebrow: "紅旗", title: "跌倒變多或吞嚥變差，要快處理", lede: "巴金森照顧最怕跌倒骨折與吸入性肺炎風險。", tone: "danger", image: "assets/health3/generated/swallowing-safe-meal-hero.jpg", points: ["反覆跌倒或差點跌倒。", "喝水常嗆、發燒或聲音濕。", "幻覺、混亂、嗜睡明顯改變。"] },
+      { eyebrow: "用藥時間", title: "一天中何時卡住，要和藥效一起看", lede: "記錄用藥前後狀態，能幫助醫師判斷是否需要調整。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["不要自行改時間或劑量。", "記錄動不了、抖、僵硬的時段。", "回診帶時間表和影片。"] },
+      { eyebrow: "步態", title: "凍住時不要硬拉，先停再給提示", lede: "小碎步和突然卡住時，用口令或視覺線索比拉扯更安全。", image: "assets/nursing-detail-02-walking-fast.jpg", points: ["先讓長輩站穩。", "用短口令：看前方、跨一步。", "轉身慢一點，少催促。"] },
+      { eyebrow: "吞嚥", title: "吃飯要慢，不是一直催吃完", lede: "姿勢、口量、速度和食物質地，都會影響吞嚥安全。", image: "assets/health3/generated/swallowing-safe-meal-inline.jpg", points: ["坐直、腳踩穩。", "一口吞完再下一口。", "常嗆請專業評估。"] },
+      { eyebrow: "家裡", title: "清動線，比提醒小心更有效", lede: "地墊、門檻、昏暗路線和轉身空間，都會放大跌倒風險。", image: "assets/health3/generated/fall-prevention-night-route-hero.jpg", points: ["走道清空、夜燈固定。", "常用物品放在伸手可及處。", "浴室和床邊優先處理。"] },
+      { eyebrow: "下一步", title: "照顧節奏要穩，不要跟長輩搶速度", lede: "多給幾秒鐘，常常比多說幾句小心更有幫助。", tone: "calm", image: "assets/homepage-batch/family-consultation-clear.jpg", points: ["固定作息與用藥提醒。", "復能、吞嚥、營養一起看。", "不能取代診斷；急性惡化請就醫。"] }
+    ],
+    references: [referenceLibrary.niaParkinson, referenceLibrary.niaParkinsonSymptoms, referenceLibrary.swallowing2022]
+  }),
+  "elderly-chronic-kidney-disease-lazy-pack": pptLazyPack({
+    summary: ["慢性腎臟病早期可能沒有症狀，需要靠檢查追蹤。", "高血壓和糖尿病是重要風險，要一起管理。", "水腫、尿量改變、喘和藥物使用都要記錄。"],
+    slides: [
+      { eyebrow: "先看結論", title: "腎臟常安靜變差", lede: "早期可能沒感覺，抽血、尿液和回診紀錄才是關鍵。", image: "assets/homepage-batch/14-care-notes-fast.jpg", points: ["不要等水腫才注意。", "高血壓、糖尿病要一起管。", "檢查數值要連續看趨勢。"] },
+      { eyebrow: "紅旗", title: "喘、尿變少、全身腫，要先就醫", lede: "水分、電解質或腎功能變化可能影響全身狀態。", tone: "danger", image: "assets/nursing-detail-01-vitals-fast.jpg", points: ["喘、胸悶、意識混亂。", "尿量明顯變少。", "水腫快速增加或血壓明顯失控。"] },
+      { eyebrow: "三高", title: "顧腎不是只看腎，是先顧血壓血糖", lede: "高血壓和糖尿病是慢性腎臟病的重要風險，家屬可協助規律量測。", image: "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg", points: ["血壓、血糖依醫囑紀錄。", "回診前整理最近趨勢。", "不要只在檢查前幾天控制。"] },
+      { eyebrow: "用藥", title: "止痛藥、草藥、保健品都要問過", lede: "腎功能不好時，有些藥物或補品可能增加負擔或需要調整。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["把所有藥袋和補品拍照。", "不要自行加利尿劑或止痛藥。", "看診一定告知腎功能狀況。"] },
+      { eyebrow: "飲食水分", title: "限水、限蛋白不能自己猜", lede: "不同腎臟階段和共病不同，飲食限制要由醫師或營養師設定。", image: "assets/health3/generated/hydration-meal-observation-hero.jpg", points: ["不要自行極端限水。", "食慾下降和體重下降要記錄。", "鈉、鉀、蛋白質依專業建議。"] },
+      { eyebrow: "回診", title: "回診前準備五件事", lede: "紀錄越具體，醫師越容易判斷是否需要調整。", image: "assets/homepage-batch/family-consultation-clear.jpg", points: ["血壓血糖、體重、水腫。", "尿量、食慾、喘、疲倦。", "所有藥物、保健品、中草藥。"] },
+      { eyebrow: "下一步", title: "家屬做的是把風險提早看見", lede: "慢性腎臟病照顧不是每天害怕，而是讓異常能被早點帶去討論。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["固定量測與回診提醒。", "異常先記錄，不自行調藥。", "不能取代診斷；急性惡化請就醫。"] }
+    ],
+    references: [referenceLibrary.niddkCkd, referenceLibrary.niddkCkdCauses, referenceLibrary.niddkCkdManagement]
+  })
+};
+
 const deepStaticArticleRewritePack = Object.fromEntries(
-  Object.entries({ ...staticArticleRewritePack, ...staticArticleDepthEnhancements, ...additionalArticleDepthEnhancements, ...careworkerHardshipDepthEnhancements })
+  Object.entries({ ...staticArticleRewritePack, ...staticArticleDepthEnhancements, ...additionalArticleDepthEnhancements, ...careworkerHardshipDepthEnhancements, ...elderDiseaseLazyPackDepthEnhancements, ...elderDiseaseLazyPackSlideEnhancements })
     .map(([slug, rewrite]) => [
       slug,
       {
         ...(staticArticleRewritePack[slug] || {}),
         ...(staticArticleDepthEnhancements[slug] || {}),
         ...(additionalArticleDepthEnhancements[slug] || {}),
-        ...(careworkerHardshipDepthEnhancements[slug] || rewrite)
+        ...(careworkerHardshipDepthEnhancements[slug] || {}),
+        ...(elderDiseaseLazyPackDepthEnhancements[slug] || {}),
+        ...(elderDiseaseLazyPackSlideEnhancements[slug] || rewrite)
       }
     ])
 );
@@ -1922,5 +2560,5 @@ const aliasedArticleRewritePack = {
   ...deepStaticArticleRewritePack
 };
 
-export { health30ArticleEnhancements };
+export { elderDiseaseLazyPackArticles, health30ArticleEnhancements };
 export default aliasedArticleRewritePack;
