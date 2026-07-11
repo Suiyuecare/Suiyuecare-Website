@@ -3329,7 +3329,7 @@ function normalizeSupabaseArticlePage(article, category, cover) {
     title: article.title || "未命名文章",
     subtitle: article.subtitle || rewrite?.dek || article.excerpt || "",
     excerpt: rewrite?.dek || article.excerpt || article.subtitle || "",
-    image: getHealthArticleImage({ ...article, category: category?.display_label || category?.name || "照顧知識", categorySlug: category?.slug || categorySlug(category?.name || "照顧知識") }, cover),
+    image: getHealthArticleImage({ ...article, image: rewrite?.image || article.content_json?.image_url || article.content_json?.image || article.image, category: category?.display_label || category?.name || "照顧知識", categorySlug: category?.slug || categorySlug(category?.name || "照顧知識") }, cover),
     imageUsage: cover?.image_usage || "article_cover",
     focalPoint: cover?.focal_point || "center",
     videoUrl: video.url,
