@@ -4165,11 +4165,13 @@ async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
     pageView.innerHTML = fields.length
       ? applyCmsEnhancedServicePage(fallbackHtml, slug, fields)
       : fallbackHtml;
+    hydrateDayCareFeeGroups(pageView);
     setPageViewBusy(false);
   } catch (error) {
     console.warn(`Supabase enhanced service page unavailable for ${slug}.`, error);
     if (routeSlugFromLocation() !== slug) return;
     pageView.innerHTML = fallbackHtml;
+    hydrateDayCareFeeGroups(pageView);
     setPageViewBusy(false);
   }
 }
@@ -8994,7 +8996,115 @@ function serviceFeeItems(service, slug) {
   ];
 }
 
+const cmsAllowanceLevels = [
+  { level: 1, care: "不納入給付", respite: "不適用", shortCare: "不適用" },
+  { level: 2, care: "10,020", respite: "32,340", shortCare: "87,780" },
+  { level: 3, care: "15,460", respite: "32,340", shortCare: "87,780" },
+  { level: 4, care: "18,580", respite: "32,340", shortCare: "87,780" },
+  { level: 5, care: "24,100", respite: "32,340", shortCare: "87,780" },
+  { level: 6, care: "28,070", respite: "32,340", shortCare: "87,780" },
+  { level: 7, care: "32,090", respite: "48,510", shortCare: "71,610" },
+  { level: 8, care: "36,180", respite: "48,510", shortCare: "71,610" }
+];
+
+function renderCmsAllowanceTable() {
+  return `
+    <div class="fee-allowance-table-wrap" role="region" aria-label="CMS 等級給付額度表" tabindex="0">
+      <table class="fee-allowance-table">
+        <thead><tr><th scope="col">CMS 等級</th><th scope="col">照顧及專業服務（月）</th><th scope="col">喘息服務 G 碼（年）</th><th scope="col">短照服務 SC 碼（年）</th></tr></thead>
+        <tbody>${cmsAllowanceLevels.map((item) => `
+          <tr><th scope="row">第 ${item.level} 級</th><td>${escapeHTML(item.care)}${item.level === 1 ? "" : " 元"}</td><td>${escapeHTML(item.respite)}${item.level === 1 ? "" : " 元"}</td><td>${escapeHTML(item.shortCare)}${item.level === 1 ? "" : " 元"}</td></tr>
+        `).join("")}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderFeeCodeTable(rows = []) {
+  return `
+    <div class="fee-code-table-wrap" role="region" aria-label="日照服務碼表" tabindex="0">
+      <table class="fee-code-table">
+        <thead><tr><th scope="col">碼別</th><th scope="col">項目</th><th scope="col">內容／單位</th><th scope="col">一般價格</th><th scope="col">原民區或離島</th><th scope="col">備註</th></tr></thead>
+        <tbody>${rows.map((row) => `
+          <tr><th scope="row">${escapeHTML(row.code)}</th><td>${escapeHTML(row.name)}</td><td>${escapeHTML(row.content)}</td><td>${escapeHTML(row.price)} 元</td><td>${escapeHTML(row.remotePrice)} 元</td><td>${escapeHTML(row.note || "依照顧計畫與照管中心核定。")}</td></tr>
+        `).join("")}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+let dayCareFeeDataPromise = null;
+
+function loadDayCareFeeData() {
+  if (!dayCareFeeDataPromise) {
+    dayCareFeeDataPromise = import("./daycare-fees.js").catch((error) => {
+      dayCareFeeDataPromise = null;
+      throw error;
+    });
+  }
+  return dayCareFeeDataPromise;
+}
+
+function hydrateDayCareFeeGroups(root = document) {
+  const target = root.querySelector?.("[data-daycare-fee-groups]");
+  if (!target || target.dataset.loaded === "true" || target.dataset.loaded === "loading") return;
+  target.dataset.loaded = "loading";
+  loadDayCareFeeData()
+    .then(({ dayCareFeeGroups }) => {
+      if (routeSlugFromLocation().split("?")[0] !== "day-care") return;
+      target.innerHTML = dayCareFeeGroups.map((group, index) => `
+        <details class="fee-code-group" ${index === 0 ? "open" : ""}>
+          <summary><span>${escapeHTML(group.title)}</span><small>${escapeHTML(group.note)}</small></summary>
+          ${renderFeeCodeTable(group.rows)}
+        </details>
+      `).join("");
+      target.dataset.loaded = "true";
+    })
+    .catch((error) => {
+      console.warn("Day care fee data unavailable.", error);
+      target.dataset.loaded = "error";
+      target.textContent = "碼別資料暫時無法載入，請稍後重新整理或直接向中心詢問。";
+    });
+}
+
+function renderDayCareFeeSection() {
+  return `
+    <section class="service-fee-section service-detail-section service-motion">
+      <div class="service-section-head"><div><p class="eyebrow">Pricing</p><h2>費用怎麼算</h2></div><span>日間照顧會依長照等級、全日或半日、接送與附加服務，以及補助身分估算；中心可協助試算每月可能費用。</span></div>
+      <div class="fee-summary-grid">
+        <article><strong>依等級與全日／半日計價</strong><p>日照 BB 碼依長照第 2-8 級分全日、半日；第 2 級全日為 675／810 元，第 8 級全日為 1,285／1,540 元。</p></article>
+        <article><strong>可能另計的附加項目</strong><p>社區式沐浴 BD01、晚餐 BD02、交通接送 BD03，會依中心安排與照管核定狀況另外估算。</p></article>
+        <article class="has-cta"><strong>想知道每月大概多少？</strong><p>告訴我們每週天數、全日或半日、是否接送與補助身分，中心可先協助試算。</p><a class="service-info-link" href="#service-contact" data-service-scroll="#service-contact">請中心協助試算</a></article>
+      </div>
+      <article class="fee-allowance-card"><div><p class="eyebrow">CMS Wallet</p><h3>CMS 第 1-8 級可用額度</h3><p>第 1 級不納入長照給付；第 2-8 級依核定額度補助。超過核定額度、非核定項目或額外加購服務，皆採自費。</p></div>${renderCmsAllowanceTable()}</article>
+      <div class="fee-code-groups" data-daycare-fee-groups aria-live="polite"><p class="fee-code-loading">碼別服務介紹載入中...</p></div>
+      <p class="fee-source-note">實際可用服務、部分負擔與自費金額，仍以照管中心核定、地方政府公告及服務契約為準。</p>
+    </section>
+  `;
+}
+
+function renderDayCarePreparationSection() {
+  const items = [
+    { title: "先完成參觀與試上一日", text: "確認長輩適應環境、活動、用餐與作息後，再安排體檢與正式入托。" },
+    { title: "準備六個月內體檢文件", text: "包含抽血、B 肝表面抗原、尿液、胸部 X 光與皮膚檢查；不需糞便檢查。" },
+    { title: "帶好日常用品與用藥", text: "衛生與盥洗用品、保溫瓶、寢具、替換衣物、藥盒與必要衛生用品；藥盒請先分裝並附服藥說明。" }
+  ];
+  return renderServiceInfoSection({
+    eyebrow: "Before Enrollment",
+    title: "入托前準備",
+    body: "請依長輩平時生活習慣準備；不確定的項目可在參觀或試上一日後再和中心確認。",
+    items,
+    className: "service-notes-section day-care-preparation-section"
+  });
+}
+
 function serviceLocationItems(service, slug) {
+  if (slug === "day-care") {
+    return [
+      { title: "一館｜歲悅萬華社區長照機構", text: "108 臺北市萬華區康定路43號2樓" },
+      { title: "二館｜歲悅萬華二館社區長照機構", text: "108 臺北市萬華區西門里成都路159號2樓（雅香石頭火鍋二樓）" }
+    ];
+  }
   if (slug === "software") {
     return [
       { title: "線上訪談", text: "先以線上會議盤點流程、角色權限與第一階段模組。" },
@@ -9122,7 +9232,7 @@ function renderOneMinuteServicePage(slug) {
 
       ${renderServiceStorySection(service, slug)}
 
-      ${renderServiceInfoSection({
+      ${slug === "day-care" ? renderDayCareFeeSection() : renderServiceInfoSection({
         eyebrow: "Pricing",
         title: "費用怎麼算",
         body: serviceFeeBody(slug),
@@ -9146,6 +9256,8 @@ function renderOneMinuteServicePage(slug) {
         className: "service-notes-section",
         id: "service-apply-notes"
       })}
+
+      ${slug === "day-care" ? renderDayCarePreparationSection() : ""}
 
       ${renderServiceContactSection(service, slug)}
     </div>

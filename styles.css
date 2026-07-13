@@ -4390,6 +4390,142 @@ h2 {
 .service-fee-section .service-info-grid > li > strong {
   font-size: 20px;
 }
+.fee-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.fee-summary-grid article,
+.fee-allowance-card,
+.fee-code-group {
+  border: 1px solid rgba(227,205,176,.9);
+  border-radius: 8px;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 14px 30px rgba(83,43,11,.055);
+}
+.fee-summary-grid article {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 168px;
+  padding: 20px;
+}
+.fee-summary-grid article.has-cta { background: linear-gradient(135deg, #fffdf8, #fff1df); }
+.fee-summary-grid strong,
+.fee-allowance-card h3,
+.fee-code-group summary span { color: var(--brown); }
+.fee-summary-grid strong { font-size: 19px; line-height: 1.3; }
+.fee-summary-grid p,
+.fee-allowance-card p,
+.fee-source-note,
+.fee-code-group summary small {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14.5px;
+  font-weight: 820;
+  line-height: 1.65;
+}
+.fee-allowance-card {
+  display: grid;
+  grid-template-columns: minmax(260px, .55fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 16px;
+  padding: 22px;
+  background: linear-gradient(135deg, #fff7eb, #fffdf8 52%, #fff);
+}
+.fee-allowance-card h3 { margin: 4px 0 10px; font-size: 24px; line-height: 1.22; }
+.fee-allowance-table-wrap,
+.fee-code-table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(234,211,179,.7);
+  border-radius: 8px;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+.fee-allowance-table,
+.fee-code-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  color: var(--brown);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.fee-code-table { min-width: 980px; }
+.fee-allowance-table th,
+.fee-allowance-table td,
+.fee-code-table th,
+.fee-code-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid rgba(234,211,179,.62);
+  text-align: center;
+  vertical-align: middle;
+}
+.fee-allowance-table thead th,
+.fee-code-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fff4e5;
+  color: var(--brown);
+  font-weight: 1000;
+}
+.fee-allowance-table tbody th,
+.fee-code-table tbody th { color: var(--orange-dark); font-weight: 1000; white-space: nowrap; }
+.fee-allowance-table tr:last-child th,
+.fee-allowance-table tr:last-child td,
+.fee-code-table tr:last-child th,
+.fee-code-table tr:last-child td { border-bottom: 0; }
+.fee-code-table td:nth-child(3),
+.fee-code-table td:nth-child(6) { color: var(--muted); font-weight: 760; overflow-wrap: anywhere; }
+.fee-code-groups { display: grid; gap: 12px; }
+.fee-code-group { overflow: hidden; }
+.fee-code-group summary {
+  display: grid;
+  grid-template-columns: minmax(180px, max-content) minmax(0, 1fr) 30px;
+  gap: 10px 16px;
+  align-items: center;
+  padding: 18px 20px;
+  cursor: pointer;
+  list-style: none;
+}
+.fee-code-group summary::-webkit-details-marker { display: none; }
+.fee-code-group summary::after {
+  grid-column: 3;
+  justify-self: end;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(240,138,36,.12);
+  color: var(--orange-dark);
+  content: "+";
+  display: inline-grid;
+  place-items: center;
+  font-weight: 1000;
+}
+.fee-code-group[open] summary::after { content: "-"; }
+.fee-code-group summary span { font-size: 19px; font-weight: 1000; }
+.fee-code-group summary small { grid-column: 2; }
+.fee-code-group .fee-code-table-wrap { margin: 0 18px 18px; }
+.fee-code-loading {
+  margin: 0;
+  padding: 18px 20px;
+  border: 1px dashed rgba(240,138,36,.36);
+  border-radius: 8px;
+  background: rgba(255,247,235,.58);
+  color: #80624f;
+  font-size: 15px;
+  font-weight: 850;
+  line-height: 1.7;
+}
+.fee-source-note {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--orange);
+  background: rgba(255,247,235,.78);
+}
 .service-info-points {
   display: grid;
   gap: 10px;
@@ -11112,6 +11248,24 @@ input[name="_honey"] { display: none !important; }
   .service-fee-section .service-info-grid > li:nth-child(2) {
     grid-row: auto;
   }
+  .fee-summary-grid,
+  .fee-allowance-card { grid-template-columns: 1fr; gap: 12px; }
+  .fee-summary-grid article,
+  .fee-allowance-card { min-height: 0; padding: 18px; }
+  .fee-summary-grid strong,
+  .fee-code-group summary span { font-size: 17px; }
+  .fee-allowance-card h3 { font-size: 21px; }
+  .fee-allowance-table,
+  .fee-code-table { font-size: 13.5px; }
+  .fee-allowance-table th,
+  .fee-allowance-table td,
+  .fee-code-table th,
+  .fee-code-table td { padding: 10px; }
+  .fee-code-group summary { grid-template-columns: 1fr 32px; padding: 16px; }
+  .fee-code-group summary small { grid-column: 1 / -1; font-size: 13.5px; }
+  .fee-code-group summary::after { grid-column: 2; grid-row: 1; }
+  .fee-code-group .fee-code-table-wrap { margin: 0 12px 14px; }
+  .fee-source-note { font-size: 13.5px; }
   .service-info-points li {
     padding: 9px 10px 9px 30px;
     font-size: 13.5px;
