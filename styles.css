@@ -7992,6 +7992,382 @@ h2 {
 .talent-caregiver-benefit-list .talent-benefit-card {
   min-height: 100%;
 }
+.benefit-explorer {
+  display: grid;
+  gap: 22px;
+}
+.benefit-explorer-passport {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, .34fr);
+  min-height: 330px;
+  overflow: hidden;
+  border: 1px solid rgba(234, 211, 179, .92);
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fff7e9 0%, #fffdf8 53%, #eaf7f7 100%);
+  isolation: isolate;
+}
+.benefit-explorer-passport::after {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: 10px;
+  content: "";
+  background: repeating-linear-gradient(90deg, var(--orange) 0 32px, var(--sky) 32px 64px, var(--green) 64px 96px);
+}
+.benefit-explorer-passport-copy {
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  max-width: 760px;
+  padding: clamp(26px, 4vw, 54px);
+}
+.benefit-explorer-passport-copy .eyebrow,
+.benefit-explorer-map-head .eyebrow,
+.benefit-explorer-stage-copy .eyebrow,
+.benefit-explorer-completion .eyebrow {
+  margin: 0;
+  color: var(--sky);
+  font-size: 12px;
+  font-weight: 1000;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.benefit-explorer-passport h3,
+.benefit-explorer-map-head h3,
+.benefit-explorer-completion h3 {
+  margin: 0;
+  color: var(--brown);
+  font-size: clamp(32px, 4vw, 54px);
+  line-height: 1.12;
+}
+.benefit-explorer-passport-copy > p:not(.eyebrow),
+.benefit-explorer-map-head > span,
+.benefit-explorer-completion p:not(.eyebrow) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 780;
+  line-height: 1.72;
+}
+.benefit-explorer-milk {
+  align-self: end;
+  justify-self: center;
+  width: min(100%, 300px);
+  margin: 0 18px 10px 0;
+  filter: drop-shadow(0 18px 18px rgba(104, 62, 26, .18));
+  transform: rotate(-4deg);
+}
+.benefit-explorer-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  min-height: 40px;
+  padding: 7px 12px;
+  border: 1px solid rgba(240, 138, 36, .27);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .72);
+}
+.benefit-explorer-progress span {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+}
+.benefit-explorer-progress strong {
+  color: var(--brown);
+  font-size: 15px;
+}
+.benefit-explorer-progress b {
+  color: var(--orange-dark);
+  font-size: 22px;
+}
+.benefit-explorer-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.benefit-explorer-facts span {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 11px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .74);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+.benefit-explorer-facts b {
+  color: var(--brown);
+  font-size: 15px;
+}
+.benefit-explorer-map-wrap {
+  padding: clamp(20px, 3vw, 34px);
+  border: 1px solid rgba(234, 211, 179, .76);
+  border-radius: 8px;
+  background: #fffdf8;
+}
+.benefit-explorer-map-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+.benefit-explorer-map-head h3 {
+  margin-top: 5px;
+  font-size: clamp(26px, 3vw, 38px);
+}
+.benefit-explorer-map-head > span {
+  max-width: 250px;
+  text-align: right;
+}
+.benefit-explorer-map {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+}
+.benefit-explorer-station {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: 7px;
+  min-height: 164px;
+  padding: 13px;
+  overflow: hidden;
+  border: 1px solid rgba(231, 215, 195, .9);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--brown);
+  text-align: left;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.benefit-explorer-station::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  content: "";
+  background: var(--station-tone, var(--orange));
+}
+.benefit-explorer-station:hover,
+.benefit-explorer-station:focus-visible,
+.benefit-explorer-station.is-active {
+  border-color: var(--station-tone, var(--orange));
+  box-shadow: 0 16px 28px rgba(83, 43, 11, .12);
+  outline: none;
+  transform: translateY(-4px);
+}
+.benefit-explorer-station.is-active {
+  background: color-mix(in srgb, var(--station-wash, #fff7ec) 80%, #fff);
+}
+.benefit-explorer-station.is-bonus {
+  border-style: dashed;
+}
+.benefit-explorer-station > span:nth-of-type(2) {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 0;
+}
+.benefit-explorer-station b {
+  max-width: 100%;
+  font-size: 16px;
+  line-height: 1.32;
+}
+.benefit-explorer-station-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  margin-top: 3px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--station-wash, rgba(240, 138, 36, .12));
+  color: var(--station-tone, var(--orange-dark));
+}
+.benefit-explorer-station-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.benefit-explorer-station-stamp {
+  position: absolute;
+  right: 9px;
+  bottom: 8px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 2px solid var(--station-tone, var(--orange));
+  border-radius: 50%;
+  color: var(--station-tone, var(--orange));
+  opacity: 0;
+  transform: rotate(-18deg) scale(.65);
+  transition: opacity .18s ease, transform .18s ease;
+}
+.benefit-explorer-station-stamp svg {
+  width: 16px;
+  height: 16px;
+}
+.benefit-explorer-station.is-explored .benefit-explorer-station-stamp {
+  opacity: 1;
+  transform: rotate(-18deg) scale(1);
+}
+.benefit-explorer-tone-sky { --station-tone: var(--sky); --station-wash: rgba(22, 143, 171, .13); }
+.benefit-explorer-tone-orange { --station-tone: var(--orange-dark); --station-wash: rgba(240, 138, 36, .13); }
+.benefit-explorer-tone-green { --station-tone: var(--green); --station-wash: rgba(117, 141, 98, .15); }
+.benefit-explorer-tone-pink { --station-tone: #c86878; --station-wash: rgba(200, 104, 120, .13); }
+.benefit-explorer-stage-wrap {
+  min-height: 620px;
+}
+.benefit-explorer-stage {
+  display: grid;
+  grid-template-columns: minmax(280px, .72fr) minmax(0, 1.28fr);
+  min-height: 620px;
+  overflow: hidden;
+  border: 1px solid rgba(234, 211, 179, .76);
+  border-radius: 8px;
+  background: #fff;
+  animation: benefit-stage-in .28s ease both;
+}
+.benefit-explorer-stage[hidden] { display: none; }
+.benefit-explorer-stage-media {
+  position: relative;
+  min-height: 100%;
+  background: #ece8df;
+}
+.benefit-explorer-stage-media::after {
+  position: absolute;
+  inset: 45% 0 0;
+  content: "";
+  background: linear-gradient(180deg, transparent, rgba(54, 31, 12, .72));
+}
+.benefit-explorer-stage-media img {
+  width: 100%;
+  height: 100%;
+  min-height: 620px;
+  object-fit: cover;
+}
+.benefit-explorer-stage-media span {
+  position: absolute;
+  z-index: 1;
+  right: 22px;
+  bottom: 22px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 1000;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.benefit-explorer-stage-copy {
+  display: grid;
+  align-content: start;
+  gap: 11px;
+  padding: clamp(24px, 3.5vw, 46px);
+  background: linear-gradient(145deg, #fffdf8, var(--station-wash, #fff7ec));
+}
+.benefit-explorer-stage-copy h3 {
+  margin: 0;
+  color: var(--brown);
+  font-size: clamp(30px, 3.4vw, 48px);
+  line-height: 1.08;
+}
+.benefit-explorer-stage-copy > p:not(.eyebrow) {
+  max-width: 620px;
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-weight: 780;
+  line-height: 1.72;
+}
+.benefit-explorer-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+}
+.benefit-explorer-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 190px;
+  padding: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(231, 215, 195, .88);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .9);
+  box-shadow: 0 10px 22px rgba(83, 43, 11, .05);
+}
+.benefit-explorer-card-index {
+  color: var(--station-tone, var(--orange-dark));
+  font-size: 12px;
+  font-weight: 1000;
+  letter-spacing: 0;
+}
+.benefit-explorer-card h4 {
+  margin: 0;
+  color: var(--brown);
+  font-size: 20px;
+  line-height: 1.28;
+}
+.benefit-explorer-card strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--station-tone, var(--orange-dark));
+  font-size: clamp(21px, 2vw, 28px);
+  line-height: 1.2;
+}
+.benefit-explorer-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 760;
+  line-height: 1.65;
+}
+.benefit-explorer-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.benefit-explorer-tags span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--station-wash, rgba(240, 138, 36, .12));
+  color: var(--station-tone, var(--orange-dark));
+  font-size: 12px;
+  font-weight: 950;
+}
+.benefit-explorer-completion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: clamp(24px, 4vw, 42px);
+  border: 1px solid rgba(22, 143, 171, .22);
+  border-radius: 8px;
+  background: linear-gradient(120deg, rgba(22, 143, 171, .09), rgba(255, 253, 248, .95));
+}
+.benefit-explorer-completion h3 {
+  margin-top: 5px;
+  font-size: clamp(27px, 3vw, 40px);
+}
+.benefit-explorer-completion .primary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.benefit-explorer-completion .primary-button svg {
+  width: 18px;
+  height: 18px;
+}
+@keyframes benefit-stage-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 @media (max-width: 1120px) {
   .talent-benefit-dashboard {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -12420,7 +12796,124 @@ input[name="_honey"] { display: none !important; }
   }
 }
 
+@media (max-width: 1120px) {
+  .benefit-explorer-map {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .benefit-explorer-stage {
+    grid-template-columns: minmax(250px, .64fr) minmax(0, 1.36fr);
+  }
+  .benefit-explorer-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 900px) {
+  .benefit-explorer-passport {
+    grid-template-columns: minmax(0, 1fr) 150px;
+    min-height: 0;
+  }
+  .benefit-explorer-passport-copy {
+    padding: 26px;
+  }
+  .benefit-explorer-milk {
+    width: 150px;
+    margin: 0 8px 8px 0;
+  }
+  .benefit-explorer-map-head,
+  .benefit-explorer-completion {
+    align-items: start;
+    flex-direction: column;
+  }
+  .benefit-explorer-map-head > span {
+    max-width: none;
+    text-align: left;
+  }
+  .benefit-explorer-map {
+    display: flex;
+    margin-inline: -8px;
+    padding: 6px 8px 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: rgba(22, 143, 171, .45) transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+  .benefit-explorer-station {
+    flex: 0 0 156px;
+    min-height: 146px;
+    scroll-snap-align: start;
+  }
+  .benefit-explorer-stage-wrap,
+  .benefit-explorer-stage,
+  .benefit-explorer-stage-media img {
+    min-height: 0;
+  }
+  .benefit-explorer-stage {
+    grid-template-columns: 1fr;
+  }
+  .benefit-explorer-stage-media {
+    min-height: 250px;
+  }
+  .benefit-explorer-stage-media img {
+    height: 250px;
+  }
+}
+@media (max-width: 640px) {
+  .benefit-explorer { gap: 14px; }
+  .benefit-explorer-passport {
+    grid-template-columns: 1fr 105px;
+  }
+  .benefit-explorer-passport-copy,
+  .benefit-explorer-map-wrap,
+  .benefit-explorer-stage-copy,
+  .benefit-explorer-completion {
+    padding: 18px;
+  }
+  .benefit-explorer-passport h3 {
+    font-size: 31px;
+  }
+  .benefit-explorer-passport-copy > p:not(.eyebrow) {
+    font-size: 14px;
+  }
+  .benefit-explorer-milk {
+    width: 116px;
+    margin-right: -10px;
+  }
+  .benefit-explorer-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .benefit-explorer-facts span {
+    min-width: 0;
+  }
+  .benefit-explorer-map-head h3,
+  .benefit-explorer-completion h3 {
+    font-size: 27px;
+  }
+  .benefit-explorer-stage-media,
+  .benefit-explorer-stage-media img {
+    min-height: 206px;
+    height: 206px;
+  }
+  .benefit-explorer-stage-copy h3 {
+    font-size: 34px;
+  }
+  .benefit-explorer-card {
+    min-height: 0;
+    padding: 16px;
+  }
+  .benefit-explorer-completion .primary-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
+  .benefit-explorer-station,
+  .benefit-explorer-station-stamp,
+  .benefit-explorer-stage {
+    transition: none;
+    animation: none;
+  }
   .milestone-card {
     animation: none;
   }

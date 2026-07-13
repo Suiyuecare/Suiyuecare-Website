@@ -4385,30 +4385,10 @@ const talentPromotionCriteria = [
 ];
 
 const talentBenefitHighlights = [
-  {
-    title: "教育訓練津貼",
-    value: "4,000",
-    unit: "元/年",
-    copy: "每年支持夥伴持續進修，把照顧專業穩定累積起來。"
-  },
-  {
-    title: "健康檢查",
-    value: "1",
-    unit: "次/年",
-    copy: "每人每年安排一次健康檢查，照顧者也要被好好照顧。"
-  },
-  {
-    title: "生日禮金",
-    value: "1,000",
-    unit: "元",
-    copy: "生日當月提供禮金，讓重要日子被團隊記得。"
-  },
-  {
-    title: "節慶禮金",
-    value: "800",
-    unit: "元/節",
-    copy: "端午與中秋每節 800 元，並提供節慶禮盒。"
-  }
+  ["4,000", "元/年", "教育訓練"],
+  ["1", "次/年", "健康檢查"],
+  ["1,000", "元", "生日禮金"],
+  ["800", "元/節", "節慶禮金"]
 ];
 
 const talentBenefitCategories = [
@@ -4608,6 +4588,44 @@ const talentCaregiverExclusiveBenefits = [
     copy: "內含移位腰帶、護腰、背包、口罩、手套、酒精、名牌、版夾與筆，讓第一線服務一開始就有完整裝備。"
   }
 ];
+
+const talentBenefitStationMeta = {
+  learning: {
+    icon: "book-open-check",
+    tone: "sky",
+    image: "assets/quality-recruit-02-training-clear-display.jpg"
+  },
+  bonus: {
+    icon: "gift",
+    tone: "orange",
+    image: "assets/homepage-batch/04-admin-team-office-fast.jpg"
+  },
+  insurance: {
+    icon: "shield-check",
+    tone: "green",
+    image: "assets/homepage-batch/orange-polo-caregiver-clear-display.jpg"
+  },
+  flexibility: {
+    icon: "cloud-sun",
+    tone: "sky",
+    image: "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg"
+  },
+  "family-care": {
+    icon: "heart-handshake",
+    tone: "pink",
+    image: "assets/homepage-batch/care-home-greeting-clear-display.jpg"
+  },
+  future: {
+    icon: "rocket",
+    tone: "orange",
+    image: "assets/homepage-batch/08-orange-apron-walking-fast.jpg"
+  },
+  "caregiver-exclusive": {
+    icon: "backpack",
+    tone: "green",
+    image: "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg"
+  }
+};
 
 const talentOrgPillars = [
   ["營運管理中心", "人資、行政、客服、財務與專案管理，負責讓制度、資源與日常流程穩定運作。"],
@@ -5256,79 +5274,138 @@ function renderRecruitingJobListPanel(page, departments, openings, activeKey = "
   return renderTalentTabPanel("job-list", content, activeKey);
 }
 
+function talentBenefitStations() {
+  return [
+    ...talentBenefitCategories.map((category) => ({ ...category, ...talentBenefitStationMeta[category.key], countable: true })),
+    {
+      key: "caregiver-exclusive",
+      title: "照服員專屬支持",
+      summary: "第一線服務所需要的留任、責任保障與工作裝備，在這一站一次帶走。",
+      items: talentCaregiverExclusiveBenefits,
+      ...talentBenefitStationMeta["caregiver-exclusive"],
+      countable: false
+    }
+  ];
+}
+
 function renderTalentBenefitTags(tags = []) {
   return `
-    <div class="talent-benefit-tags" aria-label="適用標籤">
+    <div class="benefit-explorer-tags" aria-label="適用標籤">
       ${tags.map((tag) => `<span>${escapeHTML(tag)}</span>`).join("")}
     </div>
   `;
 }
 
-function renderTalentBenefitCard(item) {
+function renderTalentBenefitCard(item, index) {
   return `
-    <article class="talent-benefit-card">
-      <div class="talent-benefit-card-head">
-        <span>Benefit</span>
+    <article class="benefit-explorer-card">
+      <span class="benefit-explorer-card-index">${String(index + 1).padStart(2, "0")}</span>
+      <div>
         <h4>${escapeHTML(item.title)}</h4>
+        <strong>${escapeHTML(item.value)}</strong>
       </div>
-      <strong>${escapeHTML(item.value)}</strong>
       ${renderTalentBenefitTags(item.tags)}
       <p>${escapeHTML(item.copy)}</p>
     </article>
   `;
 }
 
-function renderTalentBenefitCategory(category, index) {
-  const categoryId = `benefit-${category.key}`;
+function renderTalentBenefitStation(station, index) {
+  const panelId = `benefit-station-panel-${station.key}`;
+  const tabId = `benefit-station-tab-${station.key}`;
+  const isActive = index === 0;
   return `
-    <section class="talent-benefit-category" id="${escapeHTML(categoryId)}" aria-labelledby="${escapeHTML(categoryId)}-title">
-      <div class="talent-benefit-category-head">
-        <span>${String(index + 1).padStart(2, "0")}</span>
-        <div>
-          <h3 id="${escapeHTML(categoryId)}-title">${escapeHTML(category.title)}</h3>
-          <p>${escapeHTML(category.summary)}</p>
+    <article
+      class="benefit-explorer-stage benefit-explorer-tone-${escapeHTML(station.tone)} ${isActive ? "is-active" : ""}"
+      id="${escapeHTML(panelId)}"
+      role="tabpanel"
+      aria-labelledby="${escapeHTML(tabId)}"
+      data-benefit-station-panel="${escapeHTML(station.key)}"
+      ${isActive ? "" : "hidden"}
+    >
+      <div class="benefit-explorer-stage-media">
+        <img src="${escapeHTML(station.image)}" alt="${escapeHTML(station.title)}相關工作情境" />
+        <span>${escapeHTML(station.title)}</span>
+      </div>
+      <div class="benefit-explorer-stage-copy">
+        <h3>${escapeHTML(station.title)}</h3>
+        <p>${escapeHTML(station.summary)}</p>
+        <div class="benefit-explorer-card-grid">
+          ${station.items.map(renderTalentBenefitCard).join("")}
         </div>
       </div>
-      <div class="talent-benefit-card-grid">
-        ${category.items.map(renderTalentBenefitCard).join("")}
-      </div>
-    </section>
+    </article>
   `;
 }
 
 function renderTalentBenefitsPanel(activeKey = "job-list") {
+  const stations = talentBenefitStations();
+  const mainStations = stations.filter((station) => station.countable);
   const content = `
-    ${renderTalentPanelLead("Benefits", "公司福利制度", "先用重點數字掌握福利，再依分類查看金額、適用對象與制度條件。")}
-    <section class="talent-benefit-dashboard" aria-label="福利亮點儀表板">
-      ${talentBenefitHighlights.map((item) => `
-        <article class="talent-benefit-metric">
-          <span>${escapeHTML(item.title)}</span>
-          <strong>${escapeHTML(item.value)}<b>${escapeHTML(item.unit)}</b></strong>
-          <p>${escapeHTML(item.copy)}</p>
-        </article>
-      `).join("")}
-    </section>
-    <div class="talent-benefit-layout">
-      <nav class="talent-benefit-nav" aria-label="福利分類">
-        ${talentBenefitCategories.map((category) => `
-          <a href="#benefit-${escapeHTML(category.key)}">${escapeHTML(category.title)}</a>
-        `).join("")}
-        <a href="#benefit-caregiver-exclusive">照服員專屬支持</a>
-      </nav>
-      <div class="talent-benefit-content">
-        ${talentBenefitCategories.map(renderTalentBenefitCategory).join("")}
-        <section class="talent-caregiver-benefit-panel" id="benefit-caregiver-exclusive" aria-labelledby="caregiver-benefits-title">
-          <div class="talent-caregiver-benefit-copy">
-            <span>Caregiver Only</span>
-            <h3 id="caregiver-benefits-title">照服員專屬支持</h3>
-            <p>把第一線照顧工作最需要的留任與責任保障獨立整理，讓照服員能快速確認自己適用的福利。</p>
+    ${renderTalentPanelLead("Benefits Passport", "公司福利制度", "選一站，快速看懂歲悅的工作支持。")}
+    <section class="benefit-explorer" data-benefit-explorer>
+      <div class="benefit-explorer-passport">
+        <div class="benefit-explorer-passport-copy">
+          <h3>跟著 Milk，探索福利。</h3>
+          <p>點選站點，看看最貼近你的工作支持。</p>
+          <div class="benefit-explorer-progress" aria-live="polite">
+            <span>福利護照</span>
+            <strong><b data-benefit-progress-count>0</b> / ${mainStations.length} 站已探索</strong>
           </div>
-          <div class="talent-caregiver-benefit-list">
-            ${talentCaregiverExclusiveBenefits.map(renderTalentBenefitCard).join("")}
+          <div class="benefit-explorer-facts">
+            ${talentBenefitHighlights.map(([value, unit, title]) => `<span><b>${escapeHTML(value)}${escapeHTML(unit)}</b>${escapeHTML(title)}</span>`).join("")}
           </div>
-        </section>
+        </div>
+        <img class="benefit-explorer-milk" src="assets/portal/suiyue-milk.png" alt="歲悅 Milk 吉祥物" />
       </div>
-    </div>
+
+      <div class="benefit-explorer-map-wrap">
+        <div class="benefit-explorer-map-head">
+          <div>
+            <h3>想先看哪一種支持？</h3>
+          </div>
+        </div>
+        <div class="benefit-explorer-map" role="tablist" aria-label="福利探索站點">
+          ${stations.map((station, index) => {
+            const panelId = `benefit-station-panel-${station.key}`;
+            const tabId = `benefit-station-tab-${station.key}`;
+            const isActive = index === 0;
+            return `
+              <button
+                class="benefit-explorer-station benefit-explorer-tone-${escapeHTML(station.tone)} ${station.countable ? "" : "is-bonus"} ${isActive ? "is-active" : ""}"
+                id="${escapeHTML(tabId)}"
+                type="button"
+                role="tab"
+                aria-selected="${isActive ? "true" : "false"}"
+                aria-controls="${escapeHTML(panelId)}"
+                tabindex="${isActive ? "0" : "-1"}"
+                data-benefit-station="${escapeHTML(station.key)}"
+                data-benefit-countable="${station.countable ? "true" : "false"}"
+              >
+                <span class="benefit-explorer-station-icon" aria-hidden="true"><i data-lucide="${escapeHTML(station.icon)}"></i></span>
+                <span>${station.countable ? String(mainStations.findIndex((item) => item.key === station.key) + 1).padStart(2, "0") : "BONUS"}</span>
+                <b>${escapeHTML(station.title)}</b>
+                <i class="benefit-explorer-station-stamp" aria-hidden="true"><span data-lucide="check"></span></i>
+              </button>
+            `;
+          }).join("")}
+        </div>
+      </div>
+
+      <div class="benefit-explorer-stage-wrap">
+        ${stations.map(renderTalentBenefitStation).join("")}
+      </div>
+
+      <section class="benefit-explorer-completion">
+        <div>
+          <h3>福利護照正在收集印章。</h3>
+          <p data-benefit-explored-list>再選幾站，看看歲悅如何支持你的生活。</p>
+        </div>
+        <button class="primary-button" type="button" data-career-jump-tab="job-list">
+          查看職位一覽 <i data-lucide="arrow-right" aria-hidden="true"></i>
+        </button>
+      </section>
+    </section>
   `;
   return renderTalentTabPanel("benefits", content, activeKey);
 }
@@ -12066,7 +12143,10 @@ function activateCareerTab(tabName, options = {}) {
     }
   });
   requestAnimationFrame(updateTalentJobDetailPosition);
-  requestAnimationFrame(updateTalentBenefitNavPosition);
+  if (tabName === "benefits") {
+    const benefitPanel = panels.find((panel) => panel.dataset.careerPanel === "benefits");
+    import("./src/lib/talentBenefitExplorer.js").then(({ hydrateTalentBenefitIcons }) => hydrateTalentBenefitIcons(benefitPanel));
+  }
 }
 
 function selectTalentJob(board, jobId, options = {}) {
@@ -12145,50 +12225,6 @@ function clearTalentJobDetailFixedState(board) {
   board.style.removeProperty("--talent-detail-top");
 }
 
-function clearTalentBenefitNavFixedState(layout) {
-  layout.classList.remove("is-nav-fixed");
-  layout.style.removeProperty("--talent-benefit-nav-left");
-  layout.style.removeProperty("--talent-benefit-nav-width");
-  layout.style.removeProperty("--talent-benefit-nav-top");
-}
-
-function updateTalentBenefitNavState(layout) {
-  const nav = layout?.querySelector(".talent-benefit-nav");
-  if (!nav || layout.offsetParent === null) return;
-  const links = [...nav.querySelectorAll('a[href^="#"]')];
-  const sections = links
-    .map((link) => {
-      const id = decodeURIComponent(link.getAttribute("href").slice(1));
-      return { id, link, target: document.getElementById(id) };
-    })
-    .filter((item) => item.target);
-  if (!sections.length) return;
-
-  const readingLine = Math.max(
-    getTalentStickyTopOffset(window.matchMedia("(max-width: 900px)").matches ? 118 : 72),
-    Math.round(window.innerHeight * 0.32)
-  );
-  let active = sections[0];
-  sections.forEach((section) => {
-    const rect = section.target.getBoundingClientRect();
-    if (rect.top <= readingLine && rect.bottom > readingLine) {
-      active = section;
-      return;
-    }
-    if (rect.top <= readingLine) active = section;
-  });
-
-  links.forEach((link) => {
-    const isActive = link === active.link;
-    link.classList.toggle("is-active", isActive);
-    if (isActive) {
-      link.setAttribute("aria-current", "true");
-    } else {
-      link.removeAttribute("aria-current");
-    }
-  });
-}
-
 function getTalentStickyTopOffset(extraGap = 18) {
   const cssHeaderHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 86;
   const headerRect = document.querySelector(".site-header")?.getBoundingClientRect();
@@ -12237,30 +12273,6 @@ function updateTalentJobDetailPosition() {
   });
 }
 
-function updateTalentBenefitNavPosition() {
-  const isDesktop = window.matchMedia("(min-width: 901px)").matches;
-  document.querySelectorAll(".talent-benefit-layout").forEach((layout) => {
-    const nav = layout.querySelector(".talent-benefit-nav");
-    updateTalentBenefitNavState(layout);
-    if (!nav || !isDesktop || layout.offsetParent === null) {
-      clearTalentBenefitNavFixedState(layout);
-      return;
-    }
-    const topOffset = getTalentStickyTopOffset();
-    const layoutRect = layout.getBoundingClientRect();
-    const navRect = nav.getBoundingClientRect();
-    const shouldFix = layoutRect.top <= topOffset && layoutRect.bottom > topOffset + navRect.height + 18 && navRect.width >= 160;
-    if (!shouldFix) {
-      clearTalentBenefitNavFixedState(layout);
-      return;
-    }
-    layout.style.setProperty("--talent-benefit-nav-left", `${Math.round(layoutRect.left)}px`);
-    layout.style.setProperty("--talent-benefit-nav-width", `${Math.round(navRect.width)}px`);
-    layout.style.setProperty("--talent-benefit-nav-top", `${topOffset}px`);
-    layout.classList.add("is-nav-fixed");
-  });
-}
-
 document.addEventListener("keydown", (event) => {
   const eventTarget = event.target instanceof Element ? event.target : null;
   const currentTab = eventTarget?.closest("[data-career-tab]");
@@ -12279,6 +12291,26 @@ document.addEventListener("keydown", (event) => {
   event.preventDefault();
   const nextTab = tabs[nextIndex];
   activateCareerTab(nextTab.dataset.careerTab, { focus: true });
+});
+
+document.addEventListener("keydown", (event) => {
+  const currentStation = event.target instanceof Element ? event.target.closest("[data-benefit-station]") : null;
+  if (!currentStation) return;
+  const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+  if (!keys.includes(event.key)) return;
+  const explorer = currentStation.closest("[data-benefit-explorer]");
+  const stations = [...(explorer?.querySelectorAll("[data-benefit-station]") || [])];
+  const currentIndex = stations.indexOf(currentStation);
+  if (currentIndex < 0) return;
+  let nextIndex = currentIndex;
+  if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % stations.length;
+  if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + stations.length) % stations.length;
+  if (event.key === "Home") nextIndex = 0;
+  if (event.key === "End") nextIndex = stations.length - 1;
+  event.preventDefault();
+  import("./src/lib/talentBenefitExplorer.js").then(({ selectTalentBenefitStation }) => {
+    selectTalentBenefitStation(explorer, stations[nextIndex].dataset.benefitStation, { focus: true });
+  });
 });
 
 document.addEventListener("keydown", (event) => {
@@ -12319,6 +12351,14 @@ document.addEventListener("click", (event) => {
     const filter = [...(board?.querySelectorAll("[data-talent-filter]") || [])].find((item) => item.dataset.talentFilter === filterName);
     if (filter) filter.value = talentChip.dataset.value || "";
     applyTalentJobFilters(board);
+    return;
+  }
+
+  const benefitStation = event.target.closest("[data-benefit-station]");
+  if (benefitStation) {
+    import("./src/lib/talentBenefitExplorer.js").then(({ selectTalentBenefitStation }) => {
+      selectTalentBenefitStation(benefitStation.closest("[data-benefit-explorer]"), benefitStation.dataset.benefitStation);
+    });
     return;
   }
 
@@ -12440,7 +12480,6 @@ window.addEventListener("scroll", () => {
   updateCareDayScroll();
   updateScrollProgress();
   updateTalentJobDetailPosition();
-  updateTalentBenefitNavPosition();
 }, { passive: true });
 window.addEventListener("error", (event) => {
   trackFrontendError("window_error", {
@@ -12462,7 +12501,6 @@ window.addEventListener("resize", () => {
   updateCareDayScroll();
   updateScrollProgress();
   updateTalentJobDetailPosition();
-  updateTalentBenefitNavPosition();
 });
 window.addEventListener("pagehide", flushPageEngagement);
 initCareDayScroll();
@@ -12470,7 +12508,6 @@ updateScrollProgress();
 optimizeImageLoading(document);
 renderPage(routeSlugFromLocation());
 requestAnimationFrame(updateTalentJobDetailPosition);
-requestAnimationFrame(updateTalentBenefitNavPosition);
 renderHomeHealthArticles();
 document.documentElement.dataset.appReady = "true";
 window.requestAnimationFrame(() => scrollToCurrentPageAnchor());
