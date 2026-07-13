@@ -9119,6 +9119,27 @@ function serviceLocationItems(service, slug) {
   ];
 }
 
+function renderDayCareLocationMap() {
+  const mapQuery = encodeURIComponent("歲悅萬華社區長照機構 108臺北市萬華區康定路43號2樓");
+  const directionsUrl = "https://www.google.com/maps/dir/?api=1&origin=108%E8%87%BA%E5%8C%97%E5%B8%82%E8%90%AC%E8%8F%AF%E5%8D%80%E5%BA%B7%E5%AE%9A%E8%B7%AF43%E8%99%9F2%E6%A8%93&destination=108%E8%87%BA%E5%8C%97%E5%B8%82%E8%90%AC%E8%8F%AF%E5%8D%80%E8%A5%BF%E9%96%80%E9%87%8C%E6%88%90%E9%83%BD%E8%B7%AF159%E8%99%9F2%E6%A8%93";
+  return `
+    <div class="day-care-location-map">
+      <div class="day-care-location-map-copy">
+        <p class="eyebrow">Map</p>
+        <strong>萬華兩館都在西門周邊</strong>
+        <p>一館與二館距離不遠，參觀前可先依地址確認方便前往的館別。</p>
+        <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer">在 Google 地圖開啟兩館位置</a>
+      </div>
+      <iframe
+        title="歲悅萬華日照中心周邊地圖"
+        src="https://www.google.com/maps?output=embed&q=${mapQuery}&z=15"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  `;
+}
+
 function serviceNoticeItems(service, slug) {
   return [
     { title: "先描述情境即可", text: "不用一次準備完整資料，先說明長輩狀態、所在地區與最急迫的需求。" },
@@ -9127,7 +9148,7 @@ function serviceNoticeItems(service, slug) {
   ];
 }
 
-function renderServiceInfoSection({ eyebrow, title, body, items, className = "", id = "" }) {
+function renderServiceInfoSection({ eyebrow, title, body, items, className = "", id = "", content = "" }) {
   return `
     <section${id ? ` id="${escapeHTML(id)}"` : ""} class="service-info-section service-detail-section service-motion ${escapeHTML(className)}">
       <div class="service-section-head">
@@ -9140,6 +9161,7 @@ function renderServiceInfoSection({ eyebrow, title, body, items, className = "",
       <ol class="service-info-grid">
         ${renderServicePlainList(items)}
       </ol>
+      ${content}
     </section>
   `;
 }
@@ -9256,7 +9278,8 @@ function renderOneMinuteServicePage(slug) {
         title: "地點分佈",
         body: "先確認你所在區域，我們會協助判斷可服務性、鄰近據點或合適窗口。",
         items: serviceLocationItems(service, slug),
-        className: "service-location-section"
+        className: "service-location-section",
+        content: slug === "day-care" ? renderDayCareLocationMap() : ""
       })}
 
       ${renderServiceInfoSection({
