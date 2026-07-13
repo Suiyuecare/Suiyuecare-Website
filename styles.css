@@ -7996,44 +7996,6 @@ h2 {
   display: grid;
   gap: 22px;
 }
-.benefit-explorer-passport {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, .34fr);
-  min-height: 330px;
-  overflow: hidden;
-  border: 1px solid rgba(234, 211, 179, .92);
-  border-radius: 8px;
-  background: linear-gradient(135deg, #fff7e9 0%, #fffdf8 53%, #eaf7f7 100%);
-  isolation: isolate;
-}
-.benefit-explorer-passport::after {
-  position: absolute;
-  inset: auto 0 0;
-  z-index: -1;
-  height: 10px;
-  content: "";
-  background: repeating-linear-gradient(90deg, var(--orange) 0 32px, var(--sky) 32px 64px, var(--green) 64px 96px);
-}
-.benefit-explorer-passport-copy {
-  display: grid;
-  align-content: center;
-  gap: 14px;
-  max-width: 760px;
-  padding: clamp(26px, 4vw, 54px);
-}
-.benefit-explorer-passport-copy .eyebrow,
-.benefit-explorer-map-head .eyebrow,
-.benefit-explorer-stage-copy .eyebrow,
-.benefit-explorer-completion .eyebrow {
-  margin: 0;
-  color: var(--sky);
-  font-size: 12px;
-  font-weight: 1000;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-.benefit-explorer-passport h3,
 .benefit-explorer-map-head h3,
 .benefit-explorer-completion h3 {
   margin: 0;
@@ -8041,66 +8003,12 @@ h2 {
   font-size: clamp(32px, 4vw, 54px);
   line-height: 1.12;
 }
-.benefit-explorer-passport-copy > p:not(.eyebrow),
-.benefit-explorer-map-head > span,
 .benefit-explorer-completion p:not(.eyebrow) {
   margin: 0;
   color: var(--muted);
   font-size: 16px;
   font-weight: 780;
   line-height: 1.72;
-}
-.benefit-explorer-milk {
-  align-self: end;
-  justify-self: center;
-  width: min(100%, 300px);
-  margin: 0 18px 10px 0;
-  filter: drop-shadow(0 18px 18px rgba(104, 62, 26, .18));
-  transform: rotate(-4deg);
-}
-.benefit-explorer-progress {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: fit-content;
-  min-height: 40px;
-  padding: 7px 12px;
-  border: 1px solid rgba(240, 138, 36, .27);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, .72);
-}
-.benefit-explorer-progress span {
-  color: var(--orange-dark);
-  font-size: 13px;
-  font-weight: 1000;
-}
-.benefit-explorer-progress strong {
-  color: var(--brown);
-  font-size: 15px;
-}
-.benefit-explorer-progress b {
-  color: var(--orange-dark);
-  font-size: 22px;
-}
-.benefit-explorer-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.benefit-explorer-facts span {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 8px 11px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, .74);
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 850;
-}
-.benefit-explorer-facts b {
-  color: var(--brown);
-  font-size: 15px;
 }
 .benefit-explorer-map-wrap {
   padding: clamp(20px, 3vw, 34px);
@@ -8118,10 +8026,6 @@ h2 {
 .benefit-explorer-map-head h3 {
   margin-top: 5px;
   font-size: clamp(26px, 3vw, 38px);
-}
-.benefit-explorer-map-head > span {
-  max-width: 250px;
-  text-align: right;
 }
 .benefit-explorer-map {
   display: grid;
@@ -12808,25 +12712,10 @@ input[name="_honey"] { display: none !important; }
   }
 }
 @media (max-width: 900px) {
-  .benefit-explorer-passport {
-    grid-template-columns: minmax(0, 1fr) 150px;
-    min-height: 0;
-  }
-  .benefit-explorer-passport-copy {
-    padding: 26px;
-  }
-  .benefit-explorer-milk {
-    width: 150px;
-    margin: 0 8px 8px 0;
-  }
   .benefit-explorer-map-head,
   .benefit-explorer-completion {
     align-items: start;
     flex-direction: column;
-  }
-  .benefit-explorer-map-head > span {
-    max-width: none;
-    text-align: left;
   }
   .benefit-explorer-map {
     display: flex;
@@ -12860,31 +12749,10 @@ input[name="_honey"] { display: none !important; }
 }
 @media (max-width: 640px) {
   .benefit-explorer { gap: 14px; }
-  .benefit-explorer-passport {
-    grid-template-columns: 1fr 105px;
-  }
-  .benefit-explorer-passport-copy,
   .benefit-explorer-map-wrap,
   .benefit-explorer-stage-copy,
   .benefit-explorer-completion {
     padding: 18px;
-  }
-  .benefit-explorer-passport h3 {
-    font-size: 31px;
-  }
-  .benefit-explorer-passport-copy > p:not(.eyebrow) {
-    font-size: 14px;
-  }
-  .benefit-explorer-milk {
-    width: 116px;
-    margin-right: -10px;
-  }
-  .benefit-explorer-facts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .benefit-explorer-facts span {
-    min-width: 0;
   }
   .benefit-explorer-map-head h3,
   .benefit-explorer-completion h3 {

@@ -4384,13 +4384,6 @@ const talentPromotionCriteria = [
   ["帶教潛力", "能整理經驗、協助新人上線，把個人能力轉化成團隊能力。"]
 ];
 
-const talentBenefitHighlights = [
-  ["4,000", "元/年", "教育訓練"],
-  ["1", "次/年", "健康檢查"],
-  ["1,000", "元", "生日禮金"],
-  ["800", "元/節", "節慶禮金"]
-];
-
 const talentBenefitCategories = [
   {
     key: "learning",
@@ -5344,21 +5337,6 @@ function renderTalentBenefitsPanel(activeKey = "job-list") {
   const content = `
     ${renderTalentPanelLead("Benefits Passport", "公司福利制度", "選一站，快速看懂歲悅的工作支持。")}
     <section class="benefit-explorer" data-benefit-explorer>
-      <div class="benefit-explorer-passport">
-        <div class="benefit-explorer-passport-copy">
-          <h3>跟著 Milk，探索福利。</h3>
-          <p>點選站點，看看最貼近你的工作支持。</p>
-          <div class="benefit-explorer-progress" aria-live="polite">
-            <span>福利護照</span>
-            <strong><b data-benefit-progress-count>0</b> / ${mainStations.length} 站已探索</strong>
-          </div>
-          <div class="benefit-explorer-facts">
-            ${talentBenefitHighlights.map(([value, unit, title]) => `<span><b>${escapeHTML(value)}${escapeHTML(unit)}</b>${escapeHTML(title)}</span>`).join("")}
-          </div>
-        </div>
-        <img class="benefit-explorer-milk" src="assets/portal/suiyue-milk.png" alt="歲悅 Milk 吉祥物" />
-      </div>
-
       <div class="benefit-explorer-map-wrap">
         <div class="benefit-explorer-map-head">
           <div>

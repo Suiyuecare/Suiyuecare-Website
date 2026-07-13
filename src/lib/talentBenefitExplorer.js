@@ -32,9 +32,6 @@ export function selectTalentBenefitStation(explorer, stationKey, options = {}) {
 
   const exploredStations = stations.filter((station) => station.dataset.benefitCountable === "true" && explored.has(station.dataset.benefitStation));
   const totalStations = stations.filter((station) => station.dataset.benefitCountable === "true").length;
-  const progressCount = explorer.querySelector("[data-benefit-progress-count]");
-  if (progressCount) progressCount.textContent = String(exploredStations.length);
-
   const exploredList = explorer.querySelector("[data-benefit-explored-list]");
   if (exploredList) {
     const names = exploredStations.map((station) => station.querySelector("b")?.textContent?.trim()).filter(Boolean);
