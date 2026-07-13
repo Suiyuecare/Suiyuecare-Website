@@ -4362,6 +4362,31 @@ h2 {
   font-weight: 820;
   line-height: 1.72;
 }
+.day-care-start-section {
+  padding-top: clamp(36px, 4vw, 60px);
+}
+.day-care-checklist-details {
+  margin-top: 18px;
+  padding: 18px 22px;
+  border: 1px solid rgba(234,211,179,.9);
+  border-radius: 8px;
+  background: rgba(255,255,255,.9);
+}
+.day-care-checklist-details summary {
+  color: var(--brown);
+  font-weight: 900;
+  cursor: pointer;
+}
+.day-care-checklist-details ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 28px;
+  margin: 18px 0 2px;
+  padding-left: 20px;
+  color: var(--muted);
+  font-weight: 750;
+  line-height: 1.6;
+}
 .service-fee-section .service-info-grid {
   grid-template-columns: minmax(260px, .82fr) minmax(0, 1.18fr);
   align-items: stretch;
@@ -11097,6 +11122,13 @@ input[name="_honey"] { display: none !important; }
   .service-info-grid {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+  .day-care-checklist-details {
+    padding: 16px 18px;
+  }
+  .day-care-checklist-details ul {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
   .service-info-grid > li {
     min-height: 0;

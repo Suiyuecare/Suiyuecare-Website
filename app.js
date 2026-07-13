@@ -8285,21 +8285,22 @@ const oneMinuteServices = {
   "day-care": {
     eyebrow: "Day Care",
     title: "日間照顧",
-    oneLiner: "白天到中心活動、用餐、休息與被照顧，晚上仍能回家。",
+    oneLiner: "白天有人陪伴、活動、共餐與照顧；晚上仍能回到熟悉的家。先參觀，再決定是否試上一日。",
     image: "assets/daycare-detail-01-exercise-hero-fast.jpg",
     imageAlt: "日間照顧中心長輩活動",
-    badge: "白天托顧",
-    idealFor: ["白天獨自在家不放心", "需要活動與社交刺激", "家屬上班需要穩定支持"],
-    outcomes: ["日常作息、餐食、活動被安排", "中心照顧團隊觀察狀態", "減少家屬白天照顧壓力"],
-    flow: ["了解長輩生活能力", "安排參觀與適應", "建立出席、接送與回報方式"],
+    badge: "白天安心、晚上回家",
+    idealFor: ["白天獨自在家，家屬不放心", "在家活動變少、需要規律作息", "家屬上班，需要穩定的白天支持"],
+    outcomes: ["活動、共餐、午休與生活支持", "照顧團隊留意精神、食慾與日常狀態", "家屬知道白天狀況，晚上安心接回家"],
+    flow: ["填姓名、電話，說明想看的館別", "安排參觀，認識環境與一日作息", "長輩適應良好，再安排試上一日與入托"],
     scenes: [
       { image: "assets/daycare-detail-02-meal-fast.jpg", title: "營養共餐", text: "依長輩吞嚥、飲食習慣與作息，安排白天餐食。" },
       { image: "assets/daycare-detail-03-activity-fast.jpg", title: "團體活動", text: "用運動、手作、認知與社交活動維持生活參與。" },
       { image: "assets/daycare-detail-04-checkin-fast.jpg", title: "每日回報", text: "中心觀察精神、食慾與活動情形，必要時提醒家屬。" }
     ],
-    applySteps: ["填寫想參觀的中心或區域", "安排參觀、試托或適應討論", "確認接送、出席頻率與補助資料"],
-    primaryCta: "詢問日照名額",
-    secondaryCta: "申請服務須知"
+    applySteps: ["填姓名、電話，說明想看的館別", "安排參觀，認識環境與一日作息", "長輩適應良好，再安排試上一日與入托"],
+    primaryCta: "預約參觀與試上一日",
+    secondaryCta: "先看入托規範",
+    contactNeed: "日間照顧諮詢"
   },
   community: {
     eyebrow: "Community",
@@ -9034,14 +9035,60 @@ function renderServiceInfoSection({ eyebrow, title, body, items, className = "",
   `;
 }
 
+function renderDayCareStartChecklist() {
+  const items = [
+    { title: "先參觀，再試上一日", text: "先帶長輩認識環境、活動與作息；確認適應良好，再安排一日體驗。" },
+    { title: "提供六個月內體檢文件", text: "包含抽血、B 肝表面抗原、尿液、胸部 X 光與皮膚檢查；不需糞便檢查。" },
+    { title: "備妥日常用品與用藥", text: "藥盒請先分裝並附服藥說明；其餘用品依長輩生活習慣準備即可。" }
+  ];
+  const checklist = [
+    "衛生紙、濕紙巾",
+    "個人物品，如牙籤牙線、梳子",
+    "保溫瓶與盥洗用品",
+    "棉被或薄毯、替換衣物",
+    "沐浴用品，建議按壓式瓶裝",
+    "藥盒與服藥說明",
+    "尿布、看護墊等必要衛生用品"
+  ];
+  return `
+    <section id="day-care-start" class="service-info-section service-detail-section service-motion day-care-start-section" aria-label="日照入托規範與準備">
+      <div class="service-section-head">
+        <div>
+          <p class="eyebrow">Before You Start</p>
+          <h2>入托前，先知道這三件事</h2>
+        </div>
+        <span>不用先決定入托。先參觀、讓長輩試上一日，再一起確認下一步。</span>
+      </div>
+      <ol class="service-info-grid">
+        ${renderServicePlainList(items)}
+      </ol>
+      <details class="day-care-checklist-details">
+        <summary>查看完整入托用品清單</summary>
+        <ul>${checklist.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>
+      </details>
+    </section>
+  `;
+}
+
 function renderServiceContactSection(service, slug) {
   const contactNeed = service.contactNeed || (slug === "software" ? "軟體系統諮詢" : slug === "quality" ? "教育品管諮詢" : "長照服務諮詢");
+  const isDayCare = slug === "day-care";
+  const title = isDayCare
+    ? "先安排參觀，讓長輩親自感受。"
+    : `想申請${service.title}？直接留下需求，讓歲悅協助你確認下一步。`;
+  const intro = isDayCare
+    ? "填寫姓名、電話並同意個資使用即可。我們會先協助安排參觀；是否試上一日、入托與費用，都等看完環境後再決定。"
+    : `不用先準備完整資料。先留下姓名、電話與需求類型，我們會依照${service.title}安排合適窗口，原則上 1 個工作天內主動聯繫。`;
+  const expectation = isDayCare
+    ? "送出後，我們會聯繫你確認館別、長輩狀況與方便參觀時間。"
+    : "送出後會寄到歲悅窗口並留存在系統，窗口會依需求類型安排專人回覆。";
+  const buttonLabel = isDayCare ? "送出參觀需求" : `送出${service.title}諮詢`;
   return `
     <section class="contact-section service-contact-section service-motion" id="service-contact" aria-label="${escapeHTML(service.title)}申請諮詢表單">
       <div>
         <p class="eyebrow">Contact Us</p>
-        <h2>想申請${escapeHTML(service.title)}？直接留下需求，讓歲悅協助你確認下一步。</h2>
-        <p>不用先準備完整資料。先留下姓名、電話與需求類型，我們會依照${escapeHTML(service.title)}安排合適窗口，原則上 1 個工作天內主動聯繫。</p>
+        <h2>${escapeHTML(title)}</h2>
+        <p>${escapeHTML(intro)}</p>
       </div>
       <form class="contact-form" action="/api/send-email" method="POST" data-form-type="contact">
         <input type="hidden" name="form_type" value="${escapeHTML(contactNeedToFormType(contactNeed))}" />
@@ -9054,10 +9101,10 @@ function renderServiceContactSection(service, slug) {
         <label>Email<input type="email" name="Email" placeholder="可選填，方便寄送回覆紀錄" /></label>
         <label>需求<select name="需求" required>${renderContactNeedOptions(contactNeed)}</select></label>
         <label class="form-notes">說明<textarea name="說明" rows="6" placeholder="可簡單描述目前遇到的情境、希望詢問的服務內容、所在地區或方便聯絡時間"></textarea></label>
-        <p class="form-expectation">送出後會寄到歲悅窗口並留存在系統，窗口會依需求類型安排專人回覆。</p>
+        <p class="form-expectation">${escapeHTML(expectation)}</p>
         <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為回覆諮詢、服務安排與後續聯繫目的，使用我填寫的個人資料。</label>
         <p class="contact-form-status" role="status" aria-live="polite" hidden></p>
-        <button type="submit">送出${escapeHTML(service.title)}諮詢</button>
+        <button type="submit">${escapeHTML(buttonLabel)}</button>
       </form>
     </section>
   `;
@@ -9066,6 +9113,7 @@ function renderServiceContactSection(service, slug) {
 function renderOneMinuteServicePage(slug) {
   const service = oneMinuteServices[slug] || oneMinuteServices["home-care"];
   const contactNeed = service.contactNeed || "長照服務諮詢";
+  const isDayCare = slug === "day-care";
   const heroImage = heroImageForViewport(service.image);
   return `
     <div class="service-detail-page one-minute-service-page ${escapeHTML(slug)}-page">
@@ -9079,14 +9127,14 @@ function renderOneMinuteServicePage(slug) {
         <div class="hero-copy service-detail-copy">
           <p class="eyebrow">${escapeHTML(service.eyebrow)}</p>
           <h1>${escapeHTML(service.title)}</h1>
-          <p class="hero-slogan">${escapeHTML(service.badge)}｜2 分鐘了解</p>
+          <p class="hero-slogan">${escapeHTML(service.badge)}｜${isDayCare ? "3 分鐘看懂" : "2 分鐘了解"}</p>
           <p>${escapeHTML(service.oneLiner)}</p>
           <div class="one-minute-service-actions">
             <a class="primary-button" href="#service-contact" data-service-scroll="#service-contact" data-contact-need="${escapeHTML(contactNeed)}" data-contact-message="我想了解${escapeHTML(service.title)}，希望協助判斷服務內容、可服務區域、費用與下一步申請方式。">${escapeHTML(service.primaryCta)}</a>
-            <a class="ghost-button" href="#service-apply-notes" data-service-scroll="#service-apply-notes">申請服務須知</a>
+            <a class="ghost-button" href="${isDayCare ? "#day-care-start" : "#service-apply-notes"}" data-service-scroll="${isDayCare ? "#day-care-start" : "#service-apply-notes"}">${escapeHTML(service.secondaryCta || "申請服務須知")}</a>
           </div>
           <div class="one-minute-proof" aria-label="${escapeHTML(service.title)}重點摘要">
-            <span>2 分鐘了解</span>
+            <span>${isDayCare ? "3 分鐘看懂" : "2 分鐘了解"}</span>
             <strong>先看照護情境，再知道怎麼申請</strong>
           </div>
         </div>
@@ -9110,6 +9158,10 @@ function renderOneMinuteServicePage(slug) {
         </article>
       </section>
 
+      ${isDayCare ? renderDayCareStartChecklist() : ""}
+
+      ${isDayCare ? renderServiceContactSection(service, slug) : ""}
+
       <section class="two-minute-scenes service-motion" aria-label="${escapeHTML(service.title)}實際照護畫面">
         <div class="service-section-head">
           <p class="eyebrow">Care Scenes</p>
@@ -9120,7 +9172,7 @@ function renderOneMinuteServicePage(slug) {
         </div>
       </section>
 
-      ${renderServiceStorySection(service, slug)}
+      ${!isDayCare ? renderServiceStorySection(service, slug) : ""}
 
       ${renderServiceInfoSection({
         eyebrow: "Pricing",
@@ -9138,16 +9190,16 @@ function renderOneMinuteServicePage(slug) {
         className: "service-location-section"
       })}
 
-      ${renderServiceInfoSection({
+      ${!isDayCare ? renderServiceInfoSection({
         eyebrow: "Before Apply",
         title: "申請服務須知",
         body: "申請前不用焦慮準備資料，先把目前情境說清楚，窗口會帶你往下一步走。",
         items: serviceNoticeItems(service, slug),
         className: "service-notes-section",
         id: "service-apply-notes"
-      })}
+      }) : ""}
 
-      ${renderServiceContactSection(service, slug)}
+      ${!isDayCare ? renderServiceContactSection(service, slug) : ""}
     </div>
   `;
 }
