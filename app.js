@@ -9091,7 +9091,7 @@ function renderDayCarePreparationSection() {
   ];
   return renderServiceInfoSection({
     eyebrow: "Before Enrollment",
-    title: "入托前準備",
+    title: "入托前，先知道這三件事",
     body: "請依長輩平時生活習慣準備；不確定的項目可在參觀或試上一日後再和中心確認。",
     items,
     className: "service-notes-section day-care-preparation-section"
@@ -9146,12 +9146,23 @@ function renderServiceInfoSection({ eyebrow, title, body, items, className = "",
 
 function renderServiceContactSection(service, slug) {
   const contactNeed = service.contactNeed || (slug === "software" ? "軟體系統諮詢" : slug === "quality" ? "教育品管諮詢" : "長照服務諮詢");
+  const isDayCare = slug === "day-care";
+  const title = isDayCare
+    ? "先安排參觀，讓長輩親自感受。"
+    : `想申請${service.title}？直接留下需求，讓歲悅協助你確認下一步。`;
+  const intro = isDayCare
+    ? "填寫姓名、電話與需求，我們會先協助安排參觀；是否試上一日、入托與費用，都能在看完環境後再決定。"
+    : `不用先準備完整資料。先留下姓名、電話與需求類型，我們會依照${service.title}安排合適窗口，原則上 1 個工作天內主動聯繫。`;
+  const expectation = isDayCare
+    ? "送出後，我們會聯繫你確認館別、長輩狀況與方便參觀時間。"
+    : "送出後會寄到歲悅窗口並留存在系統，窗口會依需求類型安排專人回覆。";
+  const buttonLabel = isDayCare ? "送出參觀需求" : `送出${service.title}諮詢`;
   return `
     <section class="contact-section service-contact-section service-motion" id="service-contact" aria-label="${escapeHTML(service.title)}申請諮詢表單">
       <div>
         <p class="eyebrow">Contact Us</p>
-        <h2>想申請${escapeHTML(service.title)}？直接留下需求，讓歲悅協助你確認下一步。</h2>
-        <p>不用先準備完整資料。先留下姓名、電話與需求類型，我們會依照${escapeHTML(service.title)}安排合適窗口，原則上 1 個工作天內主動聯繫。</p>
+        <h2>${escapeHTML(title)}</h2>
+        <p>${escapeHTML(intro)}</p>
       </div>
       <form class="contact-form" action="/api/send-email" method="POST" data-form-type="contact">
         <input type="hidden" name="form_type" value="${escapeHTML(contactNeedToFormType(contactNeed))}" />
@@ -9164,10 +9175,10 @@ function renderServiceContactSection(service, slug) {
         <label>Email<input type="email" name="Email" placeholder="可選填，方便寄送回覆紀錄" /></label>
         <label>需求<select name="需求" required>${renderContactNeedOptions(contactNeed)}</select></label>
         <label class="form-notes">說明<textarea name="說明" rows="6" placeholder="可簡單描述目前遇到的情境、希望詢問的服務內容、所在地區或方便聯絡時間"></textarea></label>
-        <p class="form-expectation">送出後會寄到歲悅窗口並留存在系統，窗口會依需求類型安排專人回覆。</p>
+        <p class="form-expectation">${escapeHTML(expectation)}</p>
         <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為回覆諮詢、服務安排與後續聯繫目的，使用我填寫的個人資料。</label>
         <p class="contact-form-status" role="status" aria-live="polite" hidden></p>
-        <button type="submit">送出${escapeHTML(service.title)}諮詢</button>
+        <button type="submit">${escapeHTML(buttonLabel)}</button>
       </form>
     </section>
   `;
