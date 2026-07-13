@@ -4586,37 +4586,37 @@ const talentBenefitStationMeta = {
   learning: {
     icon: "book-open-check",
     tone: "sky",
-    image: "assets/quality-recruit-02-training-clear-display.jpg"
+    image: "assets/benefit-explorer/learning-training.jpg"
   },
   bonus: {
     icon: "gift",
     tone: "orange",
-    image: "assets/homepage-batch/04-admin-team-office-fast.jpg"
+    image: "assets/benefit-explorer/bonus-recognition.jpg"
   },
   insurance: {
     icon: "shield-check",
     tone: "green",
-    image: "assets/homepage-batch/orange-polo-caregiver-clear-display.jpg"
+    image: "assets/benefit-explorer/insurance-care.jpg"
   },
   flexibility: {
     icon: "cloud-sun",
     tone: "sky",
-    image: "assets/homepage-batch/06-orange-polo-supervisor-fast.jpg"
+    image: "assets/benefit-explorer/flexible-work.jpg"
   },
   "family-care": {
     icon: "heart-handshake",
     tone: "pink",
-    image: "assets/homepage-batch/care-home-greeting-clear-display.jpg"
+    image: "assets/benefit-explorer/family-care.jpg"
   },
   future: {
     icon: "rocket",
     tone: "orange",
-    image: "assets/homepage-batch/08-orange-apron-walking-fast.jpg"
+    image: "assets/benefit-explorer/future-team.jpg"
   },
   "caregiver-exclusive": {
     icon: "backpack",
     tone: "green",
-    image: "assets/homepage-batch/05-orange-polo-caregiver-fast.jpg"
+    image: "assets/benefit-explorer/caregiver-kit.jpg"
   }
 };
 
