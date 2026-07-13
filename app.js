@@ -3804,6 +3804,7 @@ function renderFixedServiceTemplate(slug, fields = []) {
   const secondaryUrl = getTemplateText(fieldMap, "secondary_cta_url", "#network");
   const featureCards = getTemplateArray(fieldMap, "feature_cards");
   const flowCards = getTemplateArray(fieldMap, "flow_cards");
+  const enrollmentItems = getTemplateArray(fieldMap, "enrollment_items");
   const faqItems = getTemplateArray(fieldMap, "faq_items");
 
   return `
@@ -3846,6 +3847,17 @@ function renderFixedServiceTemplate(slug, fields = []) {
             <span>${escapeHTML(getTemplateText(fieldMap, "flow_body", ""))}</span>
           </div>
           ${renderTemplateCards(flowCards, "flow")}
+        </section>
+      ` : ""}
+
+      ${enrollmentItems.length ? `
+        <section class="service-detail-section">
+          <div class="service-section-head">
+            <p class="eyebrow">${escapeHTML(getTemplateText(fieldMap, "enrollment_eyebrow", "Enrollment Checklist"))}</p>
+            <h2>${escapeHTML(getTemplateText(fieldMap, "enrollment_title", "入托準備清單"))}</h2>
+            <span>${escapeHTML(getTemplateText(fieldMap, "enrollment_body", "體檢完成後，請依長輩平時生活習慣準備以下用品。"))}</span>
+          </div>
+          ${renderTemplateCards(enrollmentItems)}
         </section>
       ` : ""}
 
