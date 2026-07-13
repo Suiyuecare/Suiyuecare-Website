@@ -7996,19 +7996,11 @@ h2 {
   display: grid;
   gap: 22px;
 }
-.benefit-explorer-map-head h3,
-.benefit-explorer-completion h3 {
+.benefit-explorer-map-head h3 {
   margin: 0;
   color: var(--brown);
   font-size: clamp(32px, 4vw, 54px);
   line-height: 1.12;
-}
-.benefit-explorer-completion p:not(.eyebrow) {
-  margin: 0;
-  color: var(--muted);
-  font-size: 16px;
-  font-weight: 780;
-  line-height: 1.72;
 }
 .benefit-explorer-map-wrap {
   padding: clamp(20px, 3vw, 34px);
@@ -8243,30 +8235,6 @@ h2 {
   color: var(--station-tone, var(--orange-dark));
   font-size: 12px;
   font-weight: 950;
-}
-.benefit-explorer-completion {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 22px;
-  padding: clamp(24px, 4vw, 42px);
-  border: 1px solid rgba(22, 143, 171, .22);
-  border-radius: 8px;
-  background: linear-gradient(120deg, rgba(22, 143, 171, .09), rgba(255, 253, 248, .95));
-}
-.benefit-explorer-completion h3 {
-  margin-top: 5px;
-  font-size: clamp(27px, 3vw, 40px);
-}
-.benefit-explorer-completion .primary-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-.benefit-explorer-completion .primary-button svg {
-  width: 18px;
-  height: 18px;
 }
 @keyframes benefit-stage-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -12712,8 +12680,7 @@ input[name="_honey"] { display: none !important; }
   }
 }
 @media (max-width: 900px) {
-  .benefit-explorer-map-head,
-  .benefit-explorer-completion {
+  .benefit-explorer-map-head {
     align-items: start;
     flex-direction: column;
   }
@@ -12750,12 +12717,10 @@ input[name="_honey"] { display: none !important; }
 @media (max-width: 640px) {
   .benefit-explorer { gap: 14px; }
   .benefit-explorer-map-wrap,
-  .benefit-explorer-stage-copy,
-  .benefit-explorer-completion {
+  .benefit-explorer-stage-copy {
     padding: 18px;
   }
-  .benefit-explorer-map-head h3,
-  .benefit-explorer-completion h3 {
+  .benefit-explorer-map-head h3 {
     font-size: 27px;
   }
   .benefit-explorer-stage-media,
@@ -12769,10 +12734,6 @@ input[name="_honey"] { display: none !important; }
   .benefit-explorer-card {
     min-height: 0;
     padding: 16px;
-  }
-  .benefit-explorer-completion .primary-button {
-    width: 100%;
-    justify-content: center;
   }
 }
 @media (prefers-reduced-motion: reduce) {

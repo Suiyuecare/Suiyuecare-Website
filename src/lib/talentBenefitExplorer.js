@@ -30,16 +30,5 @@ export function selectTalentBenefitStation(explorer, stationKey, options = {}) {
     panel.classList.toggle("is-active", isActive);
   });
 
-  const exploredStations = stations.filter((station) => station.dataset.benefitCountable === "true" && explored.has(station.dataset.benefitStation));
-  const totalStations = stations.filter((station) => station.dataset.benefitCountable === "true").length;
-  const exploredList = explorer.querySelector("[data-benefit-explored-list]");
-  if (exploredList) {
-    const names = exploredStations.map((station) => station.querySelector("b")?.textContent?.trim()).filter(Boolean);
-    exploredList.textContent = names.length === totalStations
-      ? "六站探索完成。去看看適合你的職位。"
-      : names.length
-        ? `已探索：${names.join("、")}。再選幾站看看更多支持。`
-        : "再選幾站，看看更多支持。";
-  }
   if (options.focus) target.focus({ preventScroll: true });
 }

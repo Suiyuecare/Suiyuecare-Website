@@ -5373,16 +5373,6 @@ function renderTalentBenefitsPanel(activeKey = "job-list") {
       <div class="benefit-explorer-stage-wrap">
         ${stations.map(renderTalentBenefitStation).join("")}
       </div>
-
-      <section class="benefit-explorer-completion">
-        <div>
-          <h3>福利護照正在收集印章。</h3>
-          <p data-benefit-explored-list>再選幾站，看看歲悅如何支持你的生活。</p>
-        </div>
-        <button class="primary-button" type="button" data-career-jump-tab="job-list">
-          查看職位一覽 <i data-lucide="arrow-right" aria-hidden="true"></i>
-        </button>
-      </section>
     </section>
   `;
   return renderTalentTabPanel("benefits", content, activeKey);
