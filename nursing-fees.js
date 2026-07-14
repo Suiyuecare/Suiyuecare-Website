@@ -1,3 +1,5 @@
+import "./nursing-services.js";
+
 const fee = (code, name, content, price, remotePrice, note = "") => ({ code, name, content, price, remotePrice, note });
 
 const nursingProfessionalCodes = [
