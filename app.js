@@ -9027,7 +9027,6 @@ function serviceFeeItems(service, slug) {
   }
   if (slug === "nursing") {
     return [
-      { title: "先訂專業目標", text: "護理復能不是把所有項目都排上去，而是先看長輩目前最需要改善的生活能力、營養吞嚥或照護風險，再確認適合的服務組合。", featured: true },
       {
         title: "專業服務價格參考",
         text: "以下為長照給（支）付價格參考，格式為一般價格／原民區或離島價格；實際自付額依補助資格、核定額度與服務次數確認。",
