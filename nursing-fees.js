@@ -13,6 +13,15 @@ const nursingProfessionalCodes = [
 ];
 
 const nursingCodeSet = new Set(["CA07", "CA08", "CB01", "CB02", "CB03", "CB04"]);
+const nursingHouseholds = {
+  general: { label: "一般戶", rate: 0.16 },
+  "mid-low": { label: "中低收入戶", rate: 0.05 },
+  low: { label: "低收入戶", rate: 0 }
+};
+
+function nursingCopay(price, rate) {
+  return `${Math.round(Number(price.replaceAll(",", "")) * rate).toLocaleString("zh-TW")} 元`;
+}
 
 export const nursingFeeGroups = [
   {
@@ -27,17 +36,45 @@ export const nursingFeeGroupsMarkup = nursingFeeGroups.map((group, index) => `
     <summary><span>${group.title}</span><small>${group.note}</small></summary>
     <div class="fee-code-table-wrap">
       <table class="fee-code-table">
-        <thead><tr><th scope="col">碼別</th><th scope="col">項目</th><th scope="col">內容／單位</th><th scope="col">一般價格</th><th scope="col">原民區或離島</th><th scope="col">備註</th></tr></thead>
-        <tbody>${group.rows.map((row) => `<tr><th scope="row">${row.code}</th><td>${row.name}</td><td>${row.content}</td><td>${row.price} 元</td><td>${row.remotePrice} 元</td><td>${row.note || "依照顧計畫與照管中心核定。"}</td></tr>`).join("")}</tbody>
+        <thead><tr><th scope="col">碼別</th><th scope="col">項目</th><th scope="col">內容／單位</th><th scope="col">一般價格</th><th scope="col">自負額</th><th scope="col">備註</th></tr></thead>
+        <tbody>${group.rows.map((row) => `<tr><th scope="row">${row.code}</th><td>${row.name}</td><td>${row.content}</td><td>${row.price} 元</td><td class="fee-copay-cell" data-nursing-price="${row.price}"><strong>${nursingCopay(row.price, nursingHouseholds.general.rate)}</strong><small>一般戶 16%</small></td><td>${row.note || "依照顧計畫與照管中心核定。"}</td></tr>`).join("")}</tbody>
       </table>
     </div>
   </details>
 `).join("");
+
+const nursingHouseholdPickerMarkup = `
+  <div class="fee-household-picker" data-nursing-household-picker role="radiogroup" aria-labelledby="nursing-fee-household-title">
+    <strong class="fee-household-title" id="nursing-fee-household-title">先選擇您的補助身分</strong>
+    <div class="fee-household-options">
+      <label><input type="radio" name="nursing-fee-household" value="general" checked><span>一般戶<small>自付 16%</small></span></label>
+      <label><input type="radio" name="nursing-fee-household" value="mid-low"><span>中低收入戶<small>自付 5%</small></span></label>
+      <label><input type="radio" name="nursing-fee-household" value="low"><span>低收入戶<small>自付 0%</small></span></label>
+    </div>
+    <output data-nursing-copay-status aria-live="polite">目前顯示：一般戶，自付一般價格的 16%</output>
+  </div>`;
+
+function bindNursingHouseholdPicker(root) {
+  const picker = root.querySelector("[data-nursing-household-picker]");
+  if (!picker) return;
+  picker.addEventListener("change", (event) => {
+    const household = nursingHouseholds[event.target.value];
+    if (!household) return;
+    root.querySelectorAll("[data-nursing-price]").forEach((cell) => {
+      cell.querySelector("strong").textContent = nursingCopay(cell.dataset.nursingPrice, household.rate);
+      cell.querySelector("small").textContent = `${household.label} ${Math.round(household.rate * 100)}%`;
+    });
+    picker.querySelector("output").textContent = `目前顯示：${household.label}，自付一般價格的 ${Math.round(household.rate * 100)}%`;
+  });
+}
 
 export function hydrateNursingPage(root) {
   const fragment = (markup) => document.createRange().createContextualFragment(markup);
   root.querySelector("[data-ns]")?.replaceWith(fragment(nursingServiceSectionMarkup));
   root.querySelector("[data-ni]")?.replaceWith(fragment(nursingIdentityFieldMarkup));
   const fees = root.querySelector("[data-nursing-fee-groups]");
-  if (fees) fees.innerHTML = nursingFeeGroupsMarkup;
+  if (fees) {
+    fees.innerHTML = nursingHouseholdPickerMarkup + nursingFeeGroupsMarkup;
+    bindNursingHouseholdPicker(root);
+  }
 }
