@@ -1120,6 +1120,91 @@ h2 {
 .service-story-slider .story-points {
   margin-top: 8px;
 }
+.nursing-service-section {
+  background: linear-gradient(180deg, #fffdf8 0%, #fff8ee 100%);
+}
+.nursing-service-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, .72fr) auto;
+  align-items: end;
+  gap: 24px;
+}
+.nursing-service-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.nursing-service-slider {
+  display: flex;
+  gap: 18px;
+  padding: 4px 4px 18px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: rgba(240,138,36,.72) rgba(246,233,217,.72);
+}
+.nursing-service-slider article {
+  flex: 0 0 clamp(310px, 31vw, 430px);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
+  scroll-snap-align: start;
+}
+.nursing-service-slider figure {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  margin: 0;
+  overflow: hidden;
+  background: #f6e9d9;
+}
+.nursing-service-slider img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .35s ease;
+}
+.nursing-service-slider article:hover img {
+  transform: scale(1.025);
+}
+.nursing-service-slider figure span {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255,255,255,.94);
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 10px 24px rgba(83,43,11,.16);
+}
+.nursing-service-slider article > div {
+  padding: 24px 24px 26px;
+}
+.nursing-service-slider h3 {
+  margin: 0 0 10px;
+  color: var(--brown);
+  font-size: 25px;
+}
+.nursing-service-slider p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.nursing-service-slider::-webkit-scrollbar { height: 10px; }
+.nursing-service-slider::-webkit-scrollbar-track { border-radius: 999px; background: rgba(246,233,217,.72); }
+.nursing-service-slider::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(240,138,36,.72); }
+.nursing-service-swipe-note {
+  margin: 2px 4px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
 .story-slider {
   display: flex;
   gap: 18px;
@@ -12716,6 +12801,25 @@ input[name="_honey"] { display: none !important; }
   }
 }
 @media (max-width: 640px) {
+  .nursing-service-head {
+    gap: 16px;
+  }
+  .nursing-service-controls {
+    justify-self: start;
+  }
+  .nursing-service-controls .carousel-button {
+    width: 50px;
+    height: 50px;
+  }
+  .nursing-service-slider {
+    margin-inline: -4px;
+  }
+  .nursing-service-slider article {
+    flex-basis: min(84vw, 340px);
+  }
+  .nursing-service-slider article > div {
+    padding: 20px 20px 22px;
+  }
   .benefit-explorer { gap: 14px; }
   .benefit-explorer-map-wrap,
   .benefit-explorer-stage-copy {
@@ -12738,6 +12842,9 @@ input[name="_honey"] { display: none !important; }
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .nursing-service-slider img {
+    transition: none;
+  }
   .benefit-explorer-station,
   .benefit-explorer-station-stamp,
   .benefit-explorer-stage {

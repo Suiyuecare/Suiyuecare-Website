@@ -9364,6 +9364,8 @@ function renderOneMinuteServicePage(slug, layout = {}) {
         </article>
       </section>
 
+      ${slug === "nursing" ? `<div data-nursing-service-section></div>` : ""}
+
       <section class="two-minute-scenes service-motion" aria-label="${escapeHTML(service.title)}實際照護畫面">
         <div class="service-section-head">
           <p class="eyebrow">Care Scenes</p>
