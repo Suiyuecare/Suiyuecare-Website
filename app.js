@@ -9354,7 +9354,7 @@ function renderOneMinuteServicePage(slug, layout = {}) {
         </div>
       </section>`}
 
-      ${isNursing ? "" : renderServiceStorySection(service, slug)}
+      ${renderServiceStorySection(service, slug)}
 
       ${isDayCare ? renderDayCareFeeSection() : isNursing ? renderNursingFeeSection() : renderServiceInfoSection({
         eyebrow: "Pricing",
