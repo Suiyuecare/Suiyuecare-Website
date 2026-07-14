@@ -4608,6 +4608,55 @@ h2 {
 .fee-code-table td:nth-child(3),
 .fee-code-table td:nth-child(6) { color: var(--muted); font-weight: 760; overflow-wrap: anywhere; }
 .fee-code-groups { display: grid; gap: 12px; }
+.nursing-page .fee-household-picker {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 2px solid rgba(240,138,36,.3);
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fff1df, #fffaf4 62%, #fff);
+  box-shadow: 0 14px 30px rgba(83,43,11,.055);
+}
+.nursing-page .fee-household-title {
+  color: var(--brown);
+  font-size: 18px;
+  font-weight: 1000;
+}
+.nursing-page .fee-household-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.nursing-page .fee-household-options label { position: relative; cursor: pointer; }
+.nursing-page .fee-household-options input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.nursing-page .fee-household-options span {
+  display: grid;
+  gap: 3px;
+  min-height: 66px;
+  align-content: center;
+  padding: 10px 14px;
+  border: 1px solid rgba(227,205,176,.95);
+  border-radius: 8px;
+  background: rgba(255,255,255,.9);
+  color: var(--brown);
+  font-size: 15px;
+  font-weight: 950;
+  text-align: center;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.nursing-page .fee-household-options span small { color: var(--orange-dark); font-size: 13px; font-weight: 900; }
+.nursing-page .fee-household-options input:checked + span {
+  border-color: var(--orange);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(240,138,36,.16);
+  transform: translateY(-1px);
+}
+.nursing-page .fee-household-options input:focus-visible + span { outline: 3px solid rgba(240,138,36,.34); outline-offset: 3px; }
+.nursing-page .fee-household-picker output { color: var(--muted); font-size: 13.5px; font-weight: 850; }
+.nursing-page .fee-copay-cell strong,
+.nursing-page .fee-copay-cell small { display: block; white-space: nowrap; }
+.nursing-page .fee-copay-cell strong { color: var(--orange-dark); font-size: 16px; font-weight: 1000; }
+.nursing-page .fee-copay-cell small { margin-top: 2px; color: var(--muted); font-size: 11.5px; font-weight: 800; }
 .fee-code-group { overflow: hidden; }
 .fee-code-group summary {
   display: grid;
@@ -11650,6 +11699,14 @@ input[name="_honey"] { display: none !important; }
   .fee-code-group summary small { grid-column: 1 / -1; font-size: 13.5px; }
   .fee-code-group summary::after { grid-column: 2; grid-row: 1; }
   .fee-code-group .fee-code-table-wrap { margin: 0 12px 14px; }
+  .nursing-page .fee-household-picker { padding: 16px; }
+  .nursing-page .fee-household-options { grid-template-columns: 1fr; gap: 8px; }
+  .nursing-page .fee-household-options span {
+    grid-template-columns: 1fr auto;
+    min-height: 52px;
+    align-items: center;
+    text-align: left;
+  }
   .fee-source-note { font-size: 13.5px; }
   .service-info-points li {
     padding: 9px 10px 9px 30px;
