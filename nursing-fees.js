@@ -1,4 +1,5 @@
-import "./nursing-services.js";
+import { nursingIdentityFieldMarkup, nursingServiceSectionMarkup } from "./nursing-services.js";
+export { nursingIdentityFieldMarkup, nursingServiceSectionMarkup };
 
 const fee = (code, name, content, price, remotePrice, note = "") => ({ code, name, content, price, remotePrice, note });
 
@@ -20,3 +21,23 @@ export const nursingFeeGroups = [
     rows: nursingProfessionalCodes.filter((item) => nursingCodeSet.has(item.code))
   }
 ];
+
+export const nursingFeeGroupsMarkup = nursingFeeGroups.map((group, index) => `
+  <details class="fee-code-group" ${index === 0 ? "open" : ""}>
+    <summary><span>${group.title}</span><small>${group.note}</small></summary>
+    <div class="fee-code-table-wrap">
+      <table class="fee-code-table">
+        <thead><tr><th scope="col">碼別</th><th scope="col">項目</th><th scope="col">內容／單位</th><th scope="col">一般價格</th><th scope="col">原民區或離島</th><th scope="col">備註</th></tr></thead>
+        <tbody>${group.rows.map((row) => `<tr><th scope="row">${row.code}</th><td>${row.name}</td><td>${row.content}</td><td>${row.price} 元</td><td>${row.remotePrice} 元</td><td>${row.note || "依照顧計畫與照管中心核定。"}</td></tr>`).join("")}</tbody>
+      </table>
+    </div>
+  </details>
+`).join("");
+
+export function hydrateNursingPage(root) {
+  const fragment = (markup) => document.createRange().createContextualFragment(markup);
+  root.querySelector("[data-ns]")?.replaceWith(fragment(nursingServiceSectionMarkup));
+  root.querySelector("[data-ni]")?.replaceWith(fragment(nursingIdentityFieldMarkup));
+  const fees = root.querySelector("[data-nursing-fee-groups]");
+  if (fees) fees.innerHTML = nursingFeeGroupsMarkup;
+}

@@ -224,6 +224,7 @@ function buildSubmissionPayload(body) {
       opening_id: sanitize(body.opening_id, 120),
       opening_title: sanitize(body.opening_title, 220),
       opening_slug: sanitize(body.opening_slug, 160),
+      identity_category: sanitize(body.identity_category || body["身分類別"], 80),
       user_agent: sanitize(body.user_agent, 500),
       page_title: sanitize(body.page_title, 240),
       submitted_at: new Date().toISOString()
@@ -438,6 +439,7 @@ function renderEmailHtml(payload) {
     ["電話", payload.phone],
     ["Email", payload.email],
     ["主旨/需求", payload.subject],
+    ["身分類別", payload.metadata.identity_category],
     ["報名課程", payload.metadata.course_title],
     ["內容", payload.message],
     ["部門/分類", payload.metadata.department_title],

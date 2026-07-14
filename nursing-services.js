@@ -6,6 +6,8 @@ const nursingServiceCards = [
   ["護理指導", "由護理人員示範日常觀察與照護技巧，讓家屬在家也能照顧得更有把握。", "nursing-guidance.jpg"]
 ];
 
+export const nursingIdentityFieldMarkup = `<label>身分類別<select name="身分類別" required><option value="" selected disabled>請選擇身分類別</option><option value="一般戶">一般戶（自付 16%）</option><option value="中低收入戶">中低收入戶（自付 5%）</option><option value="低收入戶">低收入戶（自付 0%）</option><option value="尚不確定">尚不確定，請協助確認</option></select></label>`;
+
 export const nursingServiceSectionMarkup = `
   <section class="nursing-service-section service-detail-section service-motion" aria-labelledby="nursing-service-title">
     <div class="service-section-head nursing-service-head">
@@ -33,6 +35,3 @@ export const nursingServiceSectionMarkup = `
     <p class="nursing-service-swipe-note">可左右滑動查看更多服務項目</p>
   </section>
 `;
-
-const nursingServiceTarget = document.querySelector("[data-nursing-service-section]");
-if (nursingServiceTarget) nursingServiceTarget.outerHTML = nursingServiceSectionMarkup;
