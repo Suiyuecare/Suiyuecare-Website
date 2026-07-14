@@ -4166,12 +4166,14 @@ async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
       ? applyCmsEnhancedServicePage(fallbackHtml, slug, fields)
       : fallbackHtml;
     hydrateDayCareFeeGroups(pageView);
+    hydrateNursingFeeGroups(pageView);
     setPageViewBusy(false);
   } catch (error) {
     console.warn(`Supabase enhanced service page unavailable for ${slug}.`, error);
     if (routeSlugFromLocation() !== slug) return;
     pageView.innerHTML = fallbackHtml;
     hydrateDayCareFeeGroups(pageView);
+    hydrateNursingFeeGroups(pageView);
     setPageViewBusy(false);
   }
 }
@@ -9032,9 +9034,10 @@ function serviceFeeItems(service, slug) {
         points: [
           "CA07 IADLs／ADLs 復能：3 次措施 NT$4,500／NT$5,400",
           "CA08 個別化服務計畫（ISP）：4 次措施 NT$6,000／NT$7,200",
-          "CB01 營養照護：4 次措施 NT$4,000／NT$4,800",
-          "CB02 進食與吞嚥照護、CB04 臥床或長期活動受限照護：6 次措施 NT$9,000／NT$10,800",
-          "CB03 困擾行為照護：3 次措施 NT$4,500／NT$5,400"
+          "CB01 營養照護：3 次措施 NT$4,500／NT$5,400",
+          "CB02 進食與吞嚥照護：6 次措施 NT$9,000／NT$10,800",
+          "CB03 困擾行為照護：3 次措施 NT$4,500／NT$5,400",
+          "CB04 臥床或長期活動受限照護：6 次措施 NT$9,000／NT$10,800"
         ]
       },
       { title: "不確定適合哪一項？", text: "先描述診斷、出院時間、行走能力、飲食吞嚥或目前最擔心的狀況，我們會協助判斷是否適合安排護理復能。", cta: "請專人協助判斷", href: "#service-contact" }
@@ -9073,7 +9076,7 @@ function renderCmsAllowanceTable() {
 
 function renderFeeCodeTable(rows = []) {
   return `
-    <div class="fee-code-table-wrap" role="region" aria-label="日照服務碼表" tabindex="0">
+    <div class="fee-code-table-wrap" role="region" aria-label="長照服務碼表" tabindex="0">
       <table class="fee-code-table">
         <thead><tr><th scope="col">碼別</th><th scope="col">項目</th><th scope="col">內容／單位</th><th scope="col">一般價格</th><th scope="col">原民區或離島</th><th scope="col">備註</th></tr></thead>
         <tbody>${rows.map((row) => `
@@ -9118,6 +9121,40 @@ function hydrateDayCareFeeGroups(root = document) {
     });
 }
 
+let nursingFeeDataPromise = null;
+
+function loadNursingFeeData() {
+  if (!nursingFeeDataPromise) {
+    nursingFeeDataPromise = import("./nursing-fees.js").catch((error) => {
+      nursingFeeDataPromise = null;
+      throw error;
+    });
+  }
+  return nursingFeeDataPromise;
+}
+
+function hydrateNursingFeeGroups(root = document) {
+  const target = root.querySelector?.("[data-nursing-fee-groups]");
+  if (!target || target.dataset.loaded === "true" || target.dataset.loaded === "loading") return;
+  target.dataset.loaded = "loading";
+  loadNursingFeeData()
+    .then(({ nursingFeeGroups }) => {
+      if (routeSlugFromLocation().split("?")[0] !== "nursing") return;
+      target.innerHTML = nursingFeeGroups.map((group, index) => `
+        <details class="fee-code-group" ${index === 0 ? "open" : ""}>
+          <summary><span>${escapeHTML(group.title)}</span><small>${escapeHTML(group.note)}</small></summary>
+          ${renderFeeCodeTable(group.rows)}
+        </details>
+      `).join("");
+      target.dataset.loaded = "true";
+    })
+    .catch((error) => {
+      console.warn("Nursing fee data unavailable.", error);
+      target.dataset.loaded = "error";
+      target.textContent = "護理復能碼別資料暫時無法載入，請稍後重新整理或直接向窗口詢問。";
+    });
+}
+
 function renderDayCareFeeSection() {
   return `
     <section class="service-fee-section service-detail-section service-motion">
@@ -9129,6 +9166,28 @@ function renderDayCareFeeSection() {
       </div>
       <article class="fee-allowance-card"><div><p class="eyebrow">CMS Wallet</p><h3>CMS 第 1-8 級可用額度</h3><p>第 1 級不納入長照給付；第 2-8 級依核定額度補助。超過核定額度、非核定項目或額外加購服務，皆採自費。</p></div>${renderCmsAllowanceTable()}</article>
       <div class="fee-code-groups" data-daycare-fee-groups aria-live="polite"><p class="fee-code-loading">碼別服務介紹載入中...</p></div>
+      <p class="fee-source-note">實際可用服務、部分負擔與自費金額，仍以照管中心核定、地方政府公告及服務契約為準。</p>
+    </section>
+  `;
+}
+
+function renderNursingFeeSection() {
+  const service = oneMinuteServices.nursing;
+  return `
+    <section class="service-fee-section service-detail-section service-motion">
+      <div class="service-section-head"><div><p class="eyebrow">Pricing</p><h2>費用怎麼算</h2></div><span>${escapeHTML(serviceFeeBody("nursing"))}</span></div>
+      <div class="fee-summary-grid">
+        ${serviceFeeItems(service, "nursing").map((item) => `
+          <article class="${item.cta ? "has-cta" : ""}">
+            <strong>${escapeHTML(item.title)}</strong>
+            <p>${escapeHTML(item.text)}</p>
+            ${Array.isArray(item.points) && item.points.length ? `<ul class="service-info-points">${item.points.map((point) => `<li>${escapeHTML(point)}</li>`).join("")}</ul>` : ""}
+            ${item.cta ? `<a class="service-info-link" href="${escapeHTML(item.href || "#service-contact")}" data-service-scroll="${escapeHTML(item.href || "#service-contact")}">${escapeHTML(item.cta)}</a>` : ""}
+          </article>
+        `).join("")}
+      </div>
+      <article class="fee-allowance-card"><div><p class="eyebrow">CMS Wallet</p><h3>CMS 第 1-8 級可用額度</h3><p>第 1 級不納入長照給付；第 2-8 級依核定額度補助。超過核定額度、非核定項目或額外加購服務，皆採自費。</p></div>${renderCmsAllowanceTable()}</article>
+      <div class="fee-code-groups" data-nursing-fee-groups aria-live="polite"><p class="fee-code-loading">護理復能碼別服務介紹載入中...</p></div>
       <p class="fee-source-note">實際可用服務、部分負擔與自費金額，仍以照管中心核定、地方政府公告及服務契約為準。</p>
     </section>
   `;
@@ -9257,12 +9316,13 @@ function renderServiceContactSection(service, slug) {
   `;
 }
 
-function renderOneMinuteServicePage(slug) {
+function renderOneMinuteServicePage(slug, layout = {}) {
   const service = oneMinuteServices[slug] || oneMinuteServices["home-care"];
   const contactNeed = service.contactNeed || "長照服務諮詢";
+  const usesDayCareTemplate = layout.template === "day-care";
   const heroImage = heroImageForViewport(service.image);
   return `
-    <div class="service-detail-page one-minute-service-page ${escapeHTML(slug)}-page">
+    <div class="service-detail-page one-minute-service-page ${usesDayCareTemplate ? "day-care-template-page" : ""} ${escapeHTML(slug)}-page">
       <section class="hero service-detail-hero one-minute-service-hero ${escapeHTML(slug)}-hero">
         <div
           class="hero-bg"
@@ -9316,7 +9376,7 @@ function renderOneMinuteServicePage(slug) {
 
       ${renderServiceStorySection(service, slug)}
 
-      ${slug === "day-care" ? renderDayCareFeeSection() : renderServiceInfoSection({
+      ${slug === "day-care" ? renderDayCareFeeSection() : slug === "nursing" ? renderNursingFeeSection() : renderServiceInfoSection({
         eyebrow: "Pricing",
         title: "費用怎麼算",
         body: serviceFeeBody(slug),
@@ -9354,11 +9414,11 @@ function renderHomeCarePage() {
 }
 
 function renderDayCarePage() {
-  return renderOneMinuteServicePage("day-care");
+  return renderOneMinuteServicePage("day-care", { template: "day-care" });
 }
 
 function renderNursingPage() {
-  return renderOneMinuteServicePage("nursing");
+  return renderOneMinuteServicePage("nursing", { template: "day-care" });
 }
 
 function renderMigrantTrainingPage() {
