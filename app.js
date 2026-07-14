@@ -4563,6 +4563,12 @@ const talentBenefitCategories = [
 
 const talentCaregiverExclusiveBenefits = [
   {
+    title: "缺工獎勵",
+    value: "最高 108,000 元",
+    tags: ["僅限照顧服務員", "依申請資格辦理"],
+    copy: "符合申請資格的照顧服務員可申請缺工獎勵，最高 108,000 元。"
+  },
+  {
     title: "留任獎金",
     value: "滿 1 年 1,000 元，逐年增加最高 5,000 元",
     tags: ["照服員適用", "依辦法核定"],
