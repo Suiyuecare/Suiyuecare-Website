@@ -9124,35 +9124,13 @@ function hydrateDayCareFeeGroups(root = document) {
 let nursingFeeDataPromise = null;
 
 function loadNursingFeeData() {
-  if (!nursingFeeDataPromise) {
-    nursingFeeDataPromise = import("./nursing-fees.js").catch((error) => {
-      nursingFeeDataPromise = null;
-      throw error;
-    });
-  }
+  if (!nursingFeeDataPromise) nursingFeeDataPromise = import("./nursing-fees.js");
   return nursingFeeDataPromise;
 }
 
 function hydrateNursingFeeGroups(root = document) {
-  const target = root.querySelector?.("[data-nursing-fee-groups]");
-  if (!target || target.dataset.loaded === "true" || target.dataset.loaded === "loading") return;
-  target.dataset.loaded = "loading";
-  loadNursingFeeData()
-    .then(({ nursingFeeGroups }) => {
-      if (routeSlugFromLocation().split("?")[0] !== "nursing") return;
-      target.innerHTML = nursingFeeGroups.map((group, index) => `
-        <details class="fee-code-group" ${index === 0 ? "open" : ""}>
-          <summary><span>${escapeHTML(group.title)}</span><small>${escapeHTML(group.note)}</small></summary>
-          ${renderFeeCodeTable(group.rows)}
-        </details>
-      `).join("");
-      target.dataset.loaded = "true";
-    })
-    .catch((error) => {
-      console.warn("Nursing fee data unavailable.", error);
-      target.dataset.loaded = "error";
-      target.textContent = "護理復能碼別資料暫時無法載入，請稍後重新整理或直接向窗口詢問。";
-    });
+  if (!root.querySelector("[data-ns]")) return;
+  loadNursingFeeData().then(({ hydrateNursingPage }) => hydrateNursingPage(root)).catch(Boolean);
 }
 
 function renderDayCareFeeSection() {
@@ -9306,6 +9284,7 @@ function renderServiceContactSection(service, slug) {
         <label>電話<input type="tel" name="電話" placeholder="請輸入聯絡電話" required /></label>
         <label>Email<input type="email" name="Email" placeholder="可選填，方便寄送回覆紀錄" /></label>
         <label>需求<select name="需求" required>${renderContactNeedOptions(contactNeed)}</select></label>
+        ${slug === "nursing" ? `<i data-ni></i>` : ""}
         <label class="form-notes">說明<textarea name="說明" rows="6" placeholder="可簡單描述目前遇到的情境、希望詢問的服務內容、所在地區或方便聯絡時間"></textarea></label>
         <p class="form-expectation">${escapeHTML(expectation)}</p>
         <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為回覆諮詢、服務安排與後續聯繫目的，使用我填寫的個人資料。</label>
@@ -9320,6 +9299,8 @@ function renderOneMinuteServicePage(slug, layout = {}) {
   const service = oneMinuteServices[slug] || oneMinuteServices["home-care"];
   const contactNeed = service.contactNeed || "長照服務諮詢";
   const usesDayCareTemplate = layout.template === "day-care";
+  const isNursing = slug === "nursing";
+  const isDayCare = slug === "day-care";
   const heroImage = heroImageForViewport(service.image);
   return `
     <div class="service-detail-page one-minute-service-page ${usesDayCareTemplate ? "day-care-template-page" : ""} ${escapeHTML(slug)}-page">
@@ -9364,9 +9345,7 @@ function renderOneMinuteServicePage(slug, layout = {}) {
         </article>
       </section>
 
-      ${slug === "nursing" ? `<div data-nursing-service-section></div>` : ""}
-
-      <section class="two-minute-scenes service-motion" aria-label="${escapeHTML(service.title)}實際照護畫面">
+      ${isNursing ? `<i data-ns></i>` : `<section class="two-minute-scenes service-motion" aria-label="${escapeHTML(service.title)}實際照護畫面">
         <div class="service-section-head">
           <p class="eyebrow">Care Scenes</p>
           <h2>實際照顧現場畫面</h2>
@@ -9374,11 +9353,11 @@ function renderOneMinuteServicePage(slug, layout = {}) {
         <div class="two-minute-scene-grid">
           ${renderServiceSceneCards(service.scenes)}
         </div>
-      </section>
+      </section>`}
 
-      ${renderServiceStorySection(service, slug)}
+      ${isNursing ? "" : renderServiceStorySection(service, slug)}
 
-      ${slug === "day-care" ? renderDayCareFeeSection() : slug === "nursing" ? renderNursingFeeSection() : renderServiceInfoSection({
+      ${isDayCare ? renderDayCareFeeSection() : isNursing ? renderNursingFeeSection() : renderServiceInfoSection({
         eyebrow: "Pricing",
         title: "費用怎麼算",
         body: serviceFeeBody(slug),
@@ -9392,7 +9371,7 @@ function renderOneMinuteServicePage(slug, layout = {}) {
         body: "先確認你所在區域，我們會協助判斷可服務性、鄰近據點或合適窗口。",
         items: serviceLocationItems(service, slug),
         className: "service-location-section",
-        content: slug === "day-care" ? renderDayCareLocationMap() : ""
+        content: isDayCare ? renderDayCareLocationMap() : ""
       })}
 
       ${renderServiceInfoSection({
@@ -9404,7 +9383,9 @@ function renderOneMinuteServicePage(slug, layout = {}) {
         id: "service-apply-notes"
       })}
 
-      ${slug === "day-care" ? renderDayCarePreparationSection() : ""}
+      ${isDayCare ? renderDayCarePreparationSection() : ""}
+
+      ${isNursing ? renderServiceStorySection(service, slug) : ""}
 
       ${renderServiceContactSection(service, slug)}
     </div>
