@@ -8144,6 +8144,7 @@ h2 {
   height: 100%;
   min-height: 620px;
   object-fit: cover;
+  object-position: 62% center;
 }
 .benefit-explorer-stage-media span {
   position: absolute;
