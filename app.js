@@ -4924,6 +4924,12 @@ function talentText(value, fallback = "") {
   return text || fallback;
 }
 
+function isTalentAgeFriendlyRecruiting(opening = {}, title = "") {
+  const configuredValue = opening.metadata?.age_friendly_recruiting ?? opening.age_friendly_recruiting;
+  if (typeof configuredValue === "boolean") return configuredValue;
+  return String(title).includes("照顧服務員");
+}
+
 function talentListItems(value, fallback = []) {
   const items = normalizeRecruitingList(value)
     .map((item) => talentText(item?.title || item?.label || item))
@@ -5016,6 +5022,7 @@ function buildTalentJobBoardModel(page = {}, departments = [], openings = []) {
       requirements,
       benefits,
       isFeatured: Boolean(opening.is_featured),
+      isAgeFriendlyRecruiting: isTalentAgeFriendlyRecruiting(opening, title),
       applyFormEnabled: opening.apply_form_enabled !== false,
       applyButtonText: talentText(opening.apply_button_text, "申請應徵"),
       formType,
@@ -5057,6 +5064,16 @@ function renderTalentApplyControl(job, className = "primary-button", label = job
     <button class="${escapeHTML(className)}" type="button" data-recruit-apply ${talentApplyAttributes(job)}>
       ${escapeHTML(label)}
     </button>
+  `;
+}
+
+function renderTalentAgeFriendlyRecruiting(job, className = "") {
+  if (!job.isAgeFriendlyRecruiting) return "";
+  return `
+    <aside class="talent-age-friendly ${escapeHTML(className)}" aria-label="友善招募說明">
+      <strong>友善招募</strong>
+      <p>年齡不是限制，歡迎中高齡與重返職場的夥伴加入照顧行列；符合職缺條件即可應徵。</p>
+    </aside>
   `;
 }
 
@@ -5107,6 +5124,7 @@ function renderTalentJobDetail(job, inline = false) {
           <span>${job.isFeatured ? "重點職缺" : "職缺詳情"}</span>
           <h3>${escapeHTML(job.title)}</h3>
           <p>${escapeHTML(job.summary)}</p>
+          ${renderTalentAgeFriendlyRecruiting(job, "is-detail")}
         </div>
         ${renderTalentApplyControl(job)}
       </div>
@@ -5163,6 +5181,7 @@ function renderTalentJobCard(job, index) {
       data-talent-job-card
       data-job-id="${escapeHTML(job.key)}"
       data-talent-department="${escapeHTML(job.departmentTitle)}"
+      data-talent-age-friendly="${job.isAgeFriendlyRecruiting ? "true" : "false"}"
       data-apply-text="${escapeHTML(job.applyButtonText)}"
       data-form-type="${escapeHTML(job.formType)}"
       data-page-slug="${escapeHTML(job.pageSlug)}"
@@ -5183,7 +5202,12 @@ function renderTalentJobCard(job, index) {
               <h3>${escapeHTML(job.title)}</h3>
               <p>${escapeHTML(job.subtitle)}</p>
             </div>
-            ${job.isFeatured ? `<strong>重點</strong>` : ""}
+            ${job.isFeatured || job.isAgeFriendlyRecruiting ? `
+              <div class="talent-job-title-badges">
+                ${job.isFeatured ? `<strong>重點</strong>` : ""}
+                ${job.isAgeFriendlyRecruiting ? `<span>歡迎中高齡／重返職場</span>` : ""}
+              </div>
+            ` : ""}
           </div>
           ${renderTalentJobCompactMeta(job)}
           <p class="talent-job-summary">${escapeHTML(job.summary)}</p>
@@ -5228,6 +5252,12 @@ function renderTalentJobBoard(page, model) {
         <button class="is-active" type="button" data-talent-chip="department" data-value="">全部職缺</button>
         ${departmentOptions.map((department) => `<button type="button" data-talent-chip="department" data-value="${escapeHTML(department)}">${escapeHTML(department)}</button>`).join("")}
       </div>
+      ${jobs.some((job) => job.isAgeFriendlyRecruiting) ? `
+        <aside class="talent-age-friendly is-board" aria-label="照顧職類友善招募" data-talent-age-friendly-board>
+          <strong>照顧職類友善招募</strong>
+          <p>年齡不是限制，歡迎中高齡與重返職場的夥伴加入照顧行列。</p>
+        </aside>
+      ` : ""}
       <div class="talent-job-result-line" aria-live="polite">
         <strong data-talent-result-count>${jobs.length}</strong>
         <span>個職缺符合條件</span>
@@ -10384,6 +10414,7 @@ function renderTalentPage() {
     benefits: profile.benefits,
     apply_button_text: "申請應徵",
     apply_form_enabled: true,
+    metadata: { form_type: "recruiting", age_friendly_recruiting: profileKey === "caregiver" || profileKey === "dayCare" },
     sort_order: sortOrder,
     is_featured: isFeatured,
     updated_at: updatedAt
@@ -11902,6 +11933,11 @@ function updateMilestoneProgress() {
       activeCard = card;
     }
   });
+
+  const ageFriendlyNotice = board.querySelector("[data-talent-age-friendly-board]");
+  if (ageFriendlyNotice) {
+    ageFriendlyNotice.hidden = !cards.some((card) => !card.hidden && card.dataset.talentAgeFriendly === "true");
+  }
 
   cards.forEach((card) => card.classList.toggle("active", card === activeCard));
 }
