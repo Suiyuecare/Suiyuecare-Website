@@ -5572,10 +5572,17 @@ function renderRecruitingApplicationModal(page) {
     : "送出後，資料會寄到歲悅合作窗口並留存在系統，窗口原則上 1 個工作天內回覆。";
   const fields = isTalent ? `
           <p class="recruit-apply-context">申請職缺：<strong id="recruitApplyContext"></strong></p>
-          <label>您的大名<input name="姓名" type="text" required autocomplete="name" placeholder="請輸入姓名" /></label>
-          <label>您的電話<input name="電話" type="tel" required autocomplete="tel" inputmode="tel" placeholder="請輸入電話" /></label>
-          <label class="recruit-resume-field">履歷上傳 <span>非必填</span><input name="resume" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" /></label>
-          <p class="recruit-resume-hint">支援 PDF、DOC、DOCX，檔案上限 3 MB。</p>
+          <div class="recruit-apply-fields">
+            <div class="recruit-apply-contact-fields">
+              <label>您的大名<input name="姓名" type="text" required autocomplete="name" placeholder="請輸入姓名" /></label>
+              <label>您的電話<input name="電話" type="tel" required autocomplete="tel" inputmode="tel" placeholder="請輸入電話" /></label>
+            </div>
+            <div class="recruit-apply-support-fields">
+              <label class="recruit-message-field">內容 <span>非必填</span><textarea name="內容" rows="3" maxlength="2000" placeholder="可填寫相關經驗、可聯絡時間或想補充的內容"></textarea></label>
+              <label class="recruit-resume-field">履歷上傳 <span>非必填</span><input name="resume" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" /></label>
+              <p class="recruit-resume-hint">支援 PDF、DOC、DOCX，檔案上限 3 MB。</p>
+            </div>
+          </div>
           <input name="subject" id="recruitApplyTitle" type="hidden" />
   ` : `
           <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
@@ -5601,8 +5608,10 @@ function renderRecruitingApplicationModal(page) {
           <input name="opening_slug" id="recruitApplyOpeningSlug" type="hidden" />
           <input name="opening_title" id="recruitApplyOpeningTitle" type="hidden" />
           <input name="_honey" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          ${privacy}
-          <p class="course-confirm-text">${escapeHTML(confirmText)}</p>
+          <div class="recruit-apply-footer">
+            ${privacy}
+            <p class="course-confirm-text">${escapeHTML(confirmText)}</p>
+          </div>
           <button class="primary-button" type="submit">${escapeHTML(submitText)}</button>
           <p class="course-modal-status" id="recruitApplyStatus" role="status" aria-live="polite"></p>
       </form>
