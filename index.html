@@ -30,11 +30,6 @@
     <title>歲悅長照集團｜Suiyuecare Corps.</title>
     <script>
       (() => {
-        if (window.location.hostname === "apm.suiyuecare.com") {
-          document.documentElement.dataset.appHost = "apm";
-          document.title = "敏捷專案管理｜歲悅長照集團";
-        }
-
         const initialHash = window.location.hash.slice(1).split("?")[0];
         const initialPath = window.location.pathname.replace(/^\/+|\/+$/g, "");
         const initialRoute = initialPath || initialHash || "home";
@@ -143,21 +138,7 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
-    <link id="apmAdminStyles" rel="stylesheet" href="/src/admin/admin.css" media="not all" />
     <style>
-      html[data-app-host="apm"] body {
-        margin: 0;
-        background: #f7f3ec;
-      }
-
-      html[data-app-host="apm"] body > :not(.apm-root-shell):not(script) {
-        display: none !important;
-      }
-
-      html:not([data-app-host="apm"]) .apm-root-shell {
-        display: none !important;
-      }
-
       html[data-initial-route]:not([data-initial-route="home"]):not([data-app-ready="true"]) body {
         background: #fffdf8;
       }
@@ -260,82 +241,6 @@
     </script>
   </head>
   <body>
-    <div class="apm-root-shell admin-app-page">
-      <div class="admin-app-shell" hidden>
-        <aside class="admin-sidebar">
-          <div class="admin-sidebar-head">
-            <a class="admin-brand" href="https://login.suiyuecare.com/portal/">
-              <img src="/assets/company-logo.png" alt="" />
-              <span><strong>歲悅長照集團</strong><small>APM Console</small></span>
-            </a>
-          </div>
-          <nav class="admin-menu" aria-label="APM 選單">
-            <a class="active" href="/"><span>PM</span><strong>APM 專案管理</strong></a>
-            <a href="https://login.suiyuecare.com/portal/"><span>PT</span><strong>回模組頁</strong></a>
-          </nav>
-          <div class="admin-sidebar-note">
-            <span>Agile Project Management</span>
-            <strong>專案・Sprint・任務</strong>
-            <p>APM 會承接 Logging 的 Google 帳號、角色與資料範圍。</p>
-          </div>
-        </aside>
-
-        <main class="admin-main">
-          <header class="admin-topbar">
-            <div class="admin-topbar-title">
-              <p class="admin-eyebrow">Agile Project Management</p>
-              <h1>敏捷專案管理 APM</h1>
-              <span>集中管理跨部門專案、Sprint、任務負責人與進度節奏。</span>
-            </div>
-            <div class="admin-topbar-actions">
-              <a class="admin-preview-link" href="https://login.suiyuecare.com/portal/">回模組頁</a>
-              <div class="admin-userbox">
-                <b id="adminUserInitial">S</b>
-                <span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span>
-                <button id="adminLogout" type="button">登出</button>
-              </div>
-            </div>
-          </header>
-
-          <div id="apmStatus" class="admin-data-status">正在檢查 APM 權限...</div>
-
-          <section class="admin-dashboard-grid compact" aria-label="APM 摘要">
-            <article><span>Projects</span><strong data-apm-count="projects">3</strong><p>進行中專案</p></article>
-            <article><span>Sprints</span><strong data-apm-count="sprints">2</strong><p>本期衝刺</p></article>
-            <article><span>Tasks</span><strong data-apm-count="tasks">12</strong><p>任務卡片</p></article>
-            <article><span>Blocked</span><strong data-apm-count="blocked">1</strong><p>需主管協助</p></article>
-          </section>
-
-          <section class="admin-workspace-panel">
-            <div class="admin-workspace-head">
-              <div><p class="admin-eyebrow">Board</p><h2>APM 任務看板</h2></div>
-              <span class="admin-soft-note">目前為 Logging 串接版；正式資料表建立後可改讀 APM Supabase。</span>
-            </div>
-            <div id="apmBoard" class="admin-launch-grid"></div>
-          </section>
-
-          <section class="admin-workspace-panel">
-            <div class="admin-workspace-head">
-              <div><p class="admin-eyebrow">Architecture</p><h2>跨模組登入與資料來源</h2></div>
-            </div>
-            <div class="admin-cms-guidance-grid">
-              <article><span>Identity</span><strong>共用 Google 帳號</strong><p>由 Logging 完成 Google 登入與員工角色判斷。</p></article>
-              <article><span>Permission</span><strong>沿用 Logging 權限</strong><p>APM 會以登入 email、角色與 Data Scope 決定可見專案。</p></article>
-              <article><span>Data</span><strong>可獨立 Supabase</strong><p>APM 可使用自己的 Supabase 專案，只接收可信任身份。</p></article>
-              <article><span>Audit</span><strong>操作紀錄</strong><p>新增、指派、狀態異動、匯出與刪除都應寫入不可竄改紀錄。</p></article>
-            </div>
-          </section>
-        </main>
-      </div>
-
-      <div id="adminLoading" class="admin-loading">
-        <img src="/assets/company-logo.png" alt="" />
-        <strong>正在進入 APM</strong>
-        <span>系統正在確認你的 Logging 登入狀態，完成後會開啟敏捷專案管理。</span>
-        <i></i>
-      </div>
-    </div>
-
     <div class="intro-loader" aria-hidden="true">
       <div class="intro-line"></div>
       <div class="intro-brand">
@@ -892,16 +797,7 @@
     </footer>
 
     <script type="module">
-      (async () => {
-        if (window.location.hostname === "apm.suiyuecare.com") {
-          const adminStyles = document.querySelector("#apmAdminStyles");
-          if (adminStyles) adminStyles.media = "all";
-          await import("/src/admin/apm.js");
-          return;
-        }
-
-        await import("./app.js");
-      })();
+      import("./app.js");
     </script>
   </body>
 </html>

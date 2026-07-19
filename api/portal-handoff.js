@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const { createClient } = require("@supabase/supabase-js");
 
-const allowedModules = new Set(["accounting", "agile-projects", "edoc", "website-backoffice"]);
+const allowedModules = new Set(["accounting", "edoc", "website-backoffice"]);
 
 function json(response, statusCode, payload) {
   response.statusCode = statusCode;
@@ -75,7 +75,7 @@ function base64Url(value) {
 }
 
 function signPayload(payload) {
-  const secret = process.env.PORTAL_HANDOFF_SIGNING_SECRET || process.env.EDOC_PORTAL_HANDOFF_SECRET || process.env.APM_PORTAL_SIGNING_SECRET;
+  const secret = process.env.PORTAL_HANDOFF_SIGNING_SECRET || process.env.EDOC_PORTAL_HANDOFF_SECRET;
   if (!secret) {
     const error = new Error("Missing PORTAL_HANDOFF_SIGNING_SECRET.");
     error.statusCode = 503;
