@@ -553,6 +553,8 @@ async function createSignedModuleHandoff(payload) {
   const { data, error } = await supabase.auth.getSession();
   const token = data?.session?.access_token;
   if (error || !token) {
+    clearStoredProfile();
+    renderSession(null);
     throw new Error(error?.message || "Portal 登入階段已失效，請重新登入。");
   }
 
@@ -566,6 +568,12 @@ async function createSignedModuleHandoff(payload) {
   });
   const result = await response.json().catch(() => ({}));
   if (!response.ok || !result.ok) {
+    if (response.status === 401) {
+      clearStoredProfile();
+      await supabase.auth.signOut();
+      renderSession(null);
+      throw new Error("Portal 登入階段已失效，請重新使用 Google 登入。");
+    }
     throw new Error(result.message || "無法建立模組登入簽章。");
   }
   return result;
@@ -2538,15 +2546,25 @@ async function launchRequestedModuleIfReady(profile) {
 }
 
 async function applyGoogleSession() {
-  if (!supabase) return false;
+  if (!supabase) {
+    clearStoredProfile();
+    renderSession(null);
+    return null;
+  }
   const { data, error } = await supabase.auth.getSession();
   if (error) {
+    clearStoredProfile();
+    renderSession(null);
     setStatus(`Google 登入狀態檢查失敗：${error.message}`, "error");
-    return false;
+    return null;
   }
 
   const email = data.session?.user?.email || "";
-  if (!email) return false;
+  if (!email) {
+    clearStoredProfile();
+    renderSession(null);
+    return null;
+  }
 
   const profile = findProfileByEmail(email);
   if (!profile) {
@@ -2554,13 +2572,13 @@ async function applyGoogleSession() {
     await supabase.auth.signOut();
     renderSession(null);
     setStatus(`Google 帳號 ${email} 尚未建立 Portal 權限，請由系統權限中心開通。`, "error");
-    return true;
+    return null;
   }
 
   setStoredProfile(profile);
   renderSession(profile);
   setStatus(`已使用 Google 登入：${profile.label}。`, "success");
-  return true;
+  return profile;
 }
 
 function modulePermissionAllowsRole(moduleId, roleId) {
@@ -5269,9 +5287,9 @@ function renderSecurityRestrictionTool(profile) {
 async function bootPortalLogin() {
   rememberRequestedModuleLaunch();
   renderOrganizationChart(organizationChart);
-  renderSession(getStoredProfile());
-  await applyGoogleSession();
-  await launchRequestedModuleIfReady(getStoredProfile());
+  renderSession(null);
+  const profile = await applyGoogleSession();
+  await launchRequestedModuleIfReady(profile);
 }
 
 signOutButton?.addEventListener("click", () => {
