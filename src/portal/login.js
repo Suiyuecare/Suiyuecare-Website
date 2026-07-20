@@ -40,20 +40,21 @@ const modules = [
   },
   { id: "hr", number: "2", name: "人資系統" },
   { id: "accounting", number: "3", name: "會計系統" },
+  { id: "edoc", number: "4", name: "電子公文用印系統" },
   {
     id: "general-affairs",
-    number: "4",
+    number: "5",
     name: "總務系統",
     children: [
-      { id: "edoc", number: "4-1", name: "公文簽核系統" },
-      { id: "contract", number: "4-2", name: "合約管理系統" },
-      { id: "system-permissions", number: "4-3", name: "系統權限" },
-      { id: "organization-chart", number: "4-4", name: "組織圖" },
-      { id: "employee-accounts", number: "4-5", name: "員工帳號" },
-      { id: "pdf-editor", number: "4-6", name: "PDF 編輯器" }
+      { id: "contract", number: "5-1", name: "合約管理系統" },
+      { id: "system-permissions", number: "5-2", name: "系統權限" },
+      { id: "organization-chart", number: "5-3", name: "組織圖" },
+      { id: "employee-accounts", number: "5-4", name: "員工帳號" },
+      { id: "pdf-editor", number: "5-5", name: "PDF 編輯器" }
     ]
   },
-  { id: "website-backoffice", number: "6", name: "網站後台管理" }
+  { id: "apm", number: "6", name: "APM 績效與任務管理" },
+  { id: "website-backoffice", number: "7", name: "網站後台管理" }
 ];
 
 const organizationNodes = [
@@ -224,6 +225,7 @@ const moduleOrgRules = {
   "system-permissions": { owner: "it-class", scope: "custom", policy: "資訊課維護帳號，不預設看敏感內容" },
   "organization-chart": { owner: "it-class", scope: "company", policy: "依組織節點檢視公司架構" },
   "employee-accounts": { owner: "it-class", scope: "custom", policy: "員工帳號與登入狀態管理" },
+  apm: { owner: "group", scope: "company", policy: "實際資料與簽核權限由 APM 依組織主管鏈控管" },
   "website-backoffice": { owner: "it-class", scope: "company", policy: "網站內容、發布流程與後台編輯權限" },
   "pdf-editor": { owner: "it-class", scope: "assigned", policy: "已授權使用者可用" }
 };
@@ -337,7 +339,8 @@ const dataScopeDefinitions = [
 const moduleDisplayNames = {
   business: "照顧服務",
   "home-care": "居家照顧",
-  "day-care": "日間照顧"
+  "day-care": "日間照顧",
+  apm: "APM 績效與任務管理"
 };
 
 const ownerDisplayNames = {
@@ -352,11 +355,12 @@ const moduleDescriptions = {
   hr: "查看人員、出勤與人事作業",
   accounting: "查看帳務、付款與報表",
   "general-affairs": "處理行政、總務與文件流程",
-  edoc: "追蹤公文與簽核進度",
+  edoc: "公文收發、簽核、用印與寄發",
   contract: "管理合約與到期提醒",
   "system-permissions": "管理角色、權限與資料範圍",
   "organization-chart": "查看公司組織與權責關係",
   "employee-accounts": "管理員工登入帳號",
+  apm: "管理每日任務、專案、季度 KPI 與簽核進度",
   "website-backoffice": "管理官網內容、發布流程與頁面資料",
   "pdf-editor": "編輯、合併與整理 PDF 文件"
 };
@@ -369,30 +373,39 @@ const moduleIcons = {
   hr: "人資",
   accounting: "財務",
   "general-affairs": "行政",
-  edoc: "簽核",
+  edoc: "公文",
   contract: "合約",
   "system-permissions": "權限",
   "organization-chart": "組織",
   "employee-accounts": "帳號",
+  apm: "APM",
   "website-backoffice": "後台",
   "pdf-editor": "PDF"
 };
 
 const moduleLaunchUrls = {
-  accounting: "https://finance.suiyuecare.com/"
+  accounting: "https://finance.suiyuecare.com/",
+  edoc: "https://edoc.suiyuecare.com/",
+  apm: "https://apm.suiyuecare.com/"
 };
 
 const connectedModuleIds = new Set(Object.keys(moduleLaunchUrls));
-const temporarilyOpenModuleIds = new Set(["accounting", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
+const temporarilyOpenModuleIds = new Set(["accounting", "edoc", "apm", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
 const sharedGeneralAffairsModules = new Set(["pdf-editor"]);
 const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions", "organization-chart", "employee-accounts"]);
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
-const signedHandoffModuleIds = new Set();
-const externalLaunchOrigins = new Map();
+const signedHandoffModuleIds = new Set(["edoc", "apm"]);
+const postHandoffModuleIds = new Set(["apm"]);
+const externalLaunchOrigins = new Map(
+  Object.entries(moduleLaunchUrls).map(([moduleId, launchUrl]) => [new URL(launchUrl).origin, moduleId])
+);
 
 async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
   const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
   if (!launchUrl) return null;
+  if (postHandoffModuleIds.has(moduleId)) {
+    throw new Error("簽章模組必須使用安全的 POST 啟動流程。");
+  }
 
   const payload = buildModuleLaunchPayload(moduleId, profile);
   const signedHandoff = signedHandoffModuleIds.has(moduleId) ? await createSignedModuleHandoff(payload) : null;
@@ -405,6 +418,47 @@ async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
   if (signedHandoff?.signature) url.searchParams.set("signature", signedHandoff.signature);
   if (signedHandoff?.token) url.searchParams.set("token", signedHandoff.token);
   return url.toString();
+}
+
+async function launchConnectedModule(moduleId, profile, launchUrlOverride = "", navigationMode = "assign") {
+  const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
+  if (!launchUrl) return false;
+
+  if (postHandoffModuleIds.has(moduleId)) {
+    const signedHandoff = await createSignedModuleHandoff(buildModuleLaunchPayload(moduleId, profile));
+    submitSignedModuleHandoff(moduleId, launchUrl, signedHandoff);
+    return true;
+  }
+
+  const destination = await buildModuleLaunchUrl(moduleId, profile, launchUrl);
+  if (!destination) return false;
+  if (navigationMode === "replace") window.location.replace(destination);
+  else window.location.assign(destination);
+  return true;
+}
+
+function submitSignedModuleHandoff(moduleId, launchUrl, signedHandoff) {
+  const configuredUrl = new URL(moduleLaunchUrls[moduleId]);
+  const requestedUrl = new URL(launchUrl);
+  if (requestedUrl.origin !== configuredUrl.origin) {
+    throw new Error("模組啟動網址不在允許清單內。");
+  }
+
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = new URL("/api/auth/handoff", configuredUrl).toString();
+  form.hidden = true;
+
+  [["payload", signedHandoff.payload], ["signature", signedHandoff.signature]].forEach(([name, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.append(input);
+  });
+
+  document.body.append(form);
+  form.submit();
 }
 
 function buildModuleLaunchPayload(moduleId, profile) {
@@ -1163,6 +1217,13 @@ const modulePermissionDefinitions = [
     limits: "所有已啟用員工可進入 Finance；實際帳務資料與操作仍依 Finance 內部權限與 Data Scope 控管。"
   },
   {
+    moduleId: "apm",
+    roles: ["board", "shareholder", "ceo", "region-manager", "admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
+    actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "print"],
+    sensitivity: "績效 / 內部專案",
+    limits: "所有已啟用員工可進入 APM；角色、部門、主管鏈與簽核操作仍由 APM 後端權限控管。"
+  },
+  {
     moduleId: "general-affairs",
     roles: ["ceo", "admin-director", "ga-chief"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
@@ -1171,10 +1232,10 @@ const modulePermissionDefinitions = [
   },
   {
     moduleId: "edoc",
-    roles: ["ceo", "admin-director", "ga-chief"],
+    roles: ["external-audit", "board", "shareholder", "ceo", "region-manager", "admin-director", "hr-chief", "hr-staff", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     sensitivity: "簽核",
-    limits: "依簽核流程、職等與節點授權審核。"
+    limits: "所有已啟用員工可進入電子公文；實際公文、附件、用印與簽核操作仍依部門、資料範圍與目前關卡控管。"
   },
   {
     moduleId: "contract",
@@ -2414,7 +2475,9 @@ function getPortalRedirectUrl() {
 }
 
 function safeModuleLaunchRequest(rawNext = "", explicitModule = "") {
-  const moduleId = explicitModule === "edoc" ? "edoc" : "";
+  const moduleId = Object.prototype.hasOwnProperty.call(moduleLaunchUrls, explicitModule)
+    ? explicitModule
+    : "";
   if (!rawNext && moduleId) {
     return { moduleId, returnTo: moduleLaunchUrls[moduleId] };
   }
@@ -2466,12 +2529,8 @@ async function launchRequestedModuleIfReady(profile) {
   }
   setStatus(`正在啟動 ${getModuleDisplayName(module)}...`, "info");
   try {
-    const launchUrl = await buildModuleLaunchUrl(request.moduleId, profile, request.returnTo);
     window.sessionStorage.removeItem(pendingModuleLaunchKey);
-    if (launchUrl) {
-      window.location.replace(launchUrl);
-      return true;
-    }
+    if (await launchConnectedModule(request.moduleId, profile, request.returnTo, "replace")) return true;
   } catch (error) {
     setStatus(`${getModuleDisplayName(module)} 啟動失敗：${error.message}`, "error");
   }
@@ -2682,11 +2741,7 @@ function createModuleButton(module, profile) {
       button.disabled = true;
       setStatus(`正在啟動 ${getModuleDisplayName(module)}...`, "info");
       try {
-        const launchUrl = await buildModuleLaunchUrl(module.id, profile);
-        if (launchUrl) {
-          window.location.href = launchUrl;
-          return;
-        }
+        if (await launchConnectedModule(module.id, profile)) return;
       } catch (error) {
         button.disabled = false;
         setStatus(`${getModuleDisplayName(module)} 啟動失敗：${error.message}`, "error");
