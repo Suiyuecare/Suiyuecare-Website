@@ -111,8 +111,8 @@ function verifyVercelConfig() {
   assert(config.cleanUrls === true, "vercel.json should keep cleanUrls enabled.");
   assert(config.trailingSlash === false, "vercel.json should keep trailingSlash disabled.");
   assert(
-    config.buildCommand === "pnpm cms:fallbacks:sync && pnpm verify:all",
-    "vercel.json buildCommand should sync published CMS content before pnpm verify:all."
+    config.buildCommand === "pnpm build:vercel",
+    "vercel.json buildCommand should use the environment-aware Vercel build script."
   );
   assert(config.outputDirectory === "dist", "vercel.json outputDirectory should be dist.");
 

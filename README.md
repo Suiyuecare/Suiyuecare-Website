@@ -438,10 +438,10 @@ pnpm verify:all
 目前 Vercel 使用 `vercel.json` 先跑完整前台品質檢查，再輸出 `dist`：
 
 ```json
-"buildCommand": "pnpm verify:all"
+"buildCommand": "pnpm build:vercel"
 ```
 
-`verify:all` 會執行 `pnpm build`，因此 `/admin/login`、`/admin` 與 `src/` 裡的 Supabase module 仍會被正確打包；若路由首屏、防閃、前台文案、連結、基本可及性、效能預算、安全設定或圖片品質檢查失敗，部署會直接中止。
+正式環境會先同步 Supabase 已發布內容，任何同步失敗都會中止部署；Preview 則使用 Git 中已核准的 CMS 快照，避免因缺少正式環境金鑰而無法預覽。接著 `verify:all` 會執行 `pnpm build`，因此 `/admin/login`、`/admin` 與 `src/` 裡的 Supabase module 仍會被正確打包；若路由首屏、防閃、前台文案、連結、基本可及性、效能預算、安全設定或圖片品質檢查失敗，部署會直接中止。
 
 公開靜態頁 HTML 也會透過 `vercel.json` 設定 `Cache-Control: no-cache, no-store, must-revalidate`，避免 `/talent`、`/land`、`/investor-recruiting` 等深連結在部署後繼續拿到舊版首頁殼。
 

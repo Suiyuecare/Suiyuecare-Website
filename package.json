@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build && node scripts/generate-static-routes.mjs && node scripts/prune-unused-public-assets.mjs",
+    "build:vercel": "node scripts/build-vercel.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "audit:images": "node scripts/audit-images.mjs",
     "audit:images:all": "node scripts/audit-images.mjs --all",
