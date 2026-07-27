@@ -1,0 +1,293 @@
+.home-care-service-map {
+  grid-template-columns: minmax(0, 1.08fr) minmax(340px, .82fr);
+  height: clamp(610px, 48vw, 700px);
+}
+
+.home-care-coverage-board {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 18px;
+  height: 100%;
+  padding: clamp(22px, 2.5vw, 34px);
+  border: 1px solid rgba(220, 174, 117, .82);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 253, 248, .98), rgba(255, 246, 234, .92) 58%, rgba(234, 248, 250, .9));
+  box-shadow: 0 16px 36px rgba(83, 43, 11, .07);
+}
+
+.home-care-coverage-board header {
+  display: grid;
+  gap: 8px;
+}
+
+.home-care-coverage-board header .eyebrow {
+  margin: 0;
+}
+
+.home-care-coverage-board header h3 {
+  margin: 0;
+  color: var(--brown);
+  font-size: clamp(27px, 2.5vw, 40px);
+  line-height: 1.15;
+}
+
+.home-care-coverage-board header > p:last-child,
+.home-care-coverage-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 820;
+  line-height: 1.65;
+}
+
+.home-care-city-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.home-care-city-tab {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  min-height: 108px;
+  padding: 16px;
+  border: 2px solid rgba(220, 174, 117, .72);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .94);
+  color: var(--brown);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.home-care-city-tab > span {
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 1000;
+}
+
+.home-care-city-tab strong {
+  font-size: clamp(17px, 1.25vw, 21px);
+  line-height: 1.3;
+}
+
+.home-care-city-tab small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.home-care-city-tab:hover,
+.home-care-city-tab:focus-visible,
+.home-care-city-tab.active {
+  border-color: var(--orange);
+  background: #fff7eb;
+  box-shadow: 0 12px 26px rgba(83, 43, 11, .09);
+  transform: translateY(-1px);
+}
+
+.home-care-city-tab:focus-visible {
+  outline: 3px solid rgba(22, 143, 171, .24);
+  outline-offset: 2px;
+}
+
+.home-care-district-panel {
+  display: grid;
+  align-content: center;
+  gap: 18px;
+  min-height: 0;
+  padding: clamp(20px, 2.3vw, 30px);
+  border: 1px solid rgba(22, 143, 171, .24);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .88);
+}
+
+.home-care-district-panel > div {
+  display: grid;
+  gap: 4px;
+}
+
+.home-care-district-panel > div > span {
+  color: var(--sky);
+  font-size: 13px;
+  font-weight: 1000;
+}
+
+.home-care-district-panel > div > strong {
+  color: var(--brown);
+  font-size: clamp(24px, 2.3vw, 36px);
+  line-height: 1.2;
+}
+
+.home-care-district-panel ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-care-district-panel li {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  gap: 3px 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 14px 12px;
+  border: 1px solid rgba(220, 174, 117, .68);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.home-care-district-panel li > span {
+  grid-row: 1 / span 2;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 0 4px rgba(240, 138, 36, .13);
+}
+
+.home-care-district-panel li strong {
+  min-width: 0;
+  color: var(--brown);
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.home-care-district-panel li small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.home-care-coverage-note {
+  padding: 12px 14px;
+  border-left: 4px solid var(--orange);
+  background: rgba(255, 255, 255, .74);
+}
+
+.home-care-location-detail {
+  border: 1px solid rgba(220, 174, 117, .82);
+  border-radius: 8px;
+  box-shadow: 0 16px 36px rgba(83, 43, 11, .07);
+}
+
+.home-care-location-detail img {
+  height: 250px;
+  object-position: center;
+}
+
+.home-care-location-detail > div {
+  padding: 24px;
+}
+
+.home-care-location-detail dl div {
+  grid-template-columns: 78px minmax(0, 1fr);
+}
+
+.home-care-location-detail dd {
+  line-height: 1.55;
+}
+
+.home-care-application-journey {
+  background:
+    linear-gradient(110deg, rgba(255, 248, 238, .96), rgba(255, 253, 248, .98) 52%, rgba(234, 248, 250, .9));
+}
+
+@media (max-width: 1050px) {
+  .home-care-service-map {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .home-care-coverage-board,
+  .home-care-location-detail {
+    min-height: 0;
+  }
+
+  .home-care-location-detail {
+    grid-template-columns: minmax(260px, .72fr) minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .home-care-location-detail img {
+    height: 100%;
+    min-height: 420px;
+  }
+}
+
+@media (max-width: 760px) {
+  .home-care-coverage-board {
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .home-care-coverage-board header h3 {
+    font-size: 25px;
+  }
+
+  .home-care-city-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .home-care-city-tab {
+    min-height: 86px;
+    padding: 13px 14px;
+  }
+
+  .home-care-district-panel {
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .home-care-district-panel > div > strong {
+    font-size: 23px;
+  }
+
+  .home-care-district-panel ul {
+    grid-template-columns: 1fr;
+  }
+
+  .home-care-district-panel li {
+    min-height: 58px;
+    padding: 11px 12px;
+  }
+
+  .home-care-location-detail {
+    grid-template-columns: 1fr;
+    grid-template-rows: 230px auto;
+  }
+
+  .home-care-location-detail img {
+    height: 230px;
+    min-height: 0;
+  }
+
+  .home-care-location-detail > div {
+    overflow: visible;
+    padding: 20px;
+  }
+
+  .home-care-location-detail h3 {
+    font-size: 24px;
+  }
+
+  .home-care-location-detail dl div {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .home-care-location-detail .location-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-care-city-tab {
+    transition: none;
+  }
+}

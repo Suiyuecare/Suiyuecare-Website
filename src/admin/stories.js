@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
 import { prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
+import { canEditScope, canPublishScope, contentDeleteMessage, contentSaveMessage } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -20,6 +21,8 @@ const newTalkButton = document.querySelector("#newExpertTalkButton");
 
 let stories = [];
 let talks = [];
+let adminPermissions = {};
+const healthScope = "health";
 
 function setStatus(message, type = "info") {
   statusBox.hidden = !message;
@@ -44,7 +47,8 @@ async function uploadStoryImage(file, altText, imageUsage = "card") {
     altText,
     caption: altText,
     imageUsage,
-    focalPoint: imageUsage === "avatar" ? "top" : "center"
+    focalPoint: imageUsage === "avatar" ? "top" : "center",
+    scopeKey: "health"
   });
 }
 
@@ -78,6 +82,7 @@ function renderList() {
 }
 
 function renderTable(title, rows, type, meta) {
+  const editable = canEditScope(adminPermissions, healthScope);
   return `
     <article class="admin-section-card">
       <header><div><span>${escapeHTML(type)}</span><strong>${escapeHTML(title)}</strong></div></header>
@@ -91,7 +96,7 @@ function renderTable(title, rows, type, meta) {
                 <td>${escapeHTML(meta(item))}</td>
                 <td>${escapeHTML(item.status)}${item.is_featured ? " / 精選" : ""}${item.is_enabled ? "" : " / 停用"}</td>
                 <td>${formatUpdatedAt(item.updated_at)}</td>
-                <td><div class="admin-table-actions"><button type="button" data-edit-${type}="${escapeHTML(item.id)}">編輯</button><button type="button" data-delete-${type}="${escapeHTML(item.id)}">刪除</button></div></td>
+                <td><div class="admin-table-actions"><button type="button" data-edit-${type}="${escapeHTML(item.id)}">${editable ? "編輯" : "查看"}</button>${editable ? `<button type="button" data-delete-${type}="${escapeHTML(item.id)}">刪除</button>` : ""}</div></td>
               </tr>
             `).join("") : `<tr><td colspan="5"><div class="admin-empty-state">尚無資料</div></td></tr>`}
           </tbody>
@@ -162,6 +167,10 @@ function fillTalk(item) {
 
 async function saveStory(event) {
   event.preventDefault();
+  if (!canEditScope(adminPermissions, healthScope)) {
+    setStatus("你的帳號只有檢視健康內容的權限。", "error");
+    return;
+  }
   const status = storyForm.elements.status.value;
   const payload = {
     person_name: storyForm.elements.person_name.value.trim(),
@@ -189,6 +198,10 @@ async function saveStory(event) {
 
 async function saveTalk(event) {
   event.preventDefault();
+  if (!canEditScope(adminPermissions, healthScope)) {
+    setStatus("你的帳號只有檢視健康內容的權限。", "error");
+    return;
+  }
   const status = talkForm.elements.status.value;
   const payload = {
     speaker_name: talkForm.elements.speaker_name.value.trim(),
@@ -214,20 +227,29 @@ async function saveTalk(event) {
 async function upsert(table, id, payload, label) {
   setStatus(`正在儲存${label}...`, "info");
   const query = id ? supabase.from(table).update(payload).eq("id", id) : supabase.from(table).insert(payload);
-  const { error } = await query;
+  const { data, error } = await query.select("id").maybeSingle();
   if (error) {
     setStatus(`儲存失敗：${error.message}`, "error");
     return;
   }
-  setStatus(`${label}已儲存。`, "success");
-  await loadData();
+  const targetForm = table === "care_stories" ? storyForm : talkForm;
+  if (data?.id) targetForm.elements.id.value = data.id;
+  setStatus(contentSaveMessage(adminPermissions, healthScope, label), "success");
+  if (canPublishScope(adminPermissions, healthScope)) await loadData();
 }
 
 async function deleteRow(table, id, label) {
+  if (!canEditScope(adminPermissions, healthScope)) {
+    setStatus("你的帳號只有檢視健康內容的權限。", "error");
+    return;
+  }
   if (!window.confirm(`確定刪除這筆${label}嗎？`)) return;
-  const { error } = await supabase.from(table).delete().eq("id", id);
+  const { error } = await supabase.from(table).delete().eq("id", id).select("id").maybeSingle();
   if (error) setStatus(`刪除失敗：${error.message}`, "error");
-  else await loadData();
+  else {
+    setStatus(contentDeleteMessage(adminPermissions, healthScope, label), "success");
+    if (canPublishScope(adminPermissions, healthScope)) await loadData();
+  }
 }
 
 storyForm?.addEventListener("submit", saveStory);
@@ -260,5 +282,21 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadData
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    [storyForm, talkForm].forEach((targetForm) => {
+      targetForm.dataset.contentScope = healthScope;
+    });
+    await loadData();
+    if (!canEditScope(adminPermissions, healthScope)) {
+      [storyForm, talkForm].forEach((targetForm) => {
+        targetForm.querySelectorAll("input, textarea, select, button").forEach((control) => {
+          control.disabled = true;
+        });
+      });
+      newStoryButton.hidden = true;
+      newTalkButton.hidden = true;
+      setStatus("目前為唯讀模式；只有健康內容責任人可修改。", "info");
+    }
+  }
 }).catch((error) => reportAdminBootError(loading, error));

@@ -63,10 +63,13 @@ module.exports = async function handler(request, response) {
   }
 
   const recipients = {
+    owner_copy: process.env.OWNER_NOTIFY_EMAIL || "entrepreneur@suiyuecare.com",
     contact: process.env.CONTACT_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
     course_signup: process.env.COURSE_NOTIFY_EMAIL || "edu.control@suiyuecare.com",
     investor: process.env.INVESTOR_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
     land: process.env.LAND_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
+    marketing: process.env.MARKETING_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
+    system: process.env.SYSTEM_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com",
     recruiting: process.env.RECRUITING_NOTIFY_EMAIL || "generalaffairs@suiyuecare.com"
   };
 
@@ -96,10 +99,13 @@ module.exports = async function handler(request, response) {
       FORM_PUBLIC_INTAKE_FALLBACK: hasPublicKey,
       RESEND_API_KEY: hasResendKey,
       MAIL_FROM: hasMailFrom,
+      OWNER_NOTIFY_EMAIL: Boolean(recipients.owner_copy),
       CONTACT_NOTIFY_EMAIL: Boolean(recipients.contact),
       COURSE_NOTIFY_EMAIL: Boolean(recipients.course_signup),
       INVESTOR_NOTIFY_EMAIL: Boolean(recipients.investor),
       LAND_NOTIFY_EMAIL: Boolean(recipients.land),
+      MARKETING_NOTIFY_EMAIL: Boolean(recipients.marketing),
+      SYSTEM_NOTIFY_EMAIL: Boolean(recipients.system),
       RECRUITING_NOTIFY_EMAIL: Boolean(recipients.recruiting)
     },
     recipients: Object.fromEntries(Object.entries(recipients).map(([key, value]) => [key, maskedEmail(value)])),

@@ -47,9 +47,9 @@
       <main class="admin-main">
         <header class="admin-topbar">
           <div class="admin-topbar-title">
-            <p class="admin-eyebrow">Suiyuecare CMS</p>
-            <h1>Dashboard</h1>
-            <span>管理前台頁面文案、圖片素材、文章與分類。</span>
+            <p class="admin-eyebrow">My Workspace</p>
+            <h1>我的工作台</h1>
+            <span>從自己負責的頁面開始，修改後整頁送給執行長確認。</span>
           </div>
           <div class="admin-topbar-actions">
             <a class="admin-preview-link" href="/" target="_blank" rel="noopener">查看前台</a>
@@ -64,7 +64,30 @@
           </div>
         </header>
 
-        <section class="admin-dashboard-grid" aria-label="CMS 統計">
+        <section class="admin-focus-grid" aria-label="我的內容狀態">
+          <a href="/admin/visual-editor">
+            <span>我的頁面</span>
+            <strong id="adminMyPageCount">--</strong>
+            <small>看著前台直接編輯</small>
+          </a>
+          <a href="/admin/governance?view=drafts">
+            <span>我的草稿</span>
+            <strong id="adminMyDraftCount">--</strong>
+            <small>尚未送出的整頁修改</small>
+          </a>
+          <a href="/admin/governance?view=pending">
+            <span>等待審核</span>
+            <strong id="adminMyPendingCount">--</strong>
+            <small>已送給執行長</small>
+          </a>
+          <a href="/admin/governance?view=rejected">
+            <span>已退回</span>
+            <strong id="adminMyRejectedCount">--</strong>
+            <small>查看原因並繼續修改</small>
+          </a>
+        </section>
+
+        <section class="admin-dashboard-grid admin-owner-advanced" aria-label="CMS 統計">
           <article>
             <span>Articles</span>
             <strong data-dashboard-count="articles">--</strong>
@@ -112,7 +135,21 @@
           </article>
         </section>
 
-        <section class="admin-workspace-panel admin-launch-panel">
+        <section class="admin-workspace-panel admin-responsibility-panel" aria-labelledby="adminResponsibilityTitle">
+          <div class="admin-workspace-head">
+            <div>
+              <p class="admin-eyebrow">My Responsibility</p>
+              <h2 id="adminResponsibilityTitle">我的責任範圍</h2>
+              <p>你可以檢視自己部門的內容；編輯者與部門負責人可修改並送審，只有執行長／Owner 能核准發布。</p>
+            </div>
+            <div id="adminResponsibilityDepartments" class="admin-responsibility-departments" aria-label="所屬部門"></div>
+          </div>
+          <div id="adminResponsibilityList" class="admin-responsibility-list" aria-live="polite">
+            <div class="admin-empty-state">正在整理你的部門與內容範圍...</div>
+          </div>
+        </section>
+
+        <section class="admin-workspace-panel admin-launch-panel admin-owner-advanced">
           <div class="admin-workspace-head">
             <div>
               <p class="admin-eyebrow">Launch Home</p>
@@ -142,13 +179,13 @@
             <article>
               <span>04</span>
               <strong>發布與備份</strong>
-              <p>一般同仁先送審，執行長可直接發布；重要改版前先建立 CMS 備份。</p>
+              <p>部門同仁儲存後會自動送審，執行長核准才更新前台；重要改版前先建立 CMS 備份。</p>
               <a href="/admin/governance">看發布流程</a>
             </article>
           </div>
         </section>
 
-        <section class="admin-workspace-panel admin-onboarding-panel">
+        <section class="admin-workspace-panel admin-onboarding-panel admin-owner-advanced">
           <div class="admin-workspace-head">
             <div>
               <p class="admin-eyebrow">First Day Guide</p>
@@ -162,7 +199,7 @@
           </div>
         </section>
 
-        <section class="admin-workspace-panel admin-dashboard-panel">
+        <section class="admin-workspace-panel admin-dashboard-panel admin-owner-advanced">
           <div class="admin-workspace-head">
             <div>
               <p class="admin-eyebrow">Recent Updates</p>
@@ -174,7 +211,7 @@
           <div id="adminRecentUpdates" class="admin-recent-list" aria-live="polite"></div>
         </section>
 
-        <section class="admin-workspace-panel">
+        <section class="admin-workspace-panel admin-owner-advanced">
           <div class="admin-workspace-head">
             <div>
               <p class="admin-eyebrow">Content Workspace</p>

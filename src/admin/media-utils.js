@@ -427,14 +427,24 @@ export function getImageSize(file) {
   });
 }
 
-export async function fetchMediaImages(limit = 80) {
-  const { data, error } = await supabase
+export async function fetchMediaImages(limitOrOptions = 80) {
+  const options = typeof limitOrOptions === "object" && limitOrOptions !== null
+    ? limitOrOptions
+    : { limit: limitOrOptions };
+  const limit = Number(options.limit || 80);
+  const scopeKey = String(options.scopeKey || "").trim();
+  let query = supabase
     .from("media")
-    .select("id, bucket, storage_path, public_url, file_name, alt_text, caption, image_usage, focal_point, width, height, created_at")
+    .select("id, bucket, storage_path, public_url, file_name, alt_text, caption, image_usage, focal_point, width, height, scope_key, department_id, is_shared, created_at")
     .eq("is_enabled", true)
     .eq("visibility", "public")
-    .order("created_at", { ascending: false })
-    .limit(limit);
+    .order("created_at", { ascending: false });
+
+  if (scopeKey) {
+    query = query.or(`scope_key.eq.${scopeKey},is_shared.eq.true`);
+  }
+
+  const { data, error } = await query.limit(limit);
 
   if (error) throw error;
   return data || [];
@@ -446,14 +456,20 @@ export async function uploadImageToMedia({
   caption = "",
   imageUsage = "card",
   focalPoint = "center",
+  scopeKey,
   bucket = defaultImageBucket
 }) {
   if (!file) throw new Error("請先選擇圖片檔案。");
   if (!file.type.startsWith("image/")) throw new Error("只支援圖片檔案。");
 
+  const normalizedScopeKey = String(scopeKey || "").trim().toLowerCase();
+  if (!/^[a-z0-9][a-z0-9:_-]*$/.test(normalizedScopeKey)) {
+    throw new Error("找不到這張圖片所屬的內容責任範圍，請重新整理後再試一次。");
+  }
+
   const { width, height } = await getImageSize(file);
   const safeName = slugifyFileName(file.name);
-  const storagePath = `cms/${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}-${safeName}`;
+  const storagePath = `cms/${normalizedScopeKey}/${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}-${safeName}`;
 
   const { error: uploadError } = await supabase.storage
     .from(bucket)
@@ -483,10 +499,11 @@ export async function uploadImageToMedia({
       caption: caption.trim() || null,
       image_usage: getImageUsageOption(imageUsage)?.value || "card",
       focal_point: getFocalPointOption(focalPoint)?.value || "center",
+      scope_key: normalizedScopeKey,
       visibility: "public",
       is_enabled: true
     })
-    .select("id, bucket, storage_path, public_url, file_name, alt_text, caption, image_usage, focal_point, width, height, created_at")
+    .select("id, bucket, storage_path, public_url, file_name, alt_text, caption, image_usage, focal_point, width, height, scope_key, department_id, is_shared, created_at")
     .single();
 
   if (insertError) throw insertError;

@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
+import { canEditScope, canViewScope, scopeForFormType } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -19,6 +20,7 @@ const processTimeline = document.querySelector("#formProcessTimeline");
 
 let submissions = [];
 let selectedSubmission = null;
+let adminPermissions = {};
 
 const typeLabels = {
   contact: "聯絡我們",
@@ -29,6 +31,24 @@ const typeLabels = {
   system: "系統後台諮詢",
   investor: "投資洽談"
 };
+
+function canViewSubmission(item) {
+  return canViewScope(adminPermissions, item?.scope_key || scopeForFormType(item?.form_type));
+}
+
+function canEditSubmission(item) {
+  return canEditScope(adminPermissions, item?.scope_key || scopeForFormType(item?.form_type));
+}
+
+function setAvailableFormTypes() {
+  Array.from(typeFilter?.options || []).forEach((option) => {
+    if (!option.value) return;
+    option.hidden = !canViewScope(adminPermissions, scopeForFormType(option.value));
+  });
+  if (typeFilter?.value && !canViewScope(adminPermissions, scopeForFormType(typeFilter.value))) {
+    typeFilter.value = "";
+  }
+}
 
 function setStatus(message, type = "info") {
   if (!statusBox) return;
@@ -136,10 +156,15 @@ function renderDetail(item) {
   editorForm.elements.next_action.value = meta.next_action;
   editorForm.elements.next_follow_up_at.value = toLocalDateTimeInput(meta.next_follow_up_at);
   editorForm.elements.internal_note.value = item.internal_note || "";
+  editorForm.dataset.contentScope = item.scope_key || scopeForFormType(item.form_type);
+  editorForm.querySelectorAll("input, textarea, select, button").forEach((control) => {
+    control.disabled = !canEditSubmission(item);
+  });
   renderTimeline(item);
   detailTitle.textContent = `${typeLabels[item.form_type] || item.form_type}｜${item.name || "未填姓名"}`;
+  const resume = item.metadata?.resume && typeof item.metadata.resume === "object" ? item.metadata.resume : null;
   const metadataRows = item.metadata && typeof item.metadata === "object"
-    ? Object.entries(item.metadata).filter(([, value]) => value)
+    ? Object.entries(item.metadata).filter(([key, value]) => key !== "resume" && value)
     : [];
   detailBox.className = "admin-form-readonly admin-field-wide";
   detailBox.innerHTML = `
@@ -155,9 +180,33 @@ function renderDetail(item) {
       <div><dt>優先度</dt><dd>${escapeHTML(meta.priority)}</dd></div>
       <div><dt>下一步</dt><dd>${escapeHTML(meta.next_action || "-")}</dd></div>
       <div><dt>下次追蹤</dt><dd>${meta.next_follow_up_at ? formatUpdatedAt(meta.next_follow_up_at) : "-"}</dd></div>
+      ${resume?.storage_path ? `<div><dt>履歷</dt><dd><button type="button" class="admin-inline-action" data-download-resume data-resume-bucket="${escapeHTML(resume.bucket || "recruiting-resumes")}" data-resume-path="${escapeHTML(resume.storage_path)}">下載 ${escapeHTML(resume.file_name || "履歷檔案")}</button></dd></div>` : ""}
       ${metadataRows.map(([key, value]) => `<div><dt>${escapeHTML(key)}</dt><dd>${escapeHTML(String(value))}</dd></div>`).join("")}
     </dl>
   `;
+  detailBox.querySelector("[data-download-resume]")?.addEventListener("click", downloadResume);
+}
+
+async function downloadResume(event) {
+  const button = event.currentTarget;
+  const bucket = button.dataset.resumeBucket || "recruiting-resumes";
+  const storagePath = button.dataset.resumePath || "";
+  if (!storagePath) return;
+
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "準備下載...";
+  try {
+    const { data, error } = await supabase.storage.from(bucket).createSignedUrl(storagePath, 90, { download: true });
+    if (error) throw error;
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  } catch (error) {
+    console.error("Failed to create resume download URL", error);
+    setStatus(`履歷下載失敗：${error.message}`, "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
 }
 
 async function loadSubmissions() {
@@ -173,7 +222,7 @@ async function loadSubmissions() {
   try {
     const { data, error } = await query;
     if (error) throw error;
-    submissions = data || [];
+    submissions = (data || []).filter(canViewSubmission);
     renderSubmissions();
     renderWorkflowCounts();
     setStatus("", "success");
@@ -200,10 +249,15 @@ async function saveSubmission(event) {
     setStatus("請先選擇一筆表單。", "error");
     return;
   }
+  const submission = submissions.find((item) => item.id === id) || selectedSubmission;
+  if (!canEditSubmission(submission)) {
+    setStatus("你的帳號只有檢視這類案件的權限。", "error");
+    return;
+  }
   setStatus("正在儲存表單狀態...", "info");
   const nextStatus = editorForm.elements.status.value;
   try {
-    const current = submissions.find((item) => item.id === id) || selectedSubmission || {};
+    const current = submission || {};
     const metadata = current.metadata && typeof current.metadata === "object" ? { ...current.metadata } : {};
     const nextFollowUp = fromLocalDateTimeInput(editorForm.elements.next_follow_up_at.value);
     const note = editorForm.elements.internal_note.value.trim();
@@ -271,7 +325,9 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: async () => {
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    setAvailableFormTypes();
     renderDetail(null);
     await loadSubmissions();
   }

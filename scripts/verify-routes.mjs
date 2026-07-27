@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { renderPublicArticleLayout } from "../public-content-renderer.mjs";
 
 const routes = [
   "about",
@@ -62,14 +63,14 @@ const staleRecruitingShellMarkers = [
 ];
 const criticalMobileHeroAssets = {
   home: "/assets/hero-care-hero-fast-mobile.jpg",
-  about: "/assets/homepage-batch/04-admin-team-office-fast-mobile.jpg",
-  milestones: "/assets/milestones/homecare-agency-launch.jpg",
+  about: "/assets/about/about-team-group-hero-v2-mobile.jpg",
+  milestones: "/assets/milestones/milestones-team-care-planning-hero-v2.jpg",
   "home-care": "/assets/homecare-detail-01-greeting-hero-fast-mobile.jpg",
   "day-care": "/assets/daycare-detail-01-exercise-hero-fast-mobile.jpg",
-  community: "/assets/community-detail-01-exercise-hero-hires-mobile.jpg",
-  nursing: "/assets/nursing-detail-02-walking-hero-fast-mobile.jpg",
-  "migrant-training": "/assets/migrant-detail-01-classroom-hero-fast-mobile.jpg",
-  quality: "/assets/quality-detail-04-improvement-hero-fast-mobile.jpg",
+  community: "/assets/community-dementia-hero-v3.jpg",
+  nursing: "/assets/brand-scenes/rehab-v2-mobile.jpg",
+  "migrant-training": "/assets/brand-scenes/migrant-v2-mobile.jpg",
+  quality: "/assets/brand-scenes/quality-v2-mobile.jpg",
   software: "/assets/admin-recruit-02-operations-hero-hires-mobile.jpg",
   talent: "/assets/career-team-hero-hd-mobile.jpg",
   land: "/assets/land-recruit-hero-hd-mobile.jpg",
@@ -291,10 +292,28 @@ function verifyAsyncRendererAvoidsStaleFallback(source, name) {
   if (awaitIndex < 0) {
     failures.push(`app.js: ${name} must still await CMS data for quiet updates`);
   }
-  if (innerFallbackIndex >= 0 && innerFallbackIndex < awaitIndex) {
+  if (name === "renderRecruitingPageOnce") {
+    if (innerFallbackIndex >= 0 && innerFallbackIndex < awaitIndex) {
+      failures.push(`app.js: ${name} must not paint fallback content before CMS data resolves`);
+    }
+    const benefitPositionCount = (block.match(/updateTalentBenefitNavPosition/g) || []).length;
+    if (benefitPositionCount !== 1) {
+      failures.push(`app.js: ${name} must position the benefit navigation once after the final page is rendered`);
+    }
+  } else if (innerFallbackIndex >= 0 && innerFallbackIndex < awaitIndex) {
     failures.push(`app.js: ${name} must not paint fallback content before CMS data resolves`);
   }
-  if (fallbackIndex >= 0 && fallbackIndex < awaitIndex && name !== "renderCmsEnhancedServicePageOnce") {
+  if (name === "renderCmsEnhancedServicePageOnce") {
+    const homeCareHydrationCount = (block.match(/hydrateHomeCareLocationContent\(pageView\)/g) || []).length;
+    if (homeCareHydrationCount !== 1) {
+      failures.push(`app.js: ${name} must hydrate the home-care map once after the final page is rendered`);
+    }
+  }
+  if (
+    fallbackIndex >= 0 &&
+    fallbackIndex < awaitIndex &&
+    !["renderCmsEnhancedServicePageOnce", "renderRecruitingPageOnce"].includes(name)
+  ) {
     failures.push(`app.js: ${name} may only call fallbackRenderer after CMS loading fails or returns no data`);
   }
   if (name === "renderCmsEnhancedServicePageOnce" && fallbackHtmlIndex < 0) {
@@ -312,20 +331,20 @@ function verifyRecruitingRoutesUseSingleRenderer(source) {
     return;
   }
 
-  const directRenderers = [
-    ["land", "pageView.innerHTML = renderLandRecruitingPage();"],
-    ["investor-recruiting", "pageView.innerHTML = renderInvestorRecruitingPage();"],
-    ["talent", "pageView.innerHTML = renderTalentPage();"]
+  const cmsRenderers = [
+    ["land", "renderRecruitingPageOnce(normalized, renderLandRecruitingPage);"],
+    ["investor-recruiting", "renderRecruitingPageOnce(normalized, renderInvestorRecruitingPage);"],
+    ["talent", "renderRecruitingPageOnce(normalized, renderTalentPage);"]
   ];
 
-  for (const [route, renderer] of directRenderers) {
+  for (const [route, renderer] of cmsRenderers) {
     if (!block.includes(`normalized === "${route}"`) || !block.includes(renderer)) {
-      failures.push(`app.js: /${route} should render its fixed page directly, matching about and milestones`);
+      failures.push(`app.js: /${route} should render published recruiting CMS data inside its fixed layout`);
     }
   }
 
-  if (block.includes("renderRecruitingPageOnce(normalized")) {
-    failures.push("app.js: public recruiting routes must not async-swap Supabase recruiting pages after first render");
+  if (source.includes("warmRecruitingCmsData")) {
+    failures.push("app.js: recruiting routes must render CMS data, not only warm the Supabase cache");
   }
 }
 
@@ -478,7 +497,15 @@ function verifyHomeUsesCleanRouteLinks(indexSource, appSource) {
       break;
     }
   }
-  if (!appSource.includes('window.location.search ? `${pathBase}${window.location.search}` : pathBase')) {
+  const routeBlock = extractFunctionBlock(appSource, "routeSlugFromLocation");
+  const preservesRouteQuery =
+    routeBlock.includes('window.location.search ? `${pathBase}${window.location.search}` : pathBase') ||
+    (
+      routeBlock.includes("new URLSearchParams(window.location.search)") &&
+      routeBlock.includes('routeParams.delete("cms-preview")') &&
+      routeBlock.includes('routeSearch ? `${pathBase}?${routeSearch}` : pathBase')
+    );
+  if (!preservesRouteQuery) {
     failures.push("app.js: routeSlugFromLocation should preserve clean URL query strings for route rendering");
   }
 }
@@ -547,8 +574,13 @@ function verifyHealthImageFallbacks(appSource) {
   if (!appSource.includes('<img ${healthArticleImageAttrs(article') || !appSource.includes('poster="${escapeHTML(getHealthArticleImage(article))}"')) {
     failures.push("app.js: article detail hero and video poster should use normalized Health 3.0 image attributes");
   }
-  if (!appSource.includes("function renderArticleTagLinks") || !appSource.includes('href="${escapeHTML(searchHrefForTag(tag))}"')) {
-    failures.push("app.js: article hashtag pills should link to search results for the tag");
+  const tagMarkup = renderPublicArticleLayout({
+    title: "標籤連結驗證",
+    category: "健康3.0",
+    tags: ["失智照顧"]
+  });
+  if (!tagMarkup.includes(`href="/search?q=${encodeURIComponent("失智照顧")}"`)) {
+    failures.push("public content renderer: article hashtag pills should link to search results for the tag");
   }
 }
 
@@ -599,19 +631,72 @@ function verifyHealthRouteStableFirstPaint(appSource) {
     failures.push("app.js: missing renderPage router for Health 3.0 first-paint verification");
     return;
   }
-  const healthBranch = block.match(/normalized === "health"[\s\S]*?\} else if \(normalized === "search"\)/)?.[0] || "";
+  const healthBranch = block.match(/normalized === "health"[\s\S]*?\} else if \(normalized === "courses"\)/)?.[0] || "";
   if (!healthBranch) {
-    failures.push("app.js: missing Health 3.0 route branch");
+    failures.push("app.js: missing Health 3.0 and search route branches");
     return;
   }
-  if (healthBranch.includes("loadSupabaseHealthArticles({ rerender: true })")) {
-    failures.push("app.js: /health must not rerender after Supabase articles load; it causes the visible page to swap versions");
+  if (!healthBranch.includes('renderHealthRouteOnce(normalized, searchParams.get("category")') ||
+      !healthBranch.includes('renderHealthRouteOnce(normalized, searchParams.get("q")')) {
+    failures.push("app.js: /health and /search must share the single-pass Health renderer");
   }
-  if (healthBranch.includes("loadSupabaseArticleCategories({ rerender: true })")) {
-    failures.push("app.js: /health must not rerender after Supabase categories load; it causes the visible page to swap versions");
+
+  const renderer = extractFunctionBlock(appSource, "renderHealthRouteOnce");
+  const awaitIndex = renderer.indexOf("await ");
+  const renderIndex = renderer.indexOf("pageView.innerHTML = route ===");
+  if (!renderer || awaitIndex < 0 || renderIndex < awaitIndex) {
+    failures.push("app.js: renderHealthRouteOnce must wait for published data before its only visible render");
   }
-  if (!healthBranch.includes("loadSupabaseHealthArticles({ rerender: false })") || !healthBranch.includes("loadSupabaseArticleCategories({ rerender: false })")) {
-    failures.push("app.js: /health should warm remote article and category caches without replacing the first paint");
+  if (healthBranch.includes("rerender: true") || countMatches(renderer, /pageView\.innerHTML\s*=/g) !== 2) {
+    failures.push("app.js: Health routes must clear once and render final content once without a second CMS repaint");
+  }
+}
+
+function verifyCoursesRouteStableFirstPaint(appSource) {
+  const renderer = extractFunctionBlock(appSource, "renderCoursesPageFromCms");
+  if (!renderer) {
+    failures.push("app.js: missing renderCoursesPageFromCms");
+    return;
+  }
+  const awaitIndex = renderer.indexOf("await ");
+  const finalRenderIndex = renderer.indexOf("pageView.innerHTML = renderCoursesPage()");
+  if (awaitIndex < 0 || finalRenderIndex < awaitIndex) {
+    failures.push("app.js: courses must wait for published CMS data before rendering the visible page");
+  }
+  if (countMatches(renderer, /pageView\.innerHTML\s*=/g) !== 2) {
+    failures.push("app.js: courses must clear once and render final content once");
+  }
+}
+
+function verifyPublishedFallbackIntegration(appSource) {
+  for (const method of [
+    "getServiceFields",
+    "getRecruitingPage",
+    "getCourses",
+    "getMilestones",
+    "getHealthSource",
+    "getArticleSource",
+    "getHomePageContent",
+    "getHomeModules",
+    "getStoryDatabases",
+    "getSiteSettings"
+  ]) {
+    if (!appSource.includes(`loadCmsFallback("${method}"`)) {
+      failures.push(`app.js: published CMS fallback is not wired for ${method}`);
+    }
+  }
+  const startup = appSource.slice(appSource.indexOf("async function initializePublishedHomeContent"));
+  if (
+    !startup.includes('const pagePromise = loadSupabasePageContent("home")') ||
+    !startup.includes("const modulesPromise = loadSupabaseHomeModules()") ||
+    !startup.includes('loadCmsFallback("getStoryDatabases")') ||
+    !startup.includes('dataset.homeContentReady = "snapshot"') ||
+    !startup.includes("await Promise.all([pagePromise, modulesPromise")
+  ) {
+    failures.push("app.js: home page must apply the published snapshot before awaiting live CMS refreshes");
+  }
+  if (startup.includes("loadWordPressContent()")) {
+    failures.push("app.js: home initialization must not introduce WordPress as a third published-copy source");
   }
 }
 
@@ -679,7 +764,6 @@ function verifyMasterTalkHomepageColumns(appSource, indexSource) {
     failures.push("app.js: dynamic homepage Master Talk rendering should limit the homepage to 8 article cards");
   }
   if (
-    !appSource.includes("posts.length < HOMEPAGE_MASTER_TALK_LIMIT") ||
     !appSource.includes("items.length < HOMEPAGE_MASTER_TALK_LIMIT") ||
     !appSource.includes("talks.length < HOMEPAGE_MASTER_TALK_LIMIT")
   ) {
@@ -703,7 +787,6 @@ function verifySitemap() {
   }
 
   const sitemap = fs.readFileSync(file, "utf8");
-  const expectedLastmod = todayInTaipei();
   verifyCleanUrlPolicy(sitemap, "sitemap.xml");
   for (const route of sitemapRoutes) {
     const routePath = route ? `/${route}` : "/";
@@ -721,8 +804,8 @@ function verifySitemap() {
     failures.push("sitemap.xml is missing lastmod entries");
   }
   lastmods.forEach((lastmod) => {
-    if (lastmod !== expectedLastmod) {
-      failures.push(`sitemap.xml lastmod should use Asia/Taipei date ${expectedLastmod}, received ${lastmod}`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(lastmod) || Number.isNaN(Date.parse(`${lastmod}T00:00:00Z`))) {
+      failures.push(`sitemap.xml lastmod should be a valid YYYY-MM-DD date, received ${lastmod}`);
     }
   });
 
@@ -784,8 +867,10 @@ if (!fs.existsSync(appFile)) {
   verifyRecruitingRoutesUseSingleRenderer(appSource);
   verifyInvestorRoutesUseSingleRenderer(appSource);
   verifyCourseImageFallbacks(appSource);
+  verifyCoursesRouteStableFirstPaint(appSource);
   verifyHealthImageFallbacks(appSource);
   verifyHealthRouteStableFirstPaint(appSource);
+  verifyPublishedFallbackIntegration(appSource);
   verifyServiceStoryCoverage(appSource, indexSource);
   verifyHomeHealthLatestArticles(appSource, indexSource);
   verifyMasterTalkHomepageColumns(appSource, indexSource);

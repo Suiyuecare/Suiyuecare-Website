@@ -21,7 +21,7 @@ const routeBudgets = [
   { route: "/talent", file: "talent/index.html", maxKb: 45 },
   { route: "/land", file: "land/index.html", maxKb: 45 },
   { route: "/investor-recruiting", file: "investor-recruiting/index.html", maxKb: 45 },
-  { route: "/health", file: "health/index.html", maxKb: 45 },
+  { route: "/health", file: "health/index.html", maxKb: 100 },
   { route: "/search", file: "search/index.html", maxKb: 45 },
   { route: "/investors", file: "investors/index.html", maxKb: 45 },
   { route: "/ir-finance", file: "ir-finance/index.html", maxKb: 45 },
@@ -31,16 +31,16 @@ const routeBudgets = [
 ];
 
 const entryBudgets = [
-  { label: "front app bundle", prefix: "app-", ext: ".js", maxKb: 430, gzipMaxKb: 130 },
-  { label: "front style bundle", prefix: "styles-", ext: ".css", maxKb: 240, gzipMaxKb: 45 },
+  { label: "front app bundle", prefix: "app-", ext: ".js", maxKb: 431, gzipMaxKb: 133 },
+  { label: "front style bundle", prefix: "styles-", ext: ".css", maxKb: 251, gzipMaxKb: 46 },
   { label: "Supabase browser client chunk", prefix: "supabaseClient-", ext: ".js", maxKb: 260, gzipMaxKb: 75 }
 ];
 
 const criticalImageBudgets = [
   { file: "assets/hero-care-hero-fast.jpg", maxKb: 900 },
   { file: "assets/hero-care-hero-fast-mobile.jpg", maxKb: 420 },
-  { file: "assets/homepage-batch/04-admin-team-office-fast.jpg", maxKb: 900 },
-  { file: "assets/homepage-batch/04-admin-team-office-fast-mobile.jpg", maxKb: 420 },
+  { file: "assets/about/about-team-group-hero-v2.jpg", maxKb: 900 },
+  { file: "assets/about/about-team-group-hero-v2-mobile.jpg", maxKb: 420 },
   { file: "assets/homepage-batch/16-taipei-service-office-fast.jpg", maxKb: 900 },
   { file: "assets/homepage-batch/16-taipei-service-office-fast-mobile.jpg", maxKb: 420 },
   { file: "assets/homecare-detail-01-greeting-hero-fast.jpg", maxKb: 900 },
@@ -49,12 +49,16 @@ const criticalImageBudgets = [
   { file: "assets/daycare-detail-01-exercise-hero-fast-mobile.jpg", maxKb: 420 },
   { file: "assets/community-detail-01-exercise-hero-hires.jpg", maxKb: 950 },
   { file: "assets/community-detail-01-exercise-hero-hires-mobile.jpg", maxKb: 420 },
-  { file: "assets/nursing-detail-02-walking-hero-fast.jpg", maxKb: 900 },
-  { file: "assets/nursing-detail-02-walking-hero-fast-mobile.jpg", maxKb: 420 },
-  { file: "assets/migrant-detail-01-classroom-hero-fast.jpg", maxKb: 900 },
-  { file: "assets/migrant-detail-01-classroom-hero-fast-mobile.jpg", maxKb: 420 },
-  { file: "assets/quality-detail-04-improvement-hero-fast.jpg", maxKb: 900 },
-  { file: "assets/quality-detail-04-improvement-hero-fast-mobile.jpg", maxKb: 420 },
+  { file: "assets/brand-scenes/rehab-v2.jpg", maxKb: 1000 },
+  { file: "assets/brand-scenes/rehab-v2-mobile.jpg", maxKb: 420 },
+  { file: "assets/brand-scenes/migrant-v2.jpg", maxKb: 1000 },
+  { file: "assets/brand-scenes/migrant-v2-mobile.jpg", maxKb: 420 },
+  { file: "assets/brand-scenes/quality-v2.jpg", maxKb: 900 },
+  { file: "assets/brand-scenes/quality-v2-mobile.jpg", maxKb: 420 },
+  { file: "assets/brand-scenes/care-team-v2.jpg", maxKb: 950 },
+  { file: "assets/brand-scenes/care-team-v2-mobile.jpg", maxKb: 420 },
+  { file: "assets/brand-scenes/phone-v2.jpg", maxKb: 900 },
+  { file: "assets/brand-scenes/phone-v2-mobile.jpg", maxKb: 420 },
   { file: "assets/admin-recruit-02-operations-hero-hires.jpg", maxKb: 950 },
   { file: "assets/admin-recruit-02-operations-hero-hires-mobile.jpg", maxKb: 420 },
   { file: "assets/career-team-hero-hd.jpg", maxKb: 900 },

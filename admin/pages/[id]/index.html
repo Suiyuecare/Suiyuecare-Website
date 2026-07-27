@@ -75,14 +75,14 @@
                 <h2>頁面基本資料</h2>
               </div>
               <div class="admin-inline-actions">
-                <button type="button" id="requestPagePublishButton">送審發布</button>
+                <button type="button" id="requestPagePublishButton">補充審核備註</button>
                 <button type="submit">儲存頁面</button>
               </div>
             </div>
 
             <div class="admin-publish-help">
               <strong>發布提醒：儲存不等於上線</strong>
-              <p>按「儲存頁面」只是把內容存到後台，官網不會立刻改。確認內容、圖片與 SEO 都沒問題後，請按「送審發布」。主管或執行長核准後，前台才會讀取新版內容；核准前，官網會繼續顯示目前已發布版本。</p>
+              <p>部門同仁按「儲存頁面」後，系統會自動建立待審版本；只有執行長核准後，前台才會讀取新版內容。核准前，官網會繼續顯示目前已發布版本。</p>
               <a href="/admin/governance">查看發布佇列</a>
             </div>
             <div class="admin-front-map">
@@ -116,11 +116,11 @@
                 <p class="admin-eyebrow">Page Sections</p>
                 <h2>內容區塊</h2>
               </div>
-              <button type="button" id="addSectionButton">新增 Section</button>
+              <a class="admin-row-action" href="/admin/template-fields">編輯固定版位</a>
             </div>
             <div class="admin-front-map">
               <strong>前台對應</strong>
-              <span>每一張 Section 卡就是前台的一個固定版位。你可以換標題、文字、按鈕、圖片、排序與是否顯示；前台版型比例會維持固定，不會因為新增卡片而改壞版面。</span>
+              <span>每一張 Section 卡就是前台的一個固定版位。你可以換標題、文字、按鈕、圖片與是否顯示，但不能在這裡任意新增或移動版位。職缺、大事記、服務卡、流程與 FAQ 等可增加項目，請到各自的集合管理頁操作。</span>
             </div>
             <div id="pageSectionsEditor" class="admin-section-editor-list"></div>
           </section>

@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, renderEnabledBadge } from "./utils.js";
+import { canEditScope, canPublishScope, contentDeleteMessage, contentSaveMessage } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -15,6 +16,7 @@ const refreshCategoriesButton = document.querySelector("#adminRefreshCategories"
 
 let categories = [];
 let mediaImages = [];
+let adminPermissions = {};
 
 const typeSectionMap = {
   article: "health",
@@ -183,8 +185,8 @@ function renderCategories() {
       <td>${renderEnabledBadge(Boolean(category.is_enabled))}</td>
       <td>
         <div class="admin-table-actions">
-          <button type="button" data-edit-category="${escapeHTML(category.id)}">編輯</button>
-          <button type="button" data-delete-category="${escapeHTML(category.id)}">刪除</button>
+          <button type="button" data-edit-category="${escapeHTML(category.id)}">${canEditScope(adminPermissions, "health") ? "編輯" : "查看"}</button>
+          ${canEditScope(adminPermissions, "health") ? `<button type="button" data-delete-category="${escapeHTML(category.id)}">刪除</button>` : ""}
         </div>
       </td>
     </tr>
@@ -233,8 +235,9 @@ async function loadCategories() {
         .order("name", { ascending: true }),
       supabase
         .from("media")
-        .select("id, public_url, file_name, alt_text, image_usage")
+        .select("id, public_url, file_name, alt_text, image_usage, scope_key, is_shared")
         .eq("is_enabled", true)
+        .or("scope_key.eq.health,is_shared.eq.true")
         .order("created_at", { ascending: false })
         .limit(200)
     ]);
@@ -260,6 +263,10 @@ async function loadCategories() {
 
 async function saveCategory(event) {
   event.preventDefault();
+  if (!canEditScope(adminPermissions, "health")) {
+    setCategoriesStatus("你的帳號只有檢視健康文章分類的權限。", "error");
+    return;
+  }
   const submitButton = document.querySelector('button[form="adminCategoryForm"]');
   submitButton?.setAttribute("disabled", "true");
   setCategoriesStatus("正在儲存分類...", "info");
@@ -287,17 +294,18 @@ async function saveCategory(event) {
   };
 
   try {
-    if (id) {
-      const { error } = await supabase.from("article_categories").update(payload).eq("id", id);
-      if (error) throw error;
-    } else {
-      const { error } = await supabase.from("article_categories").insert(payload);
-      if (error) throw error;
-    }
+    const query = id
+      ? supabase.from("article_categories").update(payload).eq("id", id)
+      : supabase.from("article_categories").insert(payload);
+    const { data, error } = await query.select("id").maybeSingle();
+    if (error) throw error;
+    if (data?.id) categoryForm.elements.id.value = data.id;
 
-    resetCategoryForm();
-    setCategoriesStatus("分類已儲存。前台分類篩選讀取啟用分類時會自動同步。", "success");
-    await loadCategories();
+    setCategoriesStatus(contentSaveMessage(adminPermissions, "health", "文章分類"), "success");
+    if (canPublishScope(adminPermissions, "health")) {
+      resetCategoryForm();
+      await loadCategories();
+    }
   } catch (error) {
     console.error("Failed to save category", error);
     setCategoriesStatus(`儲存失敗：${error.message}`, "error");
@@ -337,18 +345,24 @@ function editCategory(id) {
 }
 
 async function deleteCategory(id) {
+  if (!canEditScope(adminPermissions, "health")) {
+    setCategoriesStatus("你的帳號只有檢視健康文章分類的權限。", "error");
+    return;
+  }
   const category = categories.find((item) => item.id === id);
   if (!category) return;
   if (!window.confirm(`確定要刪除「${category.name}」嗎？已使用此分類的文章會失去分類關聯。`)) return;
 
   setCategoriesStatus("正在刪除分類...", "info");
   try {
-    const { error } = await supabase.from("article_categories").delete().eq("id", id);
+    const { error } = await supabase.from("article_categories").delete().eq("id", id).select("id").maybeSingle();
     if (error) throw error;
 
-    if (categoryForm.elements.id.value === id) resetCategoryForm();
-    setCategoriesStatus("分類已刪除。", "success");
-    await loadCategories();
+    setCategoriesStatus(contentDeleteMessage(adminPermissions, "health", "文章分類"), "success");
+    if (canPublishScope(adminPermissions, "health")) {
+      if (categoryForm.elements.id.value === id) resetCategoryForm();
+      await loadCategories();
+    }
   } catch (error) {
     console.error("Failed to delete category", error);
     setCategoriesStatus(`刪除失敗：${error.message}`, "error");
@@ -383,5 +397,14 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadCategories
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    categoryForm.dataset.contentScope = "health";
+    await loadCategories();
+    if (!canEditScope(adminPermissions, "health")) {
+      categoryForm.querySelectorAll("input, textarea, select, button").forEach((control) => {
+        control.disabled = true;
+      });
+    }
+  }
 }).catch((error) => reportAdminBootError(loading, error));

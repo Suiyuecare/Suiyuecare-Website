@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
+import { canEditScope, canPublishScope, contentDeleteMessage, contentSaveMessage } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -37,6 +38,8 @@ let charts = [];
 let downloadableFiles = [];
 let investorPagesConfig = {};
 let selectedInvestorPageSlug = "investors";
+let adminPermissions = {};
+const investorScope = "investor";
 
 const investorPageDefaults = {
   investors: {
@@ -250,6 +253,10 @@ async function loadInvestorPageSettings() {
 
 async function saveInvestorPageSettings(event) {
   event.preventDefault();
+  if (!canEditScope(adminPermissions, investorScope)) {
+    setStatus("你的帳號只有檢視投資人資料的權限。", "error");
+    return;
+  }
   updateCurrentInvestorPageDraft();
   setStatus("正在儲存投資人頁面設定...", "info");
   const payload = {
@@ -267,8 +274,8 @@ async function saveInvestorPageSettings(event) {
     setStatus(`儲存投資人頁面設定失敗：${error.message}`, "error");
     return;
   }
-  setStatus("投資人頁面設定已儲存，重新整理前台即可看到更新。", "success");
-  await loadInvestorPageSettings();
+  setStatus(contentSaveMessage(adminPermissions, investorScope, "投資人頁面設定"), "success");
+  if (canPublishScope(adminPermissions, investorScope)) await loadInvestorPageSettings();
 }
 
 function defaultPoint(type = "bar") {
@@ -463,7 +470,7 @@ function renderTable(title, rows, type, meta) {
                 <td>${escapeHTML(meta(item))}</td>
                 <td>${escapeHTML(item.status)}${item.is_enabled ? "" : " / 停用"}</td>
                 <td>${formatUpdatedAt(item.updated_at)}</td>
-                <td><div class="admin-table-actions"><button type="button" data-edit-${type}="${escapeHTML(item.id)}">編輯</button><button type="button" data-delete-${type}="${escapeHTML(item.id)}">刪除</button></div></td>
+                <td><div class="admin-table-actions"><button type="button" data-edit-${type}="${escapeHTML(item.id)}">${canEditScope(adminPermissions, investorScope) ? "編輯" : "查看"}</button>${canEditScope(adminPermissions, investorScope) ? `<button type="button" data-delete-${type}="${escapeHTML(item.id)}">刪除</button>` : ""}</div></td>
               </tr>
             `).join("") : `<tr><td colspan="5"><div class="admin-empty-state">尚無資料</div></td></tr>`}
           </tbody>
@@ -617,15 +624,25 @@ async function saveChart(event) {
 }
 
 async function upsertRow(table, id, payload, label) {
+  if (!canEditScope(adminPermissions, investorScope)) {
+    setStatus("你的帳號只有檢視投資人資料的權限。", "error");
+    return;
+  }
   setStatus(`正在儲存${label}...`, "info");
   const query = id ? supabase.from(table).update(payload).eq("id", id) : supabase.from(table).insert(payload);
-  const { error } = await query;
+  const { data, error } = await query.select("id").maybeSingle();
   if (error) {
     setStatus(`儲存失敗：${error.message}`, "error");
     return;
   }
-  setStatus(`${label}已儲存。`, "success");
-  await loadInvestorData();
+  const targetForms = {
+    investor_notices: noticeForm,
+    investor_financial_items: financialForm,
+    investor_chart_datasets: chartForm
+  };
+  if (data?.id && targetForms[table]?.elements?.id) targetForms[table].elements.id.value = data.id;
+  setStatus(contentSaveMessage(adminPermissions, investorScope, label), "success");
+  if (canPublishScope(adminPermissions, investorScope)) await loadInvestorData();
 }
 
 function handleInvestorRepeaterClick(event) {
@@ -657,10 +674,17 @@ function handleInvestorRepeaterClick(event) {
 }
 
 async function deleteRow(table, id, label) {
+  if (!canEditScope(adminPermissions, investorScope)) {
+    setStatus("你的帳號只有檢視投資人資料的權限。", "error");
+    return;
+  }
   if (!window.confirm(`確定刪除這筆${label}嗎？`)) return;
-  const { error } = await supabase.from(table).delete().eq("id", id);
+  const { error } = await supabase.from(table).delete().eq("id", id).select("id").maybeSingle();
   if (error) setStatus(`刪除失敗：${error.message}`, "error");
-  else await loadInvestorData();
+  else {
+    setStatus(contentDeleteMessage(adminPermissions, investorScope, label), "success");
+    if (canPublishScope(adminPermissions, investorScope)) await loadInvestorData();
+  }
 }
 
 noticeForm?.addEventListener("submit", saveNotice);
@@ -728,5 +752,21 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadInvestorData
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    [noticeForm, financialForm, chartForm, investorPageSettingsForm].forEach((targetForm) => {
+      if (targetForm) targetForm.dataset.contentScope = investorScope;
+    });
+    await loadInvestorData();
+    if (!canEditScope(adminPermissions, investorScope)) {
+      [noticeForm, financialForm, chartForm, investorPageSettingsForm].forEach((targetForm) => {
+        targetForm?.querySelectorAll("input, textarea, select, button").forEach((control) => {
+          control.disabled = true;
+        });
+      });
+      [newNoticeButton, newFinancialButton, newChartButton].forEach((button) => {
+        if (button) button.hidden = true;
+      });
+    }
+  }
 }).catch((error) => reportAdminBootError(loading, error));

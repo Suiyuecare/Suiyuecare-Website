@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
+import { canEditScope, canPublishScope, contentDeleteMessage } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -13,6 +14,7 @@ const refreshArticlesButton = document.querySelector("#adminRefreshArticles");
 
 let articles = [];
 let categoryById = new Map();
+let adminPermissions = {};
 
 function setArticlesStatus(message, type = "info") {
   if (!articlesStatus) return;
@@ -90,8 +92,8 @@ function renderArticles() {
         <td><time>${formatUpdatedAt(article.updated_at)}</time></td>
         <td>
           <div class="admin-table-actions">
-            <a href="/admin/articles/${encodeURIComponent(article.id)}">編輯</a>
-            <button type="button" data-delete-article="${escapeHTML(article.id)}">刪除</button>
+            <a href="/admin/articles/${encodeURIComponent(article.id)}">${canEditScope(adminPermissions, "health") ? "編輯" : "查看"}</a>
+            ${canEditScope(adminPermissions, "health") ? `<button type="button" data-delete-article="${escapeHTML(article.id)}">刪除</button>` : ""}
           </div>
         </td>
       </tr>
@@ -153,17 +155,21 @@ async function loadArticles() {
 }
 
 async function deleteArticle(id) {
+  if (!canEditScope(adminPermissions, "health")) {
+    setArticlesStatus("你的帳號只有檢視健康文章的權限。", "error");
+    return;
+  }
   const article = articles.find((item) => item.id === id);
   if (!article) return;
   if (!window.confirm(`確定要刪除「${article.title}」嗎？此動作無法復原。`)) return;
 
   setArticlesStatus("正在刪除文章...", "info");
   try {
-    const { error } = await supabase.from("articles").delete().eq("id", id);
+    const { error } = await supabase.from("articles").delete().eq("id", id).select("id").maybeSingle();
     if (error) throw error;
 
-    setArticlesStatus("文章已刪除。", "success");
-    await loadArticles();
+    setArticlesStatus(contentDeleteMessage(adminPermissions, "health", "文章"), "success");
+    if (canPublishScope(adminPermissions, "health")) await loadArticles();
   } catch (error) {
     console.error("Failed to delete article", error);
     setArticlesStatus(`刪除失敗：${error.message}`, "error");
@@ -183,5 +189,8 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadArticles
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    await loadArticles();
+  }
 }).catch((error) => reportAdminBootError(loading, error));

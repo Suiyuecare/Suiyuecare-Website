@@ -123,8 +123,8 @@ supabase/migrations/20260518000200_cms_rls_policies.sql
 第一位管理員需要 bootstrap。建議做法：
 
 1. 先用 Supabase Auth 建立第一個後台帳號。
-2. 使用 Supabase SQL Editor 或 service role 後端腳本，將該使用者在 `profiles.role` 更新為 `owner` 或 `admin`。
-3. 後續再由 owner/admin 從後台管理其他使用者。
+2. 以 `entrepreneur@suiyuecare.com` 登入 Owner 帳號；Owner 身分不得轉讓給其他帳號。
+3. 後續由 Owner 在 `/admin/users` 設定頁面責任部門、人員部門角色與系統模組權限。
 
 ## Service Role Key
 
@@ -246,13 +246,15 @@ import { supabase, requireSupabaseClient, supabaseStorageBuckets } from "./src/l
 - 登出功能
 - Supabase 環境變數缺漏提示
 - `/admin/pages` 從 Supabase `pages` 讀取頁面列表，顯示頁面名稱、slug、啟用狀態與最後更新時間
-- `/admin/pages/:id` 可編輯頁面標題、SEO、啟用狀態與多個 `page_sections`
+- `/admin/pages/:id` 只編輯真正由 `page_sections` 驅動的頁面；使用專用 CMS 的服務、招募、大事記與投資人頁會改為唯讀並導向正確管理頁，避免出現「後台儲存成功、前台不變」。
 - `/admin/media` 可上傳圖片至 Supabase Storage，寫入 `media` 資料表，並顯示圖片列表、預覽、URL、上傳時間與刪除按鈕
 - `/admin/categories` 可新增、編輯、刪除 `article_categories`，欄位包含名稱、slug、描述、排序與啟用狀態
 - `/admin/articles` 從 Supabase `articles` 讀取文章列表，顯示標題、分類、發布狀態、置頂、發布日期、最後更新，並提供新增、編輯與刪除入口
 - `/admin/articles/new` 與 `/admin/articles/:id` 可新增或編輯文章標題、副標題、slug、分類、內容、發布狀態、發布日期、SEO、置頂與排序權重
 - `/admin/home-modules` 可管理首頁最新動態、得標紀錄、員工招募、單位影片、真實照顧情境與名人講堂。
-- `/admin/template-fields` 可管理服務頁與招募頁固定模板欄位，避免員工自由排版造成前台跑版。
+- `/admin/template-fields` 可管理服務頁固定模板欄位，避免員工自由排版造成前台跑版。部門同仁儲存後會建立待審版本，只有執行長核准才套用到前台。
+- `/admin/milestones` 可新增、編輯、排序、發布與下架大事記；前台 `/milestones` 維持固定時間軸版型並自動帶入已發布項目。
+- 前台 `/talent`、`/land`、`/investor-recruiting` 會優先讀取招募後台的 Hero、部門與職缺／合作卡片；新增已發布項目後不必改前端版型即可顯示，土地與投資人頁仍保留既有完整固定區塊。
 - 前台 `#health` 與 `#search` 會從 Supabase `articles` 讀取 `status = published` 且 `is_enabled = true` 的文章，顯示封面圖、標題、副標題、分類與發布日期，排序規則為置頂優先、發布日期新到舊。若 Supabase 尚未設定或沒有資料，會保留原本靜態內容作為 fallback。
 - 前台 `#health` 分類列會從 Supabase `article_categories` 讀取 `is_enabled = true` 的分類。使用者點選分類後會切到 `#health?category=分類slug`，只顯示該分類文章；後台新增或停用分類後，前台重新載入即可自動同步。
 - 前台單篇文章路由 `#article-文章slug` 會用 slug 從 Supabase `articles` 讀取單篇文章，並明確限制 `status = published`、`is_enabled = true`。草稿、封存或停用文章即使知道 slug 也不會在前台顯示。
@@ -453,6 +455,7 @@ pnpm verify:all
 - `GET /api/email-status`
 - 先寫入 Supabase `form_submissions`
 - 再使用 Resend 寄信
+- 每封內部表單通知會寄給原主責信箱，並同步寄給 `OWNER_NOTIFY_EMAIL`；填表者確認信不會同步副本
 - 若 `RESEND_API_KEY` 尚未設定，API 會回傳 `202`，資料仍會留存在後台，避免名單遺失
 - `/api/email-status` 會回報正式環境是否已設定 `RESEND_API_KEY` 與 `MAIL_FROM`，需帶 `Authorization: Bearer <STATUS_SECRET 或 CRON_SECRET>`，不會公開洩漏環境狀態
 
@@ -463,6 +466,7 @@ SUPABASE_URL=https://ussnmxdpxeoshlrdchov.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=...
 RESEND_API_KEY=...
 MAIL_FROM="Suiyuecare Website <noreply@suiyuecare.com>"
+OWNER_NOTIFY_EMAIL=entrepreneur@suiyuecare.com
 CONTACT_NOTIFY_EMAIL=generalaffairs@suiyuecare.com
 COURSE_NOTIFY_EMAIL=edu.control@suiyuecare.com
 INVESTOR_NOTIFY_EMAIL=generalaffairs@suiyuecare.com
@@ -502,21 +506,26 @@ supabase/migrations/20260521000100_add_courses_files_and_form_admin.sql
 
 ### 第二優先後台模組
 
-已新增首頁內容模組與服務/招募頁固定模板欄位：
+已新增首頁內容模組、服務/招募頁固定模板欄位，以及可重複新增的招募職缺與大事記：
 
 - `content_modules`：以 `target_slug = home` 管理首頁模組資料。前台目前支援 `news`、`awards`、`recruit`、`video`、`care_story`、`master_talk`，只讀取 `status = published` 且 `is_enabled = true` 的內容；若沒有 Supabase 資料，保留靜態/WordPress fallback。
 - 首頁剩餘模組已 CMS 化：`hero`、`service_item`、`location`、`partner`。管理者可在 `/admin/home-modules` 新增、編輯、刪除首頁 Hero、營業項目卡、服務據點與合作單位。
 - 服務據點會使用 `location` 模組的 `item_key` 作為點位識別，`metadata.pin_class` 或 `metadata.pin_style` 控制地圖旗子位置；萬華一館/二館可用相同 `metadata.tab_group` 呈現分館 tab。
 - 合作單位使用 `partner` 模組，前台會自動複製一組跑馬燈內容維持連續動畫。
-- `page_template_fields`：以 `page_slug` 與 `field_key` 管理固定欄位，例如服務範圍、工作特色、適合對象、部門簡介等。這是後續將八大服務頁與三大招募頁完全固定模板化的資料基礎。
+- `page_template_fields`：以 `page_slug` 與 `field_key` 管理服務頁固定欄位，例如服務範圍、工作特色、適合對象與流程；招募頁統一改由 `recruiting_*` 資料表管理，避免同一 Hero 有兩套來源。
 - `/admin/home-modules`：管理首頁模組文字、圖片、連結、日期、排序、發布狀態與是否啟用。
-- `/admin/template-fields`：管理各服務/招募頁固定欄位內容。設計目標是讓員工只改文字與圖片，不改版型。
+- `/admin/template-fields`：管理服務頁固定欄位內容。設計目標是只改文字、圖片與固定卡片資料，不改版型；空列表代表前台清空該列表，停用欄位則使用版型預設值。
+- 招募部門與職缺採「可重複項目」管理；前台固定卡片結構不變，只依發布狀態、啟用狀態與排序載入內容。
+- `/admin/milestones`：管理大事記的年份、月份、標題、標籤、摘要、圖片、同年月排序與發布狀態；前台固定時間軸結構不變。
 
 相關 migration：
 
 ```text
 supabase/migrations/20260521000200_add_home_modules_and_page_templates.sql
 supabase/migrations/20260521000400_seed_home_remaining_modules.sql
+supabase/migrations/20260711080741_add_milestones_cms.sql
+supabase/migrations/20260711082531_harden_milestones_and_template_fields.sql
+supabase/migrations/20260711082543_seed_current_talent_openings.sql
 ```
 
 ### 第三優先後台模組

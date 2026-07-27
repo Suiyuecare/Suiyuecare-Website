@@ -40,20 +40,19 @@ const modules = [
   },
   { id: "hr", number: "2", name: "人資系統" },
   { id: "accounting", number: "3", name: "會計系統" },
+  { id: "edoc", number: "4", name: "電子公文用印系統" },
   {
     id: "general-affairs",
-    number: "4",
+    number: "5",
     name: "總務系統",
     children: [
-      { id: "edoc", number: "4-1", name: "公文簽核系統" },
-      { id: "contract", number: "4-2", name: "合約管理系統" },
-      { id: "system-permissions", number: "4-3", name: "系統權限" },
-      { id: "organization-chart", number: "4-4", name: "組織圖" },
-      { id: "employee-accounts", number: "4-5", name: "員工帳號" },
-      { id: "pdf-editor", number: "4-6", name: "PDF 編輯器" }
+      { id: "contract", number: "5-1", name: "合約管理系統" },
+      { id: "system-permissions", number: "5-2", name: "系統權限" },
+      { id: "organization-chart", number: "5-3", name: "組織圖" },
+      { id: "employee-accounts", number: "5-4", name: "員工帳號" },
+      { id: "pdf-editor", number: "5-5", name: "PDF 編輯器" }
     ]
   },
-  { id: "agile-projects", number: "5", name: "敏捷專案管理" },
   { id: "website-backoffice", number: "6", name: "網站後台管理" }
 ];
 
@@ -225,7 +224,6 @@ const moduleOrgRules = {
   "system-permissions": { owner: "it-class", scope: "custom", policy: "資訊課維護帳號，不預設看敏感內容" },
   "organization-chart": { owner: "it-class", scope: "company", policy: "依組織節點檢視公司架構" },
   "employee-accounts": { owner: "it-class", scope: "custom", policy: "員工帳號與登入狀態管理" },
-  "agile-projects": { owner: "ga-class", scope: "company", policy: "比照會計系統，全員可進入；資料與操作依 APM 權限控管" },
   "website-backoffice": { owner: "it-class", scope: "company", policy: "網站內容、發布流程與後台編輯權限" },
   "pdf-editor": { owner: "it-class", scope: "assigned", policy: "已授權使用者可用" }
 };
@@ -354,12 +352,11 @@ const moduleDescriptions = {
   hr: "查看人員、出勤與人事作業",
   accounting: "查看帳務、付款與報表",
   "general-affairs": "處理行政、總務與文件流程",
-  edoc: "追蹤公文與簽核進度",
+  edoc: "公文收發、簽核、用印與寄發",
   contract: "管理合約與到期提醒",
   "system-permissions": "管理角色、權限與資料範圍",
   "organization-chart": "查看公司組織與權責關係",
   "employee-accounts": "管理員工登入帳號",
-  "agile-projects": "管理任務、看板、衝刺與專案節奏",
   "website-backoffice": "管理官網內容、發布流程與頁面資料",
   "pdf-editor": "編輯、合併與整理 PDF 文件"
 };
@@ -372,27 +369,26 @@ const moduleIcons = {
   hr: "人資",
   accounting: "財務",
   "general-affairs": "行政",
-  edoc: "簽核",
+  edoc: "公文",
   contract: "合約",
   "system-permissions": "權限",
   "organization-chart": "組織",
   "employee-accounts": "帳號",
-  "agile-projects": "專案",
   "website-backoffice": "後台",
   "pdf-editor": "PDF"
 };
 
 const moduleLaunchUrls = {
   accounting: "https://finance.suiyuecare.com/",
-  "agile-projects": "https://apm.suiyuecare.com/"
+  edoc: "https://edoc.suiyuecare.com/"
 };
 
 const connectedModuleIds = new Set(Object.keys(moduleLaunchUrls));
-const temporarilyOpenModuleIds = new Set(["accounting", "agile-projects", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
+const temporarilyOpenModuleIds = new Set(["accounting", "edoc", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
 const sharedGeneralAffairsModules = new Set(["pdf-editor"]);
 const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions", "organization-chart", "employee-accounts"]);
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
-const signedHandoffModuleIds = new Set();
+const signedHandoffModuleIds = new Set(["edoc"]);
 const externalLaunchOrigins = new Map();
 
 async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
@@ -1074,7 +1070,7 @@ const roleDefinitions = [
     grade: "課長",
     category: "行政課級角色",
     defaultScope: "class",
-    modules: ["會計系統", "總務系統", "公文簽核系統", "合約管理系統", "敏捷專案管理"],
+    modules: ["會計系統", "總務系統", "公文簽核系統", "合約管理系統"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     limits: "限總務、公文與合約流程。"
   },
@@ -1176,10 +1172,10 @@ const modulePermissionDefinitions = [
   },
   {
     moduleId: "edoc",
-    roles: ["ceo", "admin-director", "ga-chief"],
+    roles: ["external-audit", "board", "shareholder", "ceo", "region-manager", "admin-director", "hr-chief", "hr-staff", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "export", "print"],
     sensitivity: "簽核",
-    limits: "依簽核流程、職等與節點授權審核。"
+    limits: "所有已啟用員工可進入電子公文；實際公文、附件、用印與簽核操作仍依部門、資料範圍與目前關卡控管。"
   },
   {
     moduleId: "contract",
@@ -1208,13 +1204,6 @@ const modulePermissionDefinitions = [
     actions: ["view", "create", "edit", "assign", "export", "print", "manage"],
     sensitivity: "帳號 / 個資",
     limits: "帳號啟停、角色異動、權限變更都需操作紀錄。"
-  },
-  {
-    moduleId: "agile-projects",
-    roles: ["external-audit", "board", "shareholder", "ceo", "region-manager", "admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
-    actions: ["view", "create", "edit", "submit", "approve", "reject", "export", "print"],
-    sensitivity: "內部專案",
-    limits: "所有已啟用員工可進入 APM；實際任務、KPI、專案獎金資料與操作仍依 APM 內部權限與 Data Scope 控管。"
   },
   {
     moduleId: "website-backoffice",
@@ -1604,7 +1593,7 @@ const roleProfiles = [
     title: "全集團最高營運權限",
     scope: "group",
     note: "全集團",
-    modules: ["announcements", "business", "home-care", "day-care", "hr", "accounting", "general-affairs", "edoc", "contract", "system-permissions", "organization-chart", "employee-accounts", "agile-projects", "website-backoffice", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "hr", "accounting", "general-affairs", "edoc", "contract", "system-permissions", "organization-chart", "employee-accounts", "website-backoffice", "pdf-editor"]
   },
   {
     id: "region-manager",
@@ -1612,7 +1601,7 @@ const roleProfiles = [
     title: "台北區 / 新北區 / 桃園區",
     scope: "region",
     note: "僅自己區域資料",
-    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "pdf-editor"]
   },
   {
     id: "admin-director",
@@ -1620,7 +1609,7 @@ const roleProfiles = [
     title: "行政部門",
     scope: "department",
     note: "行政部門管理",
-    modules: ["announcements", "hr", "accounting", "general-affairs", "edoc", "contract", "system-permissions", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "hr", "accounting", "general-affairs", "edoc", "contract", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]
   },
   {
     id: "hr-chief",
@@ -1628,7 +1617,7 @@ const roleProfiles = [
     title: "人資課",
     scope: "class",
     note: "人資課資料",
-    modules: ["announcements", "hr", "accounting", "organization-chart", "employee-accounts", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "hr", "accounting", "organization-chart", "employee-accounts", "pdf-editor"]
   },
   {
     id: "accounting-chief",
@@ -1636,7 +1625,7 @@ const roleProfiles = [
     title: "財會課",
     scope: "class",
     note: "會計帳務與報表",
-    modules: ["announcements", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "accounting", "organization-chart", "pdf-editor"]
   },
   {
     id: "cashier-chief",
@@ -1644,7 +1633,7 @@ const roleProfiles = [
     title: "財會課 / 出納",
     scope: "class",
     note: "出納付款與收款",
-    modules: ["announcements", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "accounting", "organization-chart", "pdf-editor"]
   },
   {
     id: "ga-chief",
@@ -1652,7 +1641,7 @@ const roleProfiles = [
     title: "總務課",
     scope: "class",
     note: "公文、合約與總務事項",
-    modules: ["announcements", "accounting", "general-affairs", "edoc", "contract", "organization-chart", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "accounting", "general-affairs", "edoc", "contract", "organization-chart", "pdf-editor"]
   },
   {
     id: "business-director",
@@ -1660,7 +1649,7 @@ const roleProfiles = [
     title: "居家照顧部 / 日間照顧部等",
     scope: "business_unit",
     note: "自己業務線資料",
-    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "pdf-editor"]
   },
   {
     id: "section-chief",
@@ -1668,7 +1657,7 @@ const roleProfiles = [
     title: "業務課長",
     scope: "class",
     note: "本課資料",
-    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "pdf-editor"]
   },
   {
     id: "team-lead",
@@ -1676,7 +1665,7 @@ const roleProfiles = [
     title: "業務組長",
     scope: "assigned",
     note: "自己負責資料",
-    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "pdf-editor"]
   },
   {
     id: "staff",
@@ -1684,7 +1673,7 @@ const roleProfiles = [
     title: "一般職員",
     scope: "self",
     note: "僅自己與被指派任務",
-    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "agile-projects", "pdf-editor"]
+    modules: ["announcements", "business", "home-care", "day-care", "accounting", "organization-chart", "pdf-editor"]
   }
 ];
 
@@ -2733,10 +2722,6 @@ function createModuleButton(module, profile) {
       renderPdfEditorTool(profile);
       return;
     }
-    if (module.id === "agile-projects") {
-      renderAgileProjectTool(profile);
-      return;
-    }
     setStatus(`${module.name} 尚未設定正式連結。`, "info");
   });
 
@@ -2942,7 +2927,7 @@ function renderOrganizationTool(profile) {
         <tbody data-organization-supervisor-table-body></tbody>
       </table>
     </div>
-    <p class="account-note">主管設定目前先保存在 Portal；登入後切換 Finance、APM 或其他模組時，會把 organizationPath、managerEmployeeId、approvalManagerEmployeeId 一起帶出，讓各模組共用同一套組織階層。</p>
+    <p class="account-note">主管設定目前先保存在 Portal；登入後切換 Finance 或其他模組時，會把 organizationPath、managerEmployeeId、approvalManagerEmployeeId 一起帶出，讓各模組共用同一套組織階層。</p>
   `;
 
   const searchInput = panel.querySelector("#organizationPeopleSearchInput");
@@ -3134,47 +3119,6 @@ function renderPdfEditorTool(profile) {
   moduleLevelTwoGrid.replaceChildren(panel);
   renderFiles();
   setStatus("已開啟 PDF 編輯器。", "info");
-}
-
-function renderAgileProjectTool(profile) {
-  if (!moduleLevelTwoGrid || !moduleTitle) return;
-  moduleTitle.textContent = "總務系統｜敏捷專案管理";
-
-  const panel = document.createElement("section");
-  panel.className = "tool-detail account-management";
-  panel.innerHTML = `
-    <div class="account-head">
-      <strong>敏捷專案管理</strong>
-      <small>依專案、衝刺、負責人與跨部門協作範圍控管；正式串接前先建立入口欄位與權限位置。</small>
-    </div>
-    <div class="account-stats">
-      <article>
-        <span>專案</span>
-        <strong>0</strong>
-        <small>待串接資料表</small>
-      </article>
-      <article>
-        <span>衝刺</span>
-        <strong>0</strong>
-        <small>待建立 Sprint</small>
-      </article>
-      <article>
-        <span>任務</span>
-        <strong>0</strong>
-        <small>待建立看板</small>
-      </article>
-      <article>
-        <span>目前權限</span>
-        <strong>${escapeHtml(scopeLabels[profile.scope] || profile.scope)}</strong>
-        <small>${escapeHtml(profile.email)}</small>
-      </article>
-    </div>
-    <div class="empty-account-state">敏捷專案管理入口已建立；下一步可接專案、看板、Sprint、任務指派與操作紀錄資料表。</div>
-  `;
-
-  moduleLevelTwoGrid.classList.add("detail-grid");
-  moduleLevelTwoGrid.replaceChildren(panel);
-  setStatus("已開啟敏捷專案管理。", "info");
 }
 
 function createPermissionTabs(activeTab) {
@@ -3557,7 +3501,7 @@ function renderOrganizationStructureTool(profile) {
       <article>
         <span>資料來源</span>
         <strong>Portal</strong>
-        <small>Finance / APM / 公文 / 後台共用</small>
+        <small>Finance / 公文 / 後台共用</small>
       </article>
     </div>
     <div class="affiliation-layout">
@@ -3721,7 +3665,7 @@ function renderSupervisorRelationshipTool(profile) {
       <article>
         <span>套用範圍</span>
         <strong>全模組</strong>
-        <small>Finance / APM / 公文 / HR / 後台</small>
+        <small>Finance / 公文 / HR / 後台</small>
       </article>
     </div>
     <div class="account-toolbar">

@@ -1,5 +1,13 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { renderArticleSlideDeck } from "../article-slide-deck.js";
+import {
+  normalizePublicAssetUrl,
+  renderPublicArticleLayout,
+  renderPublicHealthIndex
+} from "../public-content-renderer.mjs";
+import { loadPublicContent } from "./load-public-content.mjs";
 
 const distDir = path.resolve("dist");
 const indexPath = path.join(distDir, "index.html");
@@ -32,7 +40,7 @@ const publicRoutePaths = new Map([
   ["contact", "/contact"]
 ]);
 
-const routes = [
+const staticRoutes = [
   {
     slug: "home",
     path: "/",
@@ -47,9 +55,9 @@ const routes = [
     path: "/about",
     title: "關於歲悅｜歲悅長照集團",
     description: "3 分鐘認識歲悅長照集團的組織願景、使命、團隊文化、服務系統與團隊成員。",
-    image: "/assets/homepage-batch/04-admin-team-office-fast.jpg",
-    imageAlt: "歲悅團隊整理照顧服務系統",
-    preloadImage: "/assets/homepage-batch/04-admin-team-office-fast.jpg",
+    image: "/assets/about/about-team-group-hero-v2.jpg",
+    imageAlt: "歲悅長照跨專業團隊大合照",
+    preloadImage: "/assets/about/about-team-group-hero-v2.jpg",
     priority: "0.92"
   },
   {
@@ -57,9 +65,9 @@ const routes = [
     path: "/milestones",
     title: "大事記｜歲悅長照集團",
     description: "查看歲悅長照集團的重要里程碑、服務擴張、據點成立與合作紀錄。",
-    image: "/assets/milestones/homecare-agency-launch.jpg",
+    image: "/assets/milestones/milestones-team-care-planning-hero-v2.jpg",
     imageAlt: "歲悅居家長照機構成立里程碑",
-    preloadImage: "/assets/milestones/homecare-agency-launch.jpg",
+    preloadImage: "/assets/milestones/milestones-team-care-planning-hero-v2.jpg",
     priority: "0.9"
   },
   {
@@ -97,9 +105,9 @@ const routes = [
     path: "/nursing",
     title: "護理復能｜歲悅長照集團",
     description: "結合護理評估、復能目標與健康監測，協助長輩恢復生活能力並降低照顧風險。",
-    image: "/assets/nursing-detail-02-walking-hero-fast.jpg",
+    image: "/assets/brand-scenes/rehab-v2.jpg",
     imageAlt: "歲悅護理復能陪伴長輩步行訓練",
-    preloadImage: "/assets/nursing-detail-02-walking-hero-fast.jpg",
+    preloadImage: "/assets/brand-scenes/rehab-v2.jpg",
     priority: "0.86"
   },
   {
@@ -107,9 +115,9 @@ const routes = [
     path: "/migrant-training",
     title: "移工培訓｜歲悅長照集團",
     description: "歲悅移工培訓提供照顧技能、家庭溝通、衛教與安全實作訓練，提升家庭照顧品質。",
-    image: "/assets/migrant-detail-01-classroom-hero-fast.jpg",
+    image: "/assets/brand-scenes/migrant-v2.jpg",
     imageAlt: "歲悅移工照顧技能培訓課堂",
-    preloadImage: "/assets/migrant-detail-01-classroom-hero-fast.jpg",
+    preloadImage: "/assets/brand-scenes/migrant-v2.jpg",
     priority: "0.84"
   },
   {
@@ -117,9 +125,9 @@ const routes = [
     path: "/quality",
     title: "教育品管｜歲悅長照集團",
     description: "歲悅教育品管以標準化教材、督導制度、服務稽核與持續改善守住照顧品質。",
-    image: "/assets/quality-detail-04-improvement-hero-fast.jpg",
+    image: "/assets/brand-scenes/quality-v2.jpg",
     imageAlt: "歲悅教育品管會議與改善討論",
-    preloadImage: "/assets/quality-detail-04-improvement-hero-fast.jpg",
+    preloadImage: "/assets/brand-scenes/quality-v2.jpg",
     priority: "0.82"
   },
   {
@@ -233,11 +241,66 @@ const routes = [
     path: "/contact",
     title: "聯絡我們｜歲悅長照集團",
     description: "聯絡歲悅長照集團，預約服務諮詢、課程合作、招募合作、投資洽談或一般客服。",
-    image: "/assets/homepage-batch/15-phone-consultation-fast.jpg",
+    image: "/assets/brand-scenes/phone-v2.jpg",
     imageAlt: "歲悅客服窗口電話諮詢",
     priority: "0.72"
   }
 ];
+
+function sitemapDate(value = "") {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return todayInTaipei();
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(date);
+}
+
+function contentRoute(item) {
+  const slideDeckHtml = item.slides?.length
+    ? renderArticleSlideDeck(item, normalizePublicAssetUrl)
+    : "";
+  return {
+    slug: `${item.contentKind}-${item.slug}`,
+    path: item.href,
+    title: item.seoTitle || `${item.title}｜健康3.0`,
+    description: item.seoDescription || item.excerpt || item.subtitle,
+    image: item.image,
+    imageAlt: item.imageAlt || item.title,
+    preloadImage: item.image,
+    priority: item.isFeatured ? "0.82" : "0.72",
+    type: "article",
+    lastmod: sitemapDate(item.lastmod || item.updatedAt || item.publishedAt),
+    article: item,
+    breadcrumbParent: {
+      name: item.contentKind === "care-story" ? "照顧故事" : item.contentKind === "master-talk" ? "名人講堂" : "健康3.0",
+      path: "/health"
+    },
+    prerenderedHtml: renderPublicArticleLayout(item, {
+      related: item.related,
+      slideDeckHtml
+    })
+  };
+}
+
+const publicContent = await loadPublicContent();
+const routes = [
+  ...staticRoutes.map((route) => route.slug === "health"
+    ? {
+        ...route,
+        prerenderedHtml: renderPublicHealthIndex(publicContent.articles, publicContent.categories)
+      }
+    : route),
+  ...publicContent.items.map(contentRoute)
+];
+
+const routePaths = new Set();
+for (const route of routes) {
+  if (routePaths.has(route.path)) throw new Error(`Duplicate public route generated: ${route.path}`);
+  routePaths.add(route.path);
+}
 
 function absoluteUrl(value) {
   if (/^https?:\/\//i.test(value)) return value;
@@ -263,6 +326,8 @@ const siteNavigation = [
 function structuredDataForRoute(route) {
   const canonical = absoluteUrl(route.path);
   const isHome = route.path === "/";
+  const articleId = `${canonical}#article`;
+  const webpageId = isHome ? `${siteOrigin}/#webpage` : `${canonical}#webpage`;
   const graph = [
     {
       "@type": ["Organization", "LocalBusiness"],
@@ -316,7 +381,7 @@ function structuredDataForRoute(route) {
     },
     {
       "@type": "WebPage",
-      "@id": isHome ? `${siteOrigin}/#webpage` : `${canonical}#webpage`,
+      "@id": webpageId,
       url: canonical,
       name: route.title,
       description: route.description,
@@ -330,6 +395,7 @@ function structuredDataForRoute(route) {
         "@type": "ImageObject",
         url: absoluteUrl(route.image)
       },
+      ...(route.article ? { mainEntity: { "@id": articleId } } : {}),
       inLanguage: "zh-Hant-TW"
     },
     {
@@ -346,23 +412,68 @@ function structuredDataForRoute(route) {
   ];
 
   if (!isHome) {
+    const breadcrumbItems = [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "首頁",
+        item: `${siteOrigin}/`
+      }
+    ];
+    if (route.breadcrumbParent) {
+      breadcrumbItems.push({
+        "@type": "ListItem",
+        position: breadcrumbItems.length + 1,
+        name: route.breadcrumbParent.name,
+        item: absoluteUrl(route.breadcrumbParent.path)
+      });
+    }
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      position: breadcrumbItems.length + 1,
+      name: route.title.replace(/｜.*$/, ""),
+      item: canonical
+    });
     graph.push({
       "@type": "BreadcrumbList",
       "@id": `${canonical}#breadcrumb`,
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "首頁",
-          item: `${siteOrigin}/`
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: route.title.replace(/｜.*$/, ""),
-          item: canonical
+      itemListElement: breadcrumbItems
+    });
+  }
+
+  if (route.article) {
+    const authorName = route.article.author || "歲悅照顧編輯部";
+    const author = /歲悅/.test(authorName)
+      ? {
+          "@type": "Organization",
+          "@id": `${siteOrigin}/#organization`,
+          name: authorName
         }
-      ]
+      : {
+          "@type": "Person",
+          name: authorName
+        };
+    graph.push({
+      "@type": route.article.schemaType || "Article",
+      "@id": articleId,
+      mainEntityOfPage: {
+        "@id": webpageId
+      },
+      headline: route.article.title,
+      description: route.description,
+      image: [absoluteUrl(route.image)],
+      datePublished: route.article.publishedAt,
+      dateModified: route.article.updatedAt || route.article.publishedAt,
+      author,
+      publisher: {
+        "@id": `${siteOrigin}/#organization`
+      },
+      articleSection: route.article.category || "照顧知識",
+      keywords: route.article.seoKeywords?.length
+        ? route.article.seoKeywords
+        : route.article.tags || [],
+      isAccessibleForFree: true,
+      inLanguage: "zh-Hant-TW"
     });
   }
 
@@ -456,6 +567,30 @@ function stripHomeShell(html, route) {
     .replaceAll('href="#home"', 'href="/"');
 }
 
+function injectPrerenderedContent(html, route) {
+  if (!route.prerenderedHtml) return html;
+  const pageView = '<section class="page detail-page" id="pageView" aria-live="polite"></section>';
+  if (!html.includes(pageView)) {
+    throw new Error(`Unable to inject pre-rendered content for ${route.path}`);
+  }
+  return html.replace(
+    pageView,
+    `<section class="page detail-page active" id="pageView" aria-live="polite" data-prerendered-route="${route.slug}">${route.prerenderedHtml}</section>`
+  );
+}
+
+function insertArticleMeta(html, route) {
+  if (!route.article) return html;
+  const articleMeta = [
+    `<meta property="article:published_time" content="${route.article.publishedAt}" />`,
+    `<meta property="article:modified_time" content="${route.article.updatedAt || route.article.publishedAt}" />`,
+    `<meta property="article:section" content="${route.article.category || "照顧知識"}" />`,
+    ...(route.article.tags || []).slice(0, 12)
+      .map((tag) => `<meta property="article:tag" content="${String(tag).replace(/&/g, "&amp;").replace(/"/g, "&quot;")}" />`)
+  ].join("\n    ");
+  return html.replace("</head>", `    ${articleMeta}\n  </head>`);
+}
+
 function routeHtml(baseHtml, route) {
   const canonical = absoluteUrl(route.path);
   const image = absoluteUrl(route.image);
@@ -466,6 +601,7 @@ function routeHtml(baseHtml, route) {
   html = html.replace(/<title>.*?<\/title>/, `<title>${route.title}</title>`);
   html = replaceAttr(html, /(<meta name="description" content=")(.*?)(" \/>)/, route.description);
   html = replaceAttr(html, /(<link rel="canonical" href=")(.*?)(" \/>)/, canonical);
+  html = replaceAttr(html, /(<meta property="og:type" content=")(.*?)(" \/>)/, route.article ? "article" : "website");
   html = replaceAttr(html, /(<meta property="og:url" content=")(.*?)(" \/>)/, canonical);
   html = replaceAttr(html, /(<meta property="og:title" content=")(.*?)(" \/>)/, route.title);
   html = replaceAttr(html, /(<meta property="og:description" content=")(.*?)(" \/>)/, route.description);
@@ -476,13 +612,19 @@ function routeHtml(baseHtml, route) {
   html = replaceAttr(html, /(<meta name="twitter:image" content=")(.*?)(" \/>)/, image);
   html = replaceAttr(html, /(<meta name="twitter:image:alt" content=")(.*?)(" \/>)/, imageAlt);
   html = replaceAttr(html, /(<link id="heroPreload" rel="preload" as="image" href=")(.*?)(" fetchpriority="high"(?: media="[^"]*")? \/>)/, preloadImage);
-  html = replaceAttr(html, /(<meta name="robots" content=")(.*?)(" \/>)/, route.robots || "index, follow");
-  html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1ux-seo-form-20260702$3`);
+  html = replaceAttr(
+    html,
+    /(<meta name="robots" content=")(.*?)(" \/>)/,
+    route.robots || (route.article ? "index, follow, max-image-preview:large" : "index, follow")
+  );
+  html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1public-content-seo-20260727$3`);
+  html = insertArticleMeta(html, route);
   html = replaceStructuredData(html, route);
   html = routeHashLinksToPaths(html);
   if (route.path !== "/") {
     html = stripHomeShell(html, route);
   }
+  html = injectPrerenderedContent(html, route);
   html = markCurrentRouteLinks(html, route);
   html = optimizeStaticImageTags(html);
   return html;
@@ -507,12 +649,11 @@ for (const route of routes) {
   fs.writeFileSync(path.join(routeDir, "index.html"), routeHtml(baseHtml, route));
 }
 
-const today = todayInTaipei();
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${routes.map((route) => `  <url>
     <loc>${absoluteUrl(route.path)}</loc>
-    <lastmod>${today}</lastmod>
+    <lastmod>${route.lastmod || todayInTaipei()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>${route.priority}</priority>
   </url>`).filter((_, index) => routes[index].sitemap !== false).join("\n")}
@@ -520,3 +661,41 @@ ${routes.map((route) => `  <url>
 `;
 
 fs.writeFileSync(path.join(distDir, "sitemap.xml"), sitemap);
+
+const manifestRoutes = routes
+  .filter((route) => route.sitemap !== false)
+  .map((route) => {
+    const routeContent = route.prerenderedHtml || `${route.title}\n${route.description}`;
+    return {
+      path: route.path,
+      url: absoluteUrl(route.path),
+      type: route.article?.contentKind || "page",
+      lastmod: route.lastmod || todayInTaipei(),
+      contentHash: crypto.createHash("sha256").update(routeContent).digest("hex")
+    };
+  });
+const manifestHash = crypto
+  .createHash("sha256")
+  .update(JSON.stringify(manifestRoutes))
+  .digest("hex");
+const seoManifest = {
+  schemaVersion: 1,
+  generatedAt: new Date().toISOString(),
+  contentHash: manifestHash,
+  cmsSnapshot: {
+    generatedAt: publicContent.snapshot?.generatedAt || null,
+    contentHash: publicContent.snapshot?.contentHash || null
+  },
+  counts: {
+    pages: manifestRoutes.filter((route) => route.type === "page").length,
+    articles: publicContent.articles.length,
+    careStories: publicContent.stories.length,
+    masterTalks: publicContent.talks.length,
+    publicUrls: manifestRoutes.length
+  },
+  routes: manifestRoutes
+};
+fs.writeFileSync(
+  path.join(distDir, "seo-manifest.json"),
+  `${JSON.stringify(seoManifest, null, 2)}\n`
+);

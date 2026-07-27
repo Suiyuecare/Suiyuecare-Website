@@ -1,7 +1,7 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
-  "buildCommand": "pnpm verify:all",
+  "buildCommand": "pnpm cms:fallbacks:sync && pnpm verify:all",
   "outputDirectory": "dist",
   "headers": [
     {
@@ -899,18 +899,6 @@
     {
       "source": "/investor-recruiting/assets/:path*",
       "destination": "/assets/:path*"
-    },
-    {
-      "source": "/article/:slug",
-      "destination": "/"
-    },
-    {
-      "source": "/care-story/:slug",
-      "destination": "/"
-    },
-    {
-      "source": "/master-talk/:slug",
-      "destination": "/"
     },
     {
       "source": "/admin/pages/:id",

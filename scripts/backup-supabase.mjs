@@ -24,6 +24,7 @@ const TABLES = [
   "recruiting_pages",
   "recruiting_departments",
   "recruiting_openings",
+  "milestones",
   "investor_notices",
   "investor_financial_items",
   "investor_chart_datasets",

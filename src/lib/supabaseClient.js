@@ -3,8 +3,25 @@ import { createClient } from "@supabase/supabase-js";
 const defaultSupabaseUrl = "https://ussnmxdpxeoshlrdchov.supabase.co";
 const defaultSupabaseAnonKey = "sb_publishable_2Qzte6W7e6iAssOyTVRuZA__MNdKR1x";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || defaultSupabaseUrl;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || defaultSupabaseAnonKey;
+function validHttpUrl(value) {
+  const candidate = String(value || "").trim();
+  try {
+    const url = new URL(candidate);
+    return ["http:", "https:"].includes(url.protocol) ? candidate : "";
+  } catch {
+    return "";
+  }
+}
+
+function validSupabasePublicKey(value) {
+  const candidate = String(value || "").trim();
+  if (candidate.startsWith("sb_publishable_") && candidate.length > 30) return candidate;
+  if (candidate.startsWith("eyJ") && candidate.length > 100) return candidate;
+  return "";
+}
+
+const supabaseUrl = validHttpUrl(import.meta.env.VITE_SUPABASE_URL) || defaultSupabaseUrl;
+const supabaseAnonKey = validSupabasePublicKey(import.meta.env.VITE_SUPABASE_ANON_KEY) || defaultSupabaseAnonKey;
 
 export const supabaseStorageBuckets = {
   publicImages: import.meta.env.VITE_SUPABASE_STORAGE_BUCKET_PUBLIC_IMAGES || "public-images",

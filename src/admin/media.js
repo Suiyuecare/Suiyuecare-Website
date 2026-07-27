@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabaseClient.js";
 import { fetchMediaImages, getFocalPointOption, getImageUsageOption, prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
+import { contentScopeLabel, editableScopeOptions } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -24,6 +25,7 @@ const mediaCountTargets = {
 
 let mediaUsageMap = new Map();
 let mediaItems = [];
+let adminPermissions = {};
 
 function setMediaStatus(message, type = "info") {
   if (!mediaStatus) return;
@@ -248,6 +250,11 @@ async function fetchMediaUsage(items) {
       title: row.title || row.page_slug || "未命名職缺",
       href: "/admin/recruiting"
     })),
+    safeUsageQuery("milestones", "id, year, month, title, image_id", "image_id", mediaIds, (row) => ({
+      type: "大事記時間軸圖片",
+      title: row.title || `${row.year || ""}/${row.month || ""}` || "未命名大事記",
+      href: "/admin/milestones"
+    })),
     safeUsageQuery("site_settings", "id, setting_label, setting_key, media_id", "media_id", mediaIds, (row) => ({
       type: "全站固定內容",
       title: row.setting_label || row.setting_key || "全站圖片",
@@ -310,6 +317,11 @@ async function fetchMediaUsage(items) {
       type: "職缺圖片 URL",
       title: row.title || row.page_slug || "未命名職缺",
       href: "/admin/recruiting"
+    })),
+    safeUrlUsageQuery("milestones", "id, year, month, title, image_url", mediaReferenceMap, (row) => [row.image_url], (row) => ({
+      type: "大事記圖片 URL",
+      title: row.title || `${row.year || ""}/${row.month || ""}` || "未命名大事記",
+      href: "/admin/milestones"
     })),
     safeUrlUsageQuery("site_settings", "id, setting_label, setting_key, value_text, value_json", mediaReferenceMap, (row) => [
       row.value_text,
@@ -415,6 +427,7 @@ function renderMedia(items) {
 
   mediaGrid.innerHTML = items.map((item) => {
     const usages = mediaUsageMap.get(item.id) || [];
+    const canManageItem = adminPermissions.role === "owner";
     return `
     <article class="admin-media-card" data-media-id="${escapeHTML(item.id)}" data-bucket="${escapeHTML(item.bucket)}" data-path="${escapeHTML(item.storage_path)}" data-usage-count="${usages.length}">
       <figure data-image-usage="${escapeHTML(item.image_usage || "card")}" data-focal-point="${escapeHTML(item.focal_point || "center")}">
@@ -424,11 +437,14 @@ function renderMedia(items) {
         <strong>${escapeHTML(item.file_name || "未命名圖片")}</strong>
         <span>${escapeHTML(item.alt_text || "尚未填寫 alt text")}</span>
         <span>用途：${escapeHTML(getImageUsageOption(item.image_usage)?.label || "卡片縮圖")} · 焦點：${escapeHTML(getFocalPointOption(item.focal_point)?.label || "置中")}</span>
+        <span>責任範圍：${escapeHTML(item.is_shared ? "全站共用素材" : contentScopeLabel(item.scope_key))}</span>
         <span>${item.width && item.height ? `${item.width} × ${item.height}` : "尺寸未記錄"}</span>
         ${renderUsageSummary(item)}
         <code>${escapeHTML(item.public_url || "")}</code>
         <time>上傳時間：${formatUpdatedAt(item.created_at)}</time>
-        <button type="button" data-delete-media data-has-usage="${usages.length ? "true" : "false"}">${usages.length ? "已使用，仍要刪除" : "刪除圖片"}</button>
+        ${canManageItem
+          ? `<button type="button" data-delete-media data-has-usage="${usages.length ? "true" : "false"}">${usages.length ? "已使用，仍要刪除" : "刪除圖片"}</button>`
+          : `<small>為避免已上線頁面缺圖，圖片刪除由執行長統一處理。</small>`}
       </div>
     </article>
   `;
@@ -460,6 +476,7 @@ function matchesSearch(item, query) {
     item.caption,
     item.public_url,
     item.storage_path,
+    contentScopeLabel(item.scope_key),
     getImageUsageOption(item.image_usage)?.label,
     getFocalPointOption(item.focal_point)?.label,
     usageText
@@ -541,7 +558,8 @@ async function uploadMedia(event) {
       altText: uploadForm.elements.alt_text.value,
       caption: uploadForm.elements.caption.value,
       imageUsage: uploadForm.elements.image_usage.value,
-      focalPoint: uploadForm.elements.focal_point.value
+      focalPoint: uploadForm.elements.focal_point.value,
+      scopeKey: uploadForm.elements.scope_key.value
     });
 
     uploadForm.reset();
@@ -556,6 +574,12 @@ async function uploadMedia(event) {
 }
 
 async function deleteMedia(card) {
+  const item = mediaItems.find((media) => media.id === card.dataset.mediaId);
+  const canManageItem = adminPermissions.role === "owner";
+  if (!canManageItem) {
+    setMediaStatus("為避免已上線頁面缺圖，圖片刪除需由執行長處理。", "error");
+    return;
+  }
   const mediaId = card.dataset.mediaId;
   const bucket = card.dataset.bucket;
   const storagePath = card.dataset.path;
@@ -602,5 +626,21 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadMedia
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    const scopeSelect = uploadForm?.elements.scope_key;
+    const scopeOptions = editableScopeOptions(adminPermissions);
+    if (scopeSelect) {
+      scopeSelect.innerHTML = scopeOptions.length
+        ? scopeOptions.map((option) => `<option value="${escapeHTML(option.value)}">${escapeHTML(option.label)}</option>`).join("")
+        : '<option value="">目前沒有可編輯的內容範圍</option>';
+    }
+    if (!scopeOptions.length) {
+      uploadForm?.querySelectorAll("input, textarea, select, button").forEach((control) => {
+        control.disabled = true;
+      });
+      document.querySelector('button[form="adminMediaUploadForm"]')?.setAttribute("disabled", "true");
+    }
+    await loadMedia();
+  }
 }).catch((error) => reportAdminBootError(loading, error));

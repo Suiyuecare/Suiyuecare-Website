@@ -92,7 +92,7 @@ async function verifyRoute(slug) {
   return failures;
 }
 
-async function verifyDynamicContentRewrite(pathname) {
+async function verifyPublicContentRoute(pathname) {
   const failures = [];
   const url = `${siteOrigin.replace(/\/$/, "")}${pathname}`;
   const response = await fetch(url, {
@@ -104,11 +104,51 @@ async function verifyDynamicContentRewrite(pathname) {
   });
   const html = await response.text();
   check(response.status === 200, failures, `${pathname}: expected 200 from ${url}, received ${response.status}`);
-  check(html.includes('const initialRoute = initialPath || initialHash || "home"'), failures, `${pathname}: production HTML should prefer path-based initial routes`);
-  check(html.includes("document.documentElement.dataset.initialRoute = initialRoute"), failures, `${pathname}: production HTML should store the resolved initial route before body paint`);
   check(html.includes('id="pageView"'), failures, `${pathname}: production HTML should include #pageView`);
+  check(html.includes("data-prerendered-route="), failures, `${pathname}: production HTML should include pre-rendered content`);
+  check(
+    html.includes(`<link rel="canonical" href="${url}" />`),
+    failures,
+    `${pathname}: production canonical should point to the content URL itself`
+  );
+  check((html.match(/<h1\b/g) || []).length === 1, failures, `${pathname}: production HTML should contain one H1`);
+  check(
+    /"@type"\s*:\s*"(?:Article|BlogPosting)"/.test(html),
+    failures,
+    `${pathname}: production HTML should contain Article or BlogPosting schema`
+  );
+  check(!html.includes("<title>歲悅長照集團｜Suiyuecare Corps.</title>"), failures, `${pathname}: should not use the homepage title`);
   check(!staleContentHashLinkPattern.test(html), failures, `${pathname}: production HTML should not include stale content hash links`);
   return failures;
+}
+
+async function publicContentManifest() {
+  const url = `${siteOrigin.replace(/\/$/, "")}/seo-manifest.json`;
+  const response = await fetch(url, {
+    headers: {
+      "cache-control": "no-cache",
+      pragma: "no-cache"
+    },
+    signal: AbortSignal.timeout(12000)
+  });
+  if (!response.ok) {
+    throw new Error(`expected 200 from ${url}, received ${response.status}`);
+  }
+  return response.json();
+}
+
+async function verifyMissingPublicContent(pathname) {
+  const response = await fetch(`${siteOrigin.replace(/\/$/, "")}${pathname}`, {
+    headers: {
+      "cache-control": "no-cache",
+      pragma: "no-cache"
+    },
+    redirect: "manual",
+    signal: AbortSignal.timeout(12000)
+  });
+  return response.status === 404
+    ? []
+    : [`${pathname}: unknown public content should return 404, received ${response.status}`];
 }
 
 const allFailures = [];
@@ -121,12 +161,42 @@ for (const route of routes) {
   }
 }
 
-for (const pathname of ["/article/longterm-care-apply", "/care-story/family-care-story", "/master-talk/care-psychology"]) {
+let manifest = null;
+try {
+  manifest = await publicContentManifest();
+  check(
+    Array.isArray(manifest.routes) && manifest.routes.length === manifest.counts?.publicUrls,
+    allFailures,
+    "seo-manifest.json should list every public URL"
+  );
+} catch (error) {
+  allFailures.push(`seo-manifest.json: production manifest check failed - ${error.message}`);
+}
+
+const representativePaths = ["article", "care-story", "master-talk"]
+  .map((type) => manifest?.routes?.find((route) => route.type === type)?.path)
+  .filter(Boolean);
+check(representativePaths.length === 3, allFailures, "seo-manifest.json should expose all three public content types");
+
+for (const pathname of representativePaths) {
   try {
-    const failures = await verifyDynamicContentRewrite(pathname);
+    const failures = await verifyPublicContentRoute(pathname);
     allFailures.push(...failures);
   } catch (error) {
-    allFailures.push(`${pathname}: production dynamic content route check failed - ${error.message}`);
+    allFailures.push(`${pathname}: production public content route check failed - ${error.message}`);
+  }
+}
+
+for (const pathname of [
+  "/article/not-a-real-publication",
+  "/care-story/not-a-real-publication",
+  "/master-talk/not-a-real-publication"
+]) {
+  try {
+    const failures = await verifyMissingPublicContent(pathname);
+    allFailures.push(...failures);
+  } catch (error) {
+    allFailures.push(`${pathname}: production 404 check failed - ${error.message}`);
   }
 }
 

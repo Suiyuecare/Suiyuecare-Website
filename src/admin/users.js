@@ -10,56 +10,10 @@ const logoutButton = document.querySelector("#adminLogout");
 const refreshButton = document.querySelector("#refreshUsersButton");
 const statusBox = document.querySelector("#usersStatus");
 const usersList = document.querySelector("#usersList");
+const contentAreaOwnershipForm = document.querySelector("#contentAreaOwnershipForm");
+const contentAreaOwnershipGrid = document.querySelector("#contentAreaOwnershipGrid");
 
 const permissionModules = [
-  {
-    id: "pages",
-    title: "官網頁面",
-    hint: "首頁、服務項目、招募合作與固定頁面文字圖片。",
-    viewFields: ["can_view_pages"],
-    editFields: ["can_edit_pages"],
-    deleteFields: ["can_delete_pages"]
-  },
-  {
-    id: "media",
-    title: "圖片庫",
-    hint: "上傳圖片、裁切圖片、查看圖片被哪些地方使用。",
-    viewFields: ["can_view_media"],
-    editFields: ["can_manage_media"],
-    deleteFields: ["can_delete_media"]
-  },
-  {
-    id: "articles",
-    title: "文章內容",
-    hint: "Health 3.0、最新消息、得標紀錄、真實照顧情境、名人講堂。",
-    viewFields: ["can_view_articles"],
-    editFields: ["can_edit_articles"],
-    deleteFields: ["can_delete_articles"]
-  },
-  {
-    id: "courses",
-    title: "課程報名",
-    hint: "課程卡片、日期、價格、報名資料。",
-    viewFields: ["can_view_courses"],
-    editFields: ["can_edit_courses"],
-    deleteFields: ["can_delete_courses"]
-  },
-  {
-    id: "recruiting",
-    title: "招募管理",
-    hint: "人才招募、職缺卡片、部門介紹。",
-    viewFields: ["can_view_recruiting"],
-    editFields: ["can_edit_recruiting"],
-    deleteFields: ["can_delete_recruiting"]
-  },
-  {
-    id: "investor",
-    title: "投資人資料",
-    hint: "投資人公告、財報下載、圖表資料。",
-    viewFields: ["can_view_investor"],
-    editFields: ["can_edit_investor"],
-    deleteFields: ["can_delete_investor"]
-  },
   {
     id: "analytics",
     title: "網站流量",
@@ -79,7 +33,7 @@ const permissionModules = [
   {
     id: "users",
     title: "人員權限",
-    hint: "新增/停用後台使用者與調整權限，只建議給主管。",
+    hint: "新增、停用後台使用者與調整權限，僅由 Owner 操作。",
     viewFields: ["can_manage_users"],
     editFields: ["can_manage_users"],
     deleteFields: []
@@ -98,12 +52,37 @@ const hiddenPermissionFields = [
   "can_publish",
   "can_review_publish",
   "can_edit_site_settings",
+  "can_view_pages",
+  "can_edit_pages",
+  "can_delete_pages",
+  "can_view_articles",
+  "can_edit_articles",
+  "can_delete_articles",
+  "can_view_media",
+  "can_manage_media",
+  "can_delete_media",
+  "can_view_courses",
+  "can_edit_courses",
+  "can_delete_courses",
   "can_view_files",
   "can_manage_files",
   "can_delete_files",
   "can_view_forms",
   "can_edit_forms",
-  "can_export_forms"
+  "can_export_forms",
+  "can_view_recruiting",
+  "can_edit_recruiting",
+  "can_delete_recruiting",
+  "can_view_investor",
+  "can_edit_investor",
+  "can_delete_investor"
+];
+
+const departmentRoleOptions = [
+  { value: "", label: "無權限", hint: "不顯示，也不能讀取未發布資料" },
+  { value: "viewer", label: "可檢視", hint: "可查看所屬內容與案件，不能修改" },
+  { value: "editor", label: "可編輯", hint: "可新增、修改並送出發布申請" },
+  { value: "manager", label: "部門負責人", hint: "可編輯並送審，作為部門權責窗口；最後仍由執行長核准" }
 ];
 
 const permissionFields = [
@@ -153,7 +132,7 @@ const roleDefaults = {
     can_view_analytics: true
   },
   admin: {
-    can_manage_users: true,
+    can_manage_users: false,
     can_publish: false,
     can_review_publish: false,
     can_edit_site_settings: true,
@@ -191,33 +170,33 @@ const roleDefaults = {
     can_publish: false,
     can_review_publish: false,
     can_edit_site_settings: false,
-    can_view_pages: true,
+    can_view_pages: false,
     can_delete_pages: false,
-    can_view_articles: true,
+    can_view_articles: false,
     can_delete_articles: false,
-    can_view_media: true,
+    can_view_media: false,
     can_delete_media: false,
-    can_view_courses: true,
+    can_view_courses: false,
     can_delete_courses: false,
-    can_view_files: true,
+    can_view_files: false,
     can_delete_files: false,
-    can_edit_forms: true,
+    can_edit_forms: false,
     can_export_forms: false,
-    can_view_recruiting: true,
-    can_edit_recruiting: true,
+    can_view_recruiting: false,
+    can_edit_recruiting: false,
     can_delete_recruiting: false,
-    can_view_investor: true,
-    can_edit_investor: true,
+    can_view_investor: false,
+    can_edit_investor: false,
     can_delete_investor: false,
     can_export_analytics: false,
-    can_view_content_health: true,
+    can_view_content_health: false,
     can_manage_backups: false,
-    can_manage_media: true,
-    can_edit_pages: true,
-    can_edit_articles: true,
-    can_edit_courses: true,
-    can_manage_files: true,
-    can_view_forms: true,
+    can_manage_media: false,
+    can_edit_pages: false,
+    can_edit_articles: false,
+    can_edit_courses: false,
+    can_manage_files: false,
+    can_view_forms: false,
     can_view_analytics: false
   },
   viewer: {
@@ -225,26 +204,26 @@ const roleDefaults = {
     can_publish: false,
     can_review_publish: false,
     can_edit_site_settings: false,
-    can_view_pages: true,
+    can_view_pages: false,
     can_delete_pages: false,
-    can_view_articles: true,
+    can_view_articles: false,
     can_delete_articles: false,
-    can_view_media: true,
+    can_view_media: false,
     can_delete_media: false,
-    can_view_courses: true,
+    can_view_courses: false,
     can_delete_courses: false,
-    can_view_files: true,
+    can_view_files: false,
     can_delete_files: false,
     can_edit_forms: false,
     can_export_forms: false,
-    can_view_recruiting: true,
+    can_view_recruiting: false,
     can_edit_recruiting: false,
     can_delete_recruiting: false,
-    can_view_investor: true,
+    can_view_investor: false,
     can_edit_investor: false,
     can_delete_investor: false,
     can_export_analytics: false,
-    can_view_content_health: true,
+    can_view_content_health: false,
     can_manage_backups: false,
     can_manage_media: false,
     can_edit_pages: false,
@@ -258,20 +237,23 @@ const roleDefaults = {
 
 const roleLabels = {
   owner: "Owner｜最高權限（僅 entrepreneur）",
-  admin: "Admin｜主管管理者（不能直接發布）",
-  editor: "Editor｜內容編輯者（需送審）",
-  viewer: "Viewer｜只讀檢視"
+  admin: "Admin｜系統工具管理者",
+  editor: "Editor｜一般後台使用者",
+  viewer: "Viewer｜只讀帳號"
 };
 
 const roleDescriptions = {
-  owner: "只有 entrepreneur@suiyuecare.com 使用。可管理所有權限、直接發布、核准送審。",
-  admin: "適合主管或後台管理者。可管理使用者與多數資料，但發布仍需送審給 Owner。",
-  editor: "適合企劃、行政、課程或招募同仁。可新增與編輯內容，但不能正式發布。",
-  viewer: "適合只需要查看資料的人員。不能新增、編輯、刪除或發布。"
+  owner: "只有 entrepreneur@suiyuecare.com 使用，可管理全站與所有部門。",
+  admin: "可依矩陣使用系統工具；帳號與部門權限仍由 Owner 統一設定。",
+  editor: "一般同仁帳號；能看、能改哪些內容完全依下方部門身分決定。",
+  viewer: "只保留登入能力；仍須加入部門並指定可檢視，才會看到該部門資料。"
 };
 
 let profiles = [];
 let admins = [];
+let departments = [];
+let departmentMemberships = [];
+let contentAreas = [];
 
 function setStatus(message, type = "info") {
   statusBox.hidden = !message;
@@ -309,6 +291,97 @@ function mergedAdmin(profile) {
   return { ...roleDefaults[profile.role || "viewer"], ...admin };
 }
 
+function membershipForProfile(profileId, departmentId) {
+  return departmentMemberships.find((membership) => (
+    membership.profile_id === profileId
+    && membership.department_id === departmentId
+    && membership.is_active !== false
+  ));
+}
+
+function contentAreasForDepartment(departmentId) {
+  return contentAreas
+    .filter((area) => area.department_id === departmentId && area.is_active !== false)
+    .sort((left, right) => Number(left.sort_order || 0) - Number(right.sort_order || 0));
+}
+
+function renderContentAreaOwnership() {
+  if (!contentAreaOwnershipGrid) return;
+  if (!contentAreas.length || !departments.length) {
+    contentAreaOwnershipGrid.innerHTML = '<div class="admin-empty-state">目前沒有可設定的內容責任資料。</div>';
+    return;
+  }
+
+  contentAreaOwnershipGrid.innerHTML = contentAreas
+    .slice()
+    .sort((left, right) => Number(left.sort_order || 0) - Number(right.sort_order || 0))
+    .map((area) => `
+      <article class="content-area-ownership-row">
+        <div>
+          <span>${escapeHTML(area.scope_key)}</span>
+          <strong>${escapeHTML(area.name)}</strong>
+          <small>${escapeHTML(area.description || "網站內容責任範圍")}</small>
+        </div>
+        <div class="content-area-paths">
+          ${area.frontend_path ? `<a href="${escapeHTML(area.frontend_path)}" target="_blank" rel="noopener">前台 ${escapeHTML(area.frontend_path)}</a>` : ""}
+          ${area.admin_path ? `<a href="${escapeHTML(area.admin_path)}">後台管理</a>` : ""}
+        </div>
+        <label>
+          <span class="sr-only">${escapeHTML(area.name)}負責部門</span>
+          <select data-content-area-scope="${escapeHTML(area.scope_key)}">
+            ${departments.map((department) => `
+              <option value="${escapeHTML(department.id)}" ${department.id === area.department_id ? "selected" : ""}>${escapeHTML(department.name)}</option>
+            `).join("")}
+          </select>
+        </label>
+      </article>
+    `).join("");
+}
+
+function renderDepartmentMatrix(profile) {
+  const isOwner = profile.role === "owner";
+  return `
+    <section class="department-access-matrix" aria-label="部門與內容責任">
+      <div class="permission-matrix-help">
+        <strong>部門與內容責任（真正限制資料庫）</strong>
+        <p>同仁只會看到所屬部門的草稿、表單、圖片與發布紀錄，也只能修改該部門負責的前台內容。所有角色完成編輯後都必須送交執行長核准。</p>
+        <small>公開官網內容仍可像一般訪客一樣查看，但不會因此取得其他部門的後台編輯權。</small>
+      </div>
+      <div class="department-access-grid">
+        ${departments.map((department) => {
+          const membership = membershipForProfile(profile.id, department.id);
+          const selectedRole = isOwner ? "manager" : membership?.membership_role || "";
+          const areas = contentAreasForDepartment(department.id);
+          const selectedRoleHint = departmentRoleOptions.find((option) => option.value === selectedRole)?.hint || departmentRoleOptions[0].hint;
+          return `
+            <article class="department-access-card" data-access-level="${escapeHTML(selectedRole || "none")}">
+              <div class="department-access-card-head">
+                <div>
+                  <span>${escapeHTML(department.slug || "department")}</span>
+                  <strong>${escapeHTML(department.name || "未命名部門")}</strong>
+                </div>
+                <label>
+                  <span class="sr-only">${escapeHTML(department.name)}權限</span>
+                  <select name="department_role_${escapeHTML(department.id)}" data-department-id="${escapeHTML(department.id)}" ${isOwner ? "disabled" : ""}>
+                    ${departmentRoleOptions.map((option) => `
+                      <option value="${escapeHTML(option.value)}" ${selectedRole === option.value ? "selected" : ""}>${escapeHTML(option.label)}</option>
+                    `).join("")}
+                  </select>
+                </label>
+              </div>
+              <p>${escapeHTML(department.description || "由此部門負責的官網內容與案件。")}</p>
+              <div class="department-area-tags" aria-label="負責內容">
+                ${areas.map((area) => `<span title="${escapeHTML(area.description || area.name)}">${escapeHTML(area.name)}</span>`).join("") || "<span>尚未指派內容</span>"}
+              </div>
+              <small>${escapeHTML(selectedRoleHint)}</small>
+            </article>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function renderRoleOptions(selectedRole = "viewer", email = "") {
   const normalizedEmail = String(email || "").toLowerCase();
   return ["owner", "admin", "editor", "viewer"].map((role) => {
@@ -323,7 +396,7 @@ function permissionLevel(admin, module) {
   return "none";
 }
 
-function renderPermissionMatrix(admin) {
+function renderPermissionMatrix(admin, role) {
   const columns = [
     ["none", "無", "看不到這個模組"],
     ["view", "可看", "可以進入查看，但不能改"],
@@ -332,8 +405,8 @@ function renderPermissionMatrix(admin) {
 
   return `
     <div class="permission-matrix-help">
-      <strong>權限怎麼看？</strong>
-      <p>每個部門只需要選「無、可看、可編輯」。正式發布仍遵守規則：除了執行長最高權限以外，其他人都只能送審，不能直接上線。</p>
+      <strong>通用系統模組權限</strong>
+      <p>這一區只管理流量、內容檢查、帳號與備份等系統工具。官網內容、圖片、案件與發布能力全部以下方部門角色為準。</p>
     </div>
     <div class="permission-matrix" role="table" aria-label="後台權限矩陣">
       <div class="permission-matrix-row permission-matrix-head" role="row">
@@ -342,6 +415,7 @@ function renderPermissionMatrix(admin) {
       </div>
       ${permissionModules.map((module) => {
         const selectedLevel = permissionLevel(admin, module);
+        const ownerOnly = module.id === "users" && role !== "owner";
         return `
           <div class="permission-matrix-row" role="row">
             <div class="permission-matrix-module">
@@ -355,6 +429,7 @@ function renderPermissionMatrix(admin) {
                   name="permission_level_${escapeHTML(module.id)}"
                   value="${value}"
                   ${selectedLevel === value ? "checked" : ""}
+                  ${ownerOnly ? "disabled" : ""}
                 />
                 <span>${escapeHTML(label)}</span>
               </label>
@@ -388,7 +463,7 @@ function renderUsers() {
         <div class="admin-help-card user-role-summary">
           <strong>目前角色：${escapeHTML(roleLabels[role] || role)}</strong>
           <p>${escapeHTML(roleDescriptions[role] || "請依照職務需求勾選細項權限。")}</p>
-          <small>發布規則：除了 entrepreneur Owner 以外，所有帳號都需要送審，不能直接讓前台上線。</small>
+          <small>發布規則：部門同仁與負責人都只能編輯、送審；只有 Owner／執行長可以核准並發布。</small>
         </div>
         <form class="admin-form-grid compact user-permission-form">
           <label><span>角色</span><select name="role" data-role-select>
@@ -397,7 +472,10 @@ function renderUsers() {
           <label><span>顯示名稱</span><input name="display_name" type="text" value="${escapeHTML(profile.display_name || "")}" /></label>
           <label><span>Email</span><input name="email" type="email" value="${escapeHTML(profile.email || "")}" /></label>
           <div class="admin-field-wide">
-            ${renderPermissionMatrix(admin)}
+            ${renderDepartmentMatrix(profile)}
+          </div>
+          <div class="admin-field-wide">
+            ${renderPermissionMatrix(admin, role)}
           </div>
           <button type="submit">儲存權限</button>
         </form>
@@ -413,6 +491,10 @@ async function loadUsers() {
     const payload = await adminUsersRequest();
     profiles = payload.profiles || [];
     admins = payload.admins || [];
+    departments = payload.departments || [];
+    departmentMemberships = payload.departmentMemberships || [];
+    contentAreas = payload.contentAreas || [];
+    renderContentAreaOwnership();
     renderUsers();
     setStatus("", "success");
   } catch (error) {
@@ -420,6 +502,34 @@ async function loadUsers() {
     setStatus(`讀取使用者失敗：${error.message}`, "error");
   } finally {
     refreshButton?.removeAttribute("disabled");
+  }
+}
+
+async function saveContentAreaOwnership(event) {
+  event.preventDefault();
+  const assignments = Array.from(contentAreaOwnershipGrid.querySelectorAll("select[data-content-area-scope]"))
+    .map((select) => ({
+      scope_key: select.dataset.contentAreaScope,
+      department_id: select.value
+    }));
+  const submitButton = contentAreaOwnershipForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  setStatus("正在儲存內容責任配置...", "info");
+  try {
+    await adminUsersRequest({
+      method: "POST",
+      body: {
+        action: "update_content_areas",
+        content_area_assignments: assignments
+      }
+    });
+    setStatus("內容責任配置已儲存；部門權限已同步更新。", "success");
+    await loadUsers();
+  } catch (error) {
+    console.error("Failed to save content ownership", error);
+    setStatus(`儲存內容責任配置失敗：${error.message}`, "error");
+  } finally {
+    submitButton.disabled = false;
   }
 }
 
@@ -461,6 +571,12 @@ async function saveUser(card, form) {
     role,
     is_active: profilePayload.is_active
   };
+  const selectedDepartmentMemberships = Array.from(form.querySelectorAll("select[data-department-id]"))
+    .filter((select) => select.value)
+    .map((select) => ({
+      department_id: select.dataset.departmentId,
+      membership_role: select.value
+    }));
   permissionFields.forEach(([field]) => {
     adminPayload[field] = false;
   });
@@ -488,6 +604,7 @@ async function saveUser(card, form) {
       method: "POST",
       body: {
         profile_id: profileId,
+        department_memberships: selectedDepartmentMemberships,
         ...profilePayload,
         ...adminPayload
       }
@@ -501,9 +618,29 @@ async function saveUser(card, form) {
 }
 
 usersList?.addEventListener("change", (event) => {
-  const select = event.target.closest("[data-role-select]");
-  if (!select) return;
-  applyRoleDefaults(select.closest("form"), select.value);
+  const departmentSelect = event.target.closest("select[data-department-id]");
+  if (departmentSelect) {
+    const card = departmentSelect.closest(".department-access-card");
+    const selectedOption = departmentRoleOptions.find((option) => option.value === departmentSelect.value) || departmentRoleOptions[0];
+    if (card) {
+      card.dataset.accessLevel = departmentSelect.value || "none";
+      const hint = card.querySelector(":scope > small");
+      if (hint) hint.textContent = selectedOption.hint;
+    }
+    return;
+  }
+
+  const roleSelect = event.target.closest("[data-role-select]");
+  if (!roleSelect) return;
+  const form = roleSelect.closest("form");
+  applyRoleDefaults(form, roleSelect.value);
+
+  form.querySelectorAll("select[data-department-id]").forEach((select) => {
+    const ownerSelected = roleSelect.value === "owner";
+    select.disabled = ownerSelected;
+    if (ownerSelected) select.value = "manager";
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+  });
 });
 
 usersList?.addEventListener("submit", (event) => {
@@ -515,6 +652,7 @@ usersList?.addEventListener("submit", (event) => {
 });
 
 refreshButton?.addEventListener("click", loadUsers);
+contentAreaOwnershipForm?.addEventListener("submit", saveContentAreaOwnership);
 bindAdminLogout(logoutButton);
 
 bootProtectedAdminPage({

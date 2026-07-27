@@ -1,0 +1,642 @@
+.day-care-application-journey {
+  padding: clamp(34px, 4vw, 58px) clamp(28px, 6vw, 92px);
+  border-block: 1px solid rgba(22, 143, 171, .18);
+  background:
+    linear-gradient(110deg, rgba(237, 249, 251, .94), rgba(255, 253, 248, .98) 58%, rgba(255, 244, 230, .78));
+  content-visibility: auto;
+  contain-intrinsic-size: 520px;
+}
+
+.day-care-application-inner {
+  max-width: 1360px;
+  margin-inline: auto;
+}
+
+.day-care-application-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 22px;
+}
+
+.day-care-application-head .eyebrow {
+  margin: 0 0 8px;
+}
+
+.day-care-application-head h2 {
+  margin: 0;
+  color: var(--brown);
+  font-size: clamp(32px, 4vw, 58px);
+  line-height: 1.08;
+}
+
+.day-care-application-head > div:first-child > p:last-child {
+  max-width: 760px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-weight: 820;
+  line-height: 1.72;
+}
+
+.day-care-application-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.day-care-application-controls output {
+  min-width: 68px;
+  color: var(--orange-dark);
+  font-size: 14px;
+  font-weight: 1000;
+  text-align: center;
+}
+
+.day-care-application-controls button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(82, 58, 36, .2);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--brown);
+  box-shadow: 0 8px 18px rgba(83, 43, 11, .07);
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.day-care-application-controls button:hover:not(:disabled),
+.day-care-application-controls button:focus-visible {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.day-care-application-controls button:focus-visible,
+.day-care-application-track:focus-visible {
+  outline: 3px solid rgba(22, 143, 171, .25);
+  outline-offset: 3px;
+}
+
+.day-care-application-controls button:disabled {
+  opacity: .34;
+  cursor: default;
+}
+
+.day-care-application-control-icon {
+  width: 19px;
+  height: 19px;
+  stroke-width: 2.4;
+}
+
+.day-care-application-track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 4px 4px 16px;
+  scroll-padding-inline: 4px;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: rgba(240, 138, 36, .72) rgba(246, 233, 217, .8);
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
+}
+
+.day-care-application-track.is-dragging {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+
+.day-care-application-track::-webkit-scrollbar {
+  height: 8px;
+}
+
+.day-care-application-track::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(246, 233, 217, .8);
+}
+
+.day-care-application-track::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(240, 138, 36, .72);
+}
+
+.day-care-application-card {
+  display: grid;
+  flex: 0 0 clamp(290px, 30vw, 390px);
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid rgba(220, 174, 117, .78);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 14px 30px rgba(83, 43, 11, .07);
+  scroll-snap-align: start;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.day-care-application-card[aria-current="step"] {
+  border-color: var(--orange);
+  box-shadow: 0 18px 38px rgba(83, 43, 11, .11);
+  transform: translateY(-2px);
+}
+
+.day-care-application-card figure {
+  position: relative;
+  aspect-ratio: 16 / 8.8;
+  overflow: hidden;
+  margin: 0;
+  background: var(--rice);
+}
+
+.day-care-application-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.day-care-application-card figure::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 46%;
+  background: linear-gradient(180deg, transparent, rgba(63, 33, 13, .58));
+  content: "";
+}
+
+.day-care-application-card figure span {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  z-index: 1;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .92);
+  color: var(--orange-dark);
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: .08em;
+}
+
+.day-care-application-card > div {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 146px;
+  padding: 18px;
+}
+
+.day-care-application-card h3 {
+  margin: 0;
+  color: var(--brown);
+  font-size: 22px;
+  line-height: 1.28;
+}
+
+.day-care-application-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.62;
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary article.day-care-assistance-summary {
+  grid-template-columns: minmax(210px, .24fr) minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  align-items: start;
+}
+
+.day-care-assistance-summary > span {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.day-care-assistance-summary > h2 {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: clamp(32px, 3.4vw, 52px);
+}
+
+.day-care-assistance-controls {
+  grid-column: 1;
+  grid-row: 3;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  align-self: end;
+}
+
+.day-care-assistance-controls output {
+  min-width: 68px;
+  color: var(--orange-dark);
+  font-size: 14px;
+  font-weight: 1000;
+  text-align: left;
+}
+
+.day-care-assistance-controls button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(82, 58, 36, .2);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--brown);
+  box-shadow: 0 8px 18px rgba(83, 43, 11, .07);
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.day-care-assistance-controls button:hover:not(:disabled),
+.day-care-assistance-controls button:focus-visible {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.day-care-assistance-controls button:focus-visible,
+.day-care-assistance-track:focus-visible {
+  outline: 3px solid rgba(22, 143, 171, .25);
+  outline-offset: 3px;
+}
+
+.day-care-assistance-controls button:disabled {
+  opacity: .34;
+  cursor: default;
+}
+
+.day-care-assistance-control-icon {
+  width: 19px;
+  height: 19px;
+  stroke-width: 2.4;
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary ul.day-care-assistance-track {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  display: flex;
+  min-width: 0;
+  gap: 14px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  margin: 0;
+  padding: 4px 4px 14px;
+  scroll-padding-inline: 4px;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: rgba(240, 138, 36, .72) rgba(246, 233, 217, .8);
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary ul.day-care-assistance-track::before {
+  display: none;
+}
+
+.day-care-assistance-track.is-dragging {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+
+.day-care-assistance-track::-webkit-scrollbar {
+  height: 8px;
+}
+
+.day-care-assistance-track::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(246, 233, 217, .8);
+}
+
+.day-care-assistance-track::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(240, 138, 36, .72);
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary li.day-care-assistance-card,
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary li.day-care-assistance-card:nth-child(2),
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary li.day-care-assistance-card:nth-child(3),
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary li.day-care-assistance-card:hover {
+  display: grid;
+  flex: 0 0 clamp(280px, 27vw, 340px);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid rgba(220, 174, 117, .78);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 14px 30px rgba(83, 43, 11, .07);
+  filter: none;
+  transform: none;
+  scroll-snap-align: start;
+  cursor: inherit;
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary li.day-care-assistance-card[aria-current="true"] {
+  border-color: var(--orange);
+  box-shadow: 0 18px 36px rgba(83, 43, 11, .11);
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card .service-timeline-dot {
+  display: none;
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card figure {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--rice);
+  box-shadow: none;
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card figure::after {
+  display: none;
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card img,
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card:hover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: none;
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card > div,
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card:hover > div {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 148px;
+  padding: 18px;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  transform: none;
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card strong {
+  font-size: 20px;
+}
+
+:is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card p {
+  font-size: 14px;
+  line-height: 1.58;
+}
+
+.day-care-two-site-map {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  height: 100%;
+}
+
+.day-care-location-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.day-care-location-tab {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  min-height: 68px;
+  padding: 12px 14px;
+  border: 2px solid rgba(220, 174, 117, .72);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--brown);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.day-care-location-tab strong {
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.day-care-location-tab span {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.day-care-location-tab:hover,
+.day-care-location-tab:focus-visible,
+.day-care-location-tab.active {
+  border-color: var(--orange);
+  background: #fff7eb;
+  box-shadow: 0 10px 22px rgba(83, 43, 11, .08);
+  transform: translateY(-1px);
+}
+
+.day-care-location-tab:focus-visible {
+  outline: 3px solid rgba(22, 143, 171, .24);
+  outline-offset: 2px;
+}
+
+.day-care-google-map {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+  min-height: 0;
+  border: 1px solid rgba(220, 174, 117, .78);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 14px 30px rgba(83, 43, 11, .07);
+}
+
+.day-care-google-map iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  border: 0;
+}
+
+.day-care-map-summary {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  border-top: 1px solid rgba(220, 174, 117, .62);
+  background: #fff;
+}
+
+.day-care-map-summary strong {
+  color: var(--orange-dark);
+  font-size: 16px;
+}
+
+.day-care-map-summary span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+@media (max-width: 1180px) {
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary article.day-care-assistance-summary {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .day-care-assistance-summary > span,
+  .day-care-assistance-summary > h2,
+  .day-care-assistance-controls,
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary ul.day-care-assistance-track {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .day-care-assistance-controls {
+    justify-content: flex-end;
+  }
+
+  .day-care-assistance-controls output {
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .day-care-location-tab {
+    min-height: 64px;
+    padding: 10px 11px;
+  }
+
+  .day-care-location-tab strong {
+    font-size: 15px;
+  }
+
+  .day-care-location-tab span {
+    font-size: 11px;
+  }
+
+  .day-care-google-map {
+    min-height: 390px;
+  }
+
+  .day-care-google-map iframe {
+    min-height: 320px;
+  }
+
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary article.day-care-assistance-summary {
+    padding: 20px 18px 22px 28px;
+  }
+
+  .day-care-assistance-summary > h2 {
+    font-size: 24px;
+  }
+
+  .day-care-assistance-controls {
+    margin-left: 8px;
+  }
+
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary ul.day-care-assistance-track {
+    width: 100%;
+    gap: 12px;
+    padding: 3px 4px 12px 8px;
+  }
+
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary li.day-care-assistance-card,
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary li.day-care-assistance-card:nth-child(2),
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary li.day-care-assistance-card:nth-child(3),
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary li.day-care-assistance-card:hover {
+    flex-basis: min(78vw, 304px);
+  }
+
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card > div,
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card:hover > div {
+    min-height: 134px;
+    padding: 15px;
+  }
+
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card strong {
+    font-size: 18px;
+  }
+
+  :is(.day-care-page, .home-care-page, .community-page) .one-minute-service-summary .day-care-assistance-card p {
+    font-size: 13px;
+    line-height: 1.52;
+  }
+
+  .day-care-application-journey {
+    padding: 28px 20px 32px;
+    contain-intrinsic-size: 470px;
+  }
+
+  .day-care-application-head {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .day-care-application-head h2 {
+    font-size: 29px;
+  }
+
+  .day-care-application-head > div:first-child > p:last-child {
+    margin-top: 8px;
+    font-size: 13.5px;
+    line-height: 1.58;
+  }
+
+  .day-care-application-controls {
+    justify-content: flex-end;
+  }
+
+  .day-care-application-controls output {
+    margin-right: auto;
+    text-align: left;
+  }
+
+  .day-care-application-track {
+    gap: 12px;
+    margin-inline: -4px;
+    padding-bottom: 12px;
+  }
+
+  .day-care-application-card {
+    flex-basis: min(82vw, 328px);
+  }
+
+  .day-care-application-card > div {
+    min-height: 132px;
+    padding: 15px;
+  }
+
+  .day-care-application-card h3 {
+    font-size: 20px;
+  }
+
+  .day-care-application-card p {
+    font-size: 13px;
+    line-height: 1.54;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day-care-application-controls button,
+  .day-care-application-card,
+  .day-care-assistance-controls button,
+  .day-care-location-tab {
+    transition: none;
+  }
+}

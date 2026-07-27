@@ -1,11 +1,95 @@
 <!doctype html>
 <html lang="zh-Hant">
   <head>
-    <meta http-equiv="refresh" content="0; url=/admin/404/" />
-    <meta name="robots" content="noindex,nofollow" />
-    <title>後台模組已整併｜歲悅長照集團</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>首頁模組管理｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
   </head>
-  <body>
-    <p>此後台模組已整併，正在前往 <a href="/admin/404/">後台導引頁</a>。</p>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/"><img src="/assets/company-logo.png" alt="" /><span><strong>歲悅長照集團</strong><small>CMS Console</small></span></a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單">
+          <a href="/admin"><span>DB</span><strong>Dashboard</strong></a>
+          <a href="/admin/pages"><span>PG</span><strong>頁面管理</strong></a>
+          <a class="active" href="/admin/home-modules"><span>HM</span><strong>首頁模組</strong></a>
+          <a href="/admin/template-fields"><span>TF</span><strong>模板欄位</strong></a>
+          <a href="/admin/media"><span>IM</span><strong>圖片管理</strong></a>
+          <a href="/admin/courses"><span>CS</span><strong>課程管理</strong></a>
+          <a href="/admin/files"><span>DL</span><strong>檔案下載</strong></a>
+          <a href="/admin/forms"><span>FM</span><strong>表單資料</strong></a>
+          <a href="/admin/articles"><span>AR</span><strong>文章管理</strong></a>
+          <a href="/admin/categories"><span>CT</span><strong>分類管理</strong></a>
+          <a href="/admin/governance"><span>GV</span><strong>發布與權限</strong></a>
+          <a href="/admin/traffic"><span>AN</span><strong>網站流量中心</strong></a>
+          <a href="/admin/content-health"><span>QA</span><strong>內容健康檢查</strong></a>
+        </nav>
+        <div class="admin-sidebar-note"><span>Home Modules</span><strong>固定版型模組</strong><p>只改內容，不改首頁版型與格線。</p></div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Homepage</p>
+            <h1>首頁內容模組</h1>
+            <span>管理最新動態、員工招募、影片、服務、據點與合作單位；真實照顧情境與名人講堂請到「故事講堂」管理。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="admin-preview-link" href="/#home" target="_blank" rel="noopener">查看首頁</a>
+            <div class="admin-userbox"><b id="adminUserInitial">S</b><span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span><button id="adminLogout" type="button">登出</button></div>
+          </div>
+        </header>
+
+        <div id="homeModulesStatus" class="admin-data-status">正在讀取首頁模組...</div>
+
+        <section class="admin-editor-layout">
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head">
+              <div><p class="admin-eyebrow">Module Form</p><h2 id="homeModuleFormTitle">新增模組</h2></div>
+              <button type="button" id="newHomeModuleButton">清空新增</button>
+            </div>
+            <form id="homeModuleForm" class="admin-form-grid">
+              <input type="hidden" name="id" />
+              <input type="hidden" name="image_id" />
+              <label><span>模組類型</span><select name="module_key"><option value="section_setting">首頁區塊設定</option><option value="hero">首頁 Hero</option><option value="news">最新消息</option><option value="awards">得標紀錄</option><option value="recruit">員工招募</option><option value="video">單位影片</option><option value="service_item">營業項目</option><option value="location">服務據點</option><option value="partner">合作單位</option></select></label>
+              <label><span>內部代碼</span><input name="item_key" type="text" placeholder="unique-item-key" /></label>
+              <label><span>標題</span><input name="title" type="text" required /></label>
+              <label><span>副標 / 人名</span><input name="subtitle" type="text" /></label>
+              <label><span>日期 / 時間</span><input name="date_label" type="text" placeholder="2026.05" /></label>
+              <label><span>標籤</span><input name="badge_label" type="text" placeholder="居家照顧 / YouTube" /></label>
+              <label class="admin-field-wide"><span>內容文字</span><textarea name="body" rows="5"></textarea></label>
+              <label><span>按鈕文字</span><input name="link_text" type="text" placeholder="Read More" /></label>
+              <label><span>連結 / 影片 URL</span><input name="link_url" type="text" placeholder="#health 或 YouTube embed URL" /></label>
+              <label class="admin-field-wide"><span>進階 JSON</span><textarea name="metadata" rows="7" placeholder='{"secondary_text":"觀看照顧系統","secondary_url":"#care-system"}'></textarea></label>
+              <label><span>排序</span><input name="sort_order" type="number" value="0" /></label>
+              <label><span>發布狀態</span><select name="status"><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">封存</option></select></label>
+              <label class="admin-toggle-field"><input name="is_featured" type="checkbox" /><span>重點內容</span></label>
+              <label class="admin-toggle-field"><input name="is_enabled" type="checkbox" checked /><span>前台顯示</span></label>
+              <label class="admin-field-wide"><span>圖片</span><input name="image_file" type="file" accept="image/*" /></label>
+              <div id="homeModuleImagePreview" class="admin-section-image-tools admin-field-wide"></div>
+              <button type="submit">儲存模組</button>
+            </form>
+          </section>
+
+          <section class="admin-workspace-panel">
+            <div class="admin-workspace-head"><div><p class="admin-eyebrow">Module List</p><h2>首頁模組列表</h2></div><button id="refreshHomeModulesButton" type="button">重新整理</button></div>
+            <div class="admin-table-wrap">
+              <table class="admin-data-table admin-article-table">
+                <thead><tr><th>內容</th><th>模組</th><th>狀態</th><th>排序</th><th>操作</th></tr></thead>
+                <tbody id="homeModulesTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+    <div id="adminLoading" class="admin-loading"><strong>正在檢查登入狀態</strong><span>請稍候...</span></div>
+    <script type="module" src="/src/admin/home-modules.js"></script>
   </body>
 </html>

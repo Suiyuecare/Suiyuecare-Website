@@ -11,6 +11,11 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
+async function importSourceModule(file) {
+  const source = Buffer.from(read(file)).toString("base64");
+  return import(`data:text/javascript;base64,${source}`);
+}
+
 function uniq(values) {
   return [...new Set(values)].sort();
 }
@@ -63,18 +68,24 @@ const verifyProductionRoutes = read("scripts/verify-production-routes.mjs");
 const verifyPerformance = read("scripts/verify-performance.mjs");
 const verifySecurity = read("scripts/verify-security.mjs");
 const vercelConfig = readJson("vercel.json");
+const { visualEditorPageList } = await importSourceModule("src/admin/visual-editor-manifest.js");
 
 const canonicalSlugs = parsePublicRoutePaths(generator);
 const canonicalPaths = canonicalSlugs.map(slugToPath).sort();
 const nonHomeSlugs = canonicalSlugs.filter((slug) => slug !== "home");
 const nonHomePaths = canonicalPaths.filter((routePath) => routePath !== "/");
 const cleanNoCacheSources = uniq(["/", "/index.html", ...nonHomePaths.map(pathToCleanSource)]);
-const dynamicContentRewriteSources = [
+const forbiddenDynamicContentRewriteSources = [
   "/article/:slug",
   "/care-story/:slug",
   "/master-talk/:slug"
 ];
 
+assertSame(
+  "visual editor page manifest",
+  uniq(visualEditorPageList().map((page) => page.slug)),
+  canonicalSlugs
+);
 assertSame("scripts/verify-routes.mjs routes", parseQuotedArray(verifyRoutes, "routes"), nonHomeSlugs);
 assertSame("scripts/verify-production-routes.mjs routes", parseQuotedArray(verifyProductionRoutes, "routes"), nonHomeSlugs);
 assertSame("scripts/verify-performance.mjs routeBudgets", parseRouteBudgetPaths(verifyPerformance), canonicalPaths);
@@ -87,11 +98,11 @@ assertSame(
   cleanNoCacheSources
 );
 assertSame(
-  "vercel.json dynamic content rewrites",
+  "vercel.json forbidden dynamic content rewrites",
   uniq((vercelConfig.rewrites || [])
     .map((entry) => entry.source)
-    .filter((source) => dynamicContentRewriteSources.includes(source))),
-  dynamicContentRewriteSources
+    .filter((source) => forbiddenDynamicContentRewriteSources.includes(source))),
+  []
 );
 
 console.log(`ok - public route inventory is consistent across ${canonicalSlugs.length} routes`);

@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabaseClient.js";
 import { prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
+import { canEditScope, canPublishScope, contentSaveMessage } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -11,6 +12,8 @@ const statusBox = document.querySelector("#siteSettingsStatus");
 const form = document.querySelector("#siteSettingsForm");
 
 let settings = [];
+let adminPermissions = {};
+const siteSettingsScope = "site:settings";
 
 const textKeys = [
   "brand_name",
@@ -103,7 +106,8 @@ async function uploadLogoIfNeeded() {
     altText: form.elements.brand_name.value.trim() || "歲悅長照集團 Logo",
     caption: "全站 Logo",
     imageUsage: "logo",
-    focalPoint: "center"
+    focalPoint: "center",
+    scopeKey: "site:settings"
   });
   return media.public_url;
 }
@@ -141,6 +145,10 @@ function buildPayloads(logoUrl) {
 
 async function saveSettings(event) {
   event.preventDefault();
+  if (!canEditScope(adminPermissions, siteSettingsScope)) {
+    setStatus("你的帳號只有檢視全站設定的權限。", "error");
+    return;
+  }
   setStatus("正在儲存全站設定...", "info");
   try {
     const logoUrl = await uploadLogoIfNeeded();
@@ -150,8 +158,8 @@ async function saveSettings(event) {
       .upsert(rows, { onConflict: "setting_key" });
     if (error) throw error;
     form.elements.logo_file.value = "";
-    setStatus("全站設定已儲存，重新整理前台即可看到更新。", "success");
-    await loadSettings();
+    setStatus(contentSaveMessage(adminPermissions, siteSettingsScope, "全站設定"), "success");
+    if (canPublishScope(adminPermissions, siteSettingsScope)) await loadSettings();
   } catch (error) {
     console.error("Failed to save site settings", error);
     setStatus(`儲存失敗：${error.message}`, "error");
@@ -167,5 +175,15 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadSettings
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    form.dataset.contentScope = siteSettingsScope;
+    await loadSettings();
+    if (!canEditScope(adminPermissions, siteSettingsScope)) {
+      form.querySelectorAll("input, textarea, select, button").forEach((control) => {
+        control.disabled = true;
+      });
+      setStatus("目前為唯讀模式；只有全站設定責任人可修改。", "info");
+    }
+  }
 }).catch((error) => reportAdminBootError(loading, error));

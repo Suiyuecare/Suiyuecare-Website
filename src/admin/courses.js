@@ -1,6 +1,7 @@
 import { supabase, supabaseStorageBuckets } from "../lib/supabaseClient.js";
 import { prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
+import { canEditScope, canPublishScope, contentDeleteMessage, contentSaveMessage } from "./content-scope.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
 
 const shell = document.querySelector(".admin-app-shell");
@@ -33,6 +34,9 @@ const courseCountTargets = {
 let courses = [];
 let courseSignups = [];
 let selectedCourseSignup = null;
+let adminPermissions = {};
+const courseScope = "courses";
+const courseFormsScope = "forms:courses";
 let courseCoverById = new Map();
 
 const signupStatusLabels = {
@@ -154,8 +158,8 @@ function renderCourses() {
       <td>${course.is_featured ? "重要課程" : "一般"}</td>
       <td>
         <div class="admin-table-actions">
-          <button type="button" data-edit-course="${escapeHTML(course.id)}">編輯</button>
-          <button type="button" data-delete-course="${escapeHTML(course.id)}">刪除</button>
+          <button type="button" data-edit-course="${escapeHTML(course.id)}">${canEditScope(adminPermissions, courseScope) ? "編輯" : "查看"}</button>
+          ${canEditScope(adminPermissions, courseScope) ? `<button type="button" data-delete-course="${escapeHTML(course.id)}">刪除</button>` : ""}
         </div>
       </td>
     </tr>
@@ -239,6 +243,9 @@ function renderSignupDetail(item) {
   signupProcessForm.elements.next_action.value = meta.next_action;
   signupProcessForm.elements.next_follow_up_at.value = toDatetimeLocal(meta.next_follow_up_at);
   signupProcessForm.elements.internal_note.value = item.internal_note || "";
+  signupProcessForm.querySelectorAll("input, textarea, select, button").forEach((control) => {
+    control.disabled = !canEditScope(adminPermissions, courseFormsScope);
+  });
   signupDetailTitle.textContent = `${meta.course_title || item.subject || "課程報名"}｜${item.name || "未填姓名"}`;
   signupDetailBox.className = "admin-form-readonly admin-field-wide";
   signupDetailBox.innerHTML = `
@@ -375,6 +382,7 @@ async function uploadCoverIfNeeded() {
     caption: "課程報名封面圖",
     imageUsage: "article_cover",
     focalPoint: "center",
+    scopeKey: "courses",
     bucket: supabaseStorageBuckets.courseImages
   });
   return media.id;
@@ -410,6 +418,10 @@ function buildPayload(coverImageId) {
 
 async function saveCourse(event) {
   event.preventDefault();
+  if (!canEditScope(adminPermissions, courseScope)) {
+    setStatus("你的帳號只有檢視課程內容的權限。", "error");
+    return;
+  }
   const submitButton = form.querySelector("button[type='submit']");
   submitButton?.setAttribute("disabled", "true");
   try {
@@ -417,11 +429,14 @@ async function saveCourse(event) {
     const payload = buildPayload(coverImageId);
     const id = form.elements.id.value;
     const query = id ? supabase.from("courses").update(payload).eq("id", id) : supabase.from("courses").insert(payload);
-    const { error } = await query;
+    const { data, error } = await query.select("id").maybeSingle();
     if (error) throw error;
-    setStatus("課程已儲存，前台會依發布狀態自動更新。", "success");
-    resetForm();
-    await loadCourses();
+    if (data?.id) form.elements.id.value = data.id;
+    setStatus(contentSaveMessage(adminPermissions, courseScope, "課程"), "success");
+    if (canPublishScope(adminPermissions, courseScope)) {
+      resetForm();
+      await loadCourses();
+    }
   } catch (error) {
     console.error("Failed to save course", error);
     setStatus(`儲存課程失敗：${error.message}`, "error");
@@ -431,14 +446,18 @@ async function saveCourse(event) {
 }
 
 async function deleteCourse(id) {
+  if (!canEditScope(adminPermissions, courseScope)) {
+    setStatus("你的帳號只有檢視課程內容的權限。", "error");
+    return;
+  }
   const course = courses.find((item) => item.id === id);
   if (!course || !window.confirm(`確定刪除「${course.title}」嗎？`)) return;
   setStatus("正在刪除課程...", "info");
   try {
-    const { error } = await supabase.from("courses").delete().eq("id", id);
+    const { error } = await supabase.from("courses").delete().eq("id", id).select("id").maybeSingle();
     if (error) throw error;
-    setStatus("課程已刪除。", "success");
-    await loadCourses();
+    setStatus(contentDeleteMessage(adminPermissions, courseScope, "課程"), "success");
+    if (canPublishScope(adminPermissions, courseScope)) await loadCourses();
   } catch (error) {
     console.error("Failed to delete course", error);
     setStatus(`刪除課程失敗：${error.message}`, "error");
@@ -452,6 +471,10 @@ function signupStatusLabel(status) {
 async function saveCourseSignupProcess(event) {
   event.preventDefault();
   if (!signupProcessForm) return;
+  if (!canEditScope(adminPermissions, courseFormsScope)) {
+    setSignupStatus("你的帳號只有檢視課程報名案件的權限。", "error");
+    return;
+  }
   const id = signupProcessForm.elements.id.value;
   if (!id) {
     setSignupStatus("請先選擇一筆課程報名。", "error");
@@ -552,9 +575,18 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: async () => {
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    form.dataset.contentScope = courseScope;
+    if (signupProcessForm) signupProcessForm.dataset.contentScope = courseFormsScope;
     resetForm();
     renderSignupDetail(null);
     await Promise.all([loadCourses(), loadCourseSignups()]);
+    if (!canEditScope(adminPermissions, courseScope)) {
+      form.querySelectorAll("input, textarea, select, button").forEach((control) => {
+        control.disabled = true;
+      });
+      newButton.hidden = true;
+    }
   }
 }).catch((error) => reportAdminBootError(loading, error));

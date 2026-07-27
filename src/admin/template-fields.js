@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML } from "./utils.js";
 import { prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
+import { canEditScope, canPublishScope, canViewScope, contentSaveMessage, scopeForPageSlug } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -14,6 +15,27 @@ const refreshButton = document.querySelector("#refreshTemplateFieldsButton");
 const list = document.querySelector("#templateFieldsList");
 
 let fields = [];
+let adminPermissions = {};
+const supportedPageSlugs = ["home-care", "day-care", "community", "nursing", "migrant-training", "quality", "software"];
+
+function canEditServicePage(pageSlug) {
+  return canEditScope(adminPermissions, scopeForPageSlug(pageSlug));
+}
+
+function canViewServicePage(pageSlug) {
+  return canViewScope(adminPermissions, scopeForPageSlug(pageSlug));
+}
+
+function setAvailablePageFilters() {
+  Array.from(pageFilter?.options || []).forEach((option) => {
+    if (!option.value) {
+      option.hidden = false;
+      return;
+    }
+    option.hidden = !canViewServicePage(option.value);
+  });
+  if (pageFilter?.value && !canViewServicePage(pageFilter.value)) pageFilter.value = "";
+}
 
 function setStatus(message, type = "info") {
   statusBox.hidden = !message;
@@ -224,15 +246,26 @@ function renderFields() {
     list.innerHTML = `<div class="admin-empty-state">目前沒有模板欄位。</div>`;
     return;
   }
-  list.innerHTML = fields.map((field) => `
-    <article class="admin-section-card" data-field-id="${escapeHTML(field.id)}">
-      <header><div><span>${escapeHTML(field.page_slug)} / ${escapeHTML(field.template_key)}</span><strong>${escapeHTML(field.field_label)}</strong></div><label class="admin-toggle-field compact"><input data-enabled type="checkbox" ${field.is_enabled ? "checked" : ""} /><span>顯示</span></label></header>
+  list.innerHTML = fields.map((field) => {
+    const canEdit = canEditServicePage(field.page_slug);
+    return `
+    <article class="admin-section-card" data-field-id="${escapeHTML(field.id)}" data-content-scope="${escapeHTML(scopeForPageSlug(field.page_slug))}">
+      <header><div><span>${escapeHTML(field.page_slug)} / ${escapeHTML(field.template_key)}</span><strong>${escapeHTML(field.field_label)}</strong></div><label class="admin-toggle-field compact"><input data-enabled type="checkbox" ${field.is_enabled ? "checked" : ""} /><span>套用 CMS；關閉則用版型預設</span></label></header>
       <div class="admin-form-grid">
         <label class="admin-field-wide"><span>${escapeHTML(field.help_text || field.field_key)}</span>${renderInput(field)}</label>
-        <button type="button" data-save-field>儲存欄位</button>
+        ${canEdit ? `<button type="button" data-save-field>${canPublishScope(adminPermissions, scopeForPageSlug(field.page_slug)) ? "儲存並套用" : "儲存並送執行長審核"}</button>` : `<small>唯讀：此服務頁不在你的內容責任範圍內。</small>`}
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
+
+  list.querySelectorAll("[data-field-id]").forEach((card) => {
+    const field = fields.find((item) => item.id === card.dataset.fieldId);
+    if (!field || canEditServicePage(field.page_slug)) return;
+    card.querySelectorAll("input, textarea, select, button").forEach((control) => {
+      control.disabled = true;
+    });
+  });
 }
 
 async function loadFields() {
@@ -240,6 +273,7 @@ async function loadFields() {
   let query = supabase
     .from("page_template_fields")
     .select("*, image:media!page_template_fields_image_id_fkey(id, public_url, alt_text, file_name)")
+    .in("page_slug", supportedPageSlugs)
     .order("page_slug")
     .order("template_key")
     .order("sort_order");
@@ -247,7 +281,7 @@ async function loadFields() {
   try {
     const { data, error } = await query;
     if (error) throw error;
-    fields = data || [];
+    fields = (data || []).filter((field) => canViewServicePage(field.page_slug));
     renderFields();
     setStatus("", "success");
   } catch (error) {
@@ -261,6 +295,10 @@ async function loadFields() {
 async function saveField(card) {
   const field = fields.find((item) => item.id === card.dataset.fieldId);
   if (!field) return;
+  if (!canEditServicePage(field.page_slug)) {
+    setStatus("此服務頁不在你的內容責任範圍內，無法儲存。", "error");
+    return;
+  }
   const input = card.querySelector("[data-field-value]");
   const imageInput = card.querySelector("[data-image-upload]");
   const enabled = card.querySelector("[data-enabled]");
@@ -274,7 +312,8 @@ async function saveField(card) {
           file: preparedFile,
           altText: field.field_label,
           caption: `${field.page_slug} ${field.field_label}`,
-          imageUsage: field.template_key?.includes("hero") ? "service_hero" : "card"
+          imageUsage: field.template_key?.includes("hero") ? "service_hero" : "card",
+          scopeKey: scopeForPageSlug(field.page_slug)
         });
         payload.image_id = media.id;
         payload.text_value = media.public_url;
@@ -306,8 +345,11 @@ async function saveField(card) {
     setStatus(`儲存失敗：${error.message}`, "error");
     return;
   }
-  setStatus("模板欄位已儲存。", "success");
-  await loadFields();
+  const scopeKey = scopeForPageSlug(field.page_slug);
+  setStatus(contentSaveMessage(adminPermissions, scopeKey, "模板欄位"), "success");
+  if (canPublishScope(adminPermissions, scopeKey)) {
+    await loadFields();
+  }
 }
 
 refreshButton?.addEventListener("click", loadFields);
@@ -350,5 +392,14 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadFields
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    setAvailablePageFilters();
+    const requestedPage = new URLSearchParams(window.location.search).get("page");
+    if (requestedPage && supportedPageSlugs.includes(requestedPage) && canViewServicePage(requestedPage)) {
+      pageFilter.value = requestedPage;
+    }
+    await loadFields();
+    if (!fields.length) setStatus("目前沒有你可檢視的服務頁固定欄位，請向 Owner 確認部門責任範圍。", "info");
+  }
 }).catch((error) => reportAdminBootError(loading, error));

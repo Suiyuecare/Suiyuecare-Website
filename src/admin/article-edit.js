@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabaseClient.js";
 import { fetchMediaImages, getFocalPointOption, getImageUsageOption, prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
+import { canEditScope, canPublishScope, contentSaveMessage } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -37,6 +38,8 @@ let categories = [];
 let selectedCoverMedia = null;
 let currentContentJson = {};
 let lastEditorRange = null;
+let adminPermissions = {};
+const articleScope = "health";
 
 function isHtmlContent(value = "") {
   return /<\/?[a-z][\s\S]*>/i.test(String(value || ""));
@@ -648,7 +651,7 @@ function setInlineImagePickerStatus(message, type = "info") {
 async function loadInlineImagePickerMedia() {
   setInlineImagePickerStatus("正在讀取媒體庫...", "info");
   try {
-    const items = await fetchMediaImages();
+    const items = await fetchMediaImages({ scopeKey: "health" });
     renderInlineImagePickerGrid(items);
     setInlineImagePickerStatus("", "success");
   } catch (error) {
@@ -659,6 +662,7 @@ async function loadInlineImagePickerMedia() {
 }
 
 function openInlineImagePicker() {
+  if (!canEditScope(adminPermissions, articleScope)) return;
   saveEditorSelection();
   inlineImagePicker.hidden = false;
   document.body.classList.add("modal-open");
@@ -709,7 +713,8 @@ async function uploadAndInsertInlineImage(event) {
       altText: inlineImageUploadForm.elements.alt_text.value,
       caption: inlineImageUploadForm.elements.caption.value,
       imageUsage: inlineImageUploadForm.elements.image_usage.value || "article_cover",
-      focalPoint: inlineImageUploadForm.elements.focal_point.value || "center"
+      focalPoint: inlineImageUploadForm.elements.focal_point.value || "center",
+      scopeKey: "health"
     });
     applyInlineImage(media);
   } catch (error) {
@@ -723,7 +728,7 @@ async function uploadAndInsertInlineImage(event) {
 async function loadCoverPickerMedia() {
   setCoverPickerStatus("正在讀取媒體庫...", "info");
   try {
-    const items = await fetchMediaImages();
+    const items = await fetchMediaImages({ scopeKey: "health" });
     renderCoverPickerGrid(items);
     setCoverPickerStatus("", "success");
   } catch (error) {
@@ -734,6 +739,7 @@ async function loadCoverPickerMedia() {
 }
 
 function openCoverPicker() {
+  if (!canEditScope(adminPermissions, articleScope)) return;
   coverPicker.hidden = false;
   document.body.classList.add("modal-open");
   loadCoverPickerMedia();
@@ -776,7 +782,8 @@ async function uploadAndSelectCover(event) {
       altText: coverUploadForm.elements.alt_text.value,
       caption: coverUploadForm.elements.caption.value,
       imageUsage: coverUploadForm.elements.image_usage.value || "article_cover",
-      focalPoint: coverUploadForm.elements.focal_point.value || "center"
+      focalPoint: coverUploadForm.elements.focal_point.value || "center",
+      scopeKey: "health"
     });
     applyCoverMedia(media);
   } catch (error) {
@@ -789,6 +796,10 @@ async function uploadAndSelectCover(event) {
 
 async function saveArticle(event) {
   event.preventDefault();
+  if (!canEditScope(adminPermissions, articleScope)) {
+    setEditorStatus("你的帳號只有檢視健康文章的權限。", "error");
+    return;
+  }
   const submitButton = document.querySelector('button[form="articleEditorForm"]');
   submitButton?.setAttribute("disabled", "true");
   setEditorStatus("正在儲存文章...", "info");
@@ -821,8 +832,10 @@ async function saveArticle(event) {
       if (error) throw error;
     }
 
-    setEditorStatus("文章已儲存。", "success");
-    await loadArticleEditor();
+    setEditorStatus(contentSaveMessage(adminPermissions, articleScope, "文章"), "success");
+    if (canPublishScope(adminPermissions, articleScope)) {
+      await loadArticleEditor();
+    }
   } catch (error) {
     console.error("Failed to save article", error);
     setEditorStatus(`儲存失敗：${error.message}`, "error");
@@ -832,6 +845,10 @@ async function saveArticle(event) {
 }
 
 async function generateArticleWithAi() {
+  if (!canEditScope(adminPermissions, articleScope)) {
+    setEditorStatus("你的帳號只有檢視健康文章的權限。", "error");
+    return;
+  }
   const title = form.elements.title.value.trim();
   if (!title) {
     setEditorStatus("請先填寫大標題，AI 才知道要寫哪一篇文章。", "error");
@@ -882,6 +899,10 @@ async function generateArticleWithAi() {
 }
 
 async function requestArticlePublish() {
+  if (!canEditScope(adminPermissions, articleScope)) {
+    setEditorStatus("你的帳號只有檢視健康文章的權限。", "error");
+    return;
+  }
   if (isNewArticle || !articleId) {
     setEditorStatus("請先儲存文章草稿，再送審發布。", "error");
     return;
@@ -1014,9 +1035,25 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: async () => {
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    form.dataset.contentScope = articleScope;
     simplifyArticleEditorLayout();
     renderSuggestionOptions();
     await loadArticleEditor();
+    if (canPublishScope(adminPermissions, articleScope)) {
+      requestPublishButton.hidden = true;
+    }
+    if (!canEditScope(adminPermissions, articleScope)) {
+      form.querySelectorAll("input, textarea, select, button").forEach((control) => {
+        control.disabled = true;
+      });
+      document.querySelectorAll(".admin-rich-editor-toolbar button").forEach((button) => {
+        button.disabled = true;
+      });
+      articleRichEditor?.setAttribute("contenteditable", "false");
+      requestPublishButton.hidden = true;
+      setEditorStatus("目前為唯讀模式；只有品牌行銷部門的編輯者可修改健康文章。", "info");
+    }
   }
 }).catch((error) => reportAdminBootError(loading, error));

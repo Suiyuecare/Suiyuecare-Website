@@ -1,4 +1,8 @@
 import { supabase } from "./src/lib/supabaseClient.js";
+import { renderPublicArticleLayout } from "./public-content-renderer.mjs";
+
+const FRONTEND_BUILD_VERSION = "care-scenes-20260714-2";
+document.documentElement.dataset.frontendBuild = FRONTEND_BUILD_VERSION;
 
 const pages = {
   about: {
@@ -32,9 +36,9 @@ const pages = {
   community: {
     eyebrow: "Community",
     title: "社區據點",
-    intro: "把預防照顧、健康促進與鄰里連結放進社區，讓長輩在離家更近的地方得到支持。",
-    focus: ["社區活動", "預防延緩失能", "在地資源串聯"],
-    features: ["共餐與健康課程", "據點活動報名", "鄰里照顧網絡"]
+    intro: "輕度失智社區課程。",
+    focus: ["課程"],
+    features: []
   },
   nursing: {
     eyebrow: "Nursing Rehab",
@@ -74,7 +78,7 @@ const pages = {
   land: {
     eyebrow: "Partnership",
     title: "土地招募",
-    intro: "尋找適合日照、社區據點與複合式長照服務的土地或空間，一起打造在地照顧基礎建設。",
+    intro: "尋找適合日間照顧中心的土地或一樓空間，一起打造安全、合法的在地照顧場域。",
     focus: ["基地條件", "合作模式", "區域需求評估"],
     features: ["空間可行性評估", "服務半徑分析", "長照場域規劃"]
   },
@@ -129,6 +133,11 @@ let siteSettings = {};
 let siteSettingsLoaded = false;
 let siteSettingsPromise = null;
 
+async function loadCmsFallback(method, ...args) {
+  const fallbackModule = await import("./cms-fallbacks.js");
+  return fallbackModule[method](...args);
+}
+
 function setPageViewBusy(isBusy = false) {
   if (!pageView) return;
   if (isBusy) {
@@ -153,14 +162,14 @@ const LEGACY_HOME_UNIT_VIDEO_ID = "dQw4w9WgXcQ";
 const YOUTUBE_IFRAME_ALLOW = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
 const routeHeroPreloads = {
   home: HOME_HERO_INSTANT_IMAGE,
-  about: "assets/homepage-batch/04-admin-team-office-fast.jpg",
-  milestones: "assets/milestones/homecare-agency-launch.jpg",
+  about: "assets/about/about-team-group-hero-v2.jpg",
+  milestones: "assets/milestones/milestones-team-care-planning-hero-v2.jpg",
   "home-care": "assets/homecare-detail-01-greeting-hero-fast.jpg",
   "day-care": "assets/daycare-detail-01-exercise-hero-fast.jpg",
-  community: "assets/community-detail-01-exercise-hero-hires.jpg",
-  nursing: "assets/nursing-detail-02-walking-hero-fast.jpg",
-  "migrant-training": "assets/migrant-detail-01-classroom-hero-fast.jpg",
-  quality: "assets/quality-detail-04-improvement-hero-fast.jpg",
+  community: "assets/community-dementia-hero-v3.jpg",
+  nursing: "assets/brand-scenes/rehab-v2.jpg",
+  "migrant-training": "assets/brand-scenes/migrant-v2.jpg",
+  quality: "assets/brand-scenes/quality-v2.jpg",
   software: "assets/admin-recruit-02-operations-hero-hires.jpg",
   talent: "assets/career-team-hero-hd.jpg",
   land: "assets/land-recruit-hero-hd.jpg",
@@ -168,34 +177,38 @@ const routeHeroPreloads = {
 };
 const routeHeroMobilePreloads = {
   home: HOME_HERO_MOBILE_IMAGE,
-  about: "assets/homepage-batch/04-admin-team-office-fast-mobile.jpg",
-  milestones: "assets/milestones/homecare-agency-launch.jpg",
+  about: "assets/about/about-team-group-hero-v2-mobile.jpg",
+  milestones: "assets/milestones/milestones-team-care-planning-hero-v2.jpg",
   "home-care": "assets/homecare-detail-01-greeting-hero-fast-mobile.jpg",
   "day-care": "assets/daycare-detail-01-exercise-hero-fast-mobile.jpg",
-  community: "assets/community-detail-01-exercise-hero-hires-mobile.jpg",
-  nursing: "assets/nursing-detail-02-walking-hero-fast-mobile.jpg",
-  "migrant-training": "assets/migrant-detail-01-classroom-hero-fast-mobile.jpg",
-  quality: "assets/quality-detail-04-improvement-hero-fast-mobile.jpg",
+  community: "assets/community-dementia-hero-v3.jpg",
+  nursing: "assets/brand-scenes/rehab-v2-mobile.jpg",
+  "migrant-training": "assets/brand-scenes/migrant-v2-mobile.jpg",
+  quality: "assets/brand-scenes/quality-v2-mobile.jpg",
   software: "assets/admin-recruit-02-operations-hero-hires-mobile.jpg",
   talent: "assets/career-team-hero-hd-mobile.jpg",
   land: "assets/land-recruit-hero-hd-mobile.jpg",
   "investor-recruiting": "assets/investor-recruit-hero-hd-mobile.jpg"
 };
-const heroMobileAssetPaths = new Map(Object.entries(routeHeroPreloads).map(([slug, image]) => [image, routeHeroMobilePreloads[slug]]).filter(([, image]) => image));
+const heroMobileAssetPaths = new Map(
+  Object.entries(routeHeroPreloads)
+    .map(([slug, image]) => [image, routeHeroMobilePreloads[slug]])
+    .filter(([, image]) => image)
+);
 
 const routeSeoMap = {
   home: DEFAULT_SEO,
   about: {
     title: "關於歲悅｜歲悅長照集團",
     description: "3 分鐘認識歲悅長照集團的組織願景、使命、團隊文化、服務系統與團隊成員。",
-    image: "assets/homepage-batch/04-admin-team-office-fast.jpg",
-    imageAlt: "歲悅團隊整理照顧服務系統"
+    image: "assets/about/about-team-group-hero-v2.jpg",
+    imageAlt: "歲悅長照跨專業團隊大合照"
   },
   milestones: {
     title: "大事記｜歲悅長照集團",
     description: "查看歲悅長照集團的重要里程碑、服務擴張、據點成立與合作紀錄。",
-    image: "assets/milestones/homecare-agency-launch.jpg",
-    imageAlt: "歲悅居家長照機構成立里程碑"
+    image: "assets/milestones/milestones-team-care-planning-hero-v2.jpg",
+    imageAlt: "歲悅長照跨專業團隊共同討論照顧計畫"
   },
   "home-care": {
     title: "居家照顧｜歲悅長照集團",
@@ -210,27 +223,27 @@ const routeSeoMap = {
     imageAlt: "歲悅日間照顧團體活動現場"
   },
   community: {
-    title: "社區據點｜歲悅長照集團",
-    description: "歲悅社區據點提供健康促進、共餐活動、預防延緩失能與在地照顧支持。",
-    image: "assets/community-detail-01-exercise-hero-hires.jpg",
-    imageAlt: "歲悅社區據點健康促進活動"
+    title: "失智社區服務據點｜歲悅長照集團",
+    description: "歲悅於士林、大同與信義設有失智症據點，為符合資格的輕度失智長輩提供定向感、認知課程、生命徵象量測與共餐。",
+    image: "assets/community-dementia-hero-v3.jpg",
+    imageAlt: "歲悅失智社區服務據點定向感課程"
   },
   nursing: {
     title: "護理復能｜歲悅長照集團",
     description: "結合護理評估、復能目標與健康監測，協助長輩恢復生活能力並降低照顧風險。",
-    image: "assets/nursing-detail-02-walking-hero-fast.jpg",
+    image: "assets/brand-scenes/rehab-v2.jpg",
     imageAlt: "歲悅護理復能陪伴長輩步行訓練"
   },
   "migrant-training": {
     title: "移工培訓｜歲悅長照集團",
     description: "歲悅移工培訓提供照顧技能、家庭溝通、衛教與安全實作訓練，提升家庭照顧品質。",
-    image: "assets/migrant-detail-01-classroom-hero-fast.jpg",
+    image: "assets/brand-scenes/migrant-v2.jpg",
     imageAlt: "歲悅移工照顧技能培訓課堂"
   },
   quality: {
     title: "教育品管｜歲悅長照集團",
     description: "歲悅教育品管以標準化教材、督導制度、服務稽核與持續改善守住照顧品質。",
-    image: "assets/quality-detail-04-improvement-hero-fast.jpg",
+    image: "assets/brand-scenes/quality-v2.jpg",
     imageAlt: "歲悅教育品管會議與改善討論"
   },
   software: {
@@ -247,9 +260,9 @@ const routeSeoMap = {
   },
   land: {
     title: "土地招募｜歲悅長照集團",
-    description: "歲悅尋找適合日照、社區據點與複合式長照服務的土地或空間合作機會。",
+    description: "歲悅於臺北、新北招募適合社區日照的土地與一樓空間，依法檢討建管、消防、公共安全及無障礙條件，為屋主提供安心的長期合作。",
     image: "assets/land-recruit-hero-hd.jpg",
-    imageAlt: "歲悅北部服務據點與土地合作區域"
+    imageAlt: "歲悅土地招募與社區日間照顧場域合作"
   },
   "investor-recruiting": {
     title: "投資人招募｜歲悅長照集團",
@@ -301,7 +314,7 @@ const routeSeoMap = {
   contact: {
     title: "聯絡我們｜歲悅長照集團",
     description: "聯絡歲悅長照集團，預約服務諮詢、課程合作、招募合作、投資洽談或一般客服。",
-    image: "assets/homepage-batch/15-phone-consultation-fast.jpg",
+    image: "assets/brand-scenes/phone-v2.jpg",
     imageAlt: "歲悅客服窗口電話諮詢"
   }
 };
@@ -341,7 +354,10 @@ function routeSlugFromLocation() {
   const hashValue = window.location.hash.slice(1);
   const hashSlug = hashValue.split("?")[0];
   const pathBase = routeSlugFromPath();
-  const pathSlug = pathBase !== "home" && window.location.search ? `${pathBase}${window.location.search}` : pathBase;
+  const routeParams = new URLSearchParams(window.location.search);
+  routeParams.delete("cms-preview");
+  const routeSearch = routeParams.toString();
+  const pathSlug = pathBase !== "home" && routeSearch ? `${pathBase}?${routeSearch}` : pathBase;
   if (hashSlug && pathBase !== "home" && !isKnownRouteSlug(hashSlug)) return pathSlug;
   return hashValue || pathSlug;
 }
@@ -678,6 +694,66 @@ const contactNeedGroups = [
   ["合作洽談", ["土地合作", "網站行銷合作", "軟體系統諮詢", "系統後台諮詢", "投資洽談", "合作洽談"]]
 ];
 
+const routeContactNeedMap = {
+  home: "長照服務諮詢",
+  contact: "長照服務諮詢",
+  about: "長照服務諮詢",
+  milestones: "長照服務諮詢",
+  health: "長照服務諮詢",
+  search: "長照服務諮詢",
+  "home-care": "居家照顧諮詢",
+  "day-care": "日間照顧諮詢",
+  community: "社區據點諮詢",
+  nursing: "護理復能諮詢",
+  "migrant-training": "移工培訓諮詢",
+  quality: "教育品管諮詢",
+  software: "軟體系統諮詢",
+  courses: "課程報名",
+  talent: "人才招募",
+  land: "土地合作",
+  "investor-recruiting": "投資洽談",
+  investors: "投資洽談",
+  "ir-finance": "投資洽談",
+  "ir-governance": "投資洽談",
+  "ir-shareholders": "投資洽談"
+};
+
+function normalizedContactNeedRoute(slug = routeSlugFromLocation()) {
+  return String(slug || "home").replace(/^#/, "").split("?")[0];
+}
+
+function contactNeedForRoute(slug = routeSlugFromLocation()) {
+  const normalized = normalizedContactNeedRoute(slug);
+  return routeContactNeedMap[normalized] || "長照服務諮詢";
+}
+
+function setContactNeedValue(select, need) {
+  if (!select || !need) return;
+  const hasOption = [...select.options].some((option) => option.value === need || option.textContent === need);
+  if (!hasOption) select.add(new Option(need, need), 0);
+  select.value = need;
+}
+
+function syncContactNeedDefaults(root = document, slug = routeSlugFromLocation()) {
+  const forms = [
+    ...(root?.matches?.(".contact-form") ? [root] : []),
+    ...(root?.querySelectorAll?.(".contact-form") || [])
+  ];
+  const normalizedRoute = normalizedContactNeedRoute(slug);
+  const need = contactNeedForRoute(slug);
+  forms.forEach((form) => {
+    const select = form.querySelector('select[name="需求"]');
+    const shouldKeepPageChoice = ["user", "preset"].includes(select?.dataset.needSource)
+      && select.dataset.needRoute === normalizedRoute;
+    if (!select || shouldKeepPageChoice) return;
+    setContactNeedValue(select, need);
+    select.dataset.needSource = "route";
+    select.dataset.needRoute = normalizedRoute;
+    const formTypeInput = form.querySelector('input[name="form_type"]');
+    if (formTypeInput) formTypeInput.value = contactNeedToFormType(need);
+  });
+}
+
 function renderContactNeedOptions(selectedNeed = "長照服務諮詢") {
   const selected = selectedNeed || "長照服務諮詢";
   const knownNeeds = new Set(contactNeedGroups.flatMap(([, options]) => options));
@@ -719,7 +795,7 @@ async function recordFormSubmission(form, formType = "contact") {
     form_type: formType,
     name: formDataValue(formData, ["姓名", "您的大名", "name"]),
     phone: formDataValue(formData, ["電話", "您的電話", "phone", "tel"]),
-    email: formDataValue(formData, ["Email", "email", "信箱"]),
+    email: formDataValue(formData, ["Email", "信箱", "email"]),
     subject: formDataValue(formData, ["需求", "課程", "您本次報名的課程", "course", "subject"]) || formType,
     message: formDataValue(formData, ["說明", "message", "內容"]),
     source_path: location.hash || "#home",
@@ -745,11 +821,12 @@ async function recordFormSubmission(form, formType = "contact") {
 
 async function sendBackendForm(form, formType = "contact") {
   const formData = new FormData(form);
+  const resume = formType === "recruiting" ? await serializeRecruitingResume(formData.get("resume")) : null;
   const payload = {
     form_type: formType,
     name: formDataValue(formData, ["姓名", "您的大名", "name"]),
     phone: formDataValue(formData, ["電話", "您的電話", "phone", "tel"]),
-    email: formDataValue(formData, ["Email", "email", "信箱"]),
+    email: formDataValue(formData, ["Email", "信箱", "email"]),
     subject: formDataValue(formData, ["需求", "課程", "您本次報名的課程", "course", "subject"]) || formType,
     message: formDataValue(formData, ["說明", "message", "內容"]),
     course_title: formDataValue(formData, ["課程", "您本次報名的課程", "course_title"]),
@@ -760,7 +837,7 @@ async function sendBackendForm(form, formType = "contact") {
     opening_id: formDataValue(formData, ["opening_id"]),
     opening_title: formDataValue(formData, ["opening_title"]),
     opening_slug: formDataValue(formData, ["opening_slug"]),
-    privacy_consent: formData.get("privacy_consent") === "on",
+    resume,
     _honey: formDataValue(formData, ["_honey"]),
     source_path: location.hash || "#home",
     page_title: document.title,
@@ -782,6 +859,25 @@ async function sendBackendForm(form, formType = "contact") {
     throw new Error(result.message || "表單送出失敗，請稍後再試。");
   }
   return result;
+}
+
+async function serializeRecruitingResume(file) {
+  if (!file || typeof file !== "object" || !file.name || !file.size) return null;
+
+  const dataBase64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+  if (!dataBase64) throw new Error("履歷檔案讀取失敗，請重新選擇檔案。");
+
+  return {
+    file_name: file.name,
+    mime_type: file.type,
+    size_bytes: file.size,
+    data_base64: dataBase64
+  };
 }
 
 function flushPageEngagement() {
@@ -832,14 +928,6 @@ function trackFrontendError(errorType, detail = {}) {
     }
   });
 }
-const WP_API_BASE = "https://www.suiyuecare.com/wp-json/wp/v2";
-const WP_CATEGORIES = {
-  latestNews: "latest-news",
-  awards: "awards",
-  careStories: "care-stories",
-  health30: "health-30",
-  masterTalk: "master-talk"
-};
 const HOMEPAGE_MASTER_TALK_LIMIT = 8;
 
 const articlePages = {
@@ -852,11 +940,12 @@ const articlePages = {
     date: "2026.05.13",
     readTime: "6 min read",
     tags: ["長照申請", "家庭照顧", "服務媒合"],
-    summary: ["先整理長輩目前生活需要協助的地方。", "把醫療、用藥、行動能力與家庭照顧時間寫下來。", "諮詢時直接描述一週中最困難的照顧時段。"],
+    summary: ["備妥基本資料與長輩日常需要協助的情況。", "由照專與個管到府評估，核定 CMS 等級與補助額度。", "照顧計畫確認後，媒合服務單位並安排第一次服務。"],
     content: [
-      ["先從一天的生活節奏開始", "很多家庭第一次接觸長照時，會先問可以申請什麼服務。但更有效的方式，是先把長輩一天的生活節奏整理出來：起床、用餐、洗澡、服藥、外出、睡眠與夜間照顧，哪些地方最容易卡住。這些細節會影響服務安排，也能幫助專業人員更快判斷適合的照顧方向。"],
-      ["把照顧困難說具體", "與其說「需要有人照顧」，不如說「早上起床移位不穩」、「洗澡時家人很擔心跌倒」、「下午容易忘記吃藥」。具體描述能讓督導判斷需要居家照顧、日間照顧、護理復能或家屬支持課程，也能避免服務進場後才重新調整。"],
-      ["保留家屬喘息的空間", "長照不是只照顧長輩，也是在支持整個家庭。當家屬已經長期睡不好、無法上班或情緒緊繃，就應該把喘息需求一起放進討論。好的照顧安排，會讓長輩安全，也讓家人能走得長久。"]
+      ["1. 提出申請與備妥資料", "準備長輩身分證字號、居住地址與主要聯絡電話，並簡單整理病況、身障證明及吃飯、洗澡、如廁等自理情形。"],
+      ["2. 到府評估，核定 CMS 等級", "照專與 A 單位個管到府訪視，依長輩狀況核定 CMS 2-8 級與補助額度。"],
+      ["3. 共同擬定照顧計畫", "依核定額度討論居家照顧、日照、輔具等服務；也可主動告知希望由指定服務單位協助。"],
+      ["4. 媒合並開始服務", "個管轉介資料給服務單位後，將由單位聯繫並安排第一次到府或日照服務。"]
     ],
     cta: "不確定該從哪一項服務開始？留下需求，讓歲悅協助判斷。"
   },
@@ -1003,7 +1092,7 @@ Object.assign(articlePages, {
     category: "活動專區",
     title: "復能照顧工作坊：陪長輩一步一步重新有把握",
     dek: "用小目標、日常動作與安全陪伴，支持長輩找回生活能力。",
-    image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+    image: "assets/brand-scenes/rehab-v2.jpg",
     author: "歲悅護理復能團隊",
     date: "2026.04.18",
     readTime: "4 min read",
@@ -1230,7 +1319,7 @@ Object.assign(articlePages, {
     category: "Master Talk",
     title: "最好的照顧，是在退化前先把生活力留住。",
     dek: "失能預防教練郭教練分享衰弱觀察、肌力活動與日常練習如何提早開始。",
-    image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+    image: "assets/brand-scenes/rehab-v2.jpg",
     author: "失能預防教練 郭教練",
     date: "2026.05.02",
     readTime: "5 min read",
@@ -1453,6 +1542,25 @@ Object.assign(articlePages, {
 let staticArticleRewritePackPromise = null;
 let staticArticleRewritePackLoaded = false;
 const articleRewriteFields = {};
+let articleSlideDeckRenderer = null;
+let articleSlideDeckRendererPromise = null;
+
+async function ensureArticleSlideDeckRenderer() {
+  if (articleSlideDeckRenderer) return;
+  if (!articleSlideDeckRendererPromise) {
+    articleSlideDeckRendererPromise = import("./article-slide-deck.js")
+      .then((module) => {
+        articleSlideDeckRenderer = (article) => module.renderArticleSlideDeck(
+          article,
+          (image) => normalizeLocalAssetUrl(contentImageUrl(image))
+        );
+      })
+      .catch((error) => {
+        console.warn("Article slide deck renderer unavailable.", error);
+      });
+  }
+  await articleSlideDeckRendererPromise;
+}
 
 function applyStaticArticleRewritePack(pack = {}) {
   Object.entries(pack).forEach(([slug, rewrite]) => {
@@ -1753,7 +1861,7 @@ healthArticles.push(
     category: "專家專欄",
     title: "最好的照顧，是在退化前先把生活力留住。",
     excerpt: "失能預防教練分享衰弱觀察、肌力活動與日常練習如何提早開始。",
-    image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+    image: "assets/brand-scenes/rehab-v2.jpg",
     author: "失能預防教練 郭教練",
     date: "2026.05.02",
     keywords: "名人講堂 失能預防 衰弱 肌力 活動"
@@ -1889,7 +1997,7 @@ const additionalHealthArticles = [
     category: "護理觀察",
     title: "長輩說不清楚哪裡痛，家人該怎麼觀察？",
     excerpt: "疼痛可能藏在表情、走路、睡眠、食慾與情緒裡，尤其失智長輩更需要系統化觀察。",
-    image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+    image: "assets/brand-scenes/rehab-v2.jpg",
     author: "歲悅護理復能團隊",
     date: "2026.07.11",
     keywords: "疼痛觀察 失智照顧 行動能力 睡眠 護理"
@@ -1955,7 +2063,7 @@ const additionalHealthArticles = [
     category: "季節照顧",
     title: "高溫天氣照顧長輩：不要等口渴才補水",
     excerpt: "長輩、慢病患者與服用部分藥物者更容易受熱傷害影響，家屬要把降溫和觀察排進日常。",
-    image: "assets/homepage-batch/15-phone-consultation-fast.jpg",
+    image: "assets/brand-scenes/phone-v2.jpg",
     author: "歲悅照顧編輯部",
     date: "2026.07.11",
     keywords: "熱傷害 高溫 長輩 補水 慢病 季節照顧"
@@ -2030,7 +2138,7 @@ const careworkerHardshipArticles = [
     category: "照服員辛苦談",
     title: "居服員的一天，常常辛苦在兩個案家之間",
     excerpt: "交通、停車、雨天、臨時取消與時間壓力，都是到宅服務不容易被看見的勞動。",
-    image: "assets/homepage-batch/15-phone-consultation-fast.jpg",
+    image: "assets/brand-scenes/phone-v2.jpg",
     author: "歲悅居家服務團隊",
     date: "2026.07.12",
     keywords: "居服員 到宅服務 交通 排班 工時 長照"
@@ -2453,13 +2561,6 @@ function imageStyleAttr(options = {}) {
   return ` style="${escapeHTML(cmsImageStyle(options))}"`;
 }
 
-function formatPostDate(dateValue, yearOnly = false) {
-  const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) return "";
-  if (yearOnly) return String(date.getFullYear());
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
-}
-
 const fallbackImages = {
   healthArticle: "assets/fallbacks/health-article-fallback.jpg",
   course: "assets/fallbacks/course-training-fallback.jpg",
@@ -2481,13 +2582,6 @@ function fallbackImageForText(text = "", fallback = fallbackImages.serviceModule
   if (/故事|心得|回饋|story|testimonial/.test(normalized)) return fallbackImages.careStory;
   if (/hero|主視覺|滿版|服務頁/.test(normalized)) return fallbackImages.serviceHero;
   return fallback;
-}
-
-function getPostImage(post, fallback = fallbackImages.healthArticle) {
-  const embedded = post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
-  const acfImage = post?.acf?.image?.url || post?.acf?.avatar?.url || post?.acf?.speaker_photo?.url || post?.acf?.cover?.url;
-  const fallbackImage = fallbackImageForText(`${post?.title?.rendered || ""} ${post?.excerpt?.rendered || ""}`, fallback);
-  return contentImageUrl(acfImage || embedded || fallbackImage);
 }
 
 function getHealthArticleThemeImage(article = {}) {
@@ -2640,7 +2734,7 @@ const masterTalkPortraitPaths = {
   "community-health-cheng": "assets/master-talk/portrait-community-health-cheng.jpg",
   "longterm-policy-wang": "assets/master-talk/portrait-longterm-policy-wang.jpg",
   "medication-safety-tsai": "assets/nursing-detail-01-vitals-clear-display.jpg",
-  "frailty-prevention-kuo": "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+  "frailty-prevention-kuo": "assets/brand-scenes/rehab-v2.jpg",
   "swallowing-care-ho": "assets/daycare-detail-02-meal-fast.jpg",
   "sleep-rhythm-tseng": "assets/homecare-detail-04-daily-support-fast.jpg",
   "care-subsidy-yang": "assets/homepage-batch/family-consultation-clear-display.jpg",
@@ -2660,7 +2754,7 @@ const masterTalkCoverPaths = {
   "community-health-cheng": "assets/master-talk/cover-community-health-cheng.jpg",
   "longterm-policy-wang": "assets/master-talk/cover-longterm-policy-wang.jpg",
   "medication-safety-tsai": "assets/nursing-detail-01-vitals-clear-display.jpg",
-  "frailty-prevention-kuo": "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+  "frailty-prevention-kuo": "assets/brand-scenes/rehab-v2.jpg",
   "swallowing-care-ho": "assets/daycare-detail-02-meal-fast.jpg",
   "sleep-rhythm-tseng": "assets/homecare-detail-04-daily-support-fast.jpg",
   "care-subsidy-yang": "assets/homepage-batch/family-consultation-clear-display.jpg",
@@ -2740,6 +2834,12 @@ const fastAssetPaths = new Set([
   "assets/location-taipei-fast.jpg",
   "assets/homecare-detail-03-safe-transfer-fast.jpg",
   "assets/homecare-detail-02-care-plan-fast.jpg",
+  "assets/homecare-scene-assessment-fast.jpg",
+  "assets/homecare-scene-meal-prep-fast.jpg",
+  "assets/homecare-scene-bathing-fast.jpg",
+  "assets/homecare-scene-outing-fast.jpg",
+  "assets/homecare-scene-joint-activity-fast.jpg",
+  "assets/homecare-scene-cleaning-fast.jpg",
   "assets/migrant-recruit-contact-sheet-fast.jpg",
   "assets/nursing-detail-03-home-safety-fast.jpg",
   "assets/homepage-batch/04-admin-team-office-fast.jpg",
@@ -2748,7 +2848,7 @@ const fastAssetPaths = new Set([
   "assets/homepage-batch/care-home-greeting-clear.jpg",
   "assets/homepage-batch/14-care-notes-fast.jpg",
   "assets/homepage-batch/family-consultation-clear.jpg",
-  "assets/homepage-batch/03-supervisor-care-plan-fast.jpg",
+  "assets/brand-scenes/care-team-v2.jpg",
   "assets/homepage-batch/orange-polo-caregiver-clear.jpg",
   "assets/homepage-batch/09-nurse-blood-pressure-hires.jpg",
   "assets/homepage-batch/11-elder-art-activity-hires.jpg",
@@ -2756,7 +2856,7 @@ const fastAssetPaths = new Set([
   "assets/homepage-batch/12-community-health-class-hires.jpg",
   "assets/homepage-batch/19-health-dementia-cover-fast.jpg",
   "assets/homepage-batch/02-daycare-group-exercise-hires.jpg",
-  "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+  "assets/brand-scenes/rehab-v2.jpg",
   "assets/cis-guide-fast.jpg",
   "assets/quality-detail-02-training-fast.jpg",
   "assets/homecare-detail-04-daily-support-fast.jpg",
@@ -3073,8 +3173,29 @@ function normalizeStaticArticle(article) {
   };
 }
 
+function normalizeFallbackHealthArticles(source) {
+  const mediaById = new Map((source.media || []).map((media) => [media.id, media]));
+  const categoriesById = new Map((source.categories || []).filter((category) => category.is_enabled !== false).map((category) => [category.id, category]));
+  return (source.articles || [])
+    .filter((article) => !article.category_id || categoriesById.has(article.category_id))
+    .map((article) => normalizeSupabaseArticle(article, mediaById, categoriesById));
+}
+
+async function fetchFallbackArticleCategories() {
+  const source = await loadCmsFallback("getHealthSource");
+  return (source.categories || [])
+    .filter((category) => category.is_enabled !== false && category.show_in_nav !== false)
+    .map((category) => ({
+      id: category.id,
+      name: category.display_label || category.name,
+      slug: category.slug || categorySlug(category.name),
+      type: category.type || "article",
+      sectionKey: category.section_key || "health"
+    }));
+}
+
 async function fetchSupabaseArticleCategories() {
-  if (!supabase) return [];
+  if (!supabase) return fetchFallbackArticleCategories();
 
   const { data, error } = await supabase
     .from("article_categories")
@@ -3104,9 +3225,18 @@ async function loadSupabaseArticleCategories({ rerender = false } = {}) {
         return categories;
       })
       .catch((error) => {
-        console.warn("Supabase article categories unavailable, using static categories.", error);
-        supabaseArticleCategoriesLoaded = true;
-        return [];
+        console.warn("CMS fallback", "article categories", error);
+        return fetchFallbackArticleCategories()
+          .then((categories) => {
+            supabaseArticleCategories = categories;
+            supabaseArticleCategoriesLoaded = true;
+            return categories;
+          })
+          .catch((fallbackError) => {
+            console.warn("CMS snapshot unavailable", fallbackError);
+            supabaseArticleCategoriesLoaded = true;
+            return [];
+          });
       });
   }
 
@@ -3120,7 +3250,10 @@ async function loadSupabaseArticleCategories({ rerender = false } = {}) {
 }
 
 async function fetchSupabaseHealthArticles() {
-  if (!supabase) return [];
+  if (!supabase) {
+    const source = await loadCmsFallback("getHealthSource");
+    return normalizeFallbackHealthArticles(source);
+  }
 
   const { data: articles, error: articleError } = await supabase
     .from("articles")
@@ -3191,9 +3324,18 @@ async function loadSupabaseHealthArticles({ rerender = false } = {}) {
         return articles;
       })
       .catch((error) => {
-        console.warn("Supabase articles unavailable, using static health articles.", error);
-        supabaseHealthArticlesLoaded = true;
-        return [];
+        console.warn("CMS fallback", "articles", error);
+        return loadCmsFallback("getHealthSource")
+          .then((source) => {
+            supabaseHealthArticles = normalizeFallbackHealthArticles(source);
+            supabaseHealthArticlesLoaded = true;
+            return supabaseHealthArticles;
+          })
+          .catch((fallbackError) => {
+            console.warn("CMS snapshot unavailable", fallbackError);
+            supabaseHealthArticlesLoaded = true;
+            return [];
+          });
       });
   }
 
@@ -3204,117 +3346,6 @@ async function loadSupabaseHealthArticles({ rerender = false } = {}) {
     if (currentBase === "health" || currentBase === "search") renderPage(current);
   }
   return articles;
-}
-
-function renderMarkdownContent(content = "") {
-  const rawContent = String(content || "").trim();
-  if (/<\/?(p|h2|h3|figure|img|ul|ol|li|strong|b|em|i|span|a|br|iframe|video)[\s>]/i.test(rawContent)) {
-    return sanitizeArticleHtml(rawContent);
-  }
-
-  const lines = String(content || "").split(/\r?\n/);
-  const blocks = [];
-  let paragraph = [];
-  let list = [];
-
-  const flushParagraph = () => {
-    if (!paragraph.length) return;
-    blocks.push(`<p>${escapeHTML(paragraph.join(" "))}</p>`);
-    paragraph = [];
-  };
-
-  const flushList = () => {
-    if (!list.length) return;
-    blocks.push(`<ul>${list.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>`);
-    list = [];
-  };
-
-  lines.forEach((line) => {
-    const trimmed = line.trim();
-    if (!trimmed) {
-      flushParagraph();
-      flushList();
-      return;
-    }
-
-    if (trimmed.startsWith("### ")) {
-      flushParagraph();
-      flushList();
-      blocks.push(`<h3>${escapeHTML(trimmed.slice(4))}</h3>`);
-      return;
-    }
-
-    if (trimmed.startsWith("## ")) {
-      flushParagraph();
-      flushList();
-      blocks.push(`<h2>${escapeHTML(trimmed.slice(3))}</h2>`);
-      return;
-    }
-
-    if (/^[-*]\s+/.test(trimmed)) {
-      flushParagraph();
-      list.push(trimmed.replace(/^[-*]\s+/, ""));
-      return;
-    }
-
-    flushList();
-    paragraph.push(trimmed);
-  });
-
-  flushParagraph();
-  flushList();
-
-  return blocks.length ? blocks.join("") : "<p>文章內容準備中。</p>";
-}
-
-function sanitizeArticleHtml(html = "") {
-  const template = document.createElement("template");
-  template.innerHTML = String(html || "");
-  const allowedTags = new Set(["P", "BR", "H2", "H3", "UL", "OL", "LI", "STRONG", "B", "EM", "I", "SPAN", "FONT", "A", "FIGURE", "FIGCAPTION", "IMG", "IFRAME", "VIDEO", "SOURCE"]);
-  const allowedAttrs = {
-    A: new Set(["href", "target", "rel"]),
-    IMG: new Set(["src", "alt", "data-image-usage", "data-focal-point"]),
-    IFRAME: new Set(["src", "title", "loading", "allow", "allowfullscreen", "referrerpolicy"]),
-    VIDEO: new Set(["src", "controls", "preload", "poster"]),
-    SOURCE: new Set(["src", "type"]),
-    SPAN: new Set(["style"]),
-    FONT: new Set(["color", "size"]),
-    FIGURE: new Set(["class"]),
-    P: new Set(["style"]),
-    H2: new Set(["style"]),
-    H3: new Set(["style"])
-  };
-
-  const walk = (node) => {
-    [...node.children].forEach((child) => {
-      if (!allowedTags.has(child.tagName)) {
-        child.replaceWith(document.createTextNode(child.textContent || ""));
-        return;
-      }
-
-      [...child.attributes].forEach((attr) => {
-        const tagAttrs = allowedAttrs[child.tagName] || new Set();
-        const isSafeStyle = attr.name === "style" && /^(color|font-size|background-color)\s*:/i.test(attr.value);
-        if (!tagAttrs.has(attr.name) && !isSafeStyle) {
-          child.removeAttribute(attr.name);
-          return;
-        }
-        if ((attr.name === "href" || attr.name === "src") && /^(javascript|data:text)/i.test(attr.value)) {
-          child.removeAttribute(attr.name);
-        }
-      });
-
-      if (child.tagName === "A") {
-        child.setAttribute("rel", "noopener");
-        if (/^https?:\/\//i.test(child.getAttribute("href") || "")) child.setAttribute("target", "_blank");
-      }
-      if (child.tagName === "FIGURE") child.classList.add("article-inline-image");
-      walk(child);
-    });
-  };
-
-  walk(template.content);
-  return template.innerHTML || "<p>文章內容準備中。</p>";
 }
 
 function normalizeSupabaseArticlePage(article, category, cover) {
@@ -3442,6 +3473,18 @@ async function fetchSupabaseArticlePage(slug) {
   return normalized;
 }
 
+async function fetchArticlePageWithFallback(slug) {
+  if (supabase) {
+    try {
+      return await fetchSupabaseArticlePage(slug);
+    } catch (error) {
+      console.warn("CMS fallback", slug, error);
+    }
+  }
+  const source = await loadCmsFallback("getArticleSource", slug);
+  return source ? normalizeSupabaseArticlePage(source.article, source.category, source.cover) : null;
+}
+
 function getSectionContent(section) {
   return section?.content_json && typeof section.content_json === "object" ? section.content_json : {};
 }
@@ -3536,10 +3579,14 @@ function applyCmsSection(section) {
 }
 
 function applyCmsPage(page, sections) {
-  setRouteSeo(page.slug || "home", {
-    title: page.seo_title || (page.title ? `${page.title}｜歲悅長照集團` : undefined),
-    description: page.seo_description || undefined
-  });
+  const pageSlug = page.slug || "home";
+  const currentRoute = routeSlugFromLocation().split("?")[0] || "home";
+  if (pageSlug === currentRoute) {
+    setRouteSeo(pageSlug, {
+      title: page.seo_title || (page.title ? `${page.title}｜歲悅長照集團` : undefined),
+      description: page.seo_description || undefined
+    });
+  }
 
   const pageContent = getSectionContent(page);
   const managedSections = Array.isArray(pageContent.managed_sections) ? pageContent.managed_sections : [];
@@ -3561,33 +3608,49 @@ function applyCmsPage(page, sections) {
 }
 
 async function loadSupabasePageContent(slug) {
-  if (!supabase) return;
-
-  try {
-    const { data: page, error: pageError } = await supabase
-      .from("pages")
-      .select("id, slug, title, seo_title, seo_description, content_json")
-      .eq("slug", slug)
-      .eq("status", "published")
-      .eq("is_enabled", true)
-      .maybeSingle();
-
-    if (pageError) throw pageError;
-    if (!page) return;
-
-    const { data: sections, error: sectionsError } = await supabase
-      .from("page_sections")
-      .select("id, section_key, title, body, image_id, content_json, sort_order")
-      .eq("page_id", page.id)
-      .eq("status", "published")
-      .eq("is_enabled", true)
-      .order("sort_order", { ascending: true });
-
-    if (sectionsError) throw sectionsError;
-    applyCmsPage(page, sections || []);
-  } catch (error) {
-    console.warn(`Supabase page content unavailable for ${slug}.`, error);
+  let page = null;
+  let sections = [];
+  let snapshotApplied = false;
+  if (slug === "home") {
+    try {
+      const snapshot = await loadCmsFallback("getHomePageContent");
+      if (snapshot.page) {
+        applyCmsPage(snapshot.page, snapshot.sections || []);
+        snapshotApplied = true;
+      }
+    } catch (error) {
+      console.warn("CMS snapshot unavailable", error);
+    }
   }
+  try {
+    if (supabase) {
+      const pageResult = await supabase
+        .from("pages")
+        .select("id, slug, title, seo_title, seo_description, content_json")
+        .eq("slug", slug)
+        .eq("status", "published")
+        .eq("is_enabled", true)
+        .maybeSingle();
+      if (pageResult.error) throw pageResult.error;
+      page = pageResult.data;
+      if (page) {
+        const sectionResult = await supabase
+          .from("page_sections")
+          .select("id, section_key, title, body, image_id, content_json, sort_order")
+          .eq("page_id", page.id)
+          .eq("status", "published")
+          .eq("is_enabled", true)
+          .order("sort_order", { ascending: true });
+        if (sectionResult.error) throw sectionResult.error;
+        sections = sectionResult.data || [];
+      }
+    }
+  } catch (error) {
+    console.warn("CMS fallback", slug, error);
+  }
+  if (!page) return snapshotApplied;
+  applyCmsPage(page, sections || []);
+  return true;
 }
 
 function renderCmsDetailPage(page, sections = []) {
@@ -3680,12 +3743,15 @@ const serviceTemplateSlugs = new Set([
 ]);
 
 const cmsEnhancedServiceSlugs = new Set([
+  "about",
+  "milestones",
   "home-care",
   "day-care",
   "community",
   "nursing",
   "migrant-training",
-  "quality"
+  "quality",
+  "software"
 ]);
 
 const supabaseServiceFieldCache = new Map();
@@ -3785,6 +3851,7 @@ function renderFixedServiceTemplate(slug, fields = []) {
   const secondaryUrl = getTemplateText(fieldMap, "secondary_cta_url", "#network");
   const featureCards = getTemplateArray(fieldMap, "feature_cards");
   const flowCards = getTemplateArray(fieldMap, "flow_cards");
+  const enrollmentItems = getTemplateArray(fieldMap, "enrollment_items");
   const faqItems = getTemplateArray(fieldMap, "faq_items");
 
   return `
@@ -3830,6 +3897,17 @@ function renderFixedServiceTemplate(slug, fields = []) {
         </section>
       ` : ""}
 
+      ${enrollmentItems.length ? `
+        <section class="service-detail-section">
+          <div class="service-section-head">
+            <p class="eyebrow">${escapeHTML(getTemplateText(fieldMap, "enrollment_eyebrow", "Enrollment Checklist"))}</p>
+            <h2>${escapeHTML(getTemplateText(fieldMap, "enrollment_title", "入托準備清單"))}</h2>
+            <span>${escapeHTML(getTemplateText(fieldMap, "enrollment_body", "體檢完成後，請依長輩平時生活習慣準備以下用品。"))}</span>
+          </div>
+          ${renderTemplateCards(enrollmentItems)}
+        </section>
+      ` : ""}
+
       ${faqItems.length ? `
         <section class="service-detail-section">
           <div class="service-section-head">
@@ -3854,16 +3932,24 @@ function renderFixedServiceTemplate(slug, fields = []) {
 }
 
 async function fetchSupabaseServiceFields(slug) {
-  if (!supabase || !cmsEnhancedServiceSlugs.has(slug)) return [];
+  if (!cmsEnhancedServiceSlugs.has(slug)) return [];
   if (supabaseServiceFieldCache.has(slug)) return supabaseServiceFieldCache.get(slug);
-  const { data, error } = await supabase
-    .from("page_template_fields")
-    .select("template_key, field_key, field_label, field_type, text_value, number_value, boolean_value, json_value, sort_order, image:media!page_template_fields_image_id_fkey(id, public_url, alt_text, file_name)")
-    .eq("page_slug", slug)
-    .eq("is_enabled", true)
-    .order("sort_order", { ascending: true });
-  if (error) throw error;
-  const fields = data || [];
+  let fields = [];
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("page_template_fields")
+        .select("template_key, field_key, field_label, field_type, text_value, number_value, boolean_value, json_value, sort_order, image:media!page_template_fields_image_id_fkey(id, public_url, alt_text, file_name)")
+        .eq("page_slug", slug)
+        .eq("is_enabled", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      fields = data || [];
+    } catch (error) {
+      console.warn("CMS fallback", slug, error);
+    }
+  }
+  if (!fields.length) fields = await loadCmsFallback("getServiceFields", slug);
   supabaseServiceFieldCache.set(slug, fields);
   return fields;
 }
@@ -4024,10 +4110,10 @@ function applyCmsEnhancedServicePage(html, slug, fields = []) {
   setNodeText(root, ".service-detail-hero .service-detail-copy .eyebrow", getTemplateText(fieldMap, "hero_eyebrow", ""));
   setNodeText(root, ".service-detail-hero .service-detail-copy h1", title);
   setNodeText(root, ".service-detail-hero .service-detail-copy > p:not(.eyebrow):not(.hero-slogan)", body);
-  setNodeText(root, ".hero-actions .primary-button", getTemplateText(fieldMap, "primary_cta_text", ""));
-  setNodeHref(root, ".hero-actions .primary-button", getTemplateText(fieldMap, "primary_cta_url", ""));
-  setNodeText(root, ".hero-actions .secondary-button", getTemplateText(fieldMap, "secondary_cta_text", ""));
-  setNodeHref(root, ".hero-actions .secondary-button", getTemplateText(fieldMap, "secondary_cta_url", ""));
+  setNodeText(root, ".hero-actions .primary-button, .one-minute-service-actions .primary-button", getTemplateText(fieldMap, "primary_cta_text", ""));
+  setNodeHref(root, ".hero-actions .primary-button, .one-minute-service-actions .primary-button", getTemplateText(fieldMap, "primary_cta_url", ""));
+  setNodeText(root, ".hero-actions .secondary-button, .one-minute-service-actions .ghost-button", getTemplateText(fieldMap, "secondary_cta_text", ""));
+  setNodeHref(root, ".hero-actions .secondary-button, .one-minute-service-actions .ghost-button", getTemplateText(fieldMap, "secondary_cta_url", ""));
   setNodeText(root, ".service-hero-card span", getTemplateText(fieldMap, "hero_badge", ""));
   setNodeText(root, ".service-hero-card strong", getTemplateText(fieldMap, "hero_card_title", ""));
   const heroImage = getTemplateText(fieldMap, "hero_image", "");
@@ -4037,72 +4123,121 @@ function applyCmsEnhancedServicePage(html, slug, fields = []) {
     heroImageNode.setAttribute("alt", getTemplateText(fieldMap, "hero_image_alt", title || heroImageNode.getAttribute("alt") || ""));
     heroImageNode.setAttribute("style", `object-position:${getTemplateText(fieldMap, "hero_focal_point", "center")};`);
   }
+  const heroBackgroundNode = root.querySelector(".one-minute-service-hero .hero-bg, .service-detail-hero .hero-bg");
+  if (heroImage && heroBackgroundNode) {
+    const existingBackground = heroBackgroundNode.style.backgroundImage || "";
+    const nextImage = `url(\"${fastAssetUrl(heroImageForViewport(heroImage))}\")`;
+    heroBackgroundNode.style.backgroundImage = /url\([^)]*\)\s*$/.test(existingBackground)
+      ? existingBackground.replace(/url\([^)]*\)\s*$/, nextImage)
+      : nextImage;
+  }
 
   const heroPoints = getTemplateArray(fieldMap, "hero_points");
   const heroPointsNode = root.querySelector(".homecare-hero-points");
-  if (heroPoints.length && heroPointsNode) {
+  if (fieldMap.hero_points && heroPointsNode) {
     heroPointsNode.innerHTML = heroPoints.map((item) => `
       <article><span>${escapeHTML(getCmsItemValue(item, ["label", "title"], ""))}</span><strong>${escapeHTML(getCmsItemValue(item, ["body", "copy", "description"], ""))}</strong></article>
     `).join("");
   }
 
   const featureCards = getTemplateArray(fieldMap, "feature_cards");
-  if (featureCards.length) {
+  if (fieldMap.feature_cards) {
     const node = root.querySelector(".service-highlight-grid");
     if (node) node.innerHTML = renderCmsHighlightGrid(featureCards);
   }
   applyServiceSectionHead(root, ".service-highlight-grid", fieldMap, "feature");
 
   const painPoints = getTemplateArray(fieldMap, "pain_points");
-  if (painPoints.length) {
+  if (fieldMap.pain_points) {
     const node = root.querySelector(".homecare-problem-grid");
     if (node) node.innerHTML = renderCmsProblemGrid(painPoints);
   }
   applyServiceSectionHead(root, ".homecare-problem-grid", fieldMap, "pain");
 
+  const quickSummary = root.querySelector(".one-minute-service-summary");
+  if (quickSummary) {
+    const service = oneMinuteServices[slug] || oneMinuteServices["home-care"];
+    const quickGroups = [
+      [painPoints, 0],
+      [getTemplateArray(fieldMap, "service_items"), 1],
+      [getTemplateArray(fieldMap, "flow_cards"), 2]
+    ];
+    quickGroups.forEach(([items, index]) => {
+      if (!items.length) return;
+      const list = quickSummary.querySelector(`article:nth-child(${index + 1}) ul`);
+      if (!list) return;
+      const normalizedItems = items.map((item) => ({
+        title: getCmsItemValue(item, ["title"], ""),
+        text: getCmsItemValue(item, ["body", "copy", "description", "fit", "text"], ""),
+        image: getCmsItemValue(item, ["image", "image_url", "url"], "")
+      }));
+      list.innerHTML = renderServiceInsightList(normalizedItems, service.scenes, index);
+    });
+  }
+
   const sceneCards = getTemplateArray(fieldMap, "scene_cards");
-  if (sceneCards.length) {
+  const sceneCardsForRender = slug === "day-care" && sceneCards.length > 0 && sceneCards.length < 8
+    ? [...sceneCards, ...oneMinuteServices["day-care"].scenes.slice(sceneCards.length)].slice(0, 8)
+    : sceneCards;
+  if (fieldMap.scene_cards) {
     const node = root.querySelector(".homecare-gallery");
-    if (node) node.innerHTML = renderCmsGallery(sceneCards);
+    if (node) node.innerHTML = renderCmsGallery(sceneCardsForRender);
   }
   applyServiceSectionHead(root, ".homecare-gallery", fieldMap, "scene");
+  if (sceneCardsForRender.length) {
+    const sceneGrid = root.querySelector(".two-minute-scene-grid");
+    if (sceneGrid) {
+      sceneGrid.innerHTML = renderServiceSceneCards(sceneCardsForRender.map((item) => ({
+        image: getCmsItemValue(item, ["image", "image_url", "url"], fallbackImages.serviceModule),
+        title: getCmsItemValue(item, ["title"], "服務現場"),
+        text: getCmsItemValue(item, ["body", "copy", "description"], "")
+      })));
+    }
+  }
 
   const serviceItems = getTemplateArray(fieldMap, "service_items");
-  if (serviceItems.length) {
+  if (fieldMap.service_items) {
     const node = root.querySelector(".community-program-grid");
     if (node) node.innerHTML = renderCmsProgramGrid(serviceItems);
   }
   applyServiceSectionHead(root, ".community-program-grid", fieldMap, "service");
 
   const scenarioCards = getTemplateArray(fieldMap, "scenario_cards");
-  if (scenarioCards.length) {
+  if (fieldMap.scenario_cards) {
     const node = root.querySelector(".homecare-scenario-grid");
     if (node) node.innerHTML = renderCmsScenarioGrid(scenarioCards);
   }
   applyServiceSectionHead(root, ".homecare-scenario-grid", fieldMap, "scenario");
 
   const flowCards = getTemplateArray(fieldMap, "flow_cards");
-  if (flowCards.length) {
+  const serviceJourneyHost = root.querySelector(`[data-${slug}-application-journey-host]`);
+  if (serviceJourneyHost) {
+    if (flowCards.length) serviceJourneyHost.dataset.flowCards = JSON.stringify(flowCards);
+    serviceJourneyHost.dataset.flowEyebrow = getTemplateText(fieldMap, "flow_eyebrow", "");
+    serviceJourneyHost.dataset.flowTitle = getTemplateText(fieldMap, "flow_title", "");
+    serviceJourneyHost.dataset.flowBody = getTemplateText(fieldMap, "flow_body", "");
+  }
+  if (fieldMap.flow_cards) {
     const node = root.querySelector(".service-flow-track");
     if (node) node.innerHTML = renderCmsFlowTrack(flowCards);
   }
   applyServiceSectionHead(root, ".service-flow-track", fieldMap, "flow");
 
   const qualityCards = getTemplateArray(fieldMap, "quality_cards");
-  if (qualityCards.length) {
+  if (fieldMap.quality_cards) {
     const node = root.querySelector(".homecare-quality-grid");
     if (node) node.innerHTML = renderCmsProblemGrid(qualityCards);
   }
   applyServiceSectionHead(root, ".homecare-quality-grid", fieldMap, "quality");
 
   const familyBoard = getTemplateArray(fieldMap, "family_board");
-  if (familyBoard.length) {
+  if (fieldMap.family_board) {
     const node = root.querySelector(".homecare-family-board");
     if (node) node.innerHTML = renderCmsFamilyBoard(familyBoard);
   }
 
   const faqItems = getTemplateArray(fieldMap, "faq_items");
-  if (faqItems.length) {
+  if (fieldMap.faq_items) {
     const node = root.querySelector(".software-faq-list");
     if (node) node.innerHTML = renderCmsFaqList(faqItems);
   }
@@ -4113,6 +4248,36 @@ function applyCmsEnhancedServicePage(html, slug, fields = []) {
   setNodeText(root, ".service-cta-panel p:not(.eyebrow)", getTemplateText(fieldMap, "cta_body", ""));
   setNodeText(root, ".service-cta-panel .primary-button", getTemplateText(fieldMap, "cta_button_text", ""));
   setNodeHref(root, ".service-cta-panel .primary-button", getTemplateText(fieldMap, "cta_button_url", ""));
+  setNodeText(root, ".service-contact-section .eyebrow", getTemplateText(fieldMap, "cta_eyebrow", ""));
+  setNodeText(root, ".service-contact-section > div > h2", getTemplateText(fieldMap, "cta_title", ""));
+  setNodeText(root, ".service-contact-section > div > p:not(.eyebrow)", getTemplateText(fieldMap, "cta_body", ""));
+  setNodeText(root, ".service-contact-section button[type='submit']", getTemplateText(fieldMap, "cta_button_text", ""));
+
+  const enrollmentItems = getTemplateArray(fieldMap, "enrollment_items");
+  const enrollmentSection = root.querySelector(".day-care-start-section, .service-notes-section");
+  if (enrollmentSection) {
+    setNodeText(enrollmentSection, ".service-section-head .eyebrow", getTemplateText(fieldMap, "enrollment_eyebrow", ""));
+    setNodeText(enrollmentSection, ".service-section-head h2", getTemplateText(fieldMap, "enrollment_title", ""));
+    setNodeText(enrollmentSection, ".service-section-head span", getTemplateText(fieldMap, "enrollment_body", ""));
+    if (enrollmentItems.length) {
+      const list = enrollmentSection.querySelector(".service-info-grid");
+      const normalizedEnrollmentItems = enrollmentItems.map((item) => ({
+        title: getCmsItemValue(item, ["title"], "準備項目"),
+        text: getCmsItemValue(item, ["text", "body", "description"], "")
+      }));
+      if (list) {
+        list.innerHTML = renderServicePlainList(
+          normalizedEnrollmentItems,
+          slug === "day-care" ? { leadingIcon: renderDayCareChecklistIcon } : undefined
+        );
+        if (slug === "day-care") {
+          enrollmentSection.classList.add("has-mobile-checklist");
+          enrollmentSection.querySelector(".day-care-mobile-checklist")?.remove();
+          list.insertAdjacentHTML("afterend", renderDayCareMobileChecklist(normalizedEnrollmentItems));
+        }
+      }
+    }
+  }
 
   if (title || body || heroImage) {
     setRouteSeo(slug, {
@@ -4127,20 +4292,23 @@ function applyCmsEnhancedServicePage(html, slug, fields = []) {
 
 async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
   const fallbackHtml = fallbackRenderer();
+  let fields = [];
+  pageView.innerHTML = "";
   setPageViewBusy(true);
   try {
-    const fields = await fetchSupabaseServiceFields(slug);
-    if (routeSlugFromLocation() !== slug) return;
-    pageView.innerHTML = fields.length
-      ? applyCmsEnhancedServicePage(fallbackHtml, slug, fields)
-      : fallbackHtml;
-    setPageViewBusy(false);
+    fields = await fetchSupabaseServiceFields(slug);
   } catch (error) {
     console.warn(`Supabase enhanced service page unavailable for ${slug}.`, error);
-    if (routeSlugFromLocation() !== slug) return;
-    pageView.innerHTML = fallbackHtml;
-    setPageViewBusy(false);
   }
+  if (routeSlugFromLocation() !== slug) return;
+  pageView.innerHTML = fields.length ? applyCmsEnhancedServicePage(fallbackHtml, slug, fields) : fallbackHtml;
+  hydrateServiceFeeCodeGroups(pageView);
+  hydrateDayCareLocationContent(pageView);
+  hydrateHomeCareLocationContent(pageView);
+  hydrateCommunityContent(pageView);
+  optimizeImageLoading(pageView);
+  observeServiceMotion(pageView);
+  setPageViewBusy(false);
 }
 
 async function loadSupabaseServiceTemplatePage(slug) {
@@ -4218,7 +4386,7 @@ const recruitingImageProfiles = [
   },
   {
     pattern: /督導|服務督導|個案管理|個案服務|個管|協調員|家庭窗口|照顧計畫|a單位|aa01|aa02|派案|家訪|電訪|supervisor|case.?manager/i,
-    image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg",
+    image: "assets/brand-scenes/care-team-v2.jpg",
     label: "督導與個案管理",
     caption: "串接家庭、照服員與服務紀錄，讓照顧品質被穩定追蹤。"
   },
@@ -4230,7 +4398,7 @@ const recruitingImageProfiles = [
   },
   {
     pattern: /移工|外籍看護|廠工|培訓|課程|活動企劃|雇主安心|教學|菲律賓|migrant|training|course/i,
-    image: "assets/migrant-recruit-01-classroom-fast.jpg",
+    image: "assets/brand-scenes/migrant-v2.jpg",
     label: "移工培訓與課程活動",
     caption: "把照顧技能、溝通情境與課程活動整理成可學習的流程。"
   },
@@ -4426,6 +4594,18 @@ const talentBenefitCategories = [
         value: "另案評核發放",
         tags: ["依辦法核定"],
         copy: "依個人表現與專案狀況另案評核發放。"
+      },
+      {
+        title: "個案開案獎金",
+        value: "2,000 元/案",
+        tags: ["全體員工", "依辦法核定"],
+        copy: "成功協助個案開案後，依公司制度發放 2,000 元開案獎金。"
+      },
+      {
+        title: "照顧服務員介紹費",
+        value: "6,000 元/人",
+        tags: ["全體員工", "依辦法核定"],
+        copy: "成功介紹照顧服務員加入團隊，符合制度條件後發放 6,000 元介紹費。"
       },
       {
         title: "留任獎金",
@@ -4646,6 +4826,11 @@ function renderRecruitingHero(page) {
   const fallback = page.page_slug === "investor-recruiting" ? fallbackImages.investor : fallbackImages.recruiting;
   const image = heroImageForViewport(getRecruitingImage(page, fallback));
   const focalPoint = focalPointToObjectPosition(page.metadata?.focal_point || "center");
+  const fixedLayoutClass = page.page_slug === "land"
+    ? "land-recruit-hero"
+    : page.page_slug === "investor-recruiting"
+      ? "investor-recruit-hero"
+      : "talent-recruit-hero";
   const heroLabel = page.hero_badge || page.subtitle || page.title || "Suiyuecare Careers";
   const contactNeed = page.page_slug === "talent" ? "人才招募" : page.page_slug === "land" ? "土地合作" : "投資洽談";
   const contactMessage = page.page_slug === "talent"
@@ -4659,7 +4844,7 @@ function renderRecruitingHero(page) {
     ? ` data-contact-need="${escapeHTML(contactNeed)}" data-contact-message="${escapeHTML(contactMessage)}"`
     : "";
   return `
-    <section class="hero service-detail-hero one-minute-service-hero recruiting-cms-hero ${escapeHTML(page.page_slug)}-recruiting-hero">
+    <section class="hero service-detail-hero one-minute-service-hero recruiting-cms-hero ${escapeHTML(fixedLayoutClass)} ${escapeHTML(page.page_slug)}-recruiting-hero">
       <div
         class="hero-bg"
         style="background-image: linear-gradient(90deg, rgba(255, 253, 248, 0.96) 0%, rgba(255, 248, 238, 0.88) 42%, rgba(255, 248, 238, 0.42) 72%, rgba(255, 248, 238, 0.08) 100%), linear-gradient(180deg, rgba(255, 253, 248, 0.18), rgba(255, 239, 218, 0.28)), url('${escapeHTML(image)}'); background-position: ${escapeHTML(focalPoint)};"
@@ -4923,20 +5108,6 @@ function buildTalentJobBoardModel(page = {}, departments = [], openings = []) {
     const summary = talentText(opening.summary, duties[0] || "歡迎與招募窗口聊聊職務內容與適合度。");
     const imageProfile = getRecruitingImageProfile(opening, getRecruitingImage(department, fallbackImages.recruiting));
     const formType = opening.metadata?.form_type || page.metadata?.form_type || "recruiting";
-    const contactMessage = `我想了解「${title}」職缺或留下應徵資料，請協助安排招募窗口聯繫。`;
-    const searchText = [
-      title,
-      departmentTitle,
-      opening.subtitle,
-      summary,
-      employmentType,
-      locationText,
-      salaryText,
-      capacityText,
-      duties.join(" "),
-      requirements.join(" "),
-      benefits.join(" ")
-    ].filter(Boolean).join(" ").toLowerCase();
     return {
       id: String(opening.id || openingSlug || jobKey),
       key: jobKey,
@@ -4967,18 +5138,13 @@ function buildTalentJobBoardModel(page = {}, departments = [], openings = []) {
       imageAlt: `${title}工作情境：${imageProfile.label}`,
       sortOrder: Number(opening.sort_order || index * 10),
       updatedMs,
-      updatedLabel: formatTalentUpdatedAt(opening.updated_at || opening.published_at || opening.created_at),
-      searchText,
-      contactNeed: "人才招募",
-      contactMessage
+      updatedLabel: formatTalentUpdatedAt(opening.updated_at || opening.published_at || opening.created_at)
     };
-  }).sort(compareTalentJobs).map((job, index) => ({ ...job, defaultRank: index }));
+  }).sort(compareTalentJobs);
 
   return {
     jobs,
-    departmentOptions: talentUniqueOptions(jobs.map((job) => job.departmentTitle)),
-    locationOptions: talentUniqueOptions(jobs.map((job) => job.location)),
-    typeOptions: talentUniqueOptions(jobs.map((job) => job.employmentType))
+    departmentOptions: talentUniqueOptions(jobs.map((job) => job.departmentTitle))
   };
 }
 
@@ -4994,25 +5160,12 @@ function talentApplyAttributes(job) {
   ].join(" ");
 }
 
-function talentContactAttributes(job) {
-  return `data-contact-need="${escapeHTML(job.contactNeed)}" data-contact-message="${escapeHTML(job.contactMessage)}"`;
-}
-
 function renderTalentApplyControl(job, className = "primary-button", label = job.applyButtonText) {
-  if (!job.applyFormEnabled) {
-    return `<a class="${escapeHTML(className)}" href="#contact" ${talentContactAttributes(job)}>留下資料</a>`;
-  }
+  if (!job.applyFormEnabled) return "";
   return `
     <button class="${escapeHTML(className)}" type="button" data-recruit-apply ${talentApplyAttributes(job)}>
       ${escapeHTML(label)}
     </button>
-  `;
-}
-
-function renderTalentJobSelectOptions(options, placeholder) {
-  return `
-    <option value="">${escapeHTML(placeholder)}</option>
-    ${options.map((option) => `<option value="${escapeHTML(option)}">${escapeHTML(option)}</option>`).join("")}
   `;
 }
 
@@ -5101,7 +5254,6 @@ function renderTalentJobDetail(job, inline = false) {
         </ol>
       </section>
       <div class="talent-job-detail-actions">
-        <a class="secondary-button" href="#contact" ${talentContactAttributes(job)}>稍後詢問</a>
         ${renderTalentApplyControl(job, "primary-button", job.applyButtonText)}
       </div>
     </div>
@@ -5119,13 +5271,7 @@ function renderTalentJobCard(job, index) {
       aria-controls="talent-job-detail-${escapeHTML(job.key)}"
       data-talent-job-card
       data-job-id="${escapeHTML(job.key)}"
-      data-talent-search="${escapeHTML(job.searchText)}"
       data-talent-department="${escapeHTML(job.departmentTitle)}"
-      data-talent-location="${escapeHTML(job.location)}"
-      data-talent-type="${escapeHTML(job.employmentType)}"
-      data-default-rank="${job.defaultRank}"
-      data-updated-rank="${job.updatedMs}"
-      data-department-rank="${escapeHTML(job.departmentTitle)}"
       data-apply-text="${escapeHTML(job.applyButtonText)}"
       data-form-type="${escapeHTML(job.formType)}"
       data-page-slug="${escapeHTML(job.pageSlug)}"
@@ -5136,7 +5282,6 @@ function renderTalentJobCard(job, index) {
       data-opening-title="${escapeHTML(job.title)}"
     >
       <div class="talent-job-card-shell">
-        ${renderTalentJobImage(job, "talent-job-card-media")}
         <div class="talent-job-card-copy">
           <div class="talent-job-card-top">
             <span class="talent-job-department">${escapeHTML(job.departmentTitle)}</span>
@@ -5155,7 +5300,6 @@ function renderTalentJobCard(job, index) {
             ${job.benefits.slice(0, 2).map((item) => `<span>${escapeHTML(item)}</span>`).join("")}
           </div>
           <div class="talent-job-card-actions">
-            <button class="text-button" type="button" data-talent-select-job="${escapeHTML(job.key)}">查看詳情</button>
             ${renderTalentApplyControl(job, "primary-button compact")}
           </div>
         </div>
@@ -5168,7 +5312,7 @@ function renderTalentJobCard(job, index) {
 }
 
 function renderTalentJobBoard(page, model) {
-  const { jobs, departmentOptions, locationOptions, typeOptions } = model;
+  const { jobs, departmentOptions } = model;
   if (!jobs.length) {
     return `
       <section class="talent-job-board is-empty" id="career-openings" aria-label="職位一覽">
@@ -5185,41 +5329,10 @@ function renderTalentJobBoard(page, model) {
   return `
     <section class="talent-job-board" id="career-openings" aria-label="職位一覽" data-talent-job-board data-active-job="${escapeHTML(firstJob.key)}">
       <span class="talent-scroll-anchor" id="recruiting-openings" aria-hidden="true"></span>
-      <div class="talent-job-toolbar" role="search" aria-label="職缺搜尋與篩選">
-        <label class="talent-job-search-control">
-          <span>關鍵字搜尋</span>
-          <input type="search" placeholder="搜尋職稱、技能、地點" autocomplete="off" data-talent-job-search />
-        </label>
-        <div class="talent-job-filters">
-          <label>
-            <span>部門</span>
-            <select data-talent-filter="department">
-              ${renderTalentJobSelectOptions(departmentOptions, "全部部門")}
-            </select>
-          </label>
-          <label>
-            <span>地點</span>
-            <select data-talent-filter="location">
-              ${renderTalentJobSelectOptions(locationOptions, "全部地點")}
-            </select>
-          </label>
-          <label>
-            <span>職務類型</span>
-            <select data-talent-filter="type">
-              ${renderTalentJobSelectOptions(typeOptions, "全部類型")}
-            </select>
-          </label>
-          <label>
-            <span>排序</span>
-            <select data-talent-sort>
-              <option value="recommended">推薦排序</option>
-              <option value="newest">最新更新</option>
-              <option value="department">依部門排序</option>
-            </select>
-          </label>
-          <button class="secondary-button talent-clear-filter" type="button" data-talent-clear-filters>清除</button>
-        </div>
-      </div>
+      <select hidden data-talent-filter="department" aria-hidden="true" tabindex="-1">
+        <option value="">全部職缺</option>
+        ${departmentOptions.map((department) => `<option value="${escapeHTML(department)}">${escapeHTML(department)}</option>`).join("")}
+      </select>
       <div class="talent-job-chip-row" aria-label="部門快速篩選">
         <button class="is-active" type="button" data-talent-chip="department" data-value="">全部職缺</button>
         ${departmentOptions.map((department) => `<button type="button" data-talent-chip="department" data-value="${escapeHTML(department)}">${escapeHTML(department)}</button>`).join("")}
@@ -5248,7 +5361,7 @@ function renderTalentJobBoard(page, model) {
       </div>
       <div class="talent-job-empty" data-talent-empty hidden>
         <h3>沒有符合條件的職缺</h3>
-        <p>可以調整關鍵字或清除篩選，再看看其他適合的角色。</p>
+        <p>可以切換部門或清除篩選，再看看其他適合的角色。</p>
         <button class="primary-button" type="button" data-talent-clear-filters>清除篩選</button>
       </div>
       <div class="talent-job-mobile-cta" data-talent-mobile-cta>
@@ -5265,7 +5378,7 @@ function renderTalentJobBoard(page, model) {
 function renderRecruitingJobListPanel(page, departments, openings, activeKey = "job-list") {
   const model = buildTalentJobBoardModel(page, departments, openings);
   const content = `
-    ${renderTalentPanelLead("Open Roles", "職位一覽", "像求職網站一樣先搜尋、篩選、比較，再展開完整內容；把地點、薪資、類型、福利與應徵入口放在同一個畫面。")}
+    ${renderTalentPanelLead("Open Roles", "職位一覽", "像求職網站一樣快速比較職缺，再展開完整內容；把地點、薪資、類型、福利與應徵入口放在同一個畫面。")}
     ${renderTalentJobBoard(page, model)}
   `;
   return renderTalentTabPanel("job-list", content, activeKey);
@@ -5461,22 +5574,31 @@ function renderTalentMissionPanel(page, departments = [], openings = [], activeK
   return renderTalentTabPanel("department-mission", content, activeKey);
 }
 
-function renderRecruitingOpportunityPage(page, departments, openings) {
+function renderRecruitingOpportunitySection(page, departments, openings) {
   const primaryDepartment = departments[0] || { id: "", title: page.title, department_slug: page.page_slug };
   return `
-    <div class="service-detail-page recruiting-cms-page ${escapeHTML(page.page_slug)}-cms-page">
-      ${renderRecruitingHero(page)}
-      <section class="service-detail-section" id="recruiting-openings">
-        <div class="service-section-head">
-          <p class="eyebrow">${escapeHTML(primaryDepartment.eyebrow || "Opportunities")}</p>
-          <h2>${escapeHTML(primaryDepartment.title || page.title)}</h2>
-          <span>${escapeHTML(primaryDepartment.description || page.subtitle || "")}</span>
-        </div>
-        ${renderRecruitingOpeningGrid(page, primaryDepartment, openings)}
-      </section>
-      ${renderRecruitingApplicationModal(page)}
-    </div>
+    <section class="service-detail-section recruiting-cms-opportunities" id="recruiting-openings">
+      <div class="service-section-head">
+        <p class="eyebrow">${escapeHTML(primaryDepartment.eyebrow || "Opportunities")}</p>
+        <h2>${escapeHTML(primaryDepartment.title || page.title)}</h2>
+        <span>${escapeHTML(primaryDepartment.description || page.subtitle || "")}</span>
+      </div>
+      ${renderRecruitingOpeningGrid(page, primaryDepartment, openings)}
+    </section>
   `;
+}
+
+function renderFixedRecruitingOpportunityPage(slug, page, departments, openings) {
+  const fixedHtml = slug === "land" ? renderLandRecruitingPage() : renderInvestorRecruitingPage();
+  const template = document.createElement("template");
+  template.innerHTML = fixedHtml.trim();
+  const root = template.content;
+  const fixedHero = root.querySelector(".hero");
+  if (fixedHero) fixedHero.outerHTML = renderRecruitingHero(page);
+  const fixedCta = root.querySelector(".service-cta-panel:last-of-type");
+  fixedCta?.insertAdjacentHTML("beforebegin", renderRecruitingOpportunitySection(page, departments, openings));
+  root.querySelector(".service-detail-page")?.insertAdjacentHTML("beforeend", renderRecruitingApplicationModal(page));
+  return template.innerHTML;
 }
 
 function renderRecruitingTalentPage(page, departments, openings) {
@@ -5501,18 +5623,26 @@ function renderRecruitingApplicationModal(page) {
   const confirmText = isTalent
     ? "送出後，資料會寄到歲悅招募窗口並留存在系統，窗口原則上 1 個工作天內回覆。"
     : "送出後，資料會寄到歲悅合作窗口並留存在系統，窗口原則上 1 個工作天內回覆。";
-  return `
-    <div class="course-signup-modal recruiting-apply-modal" id="recruitApplyModal" hidden>
-      <div class="course-signup-dialog">
-        <button class="course-modal-close" type="button" data-recruit-close aria-label="關閉">×</button>
-        <p class="eyebrow">Apply</p>
-        <h2>${escapeHTML(isTalent ? "申請應徵" : "提交洽談資料")}</h2>
-        <form id="recruitApplyForm">
+  const fields = isTalent ? `
+          <p class="recruit-apply-context">申請職缺：<strong id="recruitApplyContext"></strong></p>
+          <label>您的大名<input name="姓名" type="text" required autocomplete="name" placeholder="請輸入姓名" /></label>
+          <label>您的電話<input name="電話" type="tel" required autocomplete="tel" inputmode="tel" placeholder="請輸入電話" /></label>
+          <label class="recruit-resume-field">履歷上傳 <span>非必填</span><input name="resume" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" /></label>
+          <p class="recruit-resume-hint">支援 PDF、DOC、DOCX，檔案上限 3 MB。</p>
+          <input name="subject" id="recruitApplyTitle" type="hidden" />
+  ` : `
           <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
           <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
-          <label>Email<input name="Email" type="email" required placeholder="請輸入 Email" /></label>
           <label>申請項目<input name="subject" id="recruitApplyTitle" type="text" readonly /></label>
           <label>補充說明<textarea name="說明" rows="4" placeholder="可填寫可聯絡時間、經歷、場域資料或合作想法"></textarea></label>
+  `;
+  return `
+    <div class="course-modal recruiting-apply-modal" id="recruitApplyModal" hidden role="dialog" aria-modal="true" aria-labelledby="recruitApplyHeading">
+      <form class="course-modal-card recruit-apply-form" id="recruitApplyForm">
+        <button class="course-modal-close" type="button" data-recruit-close aria-label="關閉">×</button>
+        <p class="eyebrow">Apply</p>
+        <h2 id="recruitApplyHeading">${escapeHTML(isTalent ? "申請應徵" : "提交洽談資料")}</h2>
+          ${fields}
           <input name="recruiting_page" id="recruitApplyPage" type="hidden" />
           <input name="department_id" id="recruitApplyDepartmentId" type="hidden" />
           <input name="department_title" id="recruitApplyDepartmentTitle" type="hidden" />
@@ -5520,12 +5650,10 @@ function renderRecruitingApplicationModal(page) {
           <input name="opening_slug" id="recruitApplyOpeningSlug" type="hidden" />
           <input name="opening_title" id="recruitApplyOpeningTitle" type="hidden" />
           <input name="_honey" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為應徵、合作洽談與後續聯繫目的，使用我填寫的個人資料。</label>
           <p class="course-confirm-text">${escapeHTML(confirmText)}</p>
           <button class="primary-button" type="submit">${escapeHTML(submitText)}</button>
-          <span id="recruitApplyStatus"></span>
-        </form>
-      </div>
+          <p class="course-modal-status" id="recruitApplyStatus" role="status" aria-live="polite"></p>
+      </form>
     </div>
   `;
 }
@@ -5581,17 +5709,27 @@ async function fetchSupabaseRecruitingPage(slug) {
 }
 
 async function loadSupabaseRecruitingPage(slug) {
-  if (!supabase || !recruitingTemplateSlugs.has(slug)) return false;
+  if (!recruitingTemplateSlugs.has(slug)) return "";
   try {
-    const data = await fetchSupabaseRecruitingPage(slug);
-    if (!data || routeSlugFromLocation() !== slug) return false;
-    pageView.innerHTML = slug === "talent"
-      ? renderRecruitingTalentPage(data.page, data.departments, data.openings)
-      : renderRecruitingOpportunityPage(data.page, data.departments, data.openings);
-    return true;
+    let data = null;
+    if (supabase) {
+      try {
+        data = await fetchSupabaseRecruitingPage(slug);
+      } catch (error) {
+        console.warn("CMS fallback", slug, error);
+      }
+    }
+    if (!data) data = await loadCmsFallback("getRecruitingPage", slug);
+    if (!data || routeSlugFromLocation() !== slug) return "";
+    const visibleOpenings = slug === "land"
+      ? data.openings.filter((opening) => opening.opening_slug === "daycare-site")
+      : data.openings;
+    return slug === "talent"
+      ? renderRecruitingTalentPage(data.page, data.departments, visibleOpenings)
+      : renderFixedRecruitingOpportunityPage(slug, data.page, data.departments, visibleOpenings);
   } catch (error) {
-    console.warn(`Supabase recruiting page unavailable for ${slug}.`, error);
-    return false;
+    console.warn(`Recruiting page unavailable for ${slug}.`, error);
+    return "";
   }
 }
 
@@ -5962,77 +6100,6 @@ function renderCmsShareholdersPage(data) {
   `;
 }
 
-async function fetchWordPressJSON(path) {
-  const response = await fetch(`${WP_API_BASE}${path}`);
-  if (!response.ok) throw new Error(`WordPress API error: ${response.status}`);
-  return response.json();
-}
-
-async function fetchCategoryId(slug) {
-  const categories = await fetchWordPressJSON(`/categories?slug=${encodeURIComponent(slug)}`);
-  return categories?.[0]?.id || null;
-}
-
-async function fetchPostsByCategory(slug, limit = 10) {
-  const categoryId = await fetchCategoryId(slug);
-  if (!categoryId) return [];
-  return fetchWordPressJSON(`/posts?categories=${categoryId}&per_page=${limit}&_embed`);
-}
-
-function renderWordPressNews(posts, panel, yearOnly = false) {
-  if (!posts.length || !panel) return;
-  panel.innerHTML = posts.map((post) => `
-    <article>
-      <time>${escapeHTML(formatPostDate(post.date, yearOnly))}</time>
-      <strong>${post.title?.rendered || ""}</strong>
-      <p>${escapeHTML(stripHTML(post.excerpt?.rendered || post.content?.rendered || ""))}</p>
-    </article>
-  `).join("");
-}
-
-function renderWordPressStories(posts) {
-  if (!posts.length) return;
-  const stories = posts.map((post) => {
-    const acf = post.acf || {};
-    const name = acf.family_name || acf.person_name || stripHTML(post.title?.rendered || "家屬回饋");
-    const service = acf.service_type || "居家照顧";
-    const quote = acf.quote || stripHTML(post.title?.rendered || "");
-    const feedback = acf.short_feedback || stripHTML(post.excerpt?.rendered || post.content?.rendered || "");
-    return {
-      name,
-      service,
-      title: quote,
-      praise: feedback,
-      avatar: testimonialAvatarUrl(name, service, getPostImage(post, "assets/homepage-batch/orange-polo-caregiver-clear.jpg"))
-    };
-  });
-  renderCareStorySlider(stories);
-}
-
-function renderWordPressHealth(posts) {
-  const articleRow = document.querySelector(".home-health-section .article-row");
-  if (!posts.length || !articleRow) {
-    renderHomeHealthArticles();
-    return;
-  }
-  const [feature, ...items] = posts;
-  const miniItems = items.slice(0, 4);
-  articleRow.innerHTML = `
-    <article class="health-preview feature">
-      <img src="${escapeHTML(getPostImage(feature))}" alt="${escapeHTML(stripHTML(feature.title?.rendered || "Health 3.0"))}" />
-      <div><span>熱門文章</span><h3>${feature.title?.rendered || ""}</h3><p>${escapeHTML(stripHTML(feature.excerpt?.rendered || feature.content?.rendered || ""))}</p><a href="${escapeHTML(feature.link || "#health")}" target="_blank" rel="noopener">閱讀更多</a></div>
-    </article>
-    <div class="mini-article-grid">
-      ${miniItems.map((post) => `
-        <article class="health-preview compact">
-          <img src="${escapeHTML(getPostImage(post))}" alt="${escapeHTML(stripHTML(post.title?.rendered || "Health 3.0"))}" />
-          <div><span>照顧知識</span><h3>${post.title?.rendered || ""}</h3><a href="${escapeHTML(post.link || "#health")}" target="_blank" rel="noopener">閱讀更多</a></div>
-        </article>
-      `).join("")}
-    </div>
-  `;
-}
-
 function renderHomeHealthArticles(articles = getHealthArticleList()) {
   const articleRow = document.querySelector(".home-health-section .article-row");
   if (!articleRow) return false;
@@ -6065,31 +6132,6 @@ function renderHomeHealthArticles(articles = getHealthArticleList()) {
       `).join("")}
     </div>
   `;
-  return true;
-}
-
-function renderWordPressMasterTalk(posts) {
-  const slider = document.querySelector(".celebrity-slider");
-  if (!posts.length || posts.length < HOMEPAGE_MASTER_TALK_LIMIT || !slider) return false;
-  const homepagePosts = posts.slice(0, HOMEPAGE_MASTER_TALK_LIMIT);
-  slider.innerHTML = homepagePosts.map((post) => {
-    const acf = post.acf || {};
-    const speaker = [acf.speaker_title, acf.speaker_name].filter(Boolean).join(" ") || "名人講堂";
-    const portrait = masterTalkPortraitUrl(post.slug, speaker, post.title?.rendered, getPostImage(post, "assets/master-talk/portrait-care-psychology-chou.jpg"));
-    return `
-      <article>
-        <figure>
-          <img src="${escapeHTML(portrait)}" alt="${escapeHTML(speaker)}" />
-          <figcaption>${escapeHTML(speaker)}</figcaption>
-        </figure>
-        <div>
-          <h3>${post.title?.rendered || ""}</h3>
-          <p>${escapeHTML(stripHTML(acf.summary || post.excerpt?.rendered || post.content?.rendered || ""))}</p>
-          <a href="${escapeHTML(post.link || "#health")}" target="_blank" rel="noopener">閱讀更多</a>
-        </div>
-      </article>
-    `;
-  }).join("");
   return true;
 }
 
@@ -6127,6 +6169,11 @@ const homepageLatestUpdates = {
       date: "2026.05",
       title: "歲悅長照系統會計模組上線",
       body: "會計模組正式上線，串接財務、行政與照顧營運資料，強化內部管理與服務紀錄銜接。"
+    },
+    {
+      date: "2026.04.16",
+      title: "歲悅商標註冊完成",
+      body: "歲悅商標於 115 年 4 月 16 日完成註冊，涵蓋養老院、日間托老服務與居家看護服務等類別，讓品牌服務識別更完整。"
     },
     {
       date: "2026.03",
@@ -6192,7 +6239,7 @@ function recruitCardFallbackImage(item = {}, index = 0) {
   const text = `${item?.title || ""} ${item?.subtitle || ""} ${item?.body || ""} ${item?.link_url || ""}`;
   if (/督導|supervisor/.test(text)) return "assets/homepage-batch/orange-polo-supervisor-clear-display.jpg";
   if (/日照|日間|day.?care/.test(text)) return "assets/daycare-recruit-02-exercise-clear-display.jpg";
-  if (/個案|管理師|照顧計畫|case/.test(text)) return "assets/homepage-batch/03-supervisor-care-plan-fast.jpg";
+  if (/個案|管理師|照顧計畫|case/.test(text)) return "assets/brand-scenes/care-team-v2.jpg";
   if (/護理|nursing/.test(text)) return "assets/daycare-detail-04-checkin-fast.jpg";
   if (/失智|社區|據點|community/.test(text)) return "assets/homepage-batch/12-community-health-class-hires.jpg";
   if (/移工|菲律賓|migrant|philippines/i.test(text)) return "assets/migrant-recruit-04-communication-fast.jpg";
@@ -6348,14 +6395,54 @@ function renderSupabaseServices(items) {
 }
 
 const locationImageFallbacks = {
-  shilin: "assets/homepage-batch/16-taipei-service-office-fast.jpg",
-  datong: "assets/homepage-batch/family-consultation-clear.jpg",
-  "wanhua-a": "assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg",
-  "wanhua-b": "assets/homepage-batch/14-care-notes-fast.jpg",
-  xinyi: "assets/homepage-batch/family-consultation-clear.jpg",
-  xindian: "assets/homepage-batch/12-community-health-class-hires.jpg",
-  xinzhuang: "assets/homepage-batch/12-community-health-class-hires.jpg",
-  luzhu: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg"
+  shilin: "assets/location-shilin-home-dementia-v2.jpg",
+  datong: "assets/location-datong-dementia-v2.jpg",
+  "wanhua-a": "assets/location-wanhua-one-daycare-v2.jpg",
+  "wanhua-b": "assets/location-wanhua-two-daycare-v2.jpg",
+  xinyi: "assets/location-xinyi-dementia-v2.jpg",
+  xindian: "assets/location-xindian-integrated-care-v2.jpg",
+  xinzhuang: "assets/location-xinzhuang-migrant-training-v2.jpg",
+  luzhu: "assets/brand-scenes/rehab-v2.jpg"
+};
+
+const generatedLocationImageKeys = new Set(["shilin", "datong", "wanhua-a", "wanhua-b", "xinyi", "xindian", "xinzhuang"]);
+
+const locationEditorialOverrides = {
+  shilin: {
+    alt: "士林居家照顧與失智症據點服務照片",
+    type: "臺北市｜居家照顧・失智症據點",
+    desc: "結合居家照顧與失智症據點服務，陪伴長輩在熟悉生活圈維持日常，也支持家屬安排照顧。",
+    services: "居家照顧、失智症據點、家屬諮詢"
+  },
+  datong: {
+    alt: "大同失智症據點活動照片",
+    type: "臺北市｜失智症據點",
+    desc: "透過認知活動、社交參與與家屬支持，陪伴失智長輩維持熟悉的生活節奏。",
+    services: "失智症據點、認知活動、家屬支持"
+  },
+  "wanhua-a": { alt: "萬華一館日間照顧中心活動照片" },
+  "wanhua-b": { alt: "萬華二館日間照顧中心活動照片" },
+  xinyi: {
+    alt: "信義失智症據點活動照片",
+    type: "臺北市｜失智症據點",
+    desc: "以音樂、認知與團體活動促進長輩參與，並提供失智家庭照顧支持。",
+    services: "失智症據點、團體活動、家屬支持"
+  },
+  xindian: {
+    alt: "新店居家照顧復能與個案管理服務照片",
+    type: "新北市｜居家照顧・復能・個案管理",
+    desc: "由居家照顧、復能與個案管理團隊共同協作，依長輩能力與家庭需求安排照顧計畫。",
+    services: "居家照顧、復能服務、個案管理",
+    address: "新北市新店區居家照顧與復能服務據點"
+  },
+  xinzhuang: {
+    alt: "新莊移工照顧技能培訓照片",
+    type: "新北市｜移工培訓部門",
+    name: "歲悅新莊移工培訓部門",
+    desc: "提供家庭照顧移工實作訓練，強化安全移位、日常照顧與家庭溝通能力。",
+    services: "照顧技能培訓、安全移位、家庭溝通",
+    address: "新北市新莊區移工培訓服務據點"
+  }
 };
 
 function locationImageFallbackForKey(key = "") {
@@ -6365,7 +6452,9 @@ function locationImageFallbackForKey(key = "") {
 
 function normalizeLocationImage(item, key) {
   const fallback = normalizeLocalAssetUrl(contentImageUrl(locationImageFallbackForKey(key)));
-  const image = normalizeLocalAssetUrl(contentImageUrl(item?.image?.public_url || item?.metadata?.image_url || fallback));
+  const image = generatedLocationImageKeys.has(key)
+    ? fallback
+    : normalizeLocalAssetUrl(contentImageUrl(item?.image?.public_url || item?.metadata?.image_url || fallback));
   return { image, fallback };
 }
 
@@ -6393,7 +6482,8 @@ function normalizeSupabaseLocation(item) {
     pinClass: metadata.pin_class || `pin-${key.replace(/-a|-b/g, "")}`,
     pinStyle: metadata.pin_style || "",
     tabGroup: metadata.tab_group || "",
-    tabLabel: metadata.tab_label || ""
+    tabLabel: metadata.tab_label || "",
+    ...(locationEditorialOverrides[key] || {})
   };
 }
 
@@ -6673,50 +6763,48 @@ function applySiteSettings() {
 }
 
 async function loadSupabaseSiteSettings() {
-  if (!supabase) return false;
   if (siteSettingsLoaded) return true;
   if (siteSettingsPromise) return siteSettingsPromise;
   siteSettingsPromise = (async () => {
-  try {
-    const { data, error } = await supabase
-      .from("site_settings")
-      .select("setting_key, value_text, value_json")
-      .eq("is_enabled", true)
-      .order("sort_order", { ascending: true });
-    if (error) throw error;
-    siteSettings = (data || []).reduce((acc, item) => {
+  let applied = false;
+  const applyRows = (rows = []) => {
+    if (!rows.length) return false;
+    siteSettings = rows.reduce((acc, item) => {
       acc[item.setting_key] = item;
       return acc;
     }, {});
-    siteSettingsLoaded = true;
     applySiteSettings();
     return true;
+  };
+  try {
+    applied = applyRows(await loadCmsFallback("getSiteSettings"));
   } catch (error) {
-    console.warn("Supabase site settings unavailable, using static global settings.", error);
-    return false;
+    console.warn("CMS snapshot unavailable", error);
+  }
+  try {
+    if (supabase) {
+      const result = await supabase
+        .from("site_settings")
+        .select("setting_key, value_text, value_json")
+        .eq("is_enabled", true)
+        .order("sort_order", { ascending: true });
+      if (result.error) throw result.error;
+      applied = applyRows(result.data || []) || applied;
+    }
+  } catch (error) {
+    console.warn("CMS fallback", "site settings", error);
   } finally {
+    siteSettingsLoaded = applied;
     siteSettingsPromise = null;
   }
+  return applied;
   })();
   return siteSettingsPromise;
 }
 
-async function loadSupabaseHomeModules() {
-  if (!supabase) return false;
-
+function renderPublishedHomeModules(data = []) {
+  if (!data.length) return false;
   try {
-    const { data, error } = await supabase
-      .from("content_modules")
-      .select("id, module_key, item_key, title, subtitle, eyebrow, body, date_label, badge_label, link_text, link_url, metadata, sort_order, is_featured, image:media!content_modules_image_id_fkey(id, public_url, alt_text, file_name)")
-      .eq("target_slug", "home")
-      .eq("status", "published")
-      .eq("is_enabled", true)
-      .order("module_key", { ascending: true })
-      .order("sort_order", { ascending: true });
-
-    if (error) throw error;
-    if (!data?.length) return false;
-
     const groups = groupHomeModules(data);
     renderSupabaseSectionSettings(groups.section_setting);
     renderHomeHealthArticles();
@@ -6732,8 +6820,34 @@ async function loadSupabaseHomeModules() {
     homeModulesLoadedFromSupabase = true;
     return true;
   } catch (error) {
-    console.warn("Supabase home modules unavailable, falling back to WordPress/static homepage content.", error);
+    console.warn("Published home modules could not be rendered.", error);
     return false;
+  }
+}
+
+async function loadSupabaseHomeModules() {
+  let rendered = false;
+  try {
+    rendered = renderPublishedHomeModules(await loadCmsFallback("getHomeModules"));
+  } catch (error) {
+    console.warn("CMS snapshot unavailable", error);
+  }
+
+  try {
+    if (!supabase) return rendered;
+    const result = await supabase
+      .from("content_modules")
+      .select("id, module_key, item_key, title, subtitle, eyebrow, body, date_label, badge_label, link_text, link_url, metadata, sort_order, is_featured, image:media!content_modules_image_id_fkey(id, public_url, alt_text, file_name)")
+      .eq("target_slug", "home")
+      .eq("status", "published")
+      .eq("is_enabled", true)
+      .order("module_key", { ascending: true })
+      .order("sort_order", { ascending: true });
+    if (result.error) throw result.error;
+    return renderPublishedHomeModules(result.data || []) || rendered;
+  } catch (error) {
+    console.warn("CMS fallback", "home modules", error);
+    return rendered;
   }
 }
 
@@ -6813,71 +6927,74 @@ function renderExpertTalkSlider(talks) {
   return true;
 }
 
-async function loadSupabaseStoryDatabases() {
-  if (!supabase) return false;
-  try {
-    const now = new Date().toISOString();
-    const [{ data: stories, error: storyError }, { data: talks, error: talkError }] = await Promise.all([
-      supabase
-        .from("care_stories")
-        .select("*, cover_image:media!care_stories_cover_image_id_fkey(id, public_url, alt_text), avatar_image:media!care_stories_avatar_image_id_fkey(id, public_url, alt_text)")
-        .eq("is_enabled", true)
-        .eq("status", "published")
-        .lte("published_at", now)
-        .order("is_featured", { ascending: false })
-        .order("sort_order", { ascending: true })
-        .limit(12),
-      supabase
-        .from("expert_talks")
-        .select("*, image:media!expert_talks_image_id_fkey(id, public_url, alt_text)")
-        .eq("is_enabled", true)
-        .eq("status", "published")
-        .lte("published_at", now)
-        .order("is_featured", { ascending: false })
-        .order("sort_order", { ascending: true })
-        .limit(HOMEPAGE_MASTER_TALK_LIMIT)
-    ]);
-    if (storyError) throw storyError;
-    if (talkError) throw talkError;
-    const normalizedStories = (stories || []).map(normalizeCareStory);
-    const normalizedTalks = (talks || []).map(normalizeExpertTalk);
-    normalizedStories.forEach((story) => careStoryPageCache.set(story.slug, story));
-    normalizedTalks.forEach((talk) => expertTalkPageCache.set(talk.slug, talk));
-    const renderedStories = renderCareStorySlider(normalizedStories);
-    const renderedTalks = renderExpertTalkSlider(normalizedTalks);
-    return renderedStories || renderedTalks;
-  } catch (error) {
-    console.warn("Supabase care stories / expert talks unavailable.", error);
-    return false;
-  }
+function renderPublishedStoryDatabases(stories = [], talks = []) {
+  const normalizedStories = stories.map(normalizeCareStory);
+  const normalizedTalks = talks.map(normalizeExpertTalk);
+  normalizedStories.forEach((story) => careStoryPageCache.set(story.slug, story));
+  normalizedTalks.forEach((talk) => expertTalkPageCache.set(talk.slug, talk));
+  const renderedStories = renderCareStorySlider(normalizedStories);
+  const renderedTalks = renderExpertTalkSlider(normalizedTalks);
+  return renderedStories || renderedTalks;
 }
 
-async function loadWordPressContent() {
-  if (homeModulesLoadedFromSupabase) return;
+async function loadSupabaseStoryDatabases() {
+  let stories = [];
+  let talks = [];
   try {
-    const [careStories, health30, masterTalk] = await Promise.all([
-      fetchPostsByCategory(WP_CATEGORIES.careStories, 10),
-      fetchPostsByCategory(WP_CATEGORIES.health30, 10),
-      fetchPostsByCategory(WP_CATEGORIES.masterTalk, HOMEPAGE_MASTER_TALK_LIMIT)
-    ]);
-
-    renderHomepageLatestUpdates();
-    renderWordPressStories(careStories);
-    renderWordPressHealth(health30);
-    renderWordPressMasterTalk(masterTalk);
+    if (supabase) {
+      const now = new Date().toISOString();
+      const [storyResult, talkResult] = await Promise.all([
+        supabase
+          .from("care_stories")
+          .select("*, cover_image:media!care_stories_cover_image_id_fkey(id, public_url, alt_text), avatar_image:media!care_stories_avatar_image_id_fkey(id, public_url, alt_text)")
+          .eq("is_enabled", true)
+          .eq("status", "published")
+          .lte("published_at", now)
+          .order("is_featured", { ascending: false })
+          .order("sort_order", { ascending: true })
+          .limit(12),
+        supabase
+          .from("expert_talks")
+          .select("*, image:media!expert_talks_image_id_fkey(id, public_url, alt_text)")
+          .eq("is_enabled", true)
+          .eq("status", "published")
+          .lte("published_at", now)
+          .order("is_featured", { ascending: false })
+          .order("sort_order", { ascending: true })
+          .limit(HOMEPAGE_MASTER_TALK_LIMIT)
+      ]);
+      if (storyResult.error) throw storyResult.error;
+      if (talkResult.error) throw talkResult.error;
+      stories = storyResult.data || [];
+      talks = talkResult.data || [];
+    }
   } catch (error) {
-    console.warn("WordPress content unavailable, using static homepage content.", error);
+    console.warn("CMS fallback", "stories", error);
+  }
+  if (!stories.length && !talks.length) {
+    try {
+      ({ stories, talks } = await loadCmsFallback("getStoryDatabases"));
+    } catch (error) {
+      console.warn("CMS snapshot unavailable", error);
+      return false;
+    }
+  }
+  try {
+    return renderPublishedStoryDatabases(stories || [], talks || []);
+  } catch (error) {
+    console.warn("CMS story render", error);
+    return false;
   }
 }
 
 let locationData = {
   shilin: {
-    image: "assets/homepage-batch/16-taipei-service-office-fast.jpg",
-    alt: "士林服務據點照片",
-    type: "臺北市｜居家照顧站",
+    image: "assets/location-shilin-home-dementia-v2.jpg",
+    alt: "士林居家照顧與失智症據點服務照片",
+    type: "臺北市｜居家照顧・失智症據點",
     name: "歲悅士林失智據點 / 居家長照機構",
-    desc: "服務士林、北投生活圈，提供長照需求初談、居家照顧媒合與家屬諮詢。",
-    services: "居家照顧、喘息服務、家屬諮詢",
+    desc: "結合居家照顧與失智症據點服務，陪伴長輩在熟悉生活圈維持日常，也支持家屬安排照顧。",
+    services: "居家照顧、失智症據點、家屬諮詢",
     hours: "週一至週五 09:00-18:00",
     phone: "02-6604-5432",
     phoneHref: "tel:0266045432",
@@ -6885,12 +7002,12 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   datong: {
-    image: "assets/homepage-batch/family-consultation-clear.jpg",
-    alt: "大同服務據點照片",
-    type: "臺北市｜家屬諮詢站",
+    image: "assets/location-datong-dementia-v2.jpg",
+    alt: "大同失智症據點活動照片",
+    type: "臺北市｜失智症據點",
     name: "歲悅大同失智據點",
-    desc: "協助大同、南港與周邊家庭釐清照顧需求，安排到宅照顧與照顧計畫。",
-    services: "照顧評估、服務媒合、課程報名",
+    desc: "透過認知活動、社交參與與家屬支持，陪伴失智長輩維持熟悉的生活節奏。",
+    services: "失智症據點、認知活動、家屬支持",
     hours: "週一至週五 09:00-18:00",
     phone: "02-6604-5432",
     phoneHref: "tel:0266045432",
@@ -6898,38 +7015,38 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   "wanhua-a": {
-    image: "assets/homepage-batch/07-orange-apron-meal-prep-fast.jpg",
-    alt: "萬華居家服務據點照片",
-    type: "臺北市｜居家服務點",
-    name: "歲悅萬華日照1館",
-    desc: "支援萬華北側社區與高齡家庭，提供日常生活協助、陪伴與照顧紀錄回報。",
-    services: "生活照顧、陪伴服務、家屬回報",
+    image: "assets/location-wanhua-one-daycare-v2.jpg",
+    alt: "萬華一館日間照顧中心活動照片",
+    type: "臺北市｜日間照顧中心",
+    name: "歲悅萬華社區長照機構",
+    desc: "萬華一館提供日間照顧服務，支持長輩白天生活照顧、活動參與與家庭照顧安排。",
+    services: "日間照顧、生活支持、家屬諮詢",
     hours: "週一至週六 08:30-18:00",
     phone: "02-6604-5432",
     phoneHref: "tel:0266045432",
-    address: "臺北市萬華區北側服務據點",
+    address: "108 臺北市萬華區康定路43號2樓",
     email: "generalaffairs@suiyuecare.com"
   },
   "wanhua-b": {
-    image: "assets/homepage-batch/14-care-notes-fast.jpg",
-    alt: "萬華照顧支援據點照片",
-    type: "臺北市｜照顧支援點",
-    name: "歲悅萬華日照2館",
-    desc: "服務萬華南側生活圈，串接居家照顧、喘息安排與健康3.0照顧衛教。",
-    services: "喘息服務、健康衛教、照顧諮詢",
+    image: "assets/location-wanhua-two-daycare-v2.jpg",
+    alt: "萬華二館日間照顧中心活動照片",
+    type: "臺北市｜日間照顧中心",
+    name: "歲悅萬華二館社區長照機構",
+    desc: "萬華二館提供日間照顧服務，支持長輩白天生活照顧、活動參與與家庭照顧安排。",
+    services: "日間照顧、生活支持、家屬諮詢",
     hours: "週一至週五 09:00-17:30",
     phone: "02-6604-5432",
     phoneHref: "tel:0266045432",
-    address: "臺北市萬華區南側服務據點",
+    address: "108 臺北市萬華區西門里成都路159號2樓（雅香石頭火鍋二樓）",
     email: "generalaffairs@suiyuecare.com"
   },
   xinyi: {
-    image: "assets/homepage-batch/family-consultation-clear.jpg",
-    alt: "信義服務據點照片",
-    type: "臺北市｜健康促進站",
+    image: "assets/location-xinyi-dementia-v2.jpg",
+    alt: "信義失智症據點活動照片",
+    type: "臺北市｜失智症據點",
     name: "歲悅信義失智據點",
-    desc: "提供信義、南港周邊家屬照顧諮詢、預防延緩失能活動與課程報名。",
-    services: "健康促進、家屬課程、照顧諮詢",
+    desc: "以音樂、認知與團體活動促進長輩參與，並提供失智家庭照顧支持。",
+    services: "失智症據點、團體活動、家屬支持",
     hours: "週一至週五 09:00-18:00",
     phone: "02-6604-5432",
     phoneHref: "tel:0266045432",
@@ -6937,33 +7054,33 @@ let locationData = {
     email: "generalaffairs@suiyuecare.com"
   },
   xindian: {
-    image: "assets/homepage-batch/12-community-health-class-hires.jpg",
-    alt: "新店日間照顧據點照片",
-    type: "新北市｜日間照顧點",
+    image: "assets/location-xindian-integrated-care-v2.jpg",
+    alt: "新店居家照顧復能與個案管理服務照片",
+    type: "新北市｜居家照顧・復能・個案管理",
     name: "歲悅新店居家長照機構 / 歲悅職能治療所",
-    desc: "以白天托顧、團體活動、共餐與復能安排，支持新店、中和、永和家庭喘息。",
-    services: "日間照顧、社區共餐、延緩失能活動",
+    desc: "由居家照顧、復能與個案管理團隊共同協作，依長輩能力與家庭需求安排照顧計畫。",
+    services: "居家照顧、復能服務、個案管理",
     hours: "週一至週六 08:30-17:30",
     phone: "02-6604-5432",
     phoneHref: "tel:0266045432",
-    address: "新北市新店區日間照顧服務據點",
+    address: "新北市新店區居家照顧與復能服務據點",
     email: "generalaffairs@suiyuecare.com"
   },
   xinzhuang: {
-    image: "assets/homepage-batch/12-community-health-class-hires.jpg",
-    alt: "新莊社區據點照片",
-    type: "新北市｜社區照顧點",
-    name: "歲悅新莊辦公室",
-    desc: "串接新莊周邊社區照顧、預防延緩失能與家庭支持服務。",
-    services: "社區據點、健康促進、家屬支持",
+    image: "assets/location-xinzhuang-migrant-training-v2.jpg",
+    alt: "新莊移工照顧技能培訓照片",
+    type: "新北市｜移工培訓部門",
+    name: "歲悅新莊移工培訓部門",
+    desc: "提供家庭照顧移工實作訓練，強化安全移位、日常照顧與家庭溝通能力。",
+    services: "照顧技能培訓、安全移位、家庭溝通",
     hours: "週一至週五 09:00-17:30",
     phone: "02-6604-5432",
     phoneHref: "tel:0266045432",
-    address: "新北市新莊區社區照顧服務據點",
+    address: "新北市新莊區移工培訓服務據點",
     email: "generalaffairs@suiyuecare.com"
   },
   luzhu: {
-    image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+    image: "assets/brand-scenes/rehab-v2.jpg",
     alt: "蘆竹護理復能據點照片",
     type: "桃園市｜護理復能點",
     name: "歲悅蘆竹居家長照機構",
@@ -7308,6 +7425,20 @@ function renderSearchPage(query = "") {
   `;
 }
 
+async function renderHealthRouteOnce(route, query = "") {
+  if (pageView.dataset.prerenderedRoute !== route) pageView.innerHTML = "";
+  setPageViewBusy(true);
+  await Promise.all([
+    ensureStaticArticleRewrites(),
+    loadSupabaseHealthArticles(),
+    loadSupabaseArticleCategories()
+  ]);
+  if (routeSlugFromLocation().split("?")[0] !== route) return;
+  pageView.innerHTML = route === "health" ? renderHealthPage(query) : renderSearchPage(query);
+  setPageViewBusy(false);
+  optimizeImageLoading(pageView);
+}
+
 let supabaseCourses = [];
 let coursesLoadedFromSupabase = false;
 let coursesLoadFailed = false;
@@ -7388,33 +7519,35 @@ function getVisibleCourses() {
 }
 
 async function loadSupabaseCourses({ rerender = false } = {}) {
-  if (!supabase) {
-    coursesLoadFailed = true;
-    return [];
-  }
   if (coursesLoadPromise) return coursesLoadPromise;
   coursesLoadPromise = (async () => {
   try {
-    const { data, error } = await supabase
-      .from("courses")
-      .select("id, title, subtitle, excerpt, description, course_type, location, location_detail, starts_at, ends_at, price_text, capacity, seats_label, registration_status, registration_url, is_featured, sort_order, cover_image_id")
-      .eq("status", "published")
-      .eq("is_enabled", true)
-      .order("is_featured", { ascending: false })
-      .order("sort_order", { ascending: true })
-      .order("starts_at", { ascending: true, nullsFirst: false });
-    if (error) throw error;
-    supabaseCourses = data || [];
-    const coverIds = [...new Set(supabaseCourses.map((course) => course.cover_image_id).filter(Boolean))];
-    if (coverIds.length) {
-      const { data: coverRows, error: coverError } = await supabase
-        .from("media")
-        .select("id, public_url, alt_text, file_name, image_usage, focal_point")
-        .in("id", coverIds);
-      if (coverError) throw coverError;
-      courseCoverById = new Map((coverRows || []).map((cover) => [cover.id, cover]));
+    if (supabase) {
+      const { data, error } = await supabase
+        .from("courses")
+        .select("id, title, subtitle, excerpt, description, course_type, location, location_detail, starts_at, ends_at, price_text, capacity, seats_label, registration_status, registration_url, is_featured, sort_order, cover_image_id")
+        .eq("status", "published")
+        .eq("is_enabled", true)
+        .order("is_featured", { ascending: false })
+        .order("sort_order", { ascending: true })
+        .order("starts_at", { ascending: true, nullsFirst: false });
+      if (error) throw error;
+      supabaseCourses = data || [];
+      const coverIds = [...new Set(supabaseCourses.map((course) => course.cover_image_id).filter(Boolean))];
+      if (coverIds.length) {
+        const { data: coverRows, error: coverError } = await supabase
+          .from("media")
+          .select("id, public_url, alt_text, file_name, image_usage, focal_point")
+          .in("id", coverIds);
+        if (coverError) throw coverError;
+        courseCoverById = new Map((coverRows || []).map((cover) => [cover.id, cover]));
+      } else {
+        courseCoverById = new Map();
+      }
     } else {
-      courseCoverById = new Map();
+      const fallback = await loadCmsFallback("getCourses");
+      supabaseCourses = fallback.courses;
+      courseCoverById = new Map(fallback.covers.map((cover) => [cover.id, cover]));
     }
     coursesLoadedFromSupabase = true;
     coursesLoadFailed = false;
@@ -7423,11 +7556,21 @@ async function loadSupabaseCourses({ rerender = false } = {}) {
     }
     return supabaseCourses;
   } catch (error) {
-    console.warn("Supabase courses unavailable.", error);
-    coursesLoadedFromSupabase = false;
-    coursesLoadFailed = true;
-    courseCoverById = new Map();
-    return [];
+    console.warn("CMS fallback", "courses", error);
+    try {
+      const fallback = await loadCmsFallback("getCourses");
+      supabaseCourses = fallback.courses;
+      courseCoverById = new Map(fallback.covers.map((cover) => [cover.id, cover]));
+      coursesLoadedFromSupabase = true;
+      coursesLoadFailed = false;
+      return supabaseCourses;
+    } catch (fallbackError) {
+      console.warn("CMS snapshot unavailable", fallbackError);
+      coursesLoadedFromSupabase = false;
+      coursesLoadFailed = true;
+      courseCoverById = new Map();
+      return [];
+    }
   } finally {
     coursesLoadPromise = null;
   }
@@ -7438,10 +7581,12 @@ async function loadSupabaseCourses({ rerender = false } = {}) {
 async function renderCoursesPageFromCms() {
   home.classList.remove("active");
   pageView.classList.add("active");
+  pageView.innerHTML = "";
+  setPageViewBusy(true);
+  if (!coursesLoadedFromSupabase && !coursesLoadFailed) await loadSupabaseCourses();
+  if (routeSlugFromLocation().split("?")[0] !== "courses") return;
   pageView.innerHTML = renderCoursesPage();
-  if (!coursesLoadedFromSupabase && !coursesLoadFailed) {
-    loadSupabaseCourses({ rerender: true });
-  }
+  setPageViewBusy(false);
 }
 
 function renderCoursesPage() {
@@ -7522,13 +7667,11 @@ function renderCoursesPage() {
           <h2>課程報名確認</h2>
           <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
           <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
-          <label>Email<input name="Email" type="email" required placeholder="請輸入 Email" /></label>
           <label>您本次報名的課程<input name="課程" id="courseSignupTitle" type="text" readonly /></label>
           <input name="course_id" id="courseSignupId" type="hidden" />
           <input name="_subject" type="hidden" value="歲悅長照課程報名通知" />
           <input name="_captcha" type="hidden" value="false" />
           <input name="_honey" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為課程報名、通知與後續聯繫目的，使用我填寫的個人資料。</label>
           <p class="course-confirm-text">是否要報名？</p>
           <div class="course-modal-actions">
             <button type="button" data-course-close>否</button>
@@ -7679,7 +7822,7 @@ function renderAboutPage() {
     ["社區據點", "失智據點、健康促進、家屬課程與社區預防延緩失能。", "assets/homepage-batch/12-community-health-class-hires.jpg"],
     ["護理復能", "職能治療、復能訓練、居家安全建議與生活功能支持。", "assets/nursing-detail-02-walking-clear.jpg"],
     ["移工培訓", "把家庭照顧技能拆成可理解、可練習、可追蹤的課程。", "assets/homepage-batch/service-card-05-migrant-training-clear.jpg"],
-    ["教育品管", "用教材、訓練、稽核與改善流程承接服務品質。", "assets/quality-recruit-04-quality-meeting-clear.jpg"]
+    ["教育品管", "用教材、訓練、稽核與改善流程承接服務品質。", "assets/brand-scenes/quality-v2.jpg"]
   ];
   const aboutStats = [
     ["3", "核心服務縣市", "臺北、新北、桃園持續拓展"],
@@ -7972,7 +8115,7 @@ function renderAboutPage() {
 }
 
 function renderAboutPageThreeMinute() {
-  const heroImage = heroImageForViewport("/assets/homepage-batch/04-admin-team-office-fast.jpg");
+  const heroImage = heroImageForViewport("/assets/about/about-team-group-hero-v2.jpg");
   const chapters = [
     {
       id: "about-vision",
@@ -7991,7 +8134,7 @@ function renderAboutPageThreeMinute() {
       title: "組織使命",
       lead: "把照顧變成可以被理解、被安排、被回報，也被持續改善的日常系統。",
       body: "我們每天做的事，是把家庭的焦慮翻譯成服務計畫，把現場照顧整理成紀錄與回饋，再把經驗回收到教育訓練和品質管理。讓家屬不用一個人摸索，讓第一線照顧者不是只靠熱情硬撐。",
-      image: "/assets/homepage-batch/03-supervisor-care-plan-fast.jpg",
+      image: "/assets/brand-scenes/care-team-v2.jpg",
       points: ["先聽懂需求，再安排服務", "服務後留下家屬看得懂的紀錄", "用督導與教育支持第一線"]
     },
     {
@@ -8001,7 +8144,7 @@ function renderAboutPageThreeMinute() {
       title: "團隊文化",
       lead: "我們相信，溫柔不是抽象的感覺，而是每一次準時、每一筆紀錄、每一次回報都做得更清楚。",
       body: "歲悅的文化很簡單：把專業說成人聽得懂的話，把現場經驗變成可學習的方法，把家屬的不安接住，也把照顧者的壓力看見。團隊可以快速前進，但不犧牲長輩與家屬真正需要的安心感。",
-      image: "/assets/quality-recruit-04-quality-meeting-clear.jpg",
+      image: "/assets/brand-scenes/quality-v2.jpg",
       points: ["清楚溝通", "主動回報", "一起改善"]
     },
     {
@@ -8034,9 +8177,9 @@ function renderAboutPageThreeMinute() {
 
   const teamCards = [
     ["照顧服務員", "在長輩熟悉的生活場域中，協助沐浴、用餐、移位、陪伴與生活支持。", "/assets/homepage-batch/orange-polo-caregiver-clear.jpg"],
-    ["居服督導", "協助評估需求、安排服務、追蹤紀錄與回應家屬在服務中的變化。", "/assets/homepage-batch/03-supervisor-care-plan-fast.jpg"],
+    ["居服督導", "協助評估需求、安排服務、追蹤紀錄與回應家屬在服務中的變化。", "/assets/brand-scenes/care-team-v2.jpg"],
     ["日照與社區團隊", "設計白天作息、團體活動、共餐與社區支持，讓長輩有穩定參與。", "/assets/homepage-batch/02-daycare-group-exercise-hires.jpg"],
-    ["護理復能夥伴", "用健康觀察、復能訓練與居家安全建議，陪長輩練回生活能力。", "/assets/homepage-batch/13-rehab-walking-practice-fast.jpg"],
+    ["護理復能夥伴", "用健康觀察、復能訓練與居家安全建議，陪長輩練回生活能力。", "/assets/brand-scenes/rehab-v2.jpg"],
     ["教育品管與培訓", "把服務經驗整理成教材、課程、稽核與改善流程，讓品質能被複製。", "/assets/quality-detail-04-improvement-fast.jpg"],
     ["行政、系統與品牌", "支援表單、後台、內容、合作與營運資料，讓前線能專心照顧。", "/assets/homepage-batch/04-admin-team-office-fast.jpg"]
   ];
@@ -8163,108 +8306,86 @@ function renderAboutPageThreeMinute() {
   `;
 }
 
-function renderMilestonesPage() {
-  const heroImage = heroImageForViewport("/assets/milestones/homecare-agency-launch.jpg");
-  const milestoneStats = [
-    ["14", "重要歷程", "從機構成立、政府計畫、官方網站到系統模組逐步展開"],
-    ["8", "服務行政區", "臺北士林、北投、南港、萬華，以及新北新店、中和、永和等區域"],
-    ["5", "公共計畫與標案", "串接移工培訓、雇主支持、青年就業與失智社區服務"],
-    ["3", "系統模組上線", "會計、專案管理與電子用印模組陸續完成"]
-  ];
-  const timeline = [
-    ["2025", "06", "成立臺北市歲悅居家長照機構", "成立", "士林、北投、南港區居家長照服務啟動，建立到宅照顧、督導管理與家庭支持的服務基礎。", "/assets/milestones/homecare-agency-launch.jpg", "已完成"],
-    ["2025", "10", "得標高雄市家庭看護工作補充訓練計畫", "得標", "得標高雄市政府勞工局 115 年度「外國人從事家庭看護工作補充訓練計畫」，推動家庭看護照顧技能訓練。", "/assets/milestones/kaohsiung-caregiver-training.jpg", "已完成"],
-    ["2025", "12", "設立臺北市歲悅社區長照機構萬華一館", "設立", "萬華一館完成設立，作為社區長照服務的重要起點，提供長輩日間支持與家屬照顧資源。", "/assets/milestones/wanhua-community-care-one.jpg", "已完成"],
-    ["2025", "12", "第一版官方網站上線", "上線", "第一版官方網站完成上線，建立品牌資訊、服務介紹與聯絡入口，讓家庭能更快了解歲悅服務。", "/assets/milestones/official-website-v1-launch.jpg", "已完成"],
-    ["2026", "02", "得標勞動部移工數位學習計畫", "得標", "得標勞動部勞動力發展署 115-116 年度「移工數位學習計劃」，推動移工照顧技能數位化學習。", "/assets/milestones/migrant-digital-learning.jpg", "已完成"],
-    ["2026", "03", "參與 Team Taipei 挺就業青年畢業啟航", "參與", "參與臺北市勞工局 115 年度 Team Taipei 挺就業-青年畢業啟航，與青年人才交流長照職涯與服務現場。", "/assets/milestones/youth-employment-event.jpg", "已完成"],
-    ["2026", "04", "得標臺北市雇主安心計畫集中訓練", "得標", "得標臺北市勞動力重建運用處 115 年度「雇主安心計畫-集中訓練」，協助家庭雇主與看護工作者提升照顧品質。", "/assets/milestones/employer-training.jpg", "已完成"],
-    ["2026", "05", "歲悅長照系統會計模組上線", "上線", "會計模組正式上線，串接財務、行政與照顧營運資料，強化內部管理與服務紀錄銜接。", "/assets/milestones/accounting-module.jpg", "已完成"],
-    ["2026", "06", "設立臺北市歲悅社區長照機構萬華二館", "設立", "萬華二館完成設立，延伸社區長照服務量能，讓臺北市西區家庭有更多在地支持。", "/assets/milestones/wanhua-community-care-two.jpg", "已完成"],
-    ["2026", "06", "得標臺北市失智社區服務據點", "得標", "得標士林、大同、信義區失智社區服務據點，提供失智友善活動、家屬諮詢與社區支持。", "/assets/milestones/dementia-community-point.jpg", "已完成"],
-    ["2026", "06", "第二版官方網站上線", "上線", "第二版官方網站完成上線，優化服務動線、內容架構與視覺呈現，讓使用者更清楚找到所需資訊。", "/assets/milestones/official-website-v2-launch.jpg", "已完成"],
-    ["2026", "07", "併購新北市愛無限居家長照機構與好窩居家職能治療所", "併購", "整合新店、中和、永和居家照顧服務，並納入復能與個案管理專業，擴大新北照顧服務網絡。", "/assets/milestones/newtaipei-integration.jpg", "已完成"],
-    ["2026", "08", "歲悅長照系統專案管理模組上線", "上線", "專案管理模組正式上線，協助照顧服務、政府計畫、內部任務與跨部門進度更清楚被追蹤。", "/assets/milestones/project-management-module.jpg", "已完成"],
-    ["2026", "08", "歲悅長照系統電子用印模組上線", "上線", "電子用印模組導入行政流程，讓文件申請、核准、用印與紀錄留存更有效率。", "/assets/milestones/e-seal-module.jpg", "已完成"],
-  ].map(([year, month, title, tag, copy, image, status]) => ({ year, month, title, tag, copy, image, status }));
-  const sortedTimeline = [...timeline].sort((a, b) => Number(b.year) - Number(a.year) || Number(b.month) - Number(a.month));
-  const timelineGroups = [...new Set(sortedTimeline.map((item) => item.year))]
-    .map((year) => ({ year, items: sortedTimeline.filter((item) => item.year === year) }));
+async function fetchSupabaseMilestones() {
+  if (!supabase) return null;
+  const { data: rows, error } = await supabase
+    .from("milestones")
+    .select("id, year, month, title, tag, summary, status_label, image_id, image_url, sort_order")
+    .eq("is_enabled", true)
+    .eq("status", "published")
+    .lte("published_at", new Date().toISOString())
+    .order("year", { ascending: false })
+    .order("month", { ascending: false })
+    .order("sort_order", { ascending: true });
+  if (error) throw error;
 
-  return `
-    <div class="milestones-page">
-      <section class="hero service-detail-hero one-minute-service-hero milestones-full-hero">
-        <div
-          class="hero-bg"
-          style="background-image: linear-gradient(90deg, rgba(255, 253, 248, 0.96) 0%, rgba(255, 248, 238, 0.88) 42%, rgba(255, 248, 238, 0.42) 72%, rgba(255, 248, 238, 0.08) 100%), linear-gradient(180deg, rgba(255, 253, 248, 0.18), rgba(255, 239, 218, 0.28)), url('${escapeHTML(heroImage)}');"
-          aria-hidden="true"
-        ></div>
-        <div class="hero-copy service-detail-copy">
-          <p class="eyebrow">Milestones</p>
-          <h1>大事記</h1>
-          <p class="hero-slogan">沿著時間軸，看歲悅如何把照顧系統一步步整理成形。</p>
-          <p>從一通照顧諮詢開始，到北北桃服務網絡與教育品管系統，歲悅把每一個家庭的需求，慢慢整理成可以被理解、被追蹤、被信任的照顧歷程。</p>
-          <div class="one-minute-service-actions">
-            <a class="primary-button" href="#milestone-timeline" data-service-scroll="#milestone-timeline">看時間軸</a>
-            <a class="ghost-button" href="#contact">合作洽詢</a>
-          </div>
-          <div class="milestone-scroll-cue">
-            <span></span>
-            <strong>往下滑，看歲悅的發展歷程</strong>
-          </div>
-        </div>
-      </section>
+  const imageIds = [...new Set((rows || []).map((row) => row.image_id).filter(Boolean))];
+  let mediaById = new Map();
+  if (imageIds.length) {
+    const { data: mediaRows, error: mediaError } = await supabase
+      .from("media")
+      .select("id, public_url")
+      .in("id", imageIds);
+    if (mediaError) throw mediaError;
+    mediaById = new Map((mediaRows || []).map((media) => [media.id, media]));
+  }
 
-      <section class="milestone-stats">
-        ${milestoneStats.map(([value, label, copy]) => `<article><strong>${value}</strong><span>${label}</span><p>${copy}</p></article>`).join("")}
-      </section>
+  return (rows || []).map((row) => ({
+    id: row.id,
+    year: String(row.year),
+    month: String(row.month).padStart(2, "0"),
+    title: row.title || "未命名大事記",
+    tag: row.tag || "里程碑",
+    copy: row.summary || "",
+    image: row.image_url || mediaById.get(row.image_id)?.public_url || fallbackImages.serviceHero,
+    status: row.status_label || "已完成",
+    sortOrder: Number(row.sort_order || 0)
+  }));
+}
 
-      <section id="milestone-timeline" class="milestone-journey" aria-label="歲悅長照發展時間軸">
-        <div class="milestone-rail" aria-hidden="true">
-          <span class="milestone-rail-progress"></span>
-        </div>
-        <div class="milestone-list">
-          ${timelineGroups.map((group) => `
-            <section class="milestone-year-group" aria-label="${group.year} 年大事記">
-              <div class="milestone-year-heading">
-                <span>${group.year}</span>
-                <p>${group.year === "2026" ? "從最新上線準備往前回看，整理網站、內容、後台與資料化管理如何一步步成形。" : "12 月回到 1 月，回看歲悅如何建立服務、品管與營運基礎。"}</p>
-              </div>
-              ${group.items.map((item, index) => {
-                const globalIndex = sortedTimeline.findIndex((entry) => entry.year === item.year && entry.month === item.month);
-                return `
-                  <article class="milestone-card ${globalIndex === 0 ? "active" : ""}" data-milestone-card style="--card-index:${globalIndex}">
-                    <div class="milestone-year">
-                      <span>${item.month}月</span>
-                      <b>${item.year}</b>
-                    </div>
-                    <figure>
-                      <img src="${item.image}" alt="${item.title}" loading="${globalIndex < 2 ? "eager" : "lazy"}" />
-                    </figure>
-                    <div class="milestone-copy">
-                      <small>${globalIndex === 0 ? "<i>最新</i>" : ""}${item.tag}<em>${item.status}</em></small>
-                      <h3>${item.title}</h3>
-                      <p>${item.copy}</p>
-                    </div>
-                  </article>
-                `;
-              }).join("")}
-            </section>
-          `).join("")}
-        </div>
-      </section>
+async function renderMilestonesPageOnce() {
+  setPageViewBusy(true);
+  let milestones = null;
+  let templateFields = [];
+  try {
+    milestones = await fetchSupabaseMilestones();
+  } catch (error) {
+    console.warn("CMS fallback", "milestones", error);
+  }
+  if (!milestones?.length) {
+    try {
+      milestones = await loadCmsFallback("getMilestones");
+    } catch (error) {
+      console.warn("CMS snapshot unavailable", error);
+    }
+  }
+  try {
+    templateFields = await fetchSupabaseServiceFields("milestones");
+  } catch (error) {
+    console.warn("Supabase milestone page fields unavailable; using the bundled hero.", error);
+  }
 
-      <section class="milestone-next">
-        <p class="eyebrow">Next Chapter</p>
-        <h2>下一段歲悅，會繼續把照顧變簡單。</h2>
-        <p>我們會持續擴大照顧服務、人才招募、教育品管與合作網絡，讓更多家庭在需要照顧時，有一個清楚、親切、值得信任的入口。</p>
-        <div class="hero-actions">
-          <a class="primary-button" href="/talent">加入歲悅</a>
-          <a class="secondary-button" href="#contact">合作洽詢</a>
-        </div>
-      </section>
-    </div>
-  `;
+  try {
+    const { renderMilestonesPage: renderMilestones } = await import("./milestones-page.js");
+    if (routeSlugFromLocation() !== "milestones") return;
+    const milestoneHtml = renderMilestones(milestones, {
+      escapeHTML,
+      heroImageForViewport,
+      contentImageUrl,
+      fallbackImage: fallbackImages.serviceHero
+    });
+    pageView.innerHTML = templateFields.length
+      ? applyCmsEnhancedServicePage(milestoneHtml, "milestones", templateFields)
+      : milestoneHtml;
+  } catch (error) {
+    console.error("Milestones renderer unavailable.", error);
+    if (routeSlugFromLocation() !== "milestones") return;
+    pageView.innerHTML = `<section class="health-empty-state"><h2>大事記暫時無法載入</h2><p>請稍後重新整理頁面，或聯絡歲悅由專人協助。</p></section>`;
+  }
+  if (routeSlugFromLocation() !== "milestones") return;
+  setPageViewBusy(false);
+  initMilestonePage();
+  optimizeImageLoading(pageView);
 }
 
 const oneMinuteServices = {
@@ -8279,9 +8400,15 @@ const oneMinuteServices = {
     outcomes: ["沐浴、用餐、移位與生活支持", "服務後有紀錄，家屬看得懂", "督導追蹤，必要時調整服務"],
     flow: ["說明家中照顧情境", "確認區域、時段與照顧強度", "安排服務並回報紀錄"],
     scenes: [
-      { image: "assets/homecare-detail-02-care-plan-fast.jpg", title: "到宅評估", text: "先看長輩生活動線、起身移位、用餐與如廁情況。" },
-      { image: "assets/homecare-detail-03-safe-transfer-fast.jpg", title: "安全移位", text: "協助床邊、輪椅、浴室移動，降低跌倒與拉傷風險。" },
-      { image: "assets/homecare-detail-04-daily-support-fast.jpg", title: "日常支持", text: "陪伴用餐、盥洗、整理與服務紀錄，讓家屬掌握狀態。" }
+      { image: "assets/homecare-scene-assessment-fast.jpg", title: "到宅評估", text: "先看長輩生活動線、起身移位、用餐與如廁情況，確認適合的服務安排。" },
+      { image: "assets/homecare-scene-meal-prep-fast.jpg", title: "餐食備餐", text: "依長輩飲食習慣與吞嚥狀況，協助備餐、擺餐與進食觀察。" },
+      { image: "assets/homecare-scene-bathing-fast.jpg", title: "沐浴洗澡", text: "在安全與隱私被照顧好的前提下，協助沐浴、擦身與浴後整理。" },
+      { image: "assets/homecare-scene-outing-fast.jpg", title: "外出服務", text: "陪同外出、就醫或採買，協助移動安全與途中狀況留意。" },
+      { image: "assets/homecare-scene-joint-activity-fast.jpg", title: "肢體關節活動", text: "陪長輩做溫和關節活動與日常伸展，降低僵硬並維持活動度。" },
+      { image: "assets/homecare-scene-cleaning-fast.jpg", title: "環境整潔", text: "整理長輩主要生活空間、床邊與動線，讓家中照顧環境更安全。" },
+      { image: "assets/homecare-detail-02-care-plan-fast.jpg", title: "照顧計畫討論", text: "和長輩及家屬確認日常需求、服務目標與家中照顧節奏。" },
+      { image: "assets/homecare-detail-03-safe-transfer-fast.jpg", title: "安全移位", text: "協助練習起身、站立與行走，降低移位時的跌倒風險。" },
+      { image: "assets/homecare-detail-04-daily-support-fast.jpg", title: "日常支持", text: "從用餐到陪伴，把長輩熟悉的生活習慣穩穩接住。" }
     ],
     applySteps: ["留下聯絡方式與照顧地點", "專人電話釐清長輩狀態與可服務時段", "確認服務內容、頻率與開始日期"],
     primaryCta: "預約居家諮詢",
@@ -8296,40 +8423,40 @@ const oneMinuteServices = {
     badge: "白天托顧",
     idealFor: ["白天獨自在家不放心", "需要活動與社交刺激", "家屬上班需要穩定支持"],
     outcomes: ["日常作息、餐食、活動被安排", "中心照顧團隊觀察狀態", "減少家屬白天照顧壓力"],
-    flow: ["了解長輩生活能力", "安排參觀與適應", "建立出席、接送與回報方式"],
     scenes: [
+      { image: "assets/daycare-detail-01-exercise-fast.jpg", title: "團體運動", text: "透過適合長輩的伸展與肌力活動，維持身體活動度與參與感。" },
       { image: "assets/daycare-detail-02-meal-fast.jpg", title: "營養共餐", text: "依長輩吞嚥、飲食習慣與作息，安排白天餐食。" },
       { image: "assets/daycare-detail-03-activity-fast.jpg", title: "團體活動", text: "用運動、手作、認知與社交活動維持生活參與。" },
-      { image: "assets/daycare-detail-04-checkin-fast.jpg", title: "每日回報", text: "中心觀察精神、食慾與活動情形，必要時提醒家屬。" }
+      { image: "assets/daycare-detail-04-checkin-fast.jpg", title: "每日回報", text: "中心觀察精神、食慾與活動情形，必要時提醒家屬。" },
+      { image: "assets/daycare-scene-vitals-v1.jpg", title: "生命徵象量測", text: "依照照顧計畫與長輩狀況量測血壓、體溫或血氧，記錄每日變化，異常時及早通知家屬。" },
+      { image: "assets/daycare-scene-oral-exercise-v1.jpg", title: "健口操運動", text: "午餐前帶領嘴唇、舌頭與臉頰活動，維持口腔活動度，為進食與吞嚥做好準備。" },
+      { image: "assets/daycare-scene-shuttle-v1.jpg", title: "交通車接送", text: "依中心路線與可服務範圍安排接送，照顧人員協助上下車與輔具使用，讓每天往返更安心。" },
+      { image: "assets/service-journey-08-nap-time.jpg", title: "午間休息", text: "活動與用餐後安排安穩休息，讓白天作息有節奏、不過度疲累。" }
     ],
-    applySteps: ["填寫想參觀的中心或區域", "安排參觀、試托或適應討論", "確認接送、出席頻率與補助資料"],
     primaryCta: "詢問日照名額",
     secondaryCta: "申請服務須知"
   },
   community: {
-    eyebrow: "Community",
-    title: "社區據點",
-    oneLiner: "把健康促進、共餐、活動與資源諮詢放在熟悉社區。",
-    image: "assets/community-detail-01-exercise-hero-hires.jpg",
-    imageAlt: "社區據點健康促進活動",
-    badge: "在地支持",
-    idealFor: ["想讓長輩增加外出", "需要預防延緩失能活動", "家屬想先理解長照資源"],
-    outcomes: ["固定活動與健康促進", "共餐、陪伴與社交連結", "可銜接居家、日照或其他資源"],
-    flow: ["確認所在區域", "選擇適合活動或諮詢", "安排參與並追蹤需求"],
+    eyebrow: "Dementia Community Hub",
+    title: "失智社區服務據點",
+    oneLiner: "輕度失智社區課程。",
+    image: "assets/community-dementia-hero-v3.jpg",
+    imageAlt: "失智社區課程",
+    badge: "失智課程",
+    idealFor: ["輕度失智"],
+    outcomes: ["社區課程"],
     scenes: [
-      { image: "assets/community-detail-02-meal-fast.jpg", title: "社區共餐", text: "讓長輩有固定外出理由，也有人留意飲食與精神狀態。" },
-      { image: "assets/community-detail-03-workshop-fast.jpg", title: "健康活動", text: "肌力、平衡、認知與手作活動，做在熟悉生活圈裡。" },
-      { image: "assets/community-detail-04-consult-fast.jpg", title: "資源諮詢", text: "協助家屬理解可申請的長照服務與下一步窗口。" }
+      { image: "assets/community-course-v3.jpg", title: "社區課程" }
     ],
-    applySteps: ["告訴我們所在里別或常去區域", "確認近期活動、共餐或諮詢時段", "由據點協助報名與後續資源銜接"],
-    primaryCta: "詢問社區活動",
-    secondaryCta: "查看服務據點"
+    applySteps: ["聯絡鄰近據點"],
+    primaryCta: "詢問課程名額",
+    secondaryCta: "查看服務資格"
   },
   nursing: {
     eyebrow: "Nursing Rehab",
     title: "護理復能",
     oneLiner: "用護理觀察與復能目標，陪長輩安全練回生活能力。",
-    image: "assets/nursing-detail-02-walking-hero-fast.jpg",
+    image: "assets/brand-scenes/rehab-v2.jpg",
     imageAlt: "護理復能步行練習",
     badge: "健康與復能",
     idealFor: ["出院後行動變弱", "擔心跌倒或健康變化", "需要家屬照顧教學"],
@@ -8338,7 +8465,10 @@ const oneMinuteServices = {
     scenes: [
       { image: "assets/nursing-detail-01-vitals-clear.jpg", title: "健康觀察", text: "量測血壓、皮膚、食慾、睡眠與用藥，提早看見變化。" },
       { image: "assets/nursing-detail-02-walking-clear.jpg", title: "步行練習", text: "把復能目標放回生活，練起身、移位、走路與安全轉身。" },
-      { image: "assets/nursing-detail-03-home-safety-fast.jpg", title: "居家安全", text: "檢查浴室、床邊、動線與輔具，給家屬可執行的建議。" }
+      { image: "assets/nursing-detail-03-home-safety-fast.jpg", title: "居家安全", text: "檢查浴室、床邊、動線與輔具，給家屬可執行的建議。" },
+      { image: "assets/nursing-detail-04-care-plan-fast.jpg", title: "復能計畫與家屬教學", text: "將專業評估轉成家屬在家也能接續的照顧與練習方法。" },
+      { image: "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg", title: "血壓與健康量測", text: "透過定期量測與紀錄，協助家屬掌握長輩日常健康變化。" },
+      { image: "assets/brand-scenes/rehab-v2.jpg", title: "平衡與步行訓練", text: "依個人能力安排平衡、站立與步行練習，循序找回生活信心。" }
     ],
     applySteps: ["說明診斷、出院時間或目前身體狀況", "專人確認適合的護理或復能目標", "安排服務並提供家屬照顧提醒"],
     primaryCta: "諮詢護理復能",
@@ -8348,7 +8478,7 @@ const oneMinuteServices = {
     eyebrow: "Migrant Training",
     title: "移工培訓",
     oneLiner: "讓家庭照顧移工學會安全照顧、溝通與日常觀察。",
-    image: "assets/migrant-detail-01-classroom-hero-fast.jpg",
+    image: "assets/brand-scenes/migrant-v2.jpg",
     imageAlt: "移工照顧培訓課程",
     badge: "技能訓練",
     idealFor: ["家中剛聘請移工", "照顧方法常常不一致", "希望降低移位與沐浴風險"],
@@ -8368,7 +8498,7 @@ const oneMinuteServices = {
     eyebrow: "Quality",
     title: "教育品管",
     oneLiner: "把照顧經驗變成教材、訓練、稽核與改善流程。",
-    image: "assets/quality-detail-04-improvement-hero-fast.jpg",
+    image: "assets/brand-scenes/quality-v2.jpg",
     imageAlt: "教育品管品質改善會議",
     badge: "品質系統",
     idealFor: ["需要建立訓練制度", "服務品質想更一致", "希望用紀錄看見改善點"],
@@ -8606,7 +8736,7 @@ const oneMinuteServiceStories = {
   nursing: [
     {
       name: "王小姐",
-      image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+      image: "assets/brand-scenes/rehab-v2.jpg",
       title: "「不是催長輩走快一點，而是陪他慢慢有把握。」",
       text: "復能團隊把目標拆小，從安全起身、站穩到短距離步行，家屬也看得懂進步。"
     },
@@ -8712,7 +8842,7 @@ const oneMinuteServiceStories = {
     },
     {
       name: "黃先生",
-      image: "assets/quality-recruit-04-quality-meeting-clear.jpg",
+      image: "assets/brand-scenes/quality-v2.jpg",
       title: "「紀錄格式一致後，交班少了很多漏接。」",
       text: "服務重點、異常狀況和後續追蹤都用同一套格式整理，新舊人員交接時比較清楚。"
     },
@@ -8844,12 +8974,14 @@ function normalizeServiceInsight(item) {
   if (item && typeof item === "object") {
     return {
       title: item.title || "",
-      text: item.text || serviceInsightDetails[item.title] || ""
+      text: item.text || serviceInsightDetails[item.title] || "",
+      image: typeof item.image === "string" ? item.image : ""
     };
   }
   return {
     title: String(item || ""),
-    text: serviceInsightDetails[item] || "我們會依你的情境協助判斷，讓下一步更清楚。"
+    text: serviceInsightDetails[item] || "我們會依你的情境協助判斷，讓下一步更清楚。",
+    image: ""
   };
 }
 
@@ -8857,7 +8989,8 @@ function renderServiceInsightList(items = [], scenes = [], offset = 0) {
   return items.map((item, index) => {
     const insight = normalizeServiceInsight(item);
     const scene = scenes[(index + offset) % Math.max(scenes.length, 1)] || {};
-    const sceneImage = scene.image ? contentImageUrl(scene.image) : "";
+    const sceneImageSource = insight.image || scene.image || "";
+    const sceneImage = sceneImageSource ? contentImageUrl(sceneImageSource) : "";
     return `
       <li>
         <span class="service-timeline-dot">${String(index + 1).padStart(2, "0")}</span>
@@ -8877,7 +9010,7 @@ function renderServiceSceneCards(items = []) {
       <img src="${escapeHTML(contentImageUrl(item.image))}" alt="${escapeHTML(item.title)}" />
       <div>
         <strong>${escapeHTML(item.title)}</strong>
-        <p>${escapeHTML(item.text)}</p>
+        <p>${escapeHTML(item.text || "依長輩狀況安排合適服務。")}</p>
       </div>
     </article>
   `).join("");
@@ -8918,10 +9051,15 @@ function renderServiceStorySection(service, slug) {
   `;
 }
 
-function renderServicePlainList(items = []) {
+function renderDayCareChecklistIcon() {
+  return '<span data-day-care-checklist-icon></span>';
+}
+
+function renderServicePlainList(items = [], options = {}) {
+  const leadingIcon = typeof options?.leadingIcon === "function" ? options.leadingIcon : null;
   return items.map((item, index) => `
     <li class="${item.featured ? "is-featured" : ""} ${item.cta ? "has-cta" : ""}">
-      <span>${String(index + 1).padStart(2, "0")}</span>
+      <span${leadingIcon ? ' class="service-info-item-icon" aria-hidden="true"' : ""}>${leadingIcon ? leadingIcon(item, index) : String(index + 1).padStart(2, "0")}</span>
       <strong>${escapeHTML(item.title)}</strong>
       ${item.text ? `<p>${escapeHTML(item.text)}</p>` : ""}
       ${Array.isArray(item.points) && item.points.length ? `
@@ -8929,74 +9067,136 @@ function renderServicePlainList(items = []) {
           ${item.points.map((point) => `<li>${escapeHTML(point)}</li>`).join("")}
         </ul>
       ` : ""}
+      ${Array.isArray(item.checklist) && item.checklist.length ? `
+        <details class="day-care-checklist-details">
+          <summary>${escapeHTML(item.checklistLabel || "查看完整入托用品清單")}</summary>
+          <ul>${item.checklist.map((checklistItem) => `<li>${escapeHTML(checklistItem)}</li>`).join("")}</ul>
+        </details>
+      ` : ""}
       ${item.cta ? `<a class="service-info-link" href="${escapeHTML(item.href || "#service-contact")}" data-service-scroll="${escapeHTML(item.href || "#service-contact")}">${escapeHTML(item.cta)}</a>` : ""}
     </li>
   `).join("");
 }
 
+function renderDayCareMobileChecklist(items = []) {
+  return `
+    <details class="day-care-mobile-checklist">
+      <summary>
+        <span>入托用品</span>
+        <strong>${items.length} 項清單</strong>
+        <i aria-hidden="true">＋</i>
+      </summary>
+      <ol>
+        ${items.map((item) => `
+          <li>
+            <span class="day-care-mobile-item-icon" aria-hidden="true">${renderDayCareChecklistIcon(item)}</span>
+            <div>
+              <strong>${escapeHTML(item.title || "準備項目")}</strong>
+              ${item.text ? `<span>${escapeHTML(item.text)}</span>` : ""}
+            </div>
+          </li>
+        `).join("")}
+      </ol>
+    </details>
+  `;
+}
+
 function serviceFeeBody(slug) {
-  if (slug === "home-care" || slug === "day-care" || slug === "nursing") {
-    return "實際自付額會依長照等級、補助身分、核定額度與使用頻率不同，我們可先協助初步試算。";
-  }
+  if (slug === "home-care") return "實際自付額會依長照等級、補助身分、核定額度與使用頻率不同；我們可先協助初步試算，再確認適合的居家照顧安排。";
+  if (slug === "day-care") return "日間照顧會依長照等級、全日或半日、接送與附加服務，以及補助身分估算；中心可協助試算每月可能費用。";
+  if (slug === "nursing") return "護理復能會依專業目標、核定次數與照顧計畫安排；先確認身體狀況與期待改善目標，再估算可用補助與自付額。";
   return "實際費用會依服務內容、補助資格、區域與頻率確認，先留下需求即可協助試算。";
 }
 
-function serviceFeeItems(service, slug) {
-  if (slug === "home-care") {
-    return [
-      { title: "先看補助與照顧計畫", text: "居家照顧不是每項都要全額自費。窗口會先確認長照等級、核定額度、身分別與你想安排的頻率，再估算每月可能自付額。", featured: true },
-      {
-        title: "常見居家項目參考",
-        text: "以下為長照給（支）付價格參考，格式為一般價格／原民區或離島價格，實際自付額會再依補助比例計算。",
-        points: [
-          "BA01 基本身體清潔：NT$260／NT$310",
-          "BA02 基本日常照顧：NT$195／NT$235",
-          "BA07 協助沐浴及洗頭：NT$325／NT$385",
-          "BA14 陪同就醫：NT$685／NT$825",
-          "BA15 家務協助：NT$195／NT$235"
-        ]
-      },
-      { title: "想知道每月大概多少？", text: "留下長輩狀況、所在地區、每週想安排幾次服務，我們會協助抓出比較貼近家庭日常的試算範圍。", cta: "請窗口協助試算", href: "#service-contact" }
-    ];
-  }
-  if (slug === "day-care") {
-    return [
-      { title: "先看等級、全日或半日", text: "日間照顧會依長照需要等級、全日或半日、每週出席天數來估算。若需要接送、晚餐或沐浴等中心附加服務，會再一起確認。", featured: true },
-      {
-        title: "日照常見價格範圍",
-        text: "以下為長照給（支）付價格參考，格式為一般價格／原民區或離島價格；交通接送與附加服務需依中心安排另行確認。",
-        points: [
-          "BB01/BB02 等級二：全日 NT$675／NT$810、半日 NT$340／NT$405",
-          "BB13/BB14 等級八：全日 NT$1,285／NT$1,540、半日 NT$645／NT$770",
-          "BD01 協助沐浴：NT$200／NT$240，實際需要時可能另計",
-          "BD02 晚餐：NT$150／NT$180；BD03 接送：NT$100／NT$120，符合條件時可能另計"
-        ]
-      },
-      { title: "想估一週去幾天的費用？", text: "告訴我們長照等級、想安排全日或半日、每週天數與是否需要接送，中心窗口可以先幫你抓大概自付額。", cta: "請中心協助試算", href: "#service-contact" }
-    ];
-  }
-  if (slug === "nursing") {
-    return [
-      { title: "先訂專業目標", text: "護理復能不是把所有項目都排上去，而是先看長輩目前最需要改善的生活能力、營養吞嚥或照護風險，再確認適合的服務組合。", featured: true },
-      {
-        title: "專業服務價格參考",
-        text: "以下為長照給（支）付價格參考，格式為一般價格／原民區或離島價格；實際自付額依補助資格、核定額度與服務次數確認。",
-        points: [
-          "CA07 IADLs／ADLs 復能：3 次措施 NT$4,500／NT$5,400",
-          "CA08 個別化服務計畫（ISP）：4 次措施 NT$6,000／NT$7,200",
-          "CB01 營養照護：4 次措施 NT$4,000／NT$4,800",
-          "CB02 進食與吞嚥照護、CB04 臥床或長期活動受限照護：6 次措施 NT$9,000／NT$10,800",
-          "CB03 困擾行為照護：3 次措施 NT$4,500／NT$5,400"
-        ]
-      },
-      { title: "不確定適合哪一項？", text: "先描述診斷、出院時間、行走能力、飲食吞嚥或目前最擔心的狀況，我們會協助判斷是否適合安排護理復能。", cta: "請專人協助判斷", href: "#service-contact" }
-    ];
-  }
+function serviceFeeSummaryItems(service, slug) {
   return [
     { title: "依服務內容確認", text: "費用會依服務類型、頻率、時段、區域與是否使用補助而不同。" },
     { title: "可先諮詢試算", text: "不用先準備完整資料，留下需求後會由窗口協助初步判斷。" },
     { title: "確認後再安排", text: "服務內容、費用與開始日期會確認清楚後再進入安排流程。" }
   ];
+}
+
+let serviceFeeDataPromise = null;
+
+function shouldRenderServiceFeeGroups(slug) {
+  return ["home-care", "day-care", "nursing"].includes(slug);
+}
+
+function serviceFeeHasCopay(slug) {
+  return slug === "home-care" || slug === "day-care" || slug === "nursing";
+}
+
+function loadServiceFeeData() {
+  if (!serviceFeeDataPromise) {
+    serviceFeeDataPromise = import("./service-fees.js").catch((error) => {
+      serviceFeeDataPromise = null;
+      throw error;
+    });
+  }
+  return serviceFeeDataPromise;
+}
+
+function hydrateServiceFeeCodeGroups(root = document) {
+  const targets = root.querySelectorAll?.("[data-fee-groups]") || [];
+  targets.forEach((target) => {
+    const slug = target.dataset.feeGroups;
+    if (!shouldRenderServiceFeeGroups(slug) || target.dataset.loaded === "true" || target.dataset.loaded === "loading") return;
+    target.dataset.loaded = "loading";
+    loadServiceFeeData()
+      .then(({ serviceFeeGroups, renderFeeAllowanceCard, renderFeeCodeGroups, bindFeeCopayPicker }) => {
+        if (routeSlugFromLocation().split("?")[0] !== slug) return;
+        const groups = serviceFeeGroups(slug);
+        target.innerHTML = `${renderFeeAllowanceCard(slug)}${renderFeeCodeGroups(groups, serviceFeeHasCopay(slug), false)}`;
+        if (serviceFeeHasCopay(slug)) bindFeeCopayPicker(target.closest(".service-fee-section") || target);
+        target.dataset.loaded = "true";
+      })
+      .catch((error) => {
+        console.warn("Service fee code table unavailable.", error);
+        target.dataset.loaded = "error";
+        target.innerHTML = `<p class="fee-code-loading">碼表暫時無法載入，請稍後重新整理或直接請窗口協助查詢。</p>`;
+      });
+  });
+}
+
+function renderServiceFeeSection(service, slug) {
+  if (!shouldRenderServiceFeeGroups(slug)) {
+    return renderServiceInfoSection({
+      eyebrow: "Pricing",
+      title: "費用怎麼算",
+      body: serviceFeeBody(slug),
+      items: serviceFeeSummaryItems(service, slug),
+      className: "service-fee-section"
+    });
+  }
+  return `
+    <section class="service-fee-section service-detail-section service-motion">
+      <div class="service-section-head">
+        <div>
+          <p class="eyebrow">Pricing</p>
+          <h2>費用怎麼算</h2>
+        </div>
+        <span>${escapeHTML(serviceFeeBody(slug))}</span>
+      </div>
+      ${serviceFeeHasCopay(slug) ? renderFeeHouseholdPicker(slug) : ""}
+      <div class="fee-code-groups" data-fee-groups="${escapeHTML(slug)}" aria-live="polite">
+        <p class="fee-code-loading">給付額度與收費碼表載入中...</p>
+      </div>
+    </section>
+  `;
+}
+
+function renderFeeHouseholdPicker(slug = "service") {
+  const titleId = `${slug}-fee-household-title`;
+  return `
+    <div class="fee-household-picker" data-fee-household-picker role="radiogroup" aria-labelledby="${escapeHTML(titleId)}">
+      <strong class="fee-household-title" id="${escapeHTML(titleId)}">先選擇您的補助身分</strong>
+      <div class="fee-household-options">
+        <label><input type="radio" name="fee-household" value="general" checked><span>我是一般戶<small>自付 16%</small></span></label>
+        <label><input type="radio" name="fee-household" value="mid-low"><span>我是中低收入戶<small>自付 5%</small></span></label>
+        <label><input type="radio" name="fee-household" value="low"><span>我是低收入戶<small>自付 0%</small></span></label>
+      </div>
+      <output data-fee-copay-status aria-live="polite">目前顯示：一般戶，自付一般價格的 16%</output>
+    </div>`;
 }
 
 function serviceLocationItems(service, slug) {
@@ -9007,11 +9207,33 @@ function serviceLocationItems(service, slug) {
       { title: "到場討論", text: "若流程複雜，可再安排現場訪談或工作坊確認細節。" }
     ];
   }
+  if (slug === "nursing") {
+    return [
+      { title: "新北市全區", text: "護理復能服務涵蓋新北市全區，實際到訪時間依需求、服務項目與人力安排確認。" }
+    ];
+  }
   return [
     { title: "台北市", text: "依服務項目、時段與人力安排確認可服務區域。" },
     { title: "新北市", text: "可先留下所在地區，窗口會協助確認最近可銜接資源。" },
     { title: "桃園市", text: "日照、居家、社區與其他服務會依各據點與服務範圍確認。" }
   ];
+}
+
+function renderNursingLocationTemplate(service) {
+  const items = serviceLocationItems(service, "nursing");
+  return `
+    <div class="day-care-home-map nursing-home-map">
+      <div class="map-column">
+        <div class="north-map nursing-north-map" aria-label="護理復能服務區域地圖">
+          <img class="map-image" src="assets/nursing-new-taipei-service-map-v1.jpg" alt="護理復能服務範圍為新北市全區" />
+          <span class="nursing-map-region-label">新北市全區</span>
+        </div>
+      </div>
+      <ol class="service-info-grid nursing-location-list">
+        ${renderServicePlainList(items)}
+      </ol>
+    </div>
+  `;
 }
 
 function serviceNoticeItems(service, slug) {
@@ -9022,7 +9244,8 @@ function serviceNoticeItems(service, slug) {
   ];
 }
 
-function renderServiceInfoSection({ eyebrow, title, body, items, className = "", id = "" }) {
+function renderServiceInfoSection({ eyebrow, title, body, items, className = "", id = "", content = "" }) {
+  const hasItems = Array.isArray(items) && items.length > 0;
   return `
     <section${id ? ` id="${escapeHTML(id)}"` : ""} class="service-info-section service-detail-section service-motion ${escapeHTML(className)}">
       <div class="service-section-head">
@@ -9032,8 +9255,62 @@ function renderServiceInfoSection({ eyebrow, title, body, items, className = "",
         </div>
         <span>${escapeHTML(body)}</span>
       </div>
-      <ol class="service-info-grid">
+      ${hasItems ? `<ol class="service-info-grid">
         ${renderServicePlainList(items)}
+      </ol>` : ""}
+      ${content}
+    </section>
+  `;
+}
+
+function renderDayCareStartChecklist() {
+  const checklist = [
+    "衛生紙、濕紙巾",
+    "個人物品，如牙籤牙線、梳子",
+    "保溫瓶與盥洗用品",
+    "棉被或薄毯、替換衣物",
+    "沐浴用品，建議按壓式瓶裝",
+    "藥盒與服藥說明",
+    "尿布、看護墊等必要衛生用品"
+  ];
+  const items = [
+    { title: "先參觀，再試上一日", text: "先帶長輩認識環境、活動與作息；確認適應良好，再安排一日體驗。" },
+    { title: "提供六個月內體檢文件", text: "包含抽血、B 肝表面抗原、尿液、胸部 X 光與皮膚檢查；不需糞便檢查。" },
+    {
+      title: "備妥日常用品與用藥",
+      text: "藥盒請先分裝並附服藥說明；其餘用品依長輩生活習慣準備即可。",
+      checklist,
+      checklistLabel: "查看完整入托用品清單"
+    }
+  ];
+  return `
+    <section id="day-care-start" class="service-info-section service-detail-section service-motion day-care-start-section" aria-label="日照入托規範與準備">
+      <div class="service-section-head">
+        <div>
+          <p class="eyebrow">Before You Start</p>
+          <h2>入托前，先知道這三件事</h2>
+        </div>
+        <span>請依長輩平時生活習慣準備；不確定的項目可在參觀或試上一日後再和中心確認。</span>
+      </div>
+      <ol class="service-info-grid">
+        ${renderServicePlainList(items, { leadingIcon: renderDayCareChecklistIcon })}
+      </ol>
+    </section>
+  `;
+}
+
+function renderNursingDayCareTemplateNotes(service) {
+  return `
+    <section id="service-apply-notes" class="service-info-section service-detail-section service-motion day-care-start-section" aria-label="護理復能申請服務須知">
+      <div class="service-section-head">
+        <div>
+          <p class="eyebrow">Before You Start</p>
+          <h2>申請服務須知</h2>
+        </div>
+        <span>申請前不用焦慮準備資料，先把目前情境說清楚，窗口會帶你往下一步走。</span>
+      </div>
+      <ol class="service-info-grid">
+        ${renderServicePlainList(serviceNoticeItems(service, "nursing"))}
       </ol>
     </section>
   `;
@@ -9056,11 +9333,9 @@ function renderServiceContactSection(service, slug) {
         <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <label>姓名<input type="text" name="姓名" placeholder="請輸入姓名" required /></label>
         <label>電話<input type="tel" name="電話" placeholder="請輸入聯絡電話" required /></label>
-        <label>Email<input type="email" name="Email" placeholder="可選填，方便寄送回覆紀錄" /></label>
+        <label>Email（非必填）<input type="email" name="Email" placeholder="填寫後會收到確認信" autocomplete="email" inputmode="email" /></label>
         <label>需求<select name="需求" required>${renderContactNeedOptions(contactNeed)}</select></label>
-        <label class="form-notes">說明<textarea name="說明" rows="6" placeholder="可簡單描述目前遇到的情境、希望詢問的服務內容、所在地區或方便聯絡時間"></textarea></label>
-        <p class="form-expectation">送出後會寄到歲悅窗口並留存在系統，窗口會依需求類型安排專人回覆。</p>
-        <label class="privacy-consent"><input type="checkbox" name="privacy_consent" required />我同意歲悅長照集團為回覆諮詢、服務安排與後續聯繫目的，使用我填寫的個人資料。</label>
+        <label class="form-notes">說明<textarea name="說明" rows="6" placeholder="可補充目前情況、所在地區或方便聯絡時間">我要申請服務</textarea></label>
         <p class="contact-form-status" role="status" aria-live="polite" hidden></p>
         <button type="submit">送出${escapeHTML(service.title)}諮詢</button>
       </form>
@@ -9068,12 +9343,26 @@ function renderServiceContactSection(service, slug) {
   `;
 }
 
-function renderOneMinuteServicePage(slug) {
+function renderOneMinuteServicePage(slug, layout = {}) {
   const service = oneMinuteServices[slug] || oneMinuteServices["home-care"];
   const contactNeed = service.contactNeed || "長照服務諮詢";
+  const isDayCare = slug === "day-care";
+  const isHomeCare = slug === "home-care";
+  const isCommunity = slug === "community";
+  const usesHorizontalJourney = isDayCare || isHomeCare || isCommunity;
+  const usesDayCareTemplate = layout.template === "day-care";
+  const usesNursingLocationTemplate = usesDayCareTemplate && slug === "nursing";
+  const hasInteractiveLocationMap = usesHorizontalJourney || usesNursingLocationTemplate;
+  const secondaryTarget = isDayCare
+    ? "#day-care-start"
+    : isCommunity
+      ? "#community-eligibility"
+    : slug === "nursing"
+      ? serviceSecondaryHref(service.secondaryCta)
+      : "#service-apply-notes";
   const heroImage = heroImageForViewport(service.image);
   return `
-    <div class="service-detail-page one-minute-service-page ${escapeHTML(slug)}-page">
+    <div class="service-detail-page one-minute-service-page ${usesDayCareTemplate ? "day-care-template-page" : ""} ${escapeHTML(slug)}-page">
       <section class="hero service-detail-hero one-minute-service-hero ${escapeHTML(slug)}-hero">
         <div
           class="hero-bg"
@@ -9088,7 +9377,7 @@ function renderOneMinuteServicePage(slug) {
           <p>${escapeHTML(service.oneLiner)}</p>
           <div class="one-minute-service-actions">
             <a class="primary-button" href="#service-contact" data-service-scroll="#service-contact" data-contact-need="${escapeHTML(contactNeed)}" data-contact-message="我想了解${escapeHTML(service.title)}，希望協助判斷服務內容、可服務區域、費用與下一步申請方式。">${escapeHTML(service.primaryCta)}</a>
-            <a class="ghost-button" href="#service-apply-notes" data-service-scroll="#service-apply-notes">申請服務須知</a>
+            <a class="ghost-button" href="${secondaryTarget}" data-service-scroll="${secondaryTarget}">${escapeHTML(service.secondaryCta || "申請服務須知")}</a>
           </div>
           <div class="one-minute-proof" aria-label="${escapeHTML(service.title)}重點摘要">
             <span>2 分鐘了解</span>
@@ -9108,12 +9397,14 @@ function renderOneMinuteServicePage(slug) {
           <h2>我們可以提供什麼協助</h2>
           <ul>${renderServiceInsightList(service.outcomes, service.scenes, 1)}</ul>
         </article>
-        <article class="service-motion">
+        ${usesHorizontalJourney ? "" : `<article class="service-motion">
           <span>03</span>
           <h2>如何申請服務</h2>
           <ul>${renderServiceInsightList(service.applySteps || service.flow, service.scenes, 2)}</ul>
-        </article>
+        </article>`}
       </section>
+
+      ${isCommunity ? `<div data-community-safety-host></div>` : ""}
 
       <section class="two-minute-scenes service-motion" aria-label="${escapeHTML(service.title)}實際照護畫面">
         <div class="service-section-head">
@@ -9127,30 +9418,45 @@ function renderOneMinuteServicePage(slug) {
 
       ${renderServiceStorySection(service, slug)}
 
-      ${renderServiceInfoSection({
-        eyebrow: "Pricing",
-        title: "費用怎麼算",
-        body: serviceFeeBody(slug),
-        items: serviceFeeItems(service, slug),
-        className: "service-fee-section"
-      })}
+      ${isCommunity ? `<div data-community-eligibility-host></div>` : ""}
+
+      ${renderServiceFeeSection(service, slug)}
 
       ${renderServiceInfoSection({
         eyebrow: "Locations",
         title: "地點分佈",
-        body: "先確認你所在區域，我們會協助判斷可服務性、鄰近據點或合適窗口。",
-        items: serviceLocationItems(service, slug),
-        className: "service-location-section"
+        body: isDayCare
+          ? "點選地圖上的館別，即可查看地址與導覽。"
+          : isCommunity
+            ? "點選士林、大同或信義據點，即可查看完整地址與 Google 地圖。"
+          : slug === "nursing"
+            ? "新北市全區"
+            : "先確認你所在區域，我們會協助判斷可服務性、鄰近據點或合適窗口。",
+        items: hasInteractiveLocationMap ? [] : serviceLocationItems(service, slug),
+        className: "service-location-section",
+        content: slug === "day-care"
+          ? `<div data-day-care-location-map-host><p class="fee-code-loading">服務據點地圖載入中...</p></div>`
+          : isCommunity
+            ? `<div data-community-location-map-host><p class="fee-code-loading">失智症據點地圖載入中...</p></div>`
+          : usesNursingLocationTemplate
+            ? renderNursingLocationTemplate(service)
+          : isHomeCare
+            ? `<div data-home-care-location-map-host><p class="fee-code-loading">服務據點地圖載入中...</p></div>`
+            : ""
       })}
 
-      ${renderServiceInfoSection({
+      ${usesNursingLocationTemplate ? renderNursingDayCareTemplateNotes(service) : !usesHorizontalJourney ? renderServiceInfoSection({
         eyebrow: "Before Apply",
         title: "申請服務須知",
         body: "申請前不用焦慮準備資料，先把目前情境說清楚，窗口會帶你往下一步走。",
         items: serviceNoticeItems(service, slug),
         className: "service-notes-section",
         id: "service-apply-notes"
-      })}
+      }) : ""}
+
+      ${isDayCare ? renderDayCareStartChecklist() : ""}
+
+      ${usesHorizontalJourney ? `<div data-${slug}-application-journey-host></div>` : ""}
 
       ${renderServiceContactSection(service, slug)}
     </div>
@@ -9162,11 +9468,15 @@ function renderHomeCarePage() {
 }
 
 function renderDayCarePage() {
-  return renderOneMinuteServicePage("day-care");
+  return renderOneMinuteServicePage("day-care", {
+    template: "day-care"
+  });
 }
 
 function renderNursingPage() {
-  return renderOneMinuteServicePage("nursing");
+  return renderOneMinuteServicePage("nursing", {
+    template: "day-care"
+  });
 }
 
 function renderMigrantTrainingPage() {
@@ -9360,7 +9670,8 @@ function renderInvestorRecruitingPage() {
   `;
 }
 
-function renderLandRecruitingPage() {
+/* Legacy land recruiting layout retained in source history only.
+function renderLandRecruitingPageLegacy() {
   const heroImage = heroImageForViewport("assets/land-recruit-hero-hd.jpg");
   const siteTypes = [
     ["日間照顧中心", "建議一樓或低樓層、動線平整、可規劃活動區、用餐區、休息區與復能空間。", "120-300坪"],
@@ -9500,6 +9811,131 @@ function renderLandRecruitingPage() {
           <p>請提供地址、坪數、樓層、使用現況、照片與聯絡方式，歲悅會協助做第一輪長照用途可行性評估。</p>
         </div>
         <a class="primary-button" href="#contact" data-contact-need="土地合作" data-contact-message="我想提供土地或空間合作資料，請協助評估基地條件、服務半徑、合作模式與下一步需要準備的資料。">提供基地資料</a>
+      </section>
+    </div>
+  `;
+}
+*/
+
+function renderLandRecruitingPage() {
+  const heroImage = heroImageForViewport("assets/land-recruit-hero-hd.jpg");
+  const ownerBenefits = [
+    ["合法改善，資料留痕", "由建築師、消防設備師與專業團隊依土地使用、建管、消防、室內裝修及長照設立規定逐項檢討；未確認可行，不貿然施工。"],
+    ["固定營運，使用單純", "日照不是零售門市。服務對象與照顧團隊固定，採名冊與接送安排管理，主要為每日一次到館、一次返家，不會有隨機人潮頻繁進出。"],
+    ["長期租用，專人維護", "我們尋找可穩定經營的長期場域，重視空間保養、消防設備、公共安全與鄰里溝通，讓建物被持續、負責地使用。"]
+  ];
+  const h2Checks = [
+    ["一樓優先", "一樓該樓層面積原則 500㎡ 以下；二至五樓原則 300㎡ 以下。"],
+    ["二樓以上", "樓梯淨寬原則需達 1.2m，並另查電梯、消防與避難條件。"],
+    ["完整無障礙", "從下車處、大門、走道到廁所，需能形成連續且安全的無障礙動線。"],
+    ["合法圖說", "使用執照、竣工平面圖與現況一致，沒有影響申請的違建、夾層或封閉出口。"],
+    ["安全可改善", "分間牆、裝修材料、防火區劃、警報、排煙與緊急照明可依法規劃。"],
+    ["接送友善", "門前可短暫安全上下客，輪椅升降不妨礙鄰居、車道與公共通行。"]
+  ];
+  const flow = [
+    ["01", "提供基本資料", "地址、樓層、權狀面積、使用執照用途、平面圖與現場照片。"],
+    ["02", "專業雙重初審", "建築師查使用分區、H-2、無障礙與裝修；消防設備師查消防可行性。"],
+    ["03", "主管機關諮詢", "帶圖說向所在地長照主管機關預審，確認方向後再討論工程與租約。"],
+    ["04", "安心簽約合作", "租約納入許可未取得時的解約與押金返還機制，保障雙方權益。"]
+  ];
+  const gallerySlots = [
+    ["萬華一館｜平面圖", "待補：核准／營運平面配置"],
+    ["萬華二館｜平面圖", "待補：核准／營運平面配置"],
+    ["照顧空間｜渲染圖", "待補：活動、休憩與無障礙設計"],
+    ["接待空間｜渲染圖", "待補：入口、接送與室內氛圍"]
+  ];
+
+  return `
+    <div class="service-detail-page land-recruit-page land-owner-landing">
+      <section class="hero service-detail-hero one-minute-service-hero land-recruit-hero">
+        <div class="hero-bg" style="background-image: linear-gradient(90deg, rgba(255, 253, 248, 0.98) 0%, rgba(255, 248, 238, 0.92) 45%, rgba(255, 248, 238, 0.4) 74%, rgba(255, 248, 238, 0.08) 100%), url('${escapeHTML(heroImage)}');" aria-hidden="true"></div>
+        <div class="hero-copy service-detail-copy">
+          <p class="eyebrow">Land Partnership · 5 min read</p>
+          <h1>把您的空間，交給一個<br>守法、安靜、長久的好鄰居</h1>
+          <p class="hero-slogan">歲悅誠徵臺北、新北的一樓場域，共同打造社區日間照顧中心。</p>
+          <p>從建管、消防、公共安全到無障礙設計，我們全程依法申請、由專業人員把關。讓屋主放心，也讓長輩與鄰里安心。</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#contact" data-contact-need="土地合作" data-contact-message="我有土地或空間想請歲悅評估，地址／區域是：；樓層：；權狀面積：；目前用途：。">免費評估我的空間</a>
+            <a class="secondary-button" href="#land-reassurance">先看屋主安心承諾</a>
+          </div>
+          <div class="land-trust-strip" aria-label="合作特色"><span>依法申請</span><span>專業審查</span><span>單純進出</span><span>長期維護</span></div>
+        </div>
+      </section>
+
+      <section class="service-detail-section land-wanted-section" aria-labelledby="land-wanted-title">
+        <div class="service-section-head">
+          <p class="eyebrow">Priority Areas</p>
+          <h2 id="land-wanted-title">這些區域，我們優先看</h2>
+          <span>優先區域以外，只要條件合適也歡迎提供；我們會逐案回覆，不讓屋主自己猜法規。</span>
+        </div>
+        <div class="land-priority-grid">
+          <article><span>臺北市</span><h3>士林・大安・信義</h3><p>優先招募，其餘行政區亦可評估</p></article>
+          <article><span>新北市</span><h3>蘆洲・新莊・永和</h3><p>優先招募，其餘行政區亦可評估</p></article>
+          <aside><strong>理想條件</strong><p>合法建物・地面一樓・獨立出入口・約 200–350㎡・門前可短暫接送</p></aside>
+        </div>
+      </section>
+
+      <section class="service-detail-section land-owner-section" id="land-reassurance">
+        <div class="service-section-head">
+          <p class="eyebrow">For Property Owners</p>
+          <h2>您最在意的事，我們先說清楚</h2>
+          <span>長照場域不是把房子「改一改就營業」，而是先審查、後設計、依法施工，再取得許可。</span>
+        </div>
+        <div class="land-owner-grid">
+          ${ownerBenefits.map(([title, copy], index) => `<article><b>0${index + 1}</b><h3>${title}</h3><p>${copy}</p></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section land-compliance-section">
+        <div class="service-section-head">
+          <p class="eyebrow">H-2 First Review</p>
+          <h2>我們會先做 H-2 六項初篩</h2>
+          <span>以下為快速初篩，不等同個案核准；最終仍以建築師、消防設備師及主管機關依地址與圖說審認為準。</span>
+        </div>
+        <div class="land-h2-grid">
+          ${h2Checks.map(([title, copy]) => `<article><span aria-hidden="true">✓</span><div><h3>${title}</h3><p>${copy}</p></div></article>`).join("")}
+        </div>
+        <div class="land-compliance-promise"><strong>安全底線</strong><p>消防安全、建築安全、公共安全及無障礙條件未確認前，不進場做不可逆工程；房東不同意申請，也不會私下施工。</p></div>
+      </section>
+
+      <section class="service-detail-section land-neighborhood-section">
+        <div class="land-neighborhood-card">
+          <div>
+            <p class="eyebrow">Neighborhood Value</p>
+            <h2>不只活化空間，也補上社區照顧機能</h2>
+            <p>內政部推動社會住宅時，也將日照中心、托老托育、無障礙空間與社福服務納入社區公共機能。合規的日照據點能讓附近家庭就近取得照顧、減少長距離接送，提升高齡友善與生活便利性。</p>
+            <p class="land-value-note">這是對社區機能與建物長期使用價值的投入，不代表或保證個別房價漲幅。</p>
+            <a href="https://www.moi.gov.tw/cp.aspx?n=22" target="_blank" rel="noopener noreferrer">查看內政部「安居家園」政策說明</a>
+          </div>
+          <div class="land-neighborhood-stats" aria-label="社區價值"><span><b>在地老化</b>讓長輩留在熟悉生活圈</span><span><b>閒置活化</b>建立穩定且有管理的用途</span><span><b>公共機能</b>補足高齡家庭照顧資源</span></div>
+        </div>
+      </section>
+
+      <section class="service-detail-section land-gallery-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Our Spaces</p>
+          <h2>我們如何把安全做進空間裡</h2>
+          <span>萬華一館、二館平面圖與空間渲染圖即將補上；以下版位已預留，可直接替換正式圖片。</span>
+        </div>
+        <div class="land-gallery-grid">
+          ${gallerySlots.map(([title, copy], index) => `<figure class="land-gallery-placeholder"><div><span>IMAGE ${String(index + 1).padStart(2, "0")}</span><b>圖片預留區</b></div><figcaption><strong>${title}</strong><small>${copy}</small></figcaption></figure>`).join("")}
+        </div>
+      </section>
+
+      <section class="service-detail-section land-process-section">
+        <div class="service-section-head">
+          <p class="eyebrow">Safe Process</p>
+          <h2>先確認可行，再安心簽約</h2>
+          <span>第一階段只需基本資料，我們會把專業審查與主管機關確認放在承諾之前。</span>
+        </div>
+        <div class="service-flow-track">
+          ${flow.map(([step, title, copy]) => `<article><b>${step}</b><h3>${title}</h3><p>${copy}</p></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="service-cta-panel">
+        <div><p class="eyebrow">Land Inquiry</p><h2>先給一個地址，我們替您把風險看清楚</h2><p>提供地址、樓層、權狀面積與使用執照用途即可開始。初談不等於承諾出租，雙方確認安全、法規與合作條件後再往下走。</p></div>
+        <a class="primary-button" href="#contact" data-contact-need="土地合作" data-contact-message="我有土地或空間想請歲悅評估，地址／區域是：；樓層：；權狀面積：；目前用途：。">免費提供基地初評</a>
       </section>
     </div>
   `;
@@ -9659,7 +10095,7 @@ function renderGovernancePage() {
   ];
   const executives = [
     ["執行長", "營運策略與服務網絡拓展", "assets/homepage-batch/04-admin-team-office-fast.jpg"],
-    ["照顧品質長", "服務品管、督導制度與異常事件改善", "assets/homepage-batch/03-supervisor-care-plan-fast.jpg"],
+    ["照顧品質長", "服務品管、督導制度與異常事件改善", "assets/brand-scenes/care-team-v2.jpg"],
     ["教育訓練長", "照服員、督導與移工培訓制度", "assets/homepage-batch/11-elder-art-activity-hires.jpg"],
     ["財務行政長", "財務控管、人資行政與投資人關係", "assets/homepage-batch/family-consultation-clear.jpg"]
   ];
@@ -10000,7 +10436,7 @@ function renderShareholdersPage() {
         </div>
         <div class="faq-layout">
           <article class="governance-image-card">
-            <img src="/assets/homepage-batch/15-phone-consultation-fast.jpg" alt="歲悅投資人窗口電話諮詢" />
+            <img src="/assets/brand-scenes/phone-v2.jpg" alt="歲悅投資人窗口電話諮詢" />
             <div><span>Investor Q&A</span><h3>投資人關係的核心，是讓問題被清楚承接、被準確回覆。</h3></div>
           </article>
           <div class="shareholder-faq">
@@ -10025,106 +10461,106 @@ function renderTalentPage() {
   const heroImage = heroImageForViewport("assets/career-team-hero-hd.jpg");
   const talentAsset = (url) => escapeHTML(normalizeLocalAssetUrl(url));
   const talentContactAttrs = `data-contact-need="人才招募" data-contact-message="我想了解歲悅長照職缺或投遞應徵資料，請協助安排招募窗口聯繫。"`;
-  const openings = [
-    ["居家照顧服務員", "居家照顧部門", "到宅身體照顧、生活支持、陪伴與服務紀錄。", "assets/homepage-batch/orange-polo-caregiver-clear.jpg"],
-    ["居家服務督導", "居家照顧部門", "服務媒合、品質追蹤、照服員支持與家屬溝通。", "assets/homepage-batch/orange-polo-supervisor-clear.jpg"],
-    ["日照照顧服務員", "日間照顧部", "長輩活動陪伴、餐食照顧、生活支持與安全觀察。", "assets/homepage-batch/02-daycare-group-exercise-hires.jpg"]
+  const caregiverCommonDuties = [
+    "依照顧計畫到宅提供身體照顧、備餐、家務、陪同外出或陪同就醫等支持",
+    "完成服務紀錄、異常回報與家屬溝通，讓督導能即時掌握服務狀況",
+    "配合督導安排排班、調班、教育訓練與服務品質追蹤"
   ];
-  const careerSteps = [
-    ["0-3 個月", "新人陪跑", "完成基礎訓練、服務倫理、紀錄回報與安全照顧流程，由督導陪同熟悉第一線情境。"],
-    ["3-6 個月", "穩定上線", "能獨立完成服務紀錄、家庭溝通與異常回報，並建立穩定服務品質。"],
-    ["6-12 個月", "專業進階", "依部門選修失智照顧、復能陪伴、日照活動、移工培訓、行政營運等模組。"],
-    ["12 個月以上", "帶教與管理", "通過評核後可成為帶教員、服務督導、內訓講師、品管幹部或部門管理人才。"]
+  const caregiverCommonRequirements = [
+    "具照顧服務員訓練結業證明或長照小卡；有居家照顧經驗佳",
+    "能守時、重視安全與長輩尊嚴，願意照著服務計畫穩定執行",
+    "可配合服務區域排班，並使用手機或表單完成服務紀錄"
   ];
-  const careerTracks = [
-    ["前線專業線", ["照顧服務員", "資深照服員", "照顧帶教員", "專科照顧師"]],
-    ["督導管理線", ["服務督導助理", "居服督導", "資深督導", "區域督導"]],
-    ["教育品管線", ["課務助教", "內訓講師", "品管專員", "教育品管主管"]],
-    ["行政營運線", ["行政專員", "營運協調", "專案管理", "部門主管"]]
+  const caregiverCommonSupport = [
+    "BA 碼拆帳",
+    "AA 碼拆帳",
+    "缺工獎勵可申請",
+    "公發工作包",
+    "免費長照課程"
   ];
-  const promotionCriteria = [
-    ["服務品質", "服務紀錄完整、家屬回饋穩定、異常事件能即時回報與追蹤。"],
-    ["專業能力", "完成核心訓練與進階照顧模組，能把照顧流程做得穩、做得細。"],
-    ["團隊協作", "能與督導、行政、照服員、家屬共同解決問題，讓服務不中斷。"],
-    ["帶教潛力", "能整理經驗、協助新人上線，把個人能力轉化成團隊能力。"]
-  ];
-  const benefits = [
-    ["薪酬與獎金", "透明薪資、服務津貼、績效獎金、年終獎金與特殊服務加給，讓努力被清楚看見。", ["服務津貼", "績效獎金", "年終獎金"]],
-    ["排班與生活", "依服務區域、交通條件與個人狀態安排班表，降低跨區奔波，保留生活彈性。", ["彈性排班", "區域媒合", "休假協調"]],
-    ["訓練與證照", "新人訓練、在職教育、專業模組、證照補助與情境演練，讓照顧專業能持續升級。", ["新人訓練", "證照補助", "進階課程"]],
-    ["督導與安全", "第一線遇到照顧困難不單打獨鬥，督導、行政與品管一起支援回報、溝通與調整。", ["督導陪跑", "異常支援", "安全回報"]],
-    ["健康與保障", "提供勞健保、團保規劃、健康關懷與工作安全提醒，讓照顧者也被照顧。", ["勞健保", "團體保險", "健康關懷"]],
-    ["團隊與歸屬", "定期聚會、表揚制度、跨部門交流與照顧故事分享，讓好服務不只是個人撐起來。", ["夥伴聚會", "表揚制度", "團隊交流"]]
-  ];
-  const benefitHighlights = [
-    ["照顧者支持率", "100%", "每位新人都有督導陪跑與回饋"],
-    ["年度訓練模組", "12+", "涵蓋居家、日照、復能與家庭溝通"],
-    ["發展方向", "4 線", "前線、督導、教育品管、行政營運"]
-  ];
-  const benefitSystems = [
-    ["基本保障", ["勞保、健保、勞退提撥", "團體保險規劃", "依法給假與特休制度"]],
-    ["工作支持", ["區域媒合與排班溝通", "督導即時支援", "服務紀錄與異常回報工具"]],
-    ["成長補助", ["新人教育訓練", "在職進修與證照補助", "內訓講師與帶教培力"]],
-    ["團隊文化", ["定期團隊會議", "優良服務表揚", "照顧案例分享與跨部門交流"]]
-  ];
+  const createCaregiverOpening = ({ city, district, hourly, sortOrder, openingSlug, isFeatured = false }) => ({
+    title: `${city}居家照顧服務員（${district}區）`,
+    tag: "居服員",
+    image: "assets/recruit-home-care-worker-fast.jpg",
+    summary: `在${city}${district}區到宅服務，提供身體照顧、生活支持、陪伴與服務紀錄，協助家庭把日常照顧接穩。`,
+    duties: caregiverCommonDuties,
+    requirements: caregiverCommonRequirements,
+    support: caregiverCommonSupport,
+    employmentType: "全職 / 兼職",
+    location: `${city}${district}區`,
+    salary: `時薪 ${hourly}`,
+    capacity: "持續招募",
+    updatedAt: "2026-07-08",
+    openingSlug: openingSlug || `home-caregiver-${district}`,
+    sortOrder,
+    isFeatured
+  });
   const homeCareRecruit = {
     highlights: [
-      ["服務範圍", "士林、北投、大同、南港、萬華、新店、中永和、新莊、蘆竹"],
+      ["服務範圍", "士林、北投、南港、中和、永和、新店、淡水、大園、蘆竹"],
       ["工作特色", "到宅服務、督導陪跑、家屬溝通、服務紀錄與跨專業協作"],
       ["適合對象", "喜歡與長輩相處、重視細節、願意穩定累積照顧專業的夥伴"]
     ],
-    gallery: [
-      ["assets/homepage-batch/care-home-greeting-clear.jpg", "到宅服務前，用問候建立安心感。"],
-      ["assets/homepage-batch/orange-polo-caregiver-clear.jpg", "照顧服務員是家庭最靠近現場的支持。"],
-      ["assets/homepage-batch/03-supervisor-care-plan-fast.jpg", "督導與家屬討論照顧計畫。"],
-      ["assets/homepage-batch/14-care-notes-fast.jpg", "服務紀錄讓照顧變得可追蹤。"],
-      ["assets/homepage-batch/family-consultation-clear.jpg", "把家庭的擔心轉成清楚可執行的安排。"]
-    ],
     roles: [
+      createCaregiverOpening({ city: "臺北市", district: "士林", hourly: "230-420 元", sortOrder: 10, openingSlug: "taipei-shilin-home-caregiver", isFeatured: true }),
+      createCaregiverOpening({ city: "臺北市", district: "北投", hourly: "230-420 元", sortOrder: 20, openingSlug: "taipei-beitou-home-caregiver" }),
+      createCaregiverOpening({ city: "臺北市", district: "南港", hourly: "230-420 元", sortOrder: 30, openingSlug: "taipei-nangang-home-caregiver" }),
+      createCaregiverOpening({ city: "新北市", district: "中和", hourly: "235-420 元", sortOrder: 40, openingSlug: "new-taipei-zhonghe-home-caregiver" }),
+      createCaregiverOpening({ city: "新北市", district: "永和", hourly: "235-420 元", sortOrder: 50, openingSlug: "new-taipei-yonghe-home-caregiver" }),
+      createCaregiverOpening({ city: "新北市", district: "新店", hourly: "235-420 元", sortOrder: 60, openingSlug: "new-taipei-xindian-home-caregiver" }),
+      createCaregiverOpening({ city: "新北市", district: "淡水", hourly: "235-420 元", sortOrder: 70, openingSlug: "new-taipei-tamsui-home-caregiver" }),
+      createCaregiverOpening({ city: "桃園市", district: "大園", hourly: "235-420 元", sortOrder: 80, openingSlug: "taoyuan-dayuan-home-caregiver" }),
+      createCaregiverOpening({ city: "桃園市", district: "蘆竹", hourly: "235-420 元", sortOrder: 90, openingSlug: "taoyuan-luzhu-home-caregiver" }),
       {
-        title: "居家照顧服務員",
-        tag: "一線服務",
-        image: "assets/recruit-home-care-worker-fast.jpg",
-        summary: "到宅提供身體照顧、生活支持、陪伴與服務紀錄，是長輩與家屬最直接的安心來源。",
-        duties: ["身體照顧、備餐、陪同活動與安全觀察", "依服務計畫完成服務紀錄與回報", "與督導配合調整照顧細節"],
-        requirements: ["具照顧服務員訓練結業證明或相關經驗佳", "願意學習服務紀錄、家屬溝通與安全照顧流程", "有耐心、守時、重視長輩尊嚴"],
-        support: ["新人陪跑", "區域排班", "服務津貼"]
-      },
-      {
-        title: "居家服務督導",
-        tag: "服務管理",
+        title: "臺北市居家服務督導員",
+        tag: "居服督導",
         image: "assets/recruit-home-care-supervisor-fast.jpg",
-        summary: "負責服務媒合、品質追蹤、照服員支持與家屬溝通，把照顧現場變成穩定系統。",
-        duties: ["評估服務需求並安排合適照服員", "追蹤服務品質、異常事件與家屬回饋", "支持照服員工作狀況與教育訓練"],
-        requirements: ["具居服督導、社工、護理或長照相關經驗佳", "能清楚溝通、整理紀錄並追蹤問題", "願意在前線與行政之間協調資源"],
-        support: ["督導培訓", "管理津貼", "跨部門支援"]
+        summary: "負責台北居家服務派案、品質追蹤、家訪電訪、照服員支持與補助核銷資料，讓服務穩定接上家庭需求。",
+        duties: ["安排居家服務個案、照服員媒合、服務異動與品質追蹤", "定期家訪或電訪，處理家屬回饋、服務問題與異常狀況", "支援照服員培訓、服務紀錄、評鑑資料與內部品質管理"],
+        requirements: ["具居家服務督導、社工、護理或長照相關背景佳", "熟悉長照 2.0、BA 碼、照顧計畫與長照系統操作尤佳", "能清楚溝通並在家屬、照服員、照管中心與 A 單位之間協調"],
+        support: ["保障月薪", "業績獎金", "督導培訓", "開發獎金"],
+        employmentType: "全職",
+        location: "臺北市士林區",
+        salary: "月薪 38,000-42,000 元",
+        capacity: "1-2 名",
+        updatedAt: "2026-07-08",
+        openingSlug: "taipei-home-care-supervisor",
+        sortOrder: 100,
+        isFeatured: true
       },
       {
-        title: "個案服務協調員",
-        tag: "家庭窗口",
+        title: "新北市居家服務督導員（新店／中和／永和區）",
+        tag: "居服督導",
+        image: "assets/recruit-home-care-supervisor-fast.jpg",
+        summary: "以保障薪資加業績獎金制度，負責新店、中和、永和居家服務個案管理、照服員督導與服務品質追蹤。",
+        duties: ["管理服務安排、異動追蹤、家訪電訪與服務滿意度", "督導照服員出勤、紀錄、服務品質與教育訓練需求", "與照管中心、A 單位、家屬、個管師及跨專業資源協調"],
+        requirements: ["具居家服務督導資格、社工、護理或長照背景佳", "熟悉長照 2.0、BA 碼、補助核銷、Word、Excel 或 Google Workspace", "可配合新店、中和、永和區外勤、會議與教育訓練"],
+        support: ["保障月薪", "業績獎金", "快樂星期五", "職涯培訓"],
+        employmentType: "全職",
+        location: "新北市新店區",
+        salary: "月薪 38,000-42,000 元",
+        capacity: "1-2 名",
+        updatedAt: "2026-07-07",
+        openingSlug: "new-taipei-home-care-supervisor",
+        sortOrder: 110,
+        isFeatured: true
+      },
+      {
+        title: "新北市個案管理師（新店區）",
+        tag: "個案管理",
         image: "assets/homepage-batch/family-consultation-clear.jpg",
-        summary: "協助家庭理解服務內容、建立照顧安排，讓需求、資源與實際執行能順利接起來。",
-        duties: ["接洽家庭諮詢並整理需求", "協助服務說明、派案前資料確認", "追蹤服務開始後的家屬回饋"],
-        requirements: ["具客服、行政、長照或社福溝通經驗佳", "文字紀錄清楚，能穩定追蹤細節", "面對家屬焦慮時能保持同理與秩序"],
-        support: ["話術訓練", "行政工具", "主管陪談"]
-      },
-      {
-        title: "居家護理復能夥伴",
-        tag: "專業協作",
-        image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
-        summary: "與護理、復能與照顧團隊合作，協助長輩把日常動作重新練回生活裡。",
-        duties: ["協助復能活動與安全陪伴", "觀察長輩身體狀況並回報團隊", "配合專業人員執行居家支持建議"],
-        requirements: ["具護理、復健、職能、照顧服務或運動指導背景佳", "能重視安全、節奏與長輩意願", "願意與跨專業團隊合作"],
-        support: ["專業督導", "復能訓練", "案例討論"]
-      },
-      {
-        title: "居家行政調度專員",
-        tag: "營運支援",
-        image: "assets/homepage-batch/04-admin-team-office-fast.jpg",
-        summary: "負責班表、服務紀錄、文件與行政追蹤，讓前線照顧能順利運作、不被雜事卡住。",
-        duties: ["協助排班、服務異動與資料整理", "追蹤服務紀錄、文件與行政流程", "支援督導與客服窗口回覆"],
-        requirements: ["熟悉文書、表格與資料整理", "細心、穩定，能處理多項進度", "具長照行政或客服經驗佳"],
-        support: ["行政訓練", "流程模板", "固定工時"]
+        summary: "負責 A 單位個案管理、照顧計畫、AA01/AA02 追蹤與跨資源溝通，協助家庭把服務安排變清楚。",
+        duties: ["執行個案開案、需求評估、照顧計畫擬定、定期追蹤與紀錄", "串接照管中心、居家服務、日照、復能、護理與家庭資源", "整理系統資料、服務進度、品質指標與補助核銷相關紀錄"],
+        requirements: ["具 A 單位個案管理經驗或社工、護理、職能、物理治療、長照背景佳", "熟悉長照 2.0、AA01/AA02、個案管理流程與系統紀錄尤佳", "能獨立外勤訪視，並以清楚文字整理服務進度與家庭需求"],
+        support: ["保障月薪", "AA 拆帳", "年資加給", "快樂星期五"],
+        employmentType: "全職",
+        location: "新北市新店區",
+        salary: "月薪 40,000-65,000 元",
+        capacity: "1-2 名",
+        updatedAt: "2026-07-09",
+        openingSlug: "new-taipei-case-manager",
+        sortOrder: 120,
+        isFeatured: true
       }
     ]
   };
@@ -10134,58 +10570,40 @@ function renderTalentPage() {
       ["工作特色", "團體照顧、活動帶領、餐食支持、身心觀察、家屬回報與團隊交班"],
       ["適合對象", "喜歡團隊合作、擅長帶動氣氛，也能細心觀察長輩狀態的夥伴"]
     ],
-    gallery: [
-      ["assets/daycare-detail-04-checkin-fast.jpg", "早晨報到與健康關懷，讓長輩安心開始一天。"],
-      ["assets/daycare-recruit-02-exercise-clear.jpg", "帶領團體活動，讓生活重新有節奏與期待。"],
-      ["assets/daycare-detail-02-meal-fast.jpg", "餐食與營養支持，是日照照顧的重要細節。"],
-      ["assets/daycare-recruit-02-exercise-clear.jpg", "認知活動與陪伴，讓互動不只是消磨時間。"],
-      ["assets/daycare-detail-04-checkin-fast.jpg", "交班與紀錄，讓團隊照顧能持續接住每位長輩。"]
-    ],
     roles: [
       {
-        title: "日照照顧服務員",
-        tag: "一線照顧",
+        title: "萬華日照中心照顧服務員",
+        tag: "日照照服員",
         image: "assets/daycare-recruit-02-exercise-clear.jpg",
-        summary: "陪伴長輩在日照中心完成活動、餐食、休息與生活照顧，是現場最重要的穩定力量。",
-        duties: ["協助長輩活動參與、餐食、如廁、休息與安全觀察", "完成日常服務紀錄與異常回報", "與護理、社工、督導配合調整照顧安排"],
-        requirements: ["具照顧服務員訓練結業證明佳", "能主動觀察長輩狀態並清楚回報", "喜歡與長輩互動，重視尊嚴與安全"],
-        support: ["新人帶教", "日照排班", "活動訓練"]
+        summary: "在萬華日照中心陪伴長輩完成活動、餐食、休息與生活照顧，讓白天作息安全、有節奏。",
+        duties: ["協助日照長輩活動參與、用餐、如廁、休息與日常生活支持", "完成服務紀錄、交班、異常觀察與家屬或團隊回報", "配合護理、社工、督導執行照顧計畫與中心活動"],
+        requirements: ["具照顧服務員訓練結業證明佳", "能主動觀察長輩狀態，重視安全、尊嚴與團隊交班", "喜歡團體照顧場域，願意配合中心固定作息與活動安排"],
+        support: ["月薪制", "新人帶教", "缺工獎勵可申請", "日照活動訓練"],
+        employmentType: "全職",
+        location: "臺北市萬華區",
+        salary: "月薪 33,000-35,000 元",
+        capacity: "1-2 名",
+        updatedAt: "2026-07-08",
+        openingSlug: "wanhua-day-care-caregiver",
+        sortOrder: 200,
+        isFeatured: true
       },
       {
-        title: "日照活動帶領員",
-        tag: "活動設計",
-        image: "assets/daycare-recruit-02-exercise-clear.jpg",
-        summary: "規劃健康促進、認知刺激、手作、音樂與社交活動，讓長輩白天有參與感與成就感。",
-        duties: ["設計與帶領日照團體活動", "觀察活動反應並調整難度", "整理活動紀錄、照片與家屬回饋素材"],
-        requirements: ["具活動帶領、社工、職能、教育或長照經驗佳", "能掌握現場氣氛與長輩安全", "願意把活動設計成可複製的課程模組"],
-        support: ["活動教材", "課程共備", "講師培力"]
-      },
-      {
-        title: "日照護理人員",
-        tag: "健康照護",
-        image: "assets/daycare-detail-02-meal-fast.jpg",
-        summary: "負責健康評估、用藥與身體狀況觀察，協助團隊把日常照顧做得更安全。",
-        duties: ["長輩健康狀況觀察、量測與紀錄", "協助用藥提醒、傷口與慢病照護追蹤", "與家屬、照服員與外部醫療資源溝通"],
-        requirements: ["具護理師或護士證照", "熟悉長者照護、慢病管理或日照場域佳", "能把專業資訊轉成團隊看得懂的照顧提醒"],
-        support: ["護理支援", "案例討論", "專業進修"]
-      },
-      {
-        title: "日照個案管理員",
-        tag: "家庭窗口",
+        title: "臺北市日間照顧中心主任（純白班、儲備主管職）",
+        tag: "中心主任",
         image: "assets/daycare-detail-04-checkin-fast.jpg",
-        summary: "協助家庭完成服務說明、長輩適應、照顧計畫追蹤與家屬溝通，是中心與家庭之間的橋樑。",
-        duties: ["接洽家庭諮詢並整理長輩需求", "追蹤長輩適應狀況與服務目標", "定期彙整家屬回饋與團隊照顧建議"],
-        requirements: ["具社工、長照、客服或個案管理經驗佳", "擅長傾聽、紀錄與跨角色溝通", "能在家庭焦慮時提供清楚流程與支持"],
-        support: ["溝通模板", "督導陪談", "個案會議"]
-      },
-      {
-        title: "日照行政營運專員",
-        tag: "營運支援",
-        image: "assets/daycare-detail-04-checkin-fast.jpg",
-        summary: "處理出缺勤、交通、耗材、文件、課程與現場行政，讓日照中心每天穩定運作。",
-        duties: ["協助中心行政、文件、物資與課表安排", "追蹤出缺勤、交通接送與家屬通知", "支援主管完成營運報表與品質資料"],
-        requirements: ["熟悉文書、表格與流程追蹤", "細心穩定，能處理多項現場需求", "具長照行政、課務或客服經驗佳"],
-        support: ["行政流程", "固定工時", "跨部門支援"]
+        summary: "負責日照中心營運、人員管理、招生社區關係、法規評鑑與服務品質，作為儲備主管培養。",
+        duties: ["管理日照中心日常營運、照顧品質、招生推廣與社區關係", "統籌跨專業團隊、人力招募訓練、預算、補助與行政流程", "推動法規合規、評鑑、ISO、內部稽核、數據分析與危機客訴處理"],
+        requirements: ["具長照、社工、護理、老人照顧、公共衛生或中心管理經驗佳", "熟悉日照法規、評鑑、補助、招生營運與跨專業團隊協作尤佳", "能以主管視角處理人力、品質、家屬溝通與營運數據"],
+        support: ["純白班", "儲備主管", "營運培訓", "月薪 5 萬以上"],
+        employmentType: "全職",
+        location: "臺北市萬華區",
+        salary: "月薪 50,000 元以上",
+        capacity: "1 名",
+        updatedAt: "2026-07-08",
+        openingSlug: "taipei-day-care-director",
+        sortOrder: 210,
+        isFeatured: true
       }
     ]
   };
@@ -10195,58 +10613,40 @@ function renderTalentPage() {
       ["工作特色", "照顧技能教學、跨文化溝通、情境演練、教材設計與課後追蹤"],
       ["適合對象", "擅長教學、溝通清楚、尊重不同文化，也重視照顧安全的夥伴"]
     ],
-    gallery: [
-      ["assets/homepage-batch/service-card-05-migrant-training-clear.jpg", "從照顧流程開始，讓每位學員知道為什麼要這樣做。"],
-      ["assets/migrant-detail-02-transfer-fast.jpg", "移位與安全照顧，需要反覆示範與實作。"],
-      ["assets/migrant-detail-03-meal-fast.jpg", "備餐與營養訓練，讓家庭照顧更穩定。"],
-      ["assets/migrant-recruit-04-communication-fast.jpg", "溝通演練把照顧指令變成聽得懂的行動。"],
-      ["assets/quality-recruit-04-quality-meeting-clear.jpg", "培訓紀錄與結訓追蹤，讓學習能被延續。"]
-    ],
     roles: [
       {
-        title: "移工照顧培訓講師",
-        tag: "課程教學",
-        image: "assets/homepage-batch/service-card-05-migrant-training-clear.jpg",
-        summary: "負責設計與帶領移工照顧課程，把照顧流程、服務安全與家庭溝通轉成可練習的教學內容。",
-        duties: ["帶領照顧技能、移位安全、備餐與溝通課程", "依學員程度調整教學節奏與示範方式", "整理教材、評量與課後改善建議"],
-        requirements: ["具長照、護理、社工、職能或照顧教學經驗佳", "能清楚示範照顧步驟並耐心修正動作", "尊重多元文化，能用簡單語言說明複雜流程"],
-        support: ["講師培力", "教材模板", "課程共備"]
-      },
-      {
-        title: "照顧技能實作教練",
-        tag: "實作訓練",
-        image: "assets/migrant-detail-02-transfer-fast.jpg",
-        summary: "專注於移位、翻身、沐浴、用餐與安全照顧演練，讓學員不是只聽懂，而是真的做得出來。",
-        duties: ["進行照顧動作示範、分組演練與姿勢修正", "協助建立安全檢核表與實作評量", "回報學員學習狀況與需要補強的技能"],
-        requirements: ["具照顧服務、護理、復健或實作教學經驗佳", "熟悉身體力學與長者安全照顧原則", "能細心觀察動作風險並即時提醒"],
-        support: ["實作教案", "安全訓練", "案例討論"]
-      },
-      {
-        title: "跨文化溝通輔導員",
-        tag: "溝通支持",
+        title: "全職社群行銷專員（菲律賓）",
+        tag: "菲律賓社群",
         image: "assets/migrant-recruit-04-communication-fast.jpg",
-        summary: "協助移工、家庭與照顧團隊理解彼此需求，降低溝通誤會，讓照顧指令可以被正確執行。",
-        duties: ["協助照顧情境溝通演練與用語整理", "支援家庭照顧規則、禁忌與回報方式說明", "收集學員困難並回饋課程設計"],
-        requirements: ["具移工服務、語言教學、社福、客服或跨文化工作經驗佳", "能同理不同文化背景與家庭壓力", "文字整理與口語表達清楚"],
-        support: ["溝通腳本", "主管陪談", "情境卡教材"]
+        summary: "經營菲律賓語系社群與短影音內容，把照顧技能、工作故事與活動資訊轉成移工社群看得懂的內容。",
+        duties: ["經營 TikTok、Facebook、Instagram 等菲律賓語系社群，規劃貼文與短影音", "協助拍攝剪輯 Reels、Shorts、照顧教學、工作故事與活動素材", "把中文照顧 SOP、活動訊息與客服回覆轉成菲律賓社群可理解的溝通內容"],
+        requirements: ["具 1 年以上社群、內容、行銷或跨文化溝通經驗佳", "熟悉菲律賓移工社群語境，能掌握熱門議題與互動方式", "可與課務、行銷、客服與現場團隊協作，穩定產出內容"],
+        support: ["社群內容企劃", "短影音製作", "跨文化培訓", "活動支援"],
+        employmentType: "全職",
+        location: "新北市新莊區",
+        salary: "月薪 35,000-38,000 元",
+        capacity: "1 名",
+        updatedAt: "2026-07-08",
+        openingSlug: "filipino-social-marketing-specialist",
+        sortOrder: 300,
+        isFeatured: true
       },
       {
-        title: "培訓課務專員",
-        tag: "課務行政",
-        image: "assets/quality-recruit-04-quality-meeting-clear.jpg",
-        summary: "負責開課行政、學員資料、課程通知、簽到評量與結訓文件，讓每一堂課順利運作。",
-        duties: ["處理課程報名、通知、簽到與教材準備", "整理學員資料、評量結果與結訓紀錄", "支援講師、場地、物資與課後回饋追蹤"],
-        requirements: ["熟悉文書、表格與課務行政流程", "細心穩定，能處理多項課程進度", "具教育訓練、行政或長照課務經驗佳"],
-        support: ["課務流程", "表單模板", "固定工時"]
-      },
-      {
-        title: "家庭照顧課程企劃",
-        tag: "內容企劃",
-        image: "assets/migrant-detail-03-meal-fast.jpg",
-        summary: "把家庭照顧常見問題整理成課程、懶人包與實作教材，協助家庭與移工建立共同照顧語言。",
-        duties: ["規劃照顧課程主題、教材架構與活動流程", "整理照顧知識、圖卡、評量與課後提醒", "與講師、督導、行政協作優化課程品質"],
-        requirements: ["具課程企劃、教材設計、長照或健康教育經驗佳", "能把複雜知識轉成簡單可操作內容", "重視使用者理解與實際照顧情境"],
-        support: ["教材素材庫", "跨部門共備", "企劃培訓"]
+        title: "活動企劃專員",
+        tag: "移工培訓活動",
+        image: "assets/brand-scenes/quality-v2.jpg",
+        summary: "規劃移工培訓課程、節慶活動、交流活動與多語教材，把照顧技能訓練做成可追蹤的學習流程。",
+        duties: ["規劃移工照顧培訓課程、節慶活動、交流活動與壓力支持工作坊", "協調講師、教材、場地、預算、學習紀錄與服務品質回饋", "支援多語教材、SOP、政府或 NGO 合作提案與補助報告"],
+        requirements: ["具 3 年以上活動企劃、教育訓練、課務或長照相關經驗佳", "能掌握預算、時程、跨單位合作與活動現場執行細節", "對移工培訓、長照服務與跨文化溝通有興趣"],
+        support: ["活動企劃", "課務流程", "多語教材", "外部合作"],
+        employmentType: "全職",
+        location: "新北市新莊區",
+        salary: "月薪 38,000-42,000 元",
+        capacity: "1 名",
+        updatedAt: "2026-07-08",
+        openingSlug: "migrant-training-event-planner",
+        sortOrder: 310,
+        isFeatured: false
       }
     ]
   };
@@ -10256,60 +10656,6 @@ function renderTalentPage() {
       ["工作特色", "教材設計、內訓帶領、服務紀錄檢核、品質稽核、數據追蹤與改善專案"],
       ["適合對象", "重視細節、善於整理知識、能把現場問題轉成方法與制度的夥伴"]
     ],
-    gallery: [
-      ["assets/quality-detail-01-materials-fast.jpg", "把照顧經驗整理成教材，讓好服務可以被學會。"],
-      ["assets/quality-recruit-02-training-clear.jpg", "內訓不是上課而已，而是讓現場做法更一致。"],
-      ["assets/quality-detail-03-audit-fast.jpg", "服務紀錄檢核，讓照顧品質被看見也被追蹤。"],
-      ["assets/quality-recruit-04-quality-meeting-clear.jpg", "從問題到改善，讓團隊一起把流程變好。"],
-      ["assets/quality-recruit-04-quality-meeting-clear.jpg", "現場回饋要具體、友善，也要能真正幫上忙。"]
-    ],
-    roles: [
-      {
-        title: "教育品管專員",
-        tag: "品質管理",
-        image: "assets/quality-detail-03-audit-fast.jpg",
-        summary: "負責服務紀錄、照顧流程與品質資料檢核，把前線服務轉化為可追蹤、可改善的品質系統。",
-        duties: ["檢核服務紀錄、異常回報與品管表單", "追蹤品質指標、改善事項與結案進度", "協助督導整理服務品質回饋與教育需求"],
-        requirements: ["具長照、護理、社工、品管或行政稽核經驗佳", "細心、邏輯清楚，能穩定追蹤多項資料", "能把問題整理成具體可執行的改善建議"],
-        support: ["品管模板", "督導共作", "數據工具"]
-      },
-      {
-        title: "內訓講師",
-        tag: "教育訓練",
-        image: "assets/quality-recruit-02-training-clear.jpg",
-        summary: "帶領新人訓練與在職教育，把照顧倫理、服務流程、情境處理與紀錄回報教到能落地。",
-        duties: ["規劃並執行新人訓練、在職教育與情境演練", "依服務問題設計補強課程與測驗", "追蹤學員學習成果與現場應用狀況"],
-        requirements: ["具照顧教學、護理、社工、督導或教育訓練經驗佳", "表達清楚，能把複雜流程拆成好理解步驟", "願意和前線團隊共同修正教材"],
-        support: ["講師培力", "課程共備", "教材素材庫"]
-      },
-      {
-        title: "教材設計企劃",
-        tag: "內容設計",
-        image: "assets/quality-detail-01-materials-fast.jpg",
-        summary: "把照顧知識、服務流程與案例整理成簡報、圖卡、手冊與線上教材，讓知識更容易被吸收。",
-        duties: ["設計長照教材、流程圖、照顧圖卡與課程簡報", "整理案例、FAQ 與標準作業說明", "與講師、督導、行政協作更新教材版本"],
-        requirements: ["具教材設計、內容企劃、教育、長照或健康知識背景佳", "能把文字、圖像與流程整理得清楚易懂", "重視學習者視角與實際現場使用"],
-        support: ["設計模板", "案例資料庫", "跨部門共備"]
-      },
-      {
-        title: "服務稽核人員",
-        tag: "稽核改善",
-        image: "assets/quality-recruit-04-quality-meeting-clear.jpg",
-        summary: "透過現場觀察、紀錄檢查與團隊訪談，協助服務單位發現風險、修正流程並維持品質。",
-        duties: ["執行服務流程、紀錄與現場品質檢核", "整理稽核結果與改善追蹤表", "用支持性的方式給予前線具體回饋"],
-        requirements: ["具長照服務、督導、品管、稽核或護理背景佳", "能客觀觀察、清楚記錄並友善溝通", "重視安全、倫理與服務一致性"],
-        support: ["稽核工具", "主管陪同", "改善會議"]
-      },
-      {
-        title: "品質改善專案管理",
-        tag: "專案推進",
-        image: "assets/quality-recruit-04-quality-meeting-clear.jpg",
-        summary: "把服務問題、數據與跨部門需求整合成改善專案，讓品管不只是檢查，而是推動變好。",
-        duties: ["規劃品質改善專案、時程與追蹤指標", "整合督導、行政、講師與前線回饋", "製作改善報告、會議資料與成果追蹤"],
-        requirements: ["具專案管理、營運、品管或長照管理經驗佳", "能整理資料、掌握進度並推動跨部門合作", "喜歡把混亂問題變成清楚流程"],
-        support: ["專案模板", "資料儀表板", "管理培力"]
-      }
-    ]
   };
   const adminRecruit = {
     highlights: [
@@ -10317,58 +10663,23 @@ function renderTalentPage() {
       ["工作特色", "資料整理、流程管理、跨部門協作、電話諮詢、文件追蹤與營運報表"],
       ["適合對象", "細心穩定、溝通清楚、能整理複雜資訊，也願意支援照顧現場的夥伴"]
     ],
-    gallery: [
-      ["assets/homepage-batch/orange-polo-supervisor-clear.jpg", "人資招募與新人報到，是讓好夥伴加入團隊的第一步。"],
-      ["assets/admin-recruit-02-operations-hires.jpg", "營運調度讓服務、人力與資料能順利接上。"],
-      ["assets/admin-recruit-02-operations-hires.jpg", "財務行政把數字、文件與報表整理清楚。"],
-      ["assets/homepage-batch/family-consultation-clear.jpg", "客服總務承接家庭問題，也支援前線服務。"],
-      ["assets/admin-recruit-05-meeting-clear.jpg", "跨部門會議讓每個專案都有進度與負責人。"]
-    ],
     roles: [
       {
-        title: "人資招募專員",
-        tag: "人才招募",
-        image: "assets/homepage-batch/orange-polo-supervisor-clear.jpg",
-        summary: "負責招募、面談安排、新人報到與員工關懷，協助歲悅找到願意長久投入照顧的夥伴。",
-        duties: ["發布職缺、履歷篩選、面談安排與錄取通知", "協助新人報到、資料建檔與入職流程", "追蹤新人適應狀況與部門人力需求"],
-        requirements: ["具人資、招募、行政或客服經驗佳", "溝通親切、紀錄清楚，能穩定追蹤進度", "認同長照服務，願意理解前線工作型態"],
-        support: ["招募模板", "面談流程", "新人關懷"]
-      },
-      {
-        title: "營運行政專員",
-        tag: "營運支援",
-        image: "assets/admin-recruit-02-operations-hires.jpg",
-        summary: "協助服務資料、排程、跨部門需求與營運進度追蹤，讓每天的照顧服務不被行政流程卡住。",
-        duties: ["整理服務資料、排程異動與跨部門需求", "追蹤營運專案、會議待辦與改善進度", "支援主管製作營運報表與流程文件"],
-        requirements: ["熟悉表格、文件與資料整理", "能同時管理多項進度並主動回報", "具長照、醫療、教育或服務業行政經驗佳"],
-        support: ["流程模板", "主管帶教", "跨部門協作"]
-      },
-      {
-        title: "財務行政專員",
-        tag: "財務文件",
-        image: "assets/admin-recruit-02-operations-hires.jpg",
-        summary: "負責請款、收支資料、發票憑證、報表整理與行政核對，讓公司營運數據穩定清楚。",
-        duties: ["整理收支、請款、發票、憑證與對帳資料", "協助月報、專案報表與合約文件歸檔", "追蹤付款時程、費用申請與行政核銷"],
-        requirements: ["具財務、會計、行政或出納經驗佳", "細心、守時，對數字與文件有耐心", "熟悉試算表與基本文書工具"],
-        support: ["報表格式", "核銷流程", "財務主管支援"]
-      },
-      {
-        title: "客服總務專員",
-        tag: "服務窗口",
-        image: "assets/homepage-batch/family-consultation-clear.jpg",
-        summary: "承接電話、信箱、一般諮詢與總務事項，協助家庭、合作單位與內部團隊快速找到對的人。",
-        duties: ["接聽電話、回覆信箱與初步分類需求", "協助總務採購、文件收發與環境物資管理", "追蹤諮詢案件、轉介窗口與回覆進度"],
-        requirements: ["具客服、總務、行政或服務窗口經驗佳", "說明清楚、態度穩定，能面對焦急詢問", "能整理資訊並確實追蹤到結案"],
-        support: ["回覆腳本", "總務清單", "窗口訓練"]
-      },
-      {
-        title: "投資人與專案行政",
-        tag: "專案窗口",
+        title: "社群媒體行銷企劃",
+        tag: "品牌行銷",
         image: "assets/admin-recruit-05-meeting-clear.jpg",
-        summary: "支援投資人資料、合作提案、專案文件與會議進度，讓外部合作與內部執行有清楚節奏。",
-        duties: ["整理投資人資料、簡報、會議紀錄與追蹤事項", "協助合作提案、標案文件與專案時程管理", "彙整各部門進度，製作對外與內部報告"],
-        requirements: ["具專案行政、企劃、投資人關係或秘書經驗佳", "文字整理清楚，能掌握會議重點與時程", "具保密意識與跨部門溝通能力"],
-        support: ["簡報模板", "專案管理", "主管共作"]
+        summary: "規劃 Facebook、Instagram、LINE、YouTube 等社群內容，讓長照服務、人才招募與品牌故事被穩定看見。",
+        duties: ["規劃社群策略、內容月曆、貼文文案、活動素材與影音腳本", "與設計、影音、營運團隊協作，追蹤成效數據並提出優化建議", "支援品牌行銷、課程招生、募資溝通、招募宣傳與競品趨勢整理"],
+        requirements: ["具社群行銷、內容企劃或品牌行銷經驗佳", "文案能力清楚，具視覺品味、溝通協作能力與基本數據判讀能力", "對長照、社會議題或服務品牌有熱情，能把專業內容轉成大眾看得懂的語言"],
+        support: ["內容月曆", "跨部門素材", "品牌行銷", "數據優化"],
+        employmentType: "全職",
+        location: "臺北市信義區",
+        salary: "月薪 36,000-42,000 元",
+        capacity: "1 名",
+        updatedAt: "2026-07-08",
+        openingSlug: "social-media-marketing-planner",
+        sortOrder: 400,
+        isFeatured: false
       }
     ]
   };
@@ -10415,347 +10726,6 @@ function renderTalentPage() {
     }
   };
 
-  const departmentPanel = (key) => {
-    const item = departments[key];
-    const departmentHero = ({ eyebrow, title, copy, highlights, image, imageAlt, coverClass = "", coverEyebrow, coverTitle }) => `
-            <section class="homecare-intro ${coverClass ? `${coverClass}-intro` : ""}">
-              <div>
-                <p class="eyebrow">${eyebrow}</p>
-                <h2>${title}</h2>
-                <p>${copy}</p>
-                <div class="homecare-highlight-row">
-                  ${highlights.map(([highlightTitle, highlightCopy]) => `<article><span>${highlightTitle}</span><strong>${highlightCopy}</strong></article>`).join("")}
-                </div>
-              </div>
-              <aside class="${coverClass ? `${coverClass}-cover` : ""}">
-                <img src="${talentAsset(image)}" alt="${imageAlt}" />
-                <div><span>${coverEyebrow}</span><strong>${coverTitle}</strong></div>
-              </aside>
-            </section>
-    `;
-    if (key === "home-care-team") {
-      return `
-        <section class="career-tab-panel" data-career-panel="${key}">
-          <div class="homecare-recruit">
-            ${departmentHero({
-              eyebrow: "Home Care Team",
-              title: "居家照顧部門",
-              copy: "居家照顧是歲悅最靠近家庭的一線服務。我們進到長輩熟悉的家，把身體照顧、生活支持、家屬溝通與服務紀錄串成一套穩定流程，讓家庭不用自己猜、照顧者也不是單打獨鬥。",
-              highlights: homeCareRecruit.highlights,
-              image: "assets/homepage-batch/care-home-greeting-clear.jpg",
-              imageAlt: "歲悅居家照顧服務情境",
-              coverEyebrow: "Suiyuecare Home Care",
-              coverTitle: "把照顧帶進家裡，也把安心留在家裡。"
-            })}
-
-            <section class="homecare-gallery" aria-label="居家照顧工作情境">
-              ${homeCareRecruit.gallery.map(([image, caption]) => `<figure><img src="${talentAsset(image)}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
-            </section>
-
-            <section class="homecare-role-section">
-              <div class="career-section-head compact">
-                <p class="eyebrow">Open Roles</p>
-                <h2>居家照顧部門職缺</h2>
-                <span>點開每一個職位，可以看到工作內容、應徵條件、公司支持與申請入口。</span>
-              </div>
-              <div class="homecare-role-grid">
-                ${homeCareRecruit.roles.map((role, index) => `
-                  <details class="homecare-role-card" ${index === 0 ? "open" : ""}>
-                    <summary>
-                      <img src="${talentAsset(role.image)}" alt="${role.title}" />
-                      <div>
-                        <span>${role.tag}</span>
-                        <h3>${role.title}</h3>
-                        <p>${role.summary}</p>
-                      </div>
-                      <b>查看內容</b>
-                    </summary>
-                    <div class="homecare-role-detail">
-                      <article>
-                        <h4>工作內容</h4>
-                        <ul>${role.duties.map((duty) => `<li>${duty}</li>`).join("")}</ul>
-                      </article>
-                      <article>
-                        <h4>應徵條件</h4>
-                        <ul>${role.requirements.map((requirement) => `<li>${requirement}</li>`).join("")}</ul>
-                      </article>
-                      <div class="homecare-role-support">
-                        ${role.support.map((support) => `<span>${support}</span>`).join("")}
-                      </div>
-                      <a class="primary-button" href="#contact" ${talentContactAttrs}>申請應徵</a>
-                    </div>
-                  </details>
-                `).join("")}
-              </div>
-            </section>
-          </div>
-        </section>
-      `;
-    }
-    if (key === "day-care-team") {
-      return `
-        <section class="career-tab-panel" data-career-panel="${key}">
-          <div class="homecare-recruit daycare-recruit">
-            ${departmentHero({
-              eyebrow: "Day Care Team",
-              title: "日間照顧部",
-              copy: "日間照顧是讓長輩白天有安全、有活動、有同伴，也讓家庭有喘息空間的服務。歲悅的日照團隊把作息、餐食、活動、健康觀察與家屬回報整合在一起，讓每一天都被好好安排。",
-              highlights: dayCareRecruit.highlights,
-              image: "assets/daycare-recruit-02-exercise-clear.jpg",
-              imageAlt: "歲悅日間照顧團體活動情境",
-              coverClass: "daycare",
-              coverEyebrow: "Suiyuecare Day Care",
-              coverTitle: "讓長輩白天被陪伴，也讓家庭晚上更安心。"
-            })}
-
-            <section class="homecare-gallery daycare-gallery" aria-label="日間照顧工作情境">
-              ${dayCareRecruit.gallery.map(([image, caption]) => `<figure><img src="${talentAsset(image)}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
-            </section>
-
-            <section class="homecare-role-section">
-              <div class="career-section-head compact">
-                <p class="eyebrow">Open Roles</p>
-                <h2>日間照顧部職缺</h2>
-                <span>點開每一個職位，可以看到工作內容、應徵條件、公司支持與申請入口。</span>
-              </div>
-              <div class="homecare-role-grid">
-                ${dayCareRecruit.roles.map((role, index) => `
-                  <details class="homecare-role-card daycare-role-card" ${index === 0 ? "open" : ""}>
-                    <summary>
-                      <img src="${talentAsset(role.image)}" alt="${role.title}" />
-                      <div>
-                        <span>${role.tag}</span>
-                        <h3>${role.title}</h3>
-                        <p>${role.summary}</p>
-                      </div>
-                      <b>查看內容</b>
-                    </summary>
-                    <div class="homecare-role-detail">
-                      <article>
-                        <h4>工作內容</h4>
-                        <ul>${role.duties.map((duty) => `<li>${duty}</li>`).join("")}</ul>
-                      </article>
-                      <article>
-                        <h4>應徵條件</h4>
-                        <ul>${role.requirements.map((requirement) => `<li>${requirement}</li>`).join("")}</ul>
-                      </article>
-                      <div class="homecare-role-support">
-                        ${role.support.map((support) => `<span>${support}</span>`).join("")}
-                      </div>
-                      <a class="primary-button" href="#contact" ${talentContactAttrs}>申請應徵</a>
-                    </div>
-                  </details>
-                `).join("")}
-              </div>
-            </section>
-          </div>
-        </section>
-      `;
-    }
-    if (key === "migrant-team") {
-      return `
-        <section class="career-tab-panel" data-career-panel="${key}">
-          <div class="homecare-recruit migrant-recruit">
-            ${departmentHero({
-              eyebrow: "Migrant Training",
-              title: "移工培訓部",
-              copy: "移工培訓部把家庭照顧常見的身體照顧、移位安全、備餐營養、溝通回報與照顧紀錄，整理成可以聽懂、看懂、練習、回家後能執行的課程。這個部門不只是教技能，更是在家庭、移工與照顧團隊之間建立共同語言。",
-              highlights: migrantRecruit.highlights,
-              image: "assets/homepage-batch/service-card-05-migrant-training-clear.jpg",
-              imageAlt: "歲悅移工培訓課堂情境",
-              coverClass: "migrant",
-              coverEyebrow: "Suiyuecare Training",
-              coverTitle: "把照顧教到會，也把家庭接得更穩。"
-            })}
-
-            <section class="homecare-gallery migrant-gallery" aria-label="移工培訓工作情境">
-              ${migrantRecruit.gallery.map(([image, caption]) => `<figure><img src="${talentAsset(image)}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
-            </section>
-
-            <section class="homecare-role-section">
-              <div class="career-section-head compact">
-                <p class="eyebrow">Open Roles</p>
-                <h2>移工培訓部職缺</h2>
-                <span>點開每一個職位，可以看到工作內容、應徵條件、公司支持與申請入口。</span>
-              </div>
-              <div class="homecare-role-grid">
-                ${migrantRecruit.roles.map((role, index) => `
-                  <details class="homecare-role-card migrant-role-card" ${index === 0 ? "open" : ""}>
-                    <summary>
-                      <img src="${talentAsset(role.image)}" alt="${role.title}" />
-                      <div>
-                        <span>${role.tag}</span>
-                        <h3>${role.title}</h3>
-                        <p>${role.summary}</p>
-                      </div>
-                      <b>查看內容</b>
-                    </summary>
-                    <div class="homecare-role-detail">
-                      <article>
-                        <h4>工作內容</h4>
-                        <ul>${role.duties.map((duty) => `<li>${duty}</li>`).join("")}</ul>
-                      </article>
-                      <article>
-                        <h4>應徵條件</h4>
-                        <ul>${role.requirements.map((requirement) => `<li>${requirement}</li>`).join("")}</ul>
-                      </article>
-                      <div class="homecare-role-support">
-                        ${role.support.map((support) => `<span>${support}</span>`).join("")}
-                      </div>
-                      <a class="primary-button" href="#contact" ${talentContactAttrs}>申請應徵</a>
-                    </div>
-                  </details>
-                `).join("")}
-              </div>
-            </section>
-          </div>
-        </section>
-      `;
-    }
-    if (key === "quality-team") {
-      return `
-        <section class="career-tab-panel" data-career-panel="${key}">
-          <div class="homecare-recruit quality-recruit">
-            ${departmentHero({
-              eyebrow: "Teaching Quality",
-              title: "教學品管部",
-              copy: "教學品管部把前線照顧經驗變成可被學習、檢核與改善的系統。從新人訓練、教材設計、服務紀錄檢核到品質改善專案，這個部門讓歲悅的服務不是只靠個人努力，而是靠制度穩定變好。",
-              highlights: qualityRecruit.highlights,
-              image: "assets/quality-recruit-04-quality-meeting-clear.jpg",
-              imageAlt: "歲悅教學品管品質會議情境",
-              coverClass: "quality",
-              coverEyebrow: "Suiyuecare Quality",
-              coverTitle: "把好的照顧整理成方法，再讓方法長成制度。"
-            })}
-
-            <section class="homecare-gallery quality-gallery" aria-label="教學品管工作情境">
-              ${qualityRecruit.gallery.map(([image, caption]) => `<figure><img src="${talentAsset(image)}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
-            </section>
-
-            <section class="homecare-role-section">
-              <div class="career-section-head compact">
-                <p class="eyebrow">Open Roles</p>
-                <h2>教學品管部職缺</h2>
-                <span>點開每一個職位，可以看到工作內容、應徵條件、公司支持與申請入口。</span>
-              </div>
-              <div class="homecare-role-grid">
-                ${qualityRecruit.roles.map((role, index) => `
-                  <details class="homecare-role-card quality-role-card" ${index === 0 ? "open" : ""}>
-                    <summary>
-                      <img src="${talentAsset(role.image)}" alt="${role.title}" />
-                      <div>
-                        <span>${role.tag}</span>
-                        <h3>${role.title}</h3>
-                        <p>${role.summary}</p>
-                      </div>
-                      <b>查看內容</b>
-                    </summary>
-                    <div class="homecare-role-detail">
-                      <article>
-                        <h4>工作內容</h4>
-                        <ul>${role.duties.map((duty) => `<li>${duty}</li>`).join("")}</ul>
-                      </article>
-                      <article>
-                        <h4>應徵條件</h4>
-                        <ul>${role.requirements.map((requirement) => `<li>${requirement}</li>`).join("")}</ul>
-                      </article>
-                      <div class="homecare-role-support">
-                        ${role.support.map((support) => `<span>${support}</span>`).join("")}
-                      </div>
-                      <a class="primary-button" href="#contact" ${talentContactAttrs}>申請應徵</a>
-                    </div>
-                  </details>
-                `).join("")}
-              </div>
-            </section>
-          </div>
-        </section>
-      `;
-    }
-    if (key === "admin-team") {
-      return `
-        <section class="career-tab-panel" data-career-panel="${key}">
-          <div class="homecare-recruit admin-recruit">
-            ${departmentHero({
-              eyebrow: "Administration",
-              title: "行政部",
-              copy: "行政部是讓歲悅前線服務能穩定運作的後勤核心。從人資招募、營運調度、財務行政、客服總務到投資人與專案支援，每一個看似細節的流程，都會影響照顧是否能準時、清楚、持續地被交付。",
-              highlights: adminRecruit.highlights,
-              image: "assets/admin-recruit-05-meeting-clear.jpg",
-              imageAlt: "歲悅行政部跨部門會議情境",
-              coverClass: "admin",
-              coverEyebrow: "Suiyuecare Admin",
-              coverTitle: "讓後勤有秩序，前線照顧才有餘裕。"
-            })}
-
-            <section class="homecare-gallery admin-gallery" aria-label="行政部工作情境">
-              ${adminRecruit.gallery.map(([image, caption]) => `<figure><img src="${talentAsset(image)}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`).join("")}
-            </section>
-
-            <section class="homecare-role-section">
-              <div class="career-section-head compact">
-                <p class="eyebrow">Open Roles</p>
-                <h2>行政部職缺</h2>
-                <span>點開每一個職位，可以看到工作內容、應徵條件、公司支持與申請入口。</span>
-              </div>
-              <div class="homecare-role-grid">
-                ${adminRecruit.roles.map((role, index) => `
-                  <details class="homecare-role-card admin-role-card" ${index === 0 ? "open" : ""}>
-                    <summary>
-                      <img src="${talentAsset(role.image)}" alt="${role.title}" />
-                      <div>
-                        <span>${role.tag}</span>
-                        <h3>${role.title}</h3>
-                        <p>${role.summary}</p>
-                      </div>
-                      <b>查看內容</b>
-                    </summary>
-                    <div class="homecare-role-detail">
-                      <article>
-                        <h4>工作內容</h4>
-                        <ul>${role.duties.map((duty) => `<li>${duty}</li>`).join("")}</ul>
-                      </article>
-                      <article>
-                        <h4>應徵條件</h4>
-                        <ul>${role.requirements.map((requirement) => `<li>${requirement}</li>`).join("")}</ul>
-                      </article>
-                      <div class="homecare-role-support">
-                        ${role.support.map((support) => `<span>${support}</span>`).join("")}
-                      </div>
-                      <a class="primary-button" href="#contact" ${talentContactAttrs}>申請應徵</a>
-                    </div>
-                  </details>
-                `).join("")}
-              </div>
-            </section>
-          </div>
-        </section>
-      `;
-    }
-    return `
-      <section class="career-tab-panel" data-career-panel="${key}">
-        <div class="career-dept-layout">
-          <article class="career-dept-image">
-            <img src="${talentAsset(item.image)}" alt="${item.title}招募情境" />
-            <div><span>${item.eyebrow}</span><h3>${item.title}</h3></div>
-          </article>
-          <div class="career-dept-content">
-            <p class="eyebrow">${item.eyebrow}</p>
-            <h2>${item.title}</h2>
-            <p>${item.intro}</p>
-            <div class="career-role-grid">
-              ${item.roles.map((role) => `<article><span>Role</span><strong>${role}</strong></article>`).join("")}
-            </div>
-            <div class="career-skill-list">
-              ${item.skills.map((skill) => `<span>${skill}</span>`).join("")}
-            </div>
-            <a class="primary-button" href="#contact" ${talentContactAttrs}>我要應徵</a>
-          </div>
-        </div>
-      </section>
-    `;
-  };
-
   const staticRecruitGroups = [
     {
       key: "home-care-team",
@@ -10795,7 +10765,7 @@ function renderTalentPage() {
         image_url: "assets/quality-recruit-02-training-clear.jpg",
         highlights: qualityRecruit.highlights.map((item) => item[1])
       },
-      roles: qualityRecruit.roles
+      roles: []
     },
     {
       key: "admin-team",
@@ -10829,14 +10799,14 @@ function renderTalentPage() {
       id: `${group.key}-${roleIndex + 1}`,
       page_slug: "talent",
       department_id: group.key,
-      opening_slug: `${group.key}-${roleIndex + 1}`,
+      opening_slug: role.openingSlug || `${group.key}-${roleIndex + 1}`,
       title: role.title,
       subtitle: role.tag || group.department.title,
       summary: role.summary,
-      employment_type: roleIndex === 0 && group.key === "home-care-team" ? "全職 / 兼職" : "全職",
-      location: locationMap[group.key] || "依職缺安排",
-      salary_text: "面議 / 依經驗核定",
-      capacity_label: roleIndex === 0 ? "持續招募" : "1-2 名",
+      employment_type: role.employmentType || (roleIndex === 0 && group.key === "home-care-team" ? "全職 / 兼職" : "全職"),
+      location: role.location || locationMap[group.key] || "依職缺安排",
+      salary_text: role.salary || role.salaryText || "面議 / 依經驗核定",
+      capacity_label: role.capacity || role.capacityLabel || (roleIndex === 0 ? "持續招募" : "1-2 名"),
       image_url: role.image,
       duties: role.duties,
       requirements: role.requirements,
@@ -10844,9 +10814,9 @@ function renderTalentPage() {
       apply_button_text: "申請應徵",
       apply_form_enabled: true,
       metadata: { form_type: "recruiting" },
-      sort_order: groupIndex * 100 + roleIndex * 10,
-      is_featured: groupIndex === 0 && roleIndex < 2,
-      updated_at: null
+      sort_order: Number.isFinite(Number(role.sortOrder)) ? Number(role.sortOrder) : groupIndex * 100 + roleIndex * 10,
+      is_featured: typeof role.isFeatured === "boolean" ? role.isFeatured : groupIndex === 0 && roleIndex < 2,
+      updated_at: role.updatedAt || null
     };
   }));
   const staticTalentPage = {
@@ -10999,407 +10969,15 @@ function getRelatedArticles(slug) {
     .map((item) => ({ ...item, href: normalizePublicHref(item.href) }));
 }
 
-function searchHrefForTag(tag = "") {
-  return `/search?q=${encodeURIComponent(String(tag || "").replace(/^#\s*/, "").trim())}`;
-}
-
-function renderArticleTagLinks(tags = []) {
-  return (Array.isArray(tags) ? tags : [])
-    .filter(Boolean)
-    .map((tag) => `<a class="meta-tag" href="${escapeHTML(searchHrefForTag(tag))}" aria-label="搜尋 ${escapeHTML(tag)} 相關文章"># ${escapeHTML(tag)}</a>`)
-    .join("");
-}
-
-function renderArticleInlineImage(image = {}) {
-  if (!image?.src) return "";
-  const imageSrc = normalizeLocalAssetUrl(contentImageUrl(image.src));
-  return `
-    <figure class="article-inline-image">
-      <img src="${escapeHTML(imageSrc)}" alt="${escapeHTML(image.alt || image.caption || "健康3.0文章補充圖片")}" />
-      ${image.caption ? `<figcaption>${escapeHTML(image.caption)}</figcaption>` : ""}
-    </figure>
-  `;
-}
-
-function renderArticleContentSection(section, index, inlineImages = []) {
-  const [heading, rawBody] = Array.isArray(section) ? section : [section?.heading, section?.body];
-  const bodies = Array.isArray(rawBody) ? rawBody : [rawBody].filter(Boolean);
-  const images = inlineImages.filter((image) => Number(image.afterSection) === index);
-  return `
-    <section>
-      <h2>${escapeHTML(heading || "")}</h2>
-      ${bodies.map((body) => `<p>${escapeHTML(body || "")}</p>`).join("")}
-      ${images.map(renderArticleInlineImage).join("")}
-    </section>
-  `;
-}
-
-function renderArticleCallout(callout = {}) {
-  if (!callout?.items?.length && !callout?.body) return "";
-  return `
-    <aside class="article-callout">
-      <strong>${escapeHTML(callout.title || "照顧提醒")}</strong>
-      ${callout.body ? `<p>${escapeHTML(callout.body)}</p>` : ""}
-      ${callout.items?.length ? `<ul>${callout.items.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>` : ""}
-    </aside>
-  `;
-}
-
-function renderArticleChecklist(checklist = {}) {
-  if (!checklist?.items?.length) return "";
-  return `
-    <section class="article-checklist">
-      <h2>${escapeHTML(checklist.title || "家屬可以這樣檢查")}</h2>
-      <ul>${checklist.items.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>
-    </section>
-  `;
-}
-
-function renderArticleTable(table = {}) {
-  if (!table?.rows?.length) return "";
-  const headers = table.headers?.length ? table.headers : ["狀況", "可能原因", "下一步"];
-  return `
-    <section class="article-table-section">
-      <h2>${escapeHTML(table.title || "快速對照表")}</h2>
-      <div class="article-table-wrap">
-        <table>
-          <thead><tr>${headers.map((header) => `<th>${escapeHTML(header)}</th>`).join("")}</tr></thead>
-          <tbody>
-            ${table.rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHTML(cell)}</td>`).join("")}</tr>`).join("")}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  `;
-}
-
-function safeClassToken(value) {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, "")
-    .slice(0, 48);
-}
-
-function renderSlideVisualIcon(name = "pulse") {
-  const icons = {
-    pulse: `<svg viewBox="0 0 48 48" focusable="false"><path d="M5 25h8l5-12 8 24 6-16h11"/><path d="M36 8a12 12 0 0 1 0 24"/></svg>`,
-    gauge: `<svg viewBox="0 0 48 48" focusable="false"><path d="M9 34a17 17 0 1 1 30 0"/><path d="M24 34l10-14"/><path d="M16 34h16"/></svg>`,
-    calendar: `<svg viewBox="0 0 48 48" focusable="false"><rect x="9" y="11" width="30" height="28" rx="4"/><path d="M16 7v8M32 7v8M9 20h30M16 27h5M27 27h5M16 34h5M27 34h5"/></svg>`,
-    clock: `<svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="24" r="16"/><path d="M24 15v10l7 4"/></svg>`,
-    sun: `<svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="24" r="8"/><path d="M24 5v7M24 36v7M5 24h7M36 24h7M10.5 10.5l5 5M32.5 32.5l5 5M37.5 10.5l-5 5M15.5 32.5l-5 5"/></svg>`,
-    moon: `<svg viewBox="0 0 48 48" focusable="false"><path d="M32 38A16 16 0 0 1 27 7a13 13 0 1 0 5 31Z"/></svg>`,
-    warning: `<svg viewBox="0 0 48 48" focusable="false"><path d="M24 7 43 40H5L24 7Z"/><path d="M24 18v10M24 34h.1"/></svg>`,
-    phone: `<svg viewBox="0 0 48 48" focusable="false"><path d="M16 8h7l3 8-4 3a23 23 0 0 0 8 8l3-4 8 3v7c0 4-3 7-7 7A27 27 0 0 1 9 15c0-4 3-7 7-7Z"/></svg>`,
-    pill: `<svg viewBox="0 0 48 48" focusable="false"><path d="M18 35 35 18a9 9 0 0 0-13-13L5 22a9 9 0 0 0 13 13Z"/><path d="m14 26 8 8"/></svg>`,
-    note: `<svg viewBox="0 0 48 48" focusable="false"><path d="M13 7h16l8 8v26H13Z"/><path d="M29 7v9h8M18 24h14M18 31h14M18 38h8"/></svg>`,
-    person: `<svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="13" r="6"/><path d="M14 41c1-9 5-14 10-14s9 5 10 14"/></svg>`,
-    walk: `<svg viewBox="0 0 48 48" focusable="false"><circle cx="25" cy="8" r="4"/><path d="M22 17 17 29l-4 10M25 18l6 8 8 2M22 28l8 4 2 9"/></svg>`,
-    shield: `<svg viewBox="0 0 48 48" focusable="false"><path d="M24 5 39 11v11c0 10-6 17-15 21C15 39 9 32 9 22V11Z"/><path d="m16 24 5 5 11-12"/></svg>`,
-    home: `<svg viewBox="0 0 48 48" focusable="false"><path d="M7 22 24 8l17 14"/><path d="M13 20v21h22V20"/><path d="M20 41V29h8v12"/></svg>`,
-    heart: `<svg viewBox="0 0 48 48" focusable="false"><path d="M24 40S8 30 8 18A9 9 0 0 1 24 12a9 9 0 0 1 16 6c0 12-16 22-16 22Z"/><path d="M15 25h6l3-6 4 12 3-6h5"/></svg>`,
-    brain: `<svg viewBox="0 0 48 48" focusable="false"><path d="M18 39a8 8 0 0 1-8-8 8 8 0 0 1 3-6 8 8 0 0 1 4-15 9 9 0 0 1 7-4 9 9 0 0 1 7 4 8 8 0 0 1 4 15 8 8 0 0 1-5 14"/><path d="M24 10v29M17 19h7M24 24h8M16 30h8"/></svg>`,
-    kidney: `<svg viewBox="0 0 48 48" focusable="false"><path d="M18 10c-6 0-10 6-10 14s4 15 10 15c5 0 7-4 7-9 0-4-3-5-3-8 0-3 2-4 2-7 0-3-2-5-6-5Z"/><path d="M30 10c6 0 10 6 10 14s-4 15-10 15c-5 0-7-4-7-9 0-4 3-5 3-8 0-3-2-4-2-7 0-3 2-5 6-5Z"/></svg>`,
-    team: `<svg viewBox="0 0 48 48" focusable="false"><circle cx="18" cy="16" r="5"/><circle cx="31" cy="14" r="6"/><path d="M8 40c1-8 5-13 10-13s9 5 10 13"/><path d="M23 27c2-3 5-5 8-5 5 0 9 6 10 18"/></svg>`,
-    checklist: `<svg viewBox="0 0 48 48" focusable="false"><rect x="10" y="6" width="28" height="36" rx="4"/><path d="m16 18 3 3 6-7M28 19h5M16 30l3 3 6-7M28 31h5"/></svg>`
-  };
-  return `<span class="slide-visual-icon" aria-hidden="true">${icons[name] || icons.pulse}</span>`;
-}
-
-function renderInfographicMetric(visual = {}) {
-  if (!visual.metric && !visual.metricLabel) return "";
-  return `
-    <div class="slide-visual-metric">
-      ${visual.metric ? `<strong>${escapeHTML(visual.metric)}</strong>` : ""}
-      ${visual.metricLabel ? `<span>${escapeHTML(visual.metricLabel)}</span>` : ""}
-    </div>
-  `;
-}
-
-function renderInfographicCards(cards = []) {
-  if (!Array.isArray(cards) || cards.length === 0) return "";
-  return `
-    <div class="slide-visual-cards">
-      ${cards.slice(0, 6).map((card) => {
-        const tone = safeClassToken(card.tone);
-        return `
-          <div class="slide-visual-card ${tone ? `tone-${tone}` : ""}">
-            ${renderSlideVisualIcon(card.icon)}
-            <div>
-              ${card.value ? `<b>${escapeHTML(card.value)}</b>` : ""}
-              ${card.label ? `<span>${escapeHTML(card.label)}</span>` : ""}
-            </div>
-          </div>
-        `;
-      }).join("")}
-    </div>
-  `;
-}
-
-function renderInfographicFlow(flow = []) {
-  if (!Array.isArray(flow) || flow.length === 0) return "";
-  return `
-    <div class="slide-visual-flow">
-      ${flow.slice(0, 4).map((step, index) => `
-        <div class="slide-visual-step">
-          <i>${String(index + 1).padStart(2, "0")}</i>
-          ${renderSlideVisualIcon(step.icon)}
-          <span>${escapeHTML(step.label || "")}</span>
-        </div>
-      `).join("")}
-    </div>
-  `;
-}
-
-function renderInfographicAlerts(alerts = []) {
-  if (!Array.isArray(alerts) || alerts.length === 0) return "";
-  return `
-    <div class="slide-visual-alerts">
-      ${alerts.slice(0, 4).map((alert) => `<span>${renderSlideVisualIcon(alert.icon || "warning")}${escapeHTML(alert.label || alert)}</span>`).join("")}
-    </div>
-  `;
-}
-
-function renderArticleInfographicVisual(slide = {}, article = {}) {
-  const visual = slide.visual || {};
-  const tone = safeClassToken(visual.tone || slide.tone);
-  return `
-    <figure class="article-slide-visual article-slide-visual--infographic ${tone ? `tone-${tone}` : ""}">
-      <div class="slide-infographic-canvas">
-        <div class="slide-visual-top">
-          <span>${escapeHTML(visual.eyebrow || slide.eyebrow || "Visual")}</span>
-          ${visual.badge ? `<b>${escapeHTML(visual.badge)}</b>` : ""}
-        </div>
-        <div class="slide-visual-title">
-          ${renderSlideVisualIcon(visual.icon)}
-          <div>
-            <strong>${escapeHTML(visual.title || slide.title || article.title || "")}</strong>
-            ${visual.subtitle ? `<small>${escapeHTML(visual.subtitle)}</small>` : ""}
-          </div>
-        </div>
-        <div class="slide-visual-main">
-          ${renderInfographicMetric(visual)}
-          ${renderInfographicCards(visual.cards)}
-          ${renderInfographicFlow(visual.flow)}
-          ${renderInfographicAlerts(visual.alerts)}
-        </div>
-        ${visual.caption ? `<figcaption>${escapeHTML(visual.caption)}</figcaption>` : ""}
-      </div>
-    </figure>
-  `;
-}
-
-function renderArticleSlideVisual(slide = {}, article = {}) {
-  if (slide.visual) return renderArticleInfographicVisual(slide, article);
-  const image = slide.image || article.image;
-  if (!image) return "";
-  const imageSrc = normalizeLocalAssetUrl(contentImageUrl(image));
-  return `
-    <figure class="article-slide-visual">
-      <img src="${escapeHTML(imageSrc)}" alt="${escapeHTML(slide.alt || slide.title || article.title || "懶人包視覺頁")}" loading="lazy" decoding="async" />
-      ${slide.visualLabel ? `<figcaption>${escapeHTML(slide.visualLabel)}</figcaption>` : ""}
-    </figure>
-  `;
-}
-
-function renderArticleSlideDeck(article) {
-  const slides = Array.isArray(article.slides) ? article.slides.filter(Boolean).slice(0, 10) : [];
-  if (slides.length < 1) return "";
-  const deckHint = article.visualFormat === "ppt-icon-pack"
-    ? "70% 圖解、icon、短句，像簡報一樣快速抓重點。"
-    : "大圖、短句、清單，快速抓重點。";
-  return `
-    <section class="article-slide-deck" aria-label="${escapeHTML(article.title)} PPT式懶人包">
-      <div class="article-slide-deck-head">
-        <span>PPT式懶人包</span>
-        <strong>${slides.length} 頁速讀</strong>
-        <p>${deckHint}</p>
-      </div>
-      <nav class="article-slide-jump" aria-label="懶人包頁面索引">
-        ${slides.map((slide, index) => `<a href="#slide-${escapeHTML(article.slug)}-${index + 1}">${String(index + 1).padStart(2, "0")}</a>`).join("")}
-      </nav>
-      <div class="article-slides">
-        ${slides.map((slide, index) => {
-          const slideClasses = [
-            "article-slide",
-            article.visualFormat === "ppt-icon-pack" ? "is-icon-pack" : "",
-            slide.visual ? "has-infographic" : "",
-            slide.tone ? `tone-${safeClassToken(slide.tone)}` : ""
-          ].filter(Boolean).join(" ");
-          return `
-            <section class="${slideClasses}" id="slide-${escapeHTML(article.slug)}-${index + 1}">
-              ${renderArticleSlideVisual(slide, article)}
-              <div class="article-slide-copy">
-                <div class="article-slide-kicker">
-                  <span>${String(index + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}</span>
-                  ${slide.eyebrow ? `<em>${escapeHTML(slide.eyebrow)}</em>` : ""}
-                </div>
-                <h2>${escapeHTML(slide.title || "")}</h2>
-                ${slide.lede ? `<p class="article-slide-lede">${escapeHTML(slide.lede)}</p>` : ""}
-                ${slide.stat || slide.statLabel ? `
-                  <div class="article-slide-stat">
-                    ${slide.stat ? `<b>${escapeHTML(slide.stat)}</b>` : ""}
-                    ${slide.statLabel ? `<span>${escapeHTML(slide.statLabel)}</span>` : ""}
-                  </div>
-                ` : ""}
-                ${Array.isArray(slide.points) && slide.points.length ? `
-                  <ul>
-                    ${slide.points.slice(0, 4).map((point) => `<li>${escapeHTML(point)}</li>`).join("")}
-                  </ul>
-                ` : ""}
-              </div>
-            </section>
-          `;
-        }).join("")}
-      </div>
-    </section>
-  `;
-}
-
-function renderArticleReferences(article) {
-  const references = Array.isArray(article.references) ? article.references : [];
-  const legacySource = references.length === 0 && (article.sourceName || article.sourceUrl)
-    ? [{ name: article.sourceName || article.sourceUrl, url: article.sourceUrl || "" }]
-    : [];
-  const seenReferences = new Set();
-  const allReferences = [...references, ...legacySource]
-    .filter((item) => item?.citation || item?.name || item?.url)
-    .sort((a, b) => Number(a.evidenceRank || 99) - Number(b.evidenceRank || 99))
-    .filter((item) => {
-      const key = String(item.pmid || item.doi || item.url || item.citation || item.name || "")
-        .trim()
-        .toLowerCase()
-        .replace(/^https?:\/\/(www\.)?/, "")
-        .replace(/\/$/, "");
-      if (!key || seenReferences.has(key)) return false;
-      seenReferences.add(key);
-      return true;
-    });
-  if (!allReferences.length) return "";
-  return `
-    <section class="article-references">
-      <h2>參考資料</h2>
-      <ol>
-        ${allReferences.map((item) => `
-          <li>${item.url ? `<a href="${escapeHTML(item.url)}" target="_blank" rel="noopener">${escapeHTML(item.citation || item.name || item.url)}</a>` : escapeHTML(item.citation || item.name)}</li>
-        `).join("")}
-      </ol>
-    </section>
-  `;
-}
-
 function renderArticleLayout(article) {
   const related = getRelatedArticles(article.slug);
   const hasSlideDeck = Array.isArray(article.slides) && article.slides.length > 0;
+  const slideDeckHtml = hasSlideDeck && articleSlideDeckRenderer ? articleSlideDeckRenderer(article) : "";
 
-  return `
-    <article class="article-page">
-      <div class="article-topbar">
-        <a class="article-back" href="#health">返回上一頁</a>
-        <span class="article-category">${escapeHTML(article.category)}</span>
-      </div>
-
-      <header class="article-hero">
-        <figure>
-          <img ${healthArticleImageAttrs(article, { usage: article.imageUsage || "article_cover", focalPoint: article.focalPoint })} />
-          <figcaption>
-            <h1>${escapeHTML(article.title)}</h1>
-            <p>${escapeHTML(article.subtitle || article.excerpt || "")}</p>
-          </figcaption>
-        </figure>
-      </header>
-
-      <section class="article-layout">
-        <div class="article-main">
-          <div class="article-meta">
-            <span class="meta-editor">編輯人｜${escapeHTML(article.author)}</span>
-            <span class="meta-date">${escapeHTML(article.date)}</span>
-            ${article.readingMinutes ? `<span class="meta-editor">閱讀時間｜${Number(article.readingMinutes)} 分鐘</span>` : ""}
-            ${article.targetAudience ? `<span class="meta-editor">適合｜${escapeHTML(article.targetAudience)}</span>` : ""}
-            ${renderArticleTagLinks(article.tags)}
-          </div>
-
-          ${article.videoEmbedUrl ? `
-            <section class="article-video-block">
-              ${article.videoProvider === "youtube" || article.videoProvider === "vimeo"
-                ? `<iframe src="${escapeHTML(article.videoEmbedUrl)}" title="${escapeHTML(article.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
-                : `<video src="${escapeHTML(article.videoEmbedUrl)}" controls preload="metadata" poster="${escapeHTML(getHealthArticleImage(article))}"></video>`}
-              <div><span>${escapeHTML(article.videoLabel || article.category)}${article.videoDuration ? ` · ${escapeHTML(article.videoDuration)}` : ""}</span><p>${escapeHTML(article.videoCaption || article.subtitle || "")}</p></div>
-            </section>
-          ` : ""}
-
-          ${hasSlideDeck
-            ? renderArticleSlideDeck(article)
-            : `${article.summary?.length ? `
-              <div class="article-summary">
-                <strong>本文重點</strong>
-                <ul>${article.summary.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>
-              </div>
-            ` : ""}`}
-
-          <div class="article-body ${hasSlideDeck ? "article-body-compact" : ""}">
-            ${hasSlideDeck ? "" : renderArticleCallout(article.warning)}
-            ${hasSlideDeck ? "" : (Array.isArray(article.content)
-              ? article.content.map((section, index) => renderArticleContentSection(section, index, article.inlineImages || [])).join("")
-              : renderMarkdownContent(article.content))}
-            ${hasSlideDeck ? "" : (Array.isArray(article.checklists) ? article.checklists.map(renderArticleChecklist).join("") : "")}
-            ${hasSlideDeck ? "" : (Array.isArray(article.tables) ? article.tables.map(renderArticleTable).join("") : "")}
-            ${hasSlideDeck ? "" : (Array.isArray(article.faq) && article.faq.length ? `
-                <section class="article-faq">
-                  <h2>常見問題</h2>
-                  ${article.faq.map((item) => `
-                    <details>
-                      <summary>${escapeHTML(item.question || "")}</summary>
-                      <p>${escapeHTML(item.answer || "")}</p>
-                    </details>
-                  `).join("")}
-                </section>
-              ` : "")}
-            <div class="article-cta">
-              <p>${escapeHTML(article.cta || "不確定下一步怎麼安排？留下需求，讓歲悅協助判斷。")}</p>
-              <a href="${escapeHTML(article.ctaUrl || "#contact")}">${escapeHTML(article.ctaText || "預約照顧諮詢")}</a>
-            </div>
-            ${renderArticleReferences(article)}
-          </div>
-
-        </div>
-
-        <aside class="article-ads" aria-label="側邊推薦">
-          <a class="article-ad featured" href="#contact">
-            <span>Suiyuecare Corps.</span>
-            <strong>第一次照顧諮詢</strong>
-            <p>不知道該選居家、日照還是復能？讓專人協助判斷。</p>
-            <em>預約諮詢</em>
-          </a>
-          <a class="article-ad" href="#courses">
-            <span>Care Course</span>
-            <strong>家屬照顧課</strong>
-            <p>把移位、用餐、跌倒預防變成看得懂的日常技巧。</p>
-          </a>
-          <a class="article-ad" href="/talent">
-            <span>We want you</span>
-            <strong>加入歲悅團隊</strong>
-            <p>居服員、督導、日照照服員招募中。</p>
-          </a>
-        </aside>
-
-        <section class="article-related">
-          <div class="article-related-head">
-            <span>Related Articles</span>
-            <strong>延伸閱讀</strong>
-          </div>
-          <div class="article-related-grid">
-            ${related.map((item) => `
-              <a href="${escapeHTML(normalizePublicHref(item.href))}">
-                <img ${healthArticleImageAttrs(item, { usage: "card", focalPoint: item.focalPoint })} />
-                <span>${escapeHTML(item.category)}</span>
-                <b>${escapeHTML(item.title)}</b>
-              </a>
-            `).join("")}
-          </div>
-        </section>
-      </section>
-    </article>
-  `;
+  return renderPublicArticleLayout(article, {
+    related,
+    slideDeckHtml
+  });
 }
 
 function renderStaticArticlePage(slug) {
@@ -11438,8 +11016,10 @@ function renderStaticArticlePage(slug) {
 async function loadArticlePage(slug) {
   try {
     await ensureStaticArticleRewrites();
-    const article = await fetchSupabaseArticlePage(slug);
+    const article = await fetchArticlePageWithFallback(slug);
     if (routeSlugFromLocation() !== `article-${slug}`) return;
+    const pageArticle = article || articlePages[slug];
+    if (pageArticle?.slides?.length) await ensureArticleSlideDeckRenderer();
     if (article) {
       setRouteSeo(`article-${slug}`, {
         title: article.seoTitle || `${article.title}｜健康3.0`,
@@ -11473,6 +11053,7 @@ async function loadArticlePage(slug) {
     if (routeSlugFromLocation() !== `article-${slug}`) return;
     if (articlePages[slug]) {
       const fallback = articlePages[slug];
+      if (fallback.slides?.length) await ensureArticleSlideDeckRenderer();
       setRouteSeo(`article-${slug}`, {
         title: `${fallback.title}｜健康3.0`,
         description: fallback.dek || DEFAULT_SEO.description,
@@ -11494,24 +11075,40 @@ async function loadArticlePage(slug) {
 }
 
 async function renderRecruitingPageOnce(slug, fallbackRenderer) {
+  const fallbackHtml = fallbackRenderer();
+  pageView.innerHTML = "";
   setPageViewBusy(true);
-  const loaded = await loadSupabaseRecruitingPage(slug);
+  const renderedHtml = await loadSupabaseRecruitingPage(slug);
   if (routeSlugFromLocation() !== slug) return;
-  if (!loaded) pageView.innerHTML = fallbackRenderer();
+  pageView.innerHTML = renderedHtml || fallbackHtml;
   setPageViewBusy(false);
+  optimizeImageLoading(pageView);
+  observeServiceMotion(pageView);
+  window.requestAnimationFrame(updateTalentJobDetailPosition);
+  window.requestAnimationFrame(updateTalentBenefitNavPosition);
 }
 
 async function fetchCareStoryPage(slug) {
   if (careStoryPageCache.has(slug)) return careStoryPageCache.get(slug);
-  const { data, error } = await supabase
-    .from("care_stories")
-    .select("*, cover_image:media!care_stories_cover_image_id_fkey(id, public_url, alt_text), avatar_image:media!care_stories_avatar_image_id_fkey(id, public_url, alt_text)")
-    .eq("slug", slug)
-    .eq("is_enabled", true)
-    .eq("status", "published")
-    .lte("published_at", new Date().toISOString())
-    .maybeSingle();
-  if (error) throw error;
+  let data = null;
+  if (supabase) {
+    try {
+      const result = await supabase
+        .from("care_stories")
+        .select("*, cover_image:media!care_stories_cover_image_id_fkey(id, public_url, alt_text), avatar_image:media!care_stories_avatar_image_id_fkey(id, public_url, alt_text)")
+        .eq("slug", slug)
+        .eq("is_enabled", true)
+        .eq("status", "published")
+        .lte("published_at", new Date().toISOString())
+        .maybeSingle();
+      if (result.error) throw result.error;
+      data = result.data;
+      if (!data) return null;
+    } catch (error) {
+      console.warn(`Supabase care story unavailable for ${slug}; using the published snapshot.`, error);
+    }
+  }
+  if (!data) data = await loadCmsFallback("getCareStory", slug);
   if (!data) return null;
   const story = normalizeCareStory(data);
   careStoryPageCache.set(slug, story);
@@ -11520,15 +11117,25 @@ async function fetchCareStoryPage(slug) {
 
 async function fetchExpertTalkPage(slug) {
   if (expertTalkPageCache.has(slug)) return expertTalkPageCache.get(slug);
-  const { data, error } = await supabase
-    .from("expert_talks")
-    .select("*, image:media!expert_talks_image_id_fkey(id, public_url, alt_text)")
-    .eq("slug", slug)
-    .eq("is_enabled", true)
-    .eq("status", "published")
-    .lte("published_at", new Date().toISOString())
-    .maybeSingle();
-  if (error) throw error;
+  let data = null;
+  if (supabase) {
+    try {
+      const result = await supabase
+        .from("expert_talks")
+        .select("*, image:media!expert_talks_image_id_fkey(id, public_url, alt_text)")
+        .eq("slug", slug)
+        .eq("is_enabled", true)
+        .eq("status", "published")
+        .lte("published_at", new Date().toISOString())
+        .maybeSingle();
+      if (result.error) throw result.error;
+      data = result.data;
+      if (!data) return null;
+    } catch (error) {
+      console.warn(`Supabase expert talk unavailable for ${slug}; using the published snapshot.`, error);
+    }
+  }
+  if (!data) data = await loadCmsFallback("getExpertTalk", slug);
   if (!data) return null;
   const talk = normalizeExpertTalk(data);
   expertTalkPageCache.set(slug, talk);
@@ -11654,6 +11261,7 @@ function renderPage(slug) {
   const anchorTarget = normalized === "home" ? null : document.getElementById(normalized);
   const page = anchorTarget ? null : pages[normalized];
   const isHome = !articleSlug && !careStorySlug && !masterTalkSlug && (normalized === "home" || Boolean(anchorTarget));
+  const hasMatchingPrerender = pageView.dataset.prerenderedRoute === normalized && Boolean(pageView.innerHTML.trim());
   const handledBySpecialCms =
     normalized === "about" ||
     normalized === "milestones" ||
@@ -11663,49 +11271,58 @@ function renderPage(slug) {
     normalized === "nursing" ||
     normalized === "migrant-training" ||
     normalized === "quality" ||
+    normalized === "courses" ||
     serviceTemplateSlugs.has(normalized) ||
     recruitingTemplateSlugs.has(normalized) ||
     ["investors", "ir-finance", "ir-governance", "ir-shareholders"].includes(normalized);
 
   if (articleSlug) {
-    setRouteSeo(`article-${articleSlug}`, { title: "文章載入中｜健康3.0", canonical: routeCanonical(`article-${articleSlug}`) });
+    if (!hasMatchingPrerender) {
+      setRouteSeo(`article-${articleSlug}`, { title: "文章載入中｜健康3.0", canonical: routeCanonical(`article-${articleSlug}`) });
+    }
   } else if (careStorySlug) {
-    setRouteSeo(`care-story-${careStorySlug}`, { title: "故事載入中｜真實照顧情境", canonical: routeCanonical(`care-story-${careStorySlug}`) });
+    if (!hasMatchingPrerender) {
+      setRouteSeo(`care-story-${careStorySlug}`, { title: "故事載入中｜真實照顧情境", canonical: routeCanonical(`care-story-${careStorySlug}`) });
+    }
   } else if (masterTalkSlug) {
-    setRouteSeo(`master-talk-${masterTalkSlug}`, { title: "名人講堂載入中｜健康3.0", canonical: routeCanonical(`master-talk-${masterTalkSlug}`) });
+    if (!hasMatchingPrerender) {
+      setRouteSeo(`master-talk-${masterTalkSlug}`, { title: "名人講堂載入中｜健康3.0", canonical: routeCanonical(`master-talk-${masterTalkSlug}`) });
+    }
   } else {
     setRouteSeo(normalized || "home");
   }
 
   home.classList.toggle("active", isHome);
   pageView.classList.toggle("active", !isHome);
-  pageView.innerHTML = "";
+  if (!hasMatchingPrerender) {
+    pageView.innerHTML = "";
+    delete pageView.dataset.prerenderedRoute;
+  }
   setPageViewBusy(false);
 
   if (articleSlug) {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = "";
+    if (!hasMatchingPrerender) pageView.innerHTML = "";
     loadArticlePage(articleSlug);
   } else if (careStorySlug) {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = "";
+    if (!hasMatchingPrerender) pageView.innerHTML = "";
     loadCareStoryPage(careStorySlug);
   } else if (masterTalkSlug) {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = "";
+    if (!hasMatchingPrerender) pageView.innerHTML = "";
     loadExpertTalkPage(masterTalkSlug);
   } else if (normalized === "about") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderAboutPageThreeMinute();
+    renderCmsEnhancedServicePageOnce(normalized, renderAboutPageThreeMinute);
   } else if (normalized === "milestones") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderMilestonesPage();
-    initMilestonePage();
+    renderMilestonesPageOnce();
   } else if (normalized === "home-care") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -11733,41 +11350,29 @@ function renderPage(slug) {
   } else if (normalized === "software") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    renderServiceTemplatePageOnce(normalized, renderSoftwarePage);
+    renderCmsEnhancedServicePageOnce(normalized, renderSoftwarePage);
   } else if (normalized === "land") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderLandRecruitingPage();
+    renderRecruitingPageOnce(normalized, renderLandRecruitingPage);
   } else if (normalized === "investor-recruiting") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderInvestorRecruitingPage();
+    renderRecruitingPageOnce(normalized, renderInvestorRecruitingPage);
   } else if (normalized === "health") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderHealthPage(searchParams.get("category") || "");
-    ensureStaticArticleRewrites().then(() => {
-      const [currentRoute, currentQuery = ""] = routeSlugFromLocation().split("?");
-      if (currentRoute === "health") pageView.innerHTML = renderHealthPage(new URLSearchParams(currentQuery).get("category") || "");
-    });
-    // Keep Health 3.0 first paint stable; remote data warms the cache without replacing the visible page.
-    loadSupabaseHealthArticles({ rerender: false });
-    loadSupabaseArticleCategories({ rerender: false });
+    renderHealthRouteOnce(normalized, searchParams.get("category") || "");
   } else if (normalized === "search") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderSearchPage(searchParams.get("q") || "");
-    ensureStaticArticleRewrites().then(() => {
-      const [currentRoute, currentQuery = ""] = routeSlugFromLocation().split("?");
-      if (currentRoute === "search") pageView.innerHTML = renderSearchPage(new URLSearchParams(currentQuery).get("q") || "");
-    });
-    loadSupabaseHealthArticles({ rerender: true });
+    renderHealthRouteOnce(normalized, searchParams.get("q") || "");
   } else if (normalized === "courses") {
     renderCoursesPageFromCms();
   } else if (normalized === "talent") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    pageView.innerHTML = renderTalentPage();
+    renderRecruitingPageOnce(normalized, renderTalentPage);
   } else if (normalized === "investors") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -11863,6 +11468,11 @@ function renderPage(slug) {
   }
 
   optimizeImageLoading(isHome ? home : pageView);
+  hydrateServiceFeeCodeGroups(isHome ? home : pageView);
+  hydrateDayCareLocationContent(isHome ? home : pageView);
+  hydrateHomeCareLocationContent(isHome ? home : pageView);
+  hydrateCommunityContent(isHome ? home : pageView);
+  syncContactNeedDefaults(document, normalized);
   if (window.location.hash === "#contact") {
     window.setTimeout(applyPendingContactPreset, 180);
   }
@@ -11933,6 +11543,37 @@ function scheduleImageLoadingOptimization(root = document) {
   });
 }
 
+let dayCareLocationModulePromise = null;
+let homeCareLocationModulePromise = null;
+let communityModulePromise = null;
+
+function hydrateDayCareLocationContent(root = document) {
+  const hasDayCareLocation = root?.querySelector?.("[data-day-care-location-map-host]");
+  if (!hasDayCareLocation && !dayCareLocationModulePromise) return;
+  dayCareLocationModulePromise ||= import("./day-care-location.js");
+  dayCareLocationModulePromise
+    .then(({ hydrateDayCareLocation }) => hydrateDayCareLocation(root))
+    .catch((error) => console.warn(error));
+}
+
+function hydrateHomeCareLocationContent(root = document) {
+  const hasHomeCareLocation = root?.querySelector?.("[data-home-care-location-map-host]");
+  if (!hasHomeCareLocation && !homeCareLocationModulePromise) return;
+  homeCareLocationModulePromise ||= import("./home-care-location.js");
+  homeCareLocationModulePromise
+    .then(({ hydrateHomeCareLocation }) => hydrateHomeCareLocation(root))
+    .catch((error) => console.warn(error));
+}
+
+function hydrateCommunityContent(root = document) {
+  const hasCommunityContent = root?.querySelector?.("[data-community-safety-host], [data-community-location-map-host]");
+  if (!hasCommunityContent && !communityModulePromise) return;
+  communityModulePromise ||= import("./community-page.js");
+  communityModulePromise
+    .then(({ hydrateCommunityPage }) => hydrateCommunityPage(root))
+    .catch((error) => console.warn(error));
+}
+
 function contactFormFromTrigger(trigger) {
   const href = trigger?.getAttribute?.("href") || "";
   const targetSelector = href.startsWith("#") ? href : "";
@@ -11957,11 +11598,9 @@ function applyContactPreset(trigger) {
   if (!form) return;
   const select = form.querySelector('select[name="需求"]');
   if (select && need) {
-    const hasOption = [...select.options].some((option) => option.value === need || option.textContent === need);
-    if (!hasOption) {
-      select.add(new Option(need, need), 0);
-    }
-    select.value = need;
+    setContactNeedValue(select, need);
+    select.dataset.needSource = "preset";
+    select.dataset.needRoute = normalizedContactNeedRoute();
   }
   const textarea = form.querySelector('textarea[name="說明"]');
   if (textarea && message && !textarea.value.trim()) textarea.value = message;
@@ -12045,7 +11684,7 @@ if ("IntersectionObserver" in window) {
         }
       });
     },
-    { rootMargin: "0px 0px -12% 0px", threshold: 0.12 }
+    { rootMargin: "0px 0px -8% 0px", threshold: 0.01 }
   );
   observeServiceMotion(document);
 } else {
@@ -12059,7 +11698,14 @@ window.setTimeout(() => {
 }, 900);
 
 if ("MutationObserver" in window && pageView) {
-  const serviceMotionMutationObserver = new MutationObserver(() => scheduleServiceMotionObservation(pageView));
+  const serviceMotionMutationObserver = new MutationObserver(() => {
+    scheduleServiceMotionObservation(pageView);
+    hydrateServiceFeeCodeGroups(pageView);
+    hydrateDayCareLocationContent(pageView);
+    hydrateHomeCareLocationContent(pageView);
+    hydrateCommunityContent(pageView);
+    syncContactNeedDefaults(pageView);
+  });
   serviceMotionMutationObserver.observe(pageView, { childList: true, subtree: true });
   const imageLoadingMutationObserver = new MutationObserver(() => scheduleImageLoadingOptimization(pageView));
   imageLoadingMutationObserver.observe(pageView, { childList: true, subtree: true });
@@ -12077,6 +11723,15 @@ document.addEventListener("click", (event) => {
     window.setTimeout(() => applyContactPreset(trigger), 120);
     focusContactForm(trigger);
   }
+});
+
+document.addEventListener("change", (event) => {
+  const select = event.target.closest?.('.contact-form select[name="需求"]');
+  if (!select) return;
+  select.dataset.needSource = "user";
+  select.dataset.needRoute = normalizedContactNeedRoute();
+  const formTypeInput = select.form?.querySelector('input[name="form_type"]');
+  if (formTypeInput) formTypeInput.value = contactNeedToFormType(select.value);
 });
 
 const careDaySection = document.querySelector("[data-care-day]");
@@ -12323,6 +11978,8 @@ function openRecruitApply(dataset = {}) {
   setValue("#recruitApplyOpeningId", dataset.openingId || "");
   setValue("#recruitApplyOpeningSlug", dataset.openingSlug || "");
   setValue("#recruitApplyOpeningTitle", dataset.openingTitle || "");
+  const context = document.querySelector("#recruitApplyContext");
+  if (context) context.textContent = dataset.openingTitle || "職缺申請";
   if (status) status.textContent = "";
   modal.hidden = false;
   document.body.classList.add("modal-open");
@@ -12559,6 +12216,9 @@ document.addEventListener("submit", (event) => {
         metadata: { form_class: "contact-form", form_type: formType, email_sent: Boolean(result.emailSent) }
       });
       form.reset();
+      const needSelect = form.querySelector('select[name="需求"]');
+      if (needSelect) delete needSelect.dataset.needSource;
+      syncContactNeedDefaults(form);
       setContactFormStatus(
         form,
         result.emailSent
@@ -12619,10 +12279,6 @@ function activateCareerTab(tabName, options = {}) {
   requestAnimationFrame(updateTalentBenefitNavPosition);
 }
 
-function talentJobLower(value = "") {
-  return String(value || "").trim().toLowerCase();
-}
-
 function selectTalentJob(board, jobId, options = {}) {
   if (!board) return;
   const cards = [...board.querySelectorAll("[data-talent-job-card]")];
@@ -12651,45 +12307,18 @@ function selectTalentJob(board, jobId, options = {}) {
   requestAnimationFrame(updateTalentJobDetailPosition);
 }
 
-function sortTalentJobCards(board) {
-  const list = board.querySelector(".talent-job-list");
-  if (!list) return;
-  const sortMode = board.querySelector("[data-talent-sort]")?.value || "recommended";
-  const cards = [...list.querySelectorAll("[data-talent-job-card]")];
-  cards.sort((a, b) => {
-    if (sortMode === "newest") {
-      return Number(b.dataset.updatedRank || 0) - Number(a.dataset.updatedRank || 0)
-        || Number(a.dataset.defaultRank || 0) - Number(b.dataset.defaultRank || 0);
-    }
-    if (sortMode === "department") {
-      return String(a.dataset.departmentRank || "").localeCompare(String(b.dataset.departmentRank || ""), "zh-Hant")
-        || Number(a.dataset.defaultRank || 0) - Number(b.dataset.defaultRank || 0);
-    }
-    return Number(a.dataset.defaultRank || 0) - Number(b.dataset.defaultRank || 0);
-  });
-  cards.forEach((card) => list.append(card));
-}
-
 function applyTalentJobFilters(board) {
   if (!board) return;
-  const query = talentJobLower(board.querySelector("[data-talent-job-search]")?.value);
-  const department = talentJobLower(board.querySelector('[data-talent-filter="department"]')?.value);
-  const location = talentJobLower(board.querySelector('[data-talent-filter="location"]')?.value);
-  const type = talentJobLower(board.querySelector('[data-talent-filter="type"]')?.value);
+  const department = board.querySelector('[data-talent-filter="department"]')?.value || "";
   const cards = [...board.querySelectorAll("[data-talent-job-card]")];
   let visibleCount = 0;
 
   cards.forEach((card) => {
-    const matchesQuery = !query || talentJobLower(card.dataset.talentSearch).includes(query);
-    const matchesDepartment = !department || talentJobLower(card.dataset.talentDepartment) === department;
-    const matchesLocation = !location || talentJobLower(card.dataset.talentLocation) === location;
-    const matchesType = !type || talentJobLower(card.dataset.talentType) === type;
-    const isVisible = matchesQuery && matchesDepartment && matchesLocation && matchesType;
+    const isVisible = !department || card.dataset.talentDepartment === department;
     card.hidden = !isVisible;
     if (isVisible) visibleCount += 1;
   });
 
-  sortTalentJobCards(board);
   const countTarget = board.querySelector("[data-talent-result-count]");
   if (countTarget) countTarget.textContent = String(visibleCount);
   const emptyState = board.querySelector("[data-talent-empty]");
@@ -12712,13 +12341,9 @@ function applyTalentJobFilters(board) {
 
 function resetTalentJobFilters(board) {
   if (!board) return;
-  const search = board.querySelector("[data-talent-job-search]");
-  if (search) search.value = "";
   board.querySelectorAll("[data-talent-filter]").forEach((filter) => {
     filter.value = "";
   });
-  const sort = board.querySelector("[data-talent-sort]");
-  if (sort) sort.value = "recommended";
   applyTalentJobFilters(board);
 }
 
@@ -12837,18 +12462,6 @@ document.addEventListener("keydown", (event) => {
   selectTalentJob(jobCard.closest("[data-talent-job-board]"), jobCard.dataset.jobId, { focus: true, scrollDetail: true });
 });
 
-document.addEventListener("input", (event) => {
-  const search = event.target.closest?.("[data-talent-job-search]");
-  if (!search) return;
-  applyTalentJobFilters(search.closest("[data-talent-job-board]"));
-});
-
-document.addEventListener("change", (event) => {
-  const control = event.target.closest?.("[data-talent-filter], [data-talent-sort]");
-  if (!control) return;
-  applyTalentJobFilters(control.closest("[data-talent-job-board]"));
-});
-
 document.addEventListener("click", (event) => {
   const carouselButton = event.target.closest("[data-scroll-carousel]");
   if (carouselButton) {
@@ -12878,12 +12491,6 @@ document.addEventListener("click", (event) => {
     const filter = [...(board?.querySelectorAll("[data-talent-filter]") || [])].find((item) => item.dataset.talentFilter === filterName);
     if (filter) filter.value = talentChip.dataset.value || "";
     applyTalentJobFilters(board);
-    return;
-  }
-
-  const talentSelectButton = event.target.closest("[data-talent-select-job]");
-  if (talentSelectButton) {
-    selectTalentJob(talentSelectButton.closest("[data-talent-job-board]"), talentSelectButton.dataset.talentSelectJob, { scrollDetail: true });
     return;
   }
 
@@ -13030,20 +12637,177 @@ window.addEventListener("resize", () => {
   updateTalentBenefitNavPosition();
 });
 window.addEventListener("pagehide", flushPageEngagement);
+
+function initCmsPreviewBridge() {
+  if (new URLSearchParams(window.location.search).get("cms-preview") !== "1") return;
+
+  document.documentElement.dataset.cmsPreview = "true";
+  const parentOrigin = window.location.origin;
+  let sectionDefinitions = [];
+  let activeSectionId = "";
+  let intersectionObserver = null;
+
+  const style = document.createElement("style");
+  style.textContent = `
+    [data-cms-preview="section"] { position: relative !important; cursor: pointer !important; }
+    [data-cms-preview="section"]::after {
+      position: absolute; inset: 3px; z-index: 9998; border: 2px dashed rgba(16, 126, 145, .5);
+      border-radius: 6px; pointer-events: none; content: ""; opacity: 0; transition: opacity .14s ease;
+    }
+    [data-cms-preview="section"]:hover::after,
+    [data-cms-preview="section"].cms-preview-active::after { opacity: 1; }
+    [data-cms-preview="section"].cms-preview-active::after {
+      border-style: solid; border-color: #ef861e; box-shadow: inset 0 0 0 2px rgba(255,255,255,.8);
+    }
+    html[data-cms-preview="true"] { scroll-behavior: smooth; }
+  `;
+  document.head.appendChild(style);
+
+  function postToEditor(message) {
+    if (window.parent === window) return;
+    window.parent.postMessage(message, parentOrigin);
+  }
+
+  function setActiveSection(sectionId, shouldNotify = false) {
+    if (!sectionId) return;
+    activeSectionId = sectionId;
+    document.querySelectorAll("[data-cms-editor-section]").forEach((element) => {
+      element.classList.toggle("cms-preview-active", element.dataset.cmsEditorSection === sectionId);
+    });
+    if (shouldNotify) postToEditor({ type: "cms-editor:section-active", sectionId });
+  }
+
+  function markSections() {
+    if (!sectionDefinitions.length) return;
+    intersectionObserver?.disconnect();
+    intersectionObserver = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      const sectionId = visible?.target?.dataset?.cmsEditorSection;
+      if (sectionId && sectionId !== activeSectionId) setActiveSection(sectionId, true);
+    }, { rootMargin: "-16% 0px -62% 0px", threshold: [0.01, 0.25, 0.6] });
+
+    const mapped = [];
+    sectionDefinitions.forEach((section) => {
+      let elements = [];
+      try {
+        elements = [...document.querySelectorAll(section.selector)];
+      } catch (error) {
+        console.warn("Invalid CMS preview selector", section.selector, error);
+      }
+      elements.forEach((element) => {
+        element.dataset.cmsPreview = "section";
+        element.dataset.cmsEditorSection = section.id;
+        element.setAttribute("aria-label", `${section.label}，點選後編輯`);
+        intersectionObserver.observe(element);
+      });
+      if (elements.length) mapped.push(section.id);
+    });
+    if (activeSectionId) setActiveSection(activeSectionId);
+    postToEditor({ type: "cms-editor:mapped", sectionIds: mapped });
+  }
+
+  function applyPatch(patch) {
+    if (!patch?.selector) return;
+    let elements = [];
+    try {
+      elements = [...document.querySelectorAll(patch.selector)];
+    } catch (error) {
+      console.warn("Invalid CMS preview patch selector", patch.selector, error);
+      return;
+    }
+    elements.forEach((element) => {
+      const value = patch.value == null ? "" : String(patch.value);
+      if (patch.property === "text") element.textContent = value;
+      if (patch.property === "href") element.setAttribute("href", value || "#");
+      if (patch.property === "src" && element instanceof HTMLImageElement) element.src = value;
+      if (patch.property === "backgroundImage") {
+        const nextImage = `url(\"${value.replace(/\"/g, "\\\"")}\")`;
+        const existing = element.style.backgroundImage || "";
+        element.style.backgroundImage = /url\([^)]*\)\s*$/.test(existing)
+          ? existing.replace(/url\([^)]*\)\s*$/, nextImage)
+          : nextImage;
+      }
+    });
+  }
+
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin || event.source !== window.parent) return;
+    const message = event.data || {};
+    if (message.type === "cms-editor:init") {
+      sectionDefinitions = Array.isArray(message.sections) ? message.sections : [];
+      markSections();
+    }
+    if (message.type === "cms-editor:select-section") {
+      const section = sectionDefinitions.find((item) => item.id === message.sectionId);
+      if (!section) return;
+      activeSectionId = section.id;
+      let target = null;
+      try {
+        target = document.querySelector(section.selector);
+      } catch {
+        target = null;
+      }
+      setActiveSection(section.id);
+      target?.scrollIntoView({ block: "center", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }
+    if (message.type === "cms-editor:patch") {
+      (Array.isArray(message.patches) ? message.patches : []).forEach(applyPatch);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    const section = event.target instanceof Element ? event.target.closest("[data-cms-editor-section]") : null;
+    if (!section) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const sectionId = section.dataset.cmsEditorSection;
+    setActiveSection(sectionId);
+    postToEditor({ type: "cms-editor:section-selected", sectionId });
+  }, true);
+
+  document.addEventListener("submit", (event) => event.preventDefault(), true);
+
+  const mutationObserver = new MutationObserver(() => window.requestAnimationFrame(markSections));
+  mutationObserver.observe(document.body, { childList: true, subtree: true });
+  window.setTimeout(markSections, 100);
+  postToEditor({ type: "cms-editor:ready" });
+}
+
 initCareDayScroll();
 updateScrollProgress();
 optimizeImageLoading(document);
 renderPage(routeSlugFromLocation());
+initCmsPreviewBridge();
 requestAnimationFrame(updateTalentJobDetailPosition);
 requestAnimationFrame(updateTalentBenefitNavPosition);
 renderHomeHealthArticles();
 document.documentElement.dataset.appReady = "true";
 window.requestAnimationFrame(() => scrollToCurrentPageAnchor());
 loadSupabaseSiteSettings();
-loadSupabasePageContent("home");
-loadSupabaseHomeModules().then((loaded) => {
-  if (!loaded) loadWordPressContent();
-  loadSupabaseStoryDatabases();
+
+async function initializePublishedHomeContent() {
+  const pagePromise = loadSupabasePageContent("home");
+  const modulesPromise = loadSupabaseHomeModules();
+  const articlesPromise = loadSupabaseHealthArticles();
+  const categoriesPromise = loadSupabaseArticleCategories();
+  const storiesPromise = loadSupabaseStoryDatabases();
+  try {
+    const snapshot = await loadCmsFallback("getStoryDatabases");
+    renderPublishedStoryDatabases(snapshot.stories, snapshot.talks);
+    document.documentElement.dataset.homeContentReady = "snapshot";
+  } catch (error) {
+    console.warn("CMS snapshot unavailable", error);
+  }
+  await Promise.all([pagePromise, modulesPromise, articlesPromise, categoriesPromise, storiesPromise]);
+  renderHomeHealthArticles();
+  document.documentElement.dataset.homeContentReady = "true";
+}
+
+initializePublishedHomeContent().catch((error) => {
+  console.warn("CMS home init", error);
+  document.documentElement.dataset.homeContentReady = "fallback";
 });
 
 function removeIntroLoader() {

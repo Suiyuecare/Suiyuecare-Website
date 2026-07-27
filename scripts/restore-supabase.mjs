@@ -23,6 +23,7 @@ const RESTORE_ORDER = [
   "recruiting_pages",
   "recruiting_departments",
   "recruiting_openings",
+  "milestones",
   "investor_notices",
   "investor_financial_items",
   "investor_chart_datasets",
@@ -35,7 +36,7 @@ if (!SUPABASE_URL || !SERVICE_KEY || !BACKUP_FILE) {
   process.exit(1);
 }
 
-const OPTIONAL_TABLES = new Set(["site_settings", "content_modules", "page_template_fields", "downloadable_files", "content_templates", "analytics_report_schedules"]);
+const OPTIONAL_TABLES = new Set(["site_settings", "content_modules", "page_template_fields", "downloadable_files", "content_templates", "milestones", "analytics_report_schedules"]);
 
 function checksumPayloadForBackup(backup) {
   const clone = { ...backup };

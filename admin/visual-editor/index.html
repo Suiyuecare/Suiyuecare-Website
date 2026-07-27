@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>看著前台直接編輯｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
+  </head>
+  <body class="admin-app-page visual-editor-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/admin">
+            <img src="/assets/company-logo.png" alt="" />
+            <span><strong>歲悅長照集團</strong><small>頁面編輯</small></span>
+          </a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單"></nav>
+        <div class="admin-sidebar-note">
+          <span>Visual Editor</span>
+          <strong>點前台畫面就能修改</strong>
+          <p>一般人員只會改到自己部門的內容，送出後由執行長確認。</p>
+        </div>
+      </aside>
+
+      <main class="admin-main visual-editor-main">
+        <header class="admin-topbar visual-editor-topbar">
+          <div class="admin-topbar-title">
+            <a class="visual-editor-back" href="/admin">返回我的頁面</a>
+            <p class="admin-eyebrow">Visual Page Editor</p>
+            <h1 id="visualEditorTitle">正在開啟頁面...</h1>
+            <span id="visualEditorSubtitle">點選左側區塊或中央前台畫面，右側會顯示可修改內容。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <label class="visual-editor-page-picker">
+              <span>切換頁面</span>
+              <select id="visualEditorPagePicker" aria-label="切換要編輯的頁面"></select>
+            </label>
+            <div class="admin-userbox">
+              <b id="adminUserInitial">S</b>
+              <span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span>
+              <button id="adminLogout" type="button">登出</button>
+            </div>
+          </div>
+        </header>
+
+        <div id="visualEditorStatus" class="admin-data-status">正在讀取頁面內容...</div>
+
+        <section class="visual-editor-toolbar" aria-label="預覽工具列">
+          <div class="visual-editor-devices" role="group" aria-label="預覽尺寸">
+            <button type="button" class="is-active" data-preview-device="desktop" aria-pressed="true">桌機</button>
+            <button type="button" data-preview-device="tablet" aria-pressed="false">平板</button>
+            <button type="button" data-preview-device="mobile" aria-pressed="false">手機</button>
+          </div>
+          <div class="visual-editor-state" id="visualEditorState" aria-live="polite">尚未修改</div>
+          <a id="visualEditorOpenPage" href="/" target="_blank" rel="noopener">另開前台</a>
+        </section>
+
+        <div class="visual-editor-workspace">
+          <nav class="visual-editor-section-rail" aria-label="頁面區塊">
+            <div class="visual-editor-rail-head">
+              <strong>這一頁有哪些區塊</strong>
+              <span>點一下就會帶你到前台位置</span>
+            </div>
+            <div id="visualEditorSectionList" class="visual-editor-section-list"></div>
+          </nav>
+
+          <div class="visual-editor-preview-shell" data-preview-device="desktop">
+            <div class="visual-editor-preview-loading" id="visualEditorPreviewLoading">正在載入真實前台...</div>
+            <iframe id="visualEditorPreview" title="前台頁面即時預覽" loading="eager"></iframe>
+          </div>
+
+          <aside class="visual-editor-inspector" aria-label="內容編輯器">
+            <div class="visual-editor-inspector-head">
+              <p class="admin-eyebrow">正在編輯</p>
+              <h2 id="visualEditorSectionTitle">請選擇一個區塊</h2>
+              <p id="visualEditorSectionDescription">你也可以直接點中央前台畫面。</p>
+            </div>
+            <div id="visualEditorInspectorBody" class="visual-editor-inspector-body">
+              <div class="admin-empty-state">選取區塊後，這裡會顯示文字、圖片或卡片內容。</div>
+            </div>
+          </aside>
+        </div>
+
+        <footer class="visual-editor-actionbar" aria-label="頁面儲存與送審">
+          <div>
+            <strong id="visualEditorActionTitle">這份修改只會先存成草稿</strong>
+            <span id="visualEditorActionHint">送出後由執行長一次確認整頁內容，核准前官網維持原版本。</span>
+          </div>
+          <div class="visual-editor-action-buttons">
+            <button id="visualEditorSave" type="button">儲存草稿</button>
+            <button id="visualEditorSubmit" class="is-primary" type="button">送出給執行長</button>
+            <button id="visualEditorApprove" class="is-primary" type="button" hidden>審核並發布</button>
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <div id="adminLoading" class="admin-loading">
+      <strong>正在檢查登入狀態</strong>
+      <span>請稍候...</span>
+    </div>
+
+    <script type="module" src="/src/admin/visual-editor.js"></script>
+  </body>
+</html>

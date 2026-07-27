@@ -52,6 +52,7 @@ const backupTableGroups = [
       ["recruiting_pages", "招募頁"],
       ["recruiting_departments", "招募部門"],
       ["recruiting_openings", "招募職缺/合作卡"],
+      ["milestones", "大事記時間軸"],
       ["investor_notices", "投資人公告"],
       ["investor_financial_items", "投資人財務資料"],
       ["investor_chart_datasets", "投資人圖表資料"]
@@ -82,12 +83,13 @@ const sortableTables = new Set([
   "recruiting_pages",
   "recruiting_departments",
   "recruiting_openings",
+  "milestones",
   "investor_notices",
   "investor_financial_items",
   "investor_chart_datasets",
   "content_templates"
 ]);
-const optionalBackupTables = new Set(["site_settings", "content_modules", "page_template_fields", "downloadable_files", "content_templates", "analytics_report_schedules"]);
+const optionalBackupTables = new Set(["site_settings", "content_modules", "page_template_fields", "downloadable_files", "content_templates", "milestones", "analytics_report_schedules"]);
 const excludedBackupTables = ["form_submissions", "analytics_page_views", "analytics_events", "analytics_alerts", "analytics_health_checks", "profiles", "admins", "backup_manifests"];
 
 let selectedBackup = null;

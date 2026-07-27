@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
+import { visualEditorPageList } from "./visual-editor-manifest.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -53,6 +54,7 @@ const scopeLabels = {
   course: "課程",
   media: "圖片",
   recruiting: "招募",
+  milestone: "大事記",
   investor: "投資人",
   story: "文章管理",
   form: "表單",
@@ -340,6 +342,88 @@ function auditServiceTemplateFields(fields, issues) {
     });
 }
 
+function auditVisualEditorMappings({ templateFields, homeModules, recruitingPages, departments, openings }, issues) {
+  visualEditorPageList().forEach((page) => {
+    const editUrl = `/admin/visual-editor?page=${encodeURIComponent(page.slug)}`;
+    page.sections.forEach((section) => {
+      if (!section.selector) {
+        addIssue(issues, {
+          severity: "critical",
+          scope: "page",
+          title: `視覺編輯器缺前台定位：${page.title}／${section.label}`,
+          detail: "這個區塊沒有 selector，維護人員無法從前台點選。",
+          editUrl
+        });
+      }
+      if (section.locked && !section.lockedReason) {
+        addIssue(issues, {
+          severity: "critical",
+          scope: "page",
+          title: `鎖定區塊缺原因：${page.title}／${section.label}`,
+          detail: "系統固定內容必須告訴維護人員為什麼不能修改。",
+          editUrl
+        });
+      }
+      const hasSource = (section.fieldKeys?.length || section.moduleKeys?.length || section.recordTypes?.length) > 0;
+      if (!section.locked && !hasSource) {
+        addIssue(issues, {
+          severity: "critical",
+          scope: "page",
+          title: `視覺編輯器區塊未接資料：${page.title}／${section.label}`,
+          detail: "這個區塊既未鎖定，也沒有指定可編輯資料來源。",
+          editUrl
+        });
+      }
+    });
+
+    if (page.sourceType === "template-fields") {
+      const pageFields = templateFields.filter((field) => field.page_slug === page.slug && field.is_enabled !== false);
+      const mapped = new Set(page.sections.flatMap((section) => section.fieldKeys || []));
+      const explicitlyLocked = new Set(page.lockedFieldKeys || []);
+      if (!pageFields.length) {
+        addIssue(issues, {
+          severity: "critical",
+          scope: "service",
+          title: `視覺編輯器沒有可讀資料：${page.title}`,
+          detail: "此頁應有固定欄位，否則後台只能顯示空白。",
+          editUrl
+        });
+      }
+      pageFields.forEach((field) => {
+        if (mapped.has(field.field_key) || explicitlyLocked.has(field.field_key)) return;
+        addIssue(issues, {
+          severity: "warning",
+          scope: "service",
+          title: `未映射版位：${page.title}／${field.field_label || field.field_key}`,
+          detail: "這筆 CMS 欄位沒有出現在視覺編輯器，也沒有明確鎖定原因。",
+          editUrl,
+          updatedAt: field.updated_at,
+          impact: "維護人員可能找不到這段內容，或改了資料卻無法在前台確認。",
+          fix: "把欄位加入對應前台區塊，或在 manifest 明確標記為系統固定內容。"
+        });
+      });
+    }
+
+    if (page.sourceType === "content-modules" && !homeModules.length) {
+      addIssue(issues, { severity: "critical", scope: "home", title: "首頁視覺編輯器沒有模組資料", detail: "content_modules 為空。", editUrl });
+    }
+    if (page.sourceType === "recruiting") {
+      const hasPage = recruitingPages.some((item) => item.page_slug === page.slug);
+      const hasDepartment = departments.some((item) => item.page_slug === page.slug);
+      const hasOpening = openings.some((item) => item.page_slug === page.slug);
+      if (!hasPage || !hasDepartment || !hasOpening) {
+        addIssue(issues, {
+          severity: "critical",
+          scope: "recruiting",
+          title: `人才招募視覺編輯資料不完整`,
+          detail: `頁首 ${hasPage ? "有" : "無"}／部門 ${hasDepartment ? "有" : "無"}／職缺 ${hasOpening ? "有" : "無"}`,
+          editUrl
+        });
+      }
+    }
+  });
+}
+
 function auditCourses(courses, issues) {
   courses.forEach((course) => {
     if (!course.title) addIssue(issues, { severity: "critical", scope: "course", title: "課程缺標題", detail: course.slug || course.id, editUrl: "/admin/courses", updatedAt: course.updated_at });
@@ -422,6 +506,18 @@ function auditRecruiting(pages, departments, openings, issues) {
     if (!item.department_id) addIssue(issues, { severity: "warning", scope: "recruiting", title: `招募卡片未綁定部門：${item.title || "未命名"}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (hasPlaceholderText(item.title, item.summary)) addIssue(issues, { severity: "critical", scope: "launch", title: `招募卡片含待上架/示意文字：${item.title || "未命名"}`, detail: item.page_slug, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
     if (!item.is_enabled || item.status !== "published") addIssue(issues, { severity: "info", scope: "recruiting", title: `招募卡片未發布或停用：${item.title || "未命名"}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/recruiting", updatedAt: item.updated_at });
+  });
+}
+
+function auditMilestones(items, issues) {
+  items.forEach((item) => {
+    const label = item.title || `${item.year || "?"}/${item.month || "?"}`;
+    if (!item.title) addIssue(issues, { severity: "critical", scope: "milestone", title: "大事記缺標題", detail: label, editUrl: "/admin/milestones", updatedAt: item.updated_at });
+    if (!Number(item.year) || Number(item.month) < 1 || Number(item.month) > 12) addIssue(issues, { severity: "critical", scope: "milestone", title: `大事記日期不完整：${label}`, detail: `${item.year || "缺年份"}/${item.month || "缺月份"}`, editUrl: "/admin/milestones", updatedAt: item.updated_at });
+    if (!item.summary) addIssue(issues, { severity: "warning", scope: "milestone", title: `大事記缺摘要：${label}`, detail: `${item.year}/${item.month}`, editUrl: "/admin/milestones", updatedAt: item.updated_at });
+    if (!item.image_id && !item.image_url) addIssue(issues, { severity: "warning", scope: "milestone", title: `大事記缺圖片：${label}`, detail: "時間軸固定使用 1:1 圖片版位。", editUrl: "/admin/milestones", updatedAt: item.updated_at });
+    if (hasPlaceholderText(item.title, item.summary, item.tag)) addIssue(issues, { severity: "critical", scope: "launch", title: `大事記含待上架/示意文字：${label}`, detail: `${item.year}/${item.month}`, editUrl: "/admin/milestones", updatedAt: item.updated_at });
+    if (!item.is_enabled || item.status !== "published") addIssue(issues, { severity: "info", scope: "milestone", title: `大事記未發布或停用：${label}`, detail: `${item.status} / ${item.is_enabled ? "enabled" : "disabled"}`, editUrl: "/admin/milestones", updatedAt: item.updated_at });
   });
 }
 
@@ -598,6 +694,7 @@ async function loadContentHealth() {
       recruitingPageResult,
       departmentResult,
       openingResult,
+      milestoneResult,
       noticeResult,
       financialResult,
       fileResult,
@@ -618,6 +715,7 @@ async function loadContentHealth() {
       supabase.from("recruiting_pages").select("id,page_slug,title,subtitle,body,hero_image_id,hero_image_url,primary_cta_text,primary_cta_url,status,is_enabled,updated_at").order("sort_order", { ascending: true }),
       supabase.from("recruiting_departments").select("id,page_slug,title,department_slug,description,image_id,image_url,status,is_enabled,updated_at").order("updated_at", { ascending: false }).limit(500),
       supabase.from("recruiting_openings").select("id,page_slug,department_id,title,summary,image_id,image_url,status,is_enabled,updated_at").order("updated_at", { ascending: false }).limit(500),
+      supabase.from("milestones").select("id,year,month,title,tag,summary,image_id,image_url,status,is_enabled,updated_at").order("year", { ascending: false }).order("month", { ascending: false }).limit(500),
       supabase.from("investor_notices").select("id,title,summary,body,notice_type,date_label,published_on,link_url,file_id,status,is_enabled,updated_at").order("updated_at", { ascending: false }).limit(500),
       supabase.from("investor_financial_items").select("id,title,item_type,period_label,file_id,status,is_enabled,updated_at").order("updated_at", { ascending: false }).limit(500),
       supabase.from("downloadable_files").select("id,title,file_name,file_type,category,public_url,storage_path,status,is_enabled,is_public,updated_at").order("updated_at", { ascending: false }).limit(500),
@@ -640,6 +738,7 @@ async function loadContentHealth() {
       recruitingPageResult,
       departmentResult,
       openingResult,
+      milestoneResult,
       noticeResult,
       financialResult,
       fileResult,
@@ -656,6 +755,13 @@ async function loadContentHealth() {
     auditHomeModules(homeModulesResult.data || [], issues);
     auditPages(pagesResult.data || [], sectionsResult.data || [], issues);
     auditServiceTemplateFields(templateFieldResult.data || [], issues);
+    auditVisualEditorMappings({
+      templateFields: templateFieldResult.data || [],
+      homeModules: homeModulesResult.data || [],
+      recruitingPages: recruitingPageResult.data || [],
+      departments: departmentResult.data || [],
+      openings: openingResult.data || []
+    }, issues);
     auditCategories(categoriesResult.data || [], issues);
     auditArticles(articlesResult.data || [], categoriesResult.data || [], issues);
     auditHealthCategoryCoverage(categoriesResult.data || [], articlesResult.data || [], issues);
@@ -663,6 +769,7 @@ async function loadContentHealth() {
     auditFormSubmissions(formResult.data || [], issues);
     auditMedia(mediaResult.data || [], issues);
     auditRecruiting(recruitingPageResult.data || [], departmentResult.data || [], openingResult.data || [], issues);
+    auditMilestones(milestoneResult.data || [], issues);
     auditInvestor(noticeResult.data || [], financialResult.data || [], fileResult.data || [], chartResult.data || [], issues);
     auditStories(storyResult.data || [], talkResult.data || [], issues);
     auditLaunchReadiness({

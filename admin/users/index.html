@@ -37,7 +37,7 @@
         <div class="admin-sidebar-note">
           <span>Access Control</span>
           <strong>角色與細項權限</strong>
-          <p>Owner/Admin 可調整員工角色、停用帳號與各模組使用權限。</p>
+          <p>設定同仁所屬部門與可檢視、可編輯或可發布的責任層級。</p>
         </div>
       </aside>
 
@@ -46,7 +46,7 @@
           <div class="admin-topbar-title">
             <p class="admin-eyebrow">User Access</p>
             <h1>使用者權限管理</h1>
-            <span>調整後台使用者角色、細項權限與啟用狀態。新增 Auth 帳號仍需先在 Supabase Auth 建立。</span>
+            <span>設定所屬部門與責任層級，讓每個部門只管理自己的頁面、圖片、表單與發布流程。</span>
           </div>
           <div class="admin-topbar-actions">
             <button class="admin-preview-link" id="refreshUsersButton" type="button">重新整理</button>
@@ -62,8 +62,24 @@
 
         <section class="admin-workspace-panel">
           <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">Ownership Matrix</p><h2>內容責任配置</h2></div>
+            <span class="admin-soft-note">指定每個前台頁面、案件與後台模組由哪個部門負責。</span>
+          </div>
+          <form id="contentAreaOwnershipForm" class="content-area-ownership-form">
+            <div class="permission-matrix-help">
+              <strong>頁面歸屬部門</strong>
+              <p>調整後，該部門的可檢視、可編輯權限會同步套用到內容、圖片、表單、送審紀錄與檔案。</p>
+              <small>只有 Owner／執行長能修改這張矩陣；任何部門都不能自行取得其他部門權限。</small>
+            </div>
+            <div id="contentAreaOwnershipGrid" class="content-area-ownership-grid"></div>
+            <button type="submit">儲存內容責任配置</button>
+          </form>
+        </section>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
             <div><p class="admin-eyebrow">Users</p><h2>後台使用者列表</h2></div>
-            <span class="admin-soft-note">可把員工設為 viewer 只保留帳號，或取消啟用立即停權。</span>
+            <span class="admin-soft-note">請同仁先登入一次，帳號就會出現在這裡；再由你指派部門與角色。</span>
           </div>
           <div id="usersList" class="admin-section-editor-list"></div>
         </section>

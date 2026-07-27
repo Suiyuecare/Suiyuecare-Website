@@ -1,11 +1,75 @@
 <!doctype html>
 <html lang="zh-Hant">
   <head>
-    <meta http-equiv="refresh" content="0; url=/admin/404/" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex,nofollow" />
-    <title>後台模組已整併｜歲悅長照集團</title>
+    <title>固定版位管理｜歲悅長照集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/admin/admin.css" />
   </head>
-  <body>
-    <p>此後台模組已整併，正在前往 <a href="/admin/404/">後台導引頁</a>。</p>
+  <body class="admin-app-page">
+    <div class="admin-app-shell" hidden>
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-head">
+          <a class="admin-brand" href="/"><img src="/assets/company-logo.png" alt="" /><span><strong>歲悅長照集團</strong><small>CMS Console</small></span></a>
+        </div>
+        <nav class="admin-menu" aria-label="後台選單"></nav>
+        <div class="admin-sidebar-note"><span>Layout Contract</span><strong>版型固定，內容可換</strong><p>前台欄位、圖片比例與卡片結構由模板控制，編輯內容不會改壞版面。</p></div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div class="admin-topbar-title">
+            <p class="admin-eyebrow">Fixed Slots</p>
+            <h1>固定版位與重複卡片</h1>
+            <span>一般文字與圖片只能填入既有版位；服務卡、流程、FAQ 等清單可新增項目，前台會維持固定版型自動排列。</span>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="admin-preview-link" href="/home-care" target="_blank" rel="noopener">查看前台</a>
+            <div class="admin-userbox"><b id="adminUserInitial">S</b><span><small>登入者</small><strong id="adminUserEmail">正在確認登入狀態...</strong></span><button id="adminLogout" type="button">登出</button></div>
+          </div>
+        </header>
+
+        <div id="templateFieldsStatus" class="admin-data-status">正在讀取固定版位...</div>
+
+        <section class="admin-workspace-panel">
+          <div class="admin-workspace-head">
+            <div><p class="admin-eyebrow">Page Template</p><h2>選擇前台頁面</h2></div>
+            <button id="refreshTemplateFieldsButton" type="button">重新整理</button>
+          </div>
+          <div class="admin-front-map">
+            <strong>編輯規則</strong>
+            <span>這裡只列出前台確實會讀取的服務頁固定欄位。具該服務內容責任範圍者儲存後會直接更新前台；列表欄位可新增、刪除、上移與下移。</span>
+          </div>
+          <div class="admin-form-grid">
+            <label>
+              <span>頁面</span>
+              <select id="templatePageFilter">
+                <option value="">全部固定版位</option>
+                <option value="home-care">居家照顧</option>
+                <option value="day-care">日間照顧</option>
+                <option value="community">社區據點</option>
+                <option value="nursing">護理復能</option>
+                <option value="migrant-training">移工培訓</option>
+                <option value="quality">教育品管</option>
+                <option value="software">軟體系統</option>
+              </select>
+            </label>
+          </div>
+          <div class="admin-quick-link-grid">
+            <a href="/admin/recruiting"><strong>招募固定版位與職缺</strong><span>招募 Hero、部門與職缺統一在這裡管理</span></a>
+            <a href="/admin/milestones"><strong>新增大事記</strong><span>管理年份、月份與時間軸卡片</span></a>
+          </div>
+        </section>
+
+        <section id="templateFieldsList" class="admin-section-editor-list"></section>
+      </main>
+    </div>
+
+    <div id="adminLoading" class="admin-loading"><strong>正在檢查登入狀態</strong><span>請稍候...</span></div>
+    <script type="module" src="/src/admin/template-fields.js"></script>
   </body>
 </html>

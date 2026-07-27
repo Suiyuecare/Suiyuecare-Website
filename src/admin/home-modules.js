@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabaseClient.js";
 import { prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML } from "./utils.js";
+import { canEditScope, canPublishScope, canViewScope, contentDeleteMessage, contentSaveMessage } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -17,6 +18,8 @@ const formTitle = document.querySelector("#homeModuleFormTitle");
 const imagePreview = document.querySelector("#homeModuleImagePreview");
 
 let modules = [];
+let adminPermissions = {};
+const homeScope = "page:home";
 
 const moduleLabels = {
   section_setting: "首頁區塊設定",
@@ -68,7 +71,7 @@ function renderModules() {
       <td>${escapeHTML(moduleLabels[item.module_key] || item.module_key)}</td>
       <td>${escapeHTML(item.status)}${item.is_enabled ? " · 顯示" : " · 隱藏"}</td>
       <td>${Number(item.sort_order || 0)}</td>
-      <td><div class="admin-table-actions"><button type="button" data-edit-module="${escapeHTML(item.id)}">編輯</button><button type="button" data-delete-module="${escapeHTML(item.id)}">刪除</button></div></td>
+      <td><div class="admin-table-actions"><button type="button" data-edit-module="${escapeHTML(item.id)}">${canEditScope(adminPermissions, homeScope) ? "編輯" : "查看"}</button>${canEditScope(adminPermissions, homeScope) ? `<button type="button" data-delete-module="${escapeHTML(item.id)}">刪除</button>` : ""}</div></td>
     </tr>
   `).join("");
 }
@@ -145,7 +148,8 @@ async function uploadImageIfNeeded() {
     altText: form.elements.title.value.trim(),
     caption: `${moduleLabels[form.elements.module_key.value] || "首頁模組"}圖片`,
     imageUsage: usage,
-    focalPoint: "center"
+    focalPoint: "center",
+    scopeKey: homeScope
   });
   return media.id;
 }
@@ -181,6 +185,10 @@ function buildPayload(imageId) {
 
 async function saveModule(event) {
   event.preventDefault();
+  if (!canEditScope(adminPermissions, homeScope)) {
+    setStatus("你的帳號只有檢視首頁內容的權限。", "error");
+    return;
+  }
   const submitButton = form.querySelector("button[type='submit']");
   submitButton?.setAttribute("disabled", "true");
   setStatus("正在儲存首頁模組...", "info");
@@ -189,11 +197,14 @@ async function saveModule(event) {
     const payload = buildPayload(imageId);
     const id = form.elements.id.value;
     const query = id ? supabase.from("content_modules").update(payload).eq("id", id) : supabase.from("content_modules").insert(payload);
-    const { error } = await query;
+    const { data, error } = await query.select("id").maybeSingle();
     if (error) throw error;
-    setStatus("首頁模組已儲存。", "success");
-    resetForm();
-    await loadModules();
+    if (data?.id) form.elements.id.value = data.id;
+    setStatus(contentSaveMessage(adminPermissions, homeScope, "首頁模組"), "success");
+    if (canPublishScope(adminPermissions, homeScope)) {
+      resetForm();
+      await loadModules();
+    }
   } catch (error) {
     console.error("Failed to save home module", error);
     setStatus(`儲存失敗：${error.message}`, "error");
@@ -203,15 +214,19 @@ async function saveModule(event) {
 }
 
 async function deleteModule(id) {
+  if (!canEditScope(adminPermissions, homeScope)) {
+    setStatus("你的帳號只有檢視首頁內容的權限。", "error");
+    return;
+  }
   const item = modules.find((module) => module.id === id);
   if (!item || !window.confirm(`確定刪除「${item.title}」嗎？`)) return;
-  const { error } = await supabase.from("content_modules").delete().eq("id", id);
+  const { error } = await supabase.from("content_modules").delete().eq("id", id).select("id").maybeSingle();
   if (error) {
     setStatus(`刪除失敗：${error.message}`, "error");
     return;
   }
-  setStatus("已刪除首頁模組。", "success");
-  await loadModules();
+  setStatus(contentDeleteMessage(adminPermissions, homeScope, "首頁模組"), "success");
+  if (canPublishScope(adminPermissions, homeScope)) await loadModules();
 }
 
 form?.addEventListener("submit", saveModule);
@@ -231,8 +246,20 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: async () => {
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    if (!canViewScope(adminPermissions, homeScope)) {
+      throw new Error("首頁內容不在你的部門責任範圍內。");
+    }
+    form.dataset.contentScope = homeScope;
     resetForm();
     await loadModules();
+    if (!canEditScope(adminPermissions, homeScope)) {
+      form.querySelectorAll("input, textarea, select, button").forEach((control) => {
+        control.disabled = true;
+      });
+      newButton.hidden = true;
+      setStatus("目前為唯讀模式；首頁內容需由品牌行銷部門的編輯者或管理者修改。", "info");
+    }
   }
 }).catch((error) => reportAdminBootError(loading, error));

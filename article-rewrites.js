@@ -1,10 +1,11 @@
 const staticArticleRewritePack = {
   "longterm-care-apply": {
-    dek: "第一次接觸長照時，先不用急著背服務名稱；把生活困難說清楚，才是安排服務的起點。",
+    dek: "四步理解申請、到府評估、照顧計畫與服務啟動。",
     content: [
-      ["先把問題從「需要照顧」改成「哪裡卡住」", "家人第一次申請長照，常會被補助、失能等級、服務項目弄得很緊張。其實最有幫助的準備，是先寫下長輩每天在哪些動作需要協助，例如起身、洗澡、備餐、吃藥、外出、回診或夜間如廁。問題越具體，後續評估越容易轉成可安排的服務。"],
-      ["把家庭能承擔的範圍也說出來", "長照不是只看長輩需要什麼，也要看家屬目前還能做多少。主要照顧者是否要上班、夜裡是否睡不好、家中是否有人能輪替，這些都會影響服務設計。把家屬壓力放進討論，不是抱怨，而是讓照顧計畫更接近真實生活。"],
-      ["服務可以先從最急的一段開始", "不需要一次把所有服務都排滿。若最危險的是洗澡，就先談沐浴與浴室安全；若白天沒人陪，就先評估日照或社區據點；若剛出院，就先把用藥、復能和照顧紀錄接上。長照申請是一段調整過程，不是一次考試。"]
+      ["1. 提出申請與備妥資料", "準備長輩身分證字號、居住地址與主要聯絡電話，並簡單整理病況、身障證明及吃飯、洗澡、如廁等自理情形。"],
+      ["2. 到府評估，核定 CMS 等級", "照專與 A 單位個管到府訪視，依長輩狀況核定 CMS 2-8 級與補助額度。"],
+      ["3. 共同擬定照顧計畫", "依核定額度討論居家照顧、日照、輔具等服務；也可主動告知希望由指定服務單位協助。"],
+      ["4. 媒合並開始服務", "個管轉介資料給服務單位後，將由單位聯繫並安排第一次到府或日照服務。"]
     ]
   },
   "family-care-story": {
@@ -589,16 +590,15 @@ const staticArticleDepthEnhancements = {
     readingMinutes: 9,
     targetAudience: "第一次要申請長照服務，卻不知道如何描述需求的家庭",
     warning: {
-      title: "申請前先避免三個常見誤會",
-      items: ["不用等到家屬完全撐不住才申請。", "不要只問補助多少，先把生活卡住的地方說清楚。", "若正在住院，可同步詢問出院準備銜接長照服務。"]
+      title: "申請服務提醒",
+      items: ["評估時可主動告知希望合作的服務單位。", "實際服務內容與補助額度以照管中心核定為準。"]
     },
-    summary: ["長照申請的起點不是服務名稱，而是日常生活哪些動作需要協助。", "1966、各縣市照管中心與住院出院準備窗口都可作為入口。", "評估後仍可依長輩狀態和家庭壓力持續調整服務。"],
+    summary: ["先備妥基本資料與長輩生活需求。", "照專與個管到府評估，核定 CMS 等級與額度。", "照顧計畫確認後，媒合服務單位並安排第一次服務。"],
     content: [
-      ["長照申請真正要回答的是：家裡哪裡卡住？", ["很多家庭第一次接觸長照，會先問能不能請人、補助多少、要排多久。但照管評估最需要的不是家屬背熟服務項目，而是知道長輩在一天裡哪些地方需要協助。", "建議先把起床、移位、洗澡、備餐、吃藥、外出、回診、夜間如廁和情緒照顧逐項寫下來。問題越具體，後續越容易轉成居家照顧、日照、喘息、專業服務或其他資源。"]],
-      ["申請流程可以想成四個步驟", ["第一步是提出申請，可撥打 1966、聯絡所在地長期照顧管理中心，或住院期間詢問出院準備銜接窗口。第二步是照管中心安排到府或相關評估，確認照顧需求。", "第三步是和個案管理人員討論照顧計畫，第四步才是開始使用服務。也就是說，家屬不需要在第一通電話就知道答案，真正重要的是把需求打開。"]],
-      ["評估時要說生活情境，不只說診斷名稱", ["同樣是中風、失智或衰弱，每個家庭卡住的地方可能完全不同。有人是白天無人陪伴，有人是洗澡太危險，有人是半夜一直起身，也有人是主要照顧者已經不能睡。", "評估時可以描述一週中最困難的三個時段，並說明家中誰能照顧、誰要上班、是否有人輪替。這些資訊不是抱怨，而是讓計畫更接近真實生活。"]],
-      ["服務不是一次排滿，而是先處理最急的風險", ["如果最危險的是浴室，就先談沐浴和居家安全；如果白天沒人陪，就評估日照或社區據點；如果剛出院，就先把用藥、復能和照顧紀錄接上。", "長照申請不是一次考試，而是一段持續調整。長輩狀態、家庭人力、費用承擔和情緒壓力都會變，服務也應該跟著回看。"]],
-      ["家屬壓力本身也是照顧需求", ["很多主要照顧者會把自己的疲憊放到最後，但照顧計畫若不處理照顧者耗竭，很容易很快失效。睡眠、工作、輪替、交通和情緒狀態，都應該放進討論。", "好的長照安排，是讓長輩安全，也讓家屬能繼續生活。當家庭不再只靠一個人硬撐，照顧才比較有機會走得久。"]]
+      ["1. 提出申請與備妥資料", ["準備長輩身分證字號、居住地址與主要聯絡電話。", "也可先整理病況、身障證明及吃飯、洗澡、如廁等自理情形。"]],
+      ["2. 到府評估，核定 CMS 等級", ["照管專員與 A 單位個管到府訪視，依長輩狀況核定 CMS 2-8 級。", "等級越高，對應的補助額度也越高。"]],
+      ["3. 共同擬定照顧計畫", ["依核定額度討論居家照顧、日照、輔具等需要的服務。", "這時可主動告知希望由指定服務單位協助。"]],
+      ["4. 媒合並開始服務", ["個管將資料轉介給服務單位。", "服務單位會聯繫家屬，安排第一次到府或日照服務。"]]
     ],
     checklists: [{ title: "申請前可先整理的資料", items: ["長輩基本疾病、用藥與回診資訊。", "每天需要協助的動作與時段。", "是否曾跌倒、嗆咳、走失或夜間不穩。", "主要照顧者能承擔的時間。", "目前最想先解決的三個問題。", "住院或出院後的照顧銜接需求。"] }],
     tables: [{ title: "需求怎麼轉成服務討論", headers: ["家中情境", "可能需要討論", "下一步"], rows: [["洗澡很危險", "居家照顧、浴室安全", "說明浴室動線與移位狀況"], ["白天無人陪", "日照、社區據點", "評估交通、作息與適應"], ["剛出院返家", "出院銜接、復能、用藥紀錄", "整理醫囑與第一週觀察"]] }],
@@ -1705,7 +1705,7 @@ const elderDiseaseLazyPackArticles = [
     category: "懶人包",
     title: "關節炎懶人包：痛也要安全動",
     excerpt: "用疼痛、僵硬、腫脹與活動能力來判斷，協助家屬安排安全活動與減少跌倒。",
-    image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg",
+    image: "assets/brand-scenes/rehab-v2.jpg",
     author: "歲悅復能照顧團隊",
     date: "2026.07.11",
     readingMinutes: 3,
@@ -2000,147 +2000,150 @@ function pptLazyPack({ summary = [], slides = [], references = [], cta = "", vis
 const elderDiseaseLazyPackSlideEnhancements = {
   "elderly-hypertension-lazy-pack": pptLazyPack({
     visualFormat: "ppt-icon-pack",
-    summary: ["高血壓常沒有感覺，先看一週趨勢。", "722 量法讓回診更有根據。", "胸痛、喘、神經症狀先就醫。"],
+    summary: ["高血壓常常沒有感覺，要量才知道。", "照 722 量一週，把數字和不舒服一起記下來。", "血壓高又胸痛、喘或突然無力，立刻就醫。"],
     slides: [
       {
-        eyebrow: "先看結論",
-        title: "不要只看一次數字",
+        eyebrow: "問題 1｜看起來沒事，還要量嗎？",
+        title: "要。高血壓常常沒有感覺",
         visual: {
-          eyebrow: "Blood pressure",
-          badge: "趨勢優先",
+          layout: "start",
+          eyebrow: "先量，才知道",
           icon: "gauge",
-          title: "血壓看一週，不看一秒",
-          subtitle: "同時間、同姿勢、同一本紀錄",
-          metric: "趨勢",
-          metricLabel: "比單次高低更有用",
+          title: "要。高血壓常常沒有感覺",
+          subtitle: "覺得正常，也要量血壓才知道",
           cards: [
-            { icon: "clock", value: "固定時間", label: "早晚量測", tone: "orange" },
-            { icon: "person", value: "固定姿勢", label: "坐穩再量" },
-            { icon: "note", value: "固定紀錄", label: "回診帶去", tone: "calm" }
+            { icon: "person", value: "沒症狀", label: "不等於沒問題", tone: "orange" },
+            { icon: "gauge", value: "在家量", label: "看平常狀態" },
+            { icon: "note", value: "記下來", label: "回診給醫師看", tone: "calm" }
           ],
-          caption: "高血壓常沒有明顯症狀，紀錄能補上感覺看不到的風險。"
+          takeaway: "找出家裡的血壓計，安排固定量測時間。",
+          caption: "不必先猜有沒有高血壓；先量、先記，回診時才有依據。"
         },
-        points: ["看連續變化。", "不要只挑正常值。"]
+        points: ["高血壓常沒有感覺。", "量測和紀錄才看得出變化。"]
       },
       {
-        eyebrow: "紅旗",
-        title: "有急性症狀先就醫",
+        eyebrow: "問題 2｜什麼情況要立刻就醫？",
+        title: "血壓高又不舒服，立刻求助",
         tone: "danger",
         visual: {
-          eyebrow: "Red flags",
-          badge: "先求助",
+          layout: "alert",
+          eyebrow: "不要在家等",
           icon: "warning",
-          title: "數字很高＋不舒服",
-          subtitle: "不要在家等看看",
+          title: "血壓高，又出現不舒服",
+          subtitle: "胸痛、喘、臉歪手弱、說話不清或意識改變",
           alerts: [
             { icon: "heart", label: "胸痛、喘" },
             { icon: "brain", label: "臉歪手弱" },
             { icon: "warning", label: "劇烈頭痛" },
             { icon: "phone", label: "意識改變" }
           ],
-          caption: "胸痛、喘、神經症狀或意識改變，請優先就醫。"
+          takeaway: "不要觀察到隔天，立刻就醫或撥 119 求助。",
+          caption: "出現這些症狀時，重點不是再量幾次，而是先得到緊急協助。"
         },
-        points: ["症狀比數字更急。", "不確定就先求助。"]
+        points: ["症狀比數字更急。", "不確定時，先求助。"]
       },
       {
-        eyebrow: "量測法",
-        title: "722 是家庭版 SOP",
+        eyebrow: "問題 3｜在家血壓要怎麼量？",
+        title: "照「722」量血壓",
         visual: {
-          eyebrow: "Home BP",
-          badge: "722",
+          layout: "routine",
+          eyebrow: "照順序做就好",
           icon: "calendar",
-          title: "7天｜早晚｜每回2次",
-          subtitle: "讓醫師看到平常狀態",
-          metric: "7-2-2",
-          metricLabel: "連續7天，早晚各量，每回2次",
+          title: "照 722 量血壓",
+          subtitle: "7 天、早晚各一次、每次量兩遍",
+          metric: "722",
+          metricLabel: "7 天 · 早晚各一次 · 每次兩遍",
           flow: [
-            { icon: "calendar", label: "連續7天" },
-            { icon: "sun", label: "早上" },
-            { icon: "moon", label: "晚上" },
-            { icon: "note", label: "兩次都記" }
+            { icon: "calendar", label: "連續 7 天" },
+            { icon: "sun", label: "起床後" },
+            { icon: "moon", label: "睡前" },
+            { icon: "note", label: "每次量 2 遍" }
           ],
-          caption: "量前先安靜休息，袖帶位置與手臂高度保持一致。"
+          takeaway: "量前坐好安靜休息，兩個數字都寫下來。",
+          caption: "國健署建議的 722 量法，是讓醫師看到長輩平常血壓的方式。"
         },
-        points: ["量前先休息。", "兩次都記下。"]
+        points: ["量前先坐好安靜休息。", "每一次的兩個數字都留下。"]
       },
       {
-        eyebrow: "家中觀察",
-        title: "數字旁邊要寫感覺",
+        eyebrow: "問題 4｜回診時要帶什麼？",
+        title: "帶「數字＋不舒服」紀錄",
         visual: {
-          eyebrow: "Observe",
-          badge: "數字＋狀態",
+          layout: "journal",
+          eyebrow: "不要只報一個數字",
           icon: "checklist",
-          title: "血壓紀錄不是只有 mmHg",
-          subtitle: "把生活變化放在同一頁",
+          title: "把血壓和身體狀況寫在一起",
+          subtitle: "醫師才能知道數字是在什麼情況下出現的",
           cards: [
-            { icon: "gauge", value: "血壓", label: "早晚數字" },
-            { icon: "pulse", value: "脈搏", label: "快慢不規則" },
-            { icon: "walk", value: "頭暈", label: "起身或走路" },
-            { icon: "shield", value: "跌倒", label: "差點跌也算", tone: "danger" },
-            { icon: "heart", value: "胸悶", label: "活動後更明顯", tone: "danger" },
-            { icon: "person", value: "精神", label: "食慾與活動力", tone: "calm" }
+            { icon: "gauge", value: "早晚血壓", label: "量到的數字" },
+            { icon: "walk", value: "頭暈、胸悶", label: "什麼時候發生" },
+            { icon: "shield", value: "差點跌倒", label: "也要寫下來", tone: "danger" },
+            { icon: "pill", value: "有沒有漏藥", label: "照實記錄", tone: "calm" }
           ],
-          caption: "長輩說不清楚時，症狀時間點和生活變化特別重要。"
+          takeaway: "用同一本筆記或手機表格，連續記一週。",
+          caption: "長輩說不清楚時，症狀發生時間與跌倒紀錄特別重要。"
         },
-        points: ["數字旁寫症狀。", "跌倒和頭暈也記。"]
+        points: ["數字旁邊寫當天狀況。", "頭暈、胸悶、跌倒和漏藥都要記。"]
       },
       {
-        eyebrow: "用藥",
-        title: "沒症狀也不要自行停藥",
+        eyebrow: "問題 5｜沒有不舒服，可以自己停藥嗎？",
+        title: "不可以。先記錄，再回診問醫師",
         visual: {
-          eyebrow: "Medication",
-          badge: "勿自行調藥",
+          layout: "medicine",
+          eyebrow: "不要自己調藥",
           icon: "pill",
-          title: "高血壓常安靜存在",
-          subtitle: "用藥調整交給醫師",
+          title: "沒症狀，也不要自己停藥",
+          subtitle: "自行停藥或加藥，都可能讓血壓更不穩",
           cards: [
-            { icon: "pill", value: "藥袋", label: "固定整理", tone: "orange" },
-            { icon: "checklist", value: "清單", label: "保健品也列入" },
-            { icon: "warning", value: "副作用", label: "頭暈水腫要回報", tone: "danger" },
-            { icon: "note", value: "回診", label: "每次更新", tone: "calm" }
+            { icon: "pill", value: "照原方式吃", label: "先不要自己改", tone: "orange" },
+            { icon: "checklist", value: "藥與保健品", label: "全部列清楚" },
+            { icon: "warning", value: "頭暈、水腫", label: "記下時間", tone: "danger" },
+            { icon: "note", value: "下次回診", label: "帶清單去問", tone: "calm" }
           ],
-          caption: "頭暈、水腫或血壓變化，先記錄並回診討論，不自行加減藥。"
+          takeaway: "把藥袋和保健品放在一起，拍照或列成清單。",
+          caption: "頭暈、水腫或血壓變化，先記錄，再請醫師或藥師協助判斷。"
         },
-        points: ["藥物清單固定更新。", "不自行停藥加藥。"]
+        points: ["不自行停藥或加藥。", "藥物與保健品都要帶去回診。"]
       },
       {
-        eyebrow: "生活",
-        title: "生活調整要看做得到",
+        eyebrow: "問題 6｜日常先改哪一件事？",
+        title: "先做一件做得到的，不用一次全改",
         visual: {
-          eyebrow: "Lifestyle",
-          badge: "可持續",
+          layout: "habit",
+          eyebrow: "從今天能做的開始",
           icon: "heart",
-          title: "降壓不是只靠意志力",
-          subtitle: "把每天能做的先固定",
+          title: "不用完美，先固定一個習慣",
+          subtitle: "每次只選一件，才比較做得久",
           cards: [
-            { icon: "home", value: "低鹽", label: "湯汁醬料少一點", tone: "orange" },
-            { icon: "walk", value: "活動", label: "安全分段動" },
-            { icon: "shield", value: "戒菸酒", label: "降低心血管風險", tone: "calm" },
-            { icon: "clock", value: "睡眠", label: "作息與壓力一起看" }
+            { icon: "home", value: "少一點湯汁、醬料", label: "先從一餐開始", tone: "orange" },
+            { icon: "walk", value: "安全活動", label: "依體力分段做" },
+            { icon: "shield", value: "少菸酒", label: "降低心血管風險", tone: "calm" },
+            { icon: "clock", value: "規律睡眠", label: "固定作息" }
           ],
-          caption: "長者的生活調整要配合體力、用藥與其他慢性病。"
+          takeaway: "選一件今天最容易開始的事，先做一週。",
+          caption: "長者的生活調整要配合體力、用藥與其他慢性病，不勉強硬撐。"
         },
-        points: ["先做能持續的。", "三高一起管理。"]
+        points: ["先選一件做得到的。", "不舒服時先停下來求助。"]
       },
       {
-        eyebrow: "下一步",
-        title: "建立流程，不是天天緊張",
+        eyebrow: "問題 7｜家人怎麼幫，才不會一直焦慮？",
+        title: "把「誰做什麼」寫下來",
         tone: "calm",
         visual: {
-          eyebrow: "Care flow",
-          badge: "家庭分工",
+          layout: "team",
+          eyebrow: "四件事，四個答案",
           icon: "team",
-          title: "誰量、誰記、誰陪診",
-          subtitle: "流程清楚，家裡就不靠臨場反應",
+          title: "誰量、誰記、何時回診、何時求助",
+          subtitle: "寫下來，家裡就不用每次臨時決定",
           flow: [
-            { icon: "gauge", label: "固定量" },
-            { icon: "note", label: "固定記" },
-            { icon: "team", label: "陪回診" },
-            { icon: "phone", label: "紅旗求助" }
+            { icon: "gauge", label: "誰負責量" },
+            { icon: "note", label: "誰負責記" },
+            { icon: "team", label: "下次誰陪回診" },
+            { icon: "phone", label: "緊急時找誰" }
           ],
-          caption: "這份懶人包不能取代診斷；急性惡化請先就醫。"
+          takeaway: "今天就寫下負責的人和下一次回診日期。",
+          caption: "這份圖解不能取代醫師診斷；若急性惡化，請先就醫。"
         },
-        points: ["分工寫下來。", "紅旗先就醫。"]
+        points: ["分工寫下來。", "急性症狀先就醫。"]
       }
     ],
     references: [referenceLibrary.hpaHypertension, referenceLibrary.hpaHypertension722, referenceLibrary.chronicDiseaseCdc]
@@ -2175,12 +2178,12 @@ const elderDiseaseLazyPackSlideEnhancements = {
     summary: ["中風警訊是突然發生，請立即叫救護車。", "返家後重點是復能、吞嚥、跌倒預防與再中風管理。", "症狀短暫改善仍應由醫療人員評估。"],
     slides: [
       { eyebrow: "先看結論", title: "中風最怕等看看", lede: "臉歪、手無力、說話不清或突然走不穩，都要把時間當成重點。", tone: "danger", image: "assets/nursing-detail-02-walking-hero-fast.jpg", points: ["突然發生就先叫救護車。", "不要先按摩、放血或睡一下。", "症狀好了也要評估。"] },
-      { eyebrow: "BE FAST", title: "平衡、眼睛、臉、手、說話、時間", lede: "把警訊背成一張圖，家人比較不會慌到忘記。", stat: "FAST", statLabel: "越快處理越好", image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg", points: ["突然失去平衡或看不清。", "臉歪、單側手腳無力。", "說話不清或聽不懂。"] },
+      { eyebrow: "BE FAST", title: "平衡、眼睛、臉、手、說話、時間", lede: "把警訊背成一張圖，家人比較不會慌到忘記。", stat: "FAST", statLabel: "越快處理越好", image: "assets/brand-scenes/rehab-v2.jpg", points: ["突然失去平衡或看不清。", "臉歪、單側手腳無力。", "說話不清或聽不懂。"] },
       { eyebrow: "吞嚥", title: "返家後吃飯安全要重新確認", lede: "喝水嗆、聲音濕、吃很久或反覆發燒，都可能和吞嚥風險有關。", image: "assets/health3/generated/swallowing-safe-meal-hero.jpg", points: ["吃飯坐直，慢慢來。", "記錄容易嗆的食物。", "需要時請吞嚥或復能專業評估。"] },
       { eyebrow: "復能", title: "復健目標要回到生活動作", lede: "走到餐桌、上廁所、拿杯子，比只說多走一點更清楚。", image: "assets/nursing-detail-02-walking-fast.jpg", points: ["把動作拆成小步驟。", "不要硬拉患側手臂。", "疲累、頭暈、疼痛要停下觀察。"] },
       { eyebrow: "安全", title: "跌倒預防是中風照顧的日常任務", lede: "偏癱、注意力、視野和腳步都可能影響居家安全。", image: "assets/health3/generated/fall-prevention-night-route-hero.jpg", points: ["床邊到廁所先清空。", "加夜燈、扶手、穩定椅子。", "助行器和鞋子要固定位置。"] },
       { eyebrow: "再中風", title: "用藥、血壓、血糖，要一起追蹤", lede: "再中風風險管理不是一句有吃藥，而是規律回診與生活紀錄。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["不要自行停抗凝血或降壓藥。", "量血壓、血糖依醫囑。", "記錄新的無力、語言或吞嚥變化。"] },
-      { eyebrow: "下一步", title: "家屬帶紀錄，團隊才知道怎麼調整", lede: "把每天能做到什麼、卡在哪裡寫下來，復能目標會更貼近生活。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["功能、吞嚥、跌倒、情緒都記。", "回診帶影片或照片更清楚。", "不能取代診斷；急性惡化請就醫。"] }
+      { eyebrow: "下一步", title: "家屬帶紀錄，團隊才知道怎麼調整", lede: "把每天能做到什麼、卡在哪裡寫下來，復能目標會更貼近生活。", tone: "calm", image: "assets/brand-scenes/care-team-v2.jpg", points: ["功能、吞嚥、跌倒、情緒都記。", "回診帶影片或照片更清楚。", "不能取代診斷；急性惡化請就醫。"] }
     ],
     references: [referenceLibrary.cdcStrokeSigns, referenceLibrary.cdcStrokeFacts, referenceLibrary.transitionalCare2022]
   }),
@@ -2188,7 +2191,7 @@ const elderDiseaseLazyPackSlideEnhancements = {
     summary: ["長輩心臟病警訊可能是胸悶、喘、疲倦或腳腫。", "急性胸痛、喘不過氣、昏厥應立即就醫。", "家屬要記錄活動耐受度、體重、腫脹與用藥。"],
     slides: [
       { eyebrow: "先看結論", title: "看喘、累、腳腫", lede: "不一定喊胸痛，也可能說悶、累、喘、胃不舒服或走一下就停。", image: "assets/nursing-detail-01-vitals-fast.jpg", points: ["把症狀和活動連在一起看。", "以前能走多遠，現在能走多遠。", "突然下降比單次抱怨更重要。"] },
-      { eyebrow: "紅旗", title: "胸痛、喘、昏厥，先排除急症", lede: "合併冒冷汗、噁心、虛弱、意識改變時，不要等門診。", tone: "danger", image: "assets/homepage-batch/15-phone-consultation-fast.jpg", points: ["胸痛胸悶或上半身不適。", "喘不過氣、冒冷汗、暈厥。", "心跳很亂且頭暈不舒服。"] },
+      { eyebrow: "紅旗", title: "胸痛、喘、昏厥，先排除急症", lede: "合併冒冷汗、噁心、虛弱、意識改變時，不要等門診。", tone: "danger", image: "assets/brand-scenes/phone-v2.jpg", points: ["胸痛胸悶或上半身不適。", "喘不過氣、冒冷汗、暈厥。", "心跳很亂且頭暈不舒服。"] },
       { eyebrow: "心衰竭", title: "腳腫和體重增加，是水分警訊", lede: "呼吸、體重、腳踝腫脹和躺下喘，要一起觀察。", image: "assets/homepage-batch/09-nurse-blood-pressure-fast.jpg", points: ["固定時間量體重。", "看鞋襪是否變緊。", "夜間咳醒或墊高枕頭要記錄。"] },
       { eyebrow: "活動", title: "不是完全不能動，是要看耐受度", lede: "怕喘而完全不動會退化；硬撐到胸悶也危險。", image: "assets/community-detail-01-exercise-fast.jpg", points: ["活動分段，保留休息。", "熱、冷、太飽後避免勉強。", "症狀出現時停下並記錄。"] },
       { eyebrow: "用藥", title: "利尿劑、抗凝血、降壓藥都別自行調", lede: "心臟用藥牽涉血壓、腎功能與出血風險，調整要由醫師判斷。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["藥物清單固定更新。", "瘀青、黑便、頭暈要回報。", "腳腫不要自己加利尿劑。"] },
@@ -2202,11 +2205,11 @@ const elderDiseaseLazyPackSlideEnhancements = {
     slides: [
       { eyebrow: "先看結論", title: "喘要看變化", lede: "COPD 會讓氣流受限，常見是咳、痰、喘和日常活動變困難。", image: "assets/community-detail-01-exercise-fast.jpg", points: ["看比平常更喘，不只看有沒有喘。", "咳嗽、痰色、痰量一起記。", "洗澡、走路、吃飯都能反映耐受度。"] },
       { eyebrow: "紅旗", title: "喘到說不出話，先就醫", lede: "呼吸快速惡化、嘴唇發紫、胸痛或混亂，不要只加吸入藥觀察。", tone: "danger", image: "assets/nursing-detail-01-vitals-fast.jpg", points: ["嘴唇發紫、意識混亂。", "喘到無法完整說話。", "吸入藥後仍無法緩解。"] },
-      { eyebrow: "咳痰", title: "痰變多、變濃、變色，要提高警覺", lede: "感染或急性惡化常先表現在痰和活動力。", image: "assets/homepage-batch/15-phone-consultation-fast.jpg", points: ["痰色、痰量、發燒一起看。", "食慾下降、嗜睡也要記。", "不要把所有變化都歸因老化。"] },
+      { eyebrow: "咳痰", title: "痰變多、變濃、變色，要提高警覺", lede: "感染或急性惡化常先表現在痰和活動力。", image: "assets/brand-scenes/phone-v2.jpg", points: ["痰色、痰量、發燒一起看。", "食慾下降、嗜睡也要記。", "不要把所有變化都歸因老化。"] },
       { eyebrow: "吸入器", title: "藥要進到肺裡，操作比有拿到藥更重要", lede: "吸入器需要手部力量、吸氣節奏和步驟記憶，長輩常需要重複確認。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["回診時帶吸入器請醫護看一次。", "確認吸完是否漱口或清潔。", "裝置換了，教學也要重做。"] },
       { eyebrow: "環境", title: "菸味、粉塵、香氛都可能讓喘變糟", lede: "家裡的刺激物越少，呼吸照顧越穩。", image: "assets/homepage-batch/care-home-greeting-clear.jpg", points: ["戒菸並避開二手、三手菸。", "少用香氛、薰香和粉塵用品。", "空氣差時減少外出或戴口罩。"] },
       { eyebrow: "活動", title: "安全活動能保留體力", lede: "因怕喘完全不動，肌力和耐受度會更快下降。", image: "assets/daycare-detail-01-exercise-fast.jpg", points: ["分段活動，保留休息。", "練習呼吸節奏和慢走。", "急性惡化時先就醫評估。"] },
-      { eyebrow: "下一步", title: "家裡要有急性惡化計畫", lede: "家屬要知道什麼狀況回診、急診、用藥或聯絡照顧團隊。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["把平常咳痰喘基準寫下。", "疫苗、洗手、避開感染源。", "不能取代診斷；急性惡化請就醫。"] }
+      { eyebrow: "下一步", title: "家裡要有急性惡化計畫", lede: "家屬要知道什麼狀況回診、急診、用藥或聯絡照顧團隊。", tone: "calm", image: "assets/brand-scenes/care-team-v2.jpg", points: ["把平常咳痰喘基準寫下。", "疫苗、洗手、避開感染源。", "不能取代診斷；急性惡化請就醫。"] }
     ],
     references: [referenceLibrary.cdcCopd, referenceLibrary.cdcCopdOlderAdults, referenceLibrary.chronicDiseaseCdc]
   }),
@@ -2219,27 +2222,27 @@ const elderDiseaseLazyPackSlideEnhancements = {
       { eyebrow: "居家", title: "先改床邊到浴室這條路", lede: "夜間起身、浴室濕滑和拖鞋不合，是可先處理的風險。", image: "assets/health3/generated/fall-prevention-night-route-inline.jpg", points: ["清地墊、電線、雜物。", "加夜燈、扶手、防滑鞋。", "椅子高度要好起身。"] },
       { eyebrow: "營養活動", title: "蛋白質、鈣、維生素 D 和肌力要一起看", lede: "骨頭需要營養，防跌也需要肌肉和平衡。", image: "assets/health3/generated/hydration-meal-observation-hero.jpg", points: ["營養補充依醫師或營養師建議。", "安全負重、肌力和平衡活動。", "避免因怕骨折而完全不動。"] },
       { eyebrow: "用藥", title: "骨鬆藥物沒感覺，也不能自己停", lede: "骨鬆治療需要追蹤與規律，家屬可協助提醒回診和服藥方式。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["確認藥物吃法與禁忌。", "副作用或牙科治療先告知醫師。", "追蹤骨密度和跌倒事件。"] },
-      { eyebrow: "下一步", title: "每一次差點跌倒，都值得記下來", lede: "差點跌倒是提前修正環境的機會。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["記地點、時間、原因。", "先處理重複發生的位置。", "不能取代診斷；急性惡化請就醫。"] }
+      { eyebrow: "下一步", title: "每一次差點跌倒，都值得記下來", lede: "差點跌倒是提前修正環境的機會。", tone: "calm", image: "assets/brand-scenes/care-team-v2.jpg", points: ["記地點、時間、原因。", "先處理重複發生的位置。", "不能取代診斷；急性惡化請就醫。"] }
     ],
     references: [referenceLibrary.niamsOsteoporosis, referenceLibrary.niamsOsteoporosisTreatment, referenceLibrary.fallsJama2024]
   }),
   "elderly-osteoarthritis-lazy-pack": pptLazyPack({
     summary: ["退化性關節炎會造成疼痛、僵硬與功能限制。", "完全不動會讓肌力下降，安全活動很重要。", "突然紅腫熱痛或無法承重，要就醫評估。"],
     slides: [
-      { eyebrow: "先看結論", title: "痛也要安全動", lede: "退化性關節炎要找的是能安全活動的方式，而不是只剩忍痛或躺著。", image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg", points: ["看疼痛，也看功能。", "起身、上下樓、如廁最能反映困難。", "活動調整比硬撐更重要。"] },
+      { eyebrow: "先看結論", title: "痛也要安全動", lede: "退化性關節炎要找的是能安全活動的方式，而不是只剩忍痛或躺著。", image: "assets/brand-scenes/rehab-v2.jpg", points: ["看疼痛，也看功能。", "起身、上下樓、如廁最能反映困難。", "活動調整比硬撐更重要。"] },
       { eyebrow: "紅旗", title: "關節突然紅、腫、熱、痛，不要當普通退化", lede: "如果合併發燒、跌倒或無法承重，需要就醫排除其他問題。", tone: "danger", image: "assets/nursing-detail-02-walking-fast.jpg", points: ["突然紅腫熱痛或發燒。", "跌倒後疼痛明顯。", "關節變形或無法承重。"] },
       { eyebrow: "疼痛地圖", title: "把痛畫出來，醫師更快判斷", lede: "痛的位置、時間、動作和緩解方式，比只說很痛更有用。", image: "assets/homepage-batch/14-care-notes-fast.jpg", points: ["早晨僵硬多久。", "上下樓、蹲跪、走遠是否痛。", "休息、熱敷、藥物後是否改善。"] },
       { eyebrow: "環境", title: "椅子太低，膝蓋會更辛苦", lede: "座椅高度、扶手、浴室和樓梯，會直接影響疼痛和跌倒風險。", image: "assets/nursing-detail-03-home-safety-fast.jpg", points: ["椅子要穩、不要太低。", "馬桶旁和浴室扶手要好抓。", "必要時評估手杖或助行器。"] },
       { eyebrow: "活動", title: "低衝擊、分段、能持續才是重點", lede: "安全活動能維持肌力與關節活動度，完全不動可能更退化。", image: "assets/daycare-detail-01-exercise-fast.jpg", points: ["先暖身，再慢慢增加。", "分段走路，避免長時間蹲跪。", "疼痛明顯惡化就回頭調整。"] },
       { eyebrow: "用藥", title: "貼布和止痛藥也要注意安全", lede: "長輩可能有腎臟、胃部、心血管或多重用藥問題，不能長期自己試。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["長期吃止痛藥要告知醫師。", "保健品也可能有交互作用。", "疼痛影響睡眠或外出要回診。"] },
-      { eyebrow: "下一步", title: "照顧目標是少痛一點，也多生活一點", lede: "把安全活動、環境調整和復能放在一起，長輩才敢動。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["先選一個最卡動作改善。", "用一週疼痛紀錄討論治療。", "不能取代診斷；急性惡化請就醫。"] }
+      { eyebrow: "下一步", title: "照顧目標是少痛一點，也多生活一點", lede: "把安全活動、環境調整和復能放在一起，長輩才敢動。", tone: "calm", image: "assets/brand-scenes/care-team-v2.jpg", points: ["先選一個最卡動作改善。", "用一週疼痛紀錄討論治療。", "不能取代診斷；急性惡化請就醫。"] }
     ],
     references: [referenceLibrary.niamsOsteoarthritis, referenceLibrary.niamsOsteoarthritisTreatment, referenceLibrary.assistiveTechnologyFalls]
   }),
   "elderly-parkinson-lazy-pack": pptLazyPack({
     summary: ["巴金森氏症不只手抖，也影響動作、平衡、吞嚥和睡眠。", "家屬要觀察用藥時間和身體狀態的關係。", "跌倒變多、吞嚥惡化或混亂要及早處理。"],
     slides: [
-      { eyebrow: "先看結論", title: "不只看手抖", lede: "動作慢、僵硬、小碎步、轉身不穩和吞嚥問題，常更影響生活。", image: "assets/homepage-batch/13-rehab-walking-practice-fast.jpg", points: ["看走路、起身、轉身。", "看吃飯喝水是否嗆。", "看睡眠、便祕、情緒和幻覺。"] },
+      { eyebrow: "先看結論", title: "不只看手抖", lede: "動作慢、僵硬、小碎步、轉身不穩和吞嚥問題，常更影響生活。", image: "assets/brand-scenes/rehab-v2.jpg", points: ["看走路、起身、轉身。", "看吃飯喝水是否嗆。", "看睡眠、便祕、情緒和幻覺。"] },
       { eyebrow: "紅旗", title: "跌倒變多或吞嚥變差，要快處理", lede: "巴金森照顧最怕跌倒骨折與吸入性肺炎風險。", tone: "danger", image: "assets/health3/generated/swallowing-safe-meal-hero.jpg", points: ["反覆跌倒或差點跌倒。", "喝水常嗆、發燒或聲音濕。", "幻覺、混亂、嗜睡明顯改變。"] },
       { eyebrow: "用藥時間", title: "一天中何時卡住，要和藥效一起看", lede: "記錄用藥前後狀態，能幫助醫師判斷是否需要調整。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["不要自行改時間或劑量。", "記錄動不了、抖、僵硬的時段。", "回診帶時間表和影片。"] },
       { eyebrow: "步態", title: "凍住時不要硬拉，先停再給提示", lede: "小碎步和突然卡住時，用口令或視覺線索比拉扯更安全。", image: "assets/nursing-detail-02-walking-fast.jpg", points: ["先讓長輩站穩。", "用短口令：看前方、跨一步。", "轉身慢一點，少催促。"] },
@@ -2258,7 +2261,7 @@ const elderDiseaseLazyPackSlideEnhancements = {
       { eyebrow: "用藥", title: "止痛藥、草藥、保健品都要問過", lede: "腎功能不好時，有些藥物或補品可能增加負擔或需要調整。", image: "assets/health3/generated/medication-reminder-family-system-hero.jpg", points: ["把所有藥袋和補品拍照。", "不要自行加利尿劑或止痛藥。", "看診一定告知腎功能狀況。"] },
       { eyebrow: "飲食水分", title: "限水、限蛋白不能自己猜", lede: "不同腎臟階段和共病不同，飲食限制要由醫師或營養師設定。", image: "assets/health3/generated/hydration-meal-observation-hero.jpg", points: ["不要自行極端限水。", "食慾下降和體重下降要記錄。", "鈉、鉀、蛋白質依專業建議。"] },
       { eyebrow: "回診", title: "回診前準備五件事", lede: "紀錄越具體，醫師越容易判斷是否需要調整。", image: "assets/homepage-batch/family-consultation-clear.jpg", points: ["血壓血糖、體重、水腫。", "尿量、食慾、喘、疲倦。", "所有藥物、保健品、中草藥。"] },
-      { eyebrow: "下一步", title: "家屬做的是把風險提早看見", lede: "慢性腎臟病照顧不是每天害怕，而是讓異常能被早點帶去討論。", tone: "calm", image: "assets/homepage-batch/03-supervisor-care-plan-fast.jpg", points: ["固定量測與回診提醒。", "異常先記錄，不自行調藥。", "不能取代診斷；急性惡化請就醫。"] }
+      { eyebrow: "下一步", title: "家屬做的是把風險提早看見", lede: "慢性腎臟病照顧不是每天害怕，而是讓異常能被早點帶去討論。", tone: "calm", image: "assets/brand-scenes/care-team-v2.jpg", points: ["固定量測與回診提醒。", "異常先記錄，不自行調藥。", "不能取代診斷；急性惡化請就醫。"] }
     ],
     references: [referenceLibrary.niddkCkd, referenceLibrary.niddkCkdCauses, referenceLibrary.niddkCkdManagement]
   })

@@ -9,6 +9,7 @@ dist
 
 # Local/generated review artifacts
 /outputs/
+/tmp/
 /*-check.png
 /mobile-*.png
 /option-*.png

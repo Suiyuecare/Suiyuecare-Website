@@ -1,6 +1,8 @@
 import { supabase } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
+import { canEditScope, canPublishScope, contentScopeLabel } from "./content-scope.js";
 import { escapeHTML, formatCount, formatUpdatedAt } from "./utils.js";
+import { visualEditorPageList } from "./visual-editor-manifest.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -10,6 +12,20 @@ const logoutButton = document.querySelector("#adminLogout");
 const dashboardStatus = document.querySelector("#adminDashboardStatus");
 const recentUpdates = document.querySelector("#adminRecentUpdates");
 const refreshDashboardButton = document.querySelector("#adminRefreshDashboard");
+const responsibilityDepartments = document.querySelector("#adminResponsibilityDepartments");
+const responsibilityList = document.querySelector("#adminResponsibilityList");
+const myPageCount = document.querySelector("#adminMyPageCount");
+const myDraftCount = document.querySelector("#adminMyDraftCount");
+const myPendingCount = document.querySelector("#adminMyPendingCount");
+const myRejectedCount = document.querySelector("#adminMyRejectedCount");
+
+let currentProfileId = "";
+
+const departmentRoleLabels = {
+  viewer: "檢視者",
+  editor: "編輯者",
+  manager: "部門負責人"
+};
 
 const countTargets = {
   articles: document.querySelector('[data-dashboard-count="articles"]'),
@@ -124,6 +140,102 @@ function renderRecentUpdates(items) {
   `).join("");
 }
 
+function renderResponsibilityOverview(permissions, areas = []) {
+  if (!responsibilityDepartments || !responsibilityList) return;
+
+  const departments = Array.isArray(permissions?.departments) ? permissions.departments : [];
+  responsibilityDepartments.innerHTML = permissions?.role === "owner"
+    ? '<span data-role="owner">全站 Owner</span>'
+    : departments.length
+      ? departments.map((department) => `
+        <span data-role="${escapeHTML(department.role || "viewer")}">
+          ${escapeHTML(department.name || department.slug || "未命名部門")} · ${escapeHTML(departmentRoleLabels[department.role] || "檢視者")}
+        </span>
+      `).join("")
+      : '<span data-role="unassigned">尚未指派部門</span>';
+
+  if (!areas.length) {
+    responsibilityList.innerHTML = `
+      <div class="admin-empty-state">
+        目前沒有指派內容責任範圍。請洽後台權限管理者加入所屬部門。
+      </div>
+    `;
+    return;
+  }
+
+  responsibilityList.innerHTML = areas.map((area) => {
+    const scopeKey = area.scope_key;
+    const access = canPublishScope(permissions, scopeKey)
+      ? { label: "可審核發布", value: "manager" }
+      : canEditScope(permissions, scopeKey)
+        ? { label: "可編輯送審", value: "editor" }
+        : { label: "可檢視", value: "viewer" };
+    const visualPage = visualEditorPageList().find((page) => page.scopeKey === scopeKey);
+    const adminPath = visualPage ? `/admin/visual-editor?page=${encodeURIComponent(visualPage.slug)}` : area.admin_path || "";
+    const frontendPath = area.frontend_path || "";
+    return `
+      <article>
+        <div>
+          <strong>${escapeHTML(area.name || contentScopeLabel(scopeKey))}</strong>
+          <small>${escapeHTML(area.description || scopeKey)}</small>
+        </div>
+        <span data-access="${access.value}">${access.label}</span>
+        <div class="admin-responsibility-actions">
+          ${frontendPath ? `<a href="${escapeHTML(frontendPath)}" target="_blank" rel="noopener">看前台</a>` : ""}
+          ${adminPath ? `<a href="${escapeHTML(adminPath)}">直接編輯</a>` : ""}
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadResponsibilityOverview(permissions) {
+  const fallbackAreas = (permissions?.content_scopes || []).map((scopeKey) => ({
+    scope_key: scopeKey,
+    name: contentScopeLabel(scopeKey),
+    description: scopeKey,
+    admin_path: "",
+    frontend_path: ""
+  }));
+
+  try {
+    const { data, error } = await supabase
+      .from("cms_content_areas")
+      .select("scope_key, name, description, frontend_path, admin_path, sort_order")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+    if (error) throw error;
+    const visualScopes = new Set(visualEditorPageList().map((page) => page.scopeKey));
+    const pageAreas = (data || fallbackAreas).filter((area) => visualScopes.has(area.scope_key));
+    if (myPageCount) myPageCount.textContent = formatCount(pageAreas.length);
+    renderResponsibilityOverview(permissions, pageAreas);
+  } catch (error) {
+    console.warn("Department responsibility metadata is not available yet", error);
+    renderResponsibilityOverview(permissions, fallbackAreas);
+  }
+}
+
+async function loadMyWorkQueue(permissions) {
+  if (!currentProfileId) return;
+  try {
+    let query = supabase
+      .from("cms_change_sets")
+      .select("status, requested_by");
+    if (permissions?.role !== "owner") query = query.eq("requested_by", currentProfileId);
+    const { data, error } = await query;
+    if (error) throw error;
+    const items = data || [];
+    if (myDraftCount) myDraftCount.textContent = formatCount(items.filter((item) => item.status === "draft").length);
+    if (myPendingCount) myPendingCount.textContent = formatCount(items.filter((item) => item.status === "pending").length);
+    if (myRejectedCount) myRejectedCount.textContent = formatCount(items.filter((item) => item.status === "rejected").length);
+  } catch (error) {
+    console.warn("Page change sets are not available yet", error);
+    [myDraftCount, myPendingCount, myRejectedCount].forEach((node) => {
+      if (node) node.textContent = "0";
+    });
+  }
+}
+
 async function loadDashboardData() {
   if (!supabase) return;
   refreshDashboardButton?.setAttribute("disabled", "true");
@@ -173,5 +285,17 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadDashboardData
+  onReady: async (session, permissions) => {
+    const profileResult = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("user_id", session.user.id)
+      .maybeSingle();
+    currentProfileId = profileResult.data?.id || "";
+    await Promise.all([
+      loadDashboardData(),
+      loadResponsibilityOverview(permissions),
+      loadMyWorkQueue(permissions)
+    ]);
+  }
 }).catch((error) => reportAdminBootError(loading, error));

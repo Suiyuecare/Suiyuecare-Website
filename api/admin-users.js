@@ -107,6 +107,62 @@ function readJsonBody(request, maxBytes = 100_000) {
 }
 
 const ownerEmail = "entrepreneur@suiyuecare.com";
+const contentScopeKeys = new Set([
+  "page:home",
+  "page:about",
+  "page:contact",
+  "courses",
+  "health",
+  "investor",
+  "recruiting:talent",
+  "recruiting:partnership",
+  "brand",
+  "service:home-care",
+  "service:day-care",
+  "service:community",
+  "service:nursing",
+  "service:migrant-training",
+  "service:quality",
+  "service:software",
+  "site:settings",
+  "files",
+  "forms:contact",
+  "forms:courses",
+  "forms:talent",
+  "forms:partnership",
+  "forms:brand",
+  "forms:system"
+]);
+
+const departmentMembershipRoles = new Set(["viewer", "editor", "manager"]);
+const departmentRoleRank = { viewer: 1, editor: 2, manager: 3 };
+const profileRoles = new Set(["owner", "admin", "editor", "viewer"]);
+
+function normalizeContentScopes(scopes) {
+  if (!Array.isArray(scopes)) return [];
+  return [...new Set(scopes.filter((scope) => typeof scope === "string" && contentScopeKeys.has(scope)))];
+}
+
+function normalizeDepartmentMemberships(assignments, validDepartmentIds = new Set()) {
+  if (!Array.isArray(assignments)) return [];
+  const normalizedByDepartment = new Map();
+
+  assignments.forEach((assignment) => {
+    const departmentId = String(assignment?.department_id || "").trim();
+    const membershipRole = String(assignment?.membership_role || "").trim();
+    if (!validDepartmentIds.has(departmentId) || !departmentMembershipRoles.has(membershipRole)) return;
+
+    const existing = normalizedByDepartment.get(departmentId);
+    if (!existing || departmentRoleRank[membershipRole] > departmentRoleRank[existing.membership_role]) {
+      normalizedByDepartment.set(departmentId, {
+        department_id: departmentId,
+        membership_role: membershipRole
+      });
+    }
+  });
+
+  return [...normalizedByDepartment.values()];
+}
 
 const ownerPermissions = {
   can_manage_users: true,
@@ -209,15 +265,12 @@ async function profilesCount(supabase) {
 function canManageUsers(user, currentAdmin, totalProfiles) {
   const email = String(user.email || "").toLowerCase();
   if (email === ownerEmail) return true;
-  if (totalProfiles === 0) return true;
-  if (currentAdmin?.role === "owner") return true;
-  const adminRecord = Array.isArray(currentAdmin?.admins) ? currentAdmin.admins[0] : currentAdmin?.admins;
-  return Boolean(currentAdmin?.is_active && adminRecord?.is_active && adminRecord?.can_manage_users);
+  return Boolean(currentAdmin?.is_active && currentAdmin?.role === "owner");
 }
 
 async function ensureProfileForCurrentUser(supabase, user, totalProfiles) {
   const email = String(user.email || "").toLowerCase();
-  const shouldBeOwner = email === ownerEmail || totalProfiles === 0;
+  const shouldBeOwner = email === ownerEmail;
   const displayName = user.user_metadata?.full_name || user.user_metadata?.name || (shouldBeOwner ? "歲悅長照 Owner" : email);
   const role = shouldBeOwner ? "owner" : "viewer";
 
@@ -252,24 +305,44 @@ async function ensureProfileForCurrentUser(supabase, user, totalProfiles) {
 }
 
 async function listUsers(supabase) {
-  const [{ data: profiles, error: profileError }, { data: admins, error: adminError }] = await Promise.all([
+  const [
+    { data: profiles, error: profileError },
+    { data: admins, error: adminError },
+    { data: contentScopes, error: scopeError },
+    { data: departments, error: departmentError },
+    { data: departmentMemberships, error: membershipError },
+    { data: contentAreas, error: contentAreaError }
+  ] = await Promise.all([
     supabase.from("profiles").select("id,user_id,email,display_name,role,is_active,updated_at").order("updated_at", { ascending: false }),
-    supabase.from("admins").select("*")
+    supabase.from("admins").select("*"),
+    supabase.from("admin_content_scopes").select("profile_id,scope_key"),
+    supabase.from("departments").select("id,slug,name,description,sort_order,is_active").eq("is_active", true).order("sort_order", { ascending: true }),
+    supabase.from("department_memberships").select("department_id,profile_id,membership_role,is_active").eq("is_active", true),
+    supabase.from("cms_content_areas").select("scope_key,name,description,department_id,frontend_path,admin_path,sort_order,is_active").eq("is_active", true).order("sort_order", { ascending: true })
   ]);
 
   if (profileError) throw profileError;
   if (adminError) throw adminError;
+  if (scopeError) throw scopeError;
+  if (departmentError) throw departmentError;
+  if (membershipError) throw membershipError;
+  if (contentAreaError) throw contentAreaError;
 
-  return { profiles: profiles || [], admins: admins || [] };
+  return {
+    profiles: profiles || [],
+    admins: admins || [],
+    contentScopes: contentScopes || [],
+    departments: departments || [],
+    departmentMemberships: departmentMemberships || [],
+    contentAreas: contentAreas || []
+  };
 }
 
-async function handleUpdate(request, response, supabase, user, totalProfiles) {
+async function handleUpdate(response, supabase, user, totalProfiles, body) {
   const currentAdmin = await getCurrentAdmin(supabase, user);
   if (!canManageUsers(user, currentAdmin, totalProfiles)) {
     return json(response, 403, { ok: false, message: "You do not have permission to manage users." });
   }
-
-  const body = await readJsonBody(request);
 
   const profileId = body.profile_id;
   if (!profileId) return json(response, 400, { ok: false, message: "Missing profile_id." });
@@ -283,7 +356,10 @@ async function handleUpdate(request, response, supabase, user, totalProfiles) {
   if (!targetProfile) return json(response, 404, { ok: false, message: "Profile not found." });
 
   const targetEmail = String(body.email || targetProfile.email || "").toLowerCase();
-  const requestedRole = body.role || "viewer";
+  const requestedRole = String(body.role || "viewer").trim().toLowerCase();
+  if (!profileRoles.has(requestedRole)) {
+    return json(response, 400, { ok: false, message: "Invalid profile role." });
+  }
   const normalizedRole = targetEmail === ownerEmail ? "owner" : requestedRole === "owner" ? "admin" : requestedRole;
   if (requestedRole === "owner" && targetEmail !== ownerEmail) {
     return json(response, 403, { ok: false, message: "只有 entrepreneur@suiyuecare.com 可以是最高權限 Owner。其他管理者請設定為 Admin。" });
@@ -293,7 +369,7 @@ async function handleUpdate(request, response, supabase, user, totalProfiles) {
     role: targetEmail === ownerEmail ? "owner" : normalizedRole,
     display_name: body.display_name || null,
     email: targetEmail || null,
-    is_active: Boolean(body.is_active)
+    is_active: targetEmail === ownerEmail ? true : Boolean(body.is_active)
   };
   const { error: profileError } = await supabase.from("profiles").update(profilePayload).eq("id", profileId);
   if (profileError) throw profileError;
@@ -301,18 +377,69 @@ async function handleUpdate(request, response, supabase, user, totalProfiles) {
   const adminPayload = {
     profile_id: profileId,
     role: profilePayload.role,
-    is_active: Boolean(body.is_active)
+    is_active: profilePayload.is_active
   };
   Object.keys(ownerPermissions).forEach((key) => {
     adminPayload[key] = Boolean(body[key]);
   });
   const isOwnerRole = targetEmail === ownerEmail && adminPayload.role === "owner";
+  adminPayload.can_manage_users = isOwnerRole;
   adminPayload.can_publish = isOwnerRole;
   adminPayload.can_review_publish = isOwnerRole;
+  adminPayload.can_delete_media = isOwnerRole;
   const { error: adminError } = await supabase.from("admins").upsert(adminPayload, { onConflict: "profile_id" });
   if (adminError) throw adminError;
 
-  return json(response, 200, { ok: true, message: "User permissions saved." });
+  const [{ data: departments, error: departmentsError }, { data: contentAreas, error: contentAreasError }] = await Promise.all([
+    supabase.from("departments").select("id").eq("is_active", true),
+    supabase.from("cms_content_areas").select("scope_key,department_id").eq("is_active", true)
+  ]);
+  if (departmentsError) throw departmentsError;
+  if (contentAreasError) throw contentAreasError;
+
+  const validDepartmentIds = new Set((departments || []).map((department) => department.id));
+  let requestedMemberships = normalizeDepartmentMemberships(body.department_memberships, validDepartmentIds);
+
+  // Compatibility for a cached version of the old permission page. Legacy
+  // scope checkboxes are converted into editor memberships by department.
+  if (!Array.isArray(body.department_memberships) && Array.isArray(body.content_scopes)) {
+    const requestedScopes = normalizeContentScopes(body.content_scopes);
+    requestedMemberships = normalizeDepartmentMemberships(
+      (contentAreas || [])
+        .filter((area) => requestedScopes.includes(area.scope_key))
+        .map((area) => ({ department_id: area.department_id, membership_role: "editor" })),
+      validDepartmentIds
+    );
+  }
+
+  if (isOwnerRole) requestedMemberships = [];
+
+  const { error: membershipError } = await supabase.rpc("replace_department_memberships", {
+    target_profile_id: profileId,
+    assignments: requestedMemberships
+  });
+  if (membershipError) throw membershipError;
+
+  return json(response, 200, { ok: true, message: "User permissions and department responsibilities saved." });
+}
+
+async function handleContentAreaUpdate(response, supabase, body) {
+  const assignments = body.content_area_assignments;
+  if (!Array.isArray(assignments) || !assignments.length) {
+    return json(response, 400, { ok: false, message: "內容責任配置不可為空。" });
+  }
+  if (assignments.some((assignment) => (
+    !contentScopeKeys.has(String(assignment?.scope_key || ""))
+    || !String(assignment?.department_id || "").trim()
+  ))) {
+    return json(response, 400, { ok: false, message: "內容責任配置包含無效範圍或部門。" });
+  }
+
+  const { error } = await supabase.rpc("replace_content_area_assignments", {
+    assignments
+  });
+  if (error) throw error;
+  return json(response, 200, { ok: true, message: "Content ownership assignments saved." });
 }
 
 module.exports = async function handler(request, response) {
@@ -332,7 +459,11 @@ module.exports = async function handler(request, response) {
     await ensureProfileForCurrentUser(supabase, user, totalProfiles);
 
     if (request.method === "POST") {
-      return handleUpdate(request, response, supabase, user, totalProfiles);
+      const body = await readJsonBody(request);
+      if (body.action === "update_content_areas") {
+        return handleContentAreaUpdate(response, supabase, body);
+      }
+      return handleUpdate(response, supabase, user, totalProfiles, body);
     }
 
     const data = await listUsers(supabase);

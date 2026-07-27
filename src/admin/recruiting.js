@@ -2,6 +2,8 @@ import { supabase, supabaseStorageBuckets } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
 import { prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
+import { applyPublishStatusUi } from "./auth.js";
+import { canEditScope, canPublishScope, canViewScope, contentDeleteMessage, contentSaveMessage, scopeForPageSlug } from "./content-scope.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -29,6 +31,37 @@ const recruitingCountTargets = {
 let departments = [];
 let openings = [];
 let recruitingImageById = new Map();
+let adminPermissions = {};
+
+function canEditRecruitingPage(pageSlug = pageFilter?.value) {
+  return canEditScope(adminPermissions, scopeForPageSlug(pageSlug));
+}
+
+function canViewRecruitingPage(pageSlug = pageFilter?.value) {
+  return canViewScope(adminPermissions, scopeForPageSlug(pageSlug));
+}
+
+function setAvailableRecruitingPages() {
+  Array.from(pageFilter?.options || []).forEach((option) => {
+    option.hidden = !canViewRecruitingPage(option.value);
+  });
+  if (pageFilter?.value && !canViewRecruitingPage(pageFilter.value)) {
+    const firstAllowed = Array.from(pageFilter.options).find((option) => !option.hidden);
+    if (firstAllowed) pageFilter.value = firstAllowed.value;
+  }
+}
+
+function applyRecruitingEditState() {
+  const editable = canEditRecruitingPage();
+  const scopeKey = scopeForPageSlug(pageFilter?.value);
+  [pageForm, departmentForm, openingForm].forEach((targetForm) => {
+    if (targetForm) targetForm.dataset.contentScope = scopeKey;
+    targetForm?.querySelectorAll("input, textarea, select, button").forEach((control) => { control.disabled = !editable; });
+  });
+  newDepartmentButton && (newDepartmentButton.disabled = !editable);
+  newOpeningButton && (newOpeningButton.disabled = !editable);
+  applyPublishStatusUi(adminPermissions);
+}
 
 function getLinkedImage(item, idKey = "image_id", relationKey = "image") {
   return recruitingImageById.get(item?.[idKey]) || item?.[relationKey] || null;
@@ -82,6 +115,7 @@ async function uploadRecruitingImage(file, altText, imageUsage = "card") {
     caption: altText,
     imageUsage,
     focalPoint: "center",
+    scopeKey: scopeForPageSlug(pageFilter?.value),
     bucket: supabaseStorageBuckets.jobImages
   });
 }
@@ -179,6 +213,7 @@ function renderDataList() {
     return;
   }
 
+  const editable = canEditRecruitingPage();
   dataList.innerHTML = `
     <article class="admin-section-card">
       <header><div><span>Departments</span><strong>部門 / 合作分類</strong></div></header>
@@ -198,7 +233,7 @@ function renderDataList() {
                 </td>
                 <td>${escapeHTML(statusLabel(department.status))}${department.is_enabled ? "" : " / 停用"}</td>
                 <td>${formatUpdatedAt(department.updated_at)}</td>
-                <td><div class="admin-table-actions"><button type="button" data-edit-department="${escapeHTML(department.id)}">編輯</button><button type="button" data-delete-department="${escapeHTML(department.id)}">刪除</button></div></td>
+                <td><div class="admin-table-actions">${editable ? `<button type="button" data-edit-department="${escapeHTML(department.id)}">編輯</button><button type="button" data-delete-department="${escapeHTML(department.id)}">刪除</button>` : "<span>唯讀</span>"}</div></td>
               </tr>
             `;
             }).join("")}
@@ -225,7 +260,7 @@ function renderDataList() {
                   </td>
                   <td>${escapeHTML(department?.title || "-")}</td>
                   <td>${escapeHTML(statusLabel(opening.status))}${opening.is_enabled ? "" : " / 停用"}</td>
-                  <td><div class="admin-table-actions"><button type="button" data-edit-opening="${escapeHTML(opening.id)}">編輯</button><button type="button" data-delete-opening="${escapeHTML(opening.id)}">刪除</button></div></td>
+                  <td><div class="admin-table-actions">${editable ? `<button type="button" data-edit-opening="${escapeHTML(opening.id)}">編輯</button><button type="button" data-delete-opening="${escapeHTML(opening.id)}">刪除</button>` : "<span>唯讀</span>"}</div></td>
                 </tr>
               `;
             }).join("")}
@@ -280,6 +315,7 @@ async function loadRecruitingData() {
   setStatus("正在讀取招募資料...", "info");
   try {
     const pageSlug = pageFilter.value;
+    if (!canViewRecruitingPage(pageSlug)) throw new Error("此招募頁不在你的部門責任範圍內。");
     const [{ data: pageData, error: pageError }, { data: departmentData, error: departmentError }, { data: openingData, error: openingError }] = await Promise.all([
       supabase
         .from("recruiting_pages")
@@ -323,6 +359,7 @@ async function loadRecruitingData() {
     renderDataList();
     resetDepartmentForm();
     resetOpeningForm();
+    applyRecruitingEditState();
     setStatus("", "success");
   } catch (error) {
     console.error("Failed to load recruiting data", error);
@@ -406,6 +443,7 @@ function openingPayload() {
 
 async function saveDepartment(event) {
   event.preventDefault();
+  if (!canEditRecruitingPage()) return setStatus("此招募頁不在你的內容責任範圍內。", "error");
   setStatus("正在儲存部門資料...", "info");
   try {
     const payload = departmentPayload();
@@ -414,12 +452,14 @@ async function saveDepartment(event) {
       payload.image_id = uploadedImage.id;
       payload.image_url = uploadedImage.public_url;
     }
+    const scopeKey = scopeForPageSlug(pageFilter.value);
     const id = departmentForm.elements.id.value;
     const query = id ? supabase.from("recruiting_departments").update(payload).eq("id", id) : supabase.from("recruiting_departments").insert(payload);
-    const { error } = await query;
+    const { data, error } = await query.select("id").maybeSingle();
     if (error) throw error;
-    setStatus("部門資料已儲存。", "success");
-    await loadRecruitingData();
+    if (data?.id) departmentForm.elements.id.value = data.id;
+    setStatus(contentSaveMessage(adminPermissions, scopeKey, "招募部門資料"), "success");
+    if (canPublishScope(adminPermissions, scopeKey)) await loadRecruitingData();
   } catch (error) {
     setStatus(`儲存部門失敗：${error.message}`, "error");
   }
@@ -427,6 +467,7 @@ async function saveDepartment(event) {
 
 async function savePageSettings(event) {
   event.preventDefault();
+  if (!canEditRecruitingPage()) return setStatus("此招募頁不在你的內容責任範圍內。", "error");
   setStatus("正在儲存頁面 Hero 主文案...", "info");
   try {
     const payload = pagePayload();
@@ -435,14 +476,16 @@ async function savePageSettings(event) {
       payload.hero_image_id = uploadedImage.id;
       payload.hero_image_url = uploadedImage.public_url;
     }
+    const scopeKey = scopeForPageSlug(pageFilter.value);
     const id = pageForm.elements.id.value;
     const query = id
       ? supabase.from("recruiting_pages").update(payload).eq("id", id)
       : supabase.from("recruiting_pages").insert(payload);
-    const { error } = await query;
+    const { data, error } = await query.select("id").maybeSingle();
     if (error) throw error;
-    setStatus("頁面 Hero 主文案已儲存。", "success");
-    await loadRecruitingData();
+    if (data?.id) pageForm.elements.id.value = data.id;
+    setStatus(contentSaveMessage(adminPermissions, scopeKey, "頁面 Hero 主文案"), "success");
+    if (canPublishScope(adminPermissions, scopeKey)) await loadRecruitingData();
   } catch (error) {
     console.error("Failed to save recruiting page", error);
     setStatus(`儲存頁面 Hero 失敗：${error.message}`, "error");
@@ -451,6 +494,7 @@ async function savePageSettings(event) {
 
 async function saveOpening(event) {
   event.preventDefault();
+  if (!canEditRecruitingPage()) return setStatus("此招募頁不在你的內容責任範圍內。", "error");
   setStatus("正在儲存卡片資料...", "info");
   try {
     const payload = openingPayload();
@@ -459,31 +503,43 @@ async function saveOpening(event) {
       payload.image_id = uploadedImage.id;
       payload.image_url = uploadedImage.public_url;
     }
+    const scopeKey = scopeForPageSlug(pageFilter.value);
     const id = openingForm.elements.id.value;
     const query = id ? supabase.from("recruiting_openings").update(payload).eq("id", id) : supabase.from("recruiting_openings").insert(payload);
-    const { error } = await query;
+    const { data, error } = await query.select("id").maybeSingle();
     if (error) throw error;
-    setStatus("卡片資料已儲存。", "success");
-    await loadRecruitingData();
+    if (data?.id) openingForm.elements.id.value = data.id;
+    setStatus(contentSaveMessage(adminPermissions, scopeKey, "招募卡片資料"), "success");
+    if (canPublishScope(adminPermissions, scopeKey)) await loadRecruitingData();
   } catch (error) {
     setStatus(`儲存卡片失敗：${error.message}`, "error");
   }
 }
 
 async function deleteDepartment(id) {
+  if (!canEditRecruitingPage()) return setStatus("此招募頁不在你的內容責任範圍內。", "error");
   const department = departments.find((item) => item.id === id);
   if (!department || !window.confirm(`確定刪除「${department.title}」嗎？相關卡片會保留但失去分類。`)) return;
-  const { error } = await supabase.from("recruiting_departments").delete().eq("id", id);
+  const scopeKey = scopeForPageSlug(pageFilter.value);
+  const { error } = await supabase.from("recruiting_departments").delete().eq("id", id).select("id").maybeSingle();
   if (error) setStatus(`刪除失敗：${error.message}`, "error");
-  else await loadRecruitingData();
+  else {
+    setStatus(contentDeleteMessage(adminPermissions, scopeKey, "招募部門"), "success");
+    if (canPublishScope(adminPermissions, scopeKey)) await loadRecruitingData();
+  }
 }
 
 async function deleteOpening(id) {
+  if (!canEditRecruitingPage()) return setStatus("此招募頁不在你的內容責任範圍內。", "error");
   const opening = openings.find((item) => item.id === id);
   if (!opening || !window.confirm(`確定刪除「${opening.title}」嗎？`)) return;
-  const { error } = await supabase.from("recruiting_openings").delete().eq("id", id);
+  const scopeKey = scopeForPageSlug(pageFilter.value);
+  const { error } = await supabase.from("recruiting_openings").delete().eq("id", id).select("id").maybeSingle();
   if (error) setStatus(`刪除失敗：${error.message}`, "error");
-  else await loadRecruitingData();
+  else {
+    setStatus(contentDeleteMessage(adminPermissions, scopeKey, "招募卡片"), "success");
+    if (canPublishScope(adminPermissions, scopeKey)) await loadRecruitingData();
+  }
 }
 
 pageForm?.addEventListener("submit", savePageSettings);
@@ -492,7 +548,12 @@ openingForm?.addEventListener("submit", saveOpening);
 newDepartmentButton?.addEventListener("click", resetDepartmentForm);
 newOpeningButton?.addEventListener("click", resetOpeningForm);
 refreshButton?.addEventListener("click", loadRecruitingData);
-pageFilter?.addEventListener("change", loadRecruitingData);
+pageFilter?.addEventListener("change", () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("page", pageFilter.value);
+  window.history.replaceState(null, "", `${url.pathname}${url.search}`);
+  loadRecruitingData();
+});
 departmentForm?.elements.title?.addEventListener("input", () => {
   if (!departmentForm.elements.id.value && !departmentForm.elements.department_slug.value) departmentForm.elements.department_slug.value = slugify(departmentForm.elements.title.value, "department");
 });
@@ -518,5 +579,11 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadRecruitingData
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    setAvailableRecruitingPages();
+    const requestedPage = new URLSearchParams(window.location.search).get("page");
+    if (requestedPage && canViewRecruitingPage(requestedPage)) pageFilter.value = requestedPage;
+    await loadRecruitingData();
+  }
 }).catch((error) => reportAdminBootError(loading, error));

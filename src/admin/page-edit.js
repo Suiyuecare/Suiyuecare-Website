@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabaseClient.js";
 import { fetchMediaImages, getFocalPointOption, getImageUsageOption, prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
+import { canEditScope, canPublishScope, canViewScope, contentSaveMessage, scopeForPageSlug } from "./content-scope.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML } from "./utils.js";
 
@@ -13,7 +14,6 @@ const editorTitle = document.querySelector("#pageEditorTitle");
 const editorSlug = document.querySelector("#pageEditorSlug");
 const form = document.querySelector("#pageEditorForm");
 const sectionsEditor = document.querySelector("#pageSectionsEditor");
-const addSectionButton = document.querySelector("#addSectionButton");
 const requestPublishButton = document.querySelector("#requestPagePublishButton");
 const imagePicker = document.querySelector("#sectionImagePicker");
 const imagePickerGrid = document.querySelector("#sectionImagePickerGrid");
@@ -21,8 +21,32 @@ const imagePickerStatus = document.querySelector("#sectionImagePickerStatus");
 const imageUploadForm = document.querySelector("#sectionImageUploadForm");
 
 let currentPage = null;
+let currentPageScope = "";
 let currentSections = [];
 let activeImageSectionId = null;
+let adminPermissions = {};
+
+const specialPageManagers = {
+  about: { label: "關於歲悅目前由前端固定版型管理，尚未開放後台改文案。", href: "" },
+  milestones: { label: "請到大事記管理時間軸卡片。", href: "/admin/milestones" },
+  "home-care": { label: "請到固定版位管理居家照顧內容。", href: "/admin/template-fields?page=home-care" },
+  "day-care": { label: "請到固定版位管理日間照顧內容。", href: "/admin/template-fields?page=day-care" },
+  community: { label: "請到固定版位管理社區據點內容。", href: "/admin/template-fields?page=community" },
+  nursing: { label: "請到固定版位管理護理復能內容。", href: "/admin/template-fields?page=nursing" },
+  "migrant-training": { label: "請到固定版位管理移工培訓內容。", href: "/admin/template-fields?page=migrant-training" },
+  quality: { label: "請到固定版位管理教育品管內容。", href: "/admin/template-fields?page=quality" },
+  software: { label: "請到固定版位管理軟體系統內容。", href: "/admin/template-fields?page=software" },
+  talent: { label: "請到招募管理編輯 Hero、部門與職缺。", href: "/admin/recruiting" },
+  land: { label: "請到招募管理編輯 Hero 與合作卡片。", href: "/admin/recruiting" },
+  "investor-recruiting": { label: "請到招募管理編輯 Hero 與合作卡片。", href: "/admin/recruiting" },
+  health: { label: "健康3.0 列表由文章與分類資料驅動，請到文章管理編輯。", href: "/admin/articles" },
+  courses: { label: "課程報名頁由課程資料驅動，請到課程管理編輯。", href: "/admin/courses" },
+  investors: { label: "請到投資人資料管理編輯前台內容。", href: "/admin/investor-data" },
+  "ir-finance": { label: "請到投資人資料管理編輯前台內容。", href: "/admin/investor-data" },
+  "ir-governance": { label: "請到投資人資料管理編輯前台內容。", href: "/admin/investor-data" },
+  "ir-shareholders": { label: "請到投資人資料管理編輯前台內容。", href: "/admin/investor-data" },
+  contact: { label: "聯絡表單是首頁固定區塊；請從首頁內容管理對應的 contact 版位調整。", href: "/admin/pages" }
+};
 
 function getPageIdFromLocation() {
   const queryId = new URLSearchParams(window.location.search).get("id");
@@ -53,32 +77,11 @@ function getSectionImageSettings(content = {}) {
   };
 }
 
-function createEmptySection() {
-  return {
-    id: `new-${crypto.randomUUID()}`,
-    isNew: true,
-    section_key: `section_${Date.now()}`,
-    title: "",
-    body: "",
-    sort_order: currentSections.length + 1,
-    is_enabled: true,
-    image_id: null,
-    content_json: {
-      button_text: "",
-      button_href: "",
-      image_url: "",
-      image_usage: "card",
-      image_fit: "cover",
-      focal_point: "center"
-    }
-  };
-}
-
 function renderSections() {
   if (!sectionsEditor) return;
 
   if (!currentSections.length) {
-    sectionsEditor.innerHTML = '<div class="admin-empty-state">目前沒有 section，請新增第一個內容區塊。</div>';
+    sectionsEditor.innerHTML = '<div class="admin-empty-state">此頁尚未建立固定版位。為避免前台出現無法對應的空白區塊，請先由開發者建立版位契約，再回到後台填入內容。</div>';
     return;
   }
 
@@ -108,8 +111,9 @@ function renderSections() {
             <input type="text" data-field="title" value="${escapeHTML(section.title || "")}" />
           </label>
           <label>
-            <span>排序</span>
-            <input type="number" data-field="sort_order" min="0" value="${Number(section.sort_order || 0)}" />
+            <span>固定順序</span>
+            <input type="number" value="${Number(section.sort_order || 0)}" readonly aria-readonly="true" />
+            <small>版位順序由前台模板鎖定；可新增的卡片請使用對應集合管理頁。</small>
           </label>
           <label class="admin-field-wide">
             <span>文字內容</span>
@@ -201,7 +205,7 @@ async function loadPageEditor() {
   const [pageResult, sectionsResult] = await Promise.all([
     supabase
       .from("pages")
-      .select("id, slug, title, seo_title, seo_description, is_enabled, updated_at")
+      .select("id, slug, title, seo_title, seo_description, is_enabled, status, published_at, updated_at")
       .eq("id", pageId)
       .single(),
     supabase
@@ -215,7 +219,15 @@ async function loadPageEditor() {
   if (sectionsResult.error) throw sectionsResult.error;
 
   currentPage = pageResult.data;
+  currentPageScope = scopeForPageSlug(currentPage.slug);
   currentSections = sectionsResult.data || [];
+
+  if (!canViewScope(adminPermissions, currentPageScope)) {
+    throw new Error("這個頁面不在你的內容責任範圍內。");
+  }
+
+  form.dataset.contentScope = currentPageScope;
+  requestPublishButton.dataset.contentScope = currentPageScope;
 
   editorTitle.textContent = currentPage.title || "編輯頁面";
   editorSlug.textContent = `/${currentPage.slug}`;
@@ -224,12 +236,35 @@ async function loadPageEditor() {
   form.elements.seo_description.value = currentPage.seo_description || "";
   form.elements.is_enabled.checked = Boolean(currentPage.is_enabled);
 
+  const specialManager = specialPageManagers[currentPage.slug];
+  if (specialManager) {
+    form.querySelectorAll("input, textarea, select, button").forEach((control) => { control.disabled = true; });
+    requestPublishButton.hidden = true;
+    sectionsEditor.innerHTML = `
+      <div class="admin-empty-state">
+        <strong>此頁不使用通用 page_sections</strong>
+        <p>${escapeHTML(specialManager.label)}在這裡修改會造成後台顯示已儲存、前台卻不變，因此已改為唯讀。</p>
+        ${specialManager.href ? `<a class="admin-row-action" href="${escapeHTML(specialManager.href)}">前往正確管理頁</a>` : ""}
+      </div>
+    `;
+    setEditorStatus("此頁由專用固定版型管理；通用頁面編輯器已切換為唯讀。", "info");
+    return;
+  }
+
   renderSections();
   setEditorStatus("", "success");
 }
 
 async function savePage() {
   if (!currentPage) return;
+  if (!canEditScope(adminPermissions, currentPageScope)) {
+    setEditorStatus("你的帳號只有檢視權限，無法儲存頁面內容。", "error");
+    return;
+  }
+  if (specialPageManagers[currentPage.slug]) {
+    setEditorStatus("此頁由專用管理頁控制，通用 page_sections 不會寫入。", "error");
+    return;
+  }
 
   syncAllSectionsFromDOM();
   setEditorStatus("正在儲存頁面內容...", "info");
@@ -257,7 +292,11 @@ async function savePage() {
       image_id: section.image_id || null,
       content_json: section.content_json || {},
       sort_order: Number(section.sort_order || 0),
-      is_enabled: Boolean(section.is_enabled)
+      is_enabled: Boolean(section.is_enabled),
+      status: currentPage.status || "draft",
+      published_at: currentPage.status === "published"
+        ? currentPage.published_at || new Date().toISOString()
+        : null
     }));
 
     const existingSections = sectionPayloads.filter((section) => section.id);
@@ -277,8 +316,10 @@ async function savePage() {
       if (error) throw error;
     }
 
-    setEditorStatus("已儲存頁面內容。", "success");
-    await loadPageEditor();
+    setEditorStatus(contentSaveMessage(adminPermissions, currentPageScope, "頁面內容"), "success");
+    if (canPublishScope(adminPermissions, currentPageScope)) {
+      await loadPageEditor();
+    }
   } catch (error) {
     console.error("Failed to save page", error);
     setEditorStatus(`儲存失敗：${error.message}`, "error");
@@ -288,6 +329,10 @@ async function savePage() {
 }
 
 async function requestPagePublish() {
+  if (!canEditScope(adminPermissions, currentPageScope)) {
+    setEditorStatus("你的帳號只有檢視權限，無法送出發布申請。", "error");
+    return;
+  }
   if (!currentPage?.id) {
     setEditorStatus("請先讀取頁面後再送審發布。", "error");
     return;
@@ -371,7 +416,7 @@ function renderImagePickerGrid(items) {
 async function loadImagePickerMedia() {
   setImagePickerStatus("正在讀取媒體庫...", "info");
   try {
-    const items = await fetchMediaImages();
+    const items = await fetchMediaImages({ scopeKey: currentPageScope });
     renderImagePickerGrid(items);
     setImagePickerStatus("", "success");
   } catch (error) {
@@ -382,6 +427,10 @@ async function loadImagePickerMedia() {
 }
 
 function openImagePicker(sectionId) {
+  if (!canEditScope(adminPermissions, currentPageScope)) {
+    setEditorStatus("你的帳號只有檢視權限，無法更換圖片。", "error");
+    return;
+  }
   syncAllSectionsFromDOM();
   activeImageSectionId = sectionId;
   imagePicker.hidden = false;
@@ -398,6 +447,10 @@ function closeImagePicker() {
 
 async function uploadAndSelectImage(event) {
   event.preventDefault();
+  if (!canEditScope(adminPermissions, currentPageScope)) {
+    setImagePickerStatus("你的帳號只有檢視權限，無法上傳圖片。", "error");
+    return;
+  }
   const file = imageUploadForm.elements.file.files?.[0];
   if (!file) {
     setImagePickerStatus("請先選擇圖片檔案。", "error");
@@ -420,7 +473,8 @@ async function uploadAndSelectImage(event) {
       altText: imageUploadForm.elements.alt_text.value,
       caption: imageUploadForm.elements.caption.value,
       imageUsage: imageUploadForm.elements.image_usage.value,
-      focalPoint: imageUploadForm.elements.focal_point.value
+      focalPoint: imageUploadForm.elements.focal_point.value,
+      scopeKey: currentPageScope
     });
     applyMediaToActiveSection(media);
     setEditorStatus("圖片已選定，請記得儲存頁面。", "success");
@@ -431,11 +485,6 @@ async function uploadAndSelectImage(event) {
     submitButton?.removeAttribute("disabled");
   }
 }
-
-addSectionButton?.addEventListener("click", () => {
-  currentSections.push(createEmptySection());
-  renderSections();
-});
 
 form?.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -483,5 +532,16 @@ bootProtectedAdminPage({
   userEmail,
   userInitial,
   logoutButton,
-  onReady: loadPageEditor
+  onReady: async (_session, permissions) => {
+    adminPermissions = permissions || {};
+    await loadPageEditor();
+    if (canPublishScope(adminPermissions, currentPageScope)) {
+      requestPublishButton.hidden = true;
+    }
+    if (!canEditScope(adminPermissions, currentPageScope)) {
+      form.querySelectorAll("input, textarea, select, button").forEach((control) => { control.disabled = true; });
+      requestPublishButton.hidden = true;
+      setEditorStatus("目前為唯讀模式；需要此頁所屬部門的編輯權限才能修改。", "info");
+    }
+  }
 }).catch((error) => reportAdminBootError(loading, error));

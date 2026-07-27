@@ -110,7 +110,10 @@ function verifyVercelConfig() {
   const config = readJson("vercel.json");
   assert(config.cleanUrls === true, "vercel.json should keep cleanUrls enabled.");
   assert(config.trailingSlash === false, "vercel.json should keep trailingSlash disabled.");
-  assert(config.buildCommand === "pnpm verify:all", "vercel.json buildCommand should use pnpm verify:all.");
+  assert(
+    config.buildCommand === "pnpm cms:fallbacks:sync && pnpm verify:all",
+    "vercel.json buildCommand should sync published CMS content before pnpm verify:all."
+  );
   assert(config.outputDirectory === "dist", "vercel.json outputDirectory should be dist.");
 
   for (const source of ["/:path*", "/", "/index.html"]) {
@@ -143,7 +146,7 @@ function verifyVercelConfig() {
 
   const rewriteSources = new Set((config.rewrites || []).map((rewrite) => rewrite.source));
   for (const source of ["/article/:slug", "/care-story/:slug", "/master-talk/:slug"]) {
-    assert(rewriteSources.has(source), `Missing front-end content rewrite for ${source}.`);
+    assert(!rewriteSources.has(source), `Public content route ${source} must resolve to static HTML, not a rewrite.`);
   }
   const rewriteDestinations = new Map((config.rewrites || []).map((rewrite) => [rewrite.source, rewrite.destination]));
   for (const source of [
@@ -208,6 +211,11 @@ function verifyPackage() {
   assert(pkg.scripts?.["verify:route-inventory"], "package.json is missing verify:route-inventory.");
   assert(pkg.scripts?.["verify:all"]?.includes("pnpm verify:route-inventory"), "package.json verify:all should run route inventory checks.");
   assert(pkg.scripts?.["verify:all"]?.includes("pnpm verify:routes"), "package.json verify:all should run route checks.");
+  assert(pkg.scripts?.["verify:public-content-rebuild"], "package.json is missing public content rebuild checks.");
+  assert(
+    pkg.scripts?.["verify:all"]?.includes("pnpm verify:public-content-rebuild"),
+    "package.json verify:all should run public content rebuild authorization checks."
+  );
   assert(pkg.scripts?.["verify:all"]?.includes("pnpm verify:accessibility"), "package.json verify:all should run accessibility checks.");
   assert(pkg.scripts?.["verify:performance"], "package.json is missing verify:performance.");
   assert(pkg.scripts?.["verify:all"]?.includes("pnpm verify:performance"), "package.json verify:all should run performance budget checks.");

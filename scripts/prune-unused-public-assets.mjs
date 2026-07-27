@@ -3,7 +3,15 @@ import path from "node:path";
 
 const publicAssetsDir = path.resolve("public/assets");
 const distDir = path.resolve("dist");
-const sourceRoots = ["app.js", "index.html", "styles.css", "scripts", "supabase/migrations"].filter((target) => fs.existsSync(target));
+const sourceRoots = [
+  "app.js",
+  "index.html",
+  "styles.css",
+  "scripts",
+  "supabase/migrations",
+  "public/cms-fallbacks.json",
+  "dist"
+].filter((target) => fs.existsSync(target));
 const imagePattern = /\.(jpe?g|png|webp)$/i;
 const ignoredPathPattern = /(^|\/)(backups|backup|archive|tmp|TemporaryItems)(\/|$)|-instant\./i;
 const largeAssetLimit = 1.1 * 1024 * 1024;
@@ -27,7 +35,7 @@ function walkSource(target, files = []) {
     for (const entry of fs.readdirSync(target, { withFileTypes: true })) {
       const fullPath = path.join(target, entry.name);
       if (entry.isDirectory()) walkSource(fullPath, files);
-      else if (/\.(js|mjs|html|css|sql)$/i.test(entry.name)) files.push(fullPath);
+      else if (/\.(js|mjs|html|css|sql|json)$/i.test(entry.name)) files.push(fullPath);
     }
     return files;
   }

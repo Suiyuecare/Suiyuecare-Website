@@ -11,6 +11,7 @@ import {
   setStatus
 } from "./auth.js";
 import { renderAdminNavigation } from "./navigation.js";
+import { allContentScopeKeys } from "./content-scope.js";
 
 const TOAST_SELECTOR = ".admin-data-status, .admin-form-status, .admin-loading";
 const TOAST_ACTION_PATTERN = /儲存|上傳|刪除|送審|核准|退回|處理|更新|建立|匯入|還原|備份/;
@@ -117,37 +118,60 @@ export async function bootProtectedAdminPage({
 
   if (!permissions?.role) {
     if (!isUserPermissionsBootstrapPath && !isGovernanceInfoPath && !isReadableCmsDataPath) {
-      setStatus(loading, "此帳號尚未開通後台權限，請請 owner/admin 到 Supabase profiles 指派角色。", "error");
+      setStatus(loading, "此帳號尚未開通後台權限，請由執行長在使用者權限矩陣中指派部門與角色。", "error");
       return null;
     }
 
+    const isBootstrapOwner = isUserPermissionsBootstrapPath
+      && String(session?.user?.email || "").toLowerCase() === "entrepreneur@suiyuecare.com";
+    const bootstrapScopes = isBootstrapOwner ? [...allContentScopeKeys] : [];
     permissions = {
-      role: isUserPermissionsBootstrapPath ? "owner" : "viewer",
-      can_manage_users: isUserPermissionsBootstrapPath,
-      can_publish: isUserPermissionsBootstrapPath,
-      can_review_publish: isUserPermissionsBootstrapPath,
+      role: isBootstrapOwner ? "owner" : "viewer",
+      departments: [],
+      content_scopes: bootstrapScopes,
+      edit_scopes: bootstrapScopes,
+      publish_scopes: bootstrapScopes,
+      can_manage_users: isBootstrapOwner,
+      can_publish: isBootstrapOwner,
+      can_review_publish: isBootstrapOwner,
+      can_view_site_settings: isBootstrapOwner,
+      can_edit_site_settings: isBootstrapOwner,
       can_view_pages: true,
-      can_edit_pages: isUserPermissionsBootstrapPath,
-      can_delete_pages: isUserPermissionsBootstrapPath,
+      can_edit_pages: isBootstrapOwner,
+      can_delete_pages: isBootstrapOwner,
+      can_view_home_content: isBootstrapOwner,
+      can_edit_home_content: isBootstrapOwner,
+      can_view_service_content: isBootstrapOwner,
+      can_edit_service_content: isBootstrapOwner,
       can_view_articles: true,
-      can_edit_articles: isUserPermissionsBootstrapPath,
-      can_delete_articles: isUserPermissionsBootstrapPath,
+      can_edit_articles: isBootstrapOwner,
+      can_delete_articles: isBootstrapOwner,
       can_view_media: true,
-      can_manage_media: isUserPermissionsBootstrapPath,
-      can_delete_media: isUserPermissionsBootstrapPath,
+      can_manage_media: isBootstrapOwner,
+      can_delete_media: isBootstrapOwner,
       can_view_courses: true,
-      can_edit_courses: isUserPermissionsBootstrapPath,
-      can_delete_courses: isUserPermissionsBootstrapPath,
+      can_edit_courses: isBootstrapOwner,
+      can_delete_courses: isBootstrapOwner,
+      can_view_files: isBootstrapOwner,
+      can_manage_files: isBootstrapOwner,
+      can_delete_files: isBootstrapOwner,
+      can_view_forms: isBootstrapOwner,
+      can_edit_forms: isBootstrapOwner,
+      can_export_forms: isBootstrapOwner,
       can_view_recruiting: true,
-      can_edit_recruiting: isUserPermissionsBootstrapPath,
-      can_delete_recruiting: isUserPermissionsBootstrapPath,
+      can_edit_recruiting: isBootstrapOwner,
+      can_delete_recruiting: isBootstrapOwner,
+      can_edit_talent_recruiting: isBootstrapOwner,
+      can_edit_partnership_recruiting: isBootstrapOwner,
       can_view_investor: true,
-      can_edit_investor: isUserPermissionsBootstrapPath,
-      can_delete_investor: isUserPermissionsBootstrapPath,
-      can_view_analytics: isUserPermissionsBootstrapPath,
-      can_export_analytics: isUserPermissionsBootstrapPath,
+      can_edit_investor: isBootstrapOwner,
+      can_delete_investor: isBootstrapOwner,
+      can_view_brand_content: isBootstrapOwner,
+      can_edit_brand_content: isBootstrapOwner,
+      can_view_analytics: isBootstrapOwner,
+      can_export_analytics: isBootstrapOwner,
       can_view_content_health: true,
-      can_manage_backups: isUserPermissionsBootstrapPath
+      can_manage_backups: isBootstrapOwner
     };
   }
   const requiredPermission = requiredPermissionForPath();
