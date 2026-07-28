@@ -4,7 +4,8 @@ import {
   articlePublicHref,
   articlePublicNumber,
   articlePublicSlug,
-  articleSourceSlug
+  articleSourceSlug,
+  resolveArticlePublicIdentity
 } from "./article-url-map.mjs";
 
 const FRONTEND_BUILD_VERSION = "care-scenes-20260714-2";
@@ -3188,14 +3189,10 @@ function normalizeSupabaseArticle(article, mediaById, categoriesById) {
 }
 
 function normalizeStaticArticle(article) {
-  const publicNumber = articlePublicNumber(article.slug);
-  const publicSlug = articlePublicSlug(article.slug);
+  const identity = resolveArticlePublicIdentity(article);
   return {
     ...article,
-    sourceSlug: article.slug,
-    publicNumber,
-    publicSlug,
-    href: articleHref(article.slug),
+    ...identity,
     categorySlug: article.categorySlug || categorySlug(article.category)
   };
 }
@@ -10982,35 +10979,38 @@ function renderNotFoundPage(slug = "") {
 }
 
 function getRelatedArticles(slug) {
+  const normalizeRelatedArticle = (item) => {
+    const href = normalizePublicHref(item?.href);
+    if (!/^\/article\/article\d+(?:[?#].*)?$/i.test(href)) return null;
+    return {
+      href,
+      image: item.image,
+      category: item.category,
+      title: item.title,
+      focalPoint: item.focalPoint
+    };
+  };
   const current = getHealthArticleList().find((item) => articleRouteMatches(item, slug));
   const relatedSlugs = Array.isArray(current?.relatedSlugs) ? current.relatedSlugs : [];
   const curatedRelated = relatedSlugs
     .map((relatedSlug) => getHealthArticleList().find((item) => articleRouteMatches(item, relatedSlug)))
     .filter(Boolean)
-    .map((item) => ({
-      href: normalizePublicHref(item.href),
-      image: item.image,
-      category: item.category,
-      title: item.title,
-      focalPoint: item.focalPoint
-    }));
+    .map(normalizeRelatedArticle)
+    .filter(Boolean);
   if (curatedRelated.length) return curatedRelated.slice(0, 7);
 
   const cmsRelated = getHealthArticleList()
     .filter((item) => !articleRouteMatches(item, slug))
     .slice(0, 7)
-    .map((item) => ({
-      href: normalizePublicHref(item.href),
-      image: item.image,
-      category: item.category,
-      title: item.title
-    }));
+    .map(normalizeRelatedArticle)
+    .filter(Boolean);
 
   if (cmsRelated.length) return cmsRelated;
   return relatedArticleCards
     .filter((item) => normalizePublicHref(item.href) !== articleHref(slug))
     .slice(0, 7)
-    .map((item) => ({ ...item, href: normalizePublicHref(item.href) }));
+    .map(normalizeRelatedArticle)
+    .filter(Boolean);
 }
 
 function renderArticleLayout(article) {

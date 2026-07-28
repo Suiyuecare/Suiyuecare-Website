@@ -1,4 +1,8 @@
-import { ARTICLE_SOURCE_SLUGS, articlePublicHref } from "../article-url-map.mjs";
+import {
+  ARTICLE_SOURCE_SLUGS,
+  articlePublicHref,
+  resolveArticlePublicIdentity
+} from "../article-url-map.mjs";
 import { loadPublicContent } from "./load-public-content.mjs";
 
 const failures = [];
@@ -13,6 +17,10 @@ ARTICLE_SOURCE_SLUGS.forEach((sourceSlug, index) => {
   const expected = `/article/article${index + 1}`;
   if (articlePublicHref(sourceSlug) !== expected) {
     failures.push(`${sourceSlug}: expected ${expected}`);
+  }
+  const hrefOnlyIdentity = resolveArticlePublicIdentity({ href: expected });
+  if (hrefOnlyIdentity.sourceSlug !== sourceSlug || hrefOnlyIdentity.href !== expected) {
+    failures.push(`${expected}: href-only article identity did not resolve to ${sourceSlug}`);
   }
 });
 

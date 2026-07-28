@@ -136,3 +136,31 @@ export function articlePublicHref(sourceOrPublicSlug = "", explicitNumber = null
   const publicSlug = articlePublicSlug(sourceOrPublicSlug, explicitNumber);
   return publicSlug ? `/article/${publicSlug}` : "/health";
 }
+
+export function resolveArticlePublicIdentity(article = {}) {
+  const rawSourceSlug = String(article.sourceSlug || article.slug || "").trim();
+  const hrefMatch = String(article.href || "")
+    .trim()
+    .match(/^(?:https?:\/\/[^/]+)?\/article\/([^/?#]+)/i);
+  const hrefSlug = hrefMatch?.[1] || "";
+  const mappedSourceSlug =
+    articleSourceSlug(rawSourceSlug) ||
+    articleSourceSlug(hrefSlug);
+  const sourceSlug =
+    mappedSourceSlug ||
+    (rawSourceSlug && !/^article\d+$/i.test(rawSourceSlug) ? rawSourceSlug : "");
+  const explicitNumber =
+    article.publicNumber ??
+    article.public_number ??
+    null;
+  const identitySlug = rawSourceSlug || hrefSlug;
+  const publicNumber = articlePublicNumber(identitySlug, explicitNumber);
+  const publicSlug = articlePublicSlug(identitySlug, publicNumber);
+
+  return {
+    sourceSlug,
+    publicNumber,
+    publicSlug,
+    href: publicSlug ? `/article/${publicSlug}` : "/health"
+  };
+}
