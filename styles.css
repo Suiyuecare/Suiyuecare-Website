@@ -9877,6 +9877,7 @@ input[name="_honey"] { display: none !important; }
   margin: 20px 0 0;
 }
 .article-meta span,
+.article-meta time,
 .article-meta a {
   padding: 9px 14px;
   border-radius: 999px;
@@ -13233,6 +13234,7 @@ input[name="_honey"] { display: none !important; }
     overflow-x: hidden;
   }
   .article-meta span,
+  .article-meta time,
   .article-meta a {
     max-width: 100%;
     white-space: normal;
