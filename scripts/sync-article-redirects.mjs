@@ -21,10 +21,23 @@ const redirects = [
 ];
 
 const output = `${JSON.stringify({ ...config, redirects }, null, 2)}\n`;
-const current = fs.readFileSync(configPath, "utf8");
 
 if (checkOnly) {
-  if (current !== output) {
+  const managedRedirects = (config.redirects || []).filter(isManagedArticleRedirect);
+  const expectedRedirects = new Map(
+    ARTICLE_SOURCE_SLUGS.map((sourceSlug, index) => [
+      `/article/${sourceSlug}`,
+      `/article/article${index + 1}`
+    ])
+  );
+  const redirectsAreCurrent =
+    managedRedirects.length === expectedRedirects.size &&
+    managedRedirects.every((item) =>
+      expectedRedirects.get(item.source) === item.destination &&
+      item.permanent === true
+    );
+
+  if (!redirectsAreCurrent) {
     console.error("vercel.json article redirects are stale. Run pnpm articles:redirects:sync.");
     process.exit(1);
   }
