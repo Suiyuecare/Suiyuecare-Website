@@ -14,6 +14,9 @@
     "audit:images:all": "node scripts/audit-images.mjs --all",
     "audit:images:unused": "node scripts/audit-images.mjs --unused",
     "audit:images:strict": "node scripts/audit-images.mjs --strict",
+    "articles:redirects:sync": "node scripts/sync-article-redirects.mjs",
+    "verify:article-redirects": "node scripts/sync-article-redirects.mjs --check",
+    "verify:article-urls": "node scripts/verify-article-public-urls.mjs",
     "verify:route-inventory": "node scripts/verify-route-inventory.mjs",
     "verify:cms-contract": "node scripts/verify-cms-contract.mjs",
     "verify:cms-fallbacks": "node scripts/verify-cms-fallback-snapshot.mjs",
@@ -31,7 +34,7 @@
     "verify:security": "node scripts/verify-security.mjs",
     "verify:security:production": "VERIFY_PRODUCTION=1 node scripts/verify-security.mjs",
     "verify:production": "pnpm verify:routes:production && pnpm verify:security:production",
-    "verify:all": "pnpm build && pnpm verify:route-inventory && pnpm verify:cms-contract && pnpm verify:cms-fallbacks && pnpm verify:department-access && pnpm verify:routes && pnpm verify:public-content-seo && pnpm verify:public-content-rebuild && pnpm verify:copy && pnpm verify:seo && pnpm verify:links && pnpm verify:accessibility && pnpm verify:performance && pnpm verify:security && pnpm audit:images:strict",
+    "verify:all": "pnpm build && pnpm verify:article-urls && pnpm verify:article-redirects && pnpm verify:route-inventory && pnpm verify:cms-contract && pnpm verify:cms-fallbacks && pnpm verify:department-access && pnpm verify:routes && pnpm verify:public-content-seo && pnpm verify:public-content-rebuild && pnpm verify:copy && pnpm verify:seo && pnpm verify:links && pnpm verify:accessibility && pnpm verify:performance && pnpm verify:security && pnpm audit:images:strict",
     "cms:fallbacks:sync": "node scripts/sync-cms-fallbacks.mjs",
     "backup:supabase": "node scripts/backup-supabase.mjs",
     "restore:supabase": "node scripts/restore-supabase.mjs"

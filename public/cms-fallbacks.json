@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-27T17:22:47.169Z",
-  "contentHash": "6200c5225f0044bcf9b44820003c13a2b0592b46afee604f2d9e38729d7ca09c",
+  "generatedAt": "2026-07-28T04:03:56.096Z",
+  "contentHash": "67eed9a42d8318f8084ca31f150d9730406eb84140fc2769bf748103894974dd",
   "schemaVersion": 1,
   "serviceSlugs": [
     "about",
@@ -8604,7 +8604,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-24T08:09:21.944623+00:00",
-      "updated_at": "2026-05-24T08:20:02.06691+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 6,
       "difficulty": "入門",
@@ -8625,7 +8625,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅照顧團隊",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 1
     },
     {
       "id": "6e0bf943-2c58-48ac-868e-7d602ef80409",
@@ -8667,7 +8668,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-24T08:09:21.944623+00:00",
-      "updated_at": "2026-05-24T08:20:02.06691+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 7,
       "difficulty": "入門",
@@ -8688,7 +8689,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅照顧團隊",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 2
     },
     {
       "id": "1d20e00a-1e9d-4b19-9f28-66214e1370e6",
@@ -8730,7 +8732,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-24T08:09:21.944623+00:00",
-      "updated_at": "2026-05-24T08:20:02.06691+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 6,
       "difficulty": "入門",
@@ -8751,7 +8753,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅照顧團隊",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 3
     },
     {
       "id": "a1daa4c0-7cb5-40ff-bb44-40d798fcc73f",
@@ -8793,7 +8796,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-24T08:09:21.944623+00:00",
-      "updated_at": "2026-05-24T08:20:02.06691+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 8,
       "difficulty": "入門",
@@ -8814,7 +8817,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅照顧團隊",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 4
     },
     {
       "id": "fdd96b98-93d9-454d-81fd-b5f1db2154eb",
@@ -8856,7 +8860,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-24T08:09:21.944623+00:00",
-      "updated_at": "2026-05-24T08:20:02.06691+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 7,
       "difficulty": "入門",
@@ -8877,7 +8881,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅照顧團隊",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 5
     },
     {
       "id": "aba2bad0-aca2-4785-95bd-4ba86958ec22",
@@ -8919,7 +8924,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-24T08:09:21.944623+00:00",
-      "updated_at": "2026-05-24T08:20:02.06691+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 6,
       "difficulty": "入門",
@@ -8940,7 +8945,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅照顧團隊",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 6
     },
     {
       "id": "6b85771d-50e9-4189-a238-206e147788de",
@@ -8982,7 +8988,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-24T08:09:21.944623+00:00",
-      "updated_at": "2026-05-24T08:20:02.06691+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 6,
       "difficulty": "入門",
@@ -9003,7 +9009,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅照顧團隊",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 7
     },
     {
       "id": "796a997a-c36c-43ca-a8ba-dc3f6fd58114",
@@ -9045,7 +9052,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-24T08:09:21.944623+00:00",
-      "updated_at": "2026-05-24T08:20:02.06691+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "lazy_pack",
       "reading_minutes": 5,
       "difficulty": "入門",
@@ -9066,7 +9073,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅照顧團隊",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 8
     },
     {
       "id": "62588f0b-7491-4741-b57e-36a082f0c481",
@@ -9108,7 +9116,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-24T08:09:21.944623+00:00",
-      "updated_at": "2026-05-24T08:20:02.06691+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "lazy_pack",
       "reading_minutes": 7,
       "difficulty": "入門",
@@ -9129,7 +9137,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅照顧團隊",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 9
     },
     {
       "id": "40a90df0-cb93-4289-baa4-13184b5a76ec",
@@ -9171,7 +9180,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-24T08:09:21.944623+00:00",
-      "updated_at": "2026-05-24T08:20:02.06691+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 8,
       "difficulty": "入門",
@@ -9192,7 +9201,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅照顧團隊",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 10
     },
     {
       "id": "043f26e2-6e65-4353-9ae4-c13d495b35cd",
@@ -9230,7 +9240,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 6,
       "difficulty": "入門",
@@ -9251,7 +9261,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 11
     },
     {
       "id": "554a33cc-e6fc-4fde-9bf4-55f0b0ca81ad",
@@ -9289,7 +9300,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 4,
       "difficulty": "入門",
@@ -9310,7 +9321,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 12
     },
     {
       "id": "33a73948-f459-4523-a55b-2073185bf2fd",
@@ -9344,7 +9356,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-19T11:49:23.062581+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": null,
       "difficulty": null,
@@ -9358,7 +9370,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 13
     },
     {
       "id": "99094c6c-8d9f-4e26-8ee4-d718d8018627",
@@ -9392,7 +9405,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-07-13T13:41:58.792101+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "lazy_pack",
       "reading_minutes": null,
       "difficulty": null,
@@ -9410,7 +9423,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 14
     },
     {
       "id": "919137eb-7405-4aee-8af1-89bb15aea7ba",
@@ -9448,7 +9462,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 5,
       "difficulty": "入門",
@@ -9469,7 +9483,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 15
     },
     {
       "id": "aab35b6f-5f2f-4513-9daa-961d9b5758ba",
@@ -9507,7 +9522,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 7,
       "difficulty": "中階",
@@ -9528,7 +9543,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 16
     },
     {
       "id": "d2963c73-d9e9-49be-a409-8867affb3dd1",
@@ -9566,7 +9582,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 5,
       "difficulty": "入門",
@@ -9587,7 +9603,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 17
     },
     {
       "id": "fbd3229e-3b83-440d-a38d-bc5271e3ce55",
@@ -9625,7 +9642,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 4,
       "difficulty": "入門",
@@ -9646,7 +9663,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 18
     },
     {
       "id": "067198db-6de4-4d07-bb99-1c72b16976b7",
@@ -9692,7 +9710,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "video",
       "reading_minutes": 3,
       "difficulty": "入門",
@@ -9713,7 +9731,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 19
     },
     {
       "id": "58111035-58a1-426b-94f1-717f0c264452",
@@ -9759,7 +9778,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "short_video",
       "reading_minutes": 2,
       "difficulty": "入門",
@@ -9780,7 +9799,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 20
     },
     {
       "id": "34cf6567-530b-4a8e-a9ad-f9040f5bbeb4",
@@ -9818,7 +9838,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "interview",
       "reading_minutes": 6,
       "difficulty": "入門",
@@ -9839,7 +9859,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 21
     },
     {
       "id": "a66ee5e1-1873-415e-a60f-24017039191c",
@@ -9877,7 +9898,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": 5,
       "difficulty": "中階",
@@ -9898,7 +9919,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": "聯絡歲悅",
-      "cta_url": "#contact"
+      "cta_url": "#contact",
+      "public_number": 22
     },
     {
       "id": "639456f8-0d5b-4eea-8487-31998ac4ed77",
@@ -9932,7 +9954,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "short_video",
       "reading_minutes": null,
       "difficulty": null,
@@ -9946,7 +9968,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 23
     },
     {
       "id": "1c4143f9-7863-4bfd-b2d1-ba903a948c97",
@@ -9980,7 +10003,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "short_video",
       "reading_minutes": null,
       "difficulty": null,
@@ -9994,7 +10017,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 24
     },
     {
       "id": "6e25b230-9cea-4b07-842b-af22cd2d30ef",
@@ -10028,7 +10052,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "video",
       "reading_minutes": null,
       "difficulty": null,
@@ -10042,7 +10066,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 25
     },
     {
       "id": "da16d0eb-57e5-4e7d-ab28-e35582d5ec0d",
@@ -10076,7 +10101,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "video",
       "reading_minutes": null,
       "difficulty": null,
@@ -10090,7 +10115,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 26
     },
     {
       "id": "4c86a722-7f7e-47f7-bb6e-404e572e1df3",
@@ -10124,7 +10150,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "event",
       "reading_minutes": null,
       "difficulty": null,
@@ -10138,7 +10164,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 27
     },
     {
       "id": "7a9f6e5e-42f5-4d1b-b38c-2478ec2d887f",
@@ -10172,7 +10199,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-19T11:49:23.062581+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": null,
       "difficulty": null,
@@ -10186,7 +10213,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 28
     },
     {
       "id": "1ea98313-ca52-433b-80ef-2e9611b83aa2",
@@ -10220,7 +10248,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "event",
       "reading_minutes": null,
       "difficulty": null,
@@ -10234,7 +10262,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 29
     },
     {
       "id": "1d62e1a8-312e-4663-baff-be38e5456b39",
@@ -10268,7 +10297,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-19T11:49:23.062581+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": null,
       "difficulty": null,
@@ -10282,7 +10311,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 30
     },
     {
       "id": "0340a93b-7c75-4e36-adf2-98e058bb8efd",
@@ -10316,7 +10346,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "event",
       "reading_minutes": null,
       "difficulty": null,
@@ -10330,7 +10360,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 31
     },
     {
       "id": "d49043e1-1e66-434c-9368-ead5cebfbda9",
@@ -10364,7 +10395,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-19T11:49:23.062581+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "article",
       "reading_minutes": null,
       "difficulty": null,
@@ -10378,7 +10409,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 32
     },
     {
       "id": "57c5733e-e302-47d5-beb5-e093265be23f",
@@ -10412,7 +10444,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "lazy_pack",
       "reading_minutes": null,
       "difficulty": null,
@@ -10426,7 +10458,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 33
     },
     {
       "id": "a779f3f7-46bc-4cf4-be44-58ef71e0b8d6",
@@ -10460,7 +10493,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-19T11:49:23.062581+00:00",
-      "updated_at": "2026-05-23T07:39:58.605702+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "interview",
       "reading_minutes": null,
       "difficulty": null,
@@ -10474,7 +10507,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 34
     },
     {
       "id": "58687739-14cb-4013-ac3d-c98e886bd39f",
@@ -10508,7 +10542,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-05-23T07:37:50.836345+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
       "content_type": "lazy_pack",
       "reading_minutes": null,
       "difficulty": null,
@@ -10522,7 +10556,8 @@
       "related_article_ids": [],
       "faq_json": [],
       "cta_text": null,
-      "cta_url": null
+      "cta_url": null,
+      "public_number": 35
     }
   ],
   "articleCategories": [

@@ -1,3 +1,8 @@
+import {
+  articlePublicNumber,
+  articleSourceSlug
+} from "./article-url-map.mjs";
+
 let snapshotPromise;
 
 function loadSnapshot() {
@@ -75,7 +80,13 @@ export async function getHealthSource() {
 
 export async function getArticleSource(slug) {
   const source = await getHealthSource();
-  const article = source.articles.find((item) => item.slug === slug);
+  const sourceSlug = articleSourceSlug(slug);
+  const publicNumber = articlePublicNumber(slug);
+  const article = source.articles.find((item) =>
+    sourceSlug
+      ? item.slug === sourceSlug
+      : Number(item.public_number) === publicNumber
+  );
   if (!article) return null;
   return {
     article,

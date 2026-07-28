@@ -7,6 +7,10 @@ import {
   renderPublicArticleLayout,
   renderPublicHealthIndex
 } from "../public-content-renderer.mjs";
+import {
+  articlePublicHref,
+  articlePublicSlug
+} from "../article-url-map.mjs";
 import { loadPublicContent } from "./load-public-content.mjs";
 
 const distDir = path.resolve("dist");
@@ -263,7 +267,7 @@ function contentRoute(item) {
     ? renderArticleSlideDeck(item, normalizePublicAssetUrl)
     : "";
   return {
-    slug: `${item.contentKind}-${item.slug}`,
+    slug: `${item.contentKind}-${item.publicSlug || item.slug}`,
     path: item.href,
     title: item.seoTitle || `${item.title}｜健康3.0`,
     description: item.seoDescription || item.excerpt || item.subtitle,
@@ -495,7 +499,11 @@ function routeHashLinksToPaths(html) {
   for (const [slug, routePath] of publicRoutePaths) {
     output = output.replaceAll(`href="#${slug}"`, `href="${routePath}"`);
   }
-  output = output.replace(/\bhref="#article-([^"?]+)(\?[^"]*)?"/g, (_match, slug, query = "") => `href="/article/${slug}${query}"`);
+  output = output.replace(/\bhref="#article-([^"?]+)(\?[^"]*)?"/g, (_match, slug, query = "") => `href="${articlePublicHref(slug)}${query}"`);
+  output = output.replace(/\bhref="\/article\/([^"?/]+)(\?[^"]*)?"/g, (match, slug, query = "") => {
+    const publicSlug = articlePublicSlug(slug);
+    return publicSlug ? `href="/article/${publicSlug}${query}"` : match;
+  });
   output = output.replace(/\bhref="#care-story-([^"?]+)(\?[^"]*)?"/g, (_match, slug, query = "") => `href="/care-story/${slug}${query}"`);
   output = output.replace(/\bhref="#master-talk-([^"?]+)(\?[^"]*)?"/g, (_match, slug, query = "") => `href="/master-talk/${slug}${query}"`);
   return output;

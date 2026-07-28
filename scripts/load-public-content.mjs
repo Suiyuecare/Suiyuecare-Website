@@ -6,6 +6,11 @@ import {
   publicDateLabel,
   stripPublicHtml
 } from "../public-content-renderer.mjs";
+import {
+  articlePublicHref,
+  articlePublicNumber,
+  articlePublicSlug
+} from "../article-url-map.mjs";
 
 const rootDir = path.resolve(import.meta.dirname, "..");
 const appSourcePath = path.join(rootDir, "app.js");
@@ -104,6 +109,8 @@ function mediaMaps(snapshot) {
 
 function staticArticleItem(card, detail, rewrite = {}) {
   const slug = card.slug || slugFromHref(card.href);
+  const publicNumber = articlePublicNumber(slug);
+  const publicSlug = articlePublicSlug(slug);
   const merged = { ...detail, ...rewrite };
   const publishedAt = dateIso(card.publishedAt || card.date || merged.date);
   const excerpt = card.excerpt || card.subtitle || merged.dek || merged.excerpt || "";
@@ -116,7 +123,10 @@ function staticArticleItem(card, detail, rewrite = {}) {
     contentKind: "article",
     schemaType: "BlogPosting",
     slug,
-    href: `/article/${slug}`,
+    sourceSlug: slug,
+    publicNumber,
+    publicSlug,
+    href: articlePublicHref(slug),
     category: card.category || merged.category || "照顧知識",
     title: card.title || merged.title || "未命名文章",
     subtitle: card.subtitle || merged.dek || excerpt,
@@ -173,11 +183,16 @@ function cmsArticleItem(row, snapshot, staticDetails, rewrites) {
   const publishedAt = row.published_at || row.updated_at || row.created_at;
   const updatedAt = row.updated_at || publishedAt;
   const excerpt = enriched.dek || row.excerpt || row.subtitle || stripPublicHtml(row.content).slice(0, 180);
+  const publicNumber = articlePublicNumber(row.slug, row.public_number);
+  const publicSlug = articlePublicSlug(row.slug, row.public_number);
   return {
     contentKind: "article",
     schemaType: "BlogPosting",
     slug: row.slug,
-    href: `/article/${row.slug}`,
+    sourceSlug: row.slug,
+    publicNumber,
+    publicSlug,
+    href: articlePublicHref(row.slug, row.public_number),
     category: category?.display_label || category?.name || enriched.category || "照顧知識",
     title: row.title || enriched.title || "未命名文章",
     subtitle: row.subtitle || enriched.dek || row.excerpt || "",
@@ -378,6 +393,10 @@ export async function loadPublicContent() {
     ...cmsItems,
     ...staticItems.filter((item) => !cmsSlugs.has(item.slug))
   ];
+  const invalidArticle = articleItems.find((item) => !item.publicNumber || !item.publicSlug);
+  if (invalidArticle) {
+    throw new Error(`Published article is missing a stable public number: ${invalidArticle.slug}`);
+  }
 
   const storyItems = list(snapshot.careStories)
     .filter((row) => row.status === "published" && row.is_enabled !== false)

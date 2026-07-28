@@ -1,3 +1,8 @@
+import {
+  articlePublicHref,
+  articlePublicSlug
+} from "./article-url-map.mjs";
+
 const SITE_ORIGIN = "https://www.suiyuecare.com";
 
 export function escapePublicHtml(value = "") {
@@ -51,7 +56,12 @@ function safePublicHref(value = "", fallback = "/contact") {
   if (!raw) return fallback;
   if (/^\s*(javascript|data:text)/i.test(raw)) return fallback;
   if (raw === "#contact") return "/contact";
-  if (raw.startsWith("#article-")) return `/article/${raw.slice("#article-".length)}`;
+  if (raw.startsWith("#article-")) return articlePublicHref(raw.slice("#article-".length));
+  const articlePathMatch = raw.match(/^\/article\/([^?/#]+)(\?.*)?$/i);
+  if (articlePathMatch) {
+    const publicSlug = articlePublicSlug(articlePathMatch[1]);
+    return publicSlug ? `/article/${publicSlug}${articlePathMatch[2] || ""}` : raw;
+  }
   if (raw.startsWith("#care-story-")) return `/care-story/${raw.slice("#care-story-".length)}`;
   if (raw.startsWith("#master-talk-")) return `/master-talk/${raw.slice("#master-talk-".length)}`;
   if (raw === "#health") return "/health";

@@ -863,6 +863,496 @@
       ],
       "destination": "https://www.suiyuecare.com/:path*",
       "permanent": true
+    },
+    {
+      "source": "/article/daily-hydration-care",
+      "destination": "/article/article1",
+      "permanent": true
+    },
+    {
+      "source": "/article/night-fall-prevention",
+      "destination": "/article/article2",
+      "permanent": true
+    },
+    {
+      "source": "/article/meal-appetite-support",
+      "destination": "/article/article3",
+      "permanent": true
+    },
+    {
+      "source": "/article/caregiver-burnout-signs",
+      "destination": "/article/article4",
+      "permanent": true
+    },
+    {
+      "source": "/article/dementia-bathing-refusal",
+      "destination": "/article/article5",
+      "permanent": true
+    },
+    {
+      "source": "/article/home-reablement-routine",
+      "destination": "/article/article6",
+      "permanent": true
+    },
+    {
+      "source": "/article/daycare-first-week",
+      "destination": "/article/article7",
+      "permanent": true
+    },
+    {
+      "source": "/article/migrant-care-handover",
+      "destination": "/article/article8",
+      "permanent": true
+    },
+    {
+      "source": "/article/hospital-discharge-checklist",
+      "destination": "/article/article9",
+      "permanent": true
+    },
+    {
+      "source": "/article/family-meeting-care-plan",
+      "destination": "/article/article10",
+      "permanent": true
+    },
+    {
+      "source": "/article/care-transfer-safe-home",
+      "destination": "/article/article11",
+      "permanent": true
+    },
+    {
+      "source": "/article/longterm-care-apply-checklist-2026",
+      "destination": "/article/article12",
+      "permanent": true
+    },
+    {
+      "source": "/article/safe-transfer-three-reminders",
+      "destination": "/article/article13",
+      "permanent": true
+    },
+    {
+      "source": "/article/longterm-care-apply",
+      "destination": "/article/article14",
+      "permanent": true
+    },
+    {
+      "source": "/article/nutrition-soft-food-guide",
+      "destination": "/article/article15",
+      "permanent": true
+    },
+    {
+      "source": "/article/dementia-evening-anxiety",
+      "destination": "/article/article16",
+      "permanent": true
+    },
+    {
+      "source": "/article/family-care-report-rhythm",
+      "destination": "/article/article17",
+      "permanent": true
+    },
+    {
+      "source": "/article/community-health-class-family-day",
+      "destination": "/article/article18",
+      "permanent": true
+    },
+    {
+      "source": "/article/home-care-video-guide-communication",
+      "destination": "/article/article19",
+      "permanent": true
+    },
+    {
+      "source": "/article/short-video-bathroom-safety-3-tips",
+      "destination": "/article/article20",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-care-communication",
+      "destination": "/article/article21",
+      "permanent": true
+    },
+    {
+      "source": "/article/reablement-walking-home-practice",
+      "destination": "/article/article22",
+      "permanent": true
+    },
+    {
+      "source": "/article/bathroom-safety",
+      "destination": "/article/article23",
+      "permanent": true
+    },
+    {
+      "source": "/article/fall-observation",
+      "destination": "/article/article24",
+      "permanent": true
+    },
+    {
+      "source": "/article/day-care-video-guide",
+      "destination": "/article/article25",
+      "permanent": true
+    },
+    {
+      "source": "/article/home-care-video-guide",
+      "destination": "/article/article26",
+      "permanent": true
+    },
+    {
+      "source": "/article/reablement-workshop",
+      "destination": "/article/article27",
+      "permanent": true
+    },
+    {
+      "source": "/article/elder-nutrition-warning",
+      "destination": "/article/article28",
+      "permanent": true
+    },
+    {
+      "source": "/article/day-care-respite",
+      "destination": "/article/article29",
+      "permanent": true
+    },
+    {
+      "source": "/article/dementia-repeated-question",
+      "destination": "/article/article30",
+      "permanent": true
+    },
+    {
+      "source": "/article/family-care-course",
+      "destination": "/article/article31",
+      "permanent": true
+    },
+    {
+      "source": "/article/caregiver-burnout-first-steps",
+      "destination": "/article/article32",
+      "permanent": true
+    },
+    {
+      "source": "/article/dementia-response",
+      "destination": "/article/article33",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-care-psychology",
+      "destination": "/article/article34",
+      "permanent": true
+    },
+    {
+      "source": "/article/family-care-story",
+      "destination": "/article/article35",
+      "permanent": true
+    },
+    {
+      "source": "/article/fall-prevention-home-checklist",
+      "destination": "/article/article36",
+      "permanent": true
+    },
+    {
+      "source": "/article/hydration-low-appetite-elderly",
+      "destination": "/article/article37",
+      "permanent": true
+    },
+    {
+      "source": "/article/dementia-evening-agitation",
+      "destination": "/article/article38",
+      "permanent": true
+    },
+    {
+      "source": "/article/post-discharge-first-week",
+      "destination": "/article/article39",
+      "permanent": true
+    },
+    {
+      "source": "/article/safe-bathing-care",
+      "destination": "/article/article40",
+      "permanent": true
+    },
+    {
+      "source": "/article/pressure-injury-prevention",
+      "destination": "/article/article41",
+      "permanent": true
+    },
+    {
+      "source": "/article/medication-reminder-system",
+      "destination": "/article/article42",
+      "permanent": true
+    },
+    {
+      "source": "/article/day-care-transition",
+      "destination": "/article/article43",
+      "permanent": true
+    },
+    {
+      "source": "/article/swallowing-meal-safety",
+      "destination": "/article/article44",
+      "permanent": true
+    },
+    {
+      "source": "/article/safe-transfer-tips",
+      "destination": "/article/article45",
+      "permanent": true
+    },
+    {
+      "source": "/article/nutrition-warning",
+      "destination": "/article/article46",
+      "permanent": true
+    },
+    {
+      "source": "/article/caregiver-support",
+      "destination": "/article/article47",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-senior-nutrition",
+      "destination": "/article/article48",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-rehab-goals",
+      "destination": "/article/article49",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-home-safety",
+      "destination": "/article/article50",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-care-management",
+      "destination": "/article/article51",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-dementia-care",
+      "destination": "/article/article52",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-nursing-observation",
+      "destination": "/article/article53",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-family-communication",
+      "destination": "/article/article54",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-community-health",
+      "destination": "/article/article55",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-longterm-policy",
+      "destination": "/article/article56",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-medication-safety",
+      "destination": "/article/article57",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-frailty-prevention",
+      "destination": "/article/article58",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-swallowing-care",
+      "destination": "/article/article59",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-sleep-rhythm",
+      "destination": "/article/article60",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-care-subsidy",
+      "destination": "/article/article61",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-careworker-training",
+      "destination": "/article/article62",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-care-technology",
+      "destination": "/article/article63",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-discharge-transition",
+      "destination": "/article/article64",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-pressure-injury-care",
+      "destination": "/article/article65",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-daycare-transition",
+      "destination": "/article/article66",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-caregiver-burnout",
+      "destination": "/article/article67",
+      "permanent": true
+    },
+    {
+      "source": "/article/master-talk-medication-reminder",
+      "destination": "/article/article68",
+      "permanent": true
+    },
+    {
+      "source": "/article/chronic-disease-visit-prep",
+      "destination": "/article/article69",
+      "permanent": true
+    },
+    {
+      "source": "/article/elder-constipation-care",
+      "destination": "/article/article70",
+      "permanent": true
+    },
+    {
+      "source": "/article/pain-observation-elderly",
+      "destination": "/article/article71",
+      "permanent": true
+    },
+    {
+      "source": "/article/oral-care-aspiration-prevention",
+      "destination": "/article/article72",
+      "permanent": true
+    },
+    {
+      "source": "/article/urinary-incontinence-night-care",
+      "destination": "/article/article73",
+      "permanent": true
+    },
+    {
+      "source": "/article/social-isolation-depression-signs",
+      "destination": "/article/article74",
+      "permanent": true
+    },
+    {
+      "source": "/article/assistive-device-selection",
+      "destination": "/article/article75",
+      "permanent": true
+    },
+    {
+      "source": "/article/home-emergency-care-folder",
+      "destination": "/article/article76",
+      "permanent": true
+    },
+    {
+      "source": "/article/heat-injury-older-adults",
+      "destination": "/article/article77",
+      "permanent": true
+    },
+    {
+      "source": "/article/family-care-meeting-guide",
+      "destination": "/article/article78",
+      "permanent": true
+    },
+    {
+      "source": "/article/careworker-hard-work-overview",
+      "destination": "/article/article79",
+      "permanent": true
+    },
+    {
+      "source": "/article/careworker-back-pain-transfer",
+      "destination": "/article/article80",
+      "permanent": true
+    },
+    {
+      "source": "/article/careworker-emotional-labor",
+      "destination": "/article/article81",
+      "permanent": true
+    },
+    {
+      "source": "/article/home-careworker-travel-between-homes",
+      "destination": "/article/article82",
+      "permanent": true
+    },
+    {
+      "source": "/article/careworker-service-boundaries-family",
+      "destination": "/article/article83",
+      "permanent": true
+    },
+    {
+      "source": "/article/dementia-careworker-safety",
+      "destination": "/article/article84",
+      "permanent": true
+    },
+    {
+      "source": "/article/careworker-shift-sleep-fatigue",
+      "destination": "/article/article85",
+      "permanent": true
+    },
+    {
+      "source": "/article/careworker-records-supervision-support",
+      "destination": "/article/article86",
+      "permanent": true
+    },
+    {
+      "source": "/article/careworker-respect-retention",
+      "destination": "/article/article87",
+      "permanent": true
+    },
+    {
+      "source": "/article/new-careworker-first-year",
+      "destination": "/article/article88",
+      "permanent": true
+    },
+    {
+      "source": "/article/elderly-hypertension-lazy-pack",
+      "destination": "/article/article89",
+      "permanent": true
+    },
+    {
+      "source": "/article/elderly-diabetes-lazy-pack",
+      "destination": "/article/article90",
+      "permanent": true
+    },
+    {
+      "source": "/article/elderly-dementia-lazy-pack",
+      "destination": "/article/article91",
+      "permanent": true
+    },
+    {
+      "source": "/article/elderly-stroke-lazy-pack",
+      "destination": "/article/article92",
+      "permanent": true
+    },
+    {
+      "source": "/article/elderly-heart-disease-lazy-pack",
+      "destination": "/article/article93",
+      "permanent": true
+    },
+    {
+      "source": "/article/elderly-copd-lazy-pack",
+      "destination": "/article/article94",
+      "permanent": true
+    },
+    {
+      "source": "/article/elderly-osteoporosis-lazy-pack",
+      "destination": "/article/article95",
+      "permanent": true
+    },
+    {
+      "source": "/article/elderly-osteoarthritis-lazy-pack",
+      "destination": "/article/article96",
+      "permanent": true
+    },
+    {
+      "source": "/article/elderly-parkinson-lazy-pack",
+      "destination": "/article/article97",
+      "permanent": true
+    },
+    {
+      "source": "/article/elderly-chronic-kidney-disease-lazy-pack",
+      "destination": "/article/article98",
+      "permanent": true
     }
   ],
   "rewrites": [

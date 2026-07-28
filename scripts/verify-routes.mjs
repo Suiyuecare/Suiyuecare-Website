@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { renderPublicArticleLayout } from "../public-content-renderer.mjs";
+import { articlePublicHref } from "../article-url-map.mjs";
 
 const routes = [
   "about",
@@ -486,7 +487,7 @@ function verifyHomeUsesCleanRouteLinks(indexSource, appSource) {
   }
   for (const expected of [
     "articleMatch",
-    "/article/${articleMatch[1]}",
+    "articlePublicHref(articleMatch[1])",
     "careStoryMatch",
     "/care-story/${careStoryMatch[1]}",
     "masterTalkMatch",
@@ -739,7 +740,7 @@ function verifyHomeHealthLatestArticles(appSource, indexSource) {
     "post-discharge-first-week",
     "safe-bathing-care"
   ]) {
-    if (!indexSource.includes(`/article/${slug}`)) {
+    if (!indexSource.includes(articlePublicHref(slug))) {
       failures.push(`index.html: homepage Health 3.0 block should link the latest article ${slug}`);
     }
   }
@@ -770,7 +771,7 @@ function verifyMasterTalkHomepageColumns(appSource, indexSource) {
     failures.push("app.js: dynamic Master Talk sources should not replace the homepage grid unless 8 cards are available");
   }
   for (const slug of expectedSlugs) {
-    if (!appSource.includes(`"${slug}"`) || !indexSource.includes(`/article/${slug}`)) {
+    if (!appSource.includes(`"${slug}"`) || !indexSource.includes(articlePublicHref(slug))) {
       failures.push(`Master Talk card is missing from app.js or homepage grid: ${slug}`);
     }
   }

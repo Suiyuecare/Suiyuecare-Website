@@ -1,5 +1,11 @@
 import { supabase } from "./src/lib/supabaseClient.js";
 import { renderPublicArticleLayout } from "./public-content-renderer.mjs";
+import {
+  articlePublicHref,
+  articlePublicNumber,
+  articlePublicSlug,
+  articleSourceSlug
+} from "./article-url-map.mjs";
 
 const FRONTEND_BUILD_VERSION = "care-scenes-20260714-2";
 document.documentElement.dataset.frontendBuild = FRONTEND_BUILD_VERSION;
@@ -328,7 +334,7 @@ function absoluteSiteUrl(path = "") {
 function routeCanonical(slug = "home") {
   if (!slug || slug === "home") return absoluteSiteUrl("/");
   const articleMatch = String(slug).match(/^article-(.+)$/);
-  if (articleMatch) return absoluteSiteUrl(`/article/${articleMatch[1]}`);
+  if (articleMatch) return absoluteSiteUrl(articlePublicHref(articleMatch[1]));
   const storyMatch = String(slug).match(/^care-story-(.+)$/);
   if (storyMatch) return absoluteSiteUrl(`/care-story/${storyMatch[1]}`);
   const talkMatch = String(slug).match(/^master-talk-(.+)$/);
@@ -373,7 +379,12 @@ function scrollToCurrentPageAnchor(hashSlug = window.location.hash.slice(1).spli
 function normalizePublicHref(href = "#home") {
   const raw = String(href || "#home").trim();
   const articleMatch = raw.match(/^#article-([^?]+)(\?.*)?$/i);
-  if (articleMatch) return `/article/${articleMatch[1]}${articleMatch[2] || ""}`;
+  if (articleMatch) return `${articlePublicHref(articleMatch[1])}${articleMatch[2] || ""}`;
+  const articlePathMatch = raw.match(/^\/article\/([^?/#]+)(\?.*)?$/i);
+  if (articlePathMatch) {
+    const publicSlug = articlePublicSlug(articlePathMatch[1]);
+    return publicSlug ? `/article/${publicSlug}${articlePathMatch[2] || ""}` : raw;
+  }
   const careStoryMatch = raw.match(/^#care-story-([^?]+)(\?.*)?$/i);
   if (careStoryMatch) return `/care-story/${careStoryMatch[1]}${careStoryMatch[2] || ""}`;
   const masterTalkMatch = raw.match(/^#master-talk-([^?]+)(\?.*)?$/i);
@@ -408,8 +419,8 @@ function normalizePublicHref(href = "#home") {
   return raw || "#home";
 }
 
-function articleHref(slug = "") {
-  return slug ? `/article/${slug}` : "/health";
+function articleHref(slug = "", publicNumber = null) {
+  return articlePublicHref(slug, publicNumber);
 }
 
 function careStoryHref(slug = "") {
@@ -422,7 +433,14 @@ function masterTalkHref(slug = "") {
 
 function articleRouteMatches(item = {}, slug = "") {
   if (!slug) return false;
-  return item.slug === slug || normalizePublicHref(item.href) === articleHref(slug);
+  const sourceSlug = articleSourceSlug(slug);
+  const publicSlug = articlePublicSlug(slug);
+  return (
+    item.slug === slug ||
+    (sourceSlug && item.slug === sourceSlug) ||
+    (publicSlug && item.publicSlug === publicSlug) ||
+    normalizePublicHref(item.href) === articleHref(slug)
+  );
 }
 
 function navigateToPublicHref(href = "#home") {
@@ -3128,8 +3146,11 @@ function normalizeSupabaseArticle(article, mediaById, categoriesById) {
   const video = getArticleVideoData(article.content_json || {});
 
   return {
-    href: articleHref(article.slug),
+    href: articleHref(article.slug, article.public_number),
     slug: article.slug,
+    sourceSlug: article.slug,
+    publicNumber: articlePublicNumber(article.slug, article.public_number),
+    publicSlug: articlePublicSlug(article.slug, article.public_number),
     category,
     categorySlug: slug,
     categoryType: categoryData?.type || "article",
@@ -3167,8 +3188,14 @@ function normalizeSupabaseArticle(article, mediaById, categoriesById) {
 }
 
 function normalizeStaticArticle(article) {
+  const publicNumber = articlePublicNumber(article.slug);
+  const publicSlug = articlePublicSlug(article.slug);
   return {
     ...article,
+    sourceSlug: article.slug,
+    publicNumber,
+    publicSlug,
+    href: articleHref(article.slug),
     categorySlug: article.categorySlug || categorySlug(article.category)
   };
 }
@@ -3261,6 +3288,7 @@ async function fetchSupabaseHealthArticles() {
       id,
       category_id,
       slug,
+      public_number,
       title,
       subtitle,
       excerpt,
@@ -3356,6 +3384,10 @@ function normalizeSupabaseArticlePage(article, category, cover) {
   const content = rewrite?.content || article.content || "";
   return {
     slug: article.slug,
+    sourceSlug: article.slug,
+    publicNumber: articlePublicNumber(article.slug, article.public_number),
+    publicSlug: articlePublicSlug(article.slug, article.public_number),
+    href: articleHref(article.slug, article.public_number),
     category: category?.display_label || category?.name || "照顧知識",
     categorySlug: category?.slug || categorySlug(category?.name || "照顧知識"),
     title: article.title || "未命名文章",
@@ -3403,12 +3435,15 @@ async function fetchSupabaseArticlePage(slug) {
   if (!supabase || !slug) return null;
   if (supabaseArticlePageCache.has(slug)) return supabaseArticlePageCache.get(slug);
 
-  const { data: article, error } = await supabase
+  const sourceSlug = articleSourceSlug(slug);
+  const publicNumber = articlePublicNumber(slug);
+  let articleQuery = supabase
     .from("articles")
     .select(`
       id,
       category_id,
       slug,
+      public_number,
       title,
       subtitle,
       excerpt,
@@ -3436,10 +3471,19 @@ async function fetchSupabaseArticlePage(slug) {
       seo_title,
       seo_description
     `)
-    .eq("slug", slug)
     .eq("status", "published")
-    .eq("is_enabled", true)
-    .maybeSingle();
+    .eq("is_enabled", true);
+
+  if (sourceSlug) {
+    articleQuery = articleQuery.eq("slug", sourceSlug);
+  } else if (publicNumber) {
+    articleQuery = articleQuery.eq("public_number", publicNumber);
+  } else {
+    supabaseArticlePageCache.set(slug, null);
+    return null;
+  }
+
+  const { data: article, error } = await articleQuery.maybeSingle();
 
   if (error) throw error;
   if (!article) {
@@ -11014,11 +11058,12 @@ function renderStaticArticlePage(slug) {
 }
 
 async function loadArticlePage(slug) {
+  const sourceSlug = articleSourceSlug(slug) || slug;
   try {
     await ensureStaticArticleRewrites();
     const article = await fetchArticlePageWithFallback(slug);
     if (routeSlugFromLocation() !== `article-${slug}`) return;
-    const pageArticle = article || articlePages[slug];
+    const pageArticle = article || articlePages[sourceSlug];
     if (pageArticle?.slides?.length) await ensureArticleSlideDeckRenderer();
     if (article) {
       setRouteSeo(`article-${slug}`, {
@@ -11029,8 +11074,8 @@ async function loadArticlePage(slug) {
         type: "article",
         canonical: routeCanonical(`article-${slug}`)
       });
-    } else if (articlePages[slug]) {
-      const fallback = articlePages[slug];
+    } else if (articlePages[sourceSlug]) {
+      const fallback = articlePages[sourceSlug];
       setRouteSeo(`article-${slug}`, {
         title: `${fallback.title}｜健康3.0`,
         description: fallback.dek || DEFAULT_SEO.description,
@@ -11047,12 +11092,14 @@ async function loadArticlePage(slug) {
         canonical: routeCanonical("health")
       });
     }
-    pageView.innerHTML = article ? renderArticleLayout(article) : (articlePages[slug] ? renderStaticArticlePage(slug) : renderArticleNotFoundPage());
+    pageView.innerHTML = article
+      ? renderArticleLayout(article)
+      : (articlePages[sourceSlug] ? renderStaticArticlePage(sourceSlug) : renderArticleNotFoundPage());
   } catch (error) {
     console.warn("Supabase article page unavailable.", error);
     if (routeSlugFromLocation() !== `article-${slug}`) return;
-    if (articlePages[slug]) {
-      const fallback = articlePages[slug];
+    if (articlePages[sourceSlug]) {
+      const fallback = articlePages[sourceSlug];
       if (fallback.slides?.length) await ensureArticleSlideDeckRenderer();
       setRouteSeo(`article-${slug}`, {
         title: `${fallback.title}｜健康3.0`,
@@ -11070,7 +11117,9 @@ async function loadArticlePage(slug) {
         canonical: routeCanonical("health")
       });
     }
-    pageView.innerHTML = articlePages[slug] ? renderStaticArticlePage(slug) : renderArticleNotFoundPage();
+    pageView.innerHTML = articlePages[sourceSlug]
+      ? renderStaticArticlePage(sourceSlug)
+      : renderArticleNotFoundPage();
   }
 }
 
