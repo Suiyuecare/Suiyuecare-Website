@@ -235,6 +235,43 @@ function verifyApiSyntax() {
   log("api JavaScript syntax checks pass");
 }
 
+function verifyApmPortalHandoff() {
+  const portal = readText("src/portal/login.js");
+  const handoff = readText("api/portal-handoff.js");
+
+  for (const expected of [
+    'apm: "https://apm.suiyuecare.com/"',
+    'const postHandoffModuleIds = new Set(["apm"])',
+    'form.action = new URL("/api/auth/handoff", configuredUrl).toString()',
+    '"project_you@suiyuecare.com"',
+    '"investorrelations@suiyuecare.com"',
+    '"suiyue.acct@suiyuecare.com"'
+  ]) {
+    assert(portal.includes(expected), `Portal APM launch contract is missing ${expected}.`);
+  }
+  assert(
+    !portal.includes('"project_pan@suiyuecare.com", "職員"'),
+    "Departed project_pan must not remain an enabled Portal employee row."
+  );
+  assert(
+    portal.includes('"daycare.xinyi@suiyuecare.com", "課長", "信義失智據點課長"')
+      && portal.includes('"信義失智據點課", "本課", "停用"'),
+    "Vacant daycare.xinyi account must stay disabled."
+  );
+
+  for (const expected of [
+    'const allowedModules = new Set(["accounting", "apm", "edoc", "website-backoffice"])',
+    'process.env.APM_PORTAL_SIGNING_SECRET',
+    '"investorrelations@suiyuecare.com"',
+    '"suiyue.acct@suiyuecare.com"',
+    'error.statusCode = 403'
+  ]) {
+    assert(handoff.includes(expected), `Portal handoff guard is missing ${expected}.`);
+  }
+
+  log("APM secure POST launch and stale identity guards are present");
+}
+
 function verifyDist() {
   const distDir = path.resolve(root, "dist");
   if (!fs.existsSync(distDir)) {
@@ -320,6 +357,7 @@ async function main() {
   verifyRobots();
   verifyPackage();
   verifyApiSyntax();
+  verifyApmPortalHandoff();
   verifyDist();
   verifyProductionDocs();
 

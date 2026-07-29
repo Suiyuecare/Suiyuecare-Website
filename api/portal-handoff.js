@@ -1,7 +1,13 @@
 const crypto = require("crypto");
 const { createClient } = require("@supabase/supabase-js");
 
-const allowedModules = new Set(["accounting", "edoc", "website-backoffice"]);
+const allowedModules = new Set(["accounting", "apm", "edoc", "website-backoffice"]);
+const moduleDeniedEmails = new Map([
+  ["apm", new Set([
+    "investorrelations@suiyuecare.com",
+    "suiyue.acct@suiyuecare.com"
+  ])]
+]);
 
 function json(response, statusCode, payload) {
   response.statusCode = statusCode;
@@ -74,10 +80,12 @@ function base64Url(value) {
     .replace(/=+$/g, "");
 }
 
-function signPayload(payload) {
-  const secret = process.env.PORTAL_HANDOFF_SIGNING_SECRET || process.env.EDOC_PORTAL_HANDOFF_SECRET;
-  if (!secret) {
-    const error = new Error("Missing PORTAL_HANDOFF_SIGNING_SECRET.");
+function signPayload(payload, moduleId) {
+  const secret = moduleId === "apm"
+    ? process.env.APM_PORTAL_SIGNING_SECRET
+    : process.env.PORTAL_HANDOFF_SIGNING_SECRET || process.env.EDOC_PORTAL_HANDOFF_SECRET;
+  if (!secret || (moduleId === "apm" && Buffer.byteLength(secret, "utf8") < 32)) {
+    const error = new Error("Missing or insecure module handoff secret.");
     error.statusCode = 503;
     throw error;
   }
@@ -114,8 +122,23 @@ function normalizePayload(rawPayload, user) {
     error.statusCode = 400;
     throw error;
   }
+  if (moduleDeniedEmails.get(moduleId)?.has(email)) {
+    const error = new Error("This account is not an active APM employee identity.");
+    error.statusCode = 403;
+    throw error;
+  }
 
   const now = Math.floor(Date.now() / 1000);
+  if (moduleId === "apm") {
+    return {
+      email,
+      aud: "apm",
+      iat: now,
+      exp: now + 10 * 60,
+      jti: crypto.randomUUID()
+    };
+  }
+
   return {
     ...payload,
     source: "logging-portal",
@@ -135,10 +158,11 @@ module.exports = async function handler(request, response) {
   try {
     const user = await requireUser(request);
     const body = parseBody(request.body);
+    const moduleId = String(body?.payload?.moduleId || "").trim();
     const payload = normalizePayload(body.payload, user);
     return json(response, 200, {
       ok: true,
-      ...signPayload(payload)
+      ...signPayload(payload, moduleId)
     });
   } catch (error) {
     return json(response, error.statusCode || 500, {

@@ -53,7 +53,8 @@ const modules = [
       { id: "pdf-editor", number: "5-5", name: "PDF 編輯器" }
     ]
   },
-  { id: "website-backoffice", number: "6", name: "網站後台管理" }
+  { id: "apm", number: "6", name: "APM 績效與任務管理" },
+  { id: "website-backoffice", number: "7", name: "網站後台管理" }
 ];
 
 const organizationNodes = [
@@ -224,6 +225,7 @@ const moduleOrgRules = {
   "system-permissions": { owner: "it-class", scope: "custom", policy: "資訊課維護帳號，不預設看敏感內容" },
   "organization-chart": { owner: "it-class", scope: "company", policy: "依組織節點檢視公司架構" },
   "employee-accounts": { owner: "it-class", scope: "custom", policy: "員工帳號與登入狀態管理" },
+  apm: { owner: "group", scope: "company", policy: "實際資料與簽核權限由 APM 依組織主管鏈控管" },
   "website-backoffice": { owner: "it-class", scope: "company", policy: "網站內容、發布流程與後台編輯權限" },
   "pdf-editor": { owner: "it-class", scope: "assigned", policy: "已授權使用者可用" }
 };
@@ -337,7 +339,8 @@ const dataScopeDefinitions = [
 const moduleDisplayNames = {
   business: "照顧服務",
   "home-care": "居家照顧",
-  "day-care": "日間照顧"
+  "day-care": "日間照顧",
+  apm: "APM 績效與任務管理"
 };
 
 const ownerDisplayNames = {
@@ -357,6 +360,7 @@ const moduleDescriptions = {
   "system-permissions": "管理角色、權限與資料範圍",
   "organization-chart": "查看公司組織與權責關係",
   "employee-accounts": "管理員工登入帳號",
+  apm: "管理每日任務、專案、季度 KPI 與簽核進度",
   "website-backoffice": "管理官網內容、發布流程與頁面資料",
   "pdf-editor": "編輯、合併與整理 PDF 文件"
 };
@@ -374,26 +378,40 @@ const moduleIcons = {
   "system-permissions": "權限",
   "organization-chart": "組織",
   "employee-accounts": "帳號",
+  apm: "APM",
   "website-backoffice": "後台",
   "pdf-editor": "PDF"
 };
 
 const moduleLaunchUrls = {
   accounting: "https://finance.suiyuecare.com/",
-  edoc: "https://edoc.suiyuecare.com/"
+  edoc: "https://edoc.suiyuecare.com/",
+  apm: "https://apm.suiyuecare.com/"
 };
 
 const connectedModuleIds = new Set(Object.keys(moduleLaunchUrls));
-const temporarilyOpenModuleIds = new Set(["accounting", "edoc", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
+const temporarilyOpenModuleIds = new Set(["accounting", "edoc", "apm", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
 const sharedGeneralAffairsModules = new Set(["pdf-editor"]);
 const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions", "organization-chart", "employee-accounts"]);
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
-const signedHandoffModuleIds = new Set(["edoc"]);
-const externalLaunchOrigins = new Map();
+const signedHandoffModuleIds = new Set(["edoc", "apm"]);
+const postHandoffModuleIds = new Set(["apm"]);
+const moduleDeniedEmails = new Map([
+  ["apm", new Set([
+    "investorrelations@suiyuecare.com",
+    "suiyue.acct@suiyuecare.com"
+  ])]
+]);
+const externalLaunchOrigins = new Map(
+  Object.entries(moduleLaunchUrls).map(([moduleId, launchUrl]) => [new URL(launchUrl).origin, moduleId])
+);
 
 async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
   const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
   if (!launchUrl) return null;
+  if (postHandoffModuleIds.has(moduleId)) {
+    throw new Error("簽章模組必須使用安全的 POST 啟動流程。");
+  }
 
   const payload = buildModuleLaunchPayload(moduleId, profile);
   const signedHandoff = signedHandoffModuleIds.has(moduleId) ? await createSignedModuleHandoff(payload) : null;
@@ -406,6 +424,47 @@ async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
   if (signedHandoff?.signature) url.searchParams.set("signature", signedHandoff.signature);
   if (signedHandoff?.token) url.searchParams.set("token", signedHandoff.token);
   return url.toString();
+}
+
+async function launchConnectedModule(moduleId, profile, launchUrlOverride = "", navigationMode = "assign") {
+  const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
+  if (!launchUrl) return false;
+
+  if (postHandoffModuleIds.has(moduleId)) {
+    const signedHandoff = await createSignedModuleHandoff(buildModuleLaunchPayload(moduleId, profile));
+    submitSignedModuleHandoff(moduleId, launchUrl, signedHandoff);
+    return true;
+  }
+
+  const destination = await buildModuleLaunchUrl(moduleId, profile, launchUrl);
+  if (!destination) return false;
+  if (navigationMode === "replace") window.location.replace(destination);
+  else window.location.assign(destination);
+  return true;
+}
+
+function submitSignedModuleHandoff(moduleId, launchUrl, signedHandoff) {
+  const configuredUrl = new URL(moduleLaunchUrls[moduleId]);
+  const requestedUrl = new URL(launchUrl);
+  if (requestedUrl.origin !== configuredUrl.origin) {
+    throw new Error("模組啟動網址不在允許清單內。");
+  }
+
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = new URL("/api/auth/handoff", configuredUrl).toString();
+  form.hidden = true;
+
+  [["payload", signedHandoff.payload], ["signature", signedHandoff.signature]].forEach(([name, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.append(input);
+  });
+
+  document.body.append(form);
+  form.submit();
 }
 
 function buildModuleLaunchPayload(moduleId, profile) {
@@ -500,6 +559,8 @@ async function createSignedModuleHandoff(payload) {
   const { data, error } = await supabase.auth.getSession();
   const token = data?.session?.access_token;
   if (error || !token) {
+    clearStoredProfile();
+    renderSession(null);
     throw new Error(error?.message || "Portal 登入階段已失效，請重新登入。");
   }
 
@@ -513,6 +574,12 @@ async function createSignedModuleHandoff(payload) {
   });
   const result = await response.json().catch(() => ({}));
   if (!response.ok || !result.ok) {
+    if (response.status === 401) {
+      clearStoredProfile();
+      await supabase.auth.signOut();
+      renderSession(null);
+      throw new Error("Portal 登入階段已失效，請重新使用 Google 登入。");
+    }
     throw new Error(result.message || "無法建立模組登入簽章。");
   }
   return result;
@@ -557,15 +624,15 @@ const employeeAccountRows = [
   [36, "徐靜紅", "未設定", "職員", "照顧服務員", "日間照顧部", "歲悅萬華社區長照機構", "臺北市", "萬華一課", "個人與指派", "待補帳號"],
   [37, "黃苗溶", "未設定", "職員", "照顧服務員", "日間照顧部", "歲悅萬華社區長照機構", "臺北市", "萬華一課", "個人與指派", "待補帳號"],
   [38, "從缺", "未設定", "課長", "機構業務負責人", "日間照顧部", "歲悅萬華二館社區長照機構", "臺北市", "萬華二課", "本部門", "待補帳號"],
-  [39, "王力行", "daycare.shilin@suiyuecare.com", "課長", "士林失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "士林失智據點課", "本課", "啟用"],
+  [39, "王立行", "daycare.shilin@suiyuecare.com", "課長", "士林失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "士林失智據點課", "本課", "啟用"],
   [40, "吳俊璋", "daycare.datong@suiyuecare.com", "課長", "大同失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "大同失智據點課", "本課", "啟用"],
-  [41, "從缺", "daycare.xinyi@suiyuecare.com", "課長", "信義失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "信義失智據點課", "本課", "啟用"],
+  [41, "從缺", "daycare.xinyi@suiyuecare.com", "課長", "信義失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "信義失智據點課", "本課", "停用"],
   [42, "陳蕙婷", "edu.control@suiyuecare.com", "部長", "教學品管部長", "教學品管部", "歲悅股份有限公司", "臺北市", "未設定", "本部門", "啟用"],
   [43, "楊書竣", "未設定", "部長", "軟體開發部長", "軟體開發部", "歲悅股份有限公司", "臺北市", "未設定", "本部門", "待補帳號"],
   [44, "陳怡霖", "project@suiyuecare.com", "部長", "移工培訓部長", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "未設定", "本部門", "啟用"],
   [45, "徐靖雯", "project_hsu@suiyuecare.com", "課長", "業務助理", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "高雄到宅課", "本課", "啟用"],
   [46, "江守舜", "project_chiang@suiyuecare.com", "課長", "業務督導員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "本課", "啟用"],
-  [47, "潘雨柔", "project_pan@suiyuecare.com", "職員", "業務督導員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "負責項目", "啟用"],
+  [47, "游紹瑋", "project_you@suiyuecare.com", "課長", "移工數位學習課專員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "本課", "啟用"],
   [48, "沈芊佑", "project_yu@suiyuecare.com", "課長", "業務督導員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "臺北到宅課, 臺北集中課", "本課", "啟用"],
   [49, "合瓊玲", "未設定", "組長", "社團輔導員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "負責項目", "待補帳號"],
   [50, "阮氏翠", "未設定", "職員", "越南行銷企劃", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "個人與指派", "待補帳號"],
@@ -793,6 +860,7 @@ function getDefaultSupervisorEmail(account) {
   if (roleId === "admin-director") return "entrepreneur@suiyuecare.com";
   if (["hr-chief", "accounting-chief", "cashier-chief", "ga-chief"].includes(roleId)) return "admin@suiyuecare.com";
   if (email === "investorrelations@suiyuecare.com") return "entrepreneur@suiyuecare.com";
+  if (email === "project_you@suiyuecare.com") return "project_chiang@suiyuecare.com";
   if (roleId === "business-director") return "entrepreneur@suiyuecare.com";
 
   if (department.includes("移工")) return "project@suiyuecare.com";
@@ -1162,6 +1230,13 @@ const modulePermissionDefinitions = [
     actions: ["view", "create", "edit", "submit", "approve", "reject", "export", "print"],
     sensitivity: "財務",
     limits: "所有已啟用員工可進入 Finance；實際帳務資料與操作仍依 Finance 內部權限與 Data Scope 控管。"
+  },
+  {
+    moduleId: "apm",
+    roles: ["board", "shareholder", "ceo", "region-manager", "admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
+    actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "print"],
+    sensitivity: "績效 / 內部專案",
+    limits: "所有已啟用員工可進入 APM；角色、部門、主管鏈與簽核操作仍由 APM 後端權限控管。"
   },
   {
     moduleId: "general-affairs",
@@ -2415,7 +2490,9 @@ function getPortalRedirectUrl() {
 }
 
 function safeModuleLaunchRequest(rawNext = "", explicitModule = "") {
-  const moduleId = explicitModule === "edoc" ? "edoc" : "";
+  const moduleId = Object.prototype.hasOwnProperty.call(moduleLaunchUrls, explicitModule)
+    ? explicitModule
+    : "";
   if (!rawNext && moduleId) {
     return { moduleId, returnTo: moduleLaunchUrls[moduleId] };
   }
@@ -2467,12 +2544,8 @@ async function launchRequestedModuleIfReady(profile) {
   }
   setStatus(`正在啟動 ${getModuleDisplayName(module)}...`, "info");
   try {
-    const launchUrl = await buildModuleLaunchUrl(request.moduleId, profile, request.returnTo);
     window.sessionStorage.removeItem(pendingModuleLaunchKey);
-    if (launchUrl) {
-      window.location.replace(launchUrl);
-      return true;
-    }
+    if (await launchConnectedModule(request.moduleId, profile, request.returnTo, "replace")) return true;
   } catch (error) {
     setStatus(`${getModuleDisplayName(module)} 啟動失敗：${error.message}`, "error");
   }
@@ -2480,15 +2553,25 @@ async function launchRequestedModuleIfReady(profile) {
 }
 
 async function applyGoogleSession() {
-  if (!supabase) return false;
+  if (!supabase) {
+    clearStoredProfile();
+    renderSession(null);
+    return null;
+  }
   const { data, error } = await supabase.auth.getSession();
   if (error) {
+    clearStoredProfile();
+    renderSession(null);
     setStatus(`Google 登入狀態檢查失敗：${error.message}`, "error");
-    return false;
+    return null;
   }
 
   const email = data.session?.user?.email || "";
-  if (!email) return false;
+  if (!email) {
+    clearStoredProfile();
+    renderSession(null);
+    return null;
+  }
 
   const profile = findProfileByEmail(email);
   if (!profile) {
@@ -2496,13 +2579,13 @@ async function applyGoogleSession() {
     await supabase.auth.signOut();
     renderSession(null);
     setStatus(`Google 帳號 ${email} 尚未建立 Portal 權限，請由系統權限中心開通。`, "error");
-    return true;
+    return null;
   }
 
   setStoredProfile(profile);
   renderSession(profile);
   setStatus(`已使用 Google 登入：${profile.label}。`, "success");
-  return true;
+  return profile;
 }
 
 function modulePermissionAllowsRole(moduleId, roleId) {
@@ -2512,6 +2595,8 @@ function modulePermissionAllowsRole(moduleId, roleId) {
 
 function moduleIsAllowed(module, profile) {
   const profileRoleId = profile.sourceProfileId || profile.id;
+  const deniedEmails = moduleDeniedEmails.get(module.id);
+  if (deniedEmails?.has(normalizeEmail(profile.email))) return false;
   if (module.id === "general-affairs") return true;
   if (sharedGeneralAffairsModules.has(module.id)) return true;
   if (restrictedGeneralAffairsModules.has(module.id)) {
@@ -2683,11 +2768,7 @@ function createModuleButton(module, profile) {
       button.disabled = true;
       setStatus(`正在啟動 ${getModuleDisplayName(module)}...`, "info");
       try {
-        const launchUrl = await buildModuleLaunchUrl(module.id, profile);
-        if (launchUrl) {
-          window.location.href = launchUrl;
-          return;
-        }
+        if (await launchConnectedModule(module.id, profile)) return;
       } catch (error) {
         button.disabled = false;
         setStatus(`${getModuleDisplayName(module)} 啟動失敗：${error.message}`, "error");
@@ -5215,9 +5296,9 @@ function renderSecurityRestrictionTool(profile) {
 async function bootPortalLogin() {
   rememberRequestedModuleLaunch();
   renderOrganizationChart(organizationChart);
-  renderSession(getStoredProfile());
-  await applyGoogleSession();
-  await launchRequestedModuleIfReady(getStoredProfile());
+  renderSession(null);
+  const profile = await applyGoogleSession();
+  await launchRequestedModuleIfReady(profile);
 }
 
 signOutButton?.addEventListener("click", () => {
