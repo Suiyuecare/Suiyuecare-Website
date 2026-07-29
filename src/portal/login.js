@@ -396,6 +396,12 @@ const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
 const signedHandoffModuleIds = new Set(["edoc", "apm"]);
 const postHandoffModuleIds = new Set(["apm"]);
+const moduleDeniedEmails = new Map([
+  ["apm", new Set([
+    "investorrelations@suiyuecare.com",
+    "suiyue.acct@suiyuecare.com"
+  ])]
+]);
 const externalLaunchOrigins = new Map(
   Object.entries(moduleLaunchUrls).map(([moduleId, launchUrl]) => [new URL(launchUrl).origin, moduleId])
 );
@@ -618,15 +624,15 @@ const employeeAccountRows = [
   [36, "徐靜紅", "未設定", "職員", "照顧服務員", "日間照顧部", "歲悅萬華社區長照機構", "臺北市", "萬華一課", "個人與指派", "待補帳號"],
   [37, "黃苗溶", "未設定", "職員", "照顧服務員", "日間照顧部", "歲悅萬華社區長照機構", "臺北市", "萬華一課", "個人與指派", "待補帳號"],
   [38, "從缺", "未設定", "課長", "機構業務負責人", "日間照顧部", "歲悅萬華二館社區長照機構", "臺北市", "萬華二課", "本部門", "待補帳號"],
-  [39, "王力行", "daycare.shilin@suiyuecare.com", "課長", "士林失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "士林失智據點課", "本課", "啟用"],
+  [39, "王立行", "daycare.shilin@suiyuecare.com", "課長", "士林失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "士林失智據點課", "本課", "啟用"],
   [40, "吳俊璋", "daycare.datong@suiyuecare.com", "課長", "大同失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "大同失智據點課", "本課", "啟用"],
-  [41, "從缺", "daycare.xinyi@suiyuecare.com", "課長", "信義失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "信義失智據點課", "本課", "啟用"],
+  [41, "從缺", "daycare.xinyi@suiyuecare.com", "課長", "信義失智據點課長", "社區據點部", "臺北市私立歲悅居家長照機構", "臺北市", "信義失智據點課", "本課", "停用"],
   [42, "陳蕙婷", "edu.control@suiyuecare.com", "部長", "教學品管部長", "教學品管部", "歲悅股份有限公司", "臺北市", "未設定", "本部門", "啟用"],
   [43, "楊書竣", "未設定", "部長", "軟體開發部長", "軟體開發部", "歲悅股份有限公司", "臺北市", "未設定", "本部門", "待補帳號"],
   [44, "陳怡霖", "project@suiyuecare.com", "部長", "移工培訓部長", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "未設定", "本部門", "啟用"],
   [45, "徐靖雯", "project_hsu@suiyuecare.com", "課長", "業務助理", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "高雄到宅課", "本課", "啟用"],
   [46, "江守舜", "project_chiang@suiyuecare.com", "課長", "業務督導員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "本課", "啟用"],
-  [47, "潘雨柔", "project_pan@suiyuecare.com", "職員", "業務督導員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "負責項目", "啟用"],
+  [47, "游紹瑋", "project_you@suiyuecare.com", "課長", "移工數位學習課專員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "本課", "啟用"],
   [48, "沈芊佑", "project_yu@suiyuecare.com", "課長", "業務督導員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "臺北到宅課, 臺北集中課", "本課", "啟用"],
   [49, "合瓊玲", "未設定", "組長", "社團輔導員", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "負責項目", "待補帳號"],
   [50, "阮氏翠", "未設定", "職員", "越南行銷企劃", "移工培訓部", "臺北市私立歲悅居家長照機構", "臺北市", "移工數位學習課", "個人與指派", "待補帳號"],
@@ -854,6 +860,7 @@ function getDefaultSupervisorEmail(account) {
   if (roleId === "admin-director") return "entrepreneur@suiyuecare.com";
   if (["hr-chief", "accounting-chief", "cashier-chief", "ga-chief"].includes(roleId)) return "admin@suiyuecare.com";
   if (email === "investorrelations@suiyuecare.com") return "entrepreneur@suiyuecare.com";
+  if (email === "project_you@suiyuecare.com") return "project_chiang@suiyuecare.com";
   if (roleId === "business-director") return "entrepreneur@suiyuecare.com";
 
   if (department.includes("移工")) return "project@suiyuecare.com";
@@ -2588,6 +2595,8 @@ function modulePermissionAllowsRole(moduleId, roleId) {
 
 function moduleIsAllowed(module, profile) {
   const profileRoleId = profile.sourceProfileId || profile.id;
+  const deniedEmails = moduleDeniedEmails.get(module.id);
+  if (deniedEmails?.has(normalizeEmail(profile.email))) return false;
   if (module.id === "general-affairs") return true;
   if (sharedGeneralAffairsModules.has(module.id)) return true;
   if (restrictedGeneralAffairsModules.has(module.id)) {

@@ -2,6 +2,12 @@ const crypto = require("crypto");
 const { createClient } = require("@supabase/supabase-js");
 
 const allowedModules = new Set(["accounting", "apm", "edoc", "website-backoffice"]);
+const moduleDeniedEmails = new Map([
+  ["apm", new Set([
+    "investorrelations@suiyuecare.com",
+    "suiyue.acct@suiyuecare.com"
+  ])]
+]);
 
 function json(response, statusCode, payload) {
   response.statusCode = statusCode;
@@ -114,6 +120,11 @@ function normalizePayload(rawPayload, user) {
   if (!allowedModules.has(moduleId)) {
     const error = new Error("Module is not allowed for Portal handoff.");
     error.statusCode = 400;
+    throw error;
+  }
+  if (moduleDeniedEmails.get(moduleId)?.has(email)) {
+    const error = new Error("This account is not an active APM employee identity.");
+    error.statusCode = 403;
     throw error;
   }
 
