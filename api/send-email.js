@@ -215,13 +215,16 @@ function enforceRateLimit(request, payload) {
 function buildSubmissionPayload(body) {
   const requestedFormType = sanitize(body.form_type || "contact", 80);
   const formType = FORM_RECIPIENTS[requestedFormType] ? requestedFormType : "contact";
+  const message = formType === "recruiting"
+    ? ""
+    : sanitize(body.message || body["說明"] || body["內容"], 2000);
   return {
     form_type: formType,
     name: sanitize(body.name || body["姓名"] || body["您的大名"], 160),
     phone: sanitize(body.phone || body["電話"] || body["您的電話"], 80),
     email: sanitize(body.email || body["信箱"] || body.Email, 180),
     subject: sanitize(body.subject || body["需求"] || body["課程"] || body["您本次報名的課程"] || body.course || "官網表單", 220),
-    message: sanitize(body.message || body["說明"] || body["內容"], 2000),
+    message,
     source_path: sanitize(body.source_path || body.page_path || "/", 500),
     recipient_email: FORM_RECIPIENTS[formType] || FORM_RECIPIENTS.contact,
     email_sent: false,
@@ -455,7 +458,7 @@ function renderEmailHtml(payload) {
     ["履歷", payload.metadata.resume?.file_name],
     ["來源頁面", payload.source_path],
     ["送出時間", payload.metadata.submitted_at]
-  ];
+  ].filter(([label]) => payload.form_type !== "recruiting" || label !== "內容");
 
   return `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC','Segoe UI',sans-serif;line-height:1.8;color:#3f2414">

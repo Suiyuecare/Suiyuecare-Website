@@ -2422,6 +2422,24 @@ h2 {
   cursor: pointer;
   transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease, filter .24s ease;
 }
+a.health-preview,
+a.health-feature,
+a.health-card,
+a.health-list-card,
+a.health-pack-card,
+a.health-event-card,
+a.health-video-card,
+a.search-result-card {
+  color: inherit;
+  text-decoration: none;
+}
+a.health-preview,
+a.health-feature,
+a.health-pack-card,
+a.health-event-card,
+a.health-video-card {
+  display: block;
+}
 .story-slider article {
   cursor: default;
   transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease, filter .24s ease;
@@ -2776,6 +2794,13 @@ h2 {
   margin-top: 8px;
 }
 .health-video-card a {
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 12px;
+  color: #fff;
+  font-weight: 900;
+}
+.health-video-card .health-video-readmore {
   display: inline-flex;
   align-self: flex-start;
   margin-top: 12px;
@@ -7360,6 +7385,24 @@ h2 {
   font-size: clamp(22px, 2vw, 28px);
   line-height: 1.22;
 }
+.talent-job-select {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.talent-job-select:focus-visible {
+  outline: 3px solid rgba(22,143,171,.52);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
 .talent-job-title-row p,
 .talent-job-summary {
   margin: 0;
@@ -7723,6 +7766,10 @@ h2 {
   }
   .talent-job-detail-sections {
     grid-template-columns: 1fr;
+  }
+  .talent-job-card-actions,
+  .talent-job-mobile-detail .talent-job-detail-actions {
+    display: none;
   }
   .talent-job-mobile-cta {
     position: fixed;
@@ -9432,7 +9479,7 @@ h2 {
 .course-modal {
   position: fixed;
   inset: 0;
-  z-index: 80;
+  z-index: 300;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -9517,6 +9564,7 @@ h2 {
   font-weight: 900;
 }
 .recruit-apply-form {
+  min-width: 0;
   gap: 14px;
 }
 .recruit-apply-context {
@@ -9532,6 +9580,9 @@ h2 {
   font-size: 14px;
 }
 .recruit-apply-form input[type="file"] {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 56px;
   padding: 8px;
   font: inherit;

@@ -810,13 +810,16 @@ function setContactFormStatus(form, message = "", state = "") {
 async function recordFormSubmission(form, formType = "contact") {
   if (!supabase || !form) return null;
   const formData = new FormData(form);
+  const message = formType === "recruiting"
+    ? ""
+    : formDataValue(formData, ["說明", "message", "內容"]);
   const payload = {
     form_type: formType,
     name: formDataValue(formData, ["姓名", "您的大名", "name"]),
     phone: formDataValue(formData, ["電話", "您的電話", "phone", "tel"]),
     email: formDataValue(formData, ["Email", "信箱", "email"]),
     subject: formDataValue(formData, ["需求", "課程", "您本次報名的課程", "course", "subject"]) || formType,
-    message: formDataValue(formData, ["說明", "message", "內容"]),
+    message,
     source_path: location.hash || "#home",
     metadata: {
       page_title: document.title,
@@ -841,13 +844,16 @@ async function recordFormSubmission(form, formType = "contact") {
 async function sendBackendForm(form, formType = "contact") {
   const formData = new FormData(form);
   const resume = formType === "recruiting" ? await serializeRecruitingResume(formData.get("resume")) : null;
+  const message = formType === "recruiting"
+    ? ""
+    : formDataValue(formData, ["說明", "message", "內容"]);
   const payload = {
     form_type: formType,
     name: formDataValue(formData, ["姓名", "您的大名", "name"]),
     phone: formDataValue(formData, ["電話", "您的電話", "phone", "tel"]),
     email: formDataValue(formData, ["Email", "信箱", "email"]),
     subject: formDataValue(formData, ["需求", "課程", "您本次報名的課程", "course", "subject"]) || formType,
-    message: formDataValue(formData, ["說明", "message", "內容"]),
+    message,
     course_title: formDataValue(formData, ["課程", "您本次報名的課程", "course_title"]),
     course_id: formDataValue(formData, ["course_id"]),
     recruiting_page: formDataValue(formData, ["recruiting_page"]),
@@ -5303,13 +5309,13 @@ function renderTalentJobDetail(job, inline = false) {
 
 function renderTalentJobCard(job, index) {
   const isActive = index === 0;
+  const selectId = `talent-job-select-${job.key}`;
+  const detailId = `talent-job-detail-${job.key}`;
+  const mobileDetailId = `talent-job-mobile-detail-${job.key}`;
   return `
     <article
       class="talent-job-card ${isActive ? "is-active" : ""}"
-      role="option"
-      tabindex="0"
-      aria-selected="${isActive ? "true" : "false"}"
-      aria-controls="talent-job-detail-${escapeHTML(job.key)}"
+      role="listitem"
       data-talent-job-card
       data-job-id="${escapeHTML(job.key)}"
       data-talent-department="${escapeHTML(job.departmentTitle)}"
@@ -5330,7 +5336,16 @@ function renderTalentJobCard(job, index) {
           </div>
           <div class="talent-job-title-row">
             <div>
-              <h3>${escapeHTML(job.title)}</h3>
+              <h3>
+                <button
+                  class="talent-job-select"
+                  id="${escapeHTML(selectId)}"
+                  type="button"
+                  data-talent-job-select
+                  aria-controls="${escapeHTML(detailId)} ${escapeHTML(mobileDetailId)}"
+                  aria-expanded="${isActive ? "true" : "false"}"
+                >${escapeHTML(job.title)}</button>
+              </h3>
               <p>${escapeHTML(job.subtitle)}</p>
             </div>
             ${job.isFeatured ? `<strong>重點</strong>` : ""}
@@ -5345,7 +5360,7 @@ function renderTalentJobCard(job, index) {
           </div>
         </div>
       </div>
-      <div class="talent-job-mobile-detail" id="talent-job-mobile-detail-${escapeHTML(job.key)}">
+      <div class="talent-job-mobile-detail" id="${escapeHTML(mobileDetailId)}" aria-labelledby="${escapeHTML(selectId)}">
         ${renderTalentJobDetail(job, true)}
       </div>
     </article>
@@ -5383,7 +5398,7 @@ function renderTalentJobBoard(page, model) {
         <span>個職缺符合條件</span>
       </div>
       <div class="talent-job-layout">
-        <div class="talent-job-list" role="listbox" aria-label="職缺列表">
+        <div class="talent-job-list" role="list" aria-label="職缺列表">
           ${jobs.map((job, index) => renderTalentJobCard(job, index)).join("")}
         </div>
         <div class="talent-job-detail-slot">
@@ -5392,6 +5407,7 @@ function renderTalentJobBoard(page, model) {
               <article
                 id="talent-job-detail-${escapeHTML(job.key)}"
                 data-talent-job-detail="${escapeHTML(job.key)}"
+                aria-labelledby="talent-job-select-${escapeHTML(job.key)}"
                 ${index === 0 ? "" : "hidden"}
               >
                 ${renderTalentJobDetail(job)}
@@ -5678,7 +5694,7 @@ function renderRecruitingApplicationModal(page) {
           <label>補充說明<textarea name="說明" rows="4" placeholder="可填寫可聯絡時間、經歷、場域資料或合作想法"></textarea></label>
   `;
   return `
-    <div class="course-modal recruiting-apply-modal" id="recruitApplyModal" hidden role="dialog" aria-modal="true" aria-labelledby="recruitApplyHeading">
+    <div class="course-modal recruiting-apply-modal" id="recruitApplyModal" hidden tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="recruitApplyHeading">
       <form class="course-modal-card recruit-apply-form" id="recruitApplyForm">
         <button class="course-modal-close" type="button" data-recruit-close aria-label="關閉">×</button>
         <p class="eyebrow">Apply</p>
@@ -6150,27 +6166,31 @@ function renderHomeHealthArticles(articles = getHealthArticleList()) {
   if (!latest.length) return false;
 
   const [feature, ...miniItems] = latest;
+  const featureHref = normalizePublicHref(feature.href);
   articleRow.innerHTML = `
-    <article class="health-preview feature click-card" data-href="${escapeHTML(normalizePublicHref(feature.href))}" tabindex="0" role="link">
+    <a class="health-preview feature click-card" href="${escapeHTML(featureHref)}">
       <img ${healthArticleImageAttrs(feature, { usage: feature.imageUsage || "article_cover", focalPoint: feature.focalPoint })} />
       <div>
         <span>${escapeHTML(feature.category || "最新文章")}</span>
         <h3>${escapeHTML(feature.title)}</h3>
         <p>${escapeHTML(feature.subtitle || feature.excerpt || "")}</p>
-        <a href="${escapeHTML(normalizePublicHref(feature.href))}">閱讀更多</a>
+        <strong class="health-readmore">閱讀更多</strong>
       </div>
-    </article>
+    </a>
     <div class="mini-article-grid">
-      ${miniItems.map((post) => `
-        <article class="health-preview compact click-card" data-href="${escapeHTML(normalizePublicHref(post.href))}" tabindex="0" role="link">
+      ${miniItems.map((post) => {
+        const href = normalizePublicHref(post.href);
+        return `
+        <a class="health-preview compact click-card" href="${escapeHTML(href)}">
           <img ${healthArticleImageAttrs(post, { usage: "card", focalPoint: post.focalPoint })} />
           <div>
             <span>${escapeHTML(post.category || "照顧知識")}</span>
             <h3>${escapeHTML(post.title)}</h3>
-            <a href="${escapeHTML(normalizePublicHref(post.href))}">閱讀更多</a>
+            <strong class="health-readmore">閱讀更多</strong>
           </div>
-        </article>
-      `).join("")}
+        </a>
+      `;
+      }).join("")}
     </div>
   `;
   return true;
@@ -7254,20 +7274,20 @@ function getHealthSectionUrl(sectionKey, fallbackQuery) {
 function renderHealthMiniCard(article, label = article.category) {
   const href = normalizePublicHref(article.href);
   return `
-    <article class="health-pack-card click-card" data-href="${escapeHTML(href)}" tabindex="0" role="link">
+    <a class="health-pack-card click-card" href="${escapeHTML(href)}">
       <img ${healthArticleImageAttrs(article, { usage: "card", focalPoint: article.focalPoint })} />
       <div><span>${escapeHTML(label)}</span><h3>${escapeHTML(article.title)}</h3><p>${escapeHTML(article.subtitle || article.excerpt || "")}</p></div>
-    </article>
+    </a>
   `;
 }
 
 function renderHealthEventCard(article) {
   const href = normalizePublicHref(article.href);
   return `
-    <article class="health-event-card click-card" data-href="${escapeHTML(href)}" tabindex="0" role="link">
+    <a class="health-event-card click-card" href="${escapeHTML(href)}">
       <img ${healthArticleImageAttrs(article, { usage: "card", focalPoint: article.focalPoint })} />
       <div><time>${escapeHTML(article.date || "近期")}</time><h3>${escapeHTML(article.title)}</h3><p>${escapeHTML(article.subtitle || article.excerpt || "")}</p></div>
-    </article>
+    </a>
   `;
 }
 
@@ -7279,12 +7299,16 @@ function renderHealthVideoCard(article, label = article.category) {
       ? `<iframe src="${escapeHTML(article.videoEmbedUrl)}" title="${escapeHTML(article.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
       : `<video src="${escapeHTML(article.videoEmbedUrl)}" controls preload="metadata" poster="${escapeHTML(getHealthArticleImage(article))}"></video>`
     : `<img ${healthArticleImageAttrs(article, { usage: "card", focalPoint: article.focalPoint })} />`;
-  return `
-    <article class="health-video-card ${article.videoEmbedUrl ? "has-video" : "click-card"}" ${article.videoEmbedUrl ? "" : `data-href="${escapeHTML(href)}" tabindex="0" role="link"`}>
-      ${media}
-      <div><span>${escapeHTML(displayLabel)}${article.videoDuration ? ` · ${escapeHTML(article.videoDuration)}` : ""}</span><h3>${escapeHTML(article.title)}</h3>${article.videoCaption ? `<p>${escapeHTML(article.videoCaption)}</p>` : ""}<a href="${escapeHTML(href)}">閱讀更多 &gt;</a></div>
-    </article>
+  const readMore = article.videoEmbedUrl
+    ? `<a href="${escapeHTML(href)}">閱讀更多 &gt;</a>`
+    : `<strong class="health-video-readmore">閱讀更多 &gt;</strong>`;
+  const content = `
+    ${media}
+    <div><span>${escapeHTML(displayLabel)}${article.videoDuration ? ` · ${escapeHTML(article.videoDuration)}` : ""}</span><h3>${escapeHTML(article.title)}</h3>${article.videoCaption ? `<p>${escapeHTML(article.videoCaption)}</p>` : ""}${readMore}</div>
   `;
+  return article.videoEmbedUrl
+    ? `<article class="health-video-card has-video">${content}</article>`
+    : `<a class="health-video-card click-card" href="${escapeHTML(href)}">${content}</a>`;
 }
 
 function renderHealthPage(selectedCategorySlug = "") {
@@ -7329,26 +7353,26 @@ function renderHealthPage(selectedCategorySlug = "") {
 
       ${articles.length ? `
       <section class="health-board">
-        <article class="health-feature click-card" data-href="${escapeHTML(feature.href)}" tabindex="0" role="link">
+        <a class="health-feature click-card" href="${escapeHTML(normalizePublicHref(feature.href))}">
           <img ${healthArticleImageAttrs(feature, { usage: feature.imageUsage || "article_cover", focalPoint: feature.focalPoint })} />
           <div>
             <span class="health-tag">本週精選</span>
             <h2>${escapeHTML(feature.title)}</h2>
             <p>${escapeHTML(feature.subtitle || feature.excerpt)}</p>
-            <a class="health-readmore" href="${escapeHTML(feature.href)}">閱讀更多</a>
+            <strong class="health-readmore">閱讀更多</strong>
           </div>
-        </article>
+        </a>
 
         <div class="health-quick-grid">
           ${quickCards.map((post) => `
-            <article class="health-card click-card" data-href="${escapeHTML(post.href)}" tabindex="0" role="link">
+            <a class="health-card click-card" href="${escapeHTML(normalizePublicHref(post.href))}">
               <img ${healthArticleImageAttrs(post, { usage: "card", focalPoint: post.focalPoint })} />
               <div>
                 <span class="health-tag">${escapeHTML(post.category)}</span>
                 <h3>${escapeHTML(post.title)}</h3>
-                <a href="${escapeHTML(post.href)}">閱讀更多</a>
+                <strong class="health-readmore">閱讀更多</strong>
               </div>
-            </article>
+            </a>
           `).join("")}
         </div>
 
@@ -7375,7 +7399,7 @@ function renderHealthPage(selectedCategorySlug = "") {
         </div>
         <div class="health-latest-grid">
           ${latestCards.map((post) => `
-            <article class="health-list-card click-card" data-href="${escapeHTML(post.href)}" tabindex="0" role="link">
+            <a class="health-list-card click-card" href="${escapeHTML(normalizePublicHref(post.href))}">
               <img ${healthArticleImageAttrs(post, { usage: "article_cover", focalPoint: post.focalPoint })} />
               <div>
                 <span>${escapeHTML(post.category)}</span>
@@ -7383,7 +7407,7 @@ function renderHealthPage(selectedCategorySlug = "") {
                 <p>${escapeHTML(post.subtitle || post.excerpt)}</p>
                 <small>${escapeHTML(post.author)} · ${escapeHTML(post.date)}</small>
               </div>
-            </article>
+            </a>
           `).join("")}
         </div>
       </section>
@@ -7445,7 +7469,7 @@ function renderSearchPage(query = "") {
       </section>
       <section class="search-results">
         ${results.length ? results.map((post) => `
-          <article class="search-result-card click-card" data-href="${escapeHTML(post.href)}" tabindex="0" role="link">
+          <a class="search-result-card click-card" href="${escapeHTML(normalizePublicHref(post.href))}">
             <img ${healthArticleImageAttrs(post, { usage: "article_cover", focalPoint: post.focalPoint })} />
             <div>
               <span>${escapeHTML(post.category)}</span>
@@ -7453,7 +7477,7 @@ function renderSearchPage(query = "") {
               <p>${escapeHTML(post.subtitle || post.excerpt)}</p>
               <small>${escapeHTML(post.author)} · ${escapeHTML(post.date)}</small>
             </div>
-          </article>
+          </a>
         `).join("") : `
           <div class="search-empty">
             <h2>目前沒有找到相關內容</h2>
@@ -7701,11 +7725,11 @@ function renderCoursesPage() {
           </div>
         `}
       </section>
-      <div class="course-modal" id="courseSignupModal" hidden>
+      <div class="course-modal" id="courseSignupModal" hidden tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="courseSignupHeading">
         <form class="course-modal-card" id="courseSignupForm">
           <button class="course-modal-close" type="button" data-course-close aria-label="關閉報名視窗">×</button>
           <p class="eyebrow">Course Signup</p>
-          <h2>課程報名確認</h2>
+          <h2 id="courseSignupHeading">課程報名確認</h2>
           <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
           <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
           <label>您本次報名的課程<input name="課程" id="courseSignupTitle" type="text" readonly /></label>
@@ -11984,6 +12008,25 @@ document.querySelectorAll("[data-news-tab]").forEach((tab) => {
   });
 });
 
+let modalReturnFocus = null;
+
+function showFrontModal(modal, initialFocus) {
+  if (!modal) return;
+  modalReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  modal.hidden = false;
+  document.body.classList.add("modal-open");
+  initialFocus?.focus();
+}
+
+function hideFrontModal(modal) {
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.classList.remove("modal-open");
+  const returnTarget = modalReturnFocus;
+  modalReturnFocus = null;
+  if (returnTarget?.isConnected) returnTarget.focus();
+}
+
 function openCourseSignup(courseTitle = "", courseId = "") {
   const modal = document.querySelector("#courseSignupModal");
   const form = document.querySelector("#courseSignupForm");
@@ -11996,16 +12039,12 @@ function openCourseSignup(courseTitle = "", courseId = "") {
   titleInput.value = courseTitle;
   if (idInput) idInput.value = courseId;
   status.textContent = "";
-  modal.hidden = false;
-  document.body.classList.add("modal-open");
-  form.querySelector("input[name='姓名']")?.focus();
+  showFrontModal(modal, form.querySelector("input[name='姓名']"));
 }
 
 function closeCourseSignup() {
   const modal = document.querySelector("#courseSignupModal");
-  if (!modal) return;
-  modal.hidden = true;
-  document.body.classList.remove("modal-open");
+  hideFrontModal(modal);
 }
 
 function openRecruitApply(dataset = {}) {
@@ -12030,17 +12069,39 @@ function openRecruitApply(dataset = {}) {
   const context = document.querySelector("#recruitApplyContext");
   if (context) context.textContent = dataset.openingTitle || "職缺申請";
   if (status) status.textContent = "";
-  modal.hidden = false;
-  document.body.classList.add("modal-open");
-  form.querySelector("input[name='姓名']")?.focus();
+  showFrontModal(modal, form.querySelector("input[name='姓名']"));
 }
 
 function closeRecruitApply() {
   const modal = document.querySelector("#recruitApplyModal");
-  if (!modal) return;
-  modal.hidden = true;
-  document.body.classList.remove("modal-open");
+  hideFrontModal(modal);
 }
+
+document.addEventListener("keydown", (event) => {
+  const modal = document.querySelector(".course-modal:not([hidden])");
+  if (!modal) return;
+  if (event.key === "Escape") {
+    event.preventDefault();
+    if (modal.id === "recruitApplyModal") closeRecruitApply();
+    if (modal.id === "courseSignupModal") closeCourseSignup();
+    return;
+  }
+  if (event.key !== "Tab") return;
+
+  const focusable = [...modal.querySelectorAll(
+    'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled])'
+  )];
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
 
 function updateMilestoneProgress() {
   const journey = document.querySelector(".milestone-journey");
@@ -12336,7 +12397,7 @@ function selectTalentJob(board, jobId, options = {}) {
   cards.forEach((card) => {
     const isActive = Boolean(targetCard && card === targetCard);
     card.classList.toggle("is-active", isActive);
-    card.setAttribute("aria-selected", isActive ? "true" : "false");
+    card.querySelector("[data-talent-job-select]")?.setAttribute("aria-expanded", isActive ? "true" : "false");
   });
   board.querySelectorAll("[data-talent-job-detail]").forEach((panel) => {
     panel.hidden = !targetCard || panel.dataset.talentJobDetail !== targetCard.dataset.jobId;
@@ -12349,7 +12410,7 @@ function selectTalentJob(board, jobId, options = {}) {
     return;
   }
   board.dataset.activeJob = targetCard.dataset.jobId || "";
-  if (options.focus) targetCard.focus({ preventScroll: true });
+  if (options.focus) targetCard.querySelector("[data-talent-job-select]")?.focus({ preventScroll: true });
   if (options.scrollDetail && window.matchMedia("(min-width: 901px)").matches) {
     board.querySelector(".talent-job-detail")?.scrollIntoView({ block: "nearest", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }
@@ -12502,15 +12563,6 @@ document.addEventListener("keydown", (event) => {
   activateCareerTab(nextTab.dataset.careerTab, { focus: true });
 });
 
-document.addEventListener("keydown", (event) => {
-  if (event.key !== "Enter" && event.key !== " ") return;
-  const eventTarget = event.target instanceof Element ? event.target : null;
-  const jobCard = eventTarget?.closest("[data-talent-job-card]");
-  if (!jobCard || eventTarget?.closest("a, button, input, select, textarea")) return;
-  event.preventDefault();
-  selectTalentJob(jobCard.closest("[data-talent-job-board]"), jobCard.dataset.jobId, { focus: true, scrollDetail: true });
-});
-
 document.addEventListener("click", (event) => {
   const carouselButton = event.target.closest("[data-scroll-carousel]");
   if (carouselButton) {
@@ -12544,6 +12596,11 @@ document.addEventListener("click", (event) => {
   }
 
   const talentJobCard = event.target.closest("[data-talent-job-card]");
+  const talentJobSelect = event.target.closest("[data-talent-job-select]");
+  if (talentJobSelect && talentJobCard) {
+    selectTalentJob(talentJobCard.closest("[data-talent-job-board]"), talentJobCard.dataset.jobId, { focus: true, scrollDetail: true });
+    return;
+  }
   if (talentJobCard && !event.target.closest("a, button, input, select, textarea")) {
     selectTalentJob(talentJobCard.closest("[data-talent-job-board]"), talentJobCard.dataset.jobId, { scrollDetail: true });
     return;
