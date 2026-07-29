@@ -308,49 +308,6 @@
           </div>
         </section>
 
-        <section class="audience-path-section section section-tight-both reveal" aria-label="依需求快速進入">
-          <div class="section-head">
-            <div><p class="eyebrow">Start Here</p><h2>先選你現在最需要的下一步。</h2></div>
-          </div>
-          <div class="audience-path-grid compact">
-            <a class="audience-path-card featured" href="#contact" data-contact-need="長照服務諮詢" data-contact-message="我想了解長照服務，家中目前可能需要協助判斷居家照顧、日間照顧、社區據點、護理復能或喘息支持。">
-              <span>找照顧</span>
-              <strong>我正在幫家人找照顧服務</strong>
-              <p>不知道該申請哪一種服務也沒關係。先說明家中狀況、所在地區與最卡的照顧時段，歲悅會協助判斷下一步。</p>
-              <div class="audience-service-tags" aria-label="可協助判斷的服務">
-                <em>居家照顧</em>
-                <em>日間照顧</em>
-                <em>社區據點</em>
-                <em>護理復能</em>
-              </div>
-              <b>留下需求，請專人協助判斷</b>
-            </a>
-            <a class="audience-path-card course" href="/courses">
-              <span>找課程</span>
-              <strong>照顧者、移工或家屬想找課程</strong>
-              <p>照服員訓練、移工培訓、家屬照顧課與專業研習都集中在課程頁。</p>
-              <div class="audience-service-tags" aria-label="課程類型">
-                <em>照服員訓練</em>
-                <em>移工培訓</em>
-                <em>家屬照顧課</em>
-              </div>
-              <b>查看可報名課程</b>
-            </a>
-            <a class="audience-path-card partnership" href="#contact" data-contact-need="合作洽談" data-contact-message="我想了解歲悅長照集團的合作、人才、土地、網站行銷、系統後台或投資洽談，希望安排合適窗口進一步討論。">
-              <span>合作 / 加入</span>
-              <strong>我想與歲悅合作或加入團隊</strong>
-              <p>土地場域、人才招募、品牌行銷、系統導入、投資合作，都可以先留下合作方向。</p>
-              <div class="audience-service-tags" aria-label="合作類型">
-                <em>人才招募</em>
-                <em>土地合作</em>
-                <em>投資洽談</em>
-                <em>系統後台</em>
-              </div>
-              <b>留下合作需求</b>
-            </a>
-          </div>
-        </section>
-
         <section class="news-service-section section section-tight-both reveal" data-cms-section="updates">
           <div class="news-service-layout">
             <div class="news-panel">
@@ -778,6 +735,66 @@
       <section class="page detail-page" id="pageView" aria-live="polite"></section>
     </main>
 
+    <aside class="milk-helper" data-milk-helper aria-label="快速幫手">
+      <section
+        class="milk-helper-dialog"
+        id="milkHelperDialog"
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="milkHelperTitle"
+        hidden
+      >
+        <header class="milk-helper-dialog-head">
+          <div>
+            <p>快速幫手</p>
+            <h2 id="milkHelperTitle">今天想先找哪一項？</h2>
+          </div>
+          <button class="milk-helper-close" type="button" data-milk-helper-close aria-label="關閉快速幫手">
+            <span data-milk-helper-icon="close" aria-hidden="true"></span>
+          </button>
+        </header>
+        <nav class="milk-helper-actions" aria-label="快速服務選擇">
+          <a
+            href="#contact"
+            data-milk-helper-choice="care"
+            data-contact-need="長照服務諮詢"
+            data-contact-message="我想了解長照服務，家中目前可能需要協助判斷居家照顧、日間照顧、社區據點、護理復能或喘息支持。"
+          >
+            <span class="milk-helper-action-icon" data-milk-helper-icon="care" aria-hidden="true"></span>
+            <span><strong>尋找照顧服務</strong><small>請專人協助判斷適合的照顧方式</small></span>
+            <span class="milk-helper-action-arrow" data-milk-helper-icon="arrow" aria-hidden="true"></span>
+          </a>
+          <a href="/courses" data-milk-helper-choice="courses">
+            <span class="milk-helper-action-icon" data-milk-helper-icon="courses" aria-hidden="true"></span>
+            <span><strong>尋找課程</strong><small>照服員、移工與家屬照顧課程</small></span>
+            <span class="milk-helper-action-arrow" data-milk-helper-icon="arrow" aria-hidden="true"></span>
+          </a>
+          <a
+            href="#contact"
+            data-milk-helper-choice="partnership"
+            data-contact-need="合作洽談"
+            data-contact-message="我想了解歲悅長照集團的合作、人才、土地、網站行銷、系統後台或投資洽談，希望安排合適窗口進一步討論。"
+          >
+            <span class="milk-helper-action-icon" data-milk-helper-icon="partnership" aria-hidden="true"></span>
+            <span><strong>合作或加入歲悅</strong><small>人才、土地、投資與系統合作</small></span>
+            <span class="milk-helper-action-arrow" data-milk-helper-icon="arrow" aria-hidden="true"></span>
+          </a>
+        </nav>
+      </section>
+      <button
+        class="milk-helper-trigger"
+        type="button"
+        aria-label="開啟快速幫手"
+        aria-haspopup="dialog"
+        aria-controls="milkHelperDialog"
+        aria-expanded="false"
+        data-milk-helper-trigger
+      >
+        <span class="milk-helper-nudge" aria-hidden="true">點我點我</span>
+        <img src="assets/milk-assistant-transparent.png" alt="" width="500" height="500" />
+      </button>
+    </aside>
+
     <footer class="site-footer">
       <div class="footer-main">
         <div class="footer-contact">
@@ -797,6 +814,9 @@
 
     <script type="module">
       import("./app.js");
+      import("./milk-helper.js")
+        .then(({ initMilkHelper }) => initMilkHelper())
+        .catch((error) => console.warn("Milk helper unavailable.", error));
     </script>
   </body>
 </html>
