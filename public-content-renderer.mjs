@@ -136,7 +136,7 @@ function renderInlineImage(image = {}) {
   if (!image?.src) return "";
   return `
     <figure class="article-inline-image">
-      <img src="${escapePublicHtml(normalizePublicAssetUrl(image.src))}" alt="${escapePublicHtml(image.alt || image.caption || "健康3.0文章補充圖片")}" loading="lazy" decoding="async" />
+      <img src="${escapePublicHtml(normalizePublicAssetUrl(image.src))}" alt="${escapePublicHtml(image.alt || image.caption || "文章補充圖片")}" loading="lazy" decoding="async" />
       ${image.caption ? `<figcaption>${escapePublicHtml(image.caption)}</figcaption>` : ""}
     </figure>
   `;
@@ -226,7 +226,7 @@ function renderReferences(article = {}) {
 function renderTagLinks(tags = []) {
   return (Array.isArray(tags) ? tags : [])
     .filter(Boolean)
-    .map((tag) => `<a class="meta-tag" href="/search?q=${encodeURIComponent(String(tag).replace(/^#\s*/, "").trim())}" aria-label="搜尋 ${escapePublicHtml(tag)} 相關文章"># ${escapePublicHtml(tag)}</a>`)
+    .map((tag) => `<a class="meta-tag" href="/search?q=${encodeURIComponent(String(tag).replace(/^#\s*/, "").trim())}" aria-label="搜尋 ${escapePublicHtml(tag)}"># ${escapePublicHtml(tag)}</a>`)
     .join("");
 }
 
@@ -249,7 +249,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
   const hasSlideDeck = Boolean(options.slideDeckHtml);
   const isPptIconPack = article.visualFormat === "ppt-icon-pack";
   const image = normalizePublicAssetUrl(article.image);
-  const imageAlt = article.imageAlt || article.title || "健康3.0文章主圖";
+  const imageAlt = article.imageAlt || article.title || "文章主圖";
   const objectPosition = String(article.focalPoint || "center").replace(/[^a-z0-9% .-]/gi, "");
   const contentHtml = Array.isArray(article.content)
     ? article.content.map((section, index) => renderContentSection(section, index, article.inlineImages || [])).join("")

@@ -814,6 +814,9 @@
 
     <script type="module">
       import("./app.js");
+      import("./article-share.js")
+        .then(({ initArticleShare }) => initArticleShare())
+        .catch((error) => console.warn("Article sharing unavailable.", error));
       import("./milk-helper.js")
         .then(({ initMilkHelper }) => initMilkHelper())
         .catch((error) => console.warn("Milk helper unavailable.", error));
