@@ -3,7 +3,8 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const profileApi = require("../api/portal-finance-profile.js");
+const { createPortalApiHandler } = require("../api/portal-handoff.js");
+const profileApi = require("../server/portal-finance-profile.js");
 const {
   createPortalFinanceProfileHandler,
   financeConfiguration,
@@ -101,7 +102,7 @@ function financeRow(overrides = {}) {
 {
   const authCalls = [];
   const financeCalls = [];
-  const handler = createPortalFinanceProfileHandler({
+  const handler = createPortalApiHandler({
     environment,
     createPortalClient: portalClientFor(
       { id: "portal-user-id", email: portalEmail },
@@ -115,7 +116,7 @@ function financeRow(overrides = {}) {
   });
   const result = await invoke(handler, {
     method: "GET",
-    url: "https://login.suiyuecare.com/api/portal-finance-profile?email=attacker@suiyuecare.com",
+    url: "https://login.suiyuecare.com/api/portal-handoff?email=attacker@suiyuecare.com",
     headers: { authorization: `Bearer ${portalToken}` }
   });
 

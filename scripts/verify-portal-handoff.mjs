@@ -5,7 +5,7 @@ import vm from "node:vm";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { createPortalHandoffHandler } = require("../api/portal-handoff.js");
+const { createPortalApiHandler } = require("../api/portal-handoff.js");
 const { staticPortalModuleGrants } = require("../server/portal-module-policy.js");
 
 const portalToken = "portal-google-session";
@@ -94,7 +94,7 @@ function decodeSignedPayload(result) {
 }
 
 function handlerFor(user, overrides = {}) {
-  return createPortalHandoffHandler({
+  return createPortalApiHandler({
     environment,
     createPortalClient: portalClientFor(user, overrides.authError, overrides.authCalls),
     financeLookup: overrides.financeLookup || (async () => {
@@ -266,6 +266,22 @@ function handlerFor(user, overrides = {}) {
     body: "{not-json"
   });
   assert.equal(malformed.status, 400);
+}
+
+// The consolidated entrypoint exposes only the authenticated profile GET and
+// signed-handoff POST methods. Unsupported methods never reach Auth or Finance.
+{
+  const email = "entrepreneur@suiyuecare.com";
+  const authCalls = [];
+  const handler = handlerFor(verifiedGoogleUser(email), { authCalls });
+  const unsupported = await invoke(handler, {
+    method: "PUT",
+    headers: { authorization: `Bearer ${portalToken}` },
+    body: { payload: { moduleId: "apm", email } }
+  });
+  assert.equal(unsupported.status, 405);
+  assert.equal(unsupported.headers.getHeader("allow"), "GET, POST");
+  assert.deepEqual(authCalls, []);
 }
 
 console.log("ok - Portal handoff server authorization and direct escalation verifier passed");

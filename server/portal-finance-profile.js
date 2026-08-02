@@ -196,7 +196,7 @@ function projectSafeProfile(rows, expectedEmail) {
   }
 
   // Deliberately omit Finance role, approval, supervisor and Auth identifiers.
-  // This endpoint only proves that the signed-in person may reach APM.
+  // The public profile response only proves that the signed-in person may reach APM.
   return {
     source: "finance-apm-self",
     email,

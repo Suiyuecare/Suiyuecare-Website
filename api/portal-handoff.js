@@ -6,9 +6,10 @@ const {
   staticPortalGrantAllows
 } = require("../server/portal-module-policy.js");
 const {
+  createPortalFinanceProfileHandler,
   isConfirmedGoogleUser,
   lookupFinanceProfile
-} = require("./portal-finance-profile.js");
+} = require("../server/portal-finance-profile.js");
 
 const apmOrigin = "https://apm.suiyuecare.com";
 const apmWorkspacePaths = [
@@ -244,10 +245,28 @@ function createPortalHandoffHandler(dependencies = {}) {
   };
 }
 
-const handler = createPortalHandoffHandler();
+function createPortalApiHandler(dependencies = {}) {
+  const financeProfileHandler = createPortalFinanceProfileHandler(dependencies);
+  const handoffHandler = createPortalHandoffHandler(dependencies);
+
+  return async function handler(request, response) {
+    if (request.method === "GET") {
+      return financeProfileHandler(request, response);
+    }
+    if (request.method === "POST") {
+      return handoffHandler(request, response);
+    }
+
+    response.setHeader("Allow", "GET, POST");
+    return json(response, 405, { ok: false, message: "Method not allowed" });
+  };
+}
+
+const handler = createPortalApiHandler();
 
 module.exports = handler;
 module.exports.authorizeModule = authorizeModule;
+module.exports.createPortalApiHandler = createPortalApiHandler;
 module.exports.createPortalHandoffHandler = createPortalHandoffHandler;
 module.exports.normalizeApmReturnTo = normalizeApmReturnTo;
 module.exports.normalizePayload = normalizePayload;

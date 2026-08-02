@@ -227,6 +227,10 @@ function verifyApiSyntax() {
   const apiDir = path.resolve(root, "api");
   const files = fs.readdirSync(apiDir).filter((file) => file.endsWith(".js")).sort();
   assert(files.length > 0, "No API files found.");
+  assert(
+    files.length <= 12,
+    `Vercel Hobby supports at most 12 Serverless Functions; found ${files.length} API entrypoints.`
+  );
 
   for (const file of files) {
     run(process.execPath, ["--check", path.join(apiDir, file)]);
@@ -238,8 +242,13 @@ function verifyApiSyntax() {
 function verifyApmPortalHandoff() {
   const portal = readText("src/portal/login.js");
   const handoff = readText("api/portal-handoff.js");
-  const financeProfile = readText("api/portal-finance-profile.js");
+  const financeProfile = readText("server/portal-finance-profile.js");
   const modulePolicy = readText("server/portal-module-policy.js");
+
+  assert(
+    !fs.existsSync(path.join(root, "api/portal-finance-profile.js")),
+    "Finance profile must share the Portal handoff function, not consume a thirteenth API entrypoint."
+  );
 
   for (const expected of [
     'apm: "https://apm.suiyuecare.com/"',
@@ -275,7 +284,9 @@ function verifyApmPortalHandoff() {
     'apmWorkspacePaths.some((path)',
     'moduleId: "edoc"',
     "authUserId: user.id",
-    "isConfirmedGoogleUser(data.user, email)"
+    "isConfirmedGoogleUser(data.user, email)",
+    "createPortalFinanceProfileHandler(dependencies)",
+    'response.setHeader("Allow", "GET, POST")'
   ]) {
     assert(handoff.includes(expected), `Portal handoff guard is missing ${expected}.`);
   }
@@ -294,7 +305,7 @@ function verifyApmPortalHandoff() {
   );
 
   for (const expected of [
-    'fetch("/api/portal-finance-profile"',
+    'fetch("/api/portal-handoff", {\n    method: "GET"',
     'profile = await findFinanceApmProfile(data.session, email)',
     'financeApmOnly: true',
     'if (profile?.financeApmOnly) return module.id === "apm"',
@@ -302,6 +313,10 @@ function verifyApmPortalHandoff() {
   ]) {
     assert(portal.includes(expected), `Portal Finance fallback guard is missing ${expected}.`);
   }
+  assert(
+    !portal.includes("/api/portal-finance-profile"),
+    "Portal must use the consolidated handoff endpoint for Finance profile lookup."
+  );
   assert(
     !portal.includes("FINANCE_SOURCE_SECRET_KEY"),
     "Finance source secret must never be referenced by Portal client code."

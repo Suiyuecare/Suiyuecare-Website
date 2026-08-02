@@ -2509,7 +2509,7 @@ async function findFinanceApmProfile(session, expectedEmail) {
     throw error;
   }
 
-  const response = await fetch("/api/portal-finance-profile", {
+  const response = await fetch("/api/portal-handoff", {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store"
