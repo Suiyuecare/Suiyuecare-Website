@@ -1,18 +1,41 @@
 const crypto = require("crypto");
 const { createClient } = require("@supabase/supabase-js");
+const {
+  isSignedModule,
+  normalizeEmail,
+  staticPortalGrantAllows
+} = require("../server/portal-module-policy.js");
+const {
+  isConfirmedGoogleUser,
+  lookupFinanceProfile
+} = require("./portal-finance-profile.js");
 
-const allowedModules = new Set(["accounting", "apm", "edoc", "website-backoffice"]);
-const moduleDeniedEmails = new Map([
-  ["apm", new Set([
-    "investorrelations@suiyuecare.com",
-    "suiyue.acct@suiyuecare.com"
-  ])]
-]);
+const apmOrigin = "https://apm.suiyuecare.com";
+const apmWorkspacePaths = [
+  "/approvals",
+  "/calendar",
+  "/dashboard",
+  "/department",
+  "/kpi",
+  "/notifications",
+  "/projects",
+  "/settings",
+  "/tasks"
+];
+
+class SafeHttpError extends Error {
+  constructor(statusCode, message) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
 
 function json(response, statusCode, payload) {
   response.statusCode = statusCode;
   response.setHeader("Content-Type", "application/json; charset=utf-8");
   response.setHeader("Cache-Control", "no-store");
+  response.setHeader("Vary", "Authorization");
+  response.setHeader("X-Content-Type-Options", "nosniff");
   response.end(JSON.stringify(payload));
 }
 
@@ -20,56 +43,55 @@ function parseBody(body) {
   if (!body) return {};
   if (typeof body === "string") {
     if (body.length > 10_000) {
-      const error = new Error("Payload is too large.");
-      error.statusCode = 413;
-      throw error;
+      throw new SafeHttpError(413, "Payload is too large.");
     }
     try {
-      return JSON.parse(body);
+      const parsed = JSON.parse(body);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
     } catch {
-      return {};
+      throw new SafeHttpError(400, "Payload is not valid JSON.");
     }
   }
-  return body;
+  return typeof body === "object" && !Array.isArray(body) ? body : {};
 }
 
-function getSupabaseClient() {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const publishableKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+function getSupabaseClient(environment = process.env) {
+  const supabaseUrl = environment.SUPABASE_URL || environment.VITE_SUPABASE_URL;
+  const publishableKey = environment.VITE_SUPABASE_ANON_KEY || environment.SUPABASE_PUBLISHABLE_KEY;
   if (!supabaseUrl || !publishableKey) {
-    throw new Error("Missing Supabase public configuration.");
+    throw new SafeHttpError(503, "Portal authentication is not configured.");
   }
 
   return createClient(supabaseUrl, publishableKey, {
     auth: {
       persistSession: false,
-      autoRefreshToken: false
+      autoRefreshToken: false,
+      detectSessionInUrl: false
     }
   });
 }
 
 function bearerToken(request) {
-  const header = request.headers.authorization || "";
-  const match = header.match(/^Bearer\s+(.+)$/i);
-  return match?.[1] || "";
+  const header = request.headers?.authorization || request.headers?.Authorization || "";
+  return String(header).match(/^Bearer\s+([^\s]+)$/i)?.[1] || "";
 }
 
-async function requireUser(request) {
+async function requireUser(request, createPortalClient, environment) {
   const token = bearerToken(request);
   if (!token) {
-    const error = new Error("Missing bearer token.");
-    error.statusCode = 401;
-    throw error;
+    throw new SafeHttpError(401, "Portal session is required.");
   }
 
-  const supabase = getSupabaseClient();
+  const supabase = createPortalClient(environment);
   const { data, error } = await supabase.auth.getUser(token);
-  if (error || !data?.user) {
-    const authError = new Error(error?.message || "Invalid Portal session.");
-    authError.statusCode = 401;
-    throw authError;
+  const email = normalizeEmail(data?.user?.email);
+  if (error || !data?.user || !email) {
+    throw new SafeHttpError(401, "Portal session is invalid or expired.");
   }
-  return data.user;
+  if (!isConfirmedGoogleUser(data.user, email)) {
+    throw new SafeHttpError(403, "A confirmed Google identity is required.");
+  }
+  return { ...data.user, email };
 }
 
 function base64Url(value) {
@@ -80,14 +102,12 @@ function base64Url(value) {
     .replace(/=+$/g, "");
 }
 
-function signPayload(payload, moduleId) {
+function signPayload(payload, moduleId, environment = process.env) {
   const secret = moduleId === "apm"
-    ? process.env.APM_PORTAL_SIGNING_SECRET
-    : process.env.PORTAL_HANDOFF_SIGNING_SECRET || process.env.EDOC_PORTAL_HANDOFF_SECRET;
-  if (!secret || (moduleId === "apm" && Buffer.byteLength(secret, "utf8") < 32)) {
-    const error = new Error("Missing or insecure module handoff secret.");
-    error.statusCode = 503;
-    throw error;
+    ? environment.APM_PORTAL_SIGNING_SECRET
+    : environment.PORTAL_HANDOFF_SIGNING_SECRET || environment.EDOC_PORTAL_HANDOFF_SECRET;
+  if (!secret || Buffer.byteLength(secret, "utf8") < 32) {
+    throw new SafeHttpError(503, "Module handoff is not securely configured.");
   }
 
   const encodedPayload = base64Url(JSON.stringify(payload));
@@ -106,68 +126,128 @@ function signPayload(payload, moduleId) {
   };
 }
 
-function normalizePayload(rawPayload, user) {
+function normalizeApmReturnTo(rawReturnTo) {
+  const candidate = String(rawReturnTo || "/dashboard").trim();
+  if (
+    !candidate.startsWith("/")
+    || candidate.startsWith("//")
+    || candidate.includes("\\")
+    || candidate.length > 512
+    || /[\u0000-\u001f\u007f]/.test(candidate)
+  ) {
+    throw new SafeHttpError(400, "APM return path is invalid.");
+  }
+  const url = new URL(candidate, apmOrigin);
+  const allowed = url.origin === apmOrigin
+    && !url.hash
+    && apmWorkspacePaths.some((path) => url.pathname === path || url.pathname.startsWith(`${path}/`));
+  if (!allowed) {
+    throw new SafeHttpError(400, "APM return path is not allowed.");
+  }
+  return `${url.pathname}${url.search}`;
+}
+
+async function authorizeModule(moduleId, email, dependencies) {
+  if (!isSignedModule(moduleId)) {
+    throw new SafeHttpError(400, "Module is not allowed for Portal handoff.");
+  }
+  if (staticPortalGrantAllows(email, moduleId)) {
+    return "portal-static-roster";
+  }
+  if (moduleId !== "apm") {
+    throw new SafeHttpError(403, "This account is not authorized for this module.");
+  }
+
+  // Finance fallback identities are deliberately APM-only. Re-run the exact,
+  // server-side self lookup here so a caller cannot skip the Portal UI check.
+  await dependencies.financeLookup(email, dependencies.environment, dependencies.fetchImplementation);
+  return "finance-apm-self";
+}
+
+function normalizePayload(rawPayload, user, moduleId, issuedAt, randomUUID) {
   const payload = rawPayload && typeof rawPayload === "object" ? rawPayload : {};
-  const email = String(payload.email || "").trim().toLowerCase();
-  const userEmail = String(user.email || "").trim().toLowerCase();
-  if (!email || email !== userEmail) {
-    const error = new Error("Payload email does not match Portal session.");
-    error.statusCode = 403;
-    throw error;
+  const claimedEmail = normalizeEmail(payload.email);
+  if (claimedEmail && claimedEmail !== user.email) {
+    throw new SafeHttpError(403, "Payload email does not match Portal session.");
   }
 
-  const moduleId = String(payload.moduleId || "").trim();
-  if (!allowedModules.has(moduleId)) {
-    const error = new Error("Module is not allowed for Portal handoff.");
-    error.statusCode = 400;
-    throw error;
-  }
-  if (moduleDeniedEmails.get(moduleId)?.has(email)) {
-    const error = new Error("This account is not an active APM employee identity.");
-    error.statusCode = 403;
-    throw error;
-  }
-
-  const now = Math.floor(Date.now() / 1000);
+  const commonIdentity = {
+    email: user.email,
+    iat: issuedAt,
+    exp: issuedAt + 10 * 60,
+    jti: randomUUID()
+  };
   if (moduleId === "apm") {
     return {
-      email,
+      ...commonIdentity,
       aud: "apm",
-      iat: now,
-      exp: now + 10 * 60,
-      jti: crypto.randomUUID()
+      returnTo: normalizeApmReturnTo(payload.returnTo)
     };
   }
 
+  // EDOC receives only server-verified identity. It resolves role, department,
+  // approval scope and permissions from its Finance snapshot; no browser field
+  // is copied into the signed assertion.
   return {
-    ...payload,
+    ...commonIdentity,
     source: "logging-portal",
-    email,
-    authUserId: user.id,
-    iat: now,
-    exp: now + 10 * 60
+    aud: "edoc",
+    moduleId: "edoc",
+    authUserId: user.id
   };
 }
 
-module.exports = async function handler(request, response) {
-  if (request.method !== "POST") {
-    response.setHeader("Allow", "POST");
-    return json(response, 405, { ok: false, message: "Method not allowed" });
-  }
+function createPortalHandoffHandler(dependencies = {}) {
+  const environment = dependencies.environment || process.env;
+  const createPortalClient = dependencies.createPortalClient || getSupabaseClient;
+  const fetchImplementation = dependencies.fetchImplementation || fetch;
+  const financeLookup = dependencies.financeLookup || lookupFinanceProfile;
+  const now = dependencies.now || (() => Date.now());
+  const randomUUID = dependencies.randomUUID || crypto.randomUUID;
 
-  try {
-    const user = await requireUser(request);
-    const body = parseBody(request.body);
-    const moduleId = String(body?.payload?.moduleId || "").trim();
-    const payload = normalizePayload(body.payload, user);
-    return json(response, 200, {
-      ok: true,
-      ...signPayload(payload, moduleId)
-    });
-  } catch (error) {
-    return json(response, error.statusCode || 500, {
-      ok: false,
-      message: error.message || "Unable to create Portal handoff."
-    });
-  }
-};
+  return async function handler(request, response) {
+    if (request.method !== "POST") {
+      response.setHeader("Allow", "POST");
+      return json(response, 405, { ok: false, message: "Method not allowed" });
+    }
+
+    try {
+      const user = await requireUser(request, createPortalClient, environment);
+      const body = parseBody(request.body);
+      const rawPayload = body?.payload;
+      const moduleId = String(rawPayload?.moduleId || "").trim();
+      await authorizeModule(moduleId, user.email, {
+        environment,
+        fetchImplementation,
+        financeLookup
+      });
+      const payload = normalizePayload(
+        rawPayload,
+        user,
+        moduleId,
+        Math.floor(now() / 1000),
+        randomUUID
+      );
+      return json(response, 200, {
+        ok: true,
+        ...signPayload(payload, moduleId, environment)
+      });
+    } catch (error) {
+      const safeError = error?.statusCode
+        ? error
+        : new SafeHttpError(500, "Unable to create Portal handoff.");
+      return json(response, safeError.statusCode, {
+        ok: false,
+        message: safeError.message
+      });
+    }
+  };
+}
+
+const handler = createPortalHandoffHandler();
+
+module.exports = handler;
+module.exports.authorizeModule = authorizeModule;
+module.exports.createPortalHandoffHandler = createPortalHandoffHandler;
+module.exports.normalizeApmReturnTo = normalizeApmReturnTo;
+module.exports.normalizePayload = normalizePayload;

@@ -25,6 +25,7 @@ const permissionAuditStorageKey = "suiyuecare.portal.permissionAudit";
 const portalHomePath = "/portal/";
 const portalProductionOrigin = "https://login.suiyuecare.com";
 const portalOAuthBridgeOrigin = "https://suiyuecare-website.vercel.app";
+let activeSessionProfile = null;
 
 const systemAnnouncementsModule = { id: "announcements", number: "0", name: "系統公告" };
 
@@ -396,15 +397,20 @@ const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
 const signedHandoffModuleIds = new Set(["edoc", "apm"]);
 const postHandoffModuleIds = new Set(["apm"]);
-const moduleDeniedEmails = new Map([
-  ["apm", new Set([
-    "investorrelations@suiyuecare.com",
-    "suiyue.acct@suiyuecare.com"
-  ])]
-]);
 const externalLaunchOrigins = new Map(
   Object.entries(moduleLaunchUrls).map(([moduleId, launchUrl]) => [new URL(launchUrl).origin, moduleId])
 );
+const apmWorkspacePaths = [
+  "/approvals",
+  "/calendar",
+  "/dashboard",
+  "/department",
+  "/kpi",
+  "/notifications",
+  "/projects",
+  "/settings",
+  "/tasks"
+];
 
 async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
   const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
@@ -431,7 +437,9 @@ async function launchConnectedModule(moduleId, profile, launchUrlOverride = "", 
   if (!launchUrl) return false;
 
   if (postHandoffModuleIds.has(moduleId)) {
-    const signedHandoff = await createSignedModuleHandoff(buildModuleLaunchPayload(moduleId, profile));
+    const signedHandoff = await createSignedModuleHandoff(
+      buildModuleLaunchPayload(moduleId, profile, moduleReturnPath(moduleId, launchUrl))
+    );
     submitSignedModuleHandoff(moduleId, launchUrl, signedHandoff);
     return true;
   }
@@ -467,7 +475,25 @@ function submitSignedModuleHandoff(moduleId, launchUrl, signedHandoff) {
   form.submit();
 }
 
-function buildModuleLaunchPayload(moduleId, profile) {
+function moduleReturnPath(moduleId, rawLaunchUrl) {
+  if (moduleId !== "apm") return "";
+  const configuredUrl = new URL(moduleLaunchUrls.apm);
+  const url = new URL(rawLaunchUrl, configuredUrl);
+  if (url.origin !== configuredUrl.origin || url.username || url.password || url.hash) {
+    throw new Error("APM 返回網址不在允許清單內。");
+  }
+  const path = url.pathname === "/" ? "/dashboard" : url.pathname;
+  if (!apmWorkspacePaths.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) {
+    throw new Error("APM 返回頁面不在允許清單內。");
+  }
+  const returnTo = `${path}${url.search}`;
+  if (returnTo.length > 512 || returnTo.includes("\\") || /[\u0000-\u001f\u007f]/.test(returnTo)) {
+    throw new Error("APM 返回網址格式無效。");
+  }
+  return returnTo;
+}
+
+function buildModuleLaunchPayload(moduleId, profile, returnTo = "") {
   const sourceRoleKey = profile.sourceProfileId || profile.roleKey || profile.id;
   const modulePermissions = getModulePermissionForProfile(moduleId, profile);
   const organization = getProfileOrganization(profile);
@@ -492,6 +518,7 @@ function buildModuleLaunchPayload(moduleId, profile) {
     actions: modulePermissions.actions,
     moduleActions: modulePermissions.actions,
     modulePermissions,
+    ...(moduleId === "apm" ? { returnTo: returnTo || "/dashboard" } : {}),
     ...organization,
     launchedAt: new Date().toISOString()
   };
@@ -2451,6 +2478,12 @@ function securityRestrictionMatchesQuery(row, query) {
 function getStoredProfile() {
   const profileId = window.localStorage.getItem(storageKey);
   const storedEmail = window.localStorage.getItem(storageEmailKey);
+  if (
+    activeSessionProfile?.id === profileId
+    && normalizeEmail(activeSessionProfile.email) === normalizeEmail(storedEmail)
+  ) {
+    return activeSessionProfile;
+  }
   const profile = getRoleProfile(profileId) || getEmployeeProfileById(profileId);
   if (!profile || !storedEmail) return profile;
   return { ...profile, email: storedEmail };
@@ -2468,12 +2501,70 @@ function findProfileByEmail(email) {
   return null;
 }
 
+async function findFinanceApmProfile(session, expectedEmail) {
+  const token = session?.access_token;
+  if (!token) {
+    const error = new Error("Portal 登入階段已失效，請重新登入。");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const response = await fetch("/api/portal-finance-profile", {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store"
+  });
+  const result = await response.json().catch(() => ({}));
+  if (response.status === 403) return null;
+  if (!response.ok || !result.ok) {
+    const error = new Error(
+      response.status === 401
+        ? "Portal 登入階段已失效，請重新登入。"
+        : "Portal 人員資料暫時無法確認，請稍後再試。"
+    );
+    error.statusCode = response.status;
+    throw error;
+  }
+
+  const source = result.profile;
+  const email = normalizeEmail(source?.email);
+  const allowedModules = Array.isArray(source?.allowedModules) ? source.allowedModules : [];
+  if (
+    source?.source !== "finance-apm-self"
+    || email !== normalizeEmail(expectedEmail)
+    || !source?.displayName
+    || !source?.jobTitle
+    || allowedModules.length !== 1
+    || allowedModules[0] !== "apm"
+  ) {
+    const error = new Error("Portal 人員資料格式無效，請聯絡系統管理員。");
+    error.statusCode = 502;
+    throw error;
+  }
+
+  return {
+    id: "finance-apm-self",
+    label: String(source.displayName),
+    title: String(source.jobTitle),
+    email,
+    scope: "self",
+    modules: ["apm"],
+    sourceProfileId: "finance-apm-member",
+    accountStatus: "啟用",
+    departmentCode: String(source.departmentCode || ""),
+    note: "Finance 正式人員｜僅開放 APM",
+    financeApmOnly: true
+  };
+}
+
 function setStoredProfile(profile) {
+  activeSessionProfile = profile;
   window.localStorage.setItem(storageKey, profile.id);
   window.localStorage.setItem(storageEmailKey, profile.email);
 }
 
 function clearStoredProfile() {
+  activeSessionProfile = null;
   window.localStorage.removeItem(storageKey);
   window.localStorage.removeItem(storageEmailKey);
 }
@@ -2573,7 +2664,18 @@ async function applyGoogleSession() {
     return null;
   }
 
-  const profile = findProfileByEmail(email);
+  let profile = findProfileByEmail(email);
+  if (!profile) {
+    try {
+      profile = await findFinanceApmProfile(data.session, email);
+    } catch (profileError) {
+      clearStoredProfile();
+      if (profileError.statusCode === 401) await supabase.auth.signOut();
+      renderSession(null);
+      setStatus(profileError.message, "error");
+      return null;
+    }
+  }
   if (!profile) {
     clearStoredProfile();
     await supabase.auth.signOut();
@@ -2594,9 +2696,8 @@ function modulePermissionAllowsRole(moduleId, roleId) {
 }
 
 function moduleIsAllowed(module, profile) {
+  if (profile?.financeApmOnly) return module.id === "apm";
   const profileRoleId = profile.sourceProfileId || profile.id;
-  const deniedEmails = moduleDeniedEmails.get(module.id);
-  if (deniedEmails?.has(normalizeEmail(profile.email))) return false;
   if (module.id === "general-affairs") return true;
   if (sharedGeneralAffairsModules.has(module.id)) return true;
   if (restrictedGeneralAffairsModules.has(module.id)) {
@@ -2614,6 +2715,14 @@ function getModuleAccessState(module, profile) {
   const hasOpenChild = hasChildren && module.children.some(
     (child) => temporarilyOpenModuleIds.has(child.id) && moduleIsAllowed(child, profile)
   );
+
+  if (profile?.financeApmOnly && !allowed) {
+    return {
+      allowed: false,
+      actionText: "此帳號無權限",
+      status: "denied"
+    };
+  }
 
   if (hasChildren && !hasOpenChild) {
     return {
@@ -5318,6 +5427,10 @@ systemAnnouncementsButton?.addEventListener("click", () => {
     return;
   }
   const accessState = getModuleAccessState(systemAnnouncementsModule, profile);
+  if (!accessState.allowed) {
+    setStatus("系統公告：此帳號無權限。", "error");
+    return;
+  }
   if (accessState.status === "building") {
     setStatus("系統公告正在努力製作中。", "info");
     return;

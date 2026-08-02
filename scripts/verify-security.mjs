@@ -3,7 +3,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
-const sensitiveMarkerPattern = /SUPABASE_SERVICE_ROLE_KEY|RESEND_API_KEY|OPENAI_API_KEY|CRON_SECRET|REPORT_CRON_SECRET|STATUS_SECRET|ADMIN_API_SECRET|service_role|saveWarning|emailSetupRequired/;
+const sensitiveMarkerPattern = /SUPABASE_SERVICE_ROLE_KEY|FINANCE_SOURCE_SECRET_KEY|RESEND_API_KEY|OPENAI_API_KEY|CRON_SECRET|REPORT_CRON_SECRET|STATUS_SECRET|ADMIN_API_SECRET|service_role|saveWarning|emailSetupRequired/;
 const cspValue = "object-src 'none'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests";
 const textFilePattern = /\.(js|mjs|cjs|html|css|json|txt|xml|svg|map)$/i;
 const htmlNoCacheValue = "no-cache, no-store, must-revalidate";
@@ -238,17 +238,23 @@ function verifyApiSyntax() {
 function verifyApmPortalHandoff() {
   const portal = readText("src/portal/login.js");
   const handoff = readText("api/portal-handoff.js");
+  const financeProfile = readText("api/portal-finance-profile.js");
+  const modulePolicy = readText("server/portal-module-policy.js");
 
   for (const expected of [
     'apm: "https://apm.suiyuecare.com/"',
     'const postHandoffModuleIds = new Set(["apm"])',
     'form.action = new URL("/api/auth/handoff", configuredUrl).toString()',
-    '"project_you@suiyuecare.com"',
-    '"investorrelations@suiyuecare.com"',
-    '"suiyue.acct@suiyuecare.com"'
+    'moduleReturnPath(moduleId, launchUrl)',
+    'returnTo: returnTo || "/dashboard"',
+    '"project_you@suiyuecare.com"'
   ]) {
     assert(portal.includes(expected), `Portal APM launch contract is missing ${expected}.`);
   }
+  assert(
+    !portal.includes("const moduleDeniedEmails"),
+    "Portal must not hardcode employee-level APM denials; APM HR membership is authoritative."
+  );
   assert(
     !portal.includes('"project_pan@suiyuecare.com", "職員"'),
     "Departed project_pan must not remain an enabled Portal employee row."
@@ -260,16 +266,71 @@ function verifyApmPortalHandoff() {
   );
 
   for (const expected of [
-    'const allowedModules = new Set(["accounting", "apm", "edoc", "website-backoffice"])',
-    'process.env.APM_PORTAL_SIGNING_SECRET',
-    '"investorrelations@suiyuecare.com"',
-    '"suiyue.acct@suiyuecare.com"',
-    'error.statusCode = 403'
+    "isSignedModule(moduleId)",
+    "staticPortalGrantAllows(email, moduleId)",
+    'if (moduleId !== "apm")',
+    "await dependencies.financeLookup(email",
+    "environment.APM_PORTAL_SIGNING_SECRET",
+    'returnTo: normalizeApmReturnTo(payload.returnTo)',
+    'apmWorkspacePaths.some((path)',
+    'moduleId: "edoc"',
+    "authUserId: user.id",
+    "isConfirmedGoogleUser(data.user, email)"
   ]) {
     assert(handoff.includes(expected), `Portal handoff guard is missing ${expected}.`);
   }
+  assert(
+    !handoff.includes("moduleDeniedEmails")
+      && !handoff.includes('"investorrelations@suiyuecare.com"')
+      && !handoff.includes('"suiyue.acct@suiyuecare.com"')
+      && !handoff.includes("...payload"),
+    "Portal handoff must use server grants and must not copy browser authorization fields."
+  );
+  assert(
+    modulePolicy.includes('const signedModuleIds = new Set(["apm", "edoc"])')
+      && !modulePolicy.includes('"accounting"')
+      && !modulePolicy.includes('"website-backoffice"'),
+    "Only APM and EDOC may consume signed Portal assertions."
+  );
 
-  log("APM secure POST launch and stale identity guards are present");
+  for (const expected of [
+    'fetch("/api/portal-finance-profile"',
+    'profile = await findFinanceApmProfile(data.session, email)',
+    'financeApmOnly: true',
+    'if (profile?.financeApmOnly) return module.id === "apm"',
+    'modules: ["apm"]'
+  ]) {
+    assert(portal.includes(expected), `Portal Finance fallback guard is missing ${expected}.`);
+  }
+  assert(
+    !portal.includes("FINANCE_SOURCE_SECRET_KEY"),
+    "Finance source secret must never be referenced by Portal client code."
+  );
+
+  for (const expected of [
+    "FINANCE_SOURCE_SUPABASE_URL",
+    "FINANCE_SOURCE_SECRET_KEY",
+    "portalClient.auth.getUser(token)",
+    'url.searchParams.set("email", `eq.${email}`)',
+    'url.searchParams.set("active", "eq.true")',
+    'url.searchParams.set("org_status", "eq.active")',
+    'url.searchParams.set("org_source", `eq.${financeRosterSource}`)',
+    'const financeProjectRef = "udtlppnrugmtzhigdsxo"',
+    'allowedModules: ["apm"]',
+    "isConfirmedGoogleUser(data.user, email)",
+    'configuration.isOpaqueSecret ? {} : { Authorization: `Bearer ${configuration.key}` }'
+  ]) {
+    assert(financeProfile.includes(expected), `Finance self-profile API guard is missing ${expected}.`);
+  }
+  assert(
+    !financeProfile.includes("user_metadata") && !financeProfile.includes("raw_user_meta_data"),
+    "Finance self-profile lookup must use the verified Auth user email, not editable metadata."
+  );
+
+  run(process.execPath, ["scripts/verify-portal-finance-profile.mjs"]);
+  run(process.execPath, ["scripts/verify-portal-handoff.mjs"]);
+
+  log("APM/EDOC server-authorized handoff and Finance APM-only fallback are present");
 }
 
 function verifyDist() {
