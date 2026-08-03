@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
@@ -268,6 +269,7 @@ function verifyApmPortalHandoff() {
     'role="status"',
     'aria-live="polite"',
     'aria-labelledby="moduleLaunchLoadingTitle"',
+    'src="/assets/milk-favicon.png?v=20260716-transparent"',
     'id="moduleLaunchRecoveryButton"',
     'hidden',
     '正在進入 APM',
@@ -275,6 +277,13 @@ function verifyApmPortalHandoff() {
   ]) {
     assert(portalMarkup.includes(expected), `Portal APM loading markup is missing ${expected}.`);
   }
+  const mascotPath = path.join(root, "public/assets/milk-favicon.png");
+  assert(fs.existsSync(mascotPath), "Portal APM loading mascot asset is missing.");
+  const mascotHash = createHash("sha256").update(fs.readFileSync(mascotPath)).digest("hex");
+  assert(
+    mascotHash === "e7a06615f58398b1bd4cf9c7007ef66523f124602e6c48089d9f790886f11187",
+    "Portal APM loading mascot must remain the approved transparent plush icon."
+  );
   for (const expected of [
     ".module-launch-loading",
     "linear-gradient(135deg, #fffaf2, #f8ead8)",
