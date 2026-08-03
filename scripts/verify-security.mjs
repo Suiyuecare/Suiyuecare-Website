@@ -241,6 +241,8 @@ function verifyApiSyntax() {
 
 function verifyApmPortalHandoff() {
   const portal = readText("src/portal/login.js");
+  const portalMarkup = readText("portal/index.html");
+  const portalStyles = readText("src/portal/portal.css");
   const handoff = readText("api/portal-handoff.js");
   const financeProfile = readText("server/portal-finance-profile.js");
   const modulePolicy = readText("server/portal-module-policy.js");
@@ -259,6 +261,74 @@ function verifyApmPortalHandoff() {
     '"project_you@suiyuecare.com"'
   ]) {
     assert(portal.includes(expected), `Portal APM launch contract is missing ${expected}.`);
+  }
+
+  for (const expected of [
+    'id="moduleLaunchLoading"',
+    'role="status"',
+    'aria-live="polite"',
+    'aria-labelledby="moduleLaunchLoadingTitle"',
+    'id="moduleLaunchRecoveryButton"',
+    'hidden',
+    '正在進入 APM',
+    '確認完成後會直接開啟 APM 工作台。'
+  ]) {
+    assert(portalMarkup.includes(expected), `Portal APM loading markup is missing ${expected}.`);
+  }
+  for (const expected of [
+    ".module-launch-loading",
+    "linear-gradient(135deg, #fffaf2, #f8ead8)",
+    "#ea880c",
+    ".module-launch-recovery",
+    "animation: module-launch-loading 1.1s ease-in-out infinite alternate",
+    "@media (prefers-reduced-motion: reduce)"
+  ]) {
+    assert(portalStyles.includes(expected), `Portal APM loading style is missing ${expected}.`);
+  }
+
+  const connectedLaunchStart = portal.indexOf("if (connectedModuleIds.has(module.id))");
+  const connectedLaunchLoading = portal.indexOf("showModuleLaunchLoading(module.id, button)", connectedLaunchStart);
+  const connectedLaunchAwait = portal.indexOf("await launchConnectedModule(module.id, profile)", connectedLaunchStart);
+  assert(
+    connectedLaunchStart >= 0
+      && connectedLaunchLoading > connectedLaunchStart
+      && connectedLaunchLoading < connectedLaunchAwait,
+    "Portal must show the APM loading screen before awaiting the signed handoff."
+  );
+  const requestedLaunchStart = portal.indexOf("async function launchRequestedModuleIfReady");
+  const requestedLaunchLoading = portal.indexOf("showModuleLaunchLoading(request.moduleId)", requestedLaunchStart);
+  const requestedLaunchAwait = portal.indexOf("await launchConnectedModule(request.moduleId", requestedLaunchStart);
+  assert(
+    requestedLaunchStart >= 0
+      && requestedLaunchLoading > requestedLaunchStart
+      && requestedLaunchLoading < requestedLaunchAwait,
+    "Portal must show the APM loading screen before an automatic signed handoff."
+  );
+  assert(
+    portal.includes('window.addEventListener("pageshow", (event) => {')
+      && portal.includes("if (event.persisted) hideModuleLaunchLoading();"),
+    "Portal must clear a stale APM loading screen when restored from the back-forward cache."
+  );
+  assert(
+    portal.includes("showModuleLaunchLoading(requestedModuleId, portalGoogleLoginButton);")
+      && portal.includes('} catch (error) {\n    hideModuleLaunchLoading(requestedModuleId);\n    portalGoogleLoginButton.disabled = false;'),
+    "Portal must preserve the APM loading screen across Google OAuth startup and recover on failure."
+  );
+  assert(
+    portal.includes('function hideModuleLaunchLoading(moduleId = "apm")')
+      && portal.includes("hideModuleLaunchLoading(module.id);")
+      && portal.includes("hideModuleLaunchLoading(request.moduleId);"),
+    "Only the APM launch that owns the loading screen may clear it."
+  );
+  for (const expected of [
+    'portalShell?.setAttribute("inert", "")',
+    'portalShell?.removeAttribute("inert")',
+    "startModuleLaunchRecoveryTimer()",
+    'moduleLaunchRecoveryButton?.addEventListener("click"',
+    "const controller = new AbortController()",
+    "signal: controller.signal"
+  ]) {
+    assert(portal.includes(expected), `Portal APM loading recovery is missing ${expected}.`);
   }
   assert(
     !portal.includes("const moduleDeniedEmails"),
