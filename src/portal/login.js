@@ -15,6 +15,11 @@ const organizationChart = document.querySelector("#organizationChart");
 const signedInOrganizationChart = document.querySelector("#signedInOrganizationChart");
 const portalGoogleLoginButton = document.querySelector("#portalGoogleLoginButton");
 const systemAnnouncementsButton = document.querySelector("#systemAnnouncementsButton");
+const portalShell = document.querySelector(".portal-shell");
+const moduleLaunchLoading = document.querySelector("#moduleLaunchLoading");
+const moduleLaunchLoadingTitle = document.querySelector("#moduleLaunchLoadingTitle");
+const moduleLaunchLoadingDescription = document.querySelector("#moduleLaunchLoadingDescription");
+const moduleLaunchRecoveryButton = document.querySelector("#moduleLaunchRecoveryButton");
 
 const storageKey = "suiyuecare.portal.profile";
 const storageEmailKey = "suiyuecare.portal.email";
@@ -26,6 +31,8 @@ const portalHomePath = "/portal/";
 const portalProductionOrigin = "https://login.suiyuecare.com";
 const portalOAuthBridgeOrigin = "https://suiyuecare-website.vercel.app";
 let activeSessionProfile = null;
+let activeModuleLaunchButton = null;
+let moduleLaunchRecoveryTimer = null;
 
 const systemAnnouncementsModule = { id: "announcements", number: "0", name: "系統公告" };
 
@@ -411,6 +418,65 @@ const apmWorkspacePaths = [
   "/settings",
   "/tasks"
 ];
+const moduleLaunchDefaultTitle = "正在進入 APM";
+const moduleLaunchDefaultDescription = "系統正在確認你的登入狀態，確認完成後會直接開啟 APM 工作台。";
+const moduleLaunchRecoveryDelayMs = 30_000;
+const moduleLaunchRequestTimeoutMs = 20_000;
+
+function startModuleLaunchRecoveryTimer() {
+  if (moduleLaunchRecoveryTimer) window.clearTimeout(moduleLaunchRecoveryTimer);
+  moduleLaunchRecoveryTimer = window.setTimeout(() => {
+    if (moduleLaunchLoading?.hidden) return;
+    if (moduleLaunchLoadingTitle) moduleLaunchLoadingTitle.textContent = "APM 連線時間較久";
+    if (moduleLaunchLoadingDescription) {
+      moduleLaunchLoadingDescription.textContent = "你可以再稍候一下，或回到模組頁後重新開啟 APM。";
+    }
+    if (moduleLaunchRecoveryButton) moduleLaunchRecoveryButton.hidden = false;
+  }, moduleLaunchRecoveryDelayMs);
+}
+
+function resetModuleLaunchLoadingContent() {
+  if (moduleLaunchRecoveryTimer) window.clearTimeout(moduleLaunchRecoveryTimer);
+  moduleLaunchRecoveryTimer = null;
+  if (moduleLaunchLoadingTitle) moduleLaunchLoadingTitle.textContent = moduleLaunchDefaultTitle;
+  if (moduleLaunchLoadingDescription) moduleLaunchLoadingDescription.textContent = moduleLaunchDefaultDescription;
+  if (moduleLaunchRecoveryButton) moduleLaunchRecoveryButton.hidden = true;
+}
+
+function showModuleLaunchLoading(moduleId, trigger = null) {
+  if (moduleId !== "apm" || !moduleLaunchLoading) return;
+
+  if (activeModuleLaunchButton && activeModuleLaunchButton !== trigger) {
+    activeModuleLaunchButton.removeAttribute("aria-busy");
+  }
+  activeModuleLaunchButton = trigger instanceof HTMLButtonElement ? trigger : null;
+  if (activeModuleLaunchButton) {
+    activeModuleLaunchButton.disabled = true;
+    activeModuleLaunchButton.setAttribute("aria-busy", "true");
+  }
+  portalShell?.setAttribute("aria-busy", "true");
+  portalShell?.setAttribute("inert", "");
+  document.body.classList.add("is-module-launching");
+  resetModuleLaunchLoadingContent();
+  moduleLaunchLoading.hidden = false;
+  startModuleLaunchRecoveryTimer();
+}
+
+function hideModuleLaunchLoading(moduleId = "apm") {
+  if (moduleId !== "apm") return;
+  const triggerToRestore = activeModuleLaunchButton;
+  resetModuleLaunchLoadingContent();
+  moduleLaunchLoading?.setAttribute("hidden", "");
+  document.body.classList.remove("is-module-launching");
+  portalShell?.removeAttribute("aria-busy");
+  portalShell?.removeAttribute("inert");
+  if (activeModuleLaunchButton) {
+    activeModuleLaunchButton.disabled = false;
+    activeModuleLaunchButton.removeAttribute("aria-busy");
+    activeModuleLaunchButton = null;
+  }
+  triggerToRestore?.focus({ preventScroll: true });
+}
 
 async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
   const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
@@ -591,14 +657,25 @@ async function createSignedModuleHandoff(payload) {
     throw new Error(error?.message || "Portal 登入階段已失效，請重新登入。");
   }
 
-  const response = await fetch("/api/portal-handoff", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ payload })
-  });
+  const controller = new AbortController();
+  const requestTimer = window.setTimeout(() => controller.abort(), moduleLaunchRequestTimeoutMs);
+  let response;
+  try {
+    response = await fetch("/api/portal-handoff", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ payload }),
+      signal: controller.signal
+    });
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error("模組登入連線逾時，請重新開啟。");
+    throw error;
+  } finally {
+    window.clearTimeout(requestTimer);
+  }
   const result = await response.json().catch(() => ({}));
   if (!response.ok || !result.ok) {
     if (response.status === 401) {
@@ -2633,13 +2710,16 @@ async function launchRequestedModuleIfReady(profile) {
     setStatus(`${module?.name || request.moduleId}：此帳號無權限。`, "error");
     return false;
   }
+  showModuleLaunchLoading(request.moduleId);
   setStatus(`正在啟動 ${getModuleDisplayName(module)}...`, "info");
   try {
     window.sessionStorage.removeItem(pendingModuleLaunchKey);
     if (await launchConnectedModule(request.moduleId, profile, request.returnTo, "replace")) return true;
   } catch (error) {
+    hideModuleLaunchLoading(request.moduleId);
     setStatus(`${getModuleDisplayName(module)} 啟動失敗：${error.message}`, "error");
   }
+  hideModuleLaunchLoading(request.moduleId);
   return false;
 }
 
@@ -2874,15 +2954,18 @@ function createModuleButton(module, profile) {
     }
 
     if (connectedModuleIds.has(module.id)) {
+      showModuleLaunchLoading(module.id, button);
       button.disabled = true;
       setStatus(`正在啟動 ${getModuleDisplayName(module)}...`, "info");
       try {
         if (await launchConnectedModule(module.id, profile)) return;
       } catch (error) {
+        hideModuleLaunchLoading(module.id);
         button.disabled = false;
         setStatus(`${getModuleDisplayName(module)} 啟動失敗：${error.message}`, "error");
         return;
       }
+      hideModuleLaunchLoading(module.id);
       button.disabled = false;
     }
 
@@ -5404,10 +5487,12 @@ function renderSecurityRestrictionTool(profile) {
 
 async function bootPortalLogin() {
   rememberRequestedModuleLaunch();
+  const requestedLaunch = consumeRequestedModuleLaunch();
+  showModuleLaunchLoading(requestedLaunch?.moduleId);
   renderOrganizationChart(organizationChart);
   renderSession(null);
   const profile = await applyGoogleSession();
-  await launchRequestedModuleIfReady(profile);
+  if (!(await launchRequestedModuleIfReady(profile))) hideModuleLaunchLoading(requestedLaunch?.moduleId);
 }
 
 signOutButton?.addEventListener("click", () => {
@@ -5451,26 +5536,43 @@ portalGoogleLoginButton?.addEventListener("click", async () => {
     return;
   }
 
+  const requestedModuleId = consumeRequestedModuleLaunch()?.moduleId;
+  showModuleLaunchLoading(requestedModuleId, portalGoogleLoginButton);
   portalGoogleLoginButton.disabled = true;
   setStatus("正在前往 Google 登入...", "info");
 
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo,
-      queryParams: {
-        access_type: "offline",
-        prompt: "select_account"
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo,
+        queryParams: {
+          access_type: "offline",
+          prompt: "select_account"
+        }
       }
-    }
-  });
+    });
 
-  if (error) {
+    if (error) throw error;
+  } catch (error) {
+    hideModuleLaunchLoading(requestedModuleId);
     portalGoogleLoginButton.disabled = false;
-    setStatus(`Google 登入失敗：${error.message}`, "error");
+    const message = error instanceof Error ? error.message : "未知錯誤";
+    setStatus(`Google 登入失敗：${message}`, "error");
   }
 });
 
+moduleLaunchRecoveryButton?.addEventListener("click", () => {
+  window.sessionStorage.removeItem(pendingModuleLaunchKey);
+  hideModuleLaunchLoading();
+  window.location.assign(portalHomePath);
+});
+
 bootPortalLogin().catch((error) => {
+  hideModuleLaunchLoading();
   setStatus(`入口網登入狀態檢查失敗：${error.message}`, "error");
+});
+
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) hideModuleLaunchLoading();
 });

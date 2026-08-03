@@ -94,6 +94,25 @@
       <p class="login-status" id="loginStatus" role="status"></p>
     </main>
 
+    <div
+      class="module-launch-loading"
+      id="moduleLaunchLoading"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-labelledby="moduleLaunchLoadingTitle"
+      aria-describedby="moduleLaunchLoadingDescription"
+      hidden
+    >
+      <div class="module-launch-loading-card">
+        <img class="module-launch-loading-logo" src="/assets/company-logo.png" alt="" />
+        <strong id="moduleLaunchLoadingTitle">正在進入 APM</strong>
+        <span id="moduleLaunchLoadingDescription">系統正在確認你的登入狀態，確認完成後會直接開啟 APM 工作台。</span>
+        <div class="module-launch-loading-bar" aria-hidden="true"><b></b></div>
+        <button class="module-launch-recovery" id="moduleLaunchRecoveryButton" type="button" hidden>回到模組頁</button>
+      </div>
+    </div>
+
     <script type="module" src="/src/portal/login.js"></script>
   </body>
 </html>
