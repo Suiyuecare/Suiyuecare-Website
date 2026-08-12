@@ -272,8 +272,8 @@ function verifyApmPortalHandoff() {
     'src="/assets/milk-favicon.png?v=20260716-transparent"',
     'id="moduleLaunchRecoveryButton"',
     'hidden',
-    '正在進入 APM',
-    '確認完成後會直接開啟 APM 工作台。'
+    '正在進入敏捷專案管理系統',
+    '確認完成後會直接開啟敏捷專案管理系統。'
   ]) {
     assert(portalMarkup.includes(expected), `Portal APM loading markup is missing ${expected}.`);
   }
@@ -352,6 +352,12 @@ function verifyApmPortalHandoff() {
       && portal.includes('"信義失智據點課", "本課", "停用"'),
     "Vacant daycare.xinyi account must stay disabled."
   );
+  assert(
+    portal.includes('"尤䅍笙", "homecare.taipei2@suiyuecare.com"')
+      && portal.includes('"林瓊芠", "daycare.wanhua@suiyuecare.com"')
+      && !portal.includes('[35, "林方春"'),
+    "Portal current personnel labels must match the Finance active roster."
+  );
 
   for (const expected of [
     "isSignedModule(moduleId)",
@@ -408,7 +414,7 @@ function verifyApmPortalHandoff() {
     'url.searchParams.set("email", `eq.${email}`)',
     'url.searchParams.set("active", "eq.true")',
     'url.searchParams.set("org_status", "eq.active")',
-    'url.searchParams.set("org_source", `eq.${financeRosterSource}`)',
+    'url.searchParams.set("org_source", `in.(${financeRosterSources.join(",")})`)',
     'const financeProjectRef = "udtlppnrugmtzhigdsxo"',
     'allowedModules: ["apm"]',
     "isConfirmedGoogleUser(data.user, email)",

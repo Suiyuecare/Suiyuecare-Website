@@ -136,14 +136,14 @@ function normalizeApmReturnTo(rawReturnTo) {
     || candidate.length > 512
     || /[\u0000-\u001f\u007f]/.test(candidate)
   ) {
-    throw new SafeHttpError(400, "APM return path is invalid.");
+    throw new SafeHttpError(400, "敏捷專案管理系統返回路徑無效。");
   }
   const url = new URL(candidate, apmOrigin);
   const allowed = url.origin === apmOrigin
     && !url.hash
     && apmWorkspacePaths.some((path) => url.pathname === path || url.pathname.startsWith(`${path}/`));
   if (!allowed) {
-    throw new SafeHttpError(400, "APM return path is not allowed.");
+    throw new SafeHttpError(400, "敏捷專案管理系統返回路徑不在允許清單內。");
   }
   return `${url.pathname}${url.search}`;
 }

@@ -126,7 +126,10 @@ function financeRow(overrides = {}) {
   assert.equal(financeCalls[0].url.searchParams.get("email"), `eq.${portalEmail}`);
   assert.equal(financeCalls[0].url.searchParams.get("active"), "eq.true");
   assert.equal(financeCalls[0].url.searchParams.get("org_status"), "eq.active");
-  assert.equal(financeCalls[0].url.searchParams.get("org_source"), "eq.pptx_org_chart_20260728");
+  assert.equal(
+    financeCalls[0].url.searchParams.get("org_source"),
+    "in.(pptx_org_chart_20260728,personnel_management)"
+  );
   assert.equal(financeCalls[0].init.cache, "no-store");
   assert.ok(financeCalls[0].init.signal instanceof AbortSignal);
   assert.equal(financeCalls[0].init.headers.apikey, financeSecret);
@@ -255,6 +258,26 @@ function financeRow(overrides = {}) {
     () => projectSafeProfile([financeRow({ email: "different@suiyuecare.com" })], portalEmail),
     /invalid employee profile/
   );
+}
+
+{
+  const profile = projectSafeProfile([
+    financeRow({
+      org_source: "personnel_management",
+      email: "homecare.taipei2@suiyuecare.com"
+    })
+  ], "homecare.taipei2@suiyuecare.com");
+  assert.equal(profile.email, "homecare.taipei2@suiyuecare.com");
+  assert.deepEqual(profile.allowedModules, ["apm"]);
+}
+
+{
+  for (const forbiddenSource of ["preexisting_finance_runtime", null]) {
+    assert.throws(
+      () => projectSafeProfile([financeRow({ org_source: forbiddenSource })], portalEmail),
+      /invalid employee profile/
+    );
+  }
 }
 
 function legacyServiceRoleKey(ref) {
