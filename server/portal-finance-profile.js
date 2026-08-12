@@ -1,6 +1,6 @@
 const { createClient } = require("@supabase/supabase-js");
 
-const financeRosterSource = "pptx_org_chart_20260728";
+const financeRosterSources = ["pptx_org_chart_20260728", "personnel_management"];
 const financeProjectRef = "udtlppnrugmtzhigdsxo";
 const financeSupabaseHost = `${financeProjectRef}.supabase.co`;
 const financeRequestTimeoutMs = 10_000;
@@ -157,7 +157,7 @@ function financeProfileUrl(configuration, email) {
   url.searchParams.set("email", `eq.${email}`);
   url.searchParams.set("active", "eq.true");
   url.searchParams.set("org_status", "eq.active");
-  url.searchParams.set("org_source", `eq.${financeRosterSource}`);
+  url.searchParams.set("org_source", `in.(${financeRosterSources.join(",")})`);
   url.searchParams.set("limit", "2");
   return url;
 }
@@ -190,7 +190,7 @@ function projectSafeProfile(rows, expectedEmail) {
     && /^[A-Za-z0-9_-]+$/.test(departmentCode)
     && row?.active === true
     && row?.org_status === "active"
-    && row?.org_source === financeRosterSource;
+    && financeRosterSources.includes(row?.org_source);
   if (!valid) {
     throw new SafeHttpError(502, "Finance profile source returned an invalid employee profile.");
   }

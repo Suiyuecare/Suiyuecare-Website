@@ -61,7 +61,7 @@ const modules = [
       { id: "pdf-editor", number: "5-5", name: "PDF 編輯器" }
     ]
   },
-  { id: "apm", number: "6", name: "APM 績效與任務管理" },
+  { id: "apm", number: "6", name: "敏捷專案管理系統" },
   { id: "website-backoffice", number: "7", name: "網站後台管理" }
 ];
 
@@ -233,7 +233,7 @@ const moduleOrgRules = {
   "system-permissions": { owner: "it-class", scope: "custom", policy: "資訊課維護帳號，不預設看敏感內容" },
   "organization-chart": { owner: "it-class", scope: "company", policy: "依組織節點檢視公司架構" },
   "employee-accounts": { owner: "it-class", scope: "custom", policy: "員工帳號與登入狀態管理" },
-  apm: { owner: "group", scope: "company", policy: "實際資料與簽核權限由 APM 依組織主管鏈控管" },
+  apm: { owner: "group", scope: "company", policy: "實際資料與簽核權限由敏捷專案管理系統依組織主管鏈控管" },
   "website-backoffice": { owner: "it-class", scope: "company", policy: "網站內容、發布流程與後台編輯權限" },
   "pdf-editor": { owner: "it-class", scope: "assigned", policy: "已授權使用者可用" }
 };
@@ -348,7 +348,7 @@ const moduleDisplayNames = {
   business: "照顧服務",
   "home-care": "居家照顧",
   "day-care": "日間照顧",
-  apm: "APM 績效與任務管理"
+  apm: "敏捷專案管理系統"
 };
 
 const ownerDisplayNames = {
@@ -386,7 +386,7 @@ const moduleIcons = {
   "system-permissions": "權限",
   "organization-chart": "組織",
   "employee-accounts": "帳號",
-  apm: "APM",
+  apm: "專案",
   "website-backoffice": "後台",
   "pdf-editor": "PDF"
 };
@@ -418,8 +418,8 @@ const apmWorkspacePaths = [
   "/settings",
   "/tasks"
 ];
-const moduleLaunchDefaultTitle = "正在進入 APM";
-const moduleLaunchDefaultDescription = "系統正在確認你的登入狀態，確認完成後會直接開啟 APM 工作台。";
+const moduleLaunchDefaultTitle = "正在進入敏捷專案管理系統";
+const moduleLaunchDefaultDescription = "系統正在確認你的登入狀態，確認完成後會直接開啟敏捷專案管理系統。";
 const moduleLaunchRecoveryDelayMs = 30_000;
 const moduleLaunchRequestTimeoutMs = 20_000;
 
@@ -427,9 +427,9 @@ function startModuleLaunchRecoveryTimer() {
   if (moduleLaunchRecoveryTimer) window.clearTimeout(moduleLaunchRecoveryTimer);
   moduleLaunchRecoveryTimer = window.setTimeout(() => {
     if (moduleLaunchLoading?.hidden) return;
-    if (moduleLaunchLoadingTitle) moduleLaunchLoadingTitle.textContent = "APM 連線時間較久";
+    if (moduleLaunchLoadingTitle) moduleLaunchLoadingTitle.textContent = "敏捷專案管理系統連線時間較久";
     if (moduleLaunchLoadingDescription) {
-      moduleLaunchLoadingDescription.textContent = "你可以再稍候一下，或回到模組頁後重新開啟 APM。";
+      moduleLaunchLoadingDescription.textContent = "你可以再稍候一下，或回到模組頁後重新開啟敏捷專案管理系統。";
     }
     if (moduleLaunchRecoveryButton) moduleLaunchRecoveryButton.hidden = false;
   }, moduleLaunchRecoveryDelayMs);
@@ -546,15 +546,15 @@ function moduleReturnPath(moduleId, rawLaunchUrl) {
   const configuredUrl = new URL(moduleLaunchUrls.apm);
   const url = new URL(rawLaunchUrl, configuredUrl);
   if (url.origin !== configuredUrl.origin || url.username || url.password || url.hash) {
-    throw new Error("APM 返回網址不在允許清單內。");
+    throw new Error("敏捷專案管理系統返回網址不在允許清單內。");
   }
   const path = url.pathname === "/" ? "/dashboard" : url.pathname;
   if (!apmWorkspacePaths.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) {
-    throw new Error("APM 返回頁面不在允許清單內。");
+    throw new Error("敏捷專案管理系統返回頁面不在允許清單內。");
   }
   const returnTo = `${path}${url.search}`;
   if (returnTo.length > 512 || returnTo.includes("\\") || /[\u0000-\u001f\u007f]/.test(returnTo)) {
-    throw new Error("APM 返回網址格式無效。");
+    throw new Error("敏捷專案管理系統返回網址格式無效。");
   }
   return returnTo;
 }
@@ -698,7 +698,7 @@ const employeeAccountRows = [
   [6, "朱夏欣", "generalaffairs@suiyuecare.com", "課長", "總務課長", "行政部", "歲悅股份有限公司", "臺北市、新北市、桃園市", "總務課", "本課", "啟用"],
   [7, "李佳泰", "investorrelations@suiyuecare.com", "部長", "投資人關係部", "投資人關係部", "歲悅股份有限公司", "臺北市、新北市、桃園市", "未設定", "本部門", "啟用"],
   [8, "黃致皓", "homecare.taipei@suiyuecare.com", "部長", "機構業務負責人、社區據點部長", "居家照顧部", "臺北市私立歲悅居家長照機構", "臺北市", "居家服務課", "本部門", "啟用"],
-  [9, "尤䅍笙", "未設定", "課長", "業務助理", "居家照顧部", "臺北市私立歲悅居家長照機構", "臺北市", "居家服務課", "本課", "待補帳號"],
+  [9, "尤䅍笙", "homecare.taipei2@suiyuecare.com", "職員", "臺北居家服務課專員", "居家照顧部", "臺北市私立歲悅居家長照機構", "臺北市", "居家服務課", "個人與指派", "啟用"],
   [10, "邱若欣", "未設定", "組長", "居家服務督導", "居家照顧部", "臺北市私立歲悅居家長照機構", "臺北市", "居家服務課", "負責項目", "待補帳號"],
   [11, "黃鈺姃", "未設定", "組長", "居家服務督導", "居家照顧部", "臺北市私立歲悅居家長照機構", "臺北市", "居家服務課", "負責項目", "待補帳號"],
   [12, "陳弘敏", "未設定", "組長", "居家服務督導", "居家照顧部", "臺北市私立歲悅居家長照機構", "臺北市", "居家服務課", "負責項目", "待補帳號"],
@@ -724,7 +724,7 @@ const employeeAccountRows = [
   [32, "黃琪瑩", "未設定", "職員", "居家照顧服務員", "居家照顧部", "臺北市私立歲悅居家長照機構", "臺北市", "居家服務課", "個人與指派", "待補帳號"],
   [33, "董思偉", "未設定", "職員", "居家照顧服務員", "居家照顧部", "臺北市私立歲悅居家長照機構", "臺北市", "居家服務課", "個人與指派", "待補帳號"],
   [34, "廖云榛", "未設定", "職員", "居家照顧服務員", "居家照顧部", "臺北市私立歲悅居家長照機構", "臺北市", "居家服務課", "個人與指派", "待補帳號"],
-  [35, "林方春", "未設定", "課長", "機構業務負責人", "日間照顧部", "歲悅萬華社區長照機構", "臺北市", "萬華一課", "本部門", "待補帳號"],
+  [35, "林瓊芠", "daycare.wanhua@suiyuecare.com", "課長", "萬華一館課主管", "日間照顧部", "歲悅萬華社區長照機構", "臺北市", "萬華一課", "本部門", "啟用"],
   [36, "徐靜紅", "未設定", "職員", "照顧服務員", "日間照顧部", "歲悅萬華社區長照機構", "臺北市", "萬華一課", "個人與指派", "待補帳號"],
   [37, "黃苗溶", "未設定", "職員", "照顧服務員", "日間照顧部", "歲悅萬華社區長照機構", "臺北市", "萬華一課", "個人與指派", "待補帳號"],
   [38, "從缺", "未設定", "課長", "機構業務負責人", "日間照顧部", "歲悅萬華二館社區長照機構", "臺北市", "萬華二課", "本部門", "待補帳號"],
@@ -1340,7 +1340,7 @@ const modulePermissionDefinitions = [
     roles: ["board", "shareholder", "ceo", "region-manager", "admin-director", "hr-chief", "accounting-chief", "cashier-chief", "ga-chief", "business-director", "section-chief", "team-lead", "staff"],
     actions: ["view", "create", "edit", "submit", "approve", "reject", "assign", "print"],
     sensitivity: "績效 / 內部專案",
-    limits: "所有已啟用員工可進入 APM；角色、部門、主管鏈與簽核操作仍由 APM 後端權限控管。"
+    limits: "所有已啟用員工可進入敏捷專案管理系統；角色、部門、主管鏈與簽核操作仍由系統後端權限控管。"
   },
   {
     moduleId: "general-affairs",
@@ -2629,7 +2629,7 @@ async function findFinanceApmProfile(session, expectedEmail) {
     sourceProfileId: "finance-apm-member",
     accountStatus: "啟用",
     departmentCode: String(source.departmentCode || ""),
-    note: "Finance 正式人員｜僅開放 APM",
+    note: "Finance 正式人員｜僅開放敏捷專案管理系統",
     financeApmOnly: true
   };
 }

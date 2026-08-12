@@ -12,6 +12,8 @@ const staticPortalModuleGrants = new Map([
   ["generalaffairs@suiyuecare.com", new Set(["apm", "edoc"])],
   ["investorrelations@suiyuecare.com", new Set(["apm", "edoc"])],
   ["homecare.taipei@suiyuecare.com", new Set(["apm", "edoc"])],
+  ["homecare.taipei2@suiyuecare.com", new Set(["apm", "edoc"])],
+  ["daycare.wanhua@suiyuecare.com", new Set(["apm", "edoc"])],
   ["daycare.shilin@suiyuecare.com", new Set(["apm", "edoc"])],
   ["daycare.datong@suiyuecare.com", new Set(["apm", "edoc"])],
   ["edu.control@suiyuecare.com", new Set(["apm", "edoc"])],
