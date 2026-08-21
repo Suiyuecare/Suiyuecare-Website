@@ -1,7 +1,13 @@
 import { supabase, supabaseStorageBuckets } from "../lib/supabaseClient.js";
 import { prepareImageForUpload, uploadImageToMedia } from "./media-utils.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
-import { canEditScope, canPublishScope, contentDeleteMessage, contentSaveMessage } from "./content-scope.js";
+import {
+  canEditScope,
+  canPublishScope,
+  contentDeleteMessage,
+  contentSaveMessage,
+  isEducationCourseManager
+} from "./content-scope.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
 
 const shell = document.querySelector(".admin-app-shell");
@@ -24,10 +30,10 @@ const signupProcessForm = document.querySelector("#courseSignupProcessForm");
 const signupDetailTitle = document.querySelector("#courseSignupDetailTitle");
 const signupDetailBox = document.querySelector("#courseSignupDetailBox");
 const signupTimeline = document.querySelector("#courseSignupTimeline");
+const internalSignupsPanel = document.querySelector("[data-course-internal-signups]");
 const courseCountTargets = {
   published: document.querySelector('[data-course-count="published"]'),
-  featured: document.querySelector('[data-course-count="featured"]'),
-  draft: document.querySelector('[data-course-count="draft"]'),
+  pending: document.querySelector('[data-course-count="pending"]'),
   total: document.querySelector('[data-course-count="total"]')
 };
 
@@ -35,6 +41,7 @@ let courses = [];
 let courseSignups = [];
 let selectedCourseSignup = null;
 let adminPermissions = {};
+let courseManagerMode = false;
 const courseScope = "courses";
 const courseFormsScope = "forms:courses";
 let courseCoverById = new Map();
@@ -70,6 +77,35 @@ function slugify(value = "") {
     .slice(0, 80) || `course-${Date.now()}`;
 }
 
+function normalizeRegistrationUrl(value = "", { googleOnly = false } = {}) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  let url;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new Error("報名網址格式不正確，請貼上完整的 https:// 網址。");
+  }
+  if (url.protocol !== "https:") {
+    throw new Error("報名網址必須使用 https:// 安全連線。");
+  }
+  const isGoogleForm = url.hostname === "forms.gle"
+    || (url.hostname === "docs.google.com" && url.pathname.startsWith("/forms/"));
+  if (googleOnly && !isGoogleForm) {
+    throw new Error("請貼上 Google 表單網址（forms.gle 或 docs.google.com/forms）。");
+  }
+  return url.href;
+}
+
+function validatedRegistrationUrl() {
+  const value = form.elements.registration_url.value;
+  const normalized = normalizeRegistrationUrl(value, { googleOnly: courseManagerMode });
+  if (courseManagerMode && form.elements.registration_status.value === "open" && !normalized) {
+    throw new Error("課程目前是「開放報名」，請先貼上 Google 報名表單網址。");
+  }
+  return normalized || null;
+}
+
 function toDatetimeLocal(value) {
   if (!value) return "";
   const date = new Date(value);
@@ -88,7 +124,13 @@ function fromLocalDateTimeInput(value) {
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 }
 
-function renderStatusBadge(status) {
+function renderStatusBadge(status, course = {}) {
+  if (course._pending_delete) {
+    return `<span class="admin-publish-badge" data-status="pending">等待審核下架</span>`;
+  }
+  if (course._pending_review) {
+    return `<span class="admin-publish-badge" data-status="pending">等待執行長審核</span>`;
+  }
   const labels = { draft: "草稿", published: "已發布", scheduled: "排程", archived: "封存" };
   return `<span class="admin-publish-badge" data-status="${escapeHTML(status || "draft")}">${escapeHTML(labels[status] || status || "草稿")}</span>`;
 }
@@ -129,16 +171,14 @@ function renderCoverPreview(course = null) {
 
 function renderCourses() {
   if (!tableBody) return;
-  const published = courses.filter((course) => course.status === "published" && course.is_enabled).length;
-  const featured = courses.filter((course) => course.is_featured && course.status === "published" && course.is_enabled).length;
-  const draft = courses.filter((course) => course.status !== "published" || !course.is_enabled).length;
+  const published = courses.filter((course) => course.status === "published" && course.is_enabled && !course._pending_delete).length;
+  const pending = courses.filter((course) => course._pending_review).length;
   if (courseCountTargets.published) courseCountTargets.published.textContent = published;
-  if (courseCountTargets.featured) courseCountTargets.featured.textContent = featured;
-  if (courseCountTargets.draft) courseCountTargets.draft.textContent = draft;
+  if (courseCountTargets.pending) courseCountTargets.pending.textContent = pending;
   if (courseCountTargets.total) courseCountTargets.total.textContent = courses.length;
 
   if (!courses.length) {
-    tableBody.innerHTML = `<tr><td colspan="6"><div class="admin-empty-state">目前沒有課程。請在左側填寫課程名稱、日期、地點、價格與封面圖，儲存為「已發布」後前台會自動出現。</div></td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="5"><div class="admin-empty-state">目前沒有課程。填寫左側資料並送出後，執行長核准就會出現在官網。</div></td></tr>`;
     return;
   }
 
@@ -149,13 +189,12 @@ function renderCourses() {
       <td>
         <div class="admin-table-media-cell">
           ${cover?.public_url ? `<img src="${escapeHTML(cover.public_url)}" alt="${escapeHTML(cover.alt_text || course.title || "課程封面")}" />` : `<span aria-hidden="true">CS</span>`}
-          <div><strong>${escapeHTML(course.title)}</strong><small>${escapeHTML(course.excerpt || course.slug)}</small></div>
+          <div><strong>${escapeHTML(course.title)}</strong><small>${escapeHTML(course._pending_review ? "這是目前送審中的版本" : course.excerpt || course.slug)}</small></div>
         </div>
       </td>
       <td><time>${course.starts_at ? formatUpdatedAt(course.starts_at) : "未設定"}</time></td>
-      <td>${escapeHTML(course.course_type || "-")}</td>
-      <td>${renderStatusBadge(course.status)}</td>
-      <td>${course.is_featured ? "重要課程" : "一般"}</td>
+      <td>${renderStatusBadge(course.status, course)}</td>
+      <td>${course.registration_url ? "Google 表單" : course.registration_status === "open" ? "尚未設定" : "尚未開放"}</td>
       <td>
         <div class="admin-table-actions">
           <button type="button" data-edit-course="${escapeHTML(course.id)}">${canEditScope(adminPermissions, courseScope) ? "編輯" : "查看"}</button>
@@ -271,7 +310,8 @@ function resetForm() {
   form.elements.id.value = "";
   form.elements.cover_image_id.value = "";
   form.elements.is_enabled.checked = true;
-  form.elements.status.value = "draft";
+  form.elements.status.value = "published";
+  form.elements.sort_order.value = "0";
   formTitle.textContent = "新增課程";
   renderCoverPreview();
 }
@@ -294,25 +334,56 @@ function fillForm(course) {
   form.elements.seats_label.value = course.seats_label || "";
   form.elements.sort_order.value = course.sort_order ?? 0;
   form.elements.registration_url.value = course.registration_url || "";
-  form.elements.status.value = course.status || "draft";
+  form.elements.status.value = course.status || "published";
   form.elements.is_featured.checked = Boolean(course.is_featured);
   form.elements.is_enabled.checked = Boolean(course.is_enabled);
   formTitle.textContent = `編輯：${course.title}`;
   renderCoverPreview(course);
+  syncRegistrationUrlRequirement();
 }
 
 async function loadCourses() {
   setStatus("正在讀取課程資料...", "info");
   refreshButton?.setAttribute("disabled", "true");
   try {
-    const { data, error } = await supabase
-      .from("courses")
-      .select("*")
-      .order("is_featured", { ascending: false })
-      .order("sort_order", { ascending: true })
-      .order("starts_at", { ascending: true, nullsFirst: false });
-    if (error) throw error;
-    courses = data || [];
+    const [courseResult, pendingResult] = await Promise.all([
+      supabase
+        .from("courses")
+        .select("*")
+        .order("is_featured", { ascending: false })
+        .order("sort_order", { ascending: true })
+        .order("starts_at", { ascending: true, nullsFirst: false }),
+      supabase
+        .from("publish_requests")
+        .select("id,entity_id,change_action,proposed_snapshot,requested_at")
+        .eq("entity_table", "courses")
+        .eq("status", "pending")
+        .order("requested_at", { ascending: false })
+    ]);
+    if (courseResult.error) throw courseResult.error;
+    if (pendingResult.error) throw pendingResult.error;
+
+    const courseMap = new Map((courseResult.data || []).map((course) => [course.id, course]));
+    (pendingResult.data || []).forEach((request) => {
+      const current = courseMap.get(request.entity_id) || {};
+      const proposed = request.proposed_snapshot && typeof request.proposed_snapshot === "object"
+        ? request.proposed_snapshot
+        : {};
+      courseMap.set(request.entity_id, {
+        ...current,
+        ...proposed,
+        id: request.entity_id,
+        _pending_review: true,
+        _pending_delete: request.change_action === "delete",
+        _publish_request_id: request.id
+      });
+    });
+    courses = [...courseMap.values()].sort((a, b) => {
+      if (Boolean(a.is_featured) !== Boolean(b.is_featured)) return a.is_featured ? -1 : 1;
+      const sortDifference = Number(a.sort_order || 0) - Number(b.sort_order || 0);
+      if (sortDifference) return sortDifference;
+      return String(a.starts_at || "9999").localeCompare(String(b.starts_at || "9999"));
+    });
     const coverIds = [...new Set(courses.map((course) => course.cover_image_id).filter(Boolean))];
     if (coverIds.length) {
       const { data: coverRows, error: coverError } = await supabase
@@ -389,7 +460,7 @@ async function uploadCoverIfNeeded() {
 }
 
 function buildPayload(coverImageId) {
-  const status = form.elements.status.value || "draft";
+  const status = form.elements.is_enabled.checked ? "published" : "archived";
   return {
     title: form.elements.title.value.trim(),
     slug: slugify(form.elements.slug.value || form.elements.title.value),
@@ -404,7 +475,7 @@ function buildPayload(coverImageId) {
     capacity: form.elements.capacity.value ? Number(form.elements.capacity.value) : null,
     seats_label: form.elements.seats_label.value.trim() || null,
     registration_status: form.elements.registration_status.value,
-    registration_url: form.elements.registration_url.value.trim() || null,
+    registration_url: validatedRegistrationUrl(),
     cover_image_id: coverImageId,
     sort_order: Number(form.elements.sort_order.value || 0),
     is_featured: form.elements.is_featured.checked,
@@ -432,11 +503,15 @@ async function saveCourse(event) {
     const { data, error } = await query.select("id").maybeSingle();
     if (error) throw error;
     if (data?.id) form.elements.id.value = data.id;
-    setStatus(contentSaveMessage(adminPermissions, courseScope, "課程"), "success");
+    const savedId = data?.id || form.elements.id.value;
+    await loadCourses();
     if (canPublishScope(adminPermissions, courseScope)) {
       resetForm();
-      await loadCourses();
+    } else {
+      const pendingCourse = courses.find((course) => course.id === savedId);
+      if (pendingCourse) fillForm(pendingCourse);
     }
+    setStatus(contentSaveMessage(adminPermissions, courseScope, "課程"), "success");
   } catch (error) {
     console.error("Failed to save course", error);
     setStatus(`儲存課程失敗：${error.message}`, "error");
@@ -456,8 +531,8 @@ async function deleteCourse(id) {
   try {
     const { error } = await supabase.from("courses").delete().eq("id", id).select("id").maybeSingle();
     if (error) throw error;
+    await loadCourses();
     setStatus(contentDeleteMessage(adminPermissions, courseScope, "課程"), "success");
-    if (canPublishScope(adminPermissions, courseScope)) await loadCourses();
   } catch (error) {
     console.error("Failed to delete course", error);
     setStatus(`刪除課程失敗：${error.message}`, "error");
@@ -534,12 +609,19 @@ async function saveCourseSignupProcess(event) {
   }
 }
 
+function syncRegistrationUrlRequirement() {
+  const input = form?.elements.registration_url;
+  if (!input) return;
+  input.required = courseManagerMode && form.elements.registration_status.value === "open";
+}
+
 form?.addEventListener("submit", saveCourse);
 signupProcessForm?.addEventListener("submit", saveCourseSignupProcess);
 newButton?.addEventListener("click", resetForm);
 refreshButton?.addEventListener("click", loadCourses);
 signupRefreshButton?.addEventListener("click", loadCourseSignups);
 signupStatusFilter?.addEventListener("change", loadCourseSignups);
+form?.elements.registration_status?.addEventListener("change", syncRegistrationUrlRequirement);
 form?.elements.title?.addEventListener("input", () => {
   if (!form.elements.id.value && !form.elements.slug.value) form.elements.slug.value = slugify(form.elements.title.value);
 });
@@ -577,11 +659,23 @@ bootProtectedAdminPage({
   logoutButton,
   onReady: async (_session, permissions) => {
     adminPermissions = permissions || {};
+    courseManagerMode = isEducationCourseManager(adminPermissions);
+    document.body.classList.toggle("course-manager-mode", courseManagerMode);
+    if (internalSignupsPanel) internalSignupsPanel.hidden = courseManagerMode;
     form.dataset.contentScope = courseScope;
     if (signupProcessForm) signupProcessForm.dataset.contentScope = courseFormsScope;
     resetForm();
-    renderSignupDetail(null);
-    await Promise.all([loadCourses(), loadCourseSignups()]);
+    syncRegistrationUrlRequirement();
+    const submitButton = form.querySelector("button[type='submit']");
+    if (submitButton && canPublishScope(adminPermissions, courseScope)) {
+      submitButton.textContent = "儲存並發布課程";
+    }
+    if (courseManagerMode) {
+      await loadCourses();
+    } else {
+      renderSignupDetail(null);
+      await Promise.all([loadCourses(), loadCourseSignups()]);
+    }
     if (!canEditScope(adminPermissions, courseScope)) {
       form.querySelectorAll("input, textarea, select, button").forEach((control) => {
         control.disabled = true;

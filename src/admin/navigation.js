@@ -1,4 +1,5 @@
 import { hasAdminPermission } from "./auth.js";
+import { isEducationCourseManager } from "./content-scope.js";
 
 const navGroups = [
   {
@@ -68,6 +69,32 @@ export function renderAdminNavigation(permissions = {}) {
   if (!nav) return;
 
   const currentPath = normalizePath();
+  if (isEducationCourseManager(permissions)) {
+    nav.innerHTML = `
+      <section class="admin-menu-section" aria-label="課程工作">
+        <span class="admin-menu-section-label">課程工作</span>
+        <a href="/admin/courses" class="${isActivePath(currentPath, "/admin/courses") ? "active" : ""}" title="新增、修改與送審課程">
+          <span>EDU</span>
+          <strong>課程管理<small>上架、報名連結與送審</small></strong>
+        </a>
+        <a href="/courses" target="_blank" rel="noopener" title="查看正式課程頁">
+          <span>WEB</span>
+          <strong>查看官網<small>確認目前已核准的內容</small></strong>
+        </a>
+      </section>
+    `;
+
+    const note = document.querySelector(".admin-sidebar-note");
+    if (note) {
+      note.innerHTML = `
+        <span>簡單三步驟</span>
+        <strong>填課程、貼表單、送審核</strong>
+        <p>執行長核准前，官網會保留原本內容；核准後才會正式更新。</p>
+      `;
+    }
+    return;
+  }
+
   const html = navGroups.map((group) => {
     if (group.ownerOnly && permissions?.role !== "owner") return "";
     const visibleItems = group.items.filter((item) => canSeeItem(item, permissions));

@@ -53,6 +53,14 @@ assert(!contentScopeModule.canPublishScope(editorPermissions, testScope), "edito
 assert(contentScopeModule.canEditScope(managerPermissions, testScope), "manager 應可編輯並送審所屬頁面");
 assert(!contentScopeModule.canPublishScope(managerPermissions, testScope), "manager 不可核准發布");
 assert(contentScopeModule.canPublishScope(ownerPermissions, testScope), "Owner／執行長應可核准所有頁面");
+assert(contentScopeModule.isEducationCourseManager({
+  role: "editor",
+  departments: [{ slug: "education-quality", role: "manager" }],
+  content_scopes: ["service:quality", "courses", "forms:courses"],
+  edit_scopes: ["service:quality", "courses", "forms:courses"],
+  publish_scopes: []
+}), "教育品管課程負責人應進入簡化課程工作區");
+assert(!contentScopeModule.isEducationCourseManager(ownerPermissions), "Owner 不應被限制在簡化課程工作區");
 
 const frontendAdminContracts = [
   ["site_settings", "src/admin/site-settings.js", '.from("site_settings")'],
@@ -120,12 +128,17 @@ assertIncludes(resetLegacyMembershipsMigration, "profile.role <> 'owner'", "非 
 const usersApi = read("api/admin-users.js");
 const mediaUtils = read("src/admin/media-utils.js");
 const filesAdmin = read("src/admin/files.js");
+const coursesAdmin = read("src/admin/courses.js");
 assertIncludes(usersApi, 'rpc("replace_department_memberships"', "使用者管理未透過部門 membership RPC 儲存");
 assertIncludes(usersApi, 'rpc("replace_content_area_assignments"', "內容責任矩陣未透過 Owner RPC 儲存");
 assertIncludes(usersApi, 'currentAdmin?.role === "owner"', "權限矩陣 API 未限制為 Owner 操作");
 assertExcludes(usersApi, "if (totalProfiles === 0) return true", "空資料庫不得讓任意第一位使用者成為 Owner");
 assertIncludes(mediaUtils, "cms/${normalizedScopeKey}/", "圖片 Storage 路徑未包含 scopeKey");
 assertIncludes(filesAdmin, "cms/${scopeKey}/", "下載檔 Storage 路徑未包含 scopeKey");
+assertIncludes(coursesAdmin, 'hostname === "forms.gle"', "課程後台未驗證 Google 表單短網址");
+assertIncludes(coursesAdmin, 'hostname === "docs.google.com"', "課程後台未驗證 Google 表單完整網址");
+assertIncludes(frontend, "registrationUrl: safeCourseRegistrationUrl(course.registration_url)", "課程前台未讀取外部報名網址");
+assertIncludes(frontend, "window.location.assign(registrationUrl)", "課程報名按鈕未直接前往 Google 表單");
 
 const requiredAdminPages = [
   "admin/files/index.html",

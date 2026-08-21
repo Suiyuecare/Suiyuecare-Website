@@ -91,6 +91,14 @@ export function canPublishScope(permissions, scopeKey) {
   return scopeList(permissions, "publish_scopes").includes(scopeKey);
 }
 
+export function isEducationCourseManager(permissions = {}) {
+  if (permissions?.role === "owner") return false;
+  const departments = Array.isArray(permissions?.departments) ? permissions.departments : [];
+  return departments.length === 1
+    && departments[0]?.slug === "education-quality"
+    && canEditScope(permissions, "courses");
+}
+
 export function contentSaveMessage(permissions, scopeKey, label = "內容") {
   if (canPublishScope(permissions, scopeKey)) {
     return `${label}已儲存並套用。`;

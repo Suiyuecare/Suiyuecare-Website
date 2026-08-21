@@ -1212,6 +1212,11 @@ input {
   color: #b42318;
 }
 
+.admin-publish-badge[data-status="pending"] {
+  background: #fff0d8;
+  color: #b85a00;
+}
+
 .admin-publish-permission-hint {
   color: var(--admin-muted);
   display: block;
@@ -2685,6 +2690,145 @@ img[data-image-usage="map"],
   margin-top: 20px;
 }
 
+.course-summary-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-course-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.admin-course-steps article {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 2px 12px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(240, 138, 36, 0.26);
+  border-radius: 18px;
+  background: #fffaf4;
+}
+
+.admin-course-steps span {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--admin-orange);
+  color: #fff;
+  font-weight: 1000;
+}
+
+.admin-course-steps strong {
+  color: var(--admin-brown);
+  font-size: 15px;
+}
+
+.admin-course-steps small {
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.admin-course-form {
+  gap: 20px;
+}
+
+.admin-course-form > label,
+.admin-course-form > .admin-section-image-tools {
+  padding: 17px;
+  border: 1px solid rgba(225, 192, 151, 0.72);
+  border-radius: 20px;
+  background: rgba(255, 252, 248, 0.86);
+}
+
+.admin-course-title-field input {
+  min-height: 64px;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.admin-google-form-field {
+  border-color: rgba(31, 143, 166, 0.38) !important;
+  background: #f4fbfc !important;
+}
+
+.admin-google-form-field > span::before {
+  content: "FORM";
+  display: inline-grid;
+  place-items: center;
+  min-height: 24px;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #1f8fa6;
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: .08em;
+  vertical-align: 2px;
+}
+
+.admin-course-submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid rgba(240, 138, 36, 0.32);
+  border-radius: 22px;
+  background: #fff4e5;
+}
+
+.admin-course-submit p {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  color: var(--admin-muted);
+  font-weight: 850;
+}
+
+.admin-course-submit p strong {
+  color: var(--admin-brown);
+  font-size: 17px;
+}
+
+.admin-course-submit button {
+  min-height: 56px;
+  padding: 0 24px;
+  white-space: nowrap;
+}
+
+.course-manager-mode .admin-app-shell {
+  grid-template-columns: 250px minmax(0, 1fr);
+}
+
+.course-manager-mode .admin-main {
+  max-width: 1460px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.course-manager-mode .admin-editor-layout,
+.course-manager-mode .admin-workspace-panel,
+.course-manager-mode .admin-table-wrap {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.course-manager-mode .admin-editor-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.course-manager-mode .admin-topbar-title h1 {
+  font-size: clamp(42px, 5vw, 64px);
+}
+
 .course-registration-layout {
   grid-template-columns: minmax(0, 1.12fr) minmax(360px, .88fr);
 }
@@ -4137,6 +4281,10 @@ img[data-image-usage="map"],
     grid-template-columns: 1fr;
   }
 
+  .course-manager-mode .admin-app-shell {
+    grid-template-columns: 1fr;
+  }
+
   .admin-sidebar {
     position: static;
     height: auto;
@@ -4203,6 +4351,7 @@ img[data-image-usage="map"],
   .admin-launch-grid,
   .admin-onboarding-steps,
   .admin-cms-guidance-grid,
+  .admin-course-steps,
   .admin-media-toolbar,
   .governance-staff-guide {
     grid-template-columns: 1fr;
@@ -4210,6 +4359,15 @@ img[data-image-usage="map"],
 
   .admin-form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-course-submit {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-course-submit button {
+    width: 100%;
   }
 
   .permission-check-grid {
@@ -4347,6 +4505,100 @@ img[data-image-usage="map"],
 
   .admin-workspace-head {
     display: grid;
+  }
+
+  .course-manager-mode {
+    overflow-x: hidden;
+  }
+
+  .course-manager-mode .admin-workspace-panel {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .course-manager-mode .course-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .course-manager-mode .admin-course-submit {
+    align-items: stretch;
+    display: grid;
+  }
+
+  .course-manager-mode .admin-course-submit button {
+    width: 100%;
+  }
+
+  .course-manager-mode .admin-table-wrap {
+    overflow: visible;
+  }
+
+  .course-manager-mode .admin-article-table,
+  .course-manager-mode .admin-article-table tbody,
+  .course-manager-mode .admin-article-table tr,
+  .course-manager-mode .admin-article-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .course-manager-mode .admin-article-table {
+    min-width: 0;
+    border-spacing: 0;
+  }
+
+  .course-manager-mode .admin-article-table thead {
+    display: none;
+  }
+
+  .course-manager-mode .admin-article-table tr {
+    margin-top: 14px;
+    padding: 16px;
+    border: 1px solid rgba(234, 211, 179, .88);
+    border-radius: 18px;
+    background: #fffaf5;
+  }
+
+  .course-manager-mode .admin-article-table td,
+  .course-manager-mode .admin-article-table td:first-child,
+  .course-manager-mode .admin-article-table td:last-child {
+    padding: 9px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .course-manager-mode .admin-article-table td:not(:first-child)::before {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--admin-muted);
+    font-size: 11px;
+    font-weight: 1000;
+    letter-spacing: .08em;
+  }
+
+  .course-manager-mode .admin-article-table td:nth-child(2)::before {
+    content: "課程日期";
+  }
+
+  .course-manager-mode .admin-article-table td:nth-child(3)::before {
+    content: "官網狀態";
+  }
+
+  .course-manager-mode .admin-article-table td:nth-child(4)::before {
+    content: "報名方式";
+  }
+
+  .course-manager-mode .admin-article-table td:nth-child(5)::before {
+    content: "課程操作";
+  }
+
+  .course-manager-mode .admin-article-table .admin-table-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .course-manager-mode .admin-article-table .admin-table-actions button {
+    width: 100%;
   }
 
   .admin-media-grid {

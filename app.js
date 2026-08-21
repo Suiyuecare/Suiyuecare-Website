@@ -7535,6 +7535,17 @@ function courseIsOpen(course) {
   return startsAt.getTime() >= Date.now();
 }
 
+function safeCourseRegistrationUrl(value = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
 function getCourseCardImage(course, cover = {}) {
   const text = `${course?.title || ""} ${course?.subtitle || ""} ${course?.excerpt || ""} ${course?.course_type || ""}`.toLowerCase();
   const localImage = (() => {
@@ -7573,6 +7584,7 @@ function normalizeCourse(course) {
     image: getCourseCardImage(course, cover),
     isFeatured: Boolean(course.is_featured),
     registrationStatus: course.registration_status || "open",
+    registrationUrl: safeCourseRegistrationUrl(course.registration_url),
     isOpen,
     statusLabel: isOpen ? "立即報名" : "已截止"
   };
@@ -7684,13 +7696,13 @@ function renderCoursesPage() {
         </div>
         <div class="featured-course-track" aria-label="重要課程輪播">
           ${importantCourses.length ? importantCourses.map((course) => `
-            <article class="featured-course-card click-card ${course.isOpen ? "" : "is-closed"}" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" data-course-open="${course.isOpen ? "true" : "false"}" data-course-search-text="${escapeHTML(`${course.title} ${course.intro} ${course.type} ${course.location}`)}" tabindex="0" role="button">
+            <article class="featured-course-card click-card ${course.isOpen ? "" : "is-closed"}" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" data-course-open="${course.isOpen ? "true" : "false"}" data-registration-url="${escapeHTML(course.registrationUrl)}" data-course-search-text="${escapeHTML(`${course.title} ${course.intro} ${course.type} ${course.location}`)}" tabindex="0" role="button">
               <img ${courseImageAttrs(course)} />
               <div>
                 <span>${escapeHTML(course.type)}</span>
                 <h3>${escapeHTML(course.title)}</h3>
                 <p>${escapeHTML(course.intro)}</p>
-                <button class="course-register" type="button" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" ${course.isOpen ? "" : "disabled"}>${escapeHTML(course.statusLabel)}</button>
+                <button class="course-register" type="button" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" data-registration-url="${escapeHTML(course.registrationUrl)}" ${course.isOpen ? "" : "disabled"}>${escapeHTML(course.statusLabel)}</button>
               </div>
             </article>
           `).join("") : `
@@ -7706,7 +7718,7 @@ function renderCoursesPage() {
       </section>
       <section class="course-list">
         ${courses.length ? courses.map((course, index) => `
-          <article class="course-card click-card ${course.isOpen ? "" : "is-closed"}" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" data-course-open="${course.isOpen ? "true" : "false"}" data-course-search-text="${escapeHTML(`${course.title} ${course.intro} ${course.type} ${course.location}`)}" tabindex="0" role="button">
+          <article class="course-card click-card ${course.isOpen ? "" : "is-closed"}" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" data-course-open="${course.isOpen ? "true" : "false"}" data-registration-url="${escapeHTML(course.registrationUrl)}" data-course-search-text="${escapeHTML(`${course.title} ${course.intro} ${course.type} ${course.location}`)}" tabindex="0" role="button">
             <div class="course-thumb"><img ${courseImageAttrs(course)} /><span>${String(index + 1).padStart(2, "0")}</span></div>
             <div class="course-body">
               <div class="course-topline"><span class="course-type">${escapeHTML(course.type)}</span><span class="course-seats">${escapeHTML(course.seats)}</span></div>
@@ -7714,7 +7726,7 @@ function renderCoursesPage() {
               <p>${escapeHTML(course.intro)}</p>
               <div class="course-info-line"><span><em>地點</em>${escapeHTML(course.type)}｜${escapeHTML(course.location)}</span><b><em>費用</em>${escapeHTML(course.price)}</b></div>
               <div class="course-info-line"><span><em>日期</em>${escapeHTML(course.date)}</span><b><em>時間</em>${escapeHTML(course.time)}</b></div>
-              <button class="course-register" type="button" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" ${course.isOpen ? "" : "disabled"}>${escapeHTML(course.statusLabel)}</button>
+              <button class="course-register" type="button" data-course-id="${escapeHTML(course.id)}" data-course-title="${escapeHTML(course.title)}" data-registration-url="${escapeHTML(course.registrationUrl)}" ${course.isOpen ? "" : "disabled"}>${escapeHTML(course.statusLabel)}</button>
             </div>
           </article>
         `).join("") : `
@@ -12197,10 +12209,19 @@ document.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
     if (registerButton.disabled) return;
+    const registrationUrl = safeCourseRegistrationUrl(
+      registerButton.dataset.registrationUrl
+      || registerButton.closest("[data-registration-url]")?.dataset.registrationUrl
+      || ""
+    );
     trackAnalyticsEvent("reservation_click", {
       label: registerButton.dataset.courseTitle || registerButton.textContent.trim(),
-      targetUrl: "#courses"
+      targetUrl: registrationUrl || "/courses"
     });
+    if (registrationUrl) {
+      window.location.assign(registrationUrl);
+      return;
+    }
     openCourseSignup(
       registerButton.dataset.courseTitle || registerButton.closest("[data-course-title]")?.dataset.courseTitle || "",
       registerButton.dataset.courseId || registerButton.closest("[data-course-id]")?.dataset.courseId || ""
@@ -12212,6 +12233,15 @@ document.addEventListener("click", (event) => {
   if (courseCard && !event.target.closest("a, button, input, select, textarea")) {
     event.preventDefault();
     if (courseCard.dataset.courseOpen === "false") return;
+    const registrationUrl = safeCourseRegistrationUrl(courseCard.dataset.registrationUrl || "");
+    if (registrationUrl) {
+      trackAnalyticsEvent("reservation_click", {
+        label: courseCard.dataset.courseTitle || courseCard.querySelector("h3")?.textContent || "課程報名",
+        targetUrl: registrationUrl
+      });
+      window.location.assign(registrationUrl);
+      return;
+    }
     openCourseSignup(courseCard.dataset.courseTitle || courseCard.querySelector("h3")?.textContent || "", courseCard.dataset.courseId || "");
     return;
   }
@@ -12667,6 +12697,19 @@ document.addEventListener("keydown", (event) => {
   const card = event.target.closest(".click-card");
   if (!card || event.target.closest("a, button, input, select, textarea")) return;
   event.preventDefault();
+  if (card.matches(".course-card, .featured-course-card")) {
+    if (card.dataset.courseOpen === "false") return;
+    const registrationUrl = safeCourseRegistrationUrl(card.dataset.registrationUrl || "");
+    if (registrationUrl) {
+      window.location.assign(registrationUrl);
+      return;
+    }
+    openCourseSignup(
+      card.dataset.courseTitle || card.querySelector("h3")?.textContent || "",
+      card.dataset.courseId || ""
+    );
+    return;
+  }
   const href = card.dataset.href;
   if (href) navigateToPublicHref(href);
 });

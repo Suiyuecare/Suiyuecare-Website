@@ -1,6 +1,6 @@
 import { supabase } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
-import { canEditScope, canPublishScope, contentScopeLabel } from "./content-scope.js";
+import { canEditScope, canPublishScope, contentScopeLabel, isEducationCourseManager } from "./content-scope.js";
 import { escapeHTML, formatCount, formatUpdatedAt } from "./utils.js";
 import { visualEditorPageList } from "./visual-editor-manifest.js";
 
@@ -286,6 +286,10 @@ bootProtectedAdminPage({
   userInitial,
   logoutButton,
   onReady: async (session, permissions) => {
+    if (isEducationCourseManager(permissions)) {
+      window.location.replace("/admin/courses");
+      return;
+    }
     const profileResult = await supabase
       .from("profiles")
       .select("id")
