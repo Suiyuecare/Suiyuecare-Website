@@ -1554,6 +1554,12 @@ img[data-image-usage="map"],
   font-weight: 950;
 }
 
+.admin-toggle-field span small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+}
+
 .admin-form-grid input,
 .admin-form-grid select,
 .admin-form-grid textarea {
