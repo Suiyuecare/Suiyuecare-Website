@@ -138,7 +138,7 @@ assertIncludes(filesAdmin, "cms/${scopeKey}/", "下載檔 Storage 路徑未包�
 assertIncludes(coursesAdmin, 'hostname === "forms.gle"', "課程後台未驗證 Google 表單短網址");
 assertIncludes(coursesAdmin, 'hostname === "docs.google.com"', "課程後台未驗證 Google 表單完整網址");
 assertIncludes(frontend, "registrationUrl: safeCourseRegistrationUrl(course.registration_url)", "課程前台未讀取外部報名網址");
-assertIncludes(frontend, "window.location.assign(registrationUrl)", "課程報名按鈕未直接前往 Google 表單");
+assertIncludes(frontend, "location.assign(registrationUrl)", "課程報名按鈕未直接前往 Google 表單");
 
 const requiredAdminPages = [
   "admin/files/index.html",
