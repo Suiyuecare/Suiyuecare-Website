@@ -1,10 +1,8 @@
 import "./day-care-application-journey.css";
 import "./home-care-location.css";
-import {
-  ArrowLeft,
-  ArrowRight,
-  createElement as createLucideElement
-} from "lucide";
+import ArrowLeft from "lucide/dist/esm/icons/arrow-left.mjs";
+import ArrowRight from "lucide/dist/esm/icons/arrow-right.mjs";
+import createLucideElement from "lucide/dist/esm/createElement.mjs";
 
 const homeCareLocations = {
   taipei: {

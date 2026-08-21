@@ -7543,11 +7543,36 @@ function safeCourseRegistrationUrl(value) {
   }
 }
 
+function googleFormEmbedUrl(value) {
+  const registrationUrl = safeCourseRegistrationUrl(value);
+  if (!registrationUrl) return "";
+
+  try {
+    const url = new URL(registrationUrl);
+    const isGoogleForm = url.hostname === "docs.google.com" && url.pathname.includes("/forms/");
+    if (!isGoogleForm) return "";
+    url.search = "";
+    url.searchParams.set("embedded", "true");
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
+function openCourseRegistrationNewTab(registrationUrl) {
+  const newWindow = window.open(registrationUrl, "_blank", "noopener,noreferrer");
+  if (newWindow) newWindow.opener = null;
+}
+
 function activateCourseRegistration(target) {
   const course = target.closest("[data-course-id]");
   const registrationUrl = safeCourseRegistrationUrl(course.dataset.registrationUrl);
-  if (registrationUrl) location.assign(registrationUrl);
-  else openCourseSignup(course.dataset.courseTitle, course.dataset.courseId || "");
+  if (registrationUrl) {
+    const openedInModal = openCourseRegistrationModal(course.dataset.courseTitle, registrationUrl);
+    if (!openedInModal) openCourseRegistrationNewTab(registrationUrl);
+    return;
+  }
+  openCourseSignup(course.dataset.courseTitle, course.dataset.courseId || "");
 }
 
 function getCourseCardImage(course, cover = {}) {
@@ -7562,7 +7587,7 @@ function getCourseCardImage(course, cover = {}) {
     if (text.includes("照服員") || text.includes("核心") || text.includes("訓練") || text.includes("培訓") || text.includes("training")) return "assets/quality-recruit-02-training-clear.jpg";
     return "";
   })();
-  return contentImageUrl(localImage || cover.public_url || fallbackImageForText(text, fallbackImages.course));
+  return contentImageUrl(cover.public_url || localImage || fallbackImageForText(text, fallbackImages.course));
 }
 
 function courseImageAttrs(course) {
@@ -7728,8 +7753,12 @@ function renderCoursesPage() {
               <div class="course-topline"><span class="course-type">${escapeHTML(course.type)}</span><span class="course-seats">${escapeHTML(course.seats)}</span></div>
               <h3>${escapeHTML(course.title)}</h3>
               <p>${escapeHTML(course.intro)}</p>
-              <div class="course-info-line"><span><em>地點</em>${escapeHTML(course.type)}｜${escapeHTML(course.location)}</span><b><em>費用</em>${escapeHTML(course.price)}</b></div>
-              <div class="course-info-line"><span><em>日期</em>${escapeHTML(course.date)}</span><b><em>時間</em>${escapeHTML(course.time)}</b></div>
+              <div class="course-meta-grid">
+                <div class="course-meta-item"><em>地點</em><span>${escapeHTML(course.type)}｜${escapeHTML(course.location)}</span></div>
+                <div class="course-meta-item"><em>費用</em><span>${escapeHTML(course.price)}</span></div>
+                <div class="course-meta-item"><em>日期</em><span>${escapeHTML(course.date)}</span></div>
+                <div class="course-meta-item"><em>時間</em><span>${escapeHTML(course.time)}</span></div>
+              </div>
               <button class="course-register" type="button" ${course.isOpen ? "" : "disabled"}>${escapeHTML(course.statusLabel)}</button>
             </div>
           </article>
@@ -7741,26 +7770,6 @@ function renderCoursesPage() {
           </div>
         `}
       </section>
-      <div class="course-modal" id="courseSignupModal" hidden tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="courseSignupHeading">
-        <form class="course-modal-card" id="courseSignupForm">
-          <button class="course-modal-close" type="button" data-course-close aria-label="關閉報名視窗">×</button>
-          <p class="eyebrow">Course Signup</p>
-          <h2 id="courseSignupHeading">課程報名確認</h2>
-          <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
-          <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
-          <label>您本次報名的課程<input name="課程" id="courseSignupTitle" type="text" readonly /></label>
-          <input name="course_id" id="courseSignupId" type="hidden" />
-          <input name="_subject" type="hidden" value="歲悅長照課程報名通知" />
-          <input name="_captcha" type="hidden" value="false" />
-          <input name="_honey" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <p class="course-confirm-text">是否要報名？</p>
-          <div class="course-modal-actions">
-            <button type="button" data-course-close>否</button>
-            <button type="submit">是，送出報名</button>
-          </div>
-          <p class="course-modal-status" id="courseSignupStatus" aria-live="polite"></p>
-        </form>
-      </div>
     </div>
   `;
 }
@@ -12043,6 +12052,28 @@ function hideFrontModal(modal) {
   if (returnTarget?.isConnected) returnTarget.focus();
 }
 
+function openCourseRegistrationModal(courseTitle = "", registrationUrl = "") {
+  const modal = document.querySelector("#courseRegistrationModal");
+  const frame = document.querySelector("#courseRegistrationFrame");
+  const heading = document.querySelector("#courseRegistrationHeading");
+  const newTabLink = document.querySelector("#courseRegistrationNewTab");
+  const embedUrl = googleFormEmbedUrl(registrationUrl);
+  if (!modal || !frame || !heading || !newTabLink || !embedUrl) return false;
+
+  heading.textContent = courseTitle ? `報名｜${courseTitle}` : "課程報名";
+  frame.src = embedUrl;
+  newTabLink.href = registrationUrl;
+  showFrontModal(modal, modal.querySelector("[data-course-form-close]"));
+  return true;
+}
+
+function closeCourseRegistrationModal() {
+  const modal = document.querySelector("#courseRegistrationModal");
+  const frame = document.querySelector("#courseRegistrationFrame");
+  hideFrontModal(modal);
+  if (frame) frame.removeAttribute("src");
+}
+
 function openCourseSignup(courseTitle = "", courseId = "") {
   const modal = document.querySelector("#courseSignupModal");
   const form = document.querySelector("#courseSignupForm");
@@ -12100,6 +12131,7 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
     if (modal.id === "recruitApplyModal") closeRecruitApply();
     if (modal.id === "courseSignupModal") closeCourseSignup();
+    if (modal.id === "courseRegistrationModal") closeCourseRegistrationModal();
     return;
   }
   if (event.key !== "Tab") return;
@@ -12222,6 +12254,11 @@ document.addEventListener("click", (event) => {
     event.preventDefault();
     if (courseCard.dataset.courseOpen === "false") return;
     activateCourseRegistration(courseCard);
+    return;
+  }
+
+  if (event.target.closest("[data-course-form-close]") || event.target.id === "courseRegistrationModal") {
+    closeCourseRegistrationModal();
     return;
   }
 

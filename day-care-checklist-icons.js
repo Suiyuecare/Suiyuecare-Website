@@ -1,17 +1,15 @@
-import {
-  Backpack,
-  Bed,
-  Brush,
-  CupSoda,
-  MapPinned,
-  Package,
-  PillBottle,
-  Shirt,
-  ShowerHead,
-  Stethoscope,
-  Toilet,
-  createElement as createLucideElement
-} from "lucide";
+import Backpack from "lucide/dist/esm/icons/backpack.mjs";
+import Bed from "lucide/dist/esm/icons/bed.mjs";
+import Brush from "lucide/dist/esm/icons/brush.mjs";
+import CupSoda from "lucide/dist/esm/icons/cup-soda.mjs";
+import MapPinned from "lucide/dist/esm/icons/map-pinned.mjs";
+import Package from "lucide/dist/esm/icons/package.mjs";
+import PillBottle from "lucide/dist/esm/icons/pill-bottle.mjs";
+import Shirt from "lucide/dist/esm/icons/shirt.mjs";
+import ShowerHead from "lucide/dist/esm/icons/shower-head.mjs";
+import Stethoscope from "lucide/dist/esm/icons/stethoscope.mjs";
+import Toilet from "lucide/dist/esm/icons/toilet.mjs";
+import createLucideElement from "lucide/dist/esm/createElement.mjs";
 
 const checklistIcons = {
   backpack: Backpack,

@@ -1,24 +1,22 @@
 import "./day-care-application-journey.css";
 import "./community-page.css";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Brain,
-  CheckCircle2,
-  ClipboardCheck,
-  Compass,
-  CreditCard,
-  FileCheck2,
-  HeartPulse,
-  MapPin,
-  PhoneCall,
-  ShieldCheck,
-  Soup,
-  UserCheck,
-  Users,
-  XCircle,
-  createElement as createLucideElement
-} from "lucide";
+import ArrowLeft from "lucide/dist/esm/icons/arrow-left.mjs";
+import ArrowRight from "lucide/dist/esm/icons/arrow-right.mjs";
+import Brain from "lucide/dist/esm/icons/brain.mjs";
+import CheckCircle2 from "lucide/dist/esm/icons/circle-check.mjs";
+import ClipboardCheck from "lucide/dist/esm/icons/clipboard-check.mjs";
+import Compass from "lucide/dist/esm/icons/compass.mjs";
+import CreditCard from "lucide/dist/esm/icons/credit-card.mjs";
+import FileCheck2 from "lucide/dist/esm/icons/file-check-corner.mjs";
+import HeartPulse from "lucide/dist/esm/icons/heart-pulse.mjs";
+import MapPin from "lucide/dist/esm/icons/map-pin.mjs";
+import PhoneCall from "lucide/dist/esm/icons/phone-call.mjs";
+import ShieldCheck from "lucide/dist/esm/icons/shield-check.mjs";
+import Soup from "lucide/dist/esm/icons/soup.mjs";
+import UserCheck from "lucide/dist/esm/icons/user-check.mjs";
+import Users from "lucide/dist/esm/icons/users.mjs";
+import XCircle from "lucide/dist/esm/icons/circle-x.mjs";
+import createLucideElement from "lucide/dist/esm/createElement.mjs";
 
 const communityHeroImage = "assets/community-dementia-hero-v3.jpg";
 

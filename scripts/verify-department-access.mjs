@@ -138,7 +138,8 @@ assertIncludes(filesAdmin, "cms/${scopeKey}/", "下載檔 Storage 路徑未包�
 assertIncludes(coursesAdmin, 'hostname === "forms.gle"', "課程後台未驗證 Google 表單短網址");
 assertIncludes(coursesAdmin, 'hostname === "docs.google.com"', "課程後台未驗證 Google 表單完整網址");
 assertIncludes(frontend, "registrationUrl: safeCourseRegistrationUrl(course.registration_url)", "課程前台未讀取外部報名網址");
-assertIncludes(frontend, "location.assign(registrationUrl)", "課程報名按鈕未直接前往 Google 表單");
+assertIncludes(frontend, "openCourseRegistrationModal(course.dataset.courseTitle, registrationUrl)", "課程報名按鈕未優先以彈跳視窗開啟 Google 表單");
+assertIncludes(frontend, 'window.open(registrationUrl, "_blank", "noopener,noreferrer")', "課程報名缺少另開新分頁的備援方式");
 
 const requiredAdminPages = [
   "admin/files/index.html",

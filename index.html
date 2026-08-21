@@ -735,6 +735,42 @@
       <section class="page detail-page" id="pageView" aria-live="polite"></section>
     </main>
 
+    <div class="course-modal" id="courseSignupModal" hidden tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="courseSignupHeading">
+      <form class="course-modal-card" id="courseSignupForm">
+        <button class="course-modal-close" type="button" data-course-close aria-label="關閉報名視窗">×</button>
+        <p class="eyebrow">Course Signup</p>
+        <h2 id="courseSignupHeading">課程報名確認</h2>
+        <label>您的大名<input name="姓名" type="text" required placeholder="請輸入姓名" /></label>
+        <label>您的電話<input name="電話" type="tel" required placeholder="請輸入電話" /></label>
+        <label>您本次報名的課程<input name="課程" id="courseSignupTitle" type="text" readonly /></label>
+        <input name="course_id" id="courseSignupId" type="hidden" />
+        <input name="_subject" type="hidden" value="歲悅長照課程報名通知" />
+        <input name="_captcha" type="hidden" value="false" />
+        <input name="_honey" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <p class="course-confirm-text">是否要報名？</p>
+        <div class="course-modal-actions">
+          <button type="button" data-course-close>否</button>
+          <button type="submit">是，送出報名</button>
+        </div>
+        <p class="course-modal-status" id="courseSignupStatus" aria-live="polite"></p>
+      </form>
+    </div>
+    <div class="course-modal course-form-modal" id="courseRegistrationModal" hidden tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="courseRegistrationHeading">
+      <section class="course-form-modal-card">
+        <header class="course-form-modal-head">
+          <div>
+            <p class="eyebrow">Course Registration</p>
+            <h2 id="courseRegistrationHeading">課程報名</h2>
+          </div>
+          <div class="course-form-modal-actions">
+            <a id="courseRegistrationNewTab" href="#" target="_blank" rel="noopener noreferrer">另開新分頁</a>
+            <button type="button" data-course-form-close aria-label="關閉報名視窗">×</button>
+          </div>
+        </header>
+        <iframe id="courseRegistrationFrame" title="Google 課程報名表" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </section>
+    </div>
+
     <aside class="milk-helper" data-milk-helper aria-label="快速幫手">
       <section
         class="milk-helper-dialog"

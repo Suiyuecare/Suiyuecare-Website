@@ -1,11 +1,9 @@
-import {
-  ArrowRight,
-  BookOpenCheck,
-  Handshake,
-  HeartHandshake,
-  X,
-  createElement as createLucideElement
-} from "lucide";
+import ArrowRight from "lucide/dist/esm/icons/arrow-right.mjs";
+import BookOpenCheck from "lucide/dist/esm/icons/book-open-check.mjs";
+import Handshake from "lucide/dist/esm/icons/handshake.mjs";
+import HeartHandshake from "lucide/dist/esm/icons/heart-handshake.mjs";
+import X from "lucide/dist/esm/icons/x.mjs";
+import createLucideElement from "lucide/dist/esm/createElement.mjs";
 
 const helperIcons = {
   arrow: ArrowRight,
