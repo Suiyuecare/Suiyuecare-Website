@@ -7696,6 +7696,7 @@ async function renderCoursesPageFromCms() {
 }
 
 function renderCoursesPage() {
+  if (!document.querySelector("#coursePageStyles")) document.head.insertAdjacentHTML("beforeend", '<link id="coursePageStyles" rel="stylesheet" href="/course-page.css">');
   const courses = getVisibleCourses();
   const featuredCourses = courses.filter((course) => course.isFeatured);
   const importantCourses = (featuredCourses.length ? featuredCourses : courses).slice(0, 6);
