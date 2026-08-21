@@ -7546,10 +7546,8 @@ function safeCourseRegistrationUrl(value) {
 function activateCourseRegistration(target) {
   const course = target.closest("[data-course-id]");
   const registrationUrl = safeCourseRegistrationUrl(course.dataset.registrationUrl);
-  const title = course.dataset.courseTitle;
-  trackAnalyticsEvent("reservation_click", { label: title, targetUrl: registrationUrl });
   if (registrationUrl) location.assign(registrationUrl);
-  else openCourseSignup(title, course.dataset.courseId || "");
+  else openCourseSignup(course.dataset.courseTitle, course.dataset.courseId || "");
 }
 
 function getCourseCardImage(course, cover = {}) {
