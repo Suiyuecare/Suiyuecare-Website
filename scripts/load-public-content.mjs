@@ -11,6 +11,7 @@ import {
   articlePublicNumber,
   articlePublicSlug
 } from "../article-url-map.mjs";
+import { resolveHealthArticleImage } from "../health-article-images.mjs";
 
 const rootDir = path.resolve(import.meta.dirname, "..");
 const appSourcePath = path.join(rootDir, "app.js");
@@ -131,7 +132,14 @@ function staticArticleItem(card, detail, rewrite = {}) {
     title: card.title || merged.title || "未命名文章",
     subtitle: card.subtitle || merged.dek || excerpt,
     excerpt,
-    image: normalizePublicAssetUrl(card.image || merged.image),
+    image: normalizePublicAssetUrl(resolveHealthArticleImage({
+      slug,
+      category: card.category || merged.category,
+      title: card.title || merged.title,
+      subtitle: card.subtitle || merged.dek,
+      excerpt,
+      tags
+    }, card.image, merged.image)),
     imageAlt: card.title || merged.title || "健康3.0文章主圖",
     imageUsage: card.imageUsage || "article_cover",
     focalPoint: card.focalPoint || "center",
@@ -197,13 +205,20 @@ function cmsArticleItem(row, snapshot, staticDetails, rewrites) {
     title: row.title || enriched.title || "未命名文章",
     subtitle: row.subtitle || enriched.dek || row.excerpt || "",
     excerpt,
-    image: normalizePublicAssetUrl(
-      ogImage?.public_url ||
-      cover?.public_url ||
-      enriched.image ||
-      json.image_url ||
-      json.image
-    ),
+    image: normalizePublicAssetUrl(resolveHealthArticleImage({
+      slug: row.slug,
+      category: category?.display_label || category?.name || enriched.category,
+      title: row.title || enriched.title,
+      subtitle: row.subtitle || enriched.dek,
+      excerpt,
+      relatedService: row.related_service,
+      tags: list(row.tags)
+    },
+    ogImage?.public_url,
+    cover?.public_url,
+    enriched.image,
+    json.image_url,
+    json.image)),
     imageAlt: ogImage?.alt_text || cover?.alt_text || row.title || "健康3.0文章主圖",
     imageUsage: cover?.image_usage || "article_cover",
     focalPoint: cover?.focal_point || "center",

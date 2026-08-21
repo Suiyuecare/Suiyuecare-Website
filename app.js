@@ -2645,7 +2645,7 @@ function getHealthArticleThemeImage(article = {}) {
 
 function getHealthArticleImage(article = {}, cover = {}) {
   const themedImage = getHealthArticleThemeImage(article);
-  return normalizeLocalAssetUrl(contentImageUrl(article.image || cover?.public_url || themedImage || fallbackImages.healthArticle));
+  return normalizeLocalAssetUrl(contentImageUrl(themedImage || article.image || cover?.public_url || fallbackImages.healthArticle));
 }
 
 function healthArticleImageAttrs(article = {}, options = {}) {
