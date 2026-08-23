@@ -531,7 +531,15 @@ function submitSignedModuleHandoff(moduleId, launchUrl, signedHandoff) {
   form.action = new URL("/api/auth/handoff", configuredUrl).toString();
   form.hidden = true;
 
-  [["payload", signedHandoff.payload], ["signature", signedHandoff.signature]].forEach(([name, value]) => {
+  const handoffFields = moduleId === "edoc"
+    ? [["token", signedHandoff.token]]
+    : [["payload", signedHandoff.payload], ["signature", signedHandoff.signature]];
+
+  if (handoffFields.some(([, value]) => typeof value !== "string" || !value)) {
+    throw new Error("模組啟動憑證不完整，請重新進入。");
+  }
+
+  handoffFields.forEach(([name, value]) => {
     const input = document.createElement("input");
     input.type = "hidden";
     input.name = name;
