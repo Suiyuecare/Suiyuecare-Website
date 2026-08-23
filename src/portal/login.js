@@ -403,7 +403,9 @@ const sharedGeneralAffairsModules = new Set(["pdf-editor"]);
 const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions", "organization-chart", "employee-accounts"]);
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
 const signedHandoffModuleIds = new Set(["edoc", "apm"]);
-const postHandoffModuleIds = new Set(["apm"]);
+// Signed assertions for eDoc/APM must never be placed in query strings. Both
+// modules accept the same no-store POST handoff shape at /api/auth/handoff.
+const postHandoffModuleIds = new Set(["edoc", "apm"]);
 const externalLaunchOrigins = new Map(
   Object.entries(moduleLaunchUrls).map(([moduleId, launchUrl]) => [new URL(launchUrl).origin, moduleId])
 );

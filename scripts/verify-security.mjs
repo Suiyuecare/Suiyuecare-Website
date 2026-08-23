@@ -255,7 +255,7 @@ function verifyApmPortalHandoff() {
 
   for (const expected of [
     'apm: "https://apm.suiyuecare.com/"',
-    'const postHandoffModuleIds = new Set(["apm"])',
+    'const postHandoffModuleIds = new Set(["edoc", "apm"])',
     'form.action = new URL("/api/auth/handoff", configuredUrl).toString()',
     'moduleReturnPath(moduleId, launchUrl)',
     'returnTo: returnTo || "/dashboard"',
