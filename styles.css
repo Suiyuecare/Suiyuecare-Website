@@ -13382,6 +13382,16 @@ input[name="_honey"] { display: none !important; }
   .article-body .article-inline-image img {
     max-width: 100%;
   }
+  .article-body .article-inline-image:has(img[src$="-chart.svg"]) {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .article-body .article-inline-image img[src$="-chart.svg"] {
+    width: 720px;
+    max-width: none;
+  }
   .article-related-grid,
   .article-ads {
     grid-template-columns: 1fr;

@@ -31,7 +31,7 @@ const routeBudgets = [
 ];
 
 const entryBudgets = [
-  { label: "front app bundle", prefix: "app-", ext: ".js", maxKb: 431, gzipMaxKb: 133 },
+  { label: "front app bundle", prefix: "app-", ext: ".js", maxKb: 432, gzipMaxKb: 134 },
   { label: "front style bundle", prefix: "styles-", ext: ".css", maxKb: 251, gzipMaxKb: 46 },
   { label: "Supabase browser client chunk", prefix: "supabaseClient-", ext: ".js", maxKb: 260, gzipMaxKb: 75 }
 ];

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="cognitive-15-minute-title cognitive-15-minute-desc">
+  <title id="cognitive-15-minute-title">每天十五分鐘護腦活動</title>
+  <desc id="cognitive-15-minute-desc">把十五分鐘分為定向、回想、任務與分享四個區段，鼓勵有意義且難度合適的活動。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect x="0" y="0" width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="66" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="800" letter-spacing="2">15-MINUTE BRAIN ROUTINE</text>
+  <text x="64" y="118" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">不是考記憶，是讓大腦在生活裡持續參與</text>
+  <text x="64" y="154" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">活動要有意義、可完成、能回饋；答錯不責備，太難就把步驟拆小。</text>
+  <line x1="126" y1="360" x2="1074" y2="360" stroke="#ead8bf" stroke-width="14" stroke-linecap="round"/>
+  <g>
+    <circle cx="126" cy="360" r="62" fill="#fff0de" stroke="#f58a1f" stroke-width="5"/>
+    <text x="126" y="370" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="25" font-weight="900">3 分</text>
+    <text x="126" y="250" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="24" font-weight="900">看今天</text>
+    <text x="126" y="458" fill="#725b4c" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="750"><tspan x="126" dy="0">日期、天氣</tspan><tspan x="126" dy="30">今天要做什麼</tspan></text>
+  </g>
+<g>
+    <circle cx="422" cy="360" r="62" fill="#e7f6f8" stroke="#1595a8" stroke-width="5"/>
+    <text x="422" y="370" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="25" font-weight="900">4 分</text>
+    <text x="422" y="250" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="24" font-weight="900">聊一件事</text>
+    <text x="422" y="458" fill="#725b4c" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="750"><tspan x="422" dy="0">一張照片</tspan><tspan x="422" dy="30">熟悉歌曲或新聞</tspan></text>
+  </g>
+<g>
+    <circle cx="718" cy="360" r="62" fill="#eef4e9" stroke="#758d60" stroke-width="5"/>
+    <text x="718" y="370" text-anchor="middle" fill="#758d60" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="25" font-weight="900">4 分</text>
+    <text x="718" y="250" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="24" font-weight="900">做一任務</text>
+    <text x="718" y="458" fill="#725b4c" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="750"><tspan x="718" dy="0">分類、配對</tspan><tspan x="718" dy="30">備餐、摺衣</tspan></text>
+  </g>
+<g>
+    <circle cx="1014" cy="360" r="62" fill="#fcebe6" stroke="#db6547" stroke-width="5"/>
+    <text x="1014" y="370" text-anchor="middle" fill="#db6547" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="25" font-weight="900">4 分</text>
+    <text x="1014" y="250" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="24" font-weight="900">說出感受</text>
+    <text x="1014" y="458" fill="#725b4c" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="750"><tspan x="1014" dy="0">哪裡有趣</tspan><tspan x="1014" dy="30">下次想做什麼</tspan></text>
+  </g>
+  
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">若活動讓人焦躁、羞愧或反覆失敗，就降低難度或換題；陪伴感比答對幾題更重要。</text>
+</svg>

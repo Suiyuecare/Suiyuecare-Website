@@ -1631,11 +1631,15 @@ function applyHealth30ArticleEnhancements(enhancements = {}) {
 async function ensureStaticArticleRewrites() {
   if (staticArticleRewritePackLoaded) return;
   if (!staticArticleRewritePackPromise) {
-    staticArticleRewritePackPromise = import("./article-rewrites.js")
-      .then((module) => {
-        applyHealthArticleCards(module.elderDiseaseLazyPackArticles || []);
-        applyStaticArticleRewritePack(module.default || {});
-        applyHealth30ArticleEnhancements(module.health30ArticleEnhancements || {});
+    staticArticleRewritePackPromise = Promise.all([
+      import("./article-rewrites.js"),
+      import("./dementia-series-articles.mjs")
+    ])
+      .then(([rewriteModule, dementiaModule]) => {
+        applyHealthArticleCards(rewriteModule.elderDiseaseLazyPackArticles || []);
+        dementiaModule.installDementiaSeries(articlePages, healthArticles, articleHref);
+        applyStaticArticleRewritePack(rewriteModule.default || {});
+        applyHealth30ArticleEnhancements(rewriteModule.health30ArticleEnhancements || {});
         staticArticleRewritePackLoaded = true;
       })
       .catch((error) => {
@@ -11129,8 +11133,8 @@ async function loadArticlePage(slug) {
     } else if (articlePages[sourceSlug]) {
       const fallback = articlePages[sourceSlug];
       setRouteSeo(`article-${slug}`, {
-        title: `${fallback.title}｜健康3.0`,
-        description: fallback.dek || DEFAULT_SEO.description,
+        title: fallback.seoTitle || `${fallback.title}｜健康3.0`,
+        description: fallback.seoDescription || fallback.dek || DEFAULT_SEO.description,
         image: fallback.image,
         imageAlt: fallback.title,
         type: "article",
@@ -11154,8 +11158,8 @@ async function loadArticlePage(slug) {
       const fallback = articlePages[sourceSlug];
       if (fallback.slides?.length) await ensureArticleSlideDeckRenderer();
       setRouteSeo(`article-${slug}`, {
-        title: `${fallback.title}｜健康3.0`,
-        description: fallback.dek || DEFAULT_SEO.description,
+        title: fallback.seoTitle || `${fallback.title}｜健康3.0`,
+        description: fallback.seoDescription || fallback.dek || DEFAULT_SEO.description,
         image: fallback.image,
         imageAlt: fallback.title,
         type: "article",

@@ -12,6 +12,7 @@ import {
   articlePublicSlug
 } from "../article-url-map.mjs";
 import { resolveHealthArticleImage } from "../health-article-images.mjs";
+import { dementiaSeriesArticles } from "../dementia-series-articles.mjs";
 
 const rootDir = path.resolve(import.meta.dirname, "..");
 const appSourcePath = path.join(rootDir, "app.js");
@@ -140,7 +141,7 @@ function staticArticleItem(card, detail, rewrite = {}) {
       excerpt,
       tags
     }, card.image, merged.image)),
-    imageAlt: card.title || merged.title || "健康3.0文章主圖",
+    imageAlt: card.imageAlt || merged.imageAlt || card.title || merged.title || "健康3.0文章主圖",
     imageUsage: card.imageUsage || "article_cover",
     focalPoint: card.focalPoint || "center",
     author: card.author || merged.author || "歲悅照顧編輯部",
@@ -367,6 +368,9 @@ export async function loadPublicContent() {
   const rewriteModule = await import("../article-rewrites.js");
   const rewrites = { ...(rewriteModule.default || {}) };
   const staticDetails = { ...staticState.articlePages };
+  dementiaSeriesArticles.forEach((article) => {
+    staticDetails[article.slug] = { ...(staticDetails[article.slug] || {}), ...article };
+  });
   Object.entries(rewrites).forEach(([slug, rewrite]) => {
     staticDetails[slug] = { ...(staticDetails[slug] || {}), ...rewrite };
   });
@@ -374,7 +378,24 @@ export async function loadPublicContent() {
     staticDetails[slug] = { ...(staticDetails[slug] || {}), ...rewrite };
   });
 
-  const staticCards = [...staticState.healthArticles];
+  const staticCards = [
+    ...dementiaSeriesArticles.map((article) => ({
+      slug: article.slug,
+      href: `/article/${article.slug}`,
+      category: article.category,
+      title: article.title,
+      subtitle: article.dek,
+      excerpt: article.excerpt,
+      image: article.image,
+      imageAlt: article.imageAlt,
+      author: article.author,
+      date: article.date,
+      readingMinutes: article.readingMinutes,
+      tags: article.tags,
+      keywords: article.keywords
+    })),
+    ...staticState.healthArticles
+  ];
   list(rewriteModule.elderDiseaseLazyPackArticles).forEach((card) => {
     if (!staticCards.some((item) => (item.slug || slugFromHref(item.href)) === card.slug)) {
       staticCards.push({ ...card, href: `/article/${card.slug}` });

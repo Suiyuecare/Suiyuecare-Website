@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="living-well-wheel-title living-well-wheel-desc">
+  <title id="living-well-wheel-title">確診後維持生活能力</title>
+  <desc id="living-well-wheel-desc">以保留能力為中心，整理運動、作息、社交、醫療、環境與決策參與六個面向。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect x="0" y="0" width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="66" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="800" letter-spacing="2">LIVING WELL AFTER DIAGNOSIS</text>
+  <text x="64" y="118" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">確診後的目標：把還能做的事留得更久</text>
+  <text x="64" y="154" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">支持不是全部接手，而是調整環境與步驟，讓本人繼續參與。</text>
+  <circle cx="590" cy="390" r="112" fill="#fff0de" stroke="#f58a1f" stroke-width="5"/>
+  <text x="590" y="378" fill="#3c1f0b" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="25" font-weight="900"><tspan x="590" dy="0">保留能力</tspan><tspan x="590" dy="36">與生活品質</tspan></text>
+  <g>
+    <line x1="590" y1="390" x2="590" y2="215" stroke="#ead8bf" stroke-width="5"/>
+    <rect x="490" y="168" width="200" height="94" rx="8" fill="#fff0de" stroke="#f58a1f" stroke-width="2"/>
+    <text x="590" y="210" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">規律活動</text>
+    <text x="590" y="240" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="750">依能力安排</text>
+  </g>
+<g>
+    <line x1="590" y1="390" x2="837" y2="300" stroke="#ead8bf" stroke-width="5"/>
+    <rect x="737" y="253" width="200" height="94" rx="8" fill="#e7f6f8" stroke="#1595a8" stroke-width="2"/>
+    <text x="837" y="295" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">固定作息</text>
+    <text x="837" y="325" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="750">降低混亂</text>
+  </g>
+<g>
+    <line x1="590" y1="390" x2="837" y2="485" stroke="#ead8bf" stroke-width="5"/>
+    <rect x="737" y="438" width="200" height="94" rx="8" fill="#eef4e9" stroke="#758d60" stroke-width="2"/>
+    <text x="837" y="480" text-anchor="middle" fill="#758d60" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">持續社交</text>
+    <text x="837" y="510" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="750">保留角色</text>
+  </g>
+<g>
+    <line x1="590" y1="390" x2="590" y2="565" stroke="#ead8bf" stroke-width="5"/>
+    <rect x="490" y="518" width="200" height="94" rx="8" fill="#fcebe6" stroke="#db6547" stroke-width="2"/>
+    <text x="590" y="560" text-anchor="middle" fill="#db6547" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">醫療追蹤</text>
+    <text x="590" y="590" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="750">藥物與共病</text>
+  </g>
+<g>
+    <line x1="590" y1="390" x2="343" y2="485" stroke="#ead8bf" stroke-width="5"/>
+    <rect x="243" y="438" width="200" height="94" rx="8" fill="#eaf1fa" stroke="#4f77a8" stroke-width="2"/>
+    <text x="343" y="480" text-anchor="middle" fill="#4f77a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">安全環境</text>
+    <text x="343" y="510" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="750">提示與輔具</text>
+  </g>
+<g>
+    <line x1="590" y1="390" x2="343" y2="300" stroke="#ead8bf" stroke-width="5"/>
+    <rect x="243" y="253" width="200" height="94" rx="8" fill="#fff6d9" stroke="#d89e2b" stroke-width="2"/>
+    <text x="343" y="295" text-anchor="middle" fill="#d89e2b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">本人參與</text>
+    <text x="343" y="325" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="750">選擇與尊嚴</text>
+  </g>
+  
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">若出現突然混亂、跌倒、快速退化、幻覺明顯增加或照顧安全疑慮，請及早尋求醫療評估。</text>
+</svg>

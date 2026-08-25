@@ -97,7 +97,17 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "elderly-osteoporosis-lazy-pack",
   "elderly-osteoarthritis-lazy-pack",
   "elderly-parkinson-lazy-pack",
-  "elderly-chronic-kidney-disease-lazy-pack"
+  "elderly-chronic-kidney-disease-lazy-pack",
+  "dementia-prevention-midlife-habits",
+  "dementia-prevention-exercise-guide",
+  "brain-healthy-diet-plate",
+  "cardiometabolic-brain-health",
+  "hearing-loss-dementia-risk",
+  "sleep-depression-brain-health",
+  "daily-cognitive-training-15-minutes",
+  "living-well-after-dementia-diagnosis",
+  "dementia-care-cue-wait-support",
+  "dementia-supplement-myths"
 ]);
 
 const sourceNumberMap = new Map(

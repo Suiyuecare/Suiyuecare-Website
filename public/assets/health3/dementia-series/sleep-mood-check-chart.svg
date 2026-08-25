@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="sleep-mood-check-title sleep-mood-check-desc">
+  <title id="sleep-mood-check-title">睡眠與心情觀察流程</title>
+  <desc id="sleep-mood-check-desc">整理睡眠與情緒變化時可先記錄的項目、需就醫評估的線索與日常支持。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect x="0" y="0" width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="66" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="800" letter-spacing="2">SLEEP &amp; MOOD CHECK</text>
+  <text x="64" y="118" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">先找原因，不把所有記憶變化都怪在年齡</text>
+  <text x="64" y="154" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">睡眠、心情與認知互相影響；持續變化需要評估，而不是只靠硬撐。</text>
+  <rect x="64" y="210" width="322" height="348" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+  <text x="225" y="260" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="24" font-weight="900">先記錄 2 週</text>
+  <text x="105" y="312" fill="#3c1f0b" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="750"><tspan x="105" dy="0">• 上床、醒來與午睡時間</tspan><tspan x="105" dy="46">• 打鼾、喘醒、夜間頻尿</tspan><tspan x="105" dy="46">• 白天嗜睡與活動量</tspan><tspan x="105" dy="46">• 情緒、食慾、興趣</tspan><tspan x="105" dy="46">• 新藥物與咖啡因</tspan></text>
+  <line x1="406" y1="383" x2="493" y2="383" stroke="#f58a1f" stroke-width="4" stroke-linecap="round"/>
+  <polygon points="493,383 484.33974596215563,388 484.33974596215563,378" fill="#f58a1f"/>
+  <rect x="512" y="210" width="270" height="348" rx="8" fill="#fcebe6" stroke="#db6547" stroke-width="2"/>
+  <text x="647" y="260" text-anchor="middle" fill="#db6547" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="24" font-weight="900">出現這些情況</text>
+  <text x="550" y="315" fill="#3c1f0b" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="19" font-weight="800"><tspan x="550" dy="0">持續兩週以上</tspan><tspan x="550" dy="50">明顯影響日常</tspan><tspan x="550" dy="50">疑似睡眠呼吸中止</tspan><tspan x="550" dy="50">強烈無望或自傷想法</tspan><tspan x="550" dy="50">突然混亂或急劇改變</tspan></text>
+  <line x1="802" y1="383" x2="882" y2="383" stroke="#db6547" stroke-width="4" stroke-linecap="round"/>
+  <polygon points="882,383 873.3397459621556,388 873.3397459621556,378" fill="#db6547"/>
+  <rect x="902" y="210" width="234" height="348" rx="8" fill="#e7f6f8" stroke="#1595a8" stroke-width="2"/>
+  <text x="1019" y="260" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="24" font-weight="900">安排評估</text>
+  <text x="1019" y="325" fill="#3c1f0b" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="800"><tspan x="1019" dy="0">家醫／身心科</tspan><tspan x="1019" dy="49">睡眠門診</tspan><tspan x="1019" dy="49">藥物與慢性病檢視</tspan><tspan x="1019" dy="49">必要時認知評估</tspan><tspan x="1019" dy="49">同步調整白天作息</tspan></text>
+  
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">睡太久或睡太少與失智風險的關聯，不等於單一因果；突然意識改變應優先就醫。</text>
+</svg>

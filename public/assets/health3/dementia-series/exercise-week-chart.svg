@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="exercise-week-title exercise-week-desc">
+  <title id="exercise-week-title">一週護腦運動配置</title>
+  <desc id="exercise-week-desc">以一週七天範例說明有氧、肌力與平衡訓練如何分配。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect x="0" y="0" width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="66" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="800" letter-spacing="2">WEEKLY MOVEMENT PLAN</text>
+  <text x="64" y="118" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">有氧打底、肌力撐住、平衡守安全</text>
+  <text x="64" y="154" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">這是配置範例，不是處方；從能說話但微喘的強度慢慢累積。</text>
+  <g>
+    <rect x="64" y="198" width="136" height="294" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/><text x="132" y="237" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">週一</text><rect x="218" y="198" width="136" height="294" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/><text x="286" y="237" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">週二</text><rect x="372" y="198" width="136" height="294" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/><text x="440" y="237" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">週三</text><rect x="526" y="198" width="136" height="294" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/><text x="594" y="237" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">週四</text><rect x="680" y="198" width="136" height="294" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/><text x="748" y="237" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">週五</text><rect x="834" y="198" width="136" height="294" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/><text x="902" y="237" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">週六</text><rect x="988" y="198" width="136" height="294" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/><text x="1056" y="237" text-anchor="middle" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">週日</text>
+    <rect x="78" y="265" width="108" height="40" rx="8" fill="#fff0de" stroke="#f58a1f" stroke-width="1.5"/>
+  <text x="132" y="292" fill="#f58a1f" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">快走 30分</text>
+    <rect x="232" y="265" width="108" height="40" rx="8" fill="#e7f6f8" stroke="#1595a8" stroke-width="1.5"/>
+  <text x="286" y="292" fill="#1595a8" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">肌力 20分</text>
+    <rect x="386" y="265" width="108" height="40" rx="8" fill="#fff0de" stroke="#f58a1f" stroke-width="1.5"/>
+  <text x="440" y="292" fill="#f58a1f" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">快走 30分</text>
+    <rect x="540" y="265" width="108" height="40" rx="8" fill="#eef4e9" stroke="#758d60" stroke-width="1.5"/>
+  <text x="594" y="292" fill="#758d60" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">平衡 15分</text>
+    <rect x="694" y="265" width="108" height="40" rx="8" fill="#fff0de" stroke="#f58a1f" stroke-width="1.5"/>
+  <text x="748" y="292" fill="#f58a1f" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">快走 30分</text>
+    <rect x="848" y="265" width="108" height="40" rx="8" fill="#e7f6f8" stroke="#1595a8" stroke-width="1.5"/>
+  <text x="902" y="292" fill="#1595a8" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">肌力 20分</text>
+    <rect x="1002" y="265" width="108" height="40" rx="8" fill="#fff0de" stroke="#f58a1f" stroke-width="1.5"/>
+  <text x="1056" y="292" fill="#f58a1f" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">散步 30分</text>
+    <rect x="78" y="331" width="108" height="40" rx="8" fill="#eef4e9" stroke="#758d60" stroke-width="1.5"/>
+  <text x="132" y="358" fill="#758d60" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">平衡 10分</text>
+    <rect x="386" y="331" width="108" height="40" rx="8" fill="#eef4e9" stroke="#758d60" stroke-width="1.5"/>
+  <text x="440" y="358" fill="#758d60" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">平衡 10分</text>
+    <rect x="694" y="331" width="108" height="40" rx="8" fill="#eef4e9" stroke="#758d60" stroke-width="1.5"/>
+  <text x="748" y="358" fill="#758d60" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">平衡 10分</text>
+    <rect x="1002" y="331" width="108" height="40" rx="8" fill="#eaf1fa" stroke="#4f77a8" stroke-width="1.5"/>
+  <text x="1056" y="358" fill="#4f77a8" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">伸展 10分</text>
+    <text x="132" y="444" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700">可拆成<br/>3 次 10 分</text>
+    <text x="286" y="444" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700">椅子起立<br/>推牆</text>
+    <text x="594" y="444" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700">扶穩練習<br/>安全第一</text>
+    <text x="902" y="444" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700">彈力帶<br/>提踵</text>
+  </g>
+  <rect x="64" y="530" width="318" height="40" rx="8" fill="#fff0de" stroke="#f58a1f" stroke-width="1.5"/>
+  <text x="223" y="557" fill="#f58a1f" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">每週至少 150 分鐘中等強度有氧</text>
+  <rect x="402" y="530" width="258" height="40" rx="8" fill="#e7f6f8" stroke="#1595a8" stroke-width="1.5"/>
+  <text x="531" y="557" fill="#1595a8" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">每週至少 2 天肌力</text>
+  <rect x="680" y="530" width="456" height="40" rx="8" fill="#eef4e9" stroke="#758d60" stroke-width="1.5"/>
+  <text x="908" y="557" fill="#758d60" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">行動較不穩者：每週至少 3 天平衡練習</text>
+  
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">胸痛、暈眩、喘不過氣或新出現疼痛時先停止；久未運動者可先從 5–10 分鐘開始。</text>
+</svg>

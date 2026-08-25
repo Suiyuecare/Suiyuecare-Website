@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="midlife-habits-title midlife-habits-desc">
+  <title id="midlife-habits-title">護腦生活十件事</title>
+  <desc id="midlife-habits-desc">以十張卡片整理中年到高齡可持續的失智風險降低行動。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect x="0" y="0" width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="66" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="800" letter-spacing="2">BRAIN HEALTH CHECKLIST</text>
+  <text x="64" y="118" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">護腦不是做一件大事，是把 10 件小事做久</text>
+  <text x="64" y="154" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">先選最容易開始的兩項，四週後再加，不需要一天全部完成。</text>
+  <g>
+    <rect x="64" y="190" width="196" height="164" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="64" y="190" width="8" height="164" rx="4" fill="#f58a1f"/>
+    <rect x="88" y="212" width="44" height="32" rx="8" fill="#fff0de"/><text x="110" y="235" fill="#f58a1f" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">01</text>
+    <text x="146" y="237" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900">每週活動</text>
+    <text x="90" y="272" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="90" dy="0">有氧＋肌力＋平衡</tspan></text>
+  </g>
+<g>
+    <rect x="280" y="190" width="196" height="164" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="280" y="190" width="8" height="164" rx="4" fill="#1595a8"/>
+    <rect x="304" y="212" width="44" height="32" rx="8" fill="#e7f6f8"/><text x="326" y="235" fill="#1595a8" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">02</text>
+    <text x="362" y="237" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900">三高管理</text>
+    <text x="306" y="272" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="306" dy="0">按時追蹤與用藥</tspan></text>
+  </g>
+<g>
+    <rect x="496" y="190" width="196" height="164" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="496" y="190" width="8" height="164" rx="4" fill="#758d60"/>
+    <rect x="520" y="212" width="44" height="32" rx="8" fill="#eef4e9"/><text x="542" y="235" fill="#758d60" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">03</text>
+    <text x="578" y="237" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900">停止吸菸</text>
+    <text x="522" y="272" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="522" dy="0">需要時尋求戒菸支持</tspan></text>
+  </g>
+<g>
+    <rect x="712" y="190" width="196" height="164" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="712" y="190" width="8" height="164" rx="4" fill="#db6547"/>
+    <rect x="736" y="212" width="44" height="32" rx="8" fill="#fcebe6"/><text x="758" y="235" fill="#db6547" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">04</text>
+    <text x="794" y="237" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900">飲酒減量</text>
+    <text x="738" y="272" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="738" dy="0">能不喝就不必開始</tspan></text>
+  </g>
+<g>
+    <rect x="928" y="190" width="196" height="164" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="928" y="190" width="8" height="164" rx="4" fill="#4f77a8"/>
+    <rect x="952" y="212" width="44" height="32" rx="8" fill="#eaf1fa"/><text x="974" y="235" fill="#4f77a8" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">05</text>
+    <text x="1010" y="237" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900">均衡飲食</text>
+    <text x="954" y="272" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="954" dy="0">原型食物與多樣蔬果</tspan></text>
+  </g>
+<g>
+    <rect x="64" y="380" width="196" height="164" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="64" y="380" width="8" height="164" rx="4" fill="#d89e2b"/>
+    <rect x="88" y="402" width="44" height="32" rx="8" fill="#fff6d9"/><text x="110" y="425" fill="#d89e2b" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">06</text>
+    <text x="146" y="427" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900">保護聽力</text>
+    <text x="90" y="462" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="90" dy="0">聽不清就安排評估</tspan></text>
+  </g>
+<g>
+    <rect x="280" y="380" width="196" height="164" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="280" y="380" width="8" height="164" rx="4" fill="#f58a1f"/>
+    <rect x="304" y="402" width="44" height="32" rx="8" fill="#fff0de"/><text x="326" y="425" fill="#f58a1f" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">07</text>
+    <text x="362" y="427" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900">睡眠就醫</text>
+    <text x="306" y="462" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="306" dy="0">持續異常找原因</tspan></text>
+  </g>
+<g>
+    <rect x="496" y="380" width="196" height="164" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="496" y="380" width="8" height="164" rx="4" fill="#1595a8"/>
+    <rect x="520" y="402" width="44" height="32" rx="8" fill="#e7f6f8"/><text x="542" y="425" fill="#1595a8" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">08</text>
+    <text x="578" y="427" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900">維持連結</text>
+    <text x="522" y="462" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="522" dy="0">固定與人互動</tspan></text>
+  </g>
+<g>
+    <rect x="712" y="380" width="196" height="164" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="712" y="380" width="8" height="164" rx="4" fill="#758d60"/>
+    <rect x="736" y="402" width="44" height="32" rx="8" fill="#eef4e9"/><text x="758" y="425" fill="#758d60" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">09</text>
+    <text x="794" y="427" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900">學新任務</text>
+    <text x="738" y="462" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="738" dy="0">難度剛好、有回饋</tspan></text>
+  </g>
+<g>
+    <rect x="928" y="380" width="196" height="164" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="928" y="380" width="8" height="164" rx="4" fill="#db6547"/>
+    <rect x="952" y="402" width="44" height="32" rx="8" fill="#fcebe6"/><text x="974" y="425" fill="#db6547" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">10</text>
+    <text x="1010" y="427" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900">防跌護頭</text>
+    <text x="954" y="462" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="954" dy="0">視力、環境與安全</tspan></text>
+  </g>
+  
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">降低風險不等於保證不會失智；有慢性病或活動限制者，請和醫療專業討論適合做法。</text>
+</svg>

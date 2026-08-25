@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="cue-wait-flow-title cue-wait-flow-desc">
+  <title id="cue-wait-flow-title">提示等待再協助</title>
+  <desc id="cue-wait-flow-desc">以四階段流程說明失智照顧中如何先觀察、給一個提示、等待，再只協助必要部分。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect x="0" y="0" width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="66" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="800" letter-spacing="2">CUE · WAIT · SUPPORT</text>
+  <text x="64" y="118" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">少做一點替代，多留一點成功機會</text>
+  <text x="64" y="154" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">以穿衣為例：一次只給一個提示，留足反應時間，再協助卡住的步驟。</text>
+  <g>
+    <rect x="64" y="245" width="242" height="260" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="64" y="245" width="8" height="260" rx="4" fill="#f58a1f"/>
+    <rect x="88" y="267" width="44" height="32" rx="8" fill="#fff0de"/><text x="110" y="290" fill="#f58a1f" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">01</text>
+    <text x="146" y="292" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">先觀察</text>
+    <text x="90" y="327" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="90" dy="0">他卡在哪一步？</tspan><tspan x="90" dy="25">環境是否太吵？</tspan></text>
+  </g>
+<g>
+    <rect x="336" y="245" width="242" height="260" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="336" y="245" width="8" height="260" rx="4" fill="#1595a8"/>
+    <rect x="360" y="267" width="44" height="32" rx="8" fill="#e7f6f8"/><text x="382" y="290" fill="#1595a8" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">02</text>
+    <text x="418" y="292" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">給一個提示</text>
+    <text x="362" y="327" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="362" dy="0">短句、手勢或示範</tspan><tspan x="362" dy="25">不要連續下指令</tspan></text>
+  </g>
+<g>
+    <rect x="608" y="245" width="242" height="260" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="608" y="245" width="8" height="260" rx="4" fill="#758d60"/>
+    <rect x="632" y="267" width="44" height="32" rx="8" fill="#eef4e9"/><text x="654" y="290" fill="#758d60" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">03</text>
+    <text x="690" y="292" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">安靜等待</text>
+    <text x="634" y="327" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="634" dy="0">至少留幾秒反應</tspan><tspan x="634" dy="25">不急著糾正</tspan></text>
+  </g>
+<g>
+    <rect x="880" y="245" width="242" height="260" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="880" y="245" width="8" height="260" rx="4" fill="#db6547"/>
+    <rect x="904" y="267" width="44" height="32" rx="8" fill="#fcebe6"/><text x="926" y="290" fill="#db6547" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="900">04</text>
+    <text x="962" y="292" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="21" font-weight="900">只幫必要部分</text>
+    <text x="906" y="327" fill="#725b4c" text-anchor="start" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="700"><tspan x="906" dy="0">幫他越過卡點</tspan><tspan x="906" dy="25">完成後肯定努力</tspan></text>
+  </g>
+  <line x1="306" y1="375" x2="326" y2="375" stroke="#f58a1f" stroke-width="4" stroke-linecap="round"/>
+  <polygon points="326,375 317.33974596215563,380 317.33974596215563,370" fill="#f58a1f"/>
+  <line x1="578" y1="375" x2="598" y2="375" stroke="#1595a8" stroke-width="4" stroke-linecap="round"/>
+  <polygon points="598,375 589.3397459621556,380 589.3397459621556,370" fill="#1595a8"/>
+  <line x1="850" y1="375" x2="870" y2="375" stroke="#758d60" stroke-width="4" stroke-linecap="round"/>
+  <polygon points="870,375 861.3397459621556,380 861.3397459621556,370" fill="#758d60"/>
+  <rect x="64" y="545" width="1072" height="40" rx="8" fill="#fcebe6" stroke="#db6547" stroke-width="1.5"/>
+  <text x="600" y="572" fill="#db6547" text-anchor="middle" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="850">安全優先：火源、跌倒、吞嚥或走失等危險情境，要立即介入，不必硬等。</text>
+  
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">目標不是考驗記憶，而是保留參與、選擇與尊嚴；每個人的反應時間都不同。</text>
+</svg>
