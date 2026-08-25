@@ -107,7 +107,17 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "daily-cognitive-training-15-minutes",
   "living-well-after-dementia-diagnosis",
   "dementia-care-cue-wait-support",
-  "dementia-supplement-myths"
+  "dementia-supplement-myths",
+  "stroke-warning-signs-be-fast",
+  "tia-warning-stroke-emergency",
+  "ischemic-vs-hemorrhagic-stroke",
+  "stroke-prevention-risk-factors",
+  "post-stroke-dysphagia-safe-eating",
+  "stroke-rehabilitation-recovery-roadmap",
+  "post-stroke-aphasia-communication",
+  "stroke-home-care-discharge-checklist",
+  "prevent-recurrent-stroke",
+  "post-stroke-emotions-caregiver-support"
 ]);
 
 const sourceNumberMap = new Map(

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="emotion-energy-title emotion-energy-desc">
+  <title id="emotion-energy-title">中風後情緒與能量觀察</title>
+  <desc id="emotion-energy-desc">區分可先調整的黃燈與需立即求助的紅燈。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="62" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="850">MOOD &amp; ENERGY CHECK</text>
+  <text x="64" y="112" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">情緒與疲勞也是中風照顧的一部分</text>
+  <text x="64" y="151" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">先看持續時間、生活影響與安全，再決定調整節奏或立即求助。</text>
+  <rect x="64" y="205" width="510" height="374" rx="8" fill="#e7f6f8" stroke="#1595a8" stroke-width="2"/>
+    <text x="319" y="255" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="27" font-weight="900">黃燈｜安排評估與調整</text>
+    <rect x="92" y="286" width="454" height="66" rx="8" fill="#ffffff"/><text x="114" y="314" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="114" dy="0">低落、失去興趣持續兩週</tspan></text><rect x="92" y="372" width="454" height="66" rx="8" fill="#ffffff"/><text x="114" y="400" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="114" dy="0">疲勞影響復健、用藥或進食</tspan></text><rect x="92" y="458" width="454" height="66" rx="8" fill="#ffffff"/><text x="114" y="486" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="114" dy="0">照顧者長期失眠、疼痛或易怒</tspan></text><rect x="626" y="205" width="510" height="374" rx="8" fill="#fce9e4" stroke="#d95f45" stroke-width="2"/>
+    <text x="881" y="255" text-anchor="middle" fill="#d95f45" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="27" font-weight="900">紅燈｜立即求助</text>
+    <rect x="654" y="286" width="454" height="66" rx="8" fill="#ffffff"/><text x="676" y="314" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="676" dy="0">自傷、他傷想法或已準備計畫</tspan></text><rect x="654" y="372" width="454" height="66" rx="8" fill="#ffffff"/><text x="676" y="400" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="676" dy="0">突然混亂、說話或肢體劇變</tspan></text><rect x="654" y="458" width="454" height="66" rx="8" fill="#ffffff"/><text x="676" y="486" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="676" dy="0">攻擊失控、無法維持人身安全</tspan></text>
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">有自傷、他傷想法或計畫時不獨處，移開危險物並立即聯絡 119 或就近急診。</text>
+</svg>

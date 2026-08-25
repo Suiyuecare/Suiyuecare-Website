@@ -1403,6 +1403,56 @@
       "source": "/article/dementia-supplement-myths",
       "destination": "/article/article108",
       "permanent": true
+    },
+    {
+      "source": "/article/stroke-warning-signs-be-fast",
+      "destination": "/article/article109",
+      "permanent": true
+    },
+    {
+      "source": "/article/tia-warning-stroke-emergency",
+      "destination": "/article/article110",
+      "permanent": true
+    },
+    {
+      "source": "/article/ischemic-vs-hemorrhagic-stroke",
+      "destination": "/article/article111",
+      "permanent": true
+    },
+    {
+      "source": "/article/stroke-prevention-risk-factors",
+      "destination": "/article/article112",
+      "permanent": true
+    },
+    {
+      "source": "/article/post-stroke-dysphagia-safe-eating",
+      "destination": "/article/article113",
+      "permanent": true
+    },
+    {
+      "source": "/article/stroke-rehabilitation-recovery-roadmap",
+      "destination": "/article/article114",
+      "permanent": true
+    },
+    {
+      "source": "/article/post-stroke-aphasia-communication",
+      "destination": "/article/article115",
+      "permanent": true
+    },
+    {
+      "source": "/article/stroke-home-care-discharge-checklist",
+      "destination": "/article/article116",
+      "permanent": true
+    },
+    {
+      "source": "/article/prevent-recurrent-stroke",
+      "destination": "/article/article117",
+      "permanent": true
+    },
+    {
+      "source": "/article/post-stroke-emotions-caregiver-support",
+      "destination": "/article/article118",
+      "permanent": true
     }
   ],
   "rewrites": [

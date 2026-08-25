@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="rehab-roadmap-title rehab-roadmap-desc">
+  <title id="rehab-roadmap-title">中風復健路線圖</title>
+  <desc id="rehab-roadmap-desc">從急性住院、跨專業評估、復健到返家與社區參與。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="62" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="850">RECOVERY ROADMAP</text>
+  <text x="64" y="112" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">復健不是一條直線，是持續評估與接回生活</text>
+  <text x="64" y="151" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">病況穩定後及早開始，依能力前進、停留或調整。</text>
+  <g>
+    <rect x="64" y="224" width="196" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="64" y="224" width="8" height="300" rx="4" fill="#f58a1f"/>
+    <circle cx="106" cy="266" r="23" fill="#fff0de"/>
+    <text x="106" y="274" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">01</text>
+    <text x="88" y="315" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="19" font-weight="900"><tspan x="88" dy="0">急性穩定</tspan></text>
+    <text x="88" y="381" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="88" dy="0">先處理中風與併發症</tspan></text>
+  </g><line x1="263" y1="374" x2="278" y2="374" stroke="#f58a1f" stroke-width="4" stroke-linecap="round"/><polygon points="278,374 265,366 265,382" fill="#f58a1f"/><g>
+    <rect x="282" y="224" width="196" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="282" y="224" width="8" height="300" rx="4" fill="#1595a8"/>
+    <circle cx="324" cy="266" r="23" fill="#e7f6f8"/>
+    <text x="324" y="274" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">02</text>
+    <text x="306" y="315" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="19" font-weight="900"><tspan x="306" dy="0">完整評估</tspan></text>
+    <text x="306" y="381" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="306" dy="0">移位、吞嚥、溝通、</tspan><tspan x="306" dy="24">認知與情緒</tspan></text>
+  </g><line x1="481" y1="374" x2="496" y2="374" stroke="#1595a8" stroke-width="4" stroke-linecap="round"/><polygon points="496,374 483,366 483,382" fill="#1595a8"/><g>
+    <rect x="500" y="224" width="196" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="500" y="224" width="8" height="300" rx="4" fill="#758d60"/>
+    <circle cx="542" cy="266" r="23" fill="#eef4e9"/>
+    <text x="542" y="274" text-anchor="middle" fill="#758d60" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">03</text>
+    <text x="524" y="315" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="19" font-weight="900"><tspan x="524" dy="0">功能訓練</tspan></text>
+    <text x="524" y="381" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="524" dy="0">依個別目標逐步練習</tspan></text>
+  </g><line x1="699" y1="374" x2="714" y2="374" stroke="#758d60" stroke-width="4" stroke-linecap="round"/><polygon points="714,374 701,366 701,382" fill="#758d60"/><g>
+    <rect x="718" y="224" width="196" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="718" y="224" width="8" height="300" rx="4" fill="#4f77a8"/>
+    <circle cx="760" cy="266" r="23" fill="#eaf1fa"/>
+    <text x="760" y="274" text-anchor="middle" fill="#4f77a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">04</text>
+    <text x="742" y="315" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="19" font-weight="900"><tspan x="742" dy="0">返家演練</tspan></text>
+    <text x="742" y="381" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="742" dy="0">人力、環境、輔具與</tspan><tspan x="742" dy="24">照顧方法</tspan></text>
+  </g><line x1="917" y1="374" x2="932" y2="374" stroke="#4f77a8" stroke-width="4" stroke-linecap="round"/><polygon points="932,374 919,366 919,382" fill="#4f77a8"/><g>
+    <rect x="936" y="224" width="196" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="936" y="224" width="8" height="300" rx="4" fill="#d95f45"/>
+    <circle cx="978" cy="266" r="23" fill="#fce9e4"/>
+    <text x="978" y="274" text-anchor="middle" fill="#d95f45" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">05</text>
+    <text x="960" y="315" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="19" font-weight="900"><tspan x="960" dy="0">社區生活</tspan></text>
+    <text x="960" y="381" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="960" dy="0">回診、復健、角色與</tspan><tspan x="960" dy="24">參與</tspan></text>
+  </g>
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">不要拉扯無力側或勉強高強度活動；新神經症狀立刻打 119。</text>
+</svg>

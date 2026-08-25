@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="prevention-wheel-title prevention-wheel-desc">
+  <title id="prevention-wheel-title">中風預防七個面向</title>
+  <desc id="prevention-wheel-desc">從血壓、心律到生活習慣的七項預防行動。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="62" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="850">STROKE PREVENTION</text>
+  <text x="64" y="112" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">不是只少吃油：七個風險要一起管理</text>
+  <text x="64" y="151" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">先找最高風險，逐項留下可量測、可回診、可持續的行動。</text>
+  <g>
+    <rect x="64" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="64" y="205" width="8" height="166" rx="4" fill="#f58a1f"/>
+    <circle cx="106" cy="247" r="23" fill="#fff0de"/>
+    <text x="106" y="255" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">01</text>
+    <text x="142" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="142" dy="0">血壓</tspan></text>
+    <text x="88" y="299" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="88" dy="0">固定量測並帶趨勢回診</tspan></text>
+  </g><g>
+    <rect x="344" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="344" y="205" width="8" height="166" rx="4" fill="#1595a8"/>
+    <circle cx="386" cy="247" r="23" fill="#e7f6f8"/>
+    <text x="386" y="255" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">02</text>
+    <text x="422" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="422" dy="0">心房顫動</tspan></text>
+    <text x="368" y="299" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="368" dy="0">心電圖、風險評估與治療</tspan></text>
+  </g><g>
+    <rect x="624" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="624" y="205" width="8" height="166" rx="4" fill="#758d60"/>
+    <circle cx="666" cy="247" r="23" fill="#eef4e9"/>
+    <text x="666" y="255" text-anchor="middle" fill="#758d60" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">03</text>
+    <text x="702" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="702" dy="0">血糖</tspan></text>
+    <text x="648" y="299" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="648" dy="0">避免長期過高也避免低血糖</tspan></text>
+  </g><g>
+    <rect x="904" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="904" y="205" width="8" height="166" rx="4" fill="#4f77a8"/>
+    <circle cx="946" cy="247" r="23" fill="#eaf1fa"/>
+    <text x="946" y="255" text-anchor="middle" fill="#4f77a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">04</text>
+    <text x="982" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="982" dy="0">血脂</tspan></text>
+    <text x="928" y="299" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="928" dy="0">依整體心血管風險治療</tspan></text>
+  </g><g>
+    <rect x="204" y="400" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="204" y="400" width="8" height="166" rx="4" fill="#d95f45"/>
+    <circle cx="246" cy="442" r="23" fill="#fce9e4"/>
+    <text x="246" y="450" text-anchor="middle" fill="#d95f45" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">05</text>
+    <text x="282" y="439" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="282" dy="0">戒菸</tspan></text>
+    <text x="228" y="494" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="228" dy="0">使用戒菸門診與支持</tspan></text>
+  </g><g>
+    <rect x="484" y="400" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="484" y="400" width="8" height="166" rx="4" fill="#f58a1f"/>
+    <circle cx="526" cy="442" r="23" fill="#fff0de"/>
+    <text x="526" y="450" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">06</text>
+    <text x="562" y="439" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="562" dy="0">活動飲食</tspan></text>
+    <text x="508" y="494" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="508" dy="0">規律活動、少鹽與原型食物</tspan></text>
+  </g><g>
+    <rect x="764" y="400" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="764" y="400" width="8" height="166" rx="4" fill="#1595a8"/>
+    <circle cx="806" cy="442" r="23" fill="#e7f6f8"/>
+    <text x="806" y="450" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">07</text>
+    <text x="842" y="439" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="842" dy="0">睡眠</tspan></text>
+    <text x="788" y="494" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="788" dy="0">打鼾喘醒與嗜睡需評估</tspan></text>
+  </g>
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">治療目標依年齡、共病與藥物個別設定；不要自行停藥或追求過低數值。</text>
+</svg>

@@ -1633,11 +1633,13 @@ async function ensureStaticArticleRewrites() {
   if (!staticArticleRewritePackPromise) {
     staticArticleRewritePackPromise = Promise.all([
       import("./article-rewrites.js"),
-      import("./dementia-series-articles.mjs")
+      import("./dementia-series-articles.mjs"),
+      import("./stroke-series-articles.mjs")
     ])
-      .then(([rewriteModule, dementiaModule]) => {
+      .then(([rewriteModule, dementiaModule, strokeModule]) => {
         applyHealthArticleCards(rewriteModule.elderDiseaseLazyPackArticles || []);
         dementiaModule.installDementiaSeries(articlePages, healthArticles, articleHref);
+        strokeModule.installStrokeSeries(articlePages, healthArticles, articleHref);
         applyStaticArticleRewritePack(rewriteModule.default || {});
         applyHealth30ArticleEnhancements(rewriteModule.health30ArticleEnhancements || {});
         staticArticleRewritePackLoaded = true;
@@ -11089,6 +11091,7 @@ function renderStaticArticlePage(slug) {
     subtitle: article.dek,
     excerpt: article.dek,
     image: article.image,
+    imageAlt: article.imageAlt,
     author: article.author,
     date: article.date,
     tags: article.tags,
@@ -11126,7 +11129,7 @@ async function loadArticlePage(slug) {
         title: article.seoTitle || `${article.title}｜健康3.0`,
         description: article.seoDescription || article.excerpt || article.subtitle || DEFAULT_SEO.description,
         image: article.image,
-        imageAlt: article.title,
+        imageAlt: article.imageAlt || article.title,
         type: "article",
         canonical: routeCanonical(`article-${slug}`)
       });
@@ -11136,7 +11139,7 @@ async function loadArticlePage(slug) {
         title: fallback.seoTitle || `${fallback.title}｜健康3.0`,
         description: fallback.seoDescription || fallback.dek || DEFAULT_SEO.description,
         image: fallback.image,
-        imageAlt: fallback.title,
+        imageAlt: fallback.imageAlt || fallback.title,
         type: "article",
         canonical: routeCanonical(`article-${slug}`)
       });
@@ -11161,7 +11164,7 @@ async function loadArticlePage(slug) {
         title: fallback.seoTitle || `${fallback.title}｜健康3.0`,
         description: fallback.seoDescription || fallback.dek || DEFAULT_SEO.description,
         image: fallback.image,
-        imageAlt: fallback.title,
+        imageAlt: fallback.imageAlt || fallback.title,
         type: "article",
         canonical: routeCanonical(`article-${slug}`)
       });
