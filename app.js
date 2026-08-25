@@ -1634,12 +1634,14 @@ async function ensureStaticArticleRewrites() {
     staticArticleRewritePackPromise = Promise.all([
       import("./article-rewrites.js"),
       import("./dementia-series-articles.mjs"),
-      import("./stroke-series-articles.mjs")
+      import("./stroke-series-articles.mjs"),
+      import("./sarcopenia-series-articles.mjs")
     ])
-      .then(([rewriteModule, dementiaModule, strokeModule]) => {
+      .then(([rewriteModule, dementiaModule, strokeModule, sarcopeniaModule]) => {
         applyHealthArticleCards(rewriteModule.elderDiseaseLazyPackArticles || []);
         dementiaModule.installDementiaSeries(articlePages, healthArticles, articleHref);
         strokeModule.installStrokeSeries(articlePages, healthArticles, articleHref);
+        sarcopeniaModule.installSarcopeniaSeries(articlePages, healthArticles, articleHref);
         applyStaticArticleRewritePack(rewriteModule.default || {});
         applyHealth30ArticleEnhancements(rewriteModule.health30ArticleEnhancements || {});
         staticArticleRewritePackLoaded = true;

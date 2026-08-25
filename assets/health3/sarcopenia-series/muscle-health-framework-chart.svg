@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="muscle-health-title muscle-health-desc">
+  <title id="muscle-health-title">肌肉健康四個觀察面向</title>
+  <desc id="muscle-health-desc">從肌力、肌肉量、功能與生活變化理解肌少症。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="62" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="850">MUSCLE HEALTH</text>
+  <text x="64" y="112" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">別只看瘦不瘦：肌肉健康要看四件事</text>
+  <text x="64" y="151" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">低肌力與低肌肉量是診斷核心，功能變化則告訴我們生活受到多少影響。</text>
+  <g>
+    <rect x="64" y="224" width="250" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="64" y="224" width="8" height="300" rx="4" fill="#f58a1f"/>
+    <circle cx="104" cy="264" r="22" fill="#fff0de"/>
+    <text x="104" y="272" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">01</text>
+    <text x="140" y="263" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="140" dy="0">肌力</tspan></text>
+    <text x="86" y="315" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="86" dy="0">握力、起身與提物能力</tspan></text>
+  </g><line x1="317" y1="374" x2="334" y2="374" stroke="#f58a1f" stroke-width="4" stroke-linecap="round"/><polygon points="334,374 321,366 321,382" fill="#f58a1f"/><g>
+    <rect x="338" y="224" width="250" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="338" y="224" width="8" height="300" rx="4" fill="#1595a8"/>
+    <circle cx="378" cy="264" r="22" fill="#e7f6f8"/>
+    <text x="378" y="272" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">02</text>
+    <text x="414" y="263" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="414" dy="0">肌肉量</tspan></text>
+    <text x="360" y="315" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="360" dy="0">由 DXA、BIA 等專業工具評</tspan><tspan x="360" dy="24">估</tspan></text>
+  </g><line x1="591" y1="374" x2="608" y2="374" stroke="#1595a8" stroke-width="4" stroke-linecap="round"/><polygon points="608,374 595,366 595,382" fill="#1595a8"/><g>
+    <rect x="612" y="224" width="250" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="612" y="224" width="8" height="300" rx="4" fill="#758d60"/>
+    <circle cx="652" cy="264" r="22" fill="#eef4e9"/>
+    <text x="652" y="272" text-anchor="middle" fill="#758d60" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">03</text>
+    <text x="688" y="263" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="688" dy="0">功能</tspan></text>
+    <text x="634" y="315" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="634" dy="0">步行、轉位、平衡與耐力</tspan></text>
+  </g><line x1="865" y1="374" x2="882" y2="374" stroke="#758d60" stroke-width="4" stroke-linecap="round"/><polygon points="882,374 869,366 869,382" fill="#758d60"/><g>
+    <rect x="886" y="224" width="250" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="886" y="224" width="8" height="300" rx="4" fill="#4f77a8"/>
+    <circle cx="926" cy="264" r="22" fill="#eaf1fa"/>
+    <text x="926" y="272" text-anchor="middle" fill="#4f77a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">04</text>
+    <text x="962" y="263" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="962" dy="0">生活</tspan></text>
+    <text x="908" y="315" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="908" dy="0">跌倒、活動下降、住院與自</tspan><tspan x="908" dy="24">理變化</tspan></text>
+  </g>
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">體重、外觀與小腿圍只能提供線索，不能單獨診斷肌少症。</text>
+</svg>

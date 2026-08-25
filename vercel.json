@@ -1453,6 +1453,56 @@
       "source": "/article/post-stroke-emotions-caregiver-support",
       "destination": "/article/article118",
       "permanent": true
+    },
+    {
+      "source": "/article/what-is-sarcopenia-muscle-health",
+      "destination": "/article/article119",
+      "permanent": true
+    },
+    {
+      "source": "/article/sarcopenia-home-screening",
+      "destination": "/article/article120",
+      "permanent": true
+    },
+    {
+      "source": "/article/sarcopenia-awgs-diagnosis",
+      "destination": "/article/article121",
+      "permanent": true
+    },
+    {
+      "source": "/article/sarcopenia-exercise-plan",
+      "destination": "/article/article122",
+      "permanent": true
+    },
+    {
+      "source": "/article/sarcopenia-nutrition-protein",
+      "destination": "/article/article123",
+      "permanent": true
+    },
+    {
+      "source": "/article/sarcopenia-breakfast-protein",
+      "destination": "/article/article124",
+      "permanent": true
+    },
+    {
+      "source": "/article/sarcopenic-obesity-muscle-function",
+      "destination": "/article/article125",
+      "permanent": true
+    },
+    {
+      "source": "/article/post-hospital-sarcopenia-recovery",
+      "destination": "/article/article126",
+      "permanent": true
+    },
+    {
+      "source": "/article/sarcopenia-fall-prevention-home",
+      "destination": "/article/article127",
+      "permanent": true
+    },
+    {
+      "source": "/article/sarcopenia-twelve-week-plan",
+      "destination": "/article/article128",
+      "permanent": true
     }
   ],
   "rewrites": [

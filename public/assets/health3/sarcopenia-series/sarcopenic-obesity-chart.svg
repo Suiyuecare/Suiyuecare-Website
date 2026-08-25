@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="sarcopenic-obesity-title sarcopenic-obesity-desc">
+  <title id="sarcopenic-obesity-title">肌少型肥胖處理方向</title>
+  <desc id="sarcopenic-obesity-desc">比較只追體重與同時保留肌肉功能的做法。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="62" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="850">FUNCTION OVER THE SCALE</text>
+  <text x="64" y="112" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">體重正常或偏高，也可能同時低肌力</text>
+  <text x="64" y="151" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">重點不是快速變輕，而是降低多餘脂肪時保住肌肉、肌力與活動能力。</text>
+  <rect x="64" y="205" width="510" height="374" rx="8" fill="#e7f6f8" stroke="#1595a8" stroke-width="2"/>
+    <text x="319" y="255" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="27" font-weight="900">容易踩雷</text>
+    <rect x="92" y="286" width="454" height="66" rx="8" fill="#ffffff"/><text x="114" y="314" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="114" dy="0">只看 BMI 或體重</tspan></text><rect x="92" y="372" width="454" height="66" rx="8" fill="#ffffff"/><text x="114" y="400" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="114" dy="0">快速節食、蛋白質不足</tspan></text><rect x="92" y="458" width="454" height="66" rx="8" fill="#ffffff"/><text x="114" y="486" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="114" dy="0">只走路、不做阻力訓練</tspan></text><rect x="626" y="205" width="510" height="374" rx="8" fill="#fce9e4" stroke="#d95f45" stroke-width="2"/>
+    <text x="881" y="255" text-anchor="middle" fill="#d95f45" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="27" font-weight="900">較完整做法</text>
+    <rect x="654" y="286" width="454" height="66" rx="8" fill="#ffffff"/><text x="676" y="314" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="676" dy="0">量腰圍、肌力、肌肉量與功能</tspan></text><rect x="654" y="372" width="454" height="66" rx="8" fill="#ffffff"/><text x="676" y="400" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="676" dy="0">溫和能量調整並維持蛋白質</tspan></text><rect x="654" y="458" width="454" height="66" rx="8" fill="#ffffff"/><text x="676" y="486" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="800"><tspan x="676" dy="0">阻力、平衡與有氧搭配追蹤</tspan></text>
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">高齡者減重應個別評估；避免極低熱量、只做有氧或快速節食。</text>
+</svg>

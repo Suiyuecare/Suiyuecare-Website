@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="twelve-week-track-title twelve-week-track-desc">
+  <title id="twelve-week-track-title">肌少症 12 週追蹤路線</title>
+  <desc id="twelve-week-track-desc">以基線、建立習慣、漸進、複測和延續安排追蹤。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="62" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="850">12-WEEK MUSCLE PLAN</text>
+  <text x="64" y="112" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">不是追求速成，是讓每週都有可追蹤的進步</text>
+  <text x="64" y="151" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">固定少數指標，搭配運動、餐食與恢復；沒有改善時先找卡點，而不是硬加量。</text>
+  <g>
+    <rect x="64" y="224" width="196" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="64" y="224" width="8" height="300" rx="4" fill="#f58a1f"/>
+    <circle cx="104" cy="264" r="22" fill="#fff0de"/>
+    <text x="104" y="272" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">01</text>
+    <text x="86" y="312" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="86" dy="0">第 0 週</tspan></text>
+    <text x="86" y="375" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="86" dy="0">量基線：握力、坐站</tspan><tspan x="86" dy="24">、步行與食量</tspan></text>
+  </g><line x1="263" y1="374" x2="278" y2="374" stroke="#f58a1f" stroke-width="4" stroke-linecap="round"/><polygon points="278,374 265,366 265,382" fill="#f58a1f"/><g>
+    <rect x="282" y="224" width="196" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="282" y="224" width="8" height="300" rx="4" fill="#1595a8"/>
+    <circle cx="322" cy="264" r="22" fill="#e7f6f8"/>
+    <text x="322" y="272" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">02</text>
+    <text x="304" y="312" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="304" dy="0">第 1–2 週</tspan></text>
+    <text x="304" y="375" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="304" dy="0">建立固定時段與安全</tspan><tspan x="304" dy="24">動作</tspan></text>
+  </g><line x1="481" y1="374" x2="496" y2="374" stroke="#1595a8" stroke-width="4" stroke-linecap="round"/><polygon points="496,374 483,366 483,382" fill="#1595a8"/><g>
+    <rect x="500" y="224" width="196" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="500" y="224" width="8" height="300" rx="4" fill="#758d60"/>
+    <circle cx="540" cy="264" r="22" fill="#eef4e9"/>
+    <text x="540" y="272" text-anchor="middle" fill="#758d60" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">03</text>
+    <text x="522" y="312" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="522" dy="0">第 3–6 週</tspan></text>
+    <text x="522" y="375" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="522" dy="0">逐步增加阻力、次數</tspan><tspan x="522" dy="24">或組數</tspan></text>
+  </g><line x1="699" y1="374" x2="714" y2="374" stroke="#758d60" stroke-width="4" stroke-linecap="round"/><polygon points="714,374 701,366 701,382" fill="#758d60"/><g>
+    <rect x="718" y="224" width="196" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="718" y="224" width="8" height="300" rx="4" fill="#4f77a8"/>
+    <circle cx="758" cy="264" r="22" fill="#eaf1fa"/>
+    <text x="758" y="272" text-anchor="middle" fill="#4f77a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">04</text>
+    <text x="740" y="312" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="740" dy="0">第 7–10 週</tspan></text>
+    <text x="740" y="375" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="740" dy="0">把力量接回家務與外</tspan><tspan x="740" dy="24">出</tspan></text>
+  </g><line x1="917" y1="374" x2="932" y2="374" stroke="#4f77a8" stroke-width="4" stroke-linecap="round"/><polygon points="932,374 919,366 919,382" fill="#4f77a8"/><g>
+    <rect x="936" y="224" width="196" height="300" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="936" y="224" width="8" height="300" rx="4" fill="#d95f45"/>
+    <circle cx="976" cy="264" r="22" fill="#fce9e4"/>
+    <text x="976" y="272" text-anchor="middle" fill="#d95f45" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">05</text>
+    <text x="958" y="312" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="958" dy="0">第 11–12 週</tspan></text>
+    <text x="958" y="375" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="958" dy="0">複測、回顧卡點並安</tspan><tspan x="958" dy="24">排下一階段</tspan></text>
+  </g>
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">結果因疾病與起點不同；計畫需依醫療、復健與營養專業建議個別化。</text>
+</svg>

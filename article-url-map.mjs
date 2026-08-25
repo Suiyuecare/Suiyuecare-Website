@@ -117,7 +117,17 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "post-stroke-aphasia-communication",
   "stroke-home-care-discharge-checklist",
   "prevent-recurrent-stroke",
-  "post-stroke-emotions-caregiver-support"
+  "post-stroke-emotions-caregiver-support",
+  "what-is-sarcopenia-muscle-health",
+  "sarcopenia-home-screening",
+  "sarcopenia-awgs-diagnosis",
+  "sarcopenia-exercise-plan",
+  "sarcopenia-nutrition-protein",
+  "sarcopenia-breakfast-protein",
+  "sarcopenic-obesity-muscle-function",
+  "post-hospital-sarcopenia-recovery",
+  "sarcopenia-fall-prevention-home",
+  "sarcopenia-twelve-week-plan"
 ]);
 
 const sourceNumberMap = new Map(

@@ -14,6 +14,7 @@ import {
 import { resolveHealthArticleImage } from "../health-article-images.mjs";
 import { dementiaSeriesArticles } from "../dementia-series-articles.mjs";
 import { strokeSeriesArticles } from "../stroke-series-articles.mjs";
+import { sarcopeniaSeriesArticles } from "../sarcopenia-series-articles.mjs";
 
 const rootDir = path.resolve(import.meta.dirname, "..");
 const appSourcePath = path.join(rootDir, "app.js");
@@ -375,6 +376,9 @@ export async function loadPublicContent() {
   strokeSeriesArticles.forEach((article) => {
     staticDetails[article.slug] = { ...(staticDetails[article.slug] || {}), ...article };
   });
+  sarcopeniaSeriesArticles.forEach((article) => {
+    staticDetails[article.slug] = { ...(staticDetails[article.slug] || {}), ...article };
+  });
   Object.entries(rewrites).forEach(([slug, rewrite]) => {
     staticDetails[slug] = { ...(staticDetails[slug] || {}), ...rewrite };
   });
@@ -383,6 +387,21 @@ export async function loadPublicContent() {
   });
 
   const staticCards = [
+    ...sarcopeniaSeriesArticles.map((article) => ({
+      slug: article.slug,
+      href: `/article/${article.slug}`,
+      category: article.category,
+      title: article.title,
+      subtitle: article.tags.slice(0, 2).join("・"),
+      excerpt: article.excerpt,
+      image: article.image,
+      imageAlt: article.imageAlt,
+      author: article.author,
+      date: article.date,
+      readingMinutes: article.readingMinutes,
+      tags: article.tags,
+      keywords: article.keywords
+    })),
     ...strokeSeriesArticles.map((article) => ({
       slug: article.slug,
       href: `/article/${article.slug}`,

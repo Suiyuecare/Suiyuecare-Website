@@ -10045,6 +10045,9 @@ input[name="_honey"] { display: none !important; }
 .article-body .article-inline-image {
   margin: 34px 0 4px;
 }
+.article-chart-swipe-hint {
+  display: none;
+}
 .article-body .article-inline-image img {
   display: block;
   width: 100%;
@@ -13387,6 +13390,11 @@ input[name="_honey"] { display: none !important; }
     overscroll-behavior-inline: contain;
     scrollbar-width: thin;
     -webkit-overflow-scrolling: touch;
+  }
+  .article-chart-swipe-hint {
+    display: block;
+    color: var(--orange);
+    font-weight: 900;
   }
   .article-body .article-inline-image img[src$="-chart.svg"] {
     width: 720px;

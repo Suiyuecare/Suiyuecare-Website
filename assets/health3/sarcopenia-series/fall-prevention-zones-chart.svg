@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="fall-prevention-zones-title fall-prevention-zones-desc">
+  <title id="fall-prevention-zones-title">肌少症家庭防跌七區</title>
+  <desc id="fall-prevention-zones-desc">檢查床邊、浴廁、通道、鞋子、藥物與夜間活動。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="62" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="850">FALL-PROOF THE ROUTE</text>
+  <text x="64" y="112" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">先改每天會走的路，再增加更多設備</text>
+  <text x="64" y="151" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">防跌不是叫長輩不要動，而是讓他能在更安全的環境持續練力量與平衡。</text>
+  <g>
+    <rect x="64" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="64" y="205" width="8" height="166" rx="4" fill="#f58a1f"/>
+    <circle cx="104" cy="245" r="22" fill="#fff0de"/>
+    <text x="104" y="253" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">01</text>
+    <text x="140" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="140" dy="0">床邊</tspan></text>
+    <text x="86" y="296" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="86" dy="0">床高、夜燈、起身支撐</tspan></text>
+  </g><g>
+    <rect x="344" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="344" y="205" width="8" height="166" rx="4" fill="#1595a8"/>
+    <circle cx="384" cy="245" r="22" fill="#e7f6f8"/>
+    <text x="384" y="253" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">02</text>
+    <text x="420" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="420" dy="0">浴廁</tspan></text>
+    <text x="366" y="296" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="366" dy="0">止滑、扶手、洗澡椅</tspan></text>
+  </g><g>
+    <rect x="624" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="624" y="205" width="8" height="166" rx="4" fill="#758d60"/>
+    <circle cx="664" cy="245" r="22" fill="#eef4e9"/>
+    <text x="664" y="253" text-anchor="middle" fill="#758d60" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">03</text>
+    <text x="700" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="700" dy="0">通道</tspan></text>
+    <text x="646" y="296" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="646" dy="0">收線、移地墊、加照明</tspan></text>
+  </g><g>
+    <rect x="904" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="904" y="205" width="8" height="166" rx="4" fill="#4f77a8"/>
+    <circle cx="944" cy="245" r="22" fill="#eaf1fa"/>
+    <text x="944" y="253" text-anchor="middle" fill="#4f77a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">04</text>
+    <text x="980" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="980" dy="0">鞋與輔具</tspan></text>
+    <text x="926" y="296" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="926" dy="0">合腳止滑、尺寸正確</tspan></text>
+  </g><g>
+    <rect x="204" y="400" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="204" y="400" width="8" height="166" rx="4" fill="#d95f45"/>
+    <circle cx="244" cy="440" r="22" fill="#fce9e4"/>
+    <text x="244" y="448" text-anchor="middle" fill="#d95f45" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">05</text>
+    <text x="280" y="439" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="280" dy="0">藥物</tspan></text>
+    <text x="226" y="491" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="226" dy="0">頭暈、嗜睡與降壓藥回顧</tspan></text>
+  </g><g>
+    <rect x="484" y="400" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="484" y="400" width="8" height="166" rx="4" fill="#f58a1f"/>
+    <circle cx="524" cy="440" r="22" fill="#fff0de"/>
+    <text x="524" y="448" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">06</text>
+    <text x="560" y="439" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="560" dy="0">視聽</tspan></text>
+    <text x="506" y="491" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="506" dy="0">眼鏡、助聽器與光線</tspan></text>
+  </g><g>
+    <rect x="764" y="400" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="764" y="400" width="8" height="166" rx="4" fill="#1595a8"/>
+    <circle cx="804" cy="440" r="22" fill="#e7f6f8"/>
+    <text x="804" y="448" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">07</text>
+    <text x="840" y="439" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="840" dy="0">練功能</tspan></text>
+    <text x="786" y="491" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="786" dy="0">坐站、轉身、跨步與平衡</tspan></text>
+  </g>
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">跌倒撞頭、無法承重、明顯變形或意識改變時，立即就醫。</text>
+</svg>

@@ -134,8 +134,10 @@ function renderMarkdownLikeContent(content = "") {
 
 function renderInlineImage(image = {}) {
   if (!image?.src) return "";
+  const isChart = /-chart\.svg(?:[?#].*)?$/i.test(String(image.src));
   return `
     <figure class="article-inline-image">
+      ${isChart ? `<span class="article-chart-swipe-hint" aria-hidden="true">左右滑動查看完整圖表 →</span>` : ""}
       <img src="${escapePublicHtml(normalizePublicAssetUrl(image.src))}" alt="${escapePublicHtml(image.alt || image.caption || "健康3.0文章補充圖片")}" loading="lazy" decoding="async" />
       ${image.caption ? `<figcaption>${escapePublicHtml(image.caption)}</figcaption>` : ""}
     </figure>
@@ -381,7 +383,7 @@ export function renderPublicHealthIndex(items = [], categories = []) {
               <article class="health-list-card">
                 <a href="${escapePublicHtml(item.href)}">
                   <img src="${escapePublicHtml(normalizePublicAssetUrl(item.image))}" alt="${escapePublicHtml(item.title)}" loading="lazy" decoding="async" />
-                  <div><span>${escapePublicHtml(item.category || "照顧知識")}</span><h3>${escapePublicHtml(item.title)}</h3><p>${escapePublicHtml(item.subtitle || item.excerpt || "")}</p><small>${escapePublicHtml(item.author || "歲悅照顧編輯部")} · ${escapePublicHtml(item.date || "")}</small></div>
+                  <div><span>${escapePublicHtml(item.category || "照顧知識")}</span><h3>${escapePublicHtml(item.title)}</h3><p>${escapePublicHtml(item.subtitle || item.excerpt || "")}</p></div>
                 </a>
               </article>
             `).join("")}

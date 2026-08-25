@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="nutrition-plate-title nutrition-plate-desc">
+  <title id="nutrition-plate-title">肌少症飲食七個重點</title>
+  <desc id="nutrition-plate-desc">蛋白質、總熱量、三餐分配、質地與疾病調整。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect width="18" height="675" fill="#f58a1f"/>
+  <text x="64" y="62" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="18" font-weight="850">FOOD SUPPORTS TRAINING</text>
+  <text x="64" y="112" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="38" font-weight="900">蛋白質重要，但不能少了熱量與真正的餐</text>
+  <text x="64" y="151" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="650">先把每天吃得到、吞得下、消化得了的餐食安排好，再談補充品。</text>
+  <g>
+    <rect x="64" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="64" y="205" width="8" height="166" rx="4" fill="#f58a1f"/>
+    <circle cx="104" cy="245" r="22" fill="#fff0de"/>
+    <text x="104" y="253" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">01</text>
+    <text x="140" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="140" dy="0">足夠總量</tspan></text>
+    <text x="86" y="296" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="86" dy="0">高齡者常以至少 1 g/kg/日</tspan><tspan x="86" dy="24">作起點</tspan></text>
+  </g><g>
+    <rect x="344" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="344" y="205" width="8" height="166" rx="4" fill="#1595a8"/>
+    <circle cx="384" cy="245" r="22" fill="#e7f6f8"/>
+    <text x="384" y="253" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">02</text>
+    <text x="420" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="420" dy="0">三餐分配</tspan></text>
+    <text x="366" y="296" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="366" dy="0">不要把多數蛋白質集中在晚</tspan><tspan x="366" dy="24">餐</tspan></text>
+  </g><g>
+    <rect x="624" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="624" y="205" width="8" height="166" rx="4" fill="#758d60"/>
+    <circle cx="664" cy="245" r="22" fill="#eef4e9"/>
+    <text x="664" y="253" text-anchor="middle" fill="#758d60" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">03</text>
+    <text x="700" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="700" dy="0">食物優先</tspan></text>
+    <text x="646" y="296" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="646" dy="0">豆魚蛋肉奶輪替</tspan></text>
+  </g><g>
+    <rect x="904" y="205" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="904" y="205" width="8" height="166" rx="4" fill="#4f77a8"/>
+    <circle cx="944" cy="245" r="22" fill="#eaf1fa"/>
+    <text x="944" y="253" text-anchor="middle" fill="#4f77a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">04</text>
+    <text x="980" y="244" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="980" dy="0">熱量要夠</tspan></text>
+    <text x="926" y="296" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="926" dy="0">吃太少時蛋白質可能被拿來</tspan><tspan x="926" dy="24">供能</tspan></text>
+  </g><g>
+    <rect x="204" y="400" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="204" y="400" width="8" height="166" rx="4" fill="#d95f45"/>
+    <circle cx="244" cy="440" r="22" fill="#fce9e4"/>
+    <text x="244" y="448" text-anchor="middle" fill="#d95f45" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">05</text>
+    <text x="280" y="439" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="280" dy="0">好咬好吞</tspan></text>
+    <text x="226" y="491" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="226" dy="0">切碎、軟煮與適合的質地</tspan></text>
+  </g><g>
+    <rect x="484" y="400" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="484" y="400" width="8" height="166" rx="4" fill="#f58a1f"/>
+    <circle cx="524" cy="440" r="22" fill="#fff0de"/>
+    <text x="524" y="448" text-anchor="middle" fill="#f58a1f" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">06</text>
+    <text x="560" y="439" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="560" dy="0">搭配運動</tspan></text>
+    <text x="506" y="491" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="506" dy="0">阻力訓練是核心夥伴</tspan></text>
+  </g><g>
+    <rect x="764" y="400" width="250" height="166" rx="8" fill="#ffffff" stroke="#ead8bf" stroke-width="2"/>
+    <rect x="764" y="400" width="8" height="166" rx="4" fill="#1595a8"/>
+    <circle cx="804" cy="440" r="22" fill="#e7f6f8"/>
+    <text x="804" y="448" text-anchor="middle" fill="#1595a8" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="17" font-weight="900">07</text>
+    <text x="840" y="439" text-anchor="start" fill="#3c1f0b" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="20" font-weight="900"><tspan x="840" dy="0">個別調整</tspan></text>
+    <text x="786" y="491" text-anchor="start" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="700"><tspan x="786" dy="0">共病、體重與耐受度都要納</tspan><tspan x="786" dy="24">入</tspan></text>
+  </g>
+  <line x1="64" y1="620" x2="1136" y2="620" stroke="#ead8bf" stroke-width="2"/>
+  <text x="64" y="650" fill="#725b4c" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="16" font-weight="650">腎臟病、肝病、吞嚥困難、糖尿病或近期體重下降者，請個別諮詢醫師與營養師。</text>
+</svg>
