@@ -1353,6 +1353,56 @@
       "source": "/article/elderly-chronic-kidney-disease-lazy-pack",
       "destination": "/article/article98",
       "permanent": true
+    },
+    {
+      "source": "/article/dementia-prevention-midlife-habits",
+      "destination": "/article/article99",
+      "permanent": true
+    },
+    {
+      "source": "/article/dementia-prevention-exercise-guide",
+      "destination": "/article/article100",
+      "permanent": true
+    },
+    {
+      "source": "/article/brain-healthy-diet-plate",
+      "destination": "/article/article101",
+      "permanent": true
+    },
+    {
+      "source": "/article/cardiometabolic-brain-health",
+      "destination": "/article/article102",
+      "permanent": true
+    },
+    {
+      "source": "/article/hearing-loss-dementia-risk",
+      "destination": "/article/article103",
+      "permanent": true
+    },
+    {
+      "source": "/article/sleep-depression-brain-health",
+      "destination": "/article/article104",
+      "permanent": true
+    },
+    {
+      "source": "/article/daily-cognitive-training-15-minutes",
+      "destination": "/article/article105",
+      "permanent": true
+    },
+    {
+      "source": "/article/living-well-after-dementia-diagnosis",
+      "destination": "/article/article106",
+      "permanent": true
+    },
+    {
+      "source": "/article/dementia-care-cue-wait-support",
+      "destination": "/article/article107",
+      "permanent": true
+    },
+    {
+      "source": "/article/dementia-supplement-myths",
+      "destination": "/article/article108",
+      "permanent": true
     }
   ],
   "rewrites": [
