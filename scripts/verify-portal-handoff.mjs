@@ -127,6 +127,27 @@ function handlerFor(user, overrides = {}) {
     .map((row) => String(row[2]).toLowerCase())
     .sort();
   assert.deepEqual([...staticPortalModuleGrants.keys()].sort(), enabledEmails);
+
+  const suChihHsuan = JSON.parse(JSON.stringify(context.rows)).find(
+    (row) => String(row[2]).toLowerCase() === "admin.ntpc@suiyuecare.com"
+  );
+  assert.deepEqual(suChihHsuan, [
+    54,
+    "蘇之瑄",
+    "admin.ntpc@suiyuecare.com",
+    "職員",
+    "行政品管專員",
+    "教學品管部",
+    "歲悅股份有限公司",
+    "新北市",
+    "未設定",
+    "個人與指派",
+    "啟用"
+  ]);
+  assert.deepEqual(
+    [...staticPortalModuleGrants.get("admin.ntpc@suiyuecare.com")].sort(),
+    ["apm", "edoc"]
+  );
 }
 
 // A direct API caller cannot turn an enabled employee into CEO or expand EDOC

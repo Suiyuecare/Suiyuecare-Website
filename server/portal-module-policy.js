@@ -21,7 +21,8 @@ const staticPortalModuleGrants = new Map([
   ["project_hsu@suiyuecare.com", new Set(["apm", "edoc"])],
   ["project_chiang@suiyuecare.com", new Set(["apm", "edoc"])],
   ["project_you@suiyuecare.com", new Set(["apm", "edoc"])],
-  ["project_yu@suiyuecare.com", new Set(["apm", "edoc"])]
+  ["project_yu@suiyuecare.com", new Set(["apm", "edoc"])],
+  ["admin.ntpc@suiyuecare.com", new Set(["apm", "edoc"])]
 ]);
 
 function normalizeEmail(value) {
