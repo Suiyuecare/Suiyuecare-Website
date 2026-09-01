@@ -1503,6 +1503,21 @@
       "source": "/article/sarcopenia-twelve-week-plan",
       "destination": "/article/article128",
       "permanent": true
+    },
+    {
+      "source": "/article/reablement-fatigue-four-moment-check",
+      "destination": "/article/article129",
+      "permanent": true
+    },
+    {
+      "source": "/article/migrant-care-training-teach-back",
+      "destination": "/article/article130",
+      "permanent": true
+    },
+    {
+      "source": "/article/long-term-care-incident-learning-review",
+      "destination": "/article/article131",
+      "permanent": true
     }
   ],
   "rewrites": [

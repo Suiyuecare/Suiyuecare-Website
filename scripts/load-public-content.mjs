@@ -15,6 +15,7 @@ import { resolveHealthArticleImage } from "../health-article-images.mjs";
 import { dementiaSeriesArticles } from "../dementia-series-articles.mjs";
 import { strokeSeriesArticles } from "../stroke-series-articles.mjs";
 import { sarcopeniaSeriesArticles } from "../sarcopenia-series-articles.mjs";
+import { dailyArticles } from "../daily-articles/index.mjs";
 
 const rootDir = path.resolve(import.meta.dirname, "..");
 const appSourcePath = path.join(rootDir, "app.js");
@@ -144,6 +145,7 @@ function staticArticleItem(card, detail, rewrite = {}) {
       tags
     }, card.image, merged.image)),
     imageAlt: card.imageAlt || merged.imageAlt || card.title || merged.title || "健康3.0文章主圖",
+    imageCaption: card.imageCaption || merged.imageCaption || "",
     imageUsage: card.imageUsage || "article_cover",
     focalPoint: card.focalPoint || "center",
     author: card.author || merged.author || "歲悅照顧編輯部",
@@ -379,6 +381,9 @@ export async function loadPublicContent() {
   sarcopeniaSeriesArticles.forEach((article) => {
     staticDetails[article.slug] = { ...(staticDetails[article.slug] || {}), ...article };
   });
+  dailyArticles.forEach((article) => {
+    staticDetails[article.slug] = { ...(staticDetails[article.slug] || {}), ...article };
+  });
   Object.entries(rewrites).forEach(([slug, rewrite]) => {
     staticDetails[slug] = { ...(staticDetails[slug] || {}), ...rewrite };
   });
@@ -387,6 +392,22 @@ export async function loadPublicContent() {
   });
 
   const staticCards = [
+    ...dailyArticles.map((article) => ({
+      slug: article.slug,
+      href: `/article/${article.slug}`,
+      category: article.category,
+      title: article.title,
+      subtitle: article.tags.slice(0, 2).join("・"),
+      excerpt: article.excerpt,
+      image: article.image,
+      imageAlt: article.imageAlt,
+      imageCaption: article.imageCaption,
+      author: article.author,
+      date: article.date,
+      readingMinutes: article.readingMinutes,
+      tags: article.tags,
+      keywords: article.keywords
+    })),
     ...sarcopeniaSeriesArticles.map((article) => ({
       slug: article.slug,
       href: `/article/${article.slug}`,

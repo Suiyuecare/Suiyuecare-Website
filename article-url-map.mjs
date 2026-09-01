@@ -127,7 +127,10 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "sarcopenic-obesity-muscle-function",
   "post-hospital-sarcopenia-recovery",
   "sarcopenia-fall-prevention-home",
-  "sarcopenia-twelve-week-plan"
+  "sarcopenia-twelve-week-plan",
+  "reablement-fatigue-four-moment-check",
+  "migrant-care-training-teach-back",
+  "long-term-care-incident-learning-review"
 ]);
 
 const sourceNumberMap = new Map(

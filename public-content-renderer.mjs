@@ -270,6 +270,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
           <figcaption class="${isPptIconPack ? "article-hero-caption--sr-only" : ""}">
             <h1>${escapePublicHtml(article.title || "未命名文章")}</h1>
             <p>${escapePublicHtml(article.subtitle || article.excerpt || "")}</p>
+            ${article.imageCaption ? `<small class="article-hero-photo-caption">${escapePublicHtml(article.imageCaption)}</small>` : ""}
           </figcaption>
         </figure>
       </header>

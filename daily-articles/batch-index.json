@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "commitSemantics": "SELF means the commit containing this batch entry.",
+  "batches": [
+    {
+      "date": "2026-09-01",
+      "displayDate": "2026.09.01",
+      "commit": "SELF",
+      "articles": [
+        {
+          "slug": "reablement-fatigue-four-moment-check",
+          "title": "復能後累到隔天正常嗎？四個時點看懂疲勞",
+          "businessItem": "護理復能",
+          "publicNumber": 129,
+          "contentHash": "sha256:0a13724303078eae69cb51a59e3f9149d014364ce296afb4386b76d202fc9706"
+        },
+        {
+          "slug": "migrant-care-training-teach-back",
+          "title": "教過不等於學會：移工照顧培訓用教回法真正驗收",
+          "businessItem": "移工培訓",
+          "publicNumber": 130,
+          "contentHash": "sha256:09917d8b81409069f50d297dfb4e204f44fd213ae29071cc5016299e5857e06e"
+        },
+        {
+          "slug": "long-term-care-incident-learning-review",
+          "title": "長照異常事件怎麼檢討？五步把究責會議變成流程改善",
+          "businessItem": "教育品管",
+          "publicNumber": 131,
+          "contentHash": "sha256:6c656c56b04e4b02e8a32d75f2b5ada8df15dabde6bcd5f80de64231d706d144"
+        }
+      ]
+    }
+  ]
+}

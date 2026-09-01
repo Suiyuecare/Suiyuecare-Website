@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">復能疲勞四時點觀察流程</title>
+  <desc id="desc">從活動前、活動中、活動後到隔天，依長輩反應決定維持、減量、暫停或尋求專業協助的定性流程圖。</desc>
+  <rect width="1200" height="675" rx="34" fill="#fffaf3"/>
+  <text x="70" y="82" font-family="system-ui, sans-serif" font-size="38" font-weight="700" fill="#3c1f0b">復能不是撐完：看四個時點再決定下一步</text>
+  <text x="70" y="124" font-family="system-ui, sans-serif" font-size="21" fill="#725b4c">同一件生活任務，記錄反應比追求一次做得更多更重要</text>
+  <g font-family="system-ui, sans-serif">
+    <g transform="translate(70 175)">
+      <rect width="235" height="250" rx="24" fill="#ead8bf"/>
+      <circle cx="45" cy="45" r="22" fill="#4f77a8"/><text x="45" y="53" text-anchor="middle" font-size="23" font-weight="700" fill="white">1</text>
+      <text x="82" y="54" font-size="28" font-weight="700" fill="#3c1f0b">活動前</text>
+      <text x="28" y="105" font-size="21" fill="#3c1f0b">今天和平常一樣嗎？</text>
+      <text x="28" y="145" font-size="19" fill="#725b4c">精神、疼痛、喘、頭暈</text>
+      <text x="28" y="177" font-size="19" fill="#725b4c">睡眠、食量與新症狀</text>
+      <rect x="28" y="202" width="179" height="30" rx="15" fill="#758d60"/><text x="117" y="224" text-anchor="middle" font-size="17" fill="white">穩定才開始</text>
+    </g>
+    <path d="M320 300h55" stroke="#725b4c" stroke-width="6" stroke-linecap="round"/><path d="m365 286 18 14-18 14" fill="none" stroke="#725b4c" stroke-width="6"/>
+    <g transform="translate(390 175)">
+      <rect width="235" height="250" rx="24" fill="#dce8ef"/>
+      <circle cx="45" cy="45" r="22" fill="#1595a8"/><text x="45" y="53" text-anchor="middle" font-size="23" font-weight="700" fill="white">2</text>
+      <text x="82" y="54" font-size="28" font-weight="700" fill="#3c1f0b">活動中</text>
+      <text x="28" y="105" font-size="21" fill="#3c1f0b">動作還穩、能回應嗎？</text>
+      <text x="28" y="145" font-size="19" fill="#725b4c">臉色、呼吸、步態</text>
+      <text x="28" y="177" font-size="19" fill="#725b4c">疼痛與突然不舒服</text>
+      <rect x="28" y="202" width="179" height="30" rx="15" fill="#f58a1f"/><text x="117" y="224" text-anchor="middle" font-size="17" fill="white">變化就降量或停</text>
+    </g>
+    <path d="M640 300h55" stroke="#725b4c" stroke-width="6" stroke-linecap="round"/><path d="m685 286 18 14-18 14" fill="none" stroke="#725b4c" stroke-width="6"/>
+    <g transform="translate(710 175)">
+      <rect width="235" height="250" rx="24" fill="#f6e1d8"/>
+      <circle cx="45" cy="45" r="22" fill="#d95f45"/><text x="45" y="53" text-anchor="middle" font-size="23" font-weight="700" fill="white">3</text>
+      <text x="82" y="54" font-size="28" font-weight="700" fill="#3c1f0b">活動後</text>
+      <text x="28" y="105" font-size="21" fill="#3c1f0b">休息後回到基線嗎？</text>
+      <text x="28" y="145" font-size="19" fill="#725b4c">走路、說話與精神</text>
+      <text x="28" y="177" font-size="19" fill="#725b4c">記下需要多少協助</text>
+      <rect x="28" y="202" width="179" height="30" rx="15" fill="#4f77a8"/><text x="117" y="224" text-anchor="middle" font-size="17" fill="white">留下可比較紀錄</text>
+    </g>
+    <path d="M960 300h55" stroke="#725b4c" stroke-width="6" stroke-linecap="round"/><path d="m1005 286 18 14-18 14" fill="none" stroke="#725b4c" stroke-width="6"/>
+    <g transform="translate(1030 175)">
+      <rect width="100" height="250" rx="24" fill="#e5eddf"/>
+      <circle cx="50" cy="45" r="22" fill="#758d60"/><text x="50" y="53" text-anchor="middle" font-size="23" font-weight="700" fill="white">4</text>
+      <text x="50" y="98" text-anchor="middle" font-size="24" font-weight="700" fill="#3c1f0b">隔天</text>
+      <text x="50" y="137" text-anchor="middle" font-size="17" fill="#725b4c">恢復？</text>
+      <text x="50" y="168" text-anchor="middle" font-size="17" fill="#725b4c">更累？</text>
+      <text x="50" y="199" text-anchor="middle" font-size="17" fill="#725b4c">更痛？</text>
+      <text x="50" y="229" text-anchor="middle" font-size="16" fill="#3c1f0b">再調整</text>
+    </g>
+  </g>
+  <g font-family="system-ui, sans-serif">
+    <rect x="70" y="475" width="1060" height="105" rx="20" fill="#3c1f0b"/>
+    <circle cx="112" cy="527" r="20" fill="#d95f45"/>
+    <text x="150" y="518" font-size="22" font-weight="700" fill="white">立即停止並求助</text>
+    <text x="150" y="550" font-size="19" fill="#fffaf3">胸痛、呼吸困難、暈厥、冒冷汗、突然單側無力或說話不清；不要把急症當成普通疲勞。</text>
+  </g>
+  <text x="70" y="630" font-family="system-ui, sans-serif" font-size="16" fill="#725b4c">定性流程；依 WHO ICOPE 與國民健康署長者活動安全原則整理。資料查核：2026-09-01。</text>
+</svg>

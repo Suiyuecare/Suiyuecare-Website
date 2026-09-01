@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">移工照顧培訓教回法五步流程</title>
+  <desc id="desc">教學者先示範與說明，再由學員用自己的話說、親手做、處理變化情境，最後給予具體回饋並再驗收。</desc>
+  <rect width="1200" height="675" rx="34" fill="#fffaf3"/>
+  <text x="70" y="82" font-family="system-ui, sans-serif" font-size="38" font-weight="700" fill="#3c1f0b">教過不等於學會：五步完成一次教回</text>
+  <text x="70" y="124" font-family="system-ui, sans-serif" font-size="21" fill="#725b4c">驗收的是「能否安全說明、示範與應變」，不是記住老師的句子</text>
+  <g font-family="system-ui, sans-serif">
+    <g transform="translate(65 190)"><circle cx="90" cy="90" r="82" fill="#4f77a8"/><text x="90" y="78" text-anchor="middle" font-size="25" font-weight="700" fill="white">1 示範</text><text x="90" y="112" text-anchor="middle" font-size="18" fill="white">一次只教一段</text></g>
+    <path d="M245 280h60" stroke="#725b4c" stroke-width="6"/><path d="m293 266 18 14-18 14" fill="none" stroke="#725b4c" stroke-width="6"/>
+    <g transform="translate(305 190)"><circle cx="90" cy="90" r="82" fill="#1595a8"/><text x="90" y="78" text-anchor="middle" font-size="25" font-weight="700" fill="white">2 說回</text><text x="90" y="112" text-anchor="middle" font-size="18" fill="white">用自己的話說</text></g>
+    <path d="M485 280h60" stroke="#725b4c" stroke-width="6"/><path d="m533 266 18 14-18 14" fill="none" stroke="#725b4c" stroke-width="6"/>
+    <g transform="translate(545 190)"><circle cx="90" cy="90" r="82" fill="#758d60"/><text x="90" y="78" text-anchor="middle" font-size="25" font-weight="700" fill="white">3 做回</text><text x="90" y="112" text-anchor="middle" font-size="18" fill="white">在相同設備操作</text></g>
+    <path d="M725 280h60" stroke="#725b4c" stroke-width="6"/><path d="m773 266 18 14-18 14" fill="none" stroke="#725b4c" stroke-width="6"/>
+    <g transform="translate(785 190)"><circle cx="90" cy="90" r="82" fill="#f58a1f"/><text x="90" y="78" text-anchor="middle" font-size="25" font-weight="700" fill="white">4 應變</text><text x="90" y="112" text-anchor="middle" font-size="18" fill="white">換情境再判斷</text></g>
+    <path d="M965 280h60" stroke="#725b4c" stroke-width="6"/><path d="m1013 266 18 14-18 14" fill="none" stroke="#725b4c" stroke-width="6"/>
+    <g transform="translate(1025 190)"><circle cx="90" cy="90" r="82" fill="#d95f45"/><text x="90" y="78" text-anchor="middle" font-size="25" font-weight="700" fill="white">5 回饋</text><text x="90" y="112" text-anchor="middle" font-size="18" fill="white">重教後再驗收</text></g>
+  </g>
+  <g font-family="system-ui, sans-serif">
+    <rect x="70" y="420" width="510" height="140" rx="22" fill="#ead8bf"/>
+    <text x="100" y="462" font-size="24" font-weight="700" fill="#3c1f0b">好的提問</text>
+    <text x="100" y="500" font-size="20" fill="#3c1f0b">「怕我剛剛沒說清楚，請你示範一次給我看。」</text>
+    <text x="100" y="534" font-size="18" fill="#725b4c">把責任放在教學者，不讓學員覺得被考倒。</text>
+    <rect x="620" y="420" width="510" height="140" rx="22" fill="#e5eddf"/>
+    <text x="650" y="462" font-size="24" font-weight="700" fill="#3c1f0b">完成標準</text>
+    <text x="650" y="500" font-size="20" fill="#3c1f0b">關鍵步驟安全、知道何時停、知道向誰求助。</text>
+    <text x="650" y="534" font-size="18" fill="#725b4c">發音或句型不完美，不應掩蓋真正的能力。</text>
+  </g>
+  <text x="70" y="630" font-family="system-ui, sans-serif" font-size="16" fill="#725b4c">定性流程；依 teach-back 系統性回顧與勞動部外籍家庭看護工補充訓練課程架構整理。資料查核：2026-09-01。</text>
+</svg>

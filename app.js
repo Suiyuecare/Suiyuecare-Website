@@ -1635,13 +1635,15 @@ async function ensureStaticArticleRewrites() {
       import("./article-rewrites.js"),
       import("./dementia-series-articles.mjs"),
       import("./stroke-series-articles.mjs"),
-      import("./sarcopenia-series-articles.mjs")
+      import("./sarcopenia-series-articles.mjs"),
+      import("./daily-articles/index.mjs")
     ])
-      .then(([rewriteModule, dementiaModule, strokeModule, sarcopeniaModule]) => {
+      .then(([rewriteModule, dementiaModule, strokeModule, sarcopeniaModule, dailyModule]) => {
         applyHealthArticleCards(rewriteModule.elderDiseaseLazyPackArticles || []);
         dementiaModule.installDementiaSeries(articlePages, healthArticles, articleHref);
         strokeModule.installStrokeSeries(articlePages, healthArticles, articleHref);
         sarcopeniaModule.installSarcopeniaSeries(articlePages, healthArticles, articleHref);
+        dailyModule.installDailyArticles(articlePages, healthArticles, articleHref);
         applyStaticArticleRewritePack(rewriteModule.default || {});
         applyHealth30ArticleEnhancements(rewriteModule.health30ArticleEnhancements || {});
         staticArticleRewritePackLoaded = true;
@@ -11094,6 +11096,7 @@ function renderStaticArticlePage(slug) {
     excerpt: article.dek,
     image: article.image,
     imageAlt: article.imageAlt,
+    imageCaption: article.imageCaption,
     author: article.author,
     date: article.date,
     tags: article.tags,
