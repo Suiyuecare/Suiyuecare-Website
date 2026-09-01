@@ -36,7 +36,7 @@ const defaultDayCareApplicationSteps = [
   {
     step: "05",
     title: "確認體檢文件",
-    body: "確認抽血、B 肝表面抗原、尿液、胸部 X 光與皮膚檢查；不需糞便檢查。",
+    body: "確認理學檢查、胸部 X 光、血液常規、血液生化與尿液檢查等五類項目。",
     image: "assets/homepage-batch/14-care-notes-fast.jpg",
     alt: "照顧人員核對長輩體檢文件與入托資料"
   },
@@ -50,6 +50,14 @@ const defaultDayCareApplicationSteps = [
 ];
 
 const dayCareApplicationImages = defaultDayCareApplicationSteps.map(({ image, alt }) => ({ image, alt }));
+
+const dayCareHealthExamItems = [
+  ["理學檢查", "由醫師問診並進行身體各系統檢查，以及身高、體重與血壓測量。"],
+  ["胸部 X 光檢查", "主要用於篩檢肺結核等呼吸道傳染病。"],
+  ["血液常規檢查", "包含白血球（WBC）、紅血球（RBC）、血紅素（Hb）、血小板等。"],
+  ["血液生化檢查", "包含肝功能（GOT、GPT）、腎功能（肌酸酐）、飯前血糖、膽固醇及三酸甘油脂。"],
+  ["尿液檢查", "包含尿蛋白、尿糖等常規項目。"]
+];
 
 const dayCareAssistanceVisuals = {
   "生活照顧": {
@@ -131,6 +139,32 @@ function escapeJourneyText(value = "") {
   })[character]);
 }
 
+function dayCareHealthExamMarkup() {
+  return `<section id="day-care-health-exam" class="service-info-section service-detail-section service-motion day-care-health-exam-section" aria-labelledby="day-care-health-exam-title">
+    <div class="service-section-head">
+      <div>
+        <p class="eyebrow">Health Examination</p>
+        <h2 id="day-care-health-exam-title">收案前體檢項目</h2>
+      </div>
+      <span>申請日照收案時，請準備六個月內的體檢文件；前往醫療院所前，可先向中心確認報告格式與效期。</span>
+    </div>
+    <ol class="service-info-grid">
+      ${dayCareHealthExamItems.map(([title, body], index) => `<li>
+        <span>${String(index + 1).padStart(2, "0")}</span>
+        <strong>${escapeJourneyText(title)}</strong>
+        <p>${escapeJourneyText(body)}</p>
+      </li>`).join("")}
+    </ol>
+  </section>`;
+}
+
+function hydrateDayCareHealthExam(root) {
+  const host = root.querySelector?.("[data-day-care-health-exam-host]");
+  if (!host || host.dataset.hydrated === "true") return;
+  host.innerHTML = dayCareHealthExamMarkup();
+  host.dataset.hydrated = "true";
+}
+
 function journeyImageFor(item = {}, index = 0) {
   const title = String(item.title || "").trim();
   const text = `${title} ${item.body || item.copy || item.description || ""}`;
@@ -179,10 +213,14 @@ function dayCareApplicationSteps(host) {
   return source.map((item, index) => {
     const fallback = defaultDayCareApplicationSteps[index] || defaultDayCareApplicationSteps.at(-1);
     const image = journeyImageFor(item, index);
+    const title = item.title || fallback.title;
+    const usesCurrentHealthExamChecklist = /體檢項目|體檢文件|檢查項目|文件確認/.test(title);
     return {
       step: item.step || item.label || String(index + 1).padStart(2, "0"),
-      title: item.title || fallback.title,
-      body: item.body || item.copy || item.description || fallback.body,
+      title,
+      body: usesCurrentHealthExamChecklist
+        ? defaultDayCareApplicationSteps[4].body
+        : item.body || item.copy || item.description || fallback.body,
       image: image.image,
       alt: image.alt
     };
@@ -594,6 +632,7 @@ export function hydrateDayCareLocation(root = document) {
   hydrateDayCareChecklistIconNodes(root);
   hydrateDayCareQuickSummary(root);
   hydrateDayCareApplicationJourney(root);
+  hydrateDayCareHealthExam(root);
   const host = root.querySelector?.("[data-day-care-location-map-host]");
   if (!host || host.dataset.hydrated === "true") return;
   if (!host.querySelector("[data-day-care-location-detail]")) {
