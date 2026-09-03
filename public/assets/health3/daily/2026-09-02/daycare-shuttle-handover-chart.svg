@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">日照接送的早晚雙向交接流程</title>
+  <desc id="desc">早晨從行前確認、今日變化與安全候車把資訊送到日照，下午再把活動、飲食、情緒與晚間觀察帶回家庭。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="70" y="86" font-family="Noto Sans TC, sans-serif" font-size="38" font-weight="700" fill="#3c1f0b">日照接送：早晨送出變化，下午帶回下一步</text>
+  <text x="70" y="128" font-family="Noto Sans TC, sans-serif" font-size="20" fill="#725b4c">讓長輩先說，家屬與工作人員再補上安全和生活銜接資訊</text>
+  <g font-family="Noto Sans TC, sans-serif">
+    <rect x="65" y="185" width="510" height="365" rx="28" fill="#ead8bf"/>
+    <text x="105" y="235" font-size="27" font-weight="700" fill="#3c1f0b">早晨｜家裡 → 日照</text>
+    <g fill="#fffaf3">
+      <rect x="105" y="270" width="430" height="66" rx="16"/><rect x="105" y="355" width="430" height="66" rx="16"/><rect x="105" y="440" width="430" height="66" rx="16"/>
+    </g>
+    <text x="132" y="311" font-size="21" fill="#3c1f0b">確認時間窗口、等候點、聯絡方式</text>
+    <text x="132" y="396" font-size="21" fill="#3c1f0b">交接今天和平常不同的身體與情緒</text>
+    <text x="132" y="481" font-size="21" fill="#3c1f0b">點交輔具與已確認的隨身物品</text>
+    <rect x="625" y="185" width="510" height="365" rx="28" fill="#1595a8"/>
+    <text x="665" y="235" font-size="27" font-weight="700" fill="#fff">下午｜日照 → 家裡</text>
+    <g fill="#fffaf3">
+      <rect x="665" y="270" width="430" height="66" rx="16"/><rect x="665" y="355" width="430" height="66" rx="16"/><rect x="665" y="440" width="430" height="66" rx="16"/>
+    </g>
+    <text x="692" y="311" font-size="21" fill="#3c1f0b">先問長輩今天記得或喜歡什麼</text>
+    <text x="692" y="396" font-size="21" fill="#3c1f0b">補充活動、飲食水分、如廁與情緒</text>
+    <text x="692" y="481" font-size="21" fill="#3c1f0b">說清楚異常、已處置與晚間要觀察</text>
+    <path d="M500 580h200" stroke="#f58a1f" stroke-width="8" stroke-linecap="round"/>
+    <path d="m685 566 24 14-24 14" fill="none" stroke="#f58a1f" stroke-width="8"/>
+    <text x="600" y="630" text-anchor="middle" font-size="20" font-weight="700" fill="#725b4c">連續看三到五天的模式，不用一次反應就下結論</text>
+  </g>
+</svg>

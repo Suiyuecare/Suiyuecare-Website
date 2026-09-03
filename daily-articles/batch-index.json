@@ -29,6 +29,34 @@
           "contentHash": "sha256:6c656c56b04e4b02e8a32d75f2b5ada8df15dabde6bcd5f80de64231d706d144"
         }
       ]
+    },
+    {
+      "date": "2026-09-02",
+      "displayDate": "2026.09.02",
+      "commit": "SELF",
+      "articles": [
+        {
+          "slug": "long-term-care-system-downtime-continuity",
+          "title": "系統斷線也不能讓照顧斷線：長照第一線的離線紀錄與補登流程",
+          "businessItem": "軟體系統",
+          "publicNumber": 132,
+          "contentHash": "sha256:c27bfde747937a57a0edbf09f7d9bb60c0a1c6f3319c531bddc8959a0fd78019"
+        },
+        {
+          "slug": "home-care-time-priority-map",
+          "title": "居服時段怎麼排才有用？先找出一天裡最需要支援的空窗",
+          "businessItem": "居家照顧",
+          "publicNumber": 133,
+          "contentHash": "sha256:445974fd14021747d7cbba94350956d0f4acf1b1afdeb71f4ad6c04083e798a1"
+        },
+        {
+          "slug": "day-care-shuttle-handover",
+          "title": "第一次搭日照接送車：家屬早晚各做一張交接清單",
+          "businessItem": "日間照顧",
+          "publicNumber": 134,
+          "contentHash": "sha256:e173efa77a082c271d68a7bf44e896138514b6a3d928cb76395ad618e3b2cdf2"
+        }
+      ]
     }
   ]
 }

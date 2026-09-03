@@ -130,7 +130,10 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "sarcopenia-twelve-week-plan",
   "reablement-fatigue-four-moment-check",
   "migrant-care-training-teach-back",
-  "long-term-care-incident-learning-review"
+  "long-term-care-incident-learning-review",
+  "long-term-care-system-downtime-continuity",
+  "home-care-time-priority-map",
+  "day-care-shuttle-handover"
 ]);
 
 const sourceNumberMap = new Map(

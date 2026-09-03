@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">居服時段優先判斷地圖</title>
+  <desc id="desc">以後果、替代人力、時間彈性與長輩本人目標四個問題，辨認一天中最需要居家照顧支援的空窗。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="70" y="88" font-family="Noto Sans TC, sans-serif" font-size="38" font-weight="700" fill="#3c1f0b">居服不是平均分時數，而是先補關鍵空窗</text>
+  <text x="70" y="130" font-family="Noto Sans TC, sans-serif" font-size="20" fill="#725b4c">把同一個生活節點依序問四個問題，再帶回正式照顧計畫討論</text>
+  <g font-family="Noto Sans TC, sans-serif">
+    <circle cx="600" cy="360" r="112" fill="#f58a1f"/>
+    <text x="600" y="340" text-anchor="middle" font-size="28" font-weight="700" fill="#fff">需要支援的</text>
+    <text x="600" y="382" text-anchor="middle" font-size="34" font-weight="700" fill="#fff">生活空窗</text>
+    <text x="600" y="418" text-anchor="middle" font-size="17" fill="#fff">不是只有「哪裡有空」</text>
+    <g transform="translate(80 200)"><rect width="350" height="140" rx="24" fill="#d95f45"/><text x="28" y="48" font-size="24" font-weight="700" fill="#fff">① 沒協助，後果多大？</text><text x="28" y="86" font-size="18" fill="#fff">安全、餐食、如廁、必要外出</text><text x="28" y="116" font-size="17" fill="#fff">先說具體情境，不只標高風險</text></g>
+    <g transform="translate(770 200)"><rect width="350" height="140" rx="24" fill="#1595a8"/><text x="28" y="48" font-size="24" font-weight="700" fill="#fff">② 有可靠替代者嗎？</text><text x="28" y="86" font-size="18" fill="#fff">真的能到場、能長期、能安全做</text><text x="28" y="116" font-size="17" fill="#fff">「家人在家」不等於能接手</text></g>
+    <g transform="translate(80 405)"><rect width="350" height="140" rx="24" fill="#758d60"/><text x="28" y="48" font-size="24" font-weight="700" fill="#fff">③ 時間可以前後移嗎？</text><text x="28" y="86" font-size="18" fill="#fff">分清固定任務與彈性任務</text><text x="28" y="116" font-size="17" fill="#fff">避免瑣事排擠必要支持</text></g>
+    <g transform="translate(770 405)"><rect width="350" height="140" rx="24" fill="#4f77a8"/><text x="28" y="48" font-size="24" font-weight="700" fill="#fff">④ 本人最想守住什麼？</text><text x="28" y="86" font-size="18" fill="#fff">作息、選擇、角色與生活目標</text><text x="28" y="116" font-size="17" fill="#fff">支持完成，不急著全部代做</text></g>
+    <path d="M430 280 500 320M770 280 700 320M430 470 500 410M770 470 700 410" stroke="#725b4c" stroke-width="5" stroke-linecap="round"/>
+    <rect x="285" y="590" width="630" height="48" rx="24" fill="#ead8bf"/>
+    <text x="600" y="622" text-anchor="middle" font-size="20" font-weight="700" fill="#3c1f0b">試行 → 記錄 → 與照管／服務單位回顧調整</text>
+  </g>
+</svg>

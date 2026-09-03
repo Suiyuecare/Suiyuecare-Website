@@ -4,6 +4,7 @@ import {
 } from "./article-url-map.mjs";
 
 const SITE_ORIGIN = "https://www.suiyuecare.com";
+const PRERENDERED_HEALTH_ARTICLE_LIMIT = 24;
 
 export function escapePublicHtml(value = "") {
   return String(value ?? "")
@@ -338,7 +339,18 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
 }
 
 export function renderPublicHealthIndex(items = [], categories = []) {
-  const articles = Array.isArray(items) ? items.filter(Boolean) : [];
+  const articles = (Array.isArray(items) ? items.filter(Boolean) : [])
+    .map((article, index) => ({ article, index }))
+    .sort((left, right) => {
+      const leftTime = new Date(left.article.publishedAt || left.article.date || "").getTime();
+      const rightTime = new Date(right.article.publishedAt || right.article.date || "").getTime();
+      const safeLeftTime = Number.isNaN(leftTime) ? 0 : leftTime;
+      const safeRightTime = Number.isNaN(rightTime) ? 0 : rightTime;
+      return safeRightTime - safeLeftTime || left.index - right.index;
+    })
+    .map(({ article }) => article);
+  const latestArticles = articles.slice(0, PRERENDERED_HEALTH_ARTICLE_LIMIT);
+  const archivedArticles = articles.slice(PRERENDERED_HEALTH_ARTICLE_LIMIT);
   const feature = articles[0];
   const categoryNames = categories
     .map((category) => category?.display_label || category?.name)
@@ -378,9 +390,9 @@ export function renderPublicHealthIndex(items = [], categories = []) {
         </section>
 
         <section class="health-latest">
-          <div class="health-section-head"><div><p class="eyebrow">Articles</p><h2>全部照顧文章</h2></div><span>${articles.length} 篇</span></div>
+          <div class="health-section-head"><div><p class="eyebrow">Articles</p><h2>最新照顧文章</h2></div><span>共 ${articles.length} 篇</span></div>
           <div class="health-latest-grid">
-            ${articles.map((item) => `
+            ${latestArticles.map((item) => `
               <article class="health-list-card">
                 <a href="${escapePublicHtml(item.href)}">
                   <img src="${escapePublicHtml(normalizePublicAssetUrl(item.image))}" alt="${escapePublicHtml(item.title)}" loading="lazy" decoding="async" />
@@ -389,6 +401,12 @@ export function renderPublicHealthIndex(items = [], categories = []) {
               </article>
             `).join("")}
           </div>
+          ${archivedArticles.length ? `
+            <details class="health-archive-index">
+              <summary>展開完整文章索引（另有 ${archivedArticles.length} 篇）</summary>
+              <ul>${archivedArticles.map((item) => `<li><a href="${escapePublicHtml(item.href)}">${escapePublicHtml(item.title)}</a></li>`).join("")}</ul>
+            </details>
+          ` : ""}
         </section>
       ` : `<section class="health-empty-state"><h2>文章整理中</h2><p>健康3.0內容會在審核發布後顯示於此。</p></section>`}
     </div>

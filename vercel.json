@@ -1518,6 +1518,21 @@
       "source": "/article/long-term-care-incident-learning-review",
       "destination": "/article/article131",
       "permanent": true
+    },
+    {
+      "source": "/article/long-term-care-system-downtime-continuity",
+      "destination": "/article/article132",
+      "permanent": true
+    },
+    {
+      "source": "/article/home-care-time-priority-map",
+      "destination": "/article/article133",
+      "permanent": true
+    },
+    {
+      "source": "/article/day-care-shuttle-handover",
+      "destination": "/article/article134",
+      "permanent": true
     }
   ],
   "rewrites": [
