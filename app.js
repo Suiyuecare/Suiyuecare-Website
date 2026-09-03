@@ -9378,7 +9378,7 @@ function renderDayCareStartChecklist() {
   ];
   const items = [
     { title: "先參觀，再試上一日", text: "先帶長輩認識環境、活動與作息；確認適應良好，再安排一日體驗。" },
-    { title: "提供六個月內體檢文件", text: "包含抽血、B 肝表面抗原、尿液、胸部 X 光與皮膚檢查；不需糞便檢查。" },
+    { title: "提供六個月內體檢文件", text: "包含理學、胸部 X 光、血液常規、血液生化與尿液檢查；詳細內容請見收案體檢項目。" },
     {
       title: "備妥日常用品與用藥",
       text: "藥盒請先分裝並附服藥說明；其餘用品依長輩生活習慣準備即可。",
@@ -9558,6 +9558,8 @@ function renderOneMinuteServicePage(slug, layout = {}) {
       }) : ""}
 
       ${isDayCare ? renderDayCareStartChecklist() : ""}
+
+      ${isDayCare ? `<div data-day-care-health-exam-host></div>` : ""}
 
       ${usesHorizontalJourney ? `<div data-${slug}-application-journey-host></div>` : ""}
 

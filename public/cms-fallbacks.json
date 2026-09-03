@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-08-21T15:39:44.603Z",
-  "contentHash": "7860bde47ceac38d9409e0444bbd273394a3e23943095784a7a45cc6008faf9b",
+  "contentHash": "88a34be7a9e9e86d9550795a56649b7715db30ff2d20d0d3ee69e63ff2cf6b82",
   "schemaVersion": 1,
   "serviceSlugs": [
     "about",
@@ -2368,7 +2368,7 @@
           "title": "安排體檢"
         },
         {
-          "body": "抽血（血液、生化、B 肝表面抗原）、尿液、胸部 X 光與皮膚檢查；不包含糞便檢查。",
+          "body": "確認理學檢查、胸部 X 光、血液常規、血液生化與尿液檢查等五類項目。",
           "step": "05",
           "title": "確認體檢項目"
         },
