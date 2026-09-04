@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">長照課程品質六個可核對訊號</title>
+  <desc id="desc">從需求、目標、內容、練習、回饋到課後支持的六步課程品質檢查流程。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="80" y="92" font-size="42" font-weight="700" fill="#3c1f0b" font-family="system-ui, sans-serif">課程品質，不只看講師與時數</text>
+  <text x="80" y="137" font-size="24" fill="#725b4c" font-family="system-ui, sans-serif">報名前看清楚，課中做得到，回家後接得上</text>
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <g transform="translate(85 205)"><rect width="300" height="142" rx="24" fill="#ead8bf"/><text x="150" y="55" font-size="26" font-weight="700" fill="#3c1f0b">1 需求對得上</text><text x="150" y="96" font-size="21" fill="#725b4c">誰要學・為何要學</text></g>
+    <g transform="translate(450 205)"><rect width="300" height="142" rx="24" fill="#f58a1f"/><text x="150" y="55" font-size="26" font-weight="700" fill="#3c1f0b">2 目標說得清</text><text x="150" y="96" font-size="21" fill="#3c1f0b">上完能完成什麼</text></g>
+    <g transform="translate(815 205)"><rect width="300" height="142" rx="24" fill="#1595a8"/><text x="150" y="55" font-size="26" font-weight="700" fill="#fffaf3">3 內容可追溯</text><text x="150" y="96" font-size="21" fill="#fffaf3">版本・來源・適用限制</text></g>
+    <g transform="translate(85 420)"><rect width="300" height="142" rx="24" fill="#758d60"/><text x="150" y="55" font-size="26" font-weight="700" fill="#fffaf3">4 有機會練習</text><text x="150" y="96" font-size="21" fill="#fffaf3">情境操作而非只聽</text></g>
+    <g transform="translate(450 420)"><rect width="300" height="142" rx="24" fill="#4f77a8"/><text x="150" y="55" font-size="26" font-weight="700" fill="#fffaf3">5 有具體回饋</text><text x="150" y="96" font-size="21" fill="#fffaf3">指出做對與待調整</text></g>
+    <g transform="translate(815 420)"><rect width="300" height="142" rx="24" fill="#d95f45"/><text x="150" y="55" font-size="26" font-weight="700" fill="#fffaf3">6 有課後支持</text><text x="150" y="96" font-size="21" fill="#fffaf3">帶回清單與求助入口</text></g>
+    <path d="M385 276h55m310 0h55M235 357v53m365-53v53m365-53v53" stroke="#725b4c" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <text x="600" y="635" text-anchor="middle" font-size="23" fill="#725b4c" font-family="system-ui, sans-serif">有積分不等於適合每個人；先確認身分、目標與適用範圍</text>
+</svg>

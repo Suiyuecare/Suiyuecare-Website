@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">居家照顧人員異動的四步不中斷交接</title>
+  <desc id="desc">從通知家庭、確認不能中斷的需求、安排共同交接到服務後追蹤的四步流程。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="72" y="88" font-size="42" font-weight="700" fill="#3c1f0b" font-family="system-ui, sans-serif">換人不是重新開始：把人熟悉的生活接住</text>
+  <text x="72" y="132" font-size="23" fill="#725b4c" font-family="system-ui, sans-serif">交接聚焦必要事實、本人偏好與下一次確認</text>
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <g transform="translate(72 220)"><circle cx="118" cy="118" r="112" fill="#ead8bf"/><text x="118" y="104" font-size="30" font-weight="700" fill="#3c1f0b">1 提前通知</text><text x="118" y="143" font-size="21" fill="#725b4c">說明原因與窗口</text></g>
+    <g transform="translate(352 220)"><circle cx="118" cy="118" r="112" fill="#f58a1f"/><text x="118" y="104" font-size="30" font-weight="700" fill="#3c1f0b">2 排出優先</text><text x="118" y="143" font-size="21" fill="#3c1f0b">哪些不能空窗</text></g>
+    <g transform="translate(632 220)"><circle cx="118" cy="118" r="112" fill="#1595a8"/><text x="118" y="104" font-size="30" font-weight="700" fill="#fffaf3">3 共同交接</text><text x="118" y="143" font-size="21" fill="#fffaf3">本人參與確認</text></g>
+    <g transform="translate(912 220)"><circle cx="118" cy="118" r="112" fill="#758d60"/><text x="118" y="104" font-size="30" font-weight="700" fill="#fffaf3">4 服務後追蹤</text><text x="118" y="143" font-size="21" fill="#fffaf3">調整並留下紀錄</text></g>
+    <path d="M304 338h34m246 0h34m246 0h34" stroke="#725b4c" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  <rect x="145" y="520" width="910" height="88" rx="22" fill="#3c1f0b"/>
+  <text x="600" y="557" text-anchor="middle" font-size="23" font-weight="700" fill="#fffaf3" font-family="system-ui, sans-serif">交接最低必要內容</text>
+  <text x="600" y="588" text-anchor="middle" font-size="20" fill="#fffaf3" font-family="system-ui, sans-serif">安全風險・服務範圍・溝通方式・生活偏好・未完成事項・緊急聯絡</text>
+</svg>

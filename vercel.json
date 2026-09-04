@@ -1533,6 +1533,21 @@
       "source": "/article/day-care-shuttle-handover",
       "destination": "/article/article134",
       "permanent": true
+    },
+    {
+      "source": "/article/long-term-care-course-quality-check",
+      "destination": "/article/article135",
+      "permanent": true
+    },
+    {
+      "source": "/article/long-term-care-notification-priority-loop",
+      "destination": "/article/article136",
+      "permanent": true
+    },
+    {
+      "source": "/article/home-care-staff-change-continuity",
+      "destination": "/article/article137",
+      "permanent": true
     }
   ],
   "rewrites": [

@@ -133,7 +133,10 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "long-term-care-incident-learning-review",
   "long-term-care-system-downtime-continuity",
   "home-care-time-priority-map",
-  "day-care-shuttle-handover"
+  "day-care-shuttle-handover",
+  "long-term-care-course-quality-check",
+  "long-term-care-notification-priority-loop",
+  "home-care-staff-change-continuity"
 ]);
 
 const sourceNumberMap = new Map(

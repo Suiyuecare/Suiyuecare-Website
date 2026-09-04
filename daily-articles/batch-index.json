@@ -57,6 +57,34 @@
           "contentHash": "sha256:e173efa77a082c271d68a7bf44e896138514b6a3d928cb76395ad618e3b2cdf2"
         }
       ]
+    },
+    {
+      "date": "2026-09-04",
+      "displayDate": "2026.09.04",
+      "commit": "SELF",
+      "articles": [
+        {
+          "slug": "long-term-care-course-quality-check",
+          "title": "長照課程怎麼挑？報名前看懂六個真正有用的品質訊號",
+          "businessItem": "教育品管",
+          "publicNumber": 135,
+          "contentHash": "sha256:4df4a98dd48aaa577fbed181b946a05de1db1dba3e507522f5e69d30195ba876"
+        },
+        {
+          "slug": "long-term-care-notification-priority-loop",
+          "title": "系統一直跳通知，重要的反而被漏掉？長照工作的三層提醒設計",
+          "businessItem": "軟體系統",
+          "publicNumber": 136,
+          "contentHash": "sha256:900f6b36d47112d6ca10241e91cabc101a8e0cdcb91d7ceb12ac14b7441b62fa"
+        },
+        {
+          "slug": "home-care-staff-change-continuity",
+          "title": "居服員臨時請假或換人，服務怎麼接？一張不中斷交接清單",
+          "businessItem": "居家照顧",
+          "publicNumber": 137,
+          "contentHash": "sha256:c51258fc98d8f219240ebdb0eb5c8e8d3cfe32acd64bf8850d12cdb1ff205fa8"
+        }
+      ]
     }
   ]
 }
