@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">日照活動拒絕的三段回應</title>
+  <desc id="desc">先停下排除急性變化，再聽懂身體與環境線索，最後提供兩個選擇和退出方式，並把有效支持記入交班。</desc>
+  <rect width="1200" height="675" rx="32" fill="#fffaf3"/>
+  <text x="72" y="74" fill="#3c1f0b" font-family="Noto Sans TC, sans-serif" font-size="36" font-weight="700">拒絕不是終點：先停、再聽、給選擇</text>
+  <rect x="72" y="104" width="1056" height="74" rx="20" fill="#fff0e8" stroke="#d95f45" stroke-width="3"/>
+  <circle cx="116" cy="141" r="22" fill="#d95f45"/>
+  <text x="116" y="150" text-anchor="middle" fill="#fffaf3" font-family="Noto Sans TC, sans-serif" font-size="24" font-weight="700">!</text>
+  <text x="154" y="135" fill="#3c1f0b" font-family="Noto Sans TC, sans-serif" font-size="22" font-weight="700">突然和平常差很多？</text>
+  <text x="154" y="160" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="18">先暫停活動，依中心流程處理急性不適與安全風險</text>
+  <path d="M252 340 H426" stroke="#ead8bf" stroke-width="12" stroke-linecap="round"/>
+  <path d="M606 340 H780" stroke="#ead8bf" stroke-width="12" stroke-linecap="round"/>
+  <g>
+    <rect x="72" y="222" width="300" height="238" rx="28" fill="#ffffff" stroke="#1595a8" stroke-width="4"/>
+    <circle cx="122" cy="272" r="28" fill="#1595a8"/>
+    <text x="122" y="282" text-anchor="middle" fill="#fff" font-family="Noto Sans TC, sans-serif" font-size="28" font-weight="700">1</text>
+    <text x="164" y="282" fill="#3c1f0b" font-family="Noto Sans TC, sans-serif" font-size="28" font-weight="700">先停</text>
+    <text x="106" y="330" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="21">看身體與平常差異</text>
+    <text x="106" y="367" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="21">減少噪音與桌面負荷</text>
+    <text x="106" y="404" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="21">不連續催促</text>
+  </g>
+  <g>
+    <rect x="450" y="222" width="300" height="238" rx="28" fill="#ffffff" stroke="#758d60" stroke-width="4"/>
+    <circle cx="500" cy="272" r="28" fill="#758d60"/>
+    <text x="500" y="282" text-anchor="middle" fill="#fff" font-family="Noto Sans TC, sans-serif" font-size="28" font-weight="700">2</text>
+    <text x="542" y="282" fill="#3c1f0b" font-family="Noto Sans TC, sans-serif" font-size="28" font-weight="700">再聽</text>
+    <text x="484" y="330" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="21">描述看到的事</text>
+    <text x="484" y="367" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="21">問一個容易回答的問題</text>
+    <text x="484" y="404" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="21">允許沉默與休息</text>
+  </g>
+  <g>
+    <rect x="828" y="222" width="300" height="238" rx="28" fill="#ffffff" stroke="#f58a1f" stroke-width="4"/>
+    <circle cx="878" cy="272" r="28" fill="#f58a1f"/>
+    <text x="878" y="282" text-anchor="middle" fill="#fff" font-family="Noto Sans TC, sans-serif" font-size="28" font-weight="700">3</text>
+    <text x="920" y="282" fill="#3c1f0b" font-family="Noto Sans TC, sans-serif" font-size="28" font-weight="700">給選擇</text>
+    <text x="862" y="330" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="21">兩個具體小入口</text>
+    <text x="862" y="367" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="21">可觀看、可只做一小段</text>
+    <text x="862" y="404" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="21">清楚保留退出方式</text>
+  </g>
+  <rect x="188" y="510" width="824" height="96" rx="26" fill="#3c1f0b"/>
+  <text x="600" y="550" text-anchor="middle" fill="#fffaf3" font-family="Noto Sans TC, sans-serif" font-size="24" font-weight="700">最後不是寫「不配合」</text>
+  <text x="600" y="582" text-anchor="middle" fill="#ead8bf" font-family="Noto Sans TC, sans-serif" font-size="19">記下觸發、本人偏好、有效支持與停止訊號，交給下一班接續</text>
+</svg>

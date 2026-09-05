@@ -1548,6 +1548,21 @@
       "source": "/article/home-care-staff-change-continuity",
       "destination": "/article/article137",
       "permanent": true
+    },
+    {
+      "source": "/article/day-care-activity-refusal-choice",
+      "destination": "/article/article138",
+      "permanent": true
+    },
+    {
+      "source": "/article/community-care-accessibility-walkthrough",
+      "destination": "/article/article139",
+      "permanent": true
+    },
+    {
+      "source": "/article/reablement-first-visit-life-goals",
+      "destination": "/article/article140",
+      "permanent": true
     }
   ],
   "rewrites": [

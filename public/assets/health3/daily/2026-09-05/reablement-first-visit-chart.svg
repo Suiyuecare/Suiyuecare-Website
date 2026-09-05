@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">復能第一次訪視前的五步準備</title>
+  <desc id="desc">從長輩選一件重要生活任務開始，描述真實現況、準備環境物品、提出四個安全追蹤問題，最後訂出一個可回看的小循環。</desc>
+  <rect width="1200" height="675" rx="32" fill="#fffaf3"/>
+  <text x="70" y="76" fill="#3c1f0b" font-family="Noto Sans TC, sans-serif" font-size="36" font-weight="700">把「變好一點」整理成一個可討論的小循環</text>
+  <text x="70" y="112" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="19">初訪不必一次解完所有問題；先讓生活願望、真實基線與安全追蹤接起來</text>
+  <path d="M170 300 H1030" stroke="#ead8bf" stroke-width="16" stroke-linecap="round"/>
+  <g font-family="Noto Sans TC, sans-serif">
+    <g transform="translate(70 190)">
+      <circle cx="100" cy="110" r="66" fill="#1595a8"/>
+      <text x="100" y="120" text-anchor="middle" fill="#fff" font-size="34" font-weight="700">1</text>
+      <text x="100" y="210" text-anchor="middle" fill="#3c1f0b" font-size="23" font-weight="700">選一件生活事</text>
+      <text x="100" y="242" text-anchor="middle" fill="#725b4c" font-size="18">由長輩說重要性</text>
+    </g>
+    <g transform="translate(286 190)">
+      <circle cx="100" cy="110" r="66" fill="#758d60"/>
+      <text x="100" y="120" text-anchor="middle" fill="#fff" font-size="34" font-weight="700">2</text>
+      <text x="100" y="210" text-anchor="middle" fill="#3c1f0b" font-size="23" font-weight="700">描述真實現況</text>
+      <text x="100" y="242" text-anchor="middle" fill="#725b4c" font-size="18">怎麼做・卡在哪</text>
+    </g>
+    <g transform="translate(502 190)">
+      <circle cx="100" cy="110" r="66" fill="#4f77a8"/>
+      <text x="100" y="120" text-anchor="middle" fill="#fff" font-size="34" font-weight="700">3</text>
+      <text x="100" y="210" text-anchor="middle" fill="#3c1f0b" font-size="23" font-weight="700">準備環境物品</text>
+      <text x="100" y="242" text-anchor="middle" fill="#725b4c" font-size="18">用平常鞋椅與輔具</text>
+    </g>
+    <g transform="translate(718 190)">
+      <circle cx="100" cy="110" r="66" fill="#f58a1f"/>
+      <text x="100" y="120" text-anchor="middle" fill="#fff" font-size="34" font-weight="700">4</text>
+      <text x="100" y="210" text-anchor="middle" fill="#3c1f0b" font-size="23" font-weight="700">帶著四個問題</text>
+      <text x="100" y="242" text-anchor="middle" fill="#725b4c" font-size="18">開始・停止・記錄・回看</text>
+    </g>
+    <g transform="translate(934 190)">
+      <circle cx="100" cy="110" r="66" fill="#d95f45"/>
+      <text x="100" y="120" text-anchor="middle" fill="#fff" font-size="34" font-weight="700">5</text>
+      <text x="100" y="210" text-anchor="middle" fill="#3c1f0b" font-size="23" font-weight="700">訂一個小循環</text>
+      <text x="100" y="242" text-anchor="middle" fill="#725b4c" font-size="18">嘗試・觀察・調整</text>
+    </g>
+  </g>
+  <rect x="132" y="504" width="936" height="92" rx="26" fill="#3c1f0b"/>
+  <text x="600" y="545" text-anchor="middle" fill="#fffaf3" font-family="Noto Sans TC, sans-serif" font-size="24" font-weight="700">目標是共同學習工具，不是對長輩努力程度的評分</text>
+  <text x="600" y="576" text-anchor="middle" fill="#ead8bf" font-family="Noto Sans TC, sans-serif" font-size="18">未達成時，回看功能、環境、方法與支持，再決定縮小、換法或轉介</text>
+</svg>

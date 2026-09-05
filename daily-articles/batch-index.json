@@ -85,6 +85,34 @@
           "contentHash": "sha256:c51258fc98d8f219240ebdb0eb5c8e8d3cfe32acd64bf8850d12cdb1ff205fa8"
         }
       ]
+    },
+    {
+      "date": "2026-09-05",
+      "displayDate": "2026.09.05",
+      "commit": "SELF",
+      "articles": [
+        {
+          "slug": "day-care-activity-refusal-choice",
+          "title": "長輩不想參加日照活動，別急著勸：第一線的三段回應",
+          "businessItem": "日間照顧",
+          "publicNumber": 138,
+          "contentHash": "sha256:f897bba3b22716c3e192b4d0ac328bd1393ea364d5e0c315df0097ebc0c90e53"
+        },
+        {
+          "slug": "community-care-accessibility-walkthrough",
+          "title": "社區據點好不好到？開班前用一趟六站試走找出真正門檻",
+          "businessItem": "社區據點",
+          "publicNumber": 139,
+          "contentHash": "sha256:d5208faac0997b819eab32f788ab02e5446fa7c9231a54095cf2216968ffe314"
+        },
+        {
+          "slug": "reablement-first-visit-life-goals",
+          "title": "第一次復能訪視前要準備什麼？把「變好一點」換成想回去的生活",
+          "businessItem": "護理復能",
+          "publicNumber": 140,
+          "contentHash": "sha256:27ce8f25bf5d16d3778089fcd1117d7388a2a06bc9a9b1ef4599ae63779bf817"
+        }
+      ]
     }
   ]
 }

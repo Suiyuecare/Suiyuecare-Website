@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">社區據點可及性的六站試走</title>
+  <desc id="desc">長輩帶著平常輔具，依序實測出發交通、門口天候、休息座位、室內動線、廁所求助與回程改善。</desc>
+  <rect width="1200" height="675" rx="32" fill="#fffaf3"/>
+  <text x="68" y="72" fill="#3c1f0b" font-family="Noto Sans TC, sans-serif" font-size="36" font-weight="700">不是看一眼，是用真實速度走完六站</text>
+  <text x="70" y="108" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="19">帶平常的輔具・選平常的時段・讓長輩本人指出卡點</text>
+  <path d="M214 225 H408 M596 225 H790 M978 225 V446 M790 503 H596 M408 503 H214" fill="none" stroke="#ead8bf" stroke-width="12" stroke-linecap="round"/>
+  <g font-family="Noto Sans TC, sans-serif">
+    <g transform="translate(56 146)">
+      <rect width="316" height="158" rx="26" fill="#ffffff" stroke="#1595a8" stroke-width="4"/>
+      <circle cx="52" cy="52" r="27" fill="#1595a8"/><text x="52" y="61" text-anchor="middle" fill="#fff" font-size="26" font-weight="700">1</text>
+      <text x="94" y="61" fill="#3c1f0b" font-size="25" font-weight="700">出發與交通</text>
+      <text x="34" y="105" fill="#725b4c" font-size="19">候車・上下車・陪同</text>
+      <text x="34" y="134" fill="#725b4c" font-size="19">錯過班次後怎麼等</text>
+    </g>
+    <g transform="translate(438 146)">
+      <rect width="316" height="158" rx="26" fill="#ffffff" stroke="#4f77a8" stroke-width="4"/>
+      <circle cx="52" cy="52" r="27" fill="#4f77a8"/><text x="52" y="61" text-anchor="middle" fill="#fff" font-size="26" font-weight="700">2</text>
+      <text x="94" y="61" fill="#3c1f0b" font-size="25" font-weight="700">門口與天候</text>
+      <text x="34" y="105" fill="#725b4c" font-size="19">路面・門片・照明</text>
+      <text x="34" y="134" fill="#725b4c" font-size="19">雨天與炎熱的備案</text>
+    </g>
+    <g transform="translate(820 146)">
+      <rect width="316" height="158" rx="26" fill="#ffffff" stroke="#758d60" stroke-width="4"/>
+      <circle cx="52" cy="52" r="27" fill="#758d60"/><text x="52" y="61" text-anchor="middle" fill="#fff" font-size="26" font-weight="700">3</text>
+      <text x="94" y="61" fill="#3c1f0b" font-size="25" font-weight="700">休息座位</text>
+      <text x="34" y="105" fill="#725b4c" font-size="19">坐得下・站得起</text>
+      <text x="34" y="134" fill="#725b4c" font-size="19">輔具有位置可放</text>
+    </g>
+    <g transform="translate(820 424)">
+      <rect width="316" height="158" rx="26" fill="#ffffff" stroke="#f58a1f" stroke-width="4"/>
+      <circle cx="52" cy="52" r="27" fill="#f58a1f"/><text x="52" y="61" text-anchor="middle" fill="#fff" font-size="26" font-weight="700">4</text>
+      <text x="94" y="61" fill="#3c1f0b" font-size="25" font-weight="700">室內動線</text>
+      <text x="34" y="105" fill="#725b4c" font-size="19">報到・喝水・活動</text>
+      <text x="34" y="134" fill="#725b4c" font-size="19">忙碌時仍走得通</text>
+    </g>
+    <g transform="translate(438 424)">
+      <rect width="316" height="158" rx="26" fill="#ffffff" stroke="#d95f45" stroke-width="4"/>
+      <circle cx="52" cy="52" r="27" fill="#d95f45"/><text x="52" y="61" text-anchor="middle" fill="#fff" font-size="26" font-weight="700">5</text>
+      <text x="94" y="61" fill="#3c1f0b" font-size="25" font-weight="700">廁所與求助</text>
+      <text x="34" y="105" fill="#725b4c" font-size="19">轉向・關門・隱私</text>
+      <text x="34" y="134" fill="#725b4c" font-size="19">需要時怎麼呼叫</text>
+    </g>
+    <g transform="translate(56 424)">
+      <rect width="316" height="158" rx="26" fill="#3c1f0b"/>
+      <circle cx="52" cy="52" r="27" fill="#fffaf3"/><text x="52" y="61" text-anchor="middle" fill="#3c1f0b" font-size="26" font-weight="700">6</text>
+      <text x="94" y="61" fill="#fffaf3" font-size="25" font-weight="700">回程與改善</text>
+      <text x="34" y="105" fill="#ead8bf" font-size="19">疲勞後再走一次</text>
+      <text x="34" y="134" fill="#ead8bf" font-size="19">責任人・期限・再測</text>
+    </g>
+  </g>
+  <text x="600" y="635" text-anchor="middle" fill="#725b4c" font-family="Noto Sans TC, sans-serif" font-size="18">服務試走補上使用經驗，不能取代法定無障礙與工程安全檢查</text>
+</svg>
