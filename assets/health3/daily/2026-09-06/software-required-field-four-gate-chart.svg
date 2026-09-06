@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">系統新增必填欄位前的四道檢查</title>
+  <desc id="desc">先確認決策用途、資料來源、流程負擔與隱私權限，再決定欄位應必填、選填、自動帶入或不收。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="72" y="86" fill="#3c1f0b" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="42" font-weight="700">新增紅色星號前，先讓欄位過四關</text>
+  <text x="72" y="130" fill="#725b4c" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="22">每一關都說不清楚，就先不要全面上線</text>
+  <g font-family="Arial, 'Noto Sans TC', sans-serif" text-anchor="middle">
+    <g transform="translate(170 316)"><rect x="-112" y="-112" width="224" height="224" rx="32" fill="#f58a1f"/><text y="-38" fill="#fffaf3" font-size="27" font-weight="700">01　決策用途</text><text y="10" fill="#fffaf3" font-size="20">誰在何時</text><text y="42" fill="#fffaf3" font-size="20">採取什麼行動</text></g>
+    <path d="M290 316 H330" stroke="#725b4c" stroke-width="8" stroke-linecap="round"/>
+    <g transform="translate(435 316)"><rect x="-112" y="-112" width="224" height="224" rx="32" fill="#1595a8"/><text y="-38" fill="#fffaf3" font-size="27" font-weight="700">02　資料來源</text><text y="10" fill="#fffaf3" font-size="20">當下知道嗎</text><text y="42" fill="#fffaf3" font-size="20">能否誠實未知</text></g>
+    <path d="M555 316 H595" stroke="#725b4c" stroke-width="8" stroke-linecap="round"/>
+    <g transform="translate(700 316)"><rect x="-112" y="-112" width="224" height="224" rx="32" fill="#758d60"/><text y="-38" fill="#fffaf3" font-size="27" font-weight="700">03　流程負擔</text><text y="10" fill="#fffaf3" font-size="20">重複・中斷</text><text y="42" fill="#fffaf3" font-size="20">手機・離線・更正</text></g>
+    <path d="M820 316 H860" stroke="#725b4c" stroke-width="8" stroke-linecap="round"/>
+    <g transform="translate(965 316)"><rect x="-112" y="-112" width="224" height="224" rx="32" fill="#4f77a8"/><text y="-38" fill="#fffaf3" font-size="27" font-weight="700">04　隱私權限</text><text y="10" fill="#fffaf3" font-size="20">目的・角色</text><text y="42" fill="#fffaf3" font-size="20">保存・匯出・稽核</text></g>
+  </g>
+  <rect x="88" y="493" width="1024" height="124" rx="26" fill="#ead8bf" opacity="0.8"/>
+  <text x="600" y="538" text-anchor="middle" fill="#3c1f0b" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="25" font-weight="700">四關後再選去向</text>
+  <text x="600" y="582" text-anchor="middle" fill="#725b4c" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="24">必填　／　選填　／　自動帶入　／　不收或移除</text>
+</svg>

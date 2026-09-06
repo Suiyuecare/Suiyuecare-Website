@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">講師觀課回饋四欄</title>
+  <desc id="desc">依序記錄學習目標、實際看到的行為、學員當時的解釋，以及一個可重做與驗收的下一步。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="70" y="85" fill="#3c1f0b" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="42" font-weight="700">觀課回饋四欄：從印象走到下一次行動</text>
+  <text x="70" y="128" fill="#725b4c" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="22">一次只鎖定一個可觀察的學習目標</text>
+  <g font-family="Arial, 'Noto Sans TC', sans-serif">
+    <g transform="translate(64 176)"><rect width="254" height="330" rx="26" fill="#f58a1f"/><text x="28" y="54" fill="#fffaf3" font-size="27" font-weight="700">01　目標</text><text x="28" y="105" fill="#fffaf3" font-size="21">這次要看見</text><text x="28" y="138" fill="#fffaf3" font-size="21">哪個行為？</text><path d="M28 188 H226" stroke="#fffaf3" opacity="0.6"/><text x="28" y="238" fill="#fffaf3" font-size="18">具體・單一</text><text x="28" y="270" fill="#fffaf3" font-size="18">符合真實情境</text></g>
+    <g transform="translate(338 176)"><rect width="254" height="330" rx="26" fill="#1595a8"/><text x="28" y="54" fill="#fffaf3" font-size="27" font-weight="700">02　行為</text><text x="28" y="105" fill="#fffaf3" font-size="21">實際說了什麼</text><text x="28" y="138" fill="#fffaf3" font-size="21">做了什麼？</text><path d="M28 188 H226" stroke="#fffaf3" opacity="0.6"/><text x="28" y="238" fill="#fffaf3" font-size="18">事實・順序</text><text x="28" y="270" fill="#fffaf3" font-size="18">不貼態度標籤</text></g>
+    <g transform="translate(612 176)"><rect width="254" height="330" rx="26" fill="#758d60"/><text x="28" y="54" fill="#fffaf3" font-size="27" font-weight="700">03　解釋</text><text x="28" y="105" fill="#fffaf3" font-size="21">學員當時看見</text><text x="28" y="138" fill="#fffaf3" font-size="21">什麼線索？</text><path d="M28 188 H226" stroke="#fffaf3" opacity="0.6"/><text x="28" y="238" fill="#fffaf3" font-size="18">知識・判斷</text><text x="28" y="270" fill="#fffaf3" font-size="18">環境・教材斷點</text></g>
+    <g transform="translate(886 176)"><rect width="254" height="330" rx="26" fill="#4f77a8"/><text x="28" y="54" fill="#fffaf3" font-size="27" font-weight="700">04　下一步</text><text x="28" y="105" fill="#fffaf3" font-size="21">下次怎麼重做</text><text x="28" y="138" fill="#fffaf3" font-size="21">何時驗收？</text><path d="M28 188 H226" stroke="#fffaf3" opacity="0.6"/><text x="28" y="238" fill="#fffaf3" font-size="18">一個行動</text><text x="28" y="270" fill="#fffaf3" font-size="18">支持・時間・界線</text></g>
+  </g>
+  <rect x="170" y="550" width="860" height="66" rx="20" fill="#3c1f0b"/>
+  <text x="600" y="592" text-anchor="middle" fill="#fffaf3" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="23" font-weight="700">個人回饋與課程改版分開保存，兩邊都要能回看</text>
+</svg>

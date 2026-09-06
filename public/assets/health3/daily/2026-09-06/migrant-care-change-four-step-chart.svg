@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">家屬與移工更新照顧方式的四步流程</title>
+  <desc id="desc">依序確認專業來源、拆成可見動作、一起說回或做回，最後只保留一份有日期的現行版本。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="72" y="88" fill="#3c1f0b" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="42" font-weight="700">照顧方式變更，用四步完成共同更新</text>
+  <text x="72" y="132" fill="#725b4c" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="22">看不懂、版本矛盾或涉及高風險內容，就回到原專業窗口確認</text>
+  <path d="M130 360 H1070" stroke="#ead8bf" stroke-width="18" stroke-linecap="round"/>
+  <g font-family="Arial, 'Noto Sans TC', sans-serif" text-anchor="middle">
+    <g transform="translate(170 360)"><circle r="96" fill="#f58a1f"/><text y="-22" fill="#fffaf3" font-size="28" font-weight="700">01　確認來源</text><text y="23" fill="#fffaf3" font-size="21">誰改・改什麼</text><text y="54" fill="#fffaf3" font-size="21">何時開始</text></g>
+    <g transform="translate(457 360)"><circle r="96" fill="#1595a8"/><text y="-22" fill="#fffaf3" font-size="28" font-weight="700">02　拆成動作</text><text y="23" fill="#fffaf3" font-size="21">開始・步驟</text><text y="54" fill="#fffaf3" font-size="21">停止・求助</text></g>
+    <g transform="translate(744 360)"><circle r="96" fill="#758d60"/><text y="-22" fill="#fffaf3" font-size="28" font-weight="700">03　一起做回</text><text y="23" fill="#fffaf3" font-size="21">安全示範</text><text y="54" fill="#fffaf3" font-size="21">修正說明</text></g>
+    <g transform="translate(1031 360)"><circle r="96" fill="#4f77a8"/><text y="-22" fill="#fffaf3" font-size="28" font-weight="700">04　只留一版</text><text y="23" fill="#fffaf3" font-size="21">日期・窗口</text><text y="54" fill="#fffaf3" font-size="21">舊版退出</text></g>
+  </g>
+  <rect x="138" y="529" width="924" height="82" rx="22" fill="#ead8bf" opacity="0.78"/>
+  <text x="600" y="566" text-anchor="middle" fill="#3c1f0b" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="24" font-weight="700">隔天短回看：長輩反應・卡住步驟・物品位置・求助窗口</text>
+  <text x="600" y="596" text-anchor="middle" fill="#725b4c" font-family="Arial, 'Noto Sans TC', sans-serif" font-size="18">確認的是家庭流程，不是測試移工是否聽話</text>
+</svg>

@@ -113,6 +113,34 @@
           "contentHash": "sha256:27ce8f25bf5d16d3778089fcd1117d7388a2a06bc9a9b1ef4599ae63779bf817"
         }
       ]
+    },
+    {
+      "date": "2026-09-06",
+      "displayDate": "2026.09.06",
+      "commit": "SELF",
+      "articles": [
+        {
+          "slug": "migrant-care-plan-change-handover",
+          "title": "照顧方式改了別只說一次：家屬與移工的四步更新清單",
+          "businessItem": "移工培訓",
+          "publicNumber": 141,
+          "contentHash": "sha256:0d60cacfcd3d768dc809fd0bc6bb34223bbdf6872db16f0849546a94d939330e"
+        },
+        {
+          "slug": "long-term-care-training-feedback-note",
+          "title": "帶課後只寫「反應良好」不夠：講師的四欄觀課回饋",
+          "businessItem": "教育品管",
+          "publicNumber": 142,
+          "contentHash": "sha256:b286c73a7598a35c34eec257e7d3ba5509253758945d78004d825cc01eb9ec65"
+        },
+        {
+          "slug": "long-term-care-required-field-check",
+          "title": "系統要新增必填欄位？上線前先過四道流程檢查",
+          "businessItem": "軟體系統",
+          "publicNumber": 143,
+          "contentHash": "sha256:14be7a2319c587e870075ee13d2955d48b5ea73963e4c5d6bbc3cd3532caa91e"
+        }
+      ]
     }
   ]
 }

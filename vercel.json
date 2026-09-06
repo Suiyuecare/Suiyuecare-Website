@@ -1563,6 +1563,21 @@
       "source": "/article/reablement-first-visit-life-goals",
       "destination": "/article/article140",
       "permanent": true
+    },
+    {
+      "source": "/article/migrant-care-plan-change-handover",
+      "destination": "/article/article141",
+      "permanent": true
+    },
+    {
+      "source": "/article/long-term-care-training-feedback-note",
+      "destination": "/article/article142",
+      "permanent": true
+    },
+    {
+      "source": "/article/long-term-care-required-field-check",
+      "destination": "/article/article143",
+      "permanent": true
     }
   ],
   "rewrites": [
