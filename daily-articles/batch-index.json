@@ -141,6 +141,34 @@
           "contentHash": "sha256:14be7a2319c587e870075ee13d2955d48b5ea73963e4c5d6bbc3cd3532caa91e"
         }
       ]
+    },
+    {
+      "date": "2026-09-07",
+      "displayDate": "2026.09.07",
+      "commit": "SELF",
+      "articles": [
+        {
+          "slug": "home-care-belongings-privacy-agreement",
+          "title": "居服進家門，哪些東西可以動？和長輩一起訂物品與隱私約定",
+          "businessItem": "居家照顧",
+          "publicNumber": 144,
+          "contentHash": "sha256:5cb60ba97f71d4916852c0e54e84be866c646c44f9aaf557f24d366ef47d64a8"
+        },
+        {
+          "slug": "day-care-quiet-space-support",
+          "title": "日照安靜區怎麼用才有幫助？從環境減量到回到活動的照顧流程",
+          "businessItem": "日間照顧",
+          "publicNumber": 145,
+          "contentHash": "sha256:818efe3850e31ae3b1de079b7cf0a9a1626baf5b839134a8bb575f79a6225a72"
+        },
+        {
+          "slug": "community-care-program-co-design",
+          "title": "社區據點課表由誰決定？讓長輩意見真的進入下個月安排",
+          "businessItem": "社區據點",
+          "publicNumber": 146,
+          "contentHash": "sha256:5e4995e2312d03d1c00933d6856f5055153de5c0ebd31232959d83df855235a3"
+        }
+      ]
     }
   ]
 }

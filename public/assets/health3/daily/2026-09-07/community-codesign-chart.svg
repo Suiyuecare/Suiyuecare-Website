@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="chart-title chart-desc">
+<title id="chart-title">讓意見走進下個月的課表</title>
+<desc id="chart-desc">從聽需求、談取捨、小型試辦到回覆決定，回到下一輪需求。共同設計不保證增加活動量；此圖是服務決策示意。</desc>
+<rect width="1200" height="675" rx="28" fill="#fffaf3"/>
+<g font-family="'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif" fill="#3c1f0b">
+<rect x="52" y="47" width="7" height="50" rx="3" fill="#f58a1f"/><text x="78" y="80" font-size="23" fill="#725b4c">社區據點共同規劃</text>
+<text x="52" y="154" font-size="42" font-weight="700">讓意見走進下個月的課表</text>
+<text x="53" y="198" font-size="21" fill="#725b4c">定性流程示意｜依本人需要、服務計畫與現行規範調整</text>
+<g transform="translate(52,235)"><rect width="250" height="222" rx="22" fill="white" stroke="#ead8bf" stroke-width="2"/><circle cx="40" cy="43" r="22" fill="#1595a8"/><text x="40" y="51" text-anchor="middle" fill="white" font-size="24" font-weight="700">1</text><text x="25" y="105" font-size="29" font-weight="700">聽需求</text><text x="25" y="153" font-size="20" fill="#725b4c">問生活上想得到什麼</text><text x="25" y="187" font-size="20" fill="#725b4c">補進較少發言的聲音</text></g><path d="M310 341h16m-6-6 6 6-6 6" fill="none" stroke="#725b4c" stroke-width="3"/>
+<g transform="translate(334,235)"><rect width="250" height="222" rx="22" fill="white" stroke="#ead8bf" stroke-width="2"/><circle cx="40" cy="43" r="22" fill="#758d60"/><text x="40" y="51" text-anchor="middle" fill="white" font-size="24" font-weight="700">2</text><text x="25" y="105" font-size="29" font-weight="700">談取捨</text><text x="25" y="153" font-size="20" fill="#725b4c">說明人力與資源限制</text><text x="25" y="187" font-size="20" fill="#725b4c">保留不同參與方式</text></g><path d="M592 341h16m-6-6 6 6-6 6" fill="none" stroke="#725b4c" stroke-width="3"/>
+<g transform="translate(616,235)"><rect width="250" height="222" rx="22" fill="white" stroke="#ead8bf" stroke-width="2"/><circle cx="40" cy="43" r="22" fill="#4f77a8"/><text x="40" y="51" text-anchor="middle" fill="white" font-size="24" font-weight="700">3</text><text x="25" y="105" font-size="29" font-weight="700">小型試辦</text><text x="25" y="153" font-size="20" fill="#725b4c">選一個可回答的問題</text><text x="25" y="187" font-size="20" fill="#725b4c">記下參與障礙</text></g><path d="M874 341h16m-6-6 6 6-6 6" fill="none" stroke="#725b4c" stroke-width="3"/>
+<g transform="translate(898,235)"><rect width="250" height="222" rx="22" fill="white" stroke="#ead8bf" stroke-width="2"/><circle cx="40" cy="43" r="22" fill="#d95f45"/><text x="40" y="51" text-anchor="middle" fill="white" font-size="24" font-weight="700">4</text><text x="25" y="105" font-size="29" font-weight="700">回覆決定</text><text x="25" y="153" font-size="20" fill="#725b4c">採用、調整或暫緩</text><text x="25" y="187" font-size="20" fill="#725b4c">說理由與回看時點</text></g>
+<rect x="52" y="490" width="1096" height="65" rx="16" fill="#ead8bf"/><text x="76" y="531" font-size="22">下一輪從回覆與試辦發現開始；安全與專業責任不能交給投票。</text>
+<text x="53" y="599" font-size="18" fill="#725b4c">原則依據：WHO（2023）；Thomas 等（2021）；Zacharuk 等（2024）。</text>
+<text x="53" y="631" font-size="18" fill="#725b4c">歲悅長照編輯整理｜2026-09-07｜來源詳見文章 Reference；非臨床處方或驗證量表。</text>
+</g>
+</svg>
+

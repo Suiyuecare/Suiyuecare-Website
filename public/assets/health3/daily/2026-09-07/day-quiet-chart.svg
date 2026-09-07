@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="chart-title chart-desc">
+<title id="chart-title">休息，也是一種可選擇的節奏</title>
+<desc id="chart-desc">先確認狀態，再調整環境，提供自願休息與照看，最後選擇下一步。沒有固定分鐘數或療效保證。</desc>
+<rect width="1200" height="675" rx="28" fill="#fffaf3"/>
+<g font-family="'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif" fill="#3c1f0b">
+<rect x="52" y="47" width="7" height="50" rx="3" fill="#f58a1f"/><text x="78" y="80" font-size="23" fill="#725b4c">日照安靜區使用流程</text>
+<text x="52" y="154" font-size="42" font-weight="700">休息，也是一種可選擇的節奏</text>
+<text x="53" y="198" font-size="21" fill="#725b4c">定性流程示意｜依本人需要、服務計畫與現行規範調整</text>
+<g transform="translate(52,235)"><rect width="250" height="222" rx="22" fill="white" stroke="#ead8bf" stroke-width="2"/><circle cx="40" cy="43" r="22" fill="#1595a8"/><text x="40" y="51" text-anchor="middle" fill="white" font-size="24" font-weight="700">1</text><text x="25" y="105" font-size="29" font-weight="700">確認狀態</text><text x="25" y="153" font-size="20" fill="#725b4c">聽本人需要與感受</text><text x="25" y="187" font-size="20" fill="#725b4c">留意急性異常</text></g><path d="M310 341h16m-6-6 6 6-6 6" fill="none" stroke="#725b4c" stroke-width="3"/>
+<g transform="translate(334,235)"><rect width="250" height="222" rx="22" fill="white" stroke="#ead8bf" stroke-width="2"/><circle cx="40" cy="43" r="22" fill="#758d60"/><text x="40" y="51" text-anchor="middle" fill="white" font-size="24" font-weight="700">2</text><text x="25" y="105" font-size="29" font-weight="700">調整環境</text><text x="25" y="153" font-size="20" fill="#725b4c">減少重疊聲音與眩光</text><text x="25" y="187" font-size="20" fill="#725b4c">一次改少量因素</text></g><path d="M592 341h16m-6-6 6 6-6 6" fill="none" stroke="#725b4c" stroke-width="3"/>
+<g transform="translate(616,235)"><rect width="250" height="222" rx="22" fill="white" stroke="#ead8bf" stroke-width="2"/><circle cx="40" cy="43" r="22" fill="#4f77a8"/><text x="40" y="51" text-anchor="middle" fill="white" font-size="24" font-weight="700">3</text><text x="25" y="105" font-size="29" font-weight="700">自願休息</text><text x="25" y="153" font-size="20" fill="#725b4c">可求助、有人照看</text><text x="25" y="187" font-size="20" fill="#725b4c">交接責任清楚</text></g><path d="M874 341h16m-6-6 6 6-6 6" fill="none" stroke="#725b4c" stroke-width="3"/>
+<g transform="translate(898,235)"><rect width="250" height="222" rx="22" fill="white" stroke="#ead8bf" stroke-width="2"/><circle cx="40" cy="43" r="22" fill="#d95f45"/><text x="40" y="51" text-anchor="middle" fill="white" font-size="24" font-weight="700">4</text><text x="25" y="105" font-size="29" font-weight="700">選擇下一步</text><text x="25" y="153" font-size="20" fill="#725b4c">繼續休息或返回活動</text><text x="25" y="187" font-size="20" fill="#725b4c">依本人狀態回看</text></g>
+<rect x="52" y="490" width="1096" height="65" rx="16" fill="#ead8bf"/><text x="76" y="531" font-size="22">急性異常 → 優先緊急處置與專業評估；不以安靜區取代必要醫療。</text>
+<text x="53" y="599" font-size="18" fill="#725b4c">原則依據：NICE NG97（2018）；Janus 等（2021）；Siegelaar 等（2025）。</text>
+<text x="53" y="631" font-size="18" fill="#725b4c">歲悅長照編輯整理｜2026-09-07｜來源詳見文章 Reference；非臨床處方或驗證量表。</text>
+</g>
+</svg>
+

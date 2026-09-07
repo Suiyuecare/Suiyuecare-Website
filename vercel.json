@@ -1578,6 +1578,21 @@
       "source": "/article/long-term-care-required-field-check",
       "destination": "/article/article143",
       "permanent": true
+    },
+    {
+      "source": "/article/home-care-belongings-privacy-agreement",
+      "destination": "/article/article144",
+      "permanent": true
+    },
+    {
+      "source": "/article/day-care-quiet-space-support",
+      "destination": "/article/article145",
+      "permanent": true
+    },
+    {
+      "source": "/article/community-care-program-co-design",
+      "destination": "/article/article146",
+      "permanent": true
     }
   ],
   "rewrites": [

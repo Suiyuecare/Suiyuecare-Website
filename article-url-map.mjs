@@ -142,7 +142,10 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "reablement-first-visit-life-goals",
   "migrant-care-plan-change-handover",
   "long-term-care-training-feedback-note",
-  "long-term-care-required-field-check"
+  "long-term-care-required-field-check",
+  "home-care-belongings-privacy-agreement",
+  "day-care-quiet-space-support",
+  "community-care-program-co-design"
 ]);
 
 const sourceNumberMap = new Map(
