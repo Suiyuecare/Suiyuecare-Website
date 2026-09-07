@@ -1,0 +1,67 @@
+/* Reading-only refinement: keep brand and service-page typography unchanged. */
+.article-page--reading { background: #fffaf3; }
+.article-page--reading .article-topbar { padding-block: 28px 18px; }
+.article-page--reading .article-back { min-height: 44px; font-weight: 500; }
+.article-page--reading .article-category { font-weight: 500; background: transparent; }
+.article-page--reading .article-reading-heading { max-width: 1120px; padding: 0 clamp(32px, 5vw, 86px); margin: 0 auto 28px; }
+.article-page--reading .article-hero h1 { max-width: 100%; margin: 0 0 18px; color: #3c1f0b; font-size: clamp(28px, 3.4vw, 46px); font-weight: 700; line-height: 1.45; word-break: normal; overflow-wrap: anywhere; }
+.article-page--reading .article-dek { max-width: 780px; margin: 0; font-size: 18px; font-weight: 400; line-height: 1.85; color: #725b4c; }
+.article-page--reading .article-meta { margin-top: 18px; gap: 6px 16px; align-items: center; }
+.article-page--reading .article-meta span,
+.article-page--reading .article-meta time { padding: 0; font-size: 14px; font-weight: 400; background: transparent; box-shadow: none; border-radius: 0; color: #725b4c; }
+.article-page--reading .article-hero figure { max-width: 1120px; margin: 0 auto; padding: 0; border-radius: 0; background: transparent; box-shadow: none; aspect-ratio: auto; height: auto; overflow: visible; }
+.article-page--reading .article-hero figure::after { display: none; }
+.article-page--reading .article-hero img { position: static; display: block; width: 100%; max-width: 100%; height: auto; max-height: none; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 16px; }
+.article-page--reading.article-page--ppt-icon-pack .article-hero img { object-fit: contain; }
+.article-page--reading .article-hero figcaption { position: static; max-width: 100%; margin: 10px 0 0; padding: 0; color: #725b4c; font-size: 13px; font-weight: 400; line-height: 1.7; }
+.article-page--reading .article-layout { max-width: 1280px; margin: 0 auto; padding-top: 24px; }
+.article-page--reading .article-audience { margin: 0 0 12px; font-size: 14px; font-weight: 400; line-height: 1.7; color: #725b4c; }
+.article-page--reading .article-tags { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 14px; }
+.article-page--reading .article-tags .meta-tag { display: inline-flex; align-items: center; min-height: 44px; padding: 4px 0; background: transparent; color: #725b4c; font-size: 14px; font-weight: 400; text-decoration: underline; text-underline-offset: 4px; }
+.article-page--reading .article-toc { border: 1px solid #ead8bf; border-radius: 12px; background: white; margin: 12px 0 22px; }
+.article-page--reading .article-toc summary { min-height: 48px; padding: 12px 18px; color: #3c1f0b; cursor: pointer; font-size: 16px; font-weight: 700; }
+.article-page--reading .article-toc summary span { margin-left: 8px; color: #725b4c; font-size: 13px; font-weight: 400; }
+.article-page--reading .article-toc ol { margin: 0; padding: 0 20px 16px 40px; }
+.article-page--reading .article-toc li { color: #725b4c; padding-left: 2px; }
+.article-page--reading .article-toc a { display: flex; align-items: center; min-height: 44px; color: #725b4c; font-weight: 400; font-size: 15px; line-height: 1.6; text-decoration: underline; text-underline-offset: 4px; }
+.article-page--reading .article-summary { padding: 22px 24px; border-radius: 12px; box-shadow: none; background: white; }
+.article-page--reading .article-summary ul { font-weight: 400; font-size: 17px; line-height: 1.85; }
+.article-page--reading .article-body { margin-top: 32px; }
+.article-page--reading .article-body h2 { font-size: clamp(24px, 2.3vw, 32px); font-weight: 700; line-height: 1.5; scroll-margin-top: 120px; word-break: normal; overflow-wrap: anywhere; }
+.article-page--reading .article-body p,
+.article-page--reading .article-body ul,
+.article-page--reading .article-body ol { font-size: 18px; font-weight: 400; line-height: 1.9; }
+.article-page--reading .article-body .article-inline-image figcaption { font-size: 14px; font-weight: 400; }
+.article-page--reading .article-body a { font-weight: 500; color: #9c490b; }
+.article-page--reading .article-body .article-cta a { color: white; }
+.article-page--reading .article-callout { box-shadow: none; border-radius: 12px; }
+.article-page--reading .article-ads { padding-top: 12px; }
+.article-page--reading .article-ads .article-ad { box-shadow: none; }
+.article-page--reading :is(.article-toc a, .article-toc summary, .article-tags a, .article-back):focus-visible { outline: 3px solid #1595a8; outline-offset: 3px; }
+.article-page--reading .article-body h2:focus { outline: 2px solid #1595a8; outline-offset: 5px; }
+/* Keep the helper accessible without covering reading, service decisions, or search results. */
+body:has(.page.active :is(.article-page--reading, .service-detail-page, .health-page, .search-page)) .milk-helper { position: relative; inset: auto; width: auto; display: flex; justify-content: flex-end; padding: 0 24px 24px; z-index: 10; }
+body:has(.page.active :is(.article-page--reading, .service-detail-page, .health-page, .search-page)) .milk-helper-trigger { width: auto; height: 48px; min-height: 48px; display: flex; gap: 8px; align-items: center; padding: 4px 14px 4px 6px; border: 1px solid #ead8bf; border-radius: 999px; background: white; box-shadow: none; transform: none; animation: none; }
+body:has(.page.active :is(.article-page--reading, .service-detail-page, .health-page, .search-page)) .milk-helper-trigger img { width: 40px; height: 40px; order: -1; filter: none; }
+body:has(.page.active :is(.article-page--reading, .service-detail-page, .health-page, .search-page)) .milk-helper-nudge { position: static; inset: auto; transform: none; padding: 0; font-size: 14px; white-space: normal; background: transparent; box-shadow: none; color: #725b4c; }
+body:has(.page.active :is(.article-page--reading, .service-detail-page, .health-page, .search-page)) .milk-helper.is-open .milk-helper-nudge { display: block; }
+body:has(.page.active :is(.article-page--reading, .service-detail-page, .health-page, .search-page)) .milk-helper-dialog { position: absolute; right: 24px; bottom: 82px; width: min(360px, calc(100vw - 40px)); }
+@media (max-width: 760px) {
+  .article-page--reading .article-reading-heading { padding: 0 20px; margin-bottom: 22px; }
+  .article-page--reading .article-hero h1 { max-width: 100%; font-size: 28px; line-height: 1.5; }
+  .article-page--reading .article-dek { display: block; font-size: 17px; line-height: 1.85; }
+  .article-page--reading .article-meta { gap: 6px 12px; }
+  .article-page--reading .article-meta .meta-editor:first-child { flex-basis: 100%; }
+  .article-page--reading .article-hero figure { width: auto; max-width: calc(100% - 40px); margin-inline: 20px; }
+  .article-page--reading .article-hero img { max-width: 100%; height: auto; border-radius: 12px; }
+  .article-page--reading .article-hero figcaption { max-width: 100%; }
+  .article-page--reading .article-layout { padding-top: 18px; }
+  .article-page--reading .article-body h2 { scroll-margin-top: 96px; }
+  .article-page--reading .article-body p,
+  .article-page--reading .article-body ul,
+  .article-page--reading .article-body ol { font-size: 17px; line-height: 1.85; }
+  .article-page--reading .article-toc ol { padding-left: 36px; }
+  .article-page--reading .article-summary { padding: 20px; }
+  body:has(.page.active :is(.article-page--reading, .service-detail-page, .health-page, .search-page)) .milk-helper { padding-right: 20px; }
+  body:has(.page.active :is(.article-page--reading, .service-detail-page, .health-page, .search-page)) .milk-helper-dialog { right: 20px; }
+}

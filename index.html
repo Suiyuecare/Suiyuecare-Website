@@ -138,6 +138,7 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="article-reading-ux.css" />
     <style>
       html[data-initial-route]:not([data-initial-route="home"]):not([data-app-ready="true"]) body {
         background: #fffdf8;
@@ -826,7 +827,7 @@
         aria-expanded="false"
         data-milk-helper-trigger
       >
-        <span class="milk-helper-nudge" aria-hidden="true">點我點我</span>
+        <span class="milk-helper-nudge" aria-hidden="true">需要幫忙？</span>
         <img src="assets/milk-assistant-transparent.png" alt="" width="500" height="500" />
       </button>
     </aside>
@@ -835,8 +836,8 @@
       <div class="footer-main">
         <div class="footer-contact">
           <h3>聯絡資訊</h3>
-          <p>電話 02-6604-5432</p>
-          <p>信箱 generalaffairs@suiyuecare.com</p>
+          <p>電話 <a href="tel:0266045432">02-6604-5432</a></p>
+          <p>信箱 <a href="mailto:generalaffairs@suiyuecare.com">generalaffairs@suiyuecare.com</a></p>
           <p>服務諮詢、課程報名、人才合作與投資洽談</p>
         </div>
         <div class="footer-sitemap">
@@ -850,6 +851,7 @@
 
     <script type="module">
       import("./app.js");
+      import("./article-reading-navigation.js").then(({ initArticleReadingNavigation }) => initArticleReadingNavigation());
       import("./milk-helper.js")
         .then(({ initMilkHelper }) => initMilkHelper())
         .catch((error) => console.warn("Milk helper unavailable.", error));

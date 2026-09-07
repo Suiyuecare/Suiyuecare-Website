@@ -1,5 +1,8 @@
 import { supabase } from "./src/lib/supabaseClient.js";
-import { renderPublicArticleLayout } from "./public-content-renderer.mjs";
+import { getUniqueHealthTopics, resolveHealthTopic, articleMatchesHealthTopic, renderHealthTopicNavigation } from "./health-topic-navigation.mjs";
+import { renderContactPage, renderContactNeedOptions, contactSubmissionErrorMessage } from "./contact-page.mjs";
+import "./health-contact-ux.css";
+import "./service-decision-navigation.css";
 import {
   articlePublicHref,
   articlePublicNumber,
@@ -10,6 +13,35 @@ import {
 
 const FRONTEND_BUILD_VERSION = "care-scenes-20260714-2";
 document.documentElement.dataset.frontendBuild = FRONTEND_BUILD_VERSION;
+
+let renderPublicArticleLayout;
+let publicArticleRendererPromise;
+async function ensurePublicArticleRenderer() {
+  if (!publicArticleRendererPromise) {
+    publicArticleRendererPromise = import("./public-content-renderer.mjs")
+      .then((module) => { renderPublicArticleLayout = module.renderPublicArticleLayout; })
+      .catch((error) => { publicArticleRendererPromise = null; throw error; });
+  }
+  return publicArticleRendererPromise;
+}
+
+let serviceDecisionNavigation;
+let serviceDecisionNavigationLoading;
+function hydrateServiceDecisionNavigation(root) {
+  if (!root?.querySelector(".service-detail-page")) return;
+  if (serviceDecisionNavigation) {
+    serviceDecisionNavigation.hydrateServiceDecisionNavigation(root);
+    return;
+  }
+  if (serviceDecisionNavigationLoading) return;
+  serviceDecisionNavigationLoading = import("./service-decision-navigation.js")
+    .then((module) => {
+      serviceDecisionNavigation = module;
+      module.hydrateServiceDecisionNavigation(pageView);
+    })
+    .catch((error) => { console.warn("Service navigation unavailable.", error); })
+    .finally(() => { serviceDecisionNavigationLoading = null; });
+}
 
 const pages = {
   about: {
@@ -707,12 +739,6 @@ function contactNeedToFormType(need = "") {
   return "contact";
 }
 
-const contactNeedGroups = [
-  ["照顧服務", ["長照服務諮詢", "居家照顧諮詢", "日間照顧諮詢", "社區據點諮詢", "護理復能諮詢"]],
-  ["課程與招募", ["課程報名", "移工培訓諮詢", "教育品管諮詢", "人才招募"]],
-  ["合作洽談", ["土地合作", "網站行銷合作", "軟體系統諮詢", "系統後台諮詢", "投資洽談", "合作洽談"]]
-];
-
 const routeContactNeedMap = {
   home: "長照服務諮詢",
   contact: "長照服務諮詢",
@@ -771,17 +797,6 @@ function syncContactNeedDefaults(root = document, slug = routeSlugFromLocation()
     const formTypeInput = form.querySelector('input[name="form_type"]');
     if (formTypeInput) formTypeInput.value = contactNeedToFormType(need);
   });
-}
-
-function renderContactNeedOptions(selectedNeed = "長照服務諮詢") {
-  const selected = selectedNeed || "長照服務諮詢";
-  const knownNeeds = new Set(contactNeedGroups.flatMap(([, options]) => options));
-  const extraGroup = knownNeeds.has(selected) ? [] : [["其他", [selected]]];
-  return [...contactNeedGroups, ...extraGroup].map(([label, options]) => `
-    <optgroup label="${escapeHTML(label)}">
-      ${options.map((option) => `<option${option === selected ? " selected" : ""}>${escapeHTML(option)}</option>`).join("")}
-    </optgroup>
-  `).join("");
 }
 
 function contactFormType(form) {
@@ -3111,15 +3126,7 @@ function categorySlug(value = "") {
 }
 
 function getHealthCategoryList() {
-  const uniqueCategories = [...new Set(healthArticles.map((article) => article.category).filter(Boolean))];
-  const staticCategories = uniqueCategories.map((name) => ({ name, slug: categorySlug(name) }));
-  if (!supabaseArticleCategories.length) return staticCategories;
-
-  const seenSlugs = new Set(supabaseArticleCategories.map((category) => category.slug));
-  return [
-    ...supabaseArticleCategories,
-    ...staticCategories.filter((category) => !seenSlugs.has(category.slug))
-  ];
+  return getUniqueHealthTopics(supabaseArticleCategories, getHealthArticleList());
 }
 
 function getArticleRewriteFields(slug = "") {
@@ -4360,6 +4367,7 @@ async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
   }
   if (routeSlugFromLocation() !== slug) return;
   pageView.innerHTML = fields.length ? applyCmsEnhancedServicePage(fallbackHtml, slug, fields) : fallbackHtml;
+  hydrateServiceDecisionNavigation(pageView);
   hydrateServiceFeeCodeGroups(pageView);
   hydrateDayCareLocationContent(pageView);
   hydrateHomeCareLocationContent(pageView);
@@ -4393,6 +4401,7 @@ async function loadSupabaseServiceTemplatePage(slug) {
       image
     });
     pageView.innerHTML = renderFixedServiceTemplate(slug, data);
+    hydrateServiceDecisionNavigation(pageView);
     return true;
   } catch (error) {
     console.warn(`Supabase service template unavailable for ${slug}.`, error);
@@ -7326,8 +7335,9 @@ function renderHealthPage(selectedCategorySlug = "") {
   const allArticles = getHealthArticleList();
   const categories = getHealthCategoryList();
   const activeCategory = selectedCategorySlug || "";
+  const selectedTopic = resolveHealthTopic(categories, activeCategory);
   const articles = activeCategory
-    ? allArticles.filter((article) => article.categorySlug === activeCategory)
+    ? allArticles.filter((article) => articleMatchesHealthTopic(article, selectedTopic))
     : allArticles;
   const isCategoryView = Boolean(activeCategory);
   const feature = articles[0];
@@ -7349,20 +7359,15 @@ function renderHealthPage(selectedCategorySlug = "") {
             <h1>健康3.0</h1>
             <p>照顧知識專欄，整理疾病徵兆、飲食營養、復能運動、失智照顧與家屬實用技巧。</p>
           </div>
-          <form class="health-search">
-            <input name="q" type="search" placeholder="搜尋跌倒、失智、營養、復能" />
+          <form class="health-search" action="/search">
+            <input name="q" type="search" aria-label="搜尋健康3.0文章" placeholder="搜尋跌倒、失智、營養、復能" />
             <button type="submit">搜尋</button>
           </form>
         </div>
-        <div class="health-cats">
-          <button class="click-card ${activeCategory ? "" : "active"}" type="button" data-href="#search">全部文章</button>
-          ${categories.map((category) => `
-            <button class="click-card ${activeCategory === category.slug ? "active" : ""}" type="button" data-href="#search?q=${encodeURIComponent(category.name)}">${escapeHTML(category.name)}</button>
-          `).join("")}
-        </div>
+        ${renderHealthTopicNavigation(categories, allArticles, activeCategory)}
       </section>
 
-      ${articles.length ? `
+      ${articles.length && !isCategoryView ? `
       <section class="health-board">
         <a class="health-feature click-card" href="${escapeHTML(normalizePublicHref(feature.href))}">
           <img ${healthArticleImageAttrs(feature, { usage: feature.imageUsage || "article_cover", focalPoint: feature.focalPoint })} />
@@ -7394,15 +7399,30 @@ function renderHealthPage(selectedCategorySlug = "") {
           </ol>
         </aside>
       </section>
-      ` : `
+      ` : !articles.length ? `
       <section class="health-empty-state">
         <h2>這個分類目前還沒有已發布文章</h2>
         <p>相關內容正在整理中，可以先查看全部文章或搜尋其他照顧主題。</p>
         <a href="#health">查看全部文章</a>
       </section>
-      `}
+      ` : ""}
 
-      ${isCategoryView ? "" : `
+      ${isCategoryView ? `
+      <section class="health-latest health-category-results" aria-labelledby="health-category-title">
+        <div class="health-section-head">
+          <div><h2 id="health-category-title">${escapeHTML(selectedTopic?.name || "這個主題")}的全部文章</h2><p>共 ${articles.length} 篇</p></div>
+          <a href="/health">回健康3.0</a>
+        </div>
+        <div class="health-latest-grid">
+          ${articles.map((post) => `
+            <a class="health-list-card click-card" href="${escapeHTML(normalizePublicHref(post.href))}">
+              <img ${healthArticleImageAttrs(post, { usage: "article_cover", focalPoint: post.focalPoint })} />
+              <div><span>${escapeHTML(post.category)}</span><h3>${escapeHTML(post.title)}</h3><p>${escapeHTML(post.subtitle || post.excerpt)}</p><small>${escapeHTML(post.author)} · ${escapeHTML(post.date)}</small></div>
+            </a>
+          `).join("")}
+        </div>
+      </section>
+      ` : `
       <section class="health-latest">
         <div class="health-section-head">
           <div><p class="eyebrow">Latest</p><h2>最新照顧文章</h2></div>
@@ -7459,7 +7479,7 @@ function renderHealthPage(selectedCategorySlug = "") {
 }
 
 function renderSearchPage(query = "") {
-  const keyword = decodeURIComponent(query || "").trim();
+  const keyword = String(query || "").trim();
   const normalizedKeyword = keyword.toLowerCase();
   const articles = getHealthArticleList();
   const results = normalizedKeyword
@@ -7472,8 +7492,8 @@ function renderSearchPage(query = "") {
         <a class="search-back" href="#health">返回健康3.0</a>
         <p class="eyebrow">Search</p>
         <h1>搜尋照顧知識</h1>
-        <form class="health-search search-page-form">
-          <input name="q" type="search" value="${escapeHTML(keyword)}" placeholder="搜尋跌倒、失智、營養、復能" />
+        <form class="health-search search-page-form" action="/search">
+          <input name="q" type="search" aria-label="搜尋健康3.0文章" value="${escapeHTML(keyword)}" placeholder="搜尋跌倒、失智、營養、復能" />
           <button type="submit">搜尋</button>
         </form>
         <p>${keyword ? `「${escapeHTML(keyword)}」共有 ${results.length} 筆相關內容` : "輸入關鍵字，快速找到文章、影音與照顧資源。"}</p>
@@ -9460,6 +9480,8 @@ function renderOneMinuteServicePage(slug, layout = {}) {
     ? "#day-care-start"
     : isCommunity
       ? "#community-eligibility"
+    : isHomeCare
+      ? "#home-care-service-locations"
     : slug === "nursing"
       ? serviceSecondaryHref(service.secondaryCta)
       : "#service-apply-notes";
@@ -9484,7 +9506,7 @@ function renderOneMinuteServicePage(slug, layout = {}) {
           </div>
           <div class="one-minute-proof" aria-label="${escapeHTML(service.title)}重點摘要">
             <span>2 分鐘了解</span>
-            <strong>先看照護情境，再知道怎麼申請</strong>
+            <strong>適用情境、服務地點、費用與申請</strong>
           </div>
         </div>
       </section>
@@ -9509,18 +9531,6 @@ function renderOneMinuteServicePage(slug, layout = {}) {
 
       ${isCommunity ? `<div data-community-safety-host></div>` : ""}
 
-      <section class="two-minute-scenes service-motion" aria-label="${escapeHTML(service.title)}實際照護畫面">
-        <div class="service-section-head">
-          <p class="eyebrow">Care Scenes</p>
-          <h2>實際照顧現場畫面</h2>
-        </div>
-        <div class="two-minute-scene-grid">
-          ${renderServiceSceneCards(service.scenes)}
-        </div>
-      </section>
-
-      ${renderServiceStorySection(service, slug)}
-
       ${isCommunity ? `<div data-community-eligibility-host></div>` : ""}
 
       ${renderServiceFeeSection(service, slug)}
@@ -9536,6 +9546,7 @@ function renderOneMinuteServicePage(slug, layout = {}) {
             ? "新北市全區"
             : "先確認你所在區域，我們會協助判斷可服務性、鄰近據點或合適窗口。",
         items: hasInteractiveLocationMap ? [] : serviceLocationItems(service, slug),
+        id: `${slug}-service-locations`,
         className: "service-location-section",
         content: slug === "day-care"
           ? `<div data-day-care-location-map-host><p class="fee-code-loading">服務據點地圖載入中...</p></div>`
@@ -9562,6 +9573,18 @@ function renderOneMinuteServicePage(slug, layout = {}) {
       ${isDayCare ? `<div data-day-care-health-exam-host></div>` : ""}
 
       ${usesHorizontalJourney ? `<div data-${slug}-application-journey-host></div>` : ""}
+
+      <section class="two-minute-scenes service-motion" aria-label="${escapeHTML(service.title)}實際照護畫面">
+        <div class="service-section-head">
+          <p class="eyebrow">Care Scenes</p>
+          <h2>實際照顧現場畫面</h2>
+        </div>
+        <div class="two-minute-scene-grid">
+          ${renderServiceSceneCards(service.scenes)}
+        </div>
+      </section>
+
+      ${renderServiceStorySection(service, slug)}
 
       ${renderServiceContactSection(service, slug)}
     </div>
@@ -11100,6 +11123,10 @@ function renderStaticArticlePage(slug) {
     imageAlt: article.imageAlt,
     imageCaption: article.imageCaption,
     author: article.author,
+    authorTitle: article.authorTitle,
+    targetAudience: article.targetAudience,
+    relatedService: article.relatedService,
+    publishedAt: article.publishedAt,
     date: article.date,
     tags: article.tags,
     summary: article.summary,
@@ -11126,6 +11153,7 @@ function renderStaticArticlePage(slug) {
 async function loadArticlePage(slug) {
   const sourceSlug = articleSourceSlug(slug) || slug;
   try {
+    await ensurePublicArticleRenderer();
     await ensureStaticArticleRewrites();
     const article = await fetchArticlePageWithFallback(slug);
     if (routeSlugFromLocation() !== `article-${slug}`) return;
@@ -11164,6 +11192,8 @@ async function loadArticlePage(slug) {
   } catch (error) {
     console.warn("Supabase article page unavailable.", error);
     if (routeSlugFromLocation() !== `article-${slug}`) return;
+    // The static article remains readable if a transient chunk download fails.
+    if (!renderPublicArticleLayout) return;
     if (articlePages[sourceSlug]) {
       const fallback = articlePages[sourceSlug];
       if (fallback.slides?.length) await ensureArticleSlideDeckRenderer();
@@ -11317,6 +11347,7 @@ function renderExpertTalkArticle(talk) {
 
 async function loadCareStoryPage(slug) {
   try {
+    await ensurePublicArticleRenderer();
     const story = await fetchCareStoryPage(slug);
     if (routeSlugFromLocation() !== `care-story-${slug}`) return;
     if (story) {
@@ -11341,6 +11372,7 @@ async function loadCareStoryPage(slug) {
 
 async function loadExpertTalkPage(slug) {
   try {
+    await ensurePublicArticleRenderer();
     const talk = await fetchExpertTalkPage(slug);
     if (routeSlugFromLocation() !== `master-talk-${slug}`) return;
     if (talk) {
@@ -11373,7 +11405,8 @@ function renderPage(slug) {
   const articleSlug = normalized.startsWith("article-") ? normalized.replace("article-", "") : null;
   const careStorySlug = normalized.startsWith("care-story-") ? normalized.replace("care-story-", "") : null;
   const masterTalkSlug = normalized.startsWith("master-talk-") ? normalized.replace("master-talk-", "") : null;
-  const anchorTarget = normalized === "home" ? null : document.getElementById(normalized);
+  const isContactPage = normalized === "contact" && routeSlugFromPath() !== "home";
+  const anchorTarget = normalized === "home" || isContactPage ? null : document.getElementById(normalized);
   const page = anchorTarget ? null : pages[normalized];
   const isHome = !articleSlug && !careStorySlug && !masterTalkSlug && (normalized === "home" || Boolean(anchorTarget));
   const hasMatchingPrerender = pageView.dataset.prerenderedRoute === normalized && Boolean(pageView.innerHTML.trim());
@@ -11430,6 +11463,12 @@ function renderPage(slug) {
     pageView.classList.add("active");
     if (!hasMatchingPrerender) pageView.innerHTML = "";
     loadExpertTalkPage(masterTalkSlug);
+  } else if (isContactPage) {
+    home.classList.remove("active");
+    pageView.classList.add("active");
+    // Preserve a pre-rendered or already active form, including any user input.
+    if (!pageView.querySelector("[data-public-contact-page]")) pageView.innerHTML = renderContactPage();
+    pageView.dataset.prerenderedRoute = "contact";
   } else if (normalized === "about") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -11578,7 +11617,7 @@ function renderPage(slug) {
     window.scrollTo({ top: 0, behavior: "auto" });
   }
 
-  if (!isHome && !articleSlug && !careStorySlug && !masterTalkSlug && !handledBySpecialCms && !["health", "search"].includes(normalized)) {
+  if (!isHome && !articleSlug && !careStorySlug && !masterTalkSlug && !handledBySpecialCms && !["health", "search", "contact"].includes(normalized)) {
     loadSupabaseDetailPage(normalized);
   }
 
@@ -11588,8 +11627,8 @@ function renderPage(slug) {
   hydrateHomeCareLocationContent(isHome ? home : pageView);
   hydrateCommunityContent(isHome ? home : pageView);
   syncContactNeedDefaults(document, normalized);
-  if (window.location.hash === "#contact") {
-    window.setTimeout(applyPendingContactPreset, 180);
+  if (isContactPage || window.location.hash === "#contact") {
+    applyPendingContactPreset();
   }
   trackPageView(`#${rawSlug || "home"}`);
 }
@@ -11698,9 +11737,10 @@ function contactFormFromTrigger(trigger) {
       ? activePage?.querySelector(targetSelector) || document.querySelector(targetSelector)
       : null;
   return (
-    target?.querySelector?.(".contact-form") ||
+    (activePage?.contains(target) ? target?.querySelector?.(".contact-form") : null) ||
     trigger?.closest?.(".contact-section")?.querySelector?.(".contact-form") ||
     activePage?.querySelector?.(".contact-form") ||
+    target?.querySelector?.(".contact-form") ||
     document.querySelector(".contact-section#contact .contact-form") ||
     document.querySelector(".contact-form")
   );
@@ -11716,6 +11756,8 @@ function applyContactPreset(trigger) {
     setContactNeedValue(select, need);
     select.dataset.needSource = "preset";
     select.dataset.needRoute = normalizedContactNeedRoute();
+    const formTypeInput = form.querySelector('input[name="form_type"]');
+    if (formTypeInput) formTypeInput.value = contactNeedToFormType(need);
   }
   const textarea = form.querySelector('textarea[name="說明"]');
   if (textarea && message && !textarea.value.trim()) textarea.value = message;
@@ -11725,6 +11767,16 @@ function focusContactForm(trigger) {
   const form = contactFormFromTrigger(trigger);
   const input = form?.querySelector('input[name="姓名"], input:not([type="hidden"]):not([tabindex="-1"]), textarea, select');
   window.setTimeout(() => input?.focus?.({ preventScroll: true }), 260);
+}
+
+function scrollToContactSection(target, trigger) {
+  const heading = target.querySelector("h1, h2, h3") || target;
+  if (!heading.hasAttribute("tabindex")) heading.tabIndex = -1;
+  // Focus expands deferred long-page content before calculating the scroll target.
+  heading.focus({ preventScroll: true });
+  target.scrollIntoView({ behavior: "instant", block: "start" });
+  window.setTimeout(() => applyContactPreset(trigger), 120);
+  focusContactForm(trigger);
 }
 
 const pendingContactPresetKey = "suiyuecare_pending_contact_preset";
@@ -11760,18 +11812,16 @@ function applyPendingContactPreset() {
 
 function handleContactAnchorClick(link) {
   const href = link?.getAttribute?.("href") || "";
-  if (href !== "#contact") return false;
+  if (!["#contact", "/contact", "/#contact"].includes(href)) return false;
   const activePage = document.querySelector(".page.active");
-  const localTarget = activePage?.querySelector("#service-contact");
+  const localTarget = activePage?.querySelector("#service-contact, [data-public-contact-page]");
   if (localTarget) {
-    localTarget.scrollIntoView({ behavior: "smooth", block: "start" });
-    window.setTimeout(() => applyContactPreset(link), 120);
-    focusContactForm(link);
+    scrollToContactSection(localTarget, link);
     return true;
   }
   savePendingContactPreset(link);
-  if (routeSlugFromPath() === "home") return false;
-  window.location.href = "/#contact";
+  if (routeSlugFromPath() === "home" && href === "#contact") return false;
+  window.location.href = "/contact";
   return true;
 }
 
@@ -11819,6 +11869,7 @@ if ("MutationObserver" in window && pageView) {
     hydrateDayCareLocationContent(pageView);
     hydrateHomeCareLocationContent(pageView);
     hydrateCommunityContent(pageView);
+    hydrateServiceDecisionNavigation(pageView);
     syncContactNeedDefaults(pageView);
   });
   serviceMotionMutationObserver.observe(pageView, { childList: true, subtree: true });
@@ -11827,16 +11878,17 @@ if ("MutationObserver" in window && pageView) {
 }
 
 document.addEventListener("click", (event) => {
+  if (serviceDecisionNavigation?.handleServiceDecisionClick(event, pageView)) return;
   const trigger = event.target.closest("[data-service-scroll]");
   if (!trigger) return;
   const selector = trigger.getAttribute("data-service-scroll");
   const target = selector ? pageView?.querySelector(selector) : null;
   if (!target) return;
   event.preventDefault();
-  target.scrollIntoView({ behavior: "smooth", block: "start" });
   if (target.querySelector?.(".contact-form")) {
-    window.setTimeout(() => applyContactPreset(trigger), 120);
-    focusContactForm(trigger);
+    scrollToContactSection(target, trigger);
+  } else {
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 });
 
@@ -12413,7 +12465,7 @@ document.addEventListener("submit", (event) => {
     }).catch((error) => {
       console.warn("Contact form failed.", error);
       trackFrontendError("contact_form_failed", { message: error.message, stack: error.stack });
-      setContactFormStatus(form, error.message || "送出失敗，請稍後再試，或直接透過電話、LINE 聯繫我們。", "error");
+      setContactFormStatus(form, contactSubmissionErrorMessage(error), "error");
       if (submitButton) {
         submitButton.textContent = originalText;
         submitButton.removeAttribute("disabled");
