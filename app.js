@@ -4372,6 +4372,7 @@ async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
   hydrateDayCareLocationContent(pageView);
   hydrateHomeCareLocationContent(pageView);
   hydrateCommunityContent(pageView);
+  hydrateMigrantTrainingContent(pageView);
   optimizeImageLoading(pageView);
   observeServiceMotion(pageView);
   setPageViewBusy(false);
@@ -11626,6 +11627,7 @@ function renderPage(slug) {
   hydrateDayCareLocationContent(isHome ? home : pageView);
   hydrateHomeCareLocationContent(isHome ? home : pageView);
   hydrateCommunityContent(isHome ? home : pageView);
+  hydrateMigrantTrainingContent(isHome ? home : pageView);
   syncContactNeedDefaults(document, normalized);
   if (isContactPage || window.location.hash === "#contact") {
     applyPendingContactPreset();
@@ -11700,6 +11702,15 @@ function scheduleImageLoadingOptimization(root = document) {
 let dayCareLocationModulePromise = null;
 let homeCareLocationModulePromise = null;
 let communityModulePromise = null;
+let migrantTrainingModulePromise = null;
+
+function hydrateMigrantTrainingContent(root = document) {
+  if (!root?.querySelector?.(".migrant-training-page, .migrant-training-template-page")) return;
+  migrantTrainingModulePromise ||= import("./migrant-training-page.js");
+  migrantTrainingModulePromise
+    .then(({ hydrateMigrantTrainingPortfolio }) => hydrateMigrantTrainingPortfolio(root))
+    .catch((error) => { migrantTrainingModulePromise = null; console.warn(error); });
+}
 
 function hydrateDayCareLocationContent(root = document) {
   const hasDayCareLocation = root?.querySelector?.("[data-day-care-location-map-host]");
@@ -11869,6 +11880,7 @@ if ("MutationObserver" in window && pageView) {
     hydrateDayCareLocationContent(pageView);
     hydrateHomeCareLocationContent(pageView);
     hydrateCommunityContent(pageView);
+    hydrateMigrantTrainingContent(pageView);
     hydrateServiceDecisionNavigation(pageView);
     syncContactNeedDefaults(pageView);
   });

@@ -64,10 +64,11 @@ export function collectServiceDecisionData(page, slug) {
     { key: "start", title: "如何開始？", text: startText, target: targetId(start, `${slug}-service-start`) || contactTarget, action: journey ? "看完整申請流程" : preparation ? "看申請前準備" : "直接留下需求" }
   ].filter((card) => card.target);
   const extraSections = [
+    [page.querySelector("#migrant-training-projects"), "訓練計畫與實績"],
     [page.querySelector("#community-service-boundary"), "服務界線與注意事項"],
     [preparation, "申請前準備"],
     [page.querySelector("#day-care-health-exam"), "體檢項目"],
-    [page.querySelector(".two-minute-scenes"), "看照顧現場"],
+    [page.querySelector(".two-minute-scenes"), slug === "migrant-training" ? "看訓練情境說明" : "看照顧現場"],
     [contact, "直接諮詢"]
   ];
   const usedTargets = new Set(cards.map((card) => card.target));
