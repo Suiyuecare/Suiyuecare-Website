@@ -9,9 +9,9 @@ const end = source.indexOf("\nasync function loadSupabaseServiceTemplatePage(", 
 assert.ok(start >= 0 && end > start, "Locate the real shared service renderer");
 const rendererSource = source.slice(start, end);
 const hydrationNames = [
-  "hydrateServiceDecisionNavigation", "hydrateServiceFeeCodeGroups",
+  "hydrateServiceLocalLinks", "hydrateServiceFeeCodeGroups",
   "hydrateDayCareLocationContent", "hydrateHomeCareLocationContent",
-  "hydrateCommunityContent", "hydrateMigrantTrainingContent",
+  "hydrateCommunityContent",
   "optimizeImageLoading", "observeServiceMotion"
 ];
 

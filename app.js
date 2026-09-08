@@ -2,7 +2,6 @@ import { supabase } from "./src/lib/supabaseClient.js";
 import { getUniqueHealthTopics, resolveHealthTopic, articleMatchesHealthTopic, renderHealthTopicNavigation } from "./health-topic-navigation.mjs";
 import { renderContactPage, renderContactNeedOptions, contactSubmissionErrorMessage } from "./contact-page.mjs";
 import "./health-contact-ux.css";
-import "./service-decision-navigation.css";
 import {
   articlePublicHref,
   articlePublicNumber,
@@ -25,22 +24,19 @@ async function ensurePublicArticleRenderer() {
   return publicArticleRendererPromise;
 }
 
-let serviceDecisionNavigation;
-let serviceDecisionNavigationLoading;
-function hydrateServiceDecisionNavigation(root) {
-  if (!root?.querySelector(".service-detail-page")) return;
-  if (serviceDecisionNavigation) {
-    serviceDecisionNavigation.hydrateServiceDecisionNavigation(root);
-    return;
+// Retain working local hero links without adding navigation cards or visual sections.
+function hydrateServiceLocalLinks(root) {
+  const page = root?.querySelector?.(".one-minute-service-page, .service-template-page");
+  const secondary = page?.querySelector(":scope > .service-detail-hero .ghost-button, :scope > .service-detail-hero .secondary-button");
+  if (!secondary) return;
+  const location = page.querySelector(".service-location-section");
+  if (secondary.getAttribute("href") === "#network" && location) {
+    location.id ||= "service-local-locations";
+    secondary.setAttribute("href", `#${location.id}`);
   }
-  if (serviceDecisionNavigationLoading) return;
-  serviceDecisionNavigationLoading = import("./service-decision-navigation.js")
-    .then((module) => {
-      serviceDecisionNavigation = module;
-      module.hydrateServiceDecisionNavigation(pageView);
-    })
-    .catch((error) => { console.warn("Service navigation unavailable.", error); })
-    .finally(() => { serviceDecisionNavigationLoading = null; });
+  const href = secondary.getAttribute("href") || "";
+  const target = href.startsWith("#") ? page.ownerDocument.getElementById(href.slice(1)) : null;
+  if (target && page.contains(target)) secondary.setAttribute("data-service-scroll", href);
 }
 
 const pages = {
@@ -4368,12 +4364,11 @@ async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
   // Tracking parameters do not change this service's identity; real route changes still cancel stale responses.
   if (routeSlugFromLocation().split("?")[0] !== slug) return;
   pageView.innerHTML = fields.length ? applyCmsEnhancedServicePage(fallbackHtml, slug, fields) : fallbackHtml;
-  hydrateServiceDecisionNavigation(pageView);
+  hydrateServiceLocalLinks(pageView);
   hydrateServiceFeeCodeGroups(pageView);
   hydrateDayCareLocationContent(pageView);
   hydrateHomeCareLocationContent(pageView);
   hydrateCommunityContent(pageView);
-  hydrateMigrantTrainingContent(pageView);
   optimizeImageLoading(pageView);
   observeServiceMotion(pageView);
   setPageViewBusy(false);
@@ -4403,7 +4398,7 @@ async function loadSupabaseServiceTemplatePage(slug) {
       image
     });
     pageView.innerHTML = renderFixedServiceTemplate(slug, data);
-    hydrateServiceDecisionNavigation(pageView);
+    hydrateServiceLocalLinks(pageView);
     return true;
   } catch (error) {
     console.warn(`Supabase service template unavailable for ${slug}.`, error);
@@ -11628,7 +11623,6 @@ function renderPage(slug) {
   hydrateDayCareLocationContent(isHome ? home : pageView);
   hydrateHomeCareLocationContent(isHome ? home : pageView);
   hydrateCommunityContent(isHome ? home : pageView);
-  hydrateMigrantTrainingContent(isHome ? home : pageView);
   syncContactNeedDefaults(document, normalized);
   if (isContactPage || window.location.hash === "#contact") {
     applyPendingContactPreset();
@@ -11703,15 +11697,6 @@ function scheduleImageLoadingOptimization(root = document) {
 let dayCareLocationModulePromise = null;
 let homeCareLocationModulePromise = null;
 let communityModulePromise = null;
-let migrantTrainingModulePromise = null;
-
-function hydrateMigrantTrainingContent(root = document) {
-  if (!root?.querySelector?.(".migrant-training-page, .migrant-training-template-page")) return;
-  migrantTrainingModulePromise ||= import("./migrant-training-page.js");
-  migrantTrainingModulePromise
-    .then(({ hydrateMigrantTrainingPortfolio }) => hydrateMigrantTrainingPortfolio(root))
-    .catch((error) => { migrantTrainingModulePromise = null; console.warn(error); });
-}
 
 function hydrateDayCareLocationContent(root = document) {
   const hasDayCareLocation = root?.querySelector?.("[data-day-care-location-map-host]");
@@ -11881,8 +11866,7 @@ if ("MutationObserver" in window && pageView) {
     hydrateDayCareLocationContent(pageView);
     hydrateHomeCareLocationContent(pageView);
     hydrateCommunityContent(pageView);
-    hydrateMigrantTrainingContent(pageView);
-    hydrateServiceDecisionNavigation(pageView);
+    hydrateServiceLocalLinks(pageView);
     syncContactNeedDefaults(pageView);
   });
   serviceMotionMutationObserver.observe(pageView, { childList: true, subtree: true });
@@ -11891,9 +11875,8 @@ if ("MutationObserver" in window && pageView) {
 }
 
 document.addEventListener("click", (event) => {
-  if (serviceDecisionNavigation?.handleServiceDecisionClick(event, pageView)) return;
   const trigger = event.target.closest("[data-service-scroll]");
-  if (!trigger) return;
+  if (!trigger || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   const selector = trigger.getAttribute("data-service-scroll");
   const target = selector ? pageView?.querySelector(selector) : null;
   if (!target) return;
@@ -11901,7 +11884,11 @@ document.addEventListener("click", (event) => {
   if (target.querySelector?.(".contact-form")) {
     scrollToContactSection(target, trigger);
   } else {
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    const heading = target.querySelector("h2, h3") || target;
+    if (!heading.hasAttribute("tabindex")) heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
+    target.scrollIntoView({ behavior: "instant", block: "start" });
+    if (target.id) window.history.replaceState(window.history.state, "", `#${target.id}`);
   }
 });
 

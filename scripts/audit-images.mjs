@@ -7,7 +7,7 @@ const imagePattern = /\.(jpe?g|png|webp)$/i;
 const strict = process.argv.includes("--strict");
 const scanAll = process.argv.includes("--all");
 const scanUnused = process.argv.includes("--unused");
-const sourceRoots = ["app.js", "index.html", "styles.css", "migrant-training-programs.mjs", "scripts", "supabase/migrations"].filter((target) => fs.existsSync(target));
+const sourceRoots = ["app.js", "index.html", "styles.css", "scripts", "supabase/migrations"].filter((target) => fs.existsSync(target));
 const unusedLargeImageLimit = 1.1 * 1024 * 1024;
 
 function walk(dir, files = []) {
