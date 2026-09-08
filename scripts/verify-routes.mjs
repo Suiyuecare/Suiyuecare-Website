@@ -575,8 +575,27 @@ function verifyHealthImageFallbacks(appSource) {
   if (!appSource.includes('return normalized.replace(/^assets\\//, "/assets/")')) {
     failures.push("app.js: nested article routes should normalize local assets to root-relative /assets URLs");
   }
-  if (!appSource.includes('<img ${healthArticleImageAttrs(article') || !appSource.includes('poster="${escapeHTML(getHealthArticleImage(article))}"')) {
-    failures.push("app.js: article detail hero and video poster should use normalized Health 3.0 image attributes");
+  const canonicalArticleMarkup = renderPublicArticleLayout({
+    contentKind: "article",
+    slug: "canonical-image-contract",
+    href: "/article/canonical-image-contract",
+    title: "文章圖片正規化驗證",
+    image: "assets/fixture/canonical-cover.jpg",
+    imageAlt: "文章圖片正規化驗證主圖",
+    videoProvider: "direct",
+    videoEmbedUrl: "https://example.com/canonical-video.mp4",
+    publishedAt: "2026-09-09T08:00:00+08:00",
+    updatedAt: "2026-09-09T08:00:00+08:00"
+  });
+  const articleLayout = extractFunctionBlock(appSource, "renderArticleLayout");
+  if (
+    !articleLayout.includes("return renderPublicArticleLayout(article") ||
+    !canonicalArticleMarkup.includes('data-public-layout="article-unified-v1"') ||
+    !canonicalArticleMarkup.includes('src="/assets/fixture/canonical-cover.jpg"') ||
+    !canonicalArticleMarkup.includes('data-fallback-src="/assets/fallbacks/health-article-fallback.jpg"') ||
+    !canonicalArticleMarkup.includes('poster="/assets/fixture/canonical-cover.jpg"')
+  ) {
+    failures.push("article detail: app.js must delegate hero and video poster markup to the canonical normalized public renderer");
   }
   const tagMarkup = renderPublicArticleLayout({
     title: "標籤連結驗證",
@@ -646,13 +665,38 @@ function verifyHealthRouteStableFirstPaint(appSource) {
   }
 
   const renderer = extractFunctionBlock(appSource, "renderHealthRouteOnce");
-  const awaitIndex = renderer.indexOf("await ");
-  const renderIndex = renderer.indexOf("pageView.innerHTML = route ===");
-  if (!renderer || awaitIndex < 0 || renderIndex < awaitIndex) {
-    failures.push("app.js: renderHealthRouteOnce must wait for published data before its only visible render");
+  const publishedAwaitIndex = renderer.indexOf("await Promise.all([");
+  const requestGuardIndex = renderer.indexOf("requestId !== publicContentRouteRequestId");
+  const candidateRenderIndex = renderer.indexOf('const nextHtml = route === "health"');
+  if (
+    !renderer ||
+    publishedAwaitIndex < 0 ||
+    !renderer.includes("ensurePublicArticleRenderer()") ||
+    !renderer.includes("ensureStaticArticleRewrites()") ||
+    !renderer.includes("loadSupabaseHealthArticles()") ||
+    !renderer.includes("loadSupabaseArticleCategories()") ||
+    requestGuardIndex < publishedAwaitIndex ||
+    candidateRenderIndex < requestGuardIndex
+  ) {
+    failures.push("app.js: renderHealthRouteOnce must await the complete canonical inventory and reject stale route requests before producing a candidate view");
   }
-  if (healthBranch.includes("rerender: true") || countMatches(renderer, /pageView\.innerHTML\s*=/g) !== 2) {
-    failures.push("app.js: Health routes must clear once and render final content once without a second CMS repaint");
+
+  const replacementPolicy = extractFunctionBlock(appSource, "shouldReplaceHealthView");
+  if (
+    healthBranch.includes("rerender: true") ||
+    !renderer.includes('if (pageView.dataset.prerenderedRoute !== route) pageView.innerHTML = ""') ||
+    !renderer.includes("const inventoryComplete = staticArticleRewritePackComplete") ||
+    !renderer.includes("&& supabaseHealthArticlesComplete") ||
+    !renderer.includes("&& supabaseArticleCategoriesComplete") ||
+    !renderer.includes("shouldReplace = shouldReplaceHealthView(activeHealthView, nextHealthView, inventoryComplete)") ||
+    !renderer.includes("if (shouldReplace) pageView.innerHTML = nextHtml") ||
+    !renderer.includes("if (!pageView.children.length)") ||
+    !replacementPolicy.includes("if (!activeHealthView) return true") ||
+    !replacementPolicy.includes("dataset.healthCategory") ||
+    !replacementPolicy.includes("inventoryComplete") ||
+    !replacementPolicy.includes("dataset.healthContentRevision")
+  ) {
+    failures.push("app.js: Health routes must preserve a matching prerender and replace it only with a complete authoritative canonical view");
   }
 }
 
@@ -689,15 +733,35 @@ function verifyPublishedFallbackIntegration(appSource) {
       failures.push(`app.js: published CMS fallback is not wired for ${method}`);
     }
   }
-  const startup = appSource.slice(appSource.indexOf("async function initializePublishedHomeContent"));
+  const startup = extractFunctionBlock(appSource, "initializePublishedHomeContent");
+  const startupAwaitIndex = startup.indexOf("await Promise.all([pagePromise, modulesPromise, articlesPromise, categoriesPromise, storiesPromise])");
+  const finalHealthRenderIndex = startup.indexOf("renderHomeHealthArticles()", startupAwaitIndex);
+  const pageLoader = extractFunctionBlock(appSource, "loadSupabasePageContent");
+  const moduleLoader = extractFunctionBlock(appSource, "loadSupabaseHomeModules");
+  const storyLoader = extractFunctionBlock(appSource, "loadSupabaseStoryDatabases");
+  const pageSnapshotIndex = pageLoader.indexOf('loadCmsFallback("getHomePageContent")');
+  const pageLiveIndex = pageLoader.indexOf('.from("pages")');
+  const moduleSnapshotIndex = moduleLoader.indexOf('loadCmsFallback("getHomeModules")');
+  const moduleLiveIndex = moduleLoader.indexOf('.from("content_modules")');
+  const storyFallbackGateIndex = storyLoader.indexOf("if (!storiesAuthoritative || !talksAuthoritative)");
+  const storyFallbackIndex = storyLoader.indexOf('loadCmsFallback("getStoryDatabases")');
   if (
     !startup.includes('const pagePromise = loadSupabasePageContent("home")') ||
     !startup.includes("const modulesPromise = loadSupabaseHomeModules()") ||
-    !startup.includes('loadCmsFallback("getStoryDatabases")') ||
-    !startup.includes('dataset.homeContentReady = "snapshot"') ||
-    !startup.includes("await Promise.all([pagePromise, modulesPromise")
+    !startup.includes("const articlesPromise = loadSupabaseHealthArticles()") ||
+    !startup.includes("const categoriesPromise = loadSupabaseArticleCategories()") ||
+    !startup.includes("const storiesPromise = ensurePublishedStoryDatabases()") ||
+    startupAwaitIndex < 0 ||
+    finalHealthRenderIndex < startupAwaitIndex ||
+    pageSnapshotIndex < 0 || pageLiveIndex < pageSnapshotIndex ||
+    moduleSnapshotIndex < 0 || moduleLiveIndex < moduleSnapshotIndex ||
+    storyFallbackGateIndex < 0 || storyFallbackIndex < storyFallbackGateIndex ||
+    !storyLoader.includes("storiesAuthoritative = true") ||
+    !storyLoader.includes("talksAuthoritative = true") ||
+    !storyLoader.includes("replaceStories: storiesAuthoritative") ||
+    !storyLoader.includes("replaceTalks: talksAuthoritative")
   ) {
-    failures.push("app.js: home page must apply the published snapshot before awaiting live CMS refreshes");
+    failures.push("app.js: home startup must preserve snapshot first paint, await all canonical sources, and use successful live story/talk queries as authoritative");
   }
   if (startup.includes("loadWordPressContent()")) {
     failures.push("app.js: home initialization must not introduce WordPress as a third published-copy source");
@@ -733,8 +797,18 @@ function verifyServiceStoryCoverage(appSource, indexSource) {
 }
 
 function verifyHomeHealthLatestArticles(appSource, indexSource) {
-  if (!appSource.includes("function renderHomeHealthArticles") || !appSource.includes("sortHealthArticlesLatest(uniqueHealthArticles(articles))")) {
-    failures.push("app.js: homepage Health 3.0 block should render the latest local article list for family-friendly care knowledge");
+  const renderer = extractFunctionBlock(appSource, "renderHomeHealthArticles");
+  if (
+    !renderer.includes("articles = getHealthArticleList()") ||
+    !renderer.includes("mergeLatestPublicContent(articles)") ||
+    !renderer.includes(".filter((article) => article.href && article.title)") ||
+    !renderer.includes(".slice(0, 5)") ||
+    !renderer.includes("normalizePublicHref(feature.href)") ||
+    !renderer.includes("healthArticleImageAttrs(feature") ||
+    !renderer.includes("normalizePublicHref(post.href)") ||
+    !renderer.includes("healthArticleImageAttrs(post")
+  ) {
+    failures.push("app.js: homepage Health 3.0 block must render the newest five canonical public articles with normalized links and images");
   }
   for (const slug of [
     "fall-prevention-home-checklist",
@@ -767,11 +841,26 @@ function verifyMasterTalkHomepageColumns(appSource, indexSource) {
   if (!appSource.includes("const HOMEPAGE_MASTER_TALK_LIMIT = 8")) {
     failures.push("app.js: dynamic homepage Master Talk rendering should limit the homepage to 8 article cards");
   }
+  const moduleRenderer = extractFunctionBlock(appSource, "renderSupabaseMasterTalk");
+  const canonicalRenderer = extractFunctionBlock(appSource, "renderExpertTalkSlider");
+  const databaseRendererStart = appSource.indexOf("function renderPublishedStoryDatabases");
+  const databaseRendererEnd = appSource.indexOf("async function loadSupabaseStoryDatabases", databaseRendererStart);
+  const databaseRenderer = databaseRendererStart >= 0 && databaseRendererEnd > databaseRendererStart
+    ? appSource.slice(databaseRendererStart, databaseRendererEnd)
+    : "";
   if (
-    !appSource.includes("items.length < HOMEPAGE_MASTER_TALK_LIMIT") ||
-    !appSource.includes("talks.length < HOMEPAGE_MASTER_TALK_LIMIT")
+    !moduleRenderer.includes("items.length < HOMEPAGE_MASTER_TALK_LIMIT") ||
+    !moduleRenderer.includes("items.slice(0, HOMEPAGE_MASTER_TALK_LIMIT)") ||
+    !canonicalRenderer.includes("talks.slice(0, HOMEPAGE_MASTER_TALK_LIMIT)") ||
+    canonicalRenderer.includes("talks.length < HOMEPAGE_MASTER_TALK_LIMIT") ||
+    !canonicalRenderer.includes("normalizePublicHref(talk.href)") ||
+    !canonicalRenderer.includes('talk.excerpt || talk.quote || talk.topic || ""') ||
+    !databaseRenderer.includes("if (replaceTalks) expertTalkPageCache.clear()") ||
+    !databaseRenderer.includes("talks.map(normalizeExpertTalk)") ||
+    !databaseRenderer.includes("selectLatestPublicContent(expertTalkPageCache.get(talk.slug), talk)") ||
+    !databaseRenderer.includes("mergeLatestPublicContent([...expertTalkPageCache.values()])")
   ) {
-    failures.push("app.js: dynamic Master Talk sources should not replace the homepage grid unless 8 cards are available");
+    failures.push("app.js: homepage Master Talk must preserve an incomplete module snapshot while allowing the latest canonical expert-talk inventory to render up to 8 cards");
   }
   for (const slug of expectedSlugs) {
     if (!appSource.includes(`"${slug}"`) || !indexSource.includes(articlePublicHref(slug))) {

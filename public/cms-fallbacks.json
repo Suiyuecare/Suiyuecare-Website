@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-21T15:39:44.603Z",
-  "contentHash": "88a34be7a9e9e86d9550795a56649b7715db30ff2d20d0d3ee69e63ff2cf6b82",
+  "generatedAt": "2026-09-08T16:58:45.646Z",
+  "contentHash": "5316da7e1d59f919b33e9f3de05d4a8d05972e97810a51dc8880604d15f7afc7",
   "schemaVersion": 1,
   "serviceSlugs": [
     "about",
@@ -1842,7 +1842,7 @@
       "field_key": "enrollment_body",
       "field_label": "入托準備說明",
       "field_type": "textarea",
-      "text_value": "體檢完成後，請依長輩平時生活習慣準備以下用品。",
+      "text_value": "",
       "number_value": null,
       "boolean_value": null,
       "image_id": null,
@@ -1853,7 +1853,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-07-13T13:59:55.355701+00:00",
-      "updated_at": "2026-07-13T13:59:55.355701+00:00"
+      "updated_at": "2026-08-31T16:14:48.038674+00:00"
     },
     {
       "id": "64f084da-bbae-428a-bd66-866bc1aba51e",
@@ -1870,46 +1870,51 @@
         {
           "body": "",
           "label": "01",
+          "title": "體檢"
+        },
+        {
+          "body": "",
+          "label": "02",
           "title": "衛生紙、濕紙巾"
         },
         {
           "body": "如：牙籤牙線、梳子等。",
-          "label": "02",
+          "label": "03",
           "title": "個人物品"
         },
         {
           "body": "",
-          "label": "03",
+          "label": "04",
           "title": "保溫瓶"
         },
         {
           "body": "",
-          "label": "04",
+          "label": "05",
           "title": "牙刷、牙膏等盥洗用品"
         },
         {
           "body": "",
-          "label": "05",
+          "label": "06",
           "title": "棉被或薄毯"
         },
         {
           "body": "備用。",
-          "label": "06",
+          "label": "07",
           "title": "替換衣物"
         },
         {
           "body": "浴巾、毛巾、洗髮沐浴乳；請盡量選用按壓式瓶裝。",
-          "label": "07",
+          "label": "08",
           "title": "沐浴用品"
         },
         {
           "body": "請事先分裝好並附上服藥說明。",
-          "label": "08",
+          "label": "09",
           "title": "藥盒"
         },
         {
           "body": "",
-          "label": "09",
+          "label": "10",
           "title": "尿布、看護墊等衛生用品"
         }
       ],
@@ -1919,7 +1924,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-07-13T13:59:55.355701+00:00",
-      "updated_at": "2026-07-13T13:59:55.355701+00:00"
+      "updated_at": "2026-08-31T16:14:48.038674+00:00"
     },
     {
       "id": "71385b49-4dad-4d20-a1e5-283a8d54bc41",
@@ -2368,7 +2373,7 @@
           "title": "安排體檢"
         },
         {
-          "body": "確認理學檢查、胸部 X 光、血液常規、血液生化與尿液檢查等五類項目。",
+          "body": "抽血（血液、生化、B 肝表面抗原）、尿液、胸部 X 光與皮膚檢查；不包含糞便檢查。",
           "step": "05",
           "title": "確認體檢項目"
         },
@@ -8792,10 +8797,10 @@
       "id": "89c4e8f0-78c5-4687-aefc-a1183554d594",
       "year": 2026,
       "month": 6,
-      "title": "設立臺北市歲悅社區長照機構萬華二館",
-      "tag": "設立",
-      "summary": "萬華二館完成設立，延伸社區長照服務量能，讓臺北市西區家庭有更多在地支持。",
-      "status_label": "已完成",
+      "title": "籌設臺北市歲悅社區長照機構萬華二館",
+      "tag": "籌設",
+      "summary": "萬華二館目前籌設中，正式開辦日期與服務資訊將於核定後公告。",
+      "status_label": "籌設中",
       "image_id": "2cbff819-be47-4141-8776-c2d4ca7125dd",
       "image_url": "/assets/milestones/wanhua-community-care-two.jpg",
       "sort_order": 90,
@@ -8805,7 +8810,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-07-11T08:07:41.306342+00:00",
-      "updated_at": "2026-07-11T08:07:41.306342+00:00"
+      "updated_at": "2026-08-31T16:14:49.936767+00:00"
     },
     {
       "id": "bded2ef5-095a-42c8-8b8f-65801db720c4",
@@ -9719,168 +9724,6 @@
       "public_number": 11
     },
     {
-      "id": "554a33cc-e6fc-4fde-9bf4-55f0b0ca81ad",
-      "category_id": "46642685-12bf-4004-8a36-183e99d9d0e7",
-      "slug": "longterm-care-apply-checklist-2026",
-      "title": "長照服務申請懶人包：第一次諮詢前要準備什麼",
-      "subtitle": "把照顧需求、身分資料與家庭期待先整理好，諮詢會更有效率。",
-      "excerpt": "把照顧需求、身分資料與家庭期待先整理好，諮詢會更有效率。",
-      "content": "第一次接觸長照服務時，很多家庭不知道要怎麼說明需求。其實可以先把長輩目前狀況、主要照顧者、希望協助的時段與服務目標整理出來。\\n\\n## 諮詢前檢查表\\n- 長輩基本資料與居住地址。\\n- 目前疾病、用藥與行動能力。\\n- 家屬最困擾的三件事。\\n- 希望服務的頻率與時間。\\n- 是否已申請長照2.0或需要協助評估。",
-      "content_json": {},
-      "cover_image_id": "79e2df86-8d87-4991-aea4-cdfb2d05ae2e",
-      "author_name": "歲悅照顧編輯部",
-      "author_title": "Suiyuecare Corps.",
-      "author_avatar_id": null,
-      "tags": [
-        "懶人包",
-        "長照申請",
-        "照顧諮詢"
-      ],
-      "sort_order": 0,
-      "is_featured": true,
-      "is_enabled": true,
-      "status": "published",
-      "published_at": "2026-05-23T17:04:16.823198+00:00",
-      "seo_title": "長照服務申請懶人包：第一次諮詢前要準備什麼｜歲悅長照健康3.0",
-      "seo_description": "把照顧需求、身分資料與家庭期待先整理好，諮詢會更有效率。",
-      "seo_keywords": [
-        "懶人包",
-        "長照申請",
-        "照顧諮詢"
-      ],
-      "og_title": "長照服務申請懶人包：第一次諮詢前要準備什麼",
-      "og_description": "把照顧需求、身分資料與家庭期待先整理好，諮詢會更有效率。",
-      "og_image_id": null,
-      "created_by": null,
-      "updated_by": null,
-      "created_at": "2026-05-23T21:04:16.823198+00:00",
-      "updated_at": "2026-07-28T04:01:35.624571+00:00",
-      "content_type": "article",
-      "reading_minutes": 4,
-      "difficulty": "入門",
-      "target_audience": "第一次申請長照的家庭",
-      "related_service": "照顧諮詢",
-      "source_name": null,
-      "source_url": null,
-      "canonical_url": null,
-      "recommended_slots": [
-        "health-home",
-        "home-health"
-      ],
-      "summary_points": [
-        "先整理需求能縮短溝通時間",
-        "服務目標越清楚越容易媒合",
-        "歲悅可協助家庭釐清下一步"
-      ],
-      "related_article_ids": [],
-      "faq_json": [],
-      "cta_text": "聯絡歲悅",
-      "cta_url": "#contact",
-      "public_number": 12
-    },
-    {
-      "id": "33a73948-f459-4523-a55b-2073185bf2fd",
-      "category_id": "12facb2d-d09f-4266-849a-ccee08887a8b",
-      "slug": "safe-transfer-three-reminders",
-      "title": "協助長輩安全起身的三個提醒",
-      "subtitle": "先穩定、再移動，讓每一次起身都更安全。",
-      "excerpt": "家屬協助長輩起身時，先確認動線、支撐點與節奏，比用力拉起更重要。",
-      "content": "照顧長輩起身時，請先確認地面止滑、椅子穩定與長輩是否已坐穩。第二步是讓長輩雙腳踩實，照顧者站在側前方提供支撐。第三步是用口令建立節奏，不要突然拉扯。若長輩近期跌倒、頭暈或下肢無力，建議先諮詢專業人員。",
-      "content_json": {},
-      "cover_image_id": "a26c9a6d-150d-472f-861f-98b099b17c8f",
-      "author_name": "歲悅照顧編輯部",
-      "author_title": null,
-      "author_avatar_id": null,
-      "tags": [
-        "跌倒預防",
-        "移位",
-        "居家安全"
-      ],
-      "sort_order": 10,
-      "is_featured": true,
-      "is_enabled": true,
-      "status": "published",
-      "published_at": "2026-05-18T11:49:23.062581+00:00",
-      "seo_title": "協助長輩安全起身的三個提醒｜健康3.0",
-      "seo_description": "協助長輩起身、移位與跌倒預防的三個居家照顧提醒。",
-      "seo_keywords": [],
-      "og_title": null,
-      "og_description": null,
-      "og_image_id": null,
-      "created_by": null,
-      "updated_by": null,
-      "created_at": "2026-05-19T11:49:23.062581+00:00",
-      "updated_at": "2026-07-28T04:01:35.624571+00:00",
-      "content_type": "article",
-      "reading_minutes": null,
-      "difficulty": null,
-      "target_audience": null,
-      "related_service": null,
-      "source_name": null,
-      "source_url": null,
-      "canonical_url": null,
-      "recommended_slots": [],
-      "summary_points": [],
-      "related_article_ids": [],
-      "faq_json": [],
-      "cta_text": null,
-      "cta_url": null,
-      "public_number": 13
-    },
-    {
-      "id": "99094c6c-8d9f-4e26-8ee4-d718d8018627",
-      "category_id": "46642685-12bf-4004-8a36-183e99d9d0e7",
-      "slug": "longterm-care-apply",
-      "title": "長照申請懶人包：從評估到第一次服務",
-      "subtitle": "四步理解申請、到府評估、照顧計畫與服務啟動。",
-      "excerpt": "備好資料、接受評估、討論服務，完成媒合後即可開始。",
-      "content": "## 申請服務須知\n\n### 1. 提出申請與備妥資料\n準備長輩身分證字號、居住地址與主要聯絡電話，並簡單整理病況、身障證明及吃飯、洗澡、如廁等自理情形。\n\n### 2. 到府評估，核定 CMS 等級\n照管專員與 A 單位個管到府訪視，依長輩狀況核定 CMS 2-8 級與補助額度。\n\n### 3. 共同擬定照顧計畫\n依核定額度討論居家照顧、日照、輔具等服務；也可主動告知希望由指定服務單位協助。\n\n### 4. 媒合並開始服務\n個管轉介資料給服務單位後，將由單位聯繫並安排第一次到府或日照服務。",
-      "content_json": {},
-      "cover_image_id": "cc824aa3-e051-41f2-b111-2bce8432aa52",
-      "author_name": "歲悅照顧編輯部",
-      "author_title": null,
-      "author_avatar_id": null,
-      "tags": [
-        "懶人包",
-        "長照申請",
-        "家屬支持"
-      ],
-      "sort_order": 10,
-      "is_featured": true,
-      "is_enabled": true,
-      "status": "published",
-      "published_at": "2026-05-13T07:24:54.313256+00:00",
-      "seo_title": "長照申請懶人包｜歲悅長照",
-      "seo_description": "從評估到服務媒合，快速理解長照申請流程。",
-      "seo_keywords": [],
-      "og_title": null,
-      "og_description": null,
-      "og_image_id": null,
-      "created_by": null,
-      "updated_by": null,
-      "created_at": "2026-05-22T07:24:54.313256+00:00",
-      "updated_at": "2026-07-28T04:01:35.624571+00:00",
-      "content_type": "lazy_pack",
-      "reading_minutes": null,
-      "difficulty": null,
-      "target_audience": null,
-      "related_service": null,
-      "source_name": null,
-      "source_url": null,
-      "canonical_url": null,
-      "recommended_slots": [],
-      "summary_points": [
-        "備妥基本資料與長輩生活需求。",
-        "照專與個管到府評估，核定 CMS 等級與額度。",
-        "照顧計畫確認後，媒合服務單位並安排第一次服務。"
-      ],
-      "related_article_ids": [],
-      "faq_json": [],
-      "cta_text": null,
-      "cta_url": null,
-      "public_number": 14
-    },
-    {
       "id": "919137eb-7405-4aee-8af1-89bb15aea7ba",
       "category_id": "b9daf39e-58be-4f82-9c9f-01349a6d09ad",
       "slug": "nutrition-soft-food-guide",
@@ -10059,6 +9902,66 @@
       "cta_text": "聯絡歲悅",
       "cta_url": "#contact",
       "public_number": 17
+    },
+    {
+      "id": "554a33cc-e6fc-4fde-9bf4-55f0b0ca81ad",
+      "category_id": "46642685-12bf-4004-8a36-183e99d9d0e7",
+      "slug": "longterm-care-apply-checklist-2026",
+      "title": "長照服務申請懶人包：第一次諮詢前要準備什麼",
+      "subtitle": "把照顧需求、身分資料與家庭期待先整理好，諮詢會更有效率。",
+      "excerpt": "把照顧需求、身分資料與家庭期待先整理好，諮詢會更有效率。",
+      "content": "第一次接觸長照服務時，很多家庭不知道要怎麼說明需求。其實可以先把長輩目前狀況、主要照顧者、希望協助的時段與服務目標整理出來。\\n\\n## 諮詢前檢查表\\n- 長輩基本資料與居住地址。\\n- 目前疾病、用藥與行動能力。\\n- 家屬最困擾的三件事。\\n- 希望服務的頻率與時間。\\n- 是否已申請長照2.0或需要協助評估。",
+      "content_json": {},
+      "cover_image_id": "79e2df86-8d87-4991-aea4-cdfb2d05ae2e",
+      "author_name": "歲悅照顧編輯部",
+      "author_title": "Suiyuecare Corps.",
+      "author_avatar_id": null,
+      "tags": [
+        "懶人包",
+        "長照申請",
+        "照顧諮詢"
+      ],
+      "sort_order": 0,
+      "is_featured": true,
+      "is_enabled": true,
+      "status": "published",
+      "published_at": "2026-05-23T17:04:16.823198+00:00",
+      "seo_title": "長照服務申請懶人包：第一次諮詢前要準備什麼｜歲悅長照健康3.0",
+      "seo_description": "把照顧需求、身分資料與家庭期待先整理好，諮詢會更有效率。",
+      "seo_keywords": [
+        "懶人包",
+        "長照申請",
+        "照顧諮詢"
+      ],
+      "og_title": "長照服務申請懶人包：第一次諮詢前要準備什麼",
+      "og_description": "把照顧需求、身分資料與家庭期待先整理好，諮詢會更有效率。",
+      "og_image_id": null,
+      "created_by": null,
+      "updated_by": null,
+      "created_at": "2026-05-23T21:04:16.823198+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
+      "content_type": "article",
+      "reading_minutes": 4,
+      "difficulty": "入門",
+      "target_audience": "第一次申請長照的家庭",
+      "related_service": "照顧諮詢",
+      "source_name": null,
+      "source_url": null,
+      "canonical_url": null,
+      "recommended_slots": [
+        "health-home",
+        "home-health"
+      ],
+      "summary_points": [
+        "先整理需求能縮短溝通時間",
+        "服務目標越清楚越容易媒合",
+        "歲悅可協助家庭釐清下一步"
+      ],
+      "related_article_ids": [],
+      "faq_json": [],
+      "cta_text": "聯絡歲悅",
+      "cta_url": "#contact",
+      "public_number": 12
     },
     {
       "id": "fbd3229e-3b83-440d-a38d-bc5271e3ce55",
@@ -10573,6 +10476,55 @@
       "public_number": 26
     },
     {
+      "id": "33a73948-f459-4523-a55b-2073185bf2fd",
+      "category_id": "12facb2d-d09f-4266-849a-ccee08887a8b",
+      "slug": "safe-transfer-three-reminders",
+      "title": "協助長輩安全起身的三個提醒",
+      "subtitle": "先穩定、再移動，讓每一次起身都更安全。",
+      "excerpt": "家屬協助長輩起身時，先確認動線、支撐點與節奏，比用力拉起更重要。",
+      "content": "照顧長輩起身時，請先確認地面止滑、椅子穩定與長輩是否已坐穩。第二步是讓長輩雙腳踩實，照顧者站在側前方提供支撐。第三步是用口令建立節奏，不要突然拉扯。若長輩近期跌倒、頭暈或下肢無力，建議先諮詢專業人員。",
+      "content_json": {},
+      "cover_image_id": "a26c9a6d-150d-472f-861f-98b099b17c8f",
+      "author_name": "歲悅照顧編輯部",
+      "author_title": null,
+      "author_avatar_id": null,
+      "tags": [
+        "跌倒預防",
+        "移位",
+        "居家安全"
+      ],
+      "sort_order": 10,
+      "is_featured": true,
+      "is_enabled": true,
+      "status": "published",
+      "published_at": "2026-05-18T11:49:23.062581+00:00",
+      "seo_title": "協助長輩安全起身的三個提醒｜健康3.0",
+      "seo_description": "協助長輩起身、移位與跌倒預防的三個居家照顧提醒。",
+      "seo_keywords": [],
+      "og_title": null,
+      "og_description": null,
+      "og_image_id": null,
+      "created_by": null,
+      "updated_by": null,
+      "created_at": "2026-05-19T11:49:23.062581+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
+      "content_type": "article",
+      "reading_minutes": null,
+      "difficulty": null,
+      "target_audience": null,
+      "related_service": null,
+      "source_name": null,
+      "source_url": null,
+      "canonical_url": null,
+      "recommended_slots": [],
+      "summary_points": [],
+      "related_article_ids": [],
+      "faq_json": [],
+      "cta_text": null,
+      "cta_url": null,
+      "public_number": 13
+    },
+    {
       "id": "4c86a722-7f7e-47f7-bb6e-404e572e1df3",
       "category_id": "ae5c72f6-1581-4fe8-9f90-0a4b48d1762b",
       "slug": "reablement-workshop",
@@ -11012,6 +10964,59 @@
       "cta_text": null,
       "cta_url": null,
       "public_number": 35
+    },
+    {
+      "id": "99094c6c-8d9f-4e26-8ee4-d718d8018627",
+      "category_id": "46642685-12bf-4004-8a36-183e99d9d0e7",
+      "slug": "longterm-care-apply",
+      "title": "長照申請懶人包：從評估到第一次服務",
+      "subtitle": "四步理解申請、到府評估、照顧計畫與服務啟動。",
+      "excerpt": "備好資料、接受評估、討論服務，完成媒合後即可開始。",
+      "content": "## 申請服務須知\n\n### 1. 提出申請與備妥資料\n準備長輩身分證字號、居住地址與主要聯絡電話，並簡單整理病況、身障證明及吃飯、洗澡、如廁等自理情形。\n\n### 2. 到府評估，核定 CMS 等級\n照管專員與 A 單位個管到府訪視，依長輩狀況核定 CMS 2-8 級與補助額度。\n\n### 3. 共同擬定照顧計畫\n依核定額度討論居家照顧、日照、輔具等服務；也可主動告知希望由指定服務單位協助。\n\n### 4. 媒合並開始服務\n個管轉介資料給服務單位後，將由單位聯繫並安排第一次到府或日照服務。",
+      "content_json": {},
+      "cover_image_id": "cc824aa3-e051-41f2-b111-2bce8432aa52",
+      "author_name": "歲悅照顧編輯部",
+      "author_title": null,
+      "author_avatar_id": null,
+      "tags": [
+        "懶人包",
+        "長照申請",
+        "家屬支持"
+      ],
+      "sort_order": 10,
+      "is_featured": true,
+      "is_enabled": true,
+      "status": "published",
+      "published_at": "2026-05-13T07:24:54.313256+00:00",
+      "seo_title": "長照申請懶人包｜歲悅長照",
+      "seo_description": "從評估到服務媒合，快速理解長照申請流程。",
+      "seo_keywords": [],
+      "og_title": null,
+      "og_description": null,
+      "og_image_id": null,
+      "created_by": null,
+      "updated_by": null,
+      "created_at": "2026-05-22T07:24:54.313256+00:00",
+      "updated_at": "2026-07-28T04:01:35.624571+00:00",
+      "content_type": "lazy_pack",
+      "reading_minutes": null,
+      "difficulty": null,
+      "target_audience": null,
+      "related_service": null,
+      "source_name": null,
+      "source_url": null,
+      "canonical_url": null,
+      "recommended_slots": [],
+      "summary_points": [
+        "備妥基本資料與長輩生活需求。",
+        "照專與個管到府評估，核定 CMS 等級與額度。",
+        "照顧計畫確認後，媒合服務單位並安排第一次服務。"
+      ],
+      "related_article_ids": [],
+      "faq_json": [],
+      "cta_text": null,
+      "cta_url": null,
+      "public_number": 14
     }
   ],
   "articleCategories": [
@@ -12628,11 +12633,12 @@
       "badge_label": "失智據點、居家長照、家屬諮詢",
       "metadata": {
         "email": "generalaffairs@suiyuecare.com",
-        "phone": "02-6604-5432",
+        "phone": "02-6604-5432 #21（失智據點）／#11（居家照顧）",
         "address": "歲悅士林失智據點 / 居家長照機構",
         "image_url": "assets/homepage-batch/16-taipei-service-office.png",
         "pin_class": "pin-shilin",
-        "pin_label": "士林區"
+        "pin_label": "士林區",
+        "phone_href": "tel:0266045432"
       },
       "sort_order": 10,
       "is_featured": true,
@@ -12642,7 +12648,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T06:11:40.093599+00:00",
-      "updated_at": "2026-05-31T15:51:42.579606+00:00"
+      "updated_at": "2026-08-31T16:14:49.936767+00:00"
     },
     {
       "id": "c7eaf787-ee5b-4095-a174-47ce37f20809",
@@ -12660,11 +12666,12 @@
       "badge_label": "失智據點、照顧諮詢、課程報名",
       "metadata": {
         "email": "generalaffairs@suiyuecare.com",
-        "phone": "02-6604-5432",
+        "phone": "02-6604-5432 #22",
         "address": "歲悅大同失智據點",
         "image_url": "assets/homepage-batch/10-family-consultation.png",
         "pin_class": "pin-datong",
-        "pin_label": "大同區"
+        "pin_label": "大同區",
+        "phone_href": "tel:0266045432;ext=22"
       },
       "sort_order": 20,
       "is_featured": false,
@@ -12674,7 +12681,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T06:11:40.093599+00:00",
-      "updated_at": "2026-05-31T15:51:42.579606+00:00"
+      "updated_at": "2026-08-31T16:14:49.936767+00:00"
     },
     {
       "id": "04f2c09c-8f48-4e16-bb54-37987ff1f548",
@@ -12692,14 +12699,15 @@
       "badge_label": "日間照顧、生活支持、家屬諮詢",
       "metadata": {
         "email": "generalaffairs@suiyuecare.com",
-        "phone": "02-6604-5432",
+        "phone": "02-6604-5432 #31",
         "address": "108 臺北市萬華區康定路43號2樓",
         "image_alt": "歲悅萬華社區長照機構一館照片",
         "image_url": "assets/homepage-batch/07-orange-apron-meal-prep.png",
         "pin_class": "pin-wanhua",
         "pin_label": "萬華區",
         "tab_group": "wanhua",
-        "tab_label": "一館"
+        "tab_label": "一館",
+        "phone_href": "tel:0266045432;ext=31"
       },
       "sort_order": 30,
       "is_featured": false,
@@ -12709,32 +12717,33 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T06:11:40.093599+00:00",
-      "updated_at": "2026-07-13T13:37:39.830942+00:00"
+      "updated_at": "2026-08-31T16:14:49.936767+00:00"
     },
     {
       "id": "137ee2f0-a0b0-4540-8e96-aee60d1377a8",
       "target_slug": "home",
       "module_key": "location",
       "item_key": "wanhua-b",
-      "title": "歲悅萬華二館社區長照機構",
-      "subtitle": "臺北市｜日間照顧中心",
+      "title": "歲悅萬華二館社區長照機構（籌設中）",
+      "subtitle": "臺北市｜日間照顧中心（籌設中）",
       "eyebrow": "Care Network",
-      "body": "萬華二館提供日間照顧服務，支持長輩白天生活照顧、活動參與與家庭照顧安排。",
+      "body": "萬華二館目前籌設中，正式開辦日期、服務內容與服務時段將於核定後公告。",
       "image_id": null,
       "link_text": null,
       "link_url": null,
-      "date_label": "週一至週五 09:00-17:30",
-      "badge_label": "日間照顧、生活支持、家屬諮詢",
+      "date_label": "籌設中",
+      "badge_label": "籌設中",
       "metadata": {
         "email": "generalaffairs@suiyuecare.com",
-        "phone": "02-6604-5432",
+        "phone": "02-6604-5432 #32",
         "address": "108 臺北市萬華區西門里成都路159號2樓（雅香石頭火鍋二樓）",
-        "image_alt": "歲悅萬華二館社區長照機構照片",
+        "image_alt": "歲悅萬華二館籌設中場址照片",
         "image_url": "assets/homepage-batch/14-care-notes.png",
         "pin_class": "pin-wanhua",
         "pin_label": "萬華區",
         "tab_group": "wanhua",
-        "tab_label": "二館"
+        "tab_label": "二館（籌設中）",
+        "phone_href": "tel:0266045432;ext=32"
       },
       "sort_order": 31,
       "is_featured": false,
@@ -12744,7 +12753,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T06:11:40.093599+00:00",
-      "updated_at": "2026-07-13T13:37:39.830942+00:00"
+      "updated_at": "2026-08-31T16:14:49.936767+00:00"
     },
     {
       "id": "3ba62313-7303-4de0-8f94-b55f9c0e94a4",
@@ -12762,11 +12771,12 @@
       "badge_label": "失智據點、健康促進、家屬課程",
       "metadata": {
         "email": "generalaffairs@suiyuecare.com",
-        "phone": "02-6604-5432",
+        "phone": "02-6604-5432 #23",
         "address": "歲悅信義失智據點",
         "image_url": "assets/homepage-batch/10-family-consultation.png",
         "pin_class": "pin-xinyi",
-        "pin_label": "信義區"
+        "pin_label": "信義區",
+        "phone_href": "tel:0266045432;ext=23"
       },
       "sort_order": 40,
       "is_featured": false,
@@ -12776,7 +12786,7 @@
       "created_by": null,
       "updated_by": null,
       "created_at": "2026-05-22T06:11:40.093599+00:00",
-      "updated_at": "2026-05-31T15:51:42.579606+00:00"
+      "updated_at": "2026-08-31T16:14:49.936767+00:00"
     },
     {
       "id": "4875220b-d14f-4e2c-a09f-b6bdb5ffe52b",
@@ -14880,7 +14890,7 @@
     {
       "id": "2cbff819-be47-4141-8776-c2d4ca7125dd",
       "public_url": "/assets/milestones/wanhua-community-care-two.jpg",
-      "alt_text": "設立臺北市歲悅社區長照機構萬華二館",
+      "alt_text": "籌設臺北市歲悅社區長照機構萬華二館",
       "file_name": "wanhua-community-care-two.jpg",
       "image_usage": "milestone",
       "focal_point": "center"

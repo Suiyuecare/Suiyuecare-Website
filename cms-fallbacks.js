@@ -87,11 +87,15 @@ export async function getArticleSource(slug) {
       ? item.slug === sourceSlug
       : Number(item.public_number) === publicNumber
   );
-  if (!article) return null;
+  if (!article || article.status !== "published" || article.is_enabled === false) return null;
+  if (article.published_at && new Date(article.published_at).getTime() > Date.now()) return null;
+  const category = source.categories.find((item) => item.id === article.category_id) || null;
+  if (article.category_id && (!category || category.is_enabled === false)) return null;
   return {
     article,
-    category: source.categories.find((item) => item.id === article.category_id) || null,
-    cover: source.media.find((item) => item.id === article.cover_image_id) || null
+    category,
+    cover: source.media.find((item) => item.id === article.cover_image_id) || null,
+    ogImage: source.media.find((item) => item.id === article.og_image_id) || null
   };
 }
 

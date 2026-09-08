@@ -2509,7 +2509,6 @@ a.health-video-card {
   padding: 26px;
 }
 .health-feature,
-.health-quick-grid,
 .ranking-panel {
   height: 100%;
   min-height: 560px;
@@ -2611,18 +2610,9 @@ a.health-video-card {
 }
 .health-board {
   display: grid;
-  grid-template-columns: minmax(420px, 1fr) minmax(360px, .78fr) minmax(260px, .52fr);
+  grid-template-columns: minmax(420px, 1.15fr) minmax(320px, .65fr);
   gap: 18px;
   padding: 34px clamp(32px,5vw,86px) 18px;
-}
-.health-board--prerendered {
-  grid-template-columns: minmax(420px, 1.15fr) minmax(320px, .65fr);
-}
-.health-quick-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(4, 1fr);
-  gap: 12px;
 }
 .ranking-title span,
 .health-section-head .eyebrow {
@@ -11567,9 +11557,6 @@ input[name="_honey"] { display: none !important; }
   .health-event-grid {
     grid-template-columns: 1fr 1fr;
   }
-  .ranking-panel {
-    grid-column: 1 / -1;
-  }
   .health-preview.feature img { height: 260px; }
   .article-hero figure,
   .article-hero img {
@@ -11904,7 +11891,6 @@ input[name="_honey"] { display: none !important; }
   .health-search { margin-top: 18px; }
   .celebrity-slider article { flex-basis: min(360px, 72vw); }
   .health-board,
-  .health-quick-grid,
   .health-latest-grid,
   .health-media-grid,
   .health-pack-grid,
@@ -11913,7 +11899,6 @@ input[name="_honey"] { display: none !important; }
     grid-template-columns: 1fr;
   }
   .health-feature,
-  .health-quick-grid,
   .ranking-panel {
     min-height: auto;
   }
@@ -12845,7 +12830,7 @@ input[name="_honey"] { display: none !important; }
   }
   .wall-main, .video-panel { min-height: 360px; border-radius: 24px; }
   .north-map { min-height: 0; border-radius: 24px; }
-  .care-flow, .service-grid, .contact-form, .detail-content, .footer-sitemap, .health-grid, .course-list, .course-search, .footer-main, .mini-article-grid, .media-row, .health-board, .health-quick-grid, .health-latest-grid, .health-media-grid, .health-pack-grid, .health-event-grid, .investor-snapshot div, .career-growth-board, .career-role-grid, .software-module-grid, .software-screen-stats, .software-screen-table p, .software-problem-grid, .software-scenario-grid, .software-role-board, .software-package-grid, .software-control-grid, .homecare-hero-points, .homecare-problem-grid, .homecare-scenario-grid, .homecare-quality-grid, .homecare-family-board { grid-template-columns: 1fr; }
+  .care-flow, .service-grid, .contact-form, .detail-content, .footer-sitemap, .health-grid, .course-list, .course-search, .footer-main, .mini-article-grid, .media-row, .health-board, .health-latest-grid, .health-media-grid, .health-pack-grid, .health-event-grid, .investor-snapshot div, .career-growth-board, .career-role-grid, .software-module-grid, .software-screen-stats, .software-screen-table p, .software-problem-grid, .software-scenario-grid, .software-role-board, .software-package-grid, .software-control-grid, .homecare-hero-points, .homecare-problem-grid, .homecare-scenario-grid, .homecare-quality-grid, .homecare-family-board { grid-template-columns: 1fr; }
   .ir-step-list div {
     grid-template-columns: 82px minmax(0, 1fr) 38px;
   }
@@ -13044,6 +13029,17 @@ input[name="_honey"] { display: none !important; }
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
+  }
+  .health-category-results .health-latest-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-inline: 0;
+    padding: 0;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+  .health-category-results .health-list-card {
+    flex-basis: auto;
   }
   .home-health-section .article-row::-webkit-scrollbar,
   .home-health-section .media-row::-webkit-scrollbar,

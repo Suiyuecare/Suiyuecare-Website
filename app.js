@@ -9,16 +9,36 @@ import {
   articleSourceSlug,
   resolveArticlePublicIdentity
 } from "./article-url-map.mjs";
+import {
+  mergeLatestPublicContent,
+  publicContentKey,
+  publicContentRevisionTime,
+  selectLatestPublicContent
+} from "./public-content-freshness.mjs";
+import {
+  addSameKindRelated,
+  normalizeCmsPublicArticle,
+  normalizePublicCareStory,
+  normalizePublicExpertTalk,
+  normalizeStaticPublicArticle
+} from "./public-content-adapters.mjs";
+import { updatePublicStructuredData } from "./public-route-structured-data.mjs";
 
-const FRONTEND_BUILD_VERSION = "care-scenes-20260714-2";
+const FRONTEND_BUILD_VERSION = "public-content-unified-20260909-1";
 document.documentElement.dataset.frontendBuild = FRONTEND_BUILD_VERSION;
 
 let renderPublicArticleLayout;
+let renderPublicHealthIndex;
+let normalizePublicArticleAssetUrl;
 let publicArticleRendererPromise;
 async function ensurePublicArticleRenderer() {
   if (!publicArticleRendererPromise) {
     publicArticleRendererPromise = import("./public-content-renderer.mjs")
-      .then((module) => { renderPublicArticleLayout = module.renderPublicArticleLayout; })
+      .then((module) => {
+        renderPublicArticleLayout = module.renderPublicArticleLayout;
+        renderPublicHealthIndex = module.renderPublicHealthIndex;
+        normalizePublicArticleAssetUrl = module.normalizePublicAssetUrl;
+      })
       .catch((error) => { publicArticleRendererPromise = null; throw error; });
   }
   return publicArticleRendererPromise;
@@ -560,6 +580,24 @@ function setMetaProperty(property, content) {
   ensureMeta(`meta[property="${property}"]`, { property }).setAttribute("content", content);
 }
 
+function syncArticleMeta(article = null) {
+  document.head.querySelectorAll('meta[property^="article:"]').forEach((meta) => meta.remove());
+  if (!article) return;
+  const values = [
+    ["article:published_time", article.publishedAt],
+    ["article:modified_time", article.updatedAt || article.publishedAt],
+    ["article:section", article.category || "照顧知識"],
+    ...(Array.isArray(article.tags) ? article.tags.slice(0, 12).map((tag) => ["article:tag", tag]) : [])
+  ];
+  values.forEach(([property, content]) => {
+    if (!content) return;
+    const meta = document.createElement("meta");
+    meta.setAttribute("property", property);
+    meta.setAttribute("content", String(content));
+    document.head.appendChild(meta);
+  });
+}
+
 function setCanonicalUrl(url) {
   let canonical = document.head.querySelector('link[rel="canonical"]');
   if (!canonical) {
@@ -578,7 +616,7 @@ function setRouteSeo(slug = "home", overrides = {}) {
   const description = seo.description || DEFAULT_SEO.description;
   const canonical = seo.canonical || routeCanonical(normalized);
   const image = absoluteImageUrl(seo.image);
-  const robots = seo.robots || "index, follow";
+  const robots = seo.robots || (seo.article ? "index, follow, max-image-preview:large" : "index, follow");
 
   document.title = title;
   setMetaName("description", description);
@@ -586,7 +624,7 @@ function setRouteSeo(slug = "home", overrides = {}) {
   setCanonicalUrl(canonical);
   setMetaProperty("og:site_name", "歲悅長照集團");
   setMetaProperty("og:locale", "zh_TW");
-  setMetaProperty("og:type", seo.type || "website");
+  setMetaProperty("og:type", seo.type || (seo.article ? "article" : "website"));
   setMetaProperty("og:title", title);
   setMetaProperty("og:description", description);
   setMetaProperty("og:url", canonical);
@@ -599,6 +637,15 @@ function setRouteSeo(slug = "home", overrides = {}) {
   setMetaName("twitter:description", description);
   setMetaName("twitter:image", image);
   setMetaName("twitter:image:alt", seo.imageAlt || DEFAULT_SEO.imageAlt);
+  syncArticleMeta(seo.article || null);
+  updatePublicStructuredData(document, {
+    path: new URL(canonical, SITE_ORIGIN).pathname,
+    title,
+    description,
+    image,
+    article: seo.article || null,
+    breadcrumbParent: seo.breadcrumbParent || null
+  }, SITE_ORIGIN);
 }
 
 const analyticsState = {
@@ -1577,6 +1624,7 @@ Object.assign(articlePages, {
 
 let staticArticleRewritePackPromise = null;
 let staticArticleRewritePackLoaded = false;
+let staticArticleRewritePackComplete = false;
 const articleRewriteFields = {};
 let articleSlideDeckRenderer = null;
 let articleSlideDeckRendererPromise = null;
@@ -1588,7 +1636,7 @@ async function ensureArticleSlideDeckRenderer() {
       .then((module) => {
         articleSlideDeckRenderer = (article) => module.renderArticleSlideDeck(
           article,
-          (image) => normalizeLocalAssetUrl(contentImageUrl(image))
+          normalizePublicArticleAssetUrl
         );
       })
       .catch((error) => {
@@ -1657,10 +1705,12 @@ async function ensureStaticArticleRewrites() {
         dailyModule.installDailyArticles(articlePages, healthArticles, articleHref);
         applyStaticArticleRewritePack(rewriteModule.default || {});
         applyHealth30ArticleEnhancements(rewriteModule.health30ArticleEnhancements || {});
+        staticArticleRewritePackComplete = true;
         staticArticleRewritePackLoaded = true;
       })
       .catch((error) => {
         console.warn("Static article rewrite pack unavailable.", error);
+        staticArticleRewritePackComplete = false;
         staticArticleRewritePackLoaded = true;
       });
   }
@@ -2536,9 +2586,11 @@ healthArticles.unshift(
 
 let supabaseHealthArticles = [];
 let supabaseHealthArticlesLoaded = false;
+let supabaseHealthArticlesComplete = false;
 let supabaseHealthArticlesPromise = null;
 let supabaseArticleCategories = [];
 let supabaseArticleCategoriesLoaded = false;
+let supabaseArticleCategoriesComplete = false;
 let supabaseArticleCategoriesPromise = null;
 const supabaseArticlePageCache = new Map();
 let homeModulesLoadedFromSupabase = false;
@@ -3099,18 +3151,13 @@ function getArticleVideoData(contentJson = {}) {
 function formatArticleDate(dateValue) {
   const date = new Date(dateValue);
   if (Number.isNaN(date.getTime())) return "";
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+  const taipeiDate = new Date(date.getTime() + (8 * 60 * 60 * 1000));
+  return `${taipeiDate.getUTCFullYear()}.${String(taipeiDate.getUTCMonth() + 1).padStart(2, "0")}.${String(taipeiDate.getUTCDate()).padStart(2, "0")}`;
 }
 
 function getHealthArticleList() {
   const staticArticles = healthArticles.map(normalizeStaticArticle);
-  if (!supabaseHealthArticles.length) return staticArticles;
-
-  const seenHrefs = new Set(supabaseHealthArticles.map((article) => normalizePublicHref(article.href)));
-  return [
-    ...supabaseHealthArticles,
-    ...staticArticles.filter((article) => !seenHrefs.has(normalizePublicHref(article.href)))
-  ];
+  return mergeLatestPublicContent(staticArticles, supabaseHealthArticles);
 }
 
 function categorySlug(value = "") {
@@ -3153,68 +3200,25 @@ function getArticleRewriteFields(slug = "") {
   return fields;
 }
 
-function normalizeSupabaseArticle(article, mediaById, categoriesById) {
-  const categoryData = categoriesById.get(article.category_id);
-  const category = categoryData?.display_label || categoryData?.name || "照顧知識";
-  const slug = categoryData?.slug || categorySlug(category);
-  const cover = mediaById.get(article.cover_image_id);
-  const rewrite = getArticleRewriteFields(article.slug);
-  const subtitle = article.subtitle || rewrite?.dek || article.excerpt || "";
-  const excerpt = rewrite?.dek || article.excerpt || article.subtitle || stripHTML(article.content || "").slice(0, 88);
-  const publishedAt = article.published_at || article.updated_at;
-  const tagList = Array.isArray(article.tags) ? article.tags : [];
-  const tags = tagList.join(" ");
-  const video = getArticleVideoData(article.content_json || {});
 
-  return {
-    href: articleHref(article.slug, article.public_number),
-    slug: article.slug,
-    sourceSlug: article.slug,
-    publicNumber: articlePublicNumber(article.slug, article.public_number),
-    publicSlug: articlePublicSlug(article.slug, article.public_number),
-    category,
-    categorySlug: slug,
-    categoryType: categoryData?.type || "article",
-    categorySection: categoryData?.section_key || "health",
-    contentType: article.content_type || article.content_json?.content_type || categoryData?.type || "article",
-    title: article.title || "未命名文章",
-    subtitle,
-    excerpt,
-    image: getHealthArticleImage({ ...article, category, categorySlug: slug, subtitle, excerpt }, cover),
-    imageUsage: cover?.image_usage || "article_cover",
-    focalPoint: cover?.focal_point || "center",
-    videoUrl: video.url,
-    videoEmbedUrl: video.embedUrl,
-    videoProvider: video.provider,
-    videoType: video.type,
-    videoDuration: video.duration,
-    videoLabel: video.label,
-    videoCaption: video.caption,
-    author: article.author_name || "歲悅照顧編輯部",
-    date: formatArticleDate(publishedAt),
-    publishedAt,
-    readingMinutes: article.reading_minutes || rewrite?.readingMinutes,
-    difficulty: article.difficulty || "",
-    targetAudience: article.target_audience || rewrite?.targetAudience || "",
-    relatedService: article.related_service || "",
-    recommendedSlots: Array.isArray(article.recommended_slots) ? article.recommended_slots : [],
-    summaryPoints: rewrite?.summary || (Array.isArray(article.summary_points) ? article.summary_points : []),
-    relatedSlugs: Array.isArray(article.content_json?.related_slugs) ? article.content_json.related_slugs : [],
-    ctaText: article.cta_text || article.content_json?.cta_text || rewrite?.cta || "",
-    ctaUrl: article.cta_url || article.content_json?.cta_url || "",
-    isFeatured: Boolean(article.is_featured),
-    tags: tagList,
-    keywords: `${article.title || ""} ${subtitle} ${excerpt} ${category} ${tags} ${article.target_audience || ""} ${article.related_service || ""}`
-  };
+function normalizeSupabaseArticle(article, mediaById, categoriesById) {
+  return normalizeCmsPublicArticle(article, {
+    mediaById,
+    categoriesById,
+    staticDetails: articlePages,
+    rewrites: articleRewriteFields
+  });
 }
+
 
 function normalizeStaticArticle(article) {
   const identity = resolveArticlePublicIdentity(article);
-  return {
-    ...article,
-    ...identity,
-    categorySlug: article.categorySlug || categorySlug(article.category)
-  };
+  const sourceSlug = identity.sourceSlug || article.slug;
+  return normalizeStaticPublicArticle(
+    { ...article, slug: sourceSlug },
+    articlePages[sourceSlug] || {},
+    getArticleRewriteFields(sourceSlug) || {}
+  );
 }
 
 function normalizeFallbackHealthArticles(source) {
@@ -3265,6 +3269,7 @@ async function loadSupabaseArticleCategories({ rerender = false } = {}) {
     supabaseArticleCategoriesPromise = fetchSupabaseArticleCategories()
       .then((categories) => {
         supabaseArticleCategories = categories;
+        supabaseArticleCategoriesComplete = true;
         supabaseArticleCategoriesLoaded = true;
         return categories;
       })
@@ -3273,11 +3278,13 @@ async function loadSupabaseArticleCategories({ rerender = false } = {}) {
         return fetchFallbackArticleCategories()
           .then((categories) => {
             supabaseArticleCategories = categories;
+            supabaseArticleCategoriesComplete = true;
             supabaseArticleCategoriesLoaded = true;
             return categories;
           })
           .catch((fallbackError) => {
             console.warn("CMS snapshot unavailable", fallbackError);
+            supabaseArticleCategoriesComplete = false;
             supabaseArticleCategoriesLoaded = true;
             return [];
           });
@@ -3313,7 +3320,9 @@ async function fetchSupabaseHealthArticles() {
       content_json,
       content_type,
       cover_image_id,
+      og_image_id,
       author_name,
+      author_title,
       tags,
       recommended_slots,
       summary_points,
@@ -3331,14 +3340,15 @@ async function fetchSupabaseHealthArticles() {
     .eq("status", "published")
     .eq("is_enabled", true)
     .lte("published_at", new Date().toISOString())
-    .order("is_featured", { ascending: false })
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(48);
+    .order("updated_at", { ascending: false, nullsFirst: false })
+    .order("public_number", { ascending: false, nullsFirst: false })
+    .limit(500);
 
   if (articleError) throw articleError;
   if (!articles?.length) return [];
 
-  const mediaIds = [...new Set(articles.map((article) => article.cover_image_id).filter(Boolean))];
+  const mediaIds = [...new Set(articles.flatMap((article) => [article.cover_image_id, article.og_image_id]).filter(Boolean))];
   const categoryIds = [...new Set(articles.map((article) => article.category_id).filter(Boolean))];
   const [mediaResult, categoriesResult] = await Promise.all([
     mediaIds.length
@@ -3365,6 +3375,7 @@ async function loadSupabaseHealthArticles({ rerender = false } = {}) {
     supabaseHealthArticlesPromise = fetchSupabaseHealthArticles()
       .then((articles) => {
         supabaseHealthArticles = articles;
+        supabaseHealthArticlesComplete = true;
         supabaseHealthArticlesLoaded = true;
         return articles;
       })
@@ -3373,11 +3384,13 @@ async function loadSupabaseHealthArticles({ rerender = false } = {}) {
         return loadCmsFallback("getHealthSource")
           .then((source) => {
             supabaseHealthArticles = normalizeFallbackHealthArticles(source);
+            supabaseHealthArticlesComplete = true;
             supabaseHealthArticlesLoaded = true;
             return supabaseHealthArticles;
           })
           .catch((fallbackError) => {
             console.warn("CMS snapshot unavailable", fallbackError);
+            supabaseHealthArticlesComplete = false;
             supabaseHealthArticlesLoaded = true;
             return [];
           });
@@ -3393,59 +3406,14 @@ async function loadSupabaseHealthArticles({ rerender = false } = {}) {
   return articles;
 }
 
-function normalizeSupabaseArticlePage(article, category, cover) {
-  const publishedAt = article.published_at || article.updated_at;
-  const video = getArticleVideoData(article.content_json || {});
-  const rewrite = getArticleRewriteFields(article.slug);
-  const summary = rewrite?.summary || (Array.isArray(article.summary_points) ? article.summary_points : []);
-  const content = rewrite?.content || article.content || "";
-  return {
-    slug: article.slug,
-    sourceSlug: article.slug,
-    publicNumber: articlePublicNumber(article.slug, article.public_number),
-    publicSlug: articlePublicSlug(article.slug, article.public_number),
-    href: articleHref(article.slug, article.public_number),
-    category: category?.display_label || category?.name || "照顧知識",
-    categorySlug: category?.slug || categorySlug(category?.name || "照顧知識"),
-    title: article.title || "未命名文章",
-    subtitle: article.subtitle || rewrite?.dek || article.excerpt || "",
-    excerpt: rewrite?.dek || article.excerpt || article.subtitle || "",
-    image: getHealthArticleImage({ ...article, image: rewrite?.image || article.content_json?.image_url || article.content_json?.image || article.image, category: category?.display_label || category?.name || "照顧知識", categorySlug: category?.slug || categorySlug(category?.name || "照顧知識") }, cover),
-    imageUsage: cover?.image_usage || "article_cover",
-    focalPoint: cover?.focal_point || "center",
-    videoUrl: video.url,
-    videoEmbedUrl: video.embedUrl,
-    videoProvider: video.provider,
-    videoType: video.type,
-    videoDuration: video.duration,
-    videoLabel: video.label,
-    videoCaption: video.caption,
-    author: article.author_name || "歲悅照顧編輯部",
-    date: formatArticleDate(publishedAt),
-    tags: Array.isArray(article.tags) ? article.tags : [],
-    summary,
-    readingMinutes: article.reading_minutes || rewrite?.readingMinutes,
-    difficulty: article.difficulty || "",
-    targetAudience: article.target_audience || rewrite?.targetAudience || "",
-    relatedService: article.related_service || "",
-    ctaText: article.cta_text || article.content_json?.cta_text || rewrite?.cta || "",
-    ctaUrl: article.cta_url || article.content_json?.cta_url || "",
-    sourceName: article.source_name || article.content_json?.source_name || rewrite?.sourceName || "",
-    sourceUrl: article.source_url || article.content_json?.source_url || rewrite?.sourceUrl || "",
-    faq: rewrite?.faq || (Array.isArray(article.faq_json) ? article.faq_json : []),
-    relatedSlugs: Array.isArray(article.content_json?.related_slugs) ? article.content_json.related_slugs : [],
-    content,
-    inlineImages: rewrite?.inlineImages || [],
-    warning: rewrite?.warning,
-    checklists: rewrite?.checklists || [],
-    tables: rewrite?.tables || [],
-    slides: rewrite?.slides || (Array.isArray(article.content_json?.slides) ? article.content_json.slides : []),
-    visualFormat: rewrite?.visualFormat || article.content_json?.visual_format || "",
-    references: rewrite?.references || [],
-    contentRevision: rewrite?.contentRevision || "",
-    seoTitle: article.seo_title || "",
-    seoDescription: article.seo_description || ""
-  };
+
+function normalizeSupabaseArticlePage(article, category, cover, ogImage = null) {
+  return normalizeCmsPublicArticle(article, {
+    categories: category ? [category] : [],
+    media: [cover, ogImage].filter(Boolean),
+    staticDetails: articlePages,
+    rewrites: articleRewriteFields
+  });
 }
 
 async function fetchSupabaseArticlePage(slug) {
@@ -3468,7 +3436,9 @@ async function fetchSupabaseArticlePage(slug) {
       content_json,
       content_type,
       cover_image_id,
+      og_image_id,
       author_name,
+      author_title,
       tags,
       summary_points,
       reading_minutes,
@@ -3486,10 +3456,14 @@ async function fetchSupabaseArticlePage(slug) {
       published_at,
       updated_at,
       seo_title,
-      seo_description
+      seo_description,
+      seo_keywords,
+      og_title,
+      og_description
     `)
     .eq("status", "published")
-    .eq("is_enabled", true);
+    .eq("is_enabled", true)
+    .lte("published_at", new Date().toISOString());
 
   if (sourceSlug) {
     articleQuery = articleQuery.eq("slug", sourceSlug);
@@ -3508,7 +3482,7 @@ async function fetchSupabaseArticlePage(slug) {
     return null;
   }
 
-  const [categoryResult, coverResult] = await Promise.all([
+  const [categoryResult, coverResult, ogImageResult] = await Promise.all([
     article.category_id
       ? supabase
           .from("article_categories")
@@ -3523,13 +3497,25 @@ async function fetchSupabaseArticlePage(slug) {
           .select("id, public_url, alt_text, file_name, image_usage, focal_point")
           .eq("id", article.cover_image_id)
           .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+    article.og_image_id
+      ? supabase
+          .from("media")
+          .select("id, public_url, alt_text, file_name, image_usage, focal_point")
+          .eq("id", article.og_image_id)
+          .maybeSingle()
       : Promise.resolve({ data: null, error: null })
   ]);
 
   if (categoryResult.error) throw categoryResult.error;
   if (coverResult.error) throw coverResult.error;
+  if (ogImageResult.error) throw ogImageResult.error;
+  if (article.category_id && !categoryResult.data) {
+    supabaseArticlePageCache.set(slug, null);
+    return null;
+  }
 
-  const normalized = normalizeSupabaseArticlePage(article, categoryResult.data, coverResult.data);
+  const normalized = normalizeSupabaseArticlePage(article, categoryResult.data, coverResult.data, ogImageResult.data);
   supabaseArticlePageCache.set(slug, normalized);
   return normalized;
 }
@@ -3543,7 +3529,7 @@ async function fetchArticlePageWithFallback(slug) {
     }
   }
   const source = await loadCmsFallback("getArticleSource", slug);
-  return source ? normalizeSupabaseArticlePage(source.article, source.category, source.cover) : null;
+  return source ? normalizeSupabaseArticlePage(source.article, source.category, source.cover, source.ogImage) : null;
 }
 
 function getSectionContent(section) {
@@ -6177,7 +6163,7 @@ function renderCmsShareholdersPage(data) {
 function renderHomeHealthArticles(articles = getHealthArticleList()) {
   const articleRow = document.querySelector(".home-health-section .article-row");
   if (!articleRow) return false;
-  const latest = sortHealthArticlesLatest(uniqueHealthArticles(articles))
+  const latest = mergeLatestPublicContent(articles)
     .filter((article) => article.href && article.title)
     .slice(0, 5);
   if (!latest.length) return false;
@@ -6929,45 +6915,20 @@ async function loadSupabaseHomeModules() {
   }
 }
 
+
 function normalizeCareStory(row) {
-  const cover = normalizeLocalAssetUrl(contentImageUrl(row.cover_image?.public_url || row.cover_image_url || fallbackImages.careStory));
-  const avatar = normalizeLocalAssetUrl(testimonialAvatarUrl(row.person_name, row.service_type, row.avatar_image?.public_url || row.avatar_image_url || cover));
-  return {
-    slug: row.slug,
-    href: careStoryHref(row.slug),
-    name: row.person_name,
-    label: row.person_label || "家屬",
-    service: row.service_type,
-    title: row.title,
-    quote: row.quote,
-    praise: row.praise || row.summary || "",
-    body: row.story_body || "",
-    image: cover,
-    avatar,
-    date: formatArticleDate(row.published_at),
-    tags: row.tags || []
-  };
+  return normalizePublicCareStory(row);
 }
 
+
 function normalizeExpertTalk(row) {
-  const image = normalizeLocalAssetUrl(masterTalkCoverUrl(row.slug, row.speaker_name, row.speaker_title, row.topic, row.title, row.image?.public_url || row.image_url || "assets/master-talk/cover-care-psychology-chou.jpg"));
-  const portrait = normalizeLocalAssetUrl(masterTalkPortraitUrl(row.slug, row.speaker_name, row.speaker_title, row.topic, row.title, row.image?.public_url || row.image_url || "assets/master-talk/portrait-care-psychology-chou.jpg"));
-  return {
-    slug: row.slug,
-    href: masterTalkHref(row.slug),
-    speaker: row.speaker_name,
-    titleLabel: row.speaker_title || "名人講堂",
-    organization: row.organization || "",
-    topic: row.topic || "照顧觀點",
-    title: row.title,
-    quote: row.quote,
-    summary: row.summary || "",
-    body: row.body || "",
-    image,
-    portrait,
-    date: formatArticleDate(row.published_at),
-    tags: row.tags || []
-  };
+  return normalizePublicExpertTalk(row);
+}
+
+function cacheWithSameKindRelated(cache, item) {
+  cache.set(item.slug, item);
+  addSameKindRelated([...cache.values()]).forEach((candidate) => cache.set(candidate.slug, candidate));
+  return cache.get(item.slug);
 }
 
 function renderCareStorySlider(stories) {
@@ -6987,7 +6948,7 @@ function renderCareStorySlider(stories) {
 
 function renderExpertTalkSlider(talks) {
   const slider = document.querySelector(".celebrity-slider");
-  if (!talks?.length || talks.length < HOMEPAGE_MASTER_TALK_LIMIT || !slider) return false;
+  if (!talks?.length || !slider) return false;
   const homepageTalks = talks.slice(0, HOMEPAGE_MASTER_TALK_LIMIT);
   slider.innerHTML = homepageTalks.map((talk) => `
     <article data-href="${escapeHTML(normalizePublicHref(talk.href))}">
@@ -6997,7 +6958,7 @@ function renderExpertTalkSlider(talks) {
       </figure>
       <div>
         <h3>${escapeHTML(talk.title)}</h3>
-        <p>${escapeHTML(talk.summary || talk.quote || "")}</p>
+        <p>${escapeHTML(talk.excerpt || talk.quote || talk.topic || "")}</p>
         <a href="${escapeHTML(normalizePublicHref(talk.href))}">閱讀更多</a>
       </div>
     </article>
@@ -7005,64 +6966,102 @@ function renderExpertTalkSlider(talks) {
   return true;
 }
 
-function renderPublishedStoryDatabases(stories = [], talks = []) {
-  const normalizedStories = stories.map(normalizeCareStory);
-  const normalizedTalks = talks.map(normalizeExpertTalk);
-  normalizedStories.forEach((story) => careStoryPageCache.set(story.slug, story));
-  normalizedTalks.forEach((talk) => expertTalkPageCache.set(talk.slug, talk));
-  const renderedStories = renderCareStorySlider(normalizedStories);
-  const renderedTalks = renderExpertTalkSlider(normalizedTalks);
+function renderPublishedStoryDatabases(stories = [], talks = [], { replaceStories = false, replaceTalks = false } = {}) {
+  if (replaceStories) careStoryPageCache.clear();
+  if (replaceTalks) expertTalkPageCache.clear();
+  stories.map(normalizeCareStory).forEach((story) => {
+    careStoryPageCache.set(story.slug, selectLatestPublicContent(careStoryPageCache.get(story.slug), story));
+  });
+  talks.map(normalizeExpertTalk).forEach((talk) => {
+    expertTalkPageCache.set(talk.slug, selectLatestPublicContent(expertTalkPageCache.get(talk.slug), talk));
+  });
+  addSameKindRelated([
+    ...careStoryPageCache.values(),
+    ...expertTalkPageCache.values()
+  ]).forEach((item) => {
+    const cache = item.contentKind === "care-story" ? careStoryPageCache : expertTalkPageCache;
+    cache.set(item.slug, item);
+  });
+  const latestStories = mergeLatestPublicContent([...careStoryPageCache.values()]).slice(0, 12);
+  const latestTalks = mergeLatestPublicContent([...expertTalkPageCache.values()]).slice(0, HOMEPAGE_MASTER_TALK_LIMIT);
+  const renderedStories = renderCareStorySlider(latestStories);
+  const renderedTalks = renderExpertTalkSlider(latestTalks);
   return renderedStories || renderedTalks;
 }
 
 async function loadSupabaseStoryDatabases() {
   let stories = [];
   let talks = [];
+  let storiesAuthoritative = false;
+  let talksAuthoritative = false;
   try {
     if (supabase) {
       const now = new Date().toISOString();
       const [storyResult, talkResult] = await Promise.all([
         supabase
           .from("care_stories")
-          .select("*, cover_image:media!care_stories_cover_image_id_fkey(id, public_url, alt_text), avatar_image:media!care_stories_avatar_image_id_fkey(id, public_url, alt_text)")
+          .select("*, cover_image:media!care_stories_cover_image_id_fkey(id, public_url, alt_text, image_usage, focal_point), avatar_image:media!care_stories_avatar_image_id_fkey(id, public_url, alt_text, image_usage, focal_point)")
           .eq("is_enabled", true)
           .eq("status", "published")
           .lte("published_at", now)
-          .order("is_featured", { ascending: false })
+          .order("published_at", { ascending: false, nullsFirst: false })
+          .order("updated_at", { ascending: false, nullsFirst: false })
           .order("sort_order", { ascending: true })
-          .limit(12),
+          .limit(500),
         supabase
           .from("expert_talks")
-          .select("*, image:media!expert_talks_image_id_fkey(id, public_url, alt_text)")
+          .select("*, image:media!expert_talks_image_id_fkey(id, public_url, alt_text, image_usage, focal_point)")
           .eq("is_enabled", true)
           .eq("status", "published")
           .lte("published_at", now)
-          .order("is_featured", { ascending: false })
+          .order("published_at", { ascending: false, nullsFirst: false })
+          .order("updated_at", { ascending: false, nullsFirst: false })
           .order("sort_order", { ascending: true })
-          .limit(HOMEPAGE_MASTER_TALK_LIMIT)
+          .limit(500)
       ]);
-      if (storyResult.error) throw storyResult.error;
-      if (talkResult.error) throw talkResult.error;
-      stories = storyResult.data || [];
-      talks = talkResult.data || [];
+      if (storyResult.error) {
+        console.warn("CMS fallback", "stories", storyResult.error);
+      } else {
+        stories = storyResult.data || [];
+        storiesAuthoritative = true;
+      }
+      if (talkResult.error) {
+        console.warn("CMS fallback", "expert talks", talkResult.error);
+      } else {
+        talks = talkResult.data || [];
+        talksAuthoritative = true;
+      }
     }
   } catch (error) {
     console.warn("CMS fallback", "stories", error);
   }
-  if (!stories.length && !talks.length) {
+  if (!storiesAuthoritative || !talksAuthoritative) {
     try {
-      ({ stories, talks } = await loadCmsFallback("getStoryDatabases"));
+      const snapshot = await loadCmsFallback("getStoryDatabases");
+      if (!storiesAuthoritative) stories = snapshot.stories || [];
+      if (!talksAuthoritative) talks = snapshot.talks || [];
     } catch (error) {
       console.warn("CMS snapshot unavailable", error);
       return false;
     }
   }
   try {
-    return renderPublishedStoryDatabases(stories || [], talks || []);
+    return renderPublishedStoryDatabases(stories || [], talks || [], {
+      replaceStories: storiesAuthoritative,
+      replaceTalks: talksAuthoritative
+    });
   } catch (error) {
     console.warn("CMS story render", error);
     return false;
   }
+}
+
+let publishedStoryDatabasesPromise = null;
+function ensurePublishedStoryDatabases() {
+  if (!publishedStoryDatabasesPromise) {
+    publishedStoryDatabasesPromise = loadSupabaseStoryDatabases();
+  }
+  return publishedStoryDatabasesPromise;
 }
 
 let locationData = {
@@ -7223,256 +7222,12 @@ function bindLocationControls() {
   });
 }
 
-const healthSectionCategorySlugs = {
-  lazyPack: ["lazy-pack", "lazy_pack", "guide", "懶人包"],
-  activity: ["activity", "event", "活動專區"],
-  video: ["video", "影音", "影片"],
-  shortVideo: ["short-video", "short_video", "shorts", "短影片"]
-};
-
-function articleMatchesHealthSection(article, slugs = []) {
-  const normalizedSlugs = slugs.map((slug) => categorySlug(slug));
-  const tagText = (article.tags || []).map(categorySlug).join(" ");
-  const typeText = [article.contentType, article.categoryType, article.categorySection].map(categorySlug).join(" ");
-  return normalizedSlugs.includes(article.categorySlug) || normalizedSlugs.some((slug) => tagText.includes(slug) || typeText.includes(slug));
-}
-
-function getArticleSortTime(article) {
-  const rawDate = article.publishedAt || article.date || "";
-  const normalized = String(rawDate).replace(/\./g, "-");
-  const time = new Date(normalized).getTime();
-  return Number.isNaN(time) ? 0 : time;
-}
-
-function sortHealthArticlesLatest(list = []) {
-  return [...list].sort((a, b) => getArticleSortTime(b) - getArticleSortTime(a));
-}
-
-function uniqueHealthArticles(list = []) {
-  const seen = new Set();
-  return list.filter((article) => {
-    const key = article.slug || article.href || article.title;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-function getHealthSectionArticles(sectionKey, fallbackSlugs = []) {
-  const allArticles = getHealthArticleList();
-  const slugs = healthSectionCategorySlugs[sectionKey] || [];
-  const matched = allArticles.filter((article) => articleMatchesHealthSection(article, slugs));
-  if (matched.length) return sortHealthArticlesLatest(matched);
-  return fallbackSlugs
-    .map((slug) => allArticles.find((article) => article.slug === slug))
-    .filter(Boolean);
-}
-
-function getLatestCareArticles(sourceArticles = []) {
-  const specialSections = [
-    ...healthSectionCategorySlugs.lazyPack,
-    ...healthSectionCategorySlugs.activity,
-    ...healthSectionCategorySlugs.video,
-    ...healthSectionCategorySlugs.shortVideo
-  ];
-  const filtered = sourceArticles.filter((article) => !articleMatchesHealthSection(article, specialSections));
-  return sortHealthArticlesLatest(filtered.length ? filtered : sourceArticles).slice(0, 6);
-}
-
-function getHealthSectionUrl(sectionKey, fallbackQuery) {
-  const sectionSlugs = (healthSectionCategorySlugs[sectionKey] || []).map(categorySlug);
-  const matchedCategory = getHealthCategoryList().find((category) => {
-    const values = [category.slug, category.type, category.sectionKey].map(categorySlug);
-    return values.some((value) => sectionSlugs.includes(value));
-  });
-  return matchedCategory ? `#health?category=${encodeURIComponent(matchedCategory.slug)}` : `#search?q=${encodeURIComponent(fallbackQuery)}`;
-}
-
-function renderHealthMiniCard(article, label = article.category) {
-  const href = normalizePublicHref(article.href);
-  return `
-    <a class="health-pack-card click-card" href="${escapeHTML(href)}">
-      <img ${healthArticleImageAttrs(article, { usage: "card", focalPoint: article.focalPoint })} />
-      <div><span>${escapeHTML(label)}</span><h3>${escapeHTML(article.title)}</h3><p>${escapeHTML(article.subtitle || article.excerpt || "")}</p></div>
-    </a>
-  `;
-}
-
-function renderHealthEventCard(article) {
-  const href = normalizePublicHref(article.href);
-  return `
-    <a class="health-event-card click-card" href="${escapeHTML(href)}">
-      <img ${healthArticleImageAttrs(article, { usage: "card", focalPoint: article.focalPoint })} />
-      <div><time>${escapeHTML(article.date || "近期")}</time><h3>${escapeHTML(article.title)}</h3><p>${escapeHTML(article.subtitle || article.excerpt || "")}</p></div>
-    </a>
-  `;
-}
-
-function renderHealthVideoCard(article, label = article.category) {
-  const displayLabel = article.videoLabel || label;
-  const href = normalizePublicHref(article.href);
-  const media = article.videoEmbedUrl
-    ? article.videoProvider === "youtube" || article.videoProvider === "vimeo"
-      ? `<iframe src="${escapeHTML(article.videoEmbedUrl)}" title="${escapeHTML(article.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
-      : `<video src="${escapeHTML(article.videoEmbedUrl)}" controls preload="metadata" poster="${escapeHTML(getHealthArticleImage(article))}"></video>`
-    : `<img ${healthArticleImageAttrs(article, { usage: "card", focalPoint: article.focalPoint })} />`;
-  const readMore = article.videoEmbedUrl
-    ? `<a href="${escapeHTML(href)}">閱讀更多 &gt;</a>`
-    : `<strong class="health-video-readmore">閱讀更多 &gt;</strong>`;
-  const content = `
-    ${media}
-    <div><span>${escapeHTML(displayLabel)}${article.videoDuration ? ` · ${escapeHTML(article.videoDuration)}` : ""}</span><h3>${escapeHTML(article.title)}</h3>${article.videoCaption ? `<p>${escapeHTML(article.videoCaption)}</p>` : ""}${readMore}</div>
-  `;
-  return article.videoEmbedUrl
-    ? `<article class="health-video-card has-video">${content}</article>`
-    : `<a class="health-video-card click-card" href="${escapeHTML(href)}">${content}</a>`;
-}
-
 function renderHealthPage(selectedCategorySlug = "") {
-  const allArticles = getHealthArticleList();
-  const categories = getHealthCategoryList();
-  const activeCategory = selectedCategorySlug || "";
-  const selectedTopic = resolveHealthTopic(categories, activeCategory);
-  const articles = activeCategory
-    ? allArticles.filter((article) => articleMatchesHealthTopic(article, selectedTopic))
-    : allArticles;
-  const isCategoryView = Boolean(activeCategory);
-  const feature = articles[0];
-  const quickCards = articles.slice(1, 5);
-  const latestCards = getLatestCareArticles(articles);
-  const lazyPacks = getHealthSectionArticles("lazyPack", ["longterm-care-apply", "family-care-story", "dementia-response"]).slice(0, 6);
-  const eventCards = getHealthSectionArticles("activity", ["family-care-course", "day-care-respite", "reablement-workshop"]).slice(0, 3);
-  const mediaCards = uniqueHealthArticles([
-    ...getHealthSectionArticles("video", ["home-care-video-guide", "day-care-video-guide", "master-talk-care-psychology"]),
-    ...getHealthSectionArticles("shortVideo", ["fall-observation", "bathroom-safety"])
-  ]).sort((a, b) => getArticleSortTime(b) - getArticleSortTime(a)).slice(0, 4);
-
-  return `
-    <div class="health-page">
-      <section class="health-hero">
-        <div class="health-topline">
-          <div>
-            <p class="eyebrow">Health 3.0</p>
-            <h1>健康3.0</h1>
-            <p>照顧知識專欄，整理疾病徵兆、飲食營養、復能運動、失智照顧與家屬實用技巧。</p>
-          </div>
-          <form class="health-search" action="/search">
-            <input name="q" type="search" aria-label="搜尋健康3.0文章" placeholder="搜尋跌倒、失智、營養、復能" />
-            <button type="submit">搜尋</button>
-          </form>
-        </div>
-        ${renderHealthTopicNavigation(categories, allArticles, activeCategory)}
-      </section>
-
-      ${articles.length && !isCategoryView ? `
-      <section class="health-board">
-        <a class="health-feature click-card" href="${escapeHTML(normalizePublicHref(feature.href))}">
-          <img ${healthArticleImageAttrs(feature, { usage: feature.imageUsage || "article_cover", focalPoint: feature.focalPoint })} />
-          <div>
-            <span class="health-tag">本週精選</span>
-            <h2>${escapeHTML(feature.title)}</h2>
-            <p>${escapeHTML(feature.subtitle || feature.excerpt)}</p>
-            <strong class="health-readmore">閱讀更多</strong>
-          </div>
-        </a>
-
-        <div class="health-quick-grid">
-          ${quickCards.map((post) => `
-            <a class="health-card click-card" href="${escapeHTML(normalizePublicHref(post.href))}">
-              <img ${healthArticleImageAttrs(post, { usage: "card", focalPoint: post.focalPoint })} />
-              <div>
-                <span class="health-tag">${escapeHTML(post.category)}</span>
-                <h3>${escapeHTML(post.title)}</h3>
-                <strong class="health-readmore">閱讀更多</strong>
-              </div>
-            </a>
-          `).join("")}
-        </div>
-
-        <aside class="ranking-panel">
-          <div class="ranking-title"><span>Ranking</span><h3>熱門文章</h3></div>
-          <ol>
-            ${articles.slice(0, 6).map((post) => `<li><a href="${escapeHTML(post.href)}">${escapeHTML(post.title)}</a></li>`).join("")}
-          </ol>
-        </aside>
-      </section>
-      ` : !articles.length ? `
-      <section class="health-empty-state">
-        <h2>這個分類目前還沒有已發布文章</h2>
-        <p>相關內容正在整理中，可以先查看全部文章或搜尋其他照顧主題。</p>
-        <a href="#health">查看全部文章</a>
-      </section>
-      ` : ""}
-
-      ${isCategoryView ? `
-      <section class="health-latest health-category-results" aria-labelledby="health-category-title">
-        <div class="health-section-head">
-          <div><h2 id="health-category-title">${escapeHTML(selectedTopic?.name || "這個主題")}的全部文章</h2><p>共 ${articles.length} 篇</p></div>
-          <a href="/health">回健康3.0</a>
-        </div>
-        <div class="health-latest-grid">
-          ${articles.map((post) => `
-            <a class="health-list-card click-card" href="${escapeHTML(normalizePublicHref(post.href))}">
-              <img ${healthArticleImageAttrs(post, { usage: "article_cover", focalPoint: post.focalPoint })} />
-              <div><span>${escapeHTML(post.category)}</span><h3>${escapeHTML(post.title)}</h3><p>${escapeHTML(post.subtitle || post.excerpt)}</p><small>${escapeHTML(post.author)} · ${escapeHTML(post.date)}</small></div>
-            </a>
-          `).join("")}
-        </div>
-      </section>
-      ` : `
-      <section class="health-latest">
-        <div class="health-section-head">
-          <div><p class="eyebrow">Latest</p><h2>最新照顧文章</h2></div>
-          <a href="#search?q=${encodeURIComponent("照顧")}">查看全部</a>
-        </div>
-        <div class="health-latest-grid">
-          ${latestCards.map((post) => `
-            <a class="health-list-card click-card" href="${escapeHTML(normalizePublicHref(post.href))}">
-              <img ${healthArticleImageAttrs(post, { usage: "article_cover", focalPoint: post.focalPoint })} />
-              <div>
-                <span>${escapeHTML(post.category)}</span>
-                <h3>${escapeHTML(post.title)}</h3>
-                <p>${escapeHTML(post.subtitle || post.excerpt)}</p>
-                <small>${escapeHTML(post.author)} · ${escapeHTML(post.date)}</small>
-              </div>
-            </a>
-          `).join("")}
-        </div>
-      </section>
-
-      <section class="health-pack-section">
-        <div class="health-section-head">
-          <div><p class="eyebrow">Guides</p><h2>懶人包</h2></div>
-          <a href="${escapeHTML(getHealthSectionUrl("lazyPack", "懶人包"))}">更多懶人包</a>
-        </div>
-        <div class="health-pack-grid">
-          ${lazyPacks.map((article) => renderHealthMiniCard(article, "懶人包")).join("") || `<div class="health-empty-state"><h2>懶人包整理中</h2><p>我們會陸續補上更容易閱讀的照顧指南。</p></div>`}
-        </div>
-      </section>
-
-      <section class="health-event-section">
-        <div class="health-section-head">
-          <div><p class="eyebrow">Events</p><h2>活動專區</h2></div>
-          <a href="${escapeHTML(getHealthSectionUrl("activity", "活動專區"))}">更多活動</a>
-        </div>
-        <div class="health-event-grid">
-          ${eventCards.map(renderHealthEventCard).join("") || `<div class="health-empty-state"><h2>活動內容整理中</h2><p>新的講座、課程與社區活動會在確認後放上來。</p></div>`}
-        </div>
-      </section>
-
-      <section class="health-media-hub">
-        <div class="health-section-head">
-          <div><p class="eyebrow">Video</p><h2>影音與短影片</h2></div>
-          <a href="${escapeHTML(getHealthSectionUrl("video", "影片"))}">更多影音</a>
-        </div>
-        <div class="health-media-grid">
-          ${mediaCards.map((article) => renderHealthVideoCard(article, articleMatchesHealthSection(article, healthSectionCategorySlugs.shortVideo) ? "短影片" : "影片")).join("")}
-          ${!mediaCards.length ? `<div class="health-empty-state"><h2>影音內容整理中</h2><p>短影片與照顧示範會在完成後陸續更新。</p></div>` : ""}
-        </div>
-      </section>
-      `}
-    </div>
-  `;
+  return renderPublicHealthIndex(
+    getHealthArticleList(),
+    getHealthCategoryList(),
+    { selectedCategorySlug }
+  );
 }
 
 function renderSearchPage(query = "") {
@@ -7518,18 +7273,59 @@ function renderSearchPage(query = "") {
   `;
 }
 
-async function renderHealthRouteOnce(route, query = "") {
+let publicContentRouteRequestId = 0;
+
+function isActivePublicContentRequest(route, requestId) {
+  return requestId === publicContentRouteRequestId && routeSlugFromLocation().split("?")[0] === route;
+}
+
+function shouldReplaceHealthView(activeHealthView, nextHealthView, inventoryComplete = false) {
+  if (!activeHealthView) return true;
+  if (activeHealthView.dataset.healthCategory !== nextHealthView?.dataset.healthCategory) return true;
+  return inventoryComplete
+    && activeHealthView.dataset.healthContentRevision !== nextHealthView?.dataset.healthContentRevision;
+}
+
+async function renderHealthRouteOnce(route, query = "", requestId = publicContentRouteRequestId) {
   if (pageView.dataset.prerenderedRoute !== route) pageView.innerHTML = "";
+  const currentHealthView = pageView.querySelector('[data-public-layout="health-unified-v1"]');
+  const isPendingCategory = route === "health" && Boolean(query) && currentHealthView?.dataset.healthCategory !== query;
+  pageView.classList.toggle("public-content-pending", Boolean(isPendingCategory));
   setPageViewBusy(true);
-  await Promise.all([
-    ensureStaticArticleRewrites(),
-    loadSupabaseHealthArticles(),
-    loadSupabaseArticleCategories()
-  ]);
-  if (routeSlugFromLocation().split("?")[0] !== route) return;
-  pageView.innerHTML = route === "health" ? renderHealthPage(query) : renderSearchPage(query);
-  setPageViewBusy(false);
-  optimizeImageLoading(pageView);
+  try {
+    await Promise.all([
+      ensurePublicArticleRenderer(),
+      ensureStaticArticleRewrites(),
+      loadSupabaseHealthArticles(),
+      loadSupabaseArticleCategories()
+    ]);
+    if (requestId !== publicContentRouteRequestId || routeSlugFromLocation().split("?")[0] !== route) return;
+    const nextHtml = route === "health" ? renderHealthPage(query) : renderSearchPage(query);
+    let shouldReplace = true;
+    if (route === "health") {
+      const nextTemplate = document.createElement("template");
+      nextTemplate.innerHTML = nextHtml.trim();
+      const nextHealthView = nextTemplate.content.firstElementChild;
+      const activeHealthView = pageView.querySelector('[data-public-layout="health-unified-v1"]');
+      const inventoryComplete = staticArticleRewritePackComplete
+        && supabaseHealthArticlesComplete
+        && supabaseArticleCategoriesComplete;
+      shouldReplace = shouldReplaceHealthView(activeHealthView, nextHealthView, inventoryComplete);
+    }
+    if (shouldReplace) pageView.innerHTML = nextHtml;
+    optimizeImageLoading(pageView);
+  } catch (error) {
+    console.error("Unable to render public content route", error);
+    if (!pageView.children.length) {
+      pageView.innerHTML = `<section class="health-empty-state"><h2>頁面暫時無法更新</h2><p>請稍後重新整理；目前不會顯示未完成的內容。</p><a href="/health">回健康3.0</a></section>`;
+    }
+  } finally {
+    if (requestId === publicContentRouteRequestId) {
+      pageView.classList.remove("public-content-pending");
+      delete document.documentElement.dataset.healthCategoryPending;
+      setPageViewBusy(false);
+    }
+  }
 }
 
 let supabaseCourses = [];
@@ -11097,8 +10893,12 @@ function getRelatedArticles(slug) {
     .filter(Boolean);
 }
 
-function renderArticleLayout(article) {
-  const related = getRelatedArticles(article.slug);
+function renderArticleLayout(article, relatedOverride = null) {
+  const related = Array.isArray(relatedOverride)
+    ? relatedOverride
+    : Array.isArray(article.related)
+      ? article.related
+      : getRelatedArticles(article.slug);
   const hasSlideDeck = Array.isArray(article.slides) && article.slides.length > 0;
   const slideDeckHtml = hasSlideDeck && articleSlideDeckRenderer ? articleSlideDeckRenderer(article) : "";
 
@@ -11108,72 +10908,64 @@ function renderArticleLayout(article) {
   });
 }
 
-function renderStaticArticlePage(slug) {
-  const article = articlePages[slug] || articlePages["longterm-care-apply"];
-  return renderArticleLayout({
-    slug,
-    category: article.category,
-    title: article.title,
-    subtitle: article.dek,
-    excerpt: article.dek,
-    image: article.image,
-    imageAlt: article.imageAlt,
-    imageCaption: article.imageCaption,
-    author: article.author,
-    authorTitle: article.authorTitle,
-    targetAudience: article.targetAudience,
-    relatedService: article.relatedService,
-    publishedAt: article.publishedAt,
-    date: article.date,
-    tags: article.tags,
-    summary: article.summary,
-    content: article.content,
-    warning: article.warning,
-    inlineImages: article.inlineImages,
-    checklists: article.checklists,
-    tables: article.tables,
-    slides: article.slides,
-    visualFormat: article.visualFormat,
-    faq: article.faq,
-    references: article.references,
-    cta: article.cta,
-    ctaText: article.ctaText,
-    ctaUrl: article.ctaUrl,
-    focalPoint: article.focalPoint,
-    imageUsage: article.imageUsage,
-    readingMinutes: article.readingMinutes,
-    sourceName: article.sourceName,
-    sourceUrl: article.sourceUrl
-  });
+
+function staticArticlePageData(slug) {
+  const sourceSlug = articleSourceSlug(slug) || slug;
+  const detail = articlePages[sourceSlug] || articlePages["longterm-care-apply"];
+  const card = healthArticles.find((item) => resolveArticlePublicIdentity(item).sourceSlug === sourceSlug)
+    || { ...detail, slug: sourceSlug, href: articleHref(sourceSlug) };
+  return normalizeStaticPublicArticle(card, detail, getArticleRewriteFields(sourceSlug) || {});
 }
 
-async function loadArticlePage(slug) {
+function renderStaticArticlePage(slug) {
+  return renderArticleLayout(staticArticlePageData(slug));
+}
+
+function renderPublicContentIfNewer(html, item) {
+  const current = pageView.querySelector("[data-public-content-key]");
+  const nextKey = publicContentKey(item);
+  const currentKey = current?.dataset.publicContentKey || "";
+  const currentRevision = publicContentRevisionTime({ updatedAt: current?.dataset.publicContentUpdatedAt });
+  const nextRevision = publicContentRevisionTime(item);
+  if (current && currentKey && currentKey === nextKey) {
+    if (currentRevision !== null && nextRevision !== null && currentRevision > nextRevision) return false;
+    const currentRenderRevision = current.dataset.publicContentRevision || "";
+    const nextRenderRevision = String(html).match(/data-public-content-revision="([^"]+)"/)?.[1] || "";
+    if (currentRenderRevision && nextRenderRevision) {
+      if (currentRenderRevision === nextRenderRevision) return false;
+    } else if (nextRevision === null || (currentRevision !== null && currentRevision >= nextRevision)) {
+      return false;
+    }
+  }
+  pageView.innerHTML = html;
+  return true;
+}
+
+async function loadArticlePage(slug, requestId = publicContentRouteRequestId) {
   const sourceSlug = articleSourceSlug(slug) || slug;
+  const route = `article-${slug}`;
   try {
     await ensurePublicArticleRenderer();
+    if (!isActivePublicContentRequest(route, requestId)) return;
     await ensureStaticArticleRewrites();
-    const article = await fetchArticlePageWithFallback(slug);
-    if (routeSlugFromLocation() !== `article-${slug}`) return;
-    const pageArticle = article || articlePages[sourceSlug];
+    if (!isActivePublicContentRequest(route, requestId)) return;
+    const liveArticle = await fetchArticlePageWithFallback(slug);
+    if (!isActivePublicContentRequest(route, requestId)) return;
+    const staticArticle = articlePages[sourceSlug] ? staticArticlePageData(sourceSlug) : null;
+    const article = selectLatestPublicContent(staticArticle, liveArticle);
+    const pageArticle = article || staticArticle;
     if (pageArticle?.slides?.length) await ensureArticleSlideDeckRenderer();
+    if (!isActivePublicContentRequest(route, requestId)) return;
     if (article) {
-      setRouteSeo(`article-${slug}`, {
+      const adopted = renderPublicContentIfNewer(renderArticleLayout(article), article);
+      if (adopted) setRouteSeo(route, {
         title: article.seoTitle || `${article.title}｜健康3.0`,
         description: article.seoDescription || article.excerpt || article.subtitle || DEFAULT_SEO.description,
-        image: article.image,
-        imageAlt: article.imageAlt || article.title,
+        image: article.ogImage || article.image,
+        imageAlt: article.ogImageAlt || article.imageAlt || article.title,
         type: "article",
-        canonical: routeCanonical(`article-${slug}`)
-      });
-    } else if (articlePages[sourceSlug]) {
-      const fallback = articlePages[sourceSlug];
-      setRouteSeo(`article-${slug}`, {
-        title: fallback.seoTitle || `${fallback.title}｜健康3.0`,
-        description: fallback.seoDescription || fallback.dek || DEFAULT_SEO.description,
-        image: fallback.image,
-        imageAlt: fallback.imageAlt || fallback.title,
-        type: "article",
-        canonical: routeCanonical(`article-${slug}`)
+        canonical: routeCanonical(route),
+        article
       });
     } else {
       setRouteSeo("health", {
@@ -11183,36 +10975,37 @@ async function loadArticlePage(slug) {
         canonical: routeCanonical("health")
       });
     }
-    pageView.innerHTML = article
-      ? renderArticleLayout(article)
-      : (articlePages[sourceSlug] ? renderStaticArticlePage(sourceSlug) : renderArticleNotFoundPage());
+    if (!article) {
+      pageView.innerHTML = renderArticleNotFoundPage();
+    }
   } catch (error) {
     console.warn("Supabase article page unavailable.", error);
-    if (routeSlugFromLocation() !== `article-${slug}`) return;
+    if (!isActivePublicContentRequest(route, requestId)) return;
     // The static article remains readable if a transient chunk download fails.
     if (!renderPublicArticleLayout) return;
     if (articlePages[sourceSlug]) {
-      const fallback = articlePages[sourceSlug];
+      const fallback = staticArticlePageData(sourceSlug);
       if (fallback.slides?.length) await ensureArticleSlideDeckRenderer();
-      setRouteSeo(`article-${slug}`, {
+      if (!isActivePublicContentRequest(route, requestId)) return;
+      const adopted = renderPublicContentIfNewer(renderArticleLayout(fallback), fallback);
+      if (adopted) setRouteSeo(route, {
         title: fallback.seoTitle || `${fallback.title}｜健康3.0`,
-        description: fallback.seoDescription || fallback.dek || DEFAULT_SEO.description,
-        image: fallback.image,
-        imageAlt: fallback.imageAlt || fallback.title,
+        description: fallback.seoDescription || fallback.subtitle || DEFAULT_SEO.description,
+        image: fallback.ogImage || fallback.image,
+        imageAlt: fallback.ogImageAlt || fallback.imageAlt || fallback.title,
         type: "article",
-        canonical: routeCanonical(`article-${slug}`)
+        canonical: routeCanonical(route),
+        article: fallback
       });
-    } else {
+    } else if (pageView.querySelector("[data-public-content-key]")?.dataset.publicContentKey !== `href:${articleHref(slug)}`) {
       setRouteSeo("health", {
         title: "文章尚未發布｜健康3.0",
         description: "這篇文章目前尚未發布或不存在。",
         robots: "noindex, follow",
         canonical: routeCanonical("health")
       });
+      pageView.innerHTML = renderArticleNotFoundPage();
     }
-    pageView.innerHTML = articlePages[sourceSlug]
-      ? renderStaticArticlePage(sourceSlug)
-      : renderArticleNotFoundPage();
   }
 }
 
@@ -11231,13 +11024,15 @@ async function renderRecruitingPageOnce(slug, fallbackRenderer) {
 }
 
 async function fetchCareStoryPage(slug) {
-  if (careStoryPageCache.has(slug)) return careStoryPageCache.get(slug);
+  const cachedStory = careStoryPageCache.get(slug) || null;
   let data = null;
+  let liveAuthoritative = false;
+  let transientFailure = false;
   if (supabase) {
     try {
       const result = await supabase
         .from("care_stories")
-        .select("*, cover_image:media!care_stories_cover_image_id_fkey(id, public_url, alt_text), avatar_image:media!care_stories_avatar_image_id_fkey(id, public_url, alt_text)")
+        .select("*, cover_image:media!care_stories_cover_image_id_fkey(id, public_url, alt_text, image_usage, focal_point), avatar_image:media!care_stories_avatar_image_id_fkey(id, public_url, alt_text, image_usage, focal_point)")
         .eq("slug", slug)
         .eq("is_enabled", true)
         .eq("status", "published")
@@ -11245,26 +11040,43 @@ async function fetchCareStoryPage(slug) {
         .maybeSingle();
       if (result.error) throw result.error;
       data = result.data;
-      if (!data) return null;
+      liveAuthoritative = true;
     } catch (error) {
+      transientFailure = true;
       console.warn(`Supabase care story unavailable for ${slug}; using the published snapshot.`, error);
     }
   }
-  if (!data) data = await loadCmsFallback("getCareStory", slug);
-  if (!data) return null;
-  const story = normalizeCareStory(data);
-  careStoryPageCache.set(slug, story);
-  return story;
+  if (liveAuthoritative && !data) {
+    careStoryPageCache.delete(slug);
+    return null;
+  }
+  if (!data) {
+    try {
+      data = await loadCmsFallback("getCareStory", slug);
+    } catch (error) {
+      transientFailure = true;
+      console.warn(`Published care story snapshot unavailable for ${slug}.`, error);
+    }
+  }
+  if (!data) {
+    if (cachedStory) return cachedStory;
+    if (transientFailure) throw new Error(`Care story sources failed for ${slug}`);
+    return null;
+  }
+  const story = selectLatestPublicContent(cachedStory, normalizeCareStory(data));
+  return cacheWithSameKindRelated(careStoryPageCache, story);
 }
 
 async function fetchExpertTalkPage(slug) {
-  if (expertTalkPageCache.has(slug)) return expertTalkPageCache.get(slug);
+  const cachedTalk = expertTalkPageCache.get(slug) || null;
   let data = null;
+  let liveAuthoritative = false;
+  let transientFailure = false;
   if (supabase) {
     try {
       const result = await supabase
         .from("expert_talks")
-        .select("*, image:media!expert_talks_image_id_fkey(id, public_url, alt_text)")
+        .select("*, image:media!expert_talks_image_id_fkey(id, public_url, alt_text, image_usage, focal_point)")
         .eq("slug", slug)
         .eq("is_enabled", true)
         .eq("status", "published")
@@ -11272,129 +11084,117 @@ async function fetchExpertTalkPage(slug) {
         .maybeSingle();
       if (result.error) throw result.error;
       data = result.data;
-      if (!data) return null;
+      liveAuthoritative = true;
     } catch (error) {
+      transientFailure = true;
       console.warn(`Supabase expert talk unavailable for ${slug}; using the published snapshot.`, error);
     }
   }
-  if (!data) data = await loadCmsFallback("getExpertTalk", slug);
-  if (!data) return null;
-  const talk = normalizeExpertTalk(data);
-  expertTalkPageCache.set(slug, talk);
-  return talk;
+  if (liveAuthoritative && !data) {
+    expertTalkPageCache.delete(slug);
+    return null;
+  }
+  if (!data) {
+    try {
+      data = await loadCmsFallback("getExpertTalk", slug);
+    } catch (error) {
+      transientFailure = true;
+      console.warn(`Published expert talk snapshot unavailable for ${slug}.`, error);
+    }
+  }
+  if (!data) {
+    if (cachedTalk) return cachedTalk;
+    if (transientFailure) throw new Error(`Expert talk sources failed for ${slug}`);
+    return null;
+  }
+  const talk = selectLatestPublicContent(cachedTalk, normalizeExpertTalk(data));
+  return cacheWithSameKindRelated(expertTalkPageCache, talk);
 }
+
 
 function renderCareStoryArticle(story) {
-  const serviceLabel = story.service || "照顧服務";
-  const praise = story.praise || story.quote || "家屬在照顧過程中感受到資訊變清楚，服務也更容易被接上。";
-  const storyBody = story.body || story.quote || praise;
-  return renderArticleLayout({
-    slug: `care-story-${story.slug}`,
-    category: serviceLabel,
-    title: story.title,
-    subtitle: `${story.name}｜${story.label}`,
-    excerpt: story.praise,
-    image: story.image,
-    author: "Suiyuecare Corps.",
-    date: story.date,
-    tags: story.tags,
-    contentRevision: "2026-07-10-dynamic-rewrite",
-    summary: [
-      praise,
-      `${serviceLabel}的重點不只在一次服務，而是讓家庭知道每天該留意什麼。`,
-      "透過紀錄、回報與督導追蹤，照顧可以從緊急應付變成可被安排的日常。"
-    ].filter(Boolean),
-    content: [
-      ["照顧開始前，家庭最需要的是有人把狀況說清楚", `這個故事來自${story.name || "家屬"}對${serviceLabel}的回饋。家屬一開始面對的通常不是單一問題，而是一連串日常細節：什麼時候需要協助、哪些狀況算異常、家人能負擔多少、服務進場後要怎麼交接。`],
-      ["被稱讚的不是單一動作，而是照顧被接住的感覺", storyBody],
-      ["把經驗留下來，下一次照顧才會更穩", "歲悅會把服務紀錄、家屬回報與督導追蹤放在同一個照顧流程裡。當狀況改變時，家庭不需要重新摸索，而是可以依照紀錄與專業建議調整服務，讓長輩和家屬都比較安心。"]
-    ],
-    cta: "想知道家人的狀況適合哪一種照顧安排？留下需求，讓歲悅協助判斷。"
-  });
+  return renderArticleLayout(story, story.related || []);
 }
+
 
 function renderExpertTalkArticle(talk) {
-  const topic = talk.topic || talk.summary || talk.quote || "照顧現場需要被整理成家庭聽得懂、做得到的方法。";
-  const viewpoint = talk.quote || talk.summary || topic;
-  const body = talk.body || talk.summary || talk.quote || topic;
-  return renderArticleLayout({
-    slug: `master-talk-${talk.slug}`,
-    category: "名人講堂",
-    title: talk.title,
-    subtitle: `${talk.titleLabel} ${talk.speaker}${talk.organization ? `｜${talk.organization}` : ""}`,
-    excerpt: talk.summary || talk.quote,
-    image: talk.image,
-    author: talk.speaker,
-    date: talk.date,
-    tags: talk.tags,
-    contentRevision: "2026-07-10-dynamic-rewrite",
-    summary: [
-      topic,
-      viewpoint,
-      "把專業觀點轉成日常可執行的照顧步驟，是名人講堂最重要的目的。"
-    ].filter(Boolean),
-    content: [
-      ["講者從照顧現場看見的問題", viewpoint],
-      ["把觀點轉成家庭能使用的方法", body],
-      ["歲悅如何把這些提醒放回服務流程", "名人講堂不是只留下金句，而是把照顧心理、營養、復能、居家安全、溝通、用藥與系統回報等觀點，轉成家庭可理解的提醒與服務流程。當家屬知道下一步怎麼做，長輩的照顧就比較不會只靠臨場反應。"]
-    ],
-    cta: "想看更多照顧觀點與健康3.0內容？回到健康3.0閱讀更多文章。"
-  });
+  return renderArticleLayout(talk, talk.related || []);
 }
 
-async function loadCareStoryPage(slug) {
+async function loadCareStoryPage(slug, requestId = publicContentRouteRequestId) {
+  const route = `care-story-${slug}`;
   try {
     await ensurePublicArticleRenderer();
+    if (!isActivePublicContentRequest(route, requestId)) return;
+    await ensurePublishedStoryDatabases();
+    if (!isActivePublicContentRequest(route, requestId)) return;
     const story = await fetchCareStoryPage(slug);
-    if (routeSlugFromLocation() !== `care-story-${slug}`) return;
+    if (!isActivePublicContentRequest(route, requestId)) return;
     if (story) {
-      setRouteSeo(`care-story-${slug}`, {
-        title: `${story.title}｜真實照顧情境`,
-        description: story.praise || story.quote || DEFAULT_SEO.description,
-        image: story.image,
-        imageAlt: story.title,
+      const adopted = renderPublicContentIfNewer(renderCareStoryArticle(story), story);
+      if (adopted) setRouteSeo(route, {
+        title: story.seoTitle || `${story.title}｜真實照顧情境`,
+        description: story.seoDescription || story.praise || story.quote || DEFAULT_SEO.description,
+        image: story.ogImage || story.image,
+        imageAlt: story.ogImageAlt || story.imageAlt || story.title,
         type: "article",
-        canonical: routeCanonical(`care-story-${slug}`)
+        canonical: routeCanonical(route),
+        article: story
       });
     } else {
       setRouteSeo("health", { title: "故事尚未發布｜歲悅長照集團", robots: "noindex, follow", canonical: routeCanonical("health") });
+      delete pageView.dataset.prerenderedRoute;
+      pageView.innerHTML = renderArticleNotFoundPage();
     }
-    pageView.innerHTML = story ? renderCareStoryArticle(story) : renderArticleNotFoundPage();
   } catch (error) {
     console.warn("Care story page unavailable.", error);
-    setRouteSeo("health", { title: "故事尚未發布｜歲悅長照集團", robots: "noindex, follow", canonical: routeCanonical("health") });
-    pageView.innerHTML = renderArticleNotFoundPage();
+    if (!isActivePublicContentRequest(route, requestId)) return;
+    if (pageView.querySelector("[data-public-content-key]")?.dataset.publicContentKey !== `href:/care-story/${slug}`) {
+      setRouteSeo("health", { title: "故事尚未發布｜歲悅長照集團", robots: "noindex, follow", canonical: routeCanonical("health") });
+      pageView.innerHTML = renderArticleNotFoundPage();
+    }
   }
 }
 
-async function loadExpertTalkPage(slug) {
+async function loadExpertTalkPage(slug, requestId = publicContentRouteRequestId) {
+  const route = `master-talk-${slug}`;
   try {
     await ensurePublicArticleRenderer();
+    if (!isActivePublicContentRequest(route, requestId)) return;
+    await ensurePublishedStoryDatabases();
+    if (!isActivePublicContentRequest(route, requestId)) return;
     const talk = await fetchExpertTalkPage(slug);
-    if (routeSlugFromLocation() !== `master-talk-${slug}`) return;
+    if (!isActivePublicContentRequest(route, requestId)) return;
     if (talk) {
-      setRouteSeo(`master-talk-${slug}`, {
-        title: `${talk.title}｜名人講堂`,
-        description: talk.summary || talk.quote || DEFAULT_SEO.description,
-        image: talk.image,
-        imageAlt: talk.title,
+      const adopted = renderPublicContentIfNewer(renderExpertTalkArticle(talk), talk);
+      if (adopted) setRouteSeo(route, {
+        title: talk.seoTitle || `${talk.title}｜名人講堂`,
+        description: talk.seoDescription || talk.excerpt || talk.quote || DEFAULT_SEO.description,
+        image: talk.ogImage || talk.image,
+        imageAlt: talk.ogImageAlt || talk.imageAlt || talk.title,
         type: "article",
-        canonical: routeCanonical(`master-talk-${slug}`)
+        canonical: routeCanonical(route),
+        article: talk
       });
     } else {
       setRouteSeo("health", { title: "名人講堂尚未發布｜健康3.0", robots: "noindex, follow", canonical: routeCanonical("health") });
+      delete pageView.dataset.prerenderedRoute;
+      pageView.innerHTML = renderArticleNotFoundPage();
     }
-    pageView.innerHTML = talk ? renderExpertTalkArticle(talk) : renderArticleNotFoundPage();
   } catch (error) {
     console.warn("Expert talk page unavailable.", error);
-    setRouteSeo("health", { title: "名人講堂尚未發布｜健康3.0", robots: "noindex, follow", canonical: routeCanonical("health") });
-    pageView.innerHTML = renderArticleNotFoundPage();
+    if (!isActivePublicContentRequest(route, requestId)) return;
+    if (pageView.querySelector("[data-public-content-key]")?.dataset.publicContentKey !== `href:/master-talk/${slug}`) {
+      setRouteSeo("health", { title: "名人講堂尚未發布｜健康3.0", robots: "noindex, follow", canonical: routeCanonical("health") });
+      pageView.innerHTML = renderArticleNotFoundPage();
+    }
   }
 }
 
 function renderPage(slug) {
   if (!home || !pageView) return;
 
+  const publicRouteRequestId = ++publicContentRouteRequestId;
   const rawSlug = slug || "home";
   const [normalized, queryString = ""] = rawSlug.split("?");
   preloadHeroImage(routeHeroImageForViewport(normalized));
@@ -11402,6 +11202,10 @@ function renderPage(slug) {
   const articleSlug = normalized.startsWith("article-") ? normalized.replace("article-", "") : null;
   const careStorySlug = normalized.startsWith("care-story-") ? normalized.replace("care-story-", "") : null;
   const masterTalkSlug = normalized.startsWith("master-talk-") ? normalized.replace("master-talk-", "") : null;
+  if (normalized !== "health") {
+    pageView.classList.remove("public-content-pending");
+    delete document.documentElement.dataset.healthCategoryPending;
+  }
   const isContactPage = normalized === "contact" && routeSlugFromPath() !== "home";
   const anchorTarget = normalized === "home" || isContactPage ? null : document.getElementById(normalized);
   const page = anchorTarget ? null : pages[normalized];
@@ -11449,17 +11253,17 @@ function renderPage(slug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     if (!hasMatchingPrerender) pageView.innerHTML = "";
-    loadArticlePage(articleSlug);
+    loadArticlePage(articleSlug, publicRouteRequestId);
   } else if (careStorySlug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     if (!hasMatchingPrerender) pageView.innerHTML = "";
-    loadCareStoryPage(careStorySlug);
+    loadCareStoryPage(careStorySlug, publicRouteRequestId);
   } else if (masterTalkSlug) {
     home.classList.remove("active");
     pageView.classList.add("active");
     if (!hasMatchingPrerender) pageView.innerHTML = "";
-    loadExpertTalkPage(masterTalkSlug);
+    loadExpertTalkPage(masterTalkSlug, publicRouteRequestId);
   } else if (isContactPage) {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -11513,11 +11317,11 @@ function renderPage(slug) {
   } else if (normalized === "health") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    renderHealthRouteOnce(normalized, searchParams.get("category") || "");
+    renderHealthRouteOnce(normalized, searchParams.get("category") || "", publicRouteRequestId);
   } else if (normalized === "search") {
     home.classList.remove("active");
     pageView.classList.add("active");
-    renderHealthRouteOnce(normalized, searchParams.get("q") || "");
+    renderHealthRouteOnce(normalized, searchParams.get("q") || "", publicRouteRequestId);
   } else if (normalized === "courses") {
     renderCoursesPageFromCms();
   } else if (normalized === "talent") {
@@ -13018,14 +12822,7 @@ async function initializePublishedHomeContent() {
   const modulesPromise = loadSupabaseHomeModules();
   const articlesPromise = loadSupabaseHealthArticles();
   const categoriesPromise = loadSupabaseArticleCategories();
-  const storiesPromise = loadSupabaseStoryDatabases();
-  try {
-    const snapshot = await loadCmsFallback("getStoryDatabases");
-    renderPublishedStoryDatabases(snapshot.stories, snapshot.talks);
-    document.documentElement.dataset.homeContentReady = "snapshot";
-  } catch (error) {
-    console.warn("CMS snapshot unavailable", error);
-  }
+  const storiesPromise = ensurePublishedStoryDatabases();
   await Promise.all([pagePromise, modulesPromise, articlesPromise, categoriesPromise, storiesPromise]);
   renderHomeHealthArticles();
   document.documentElement.dataset.homeContentReady = "true";

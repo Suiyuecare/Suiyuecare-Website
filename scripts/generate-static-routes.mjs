@@ -12,6 +12,7 @@ import {
   articlePublicHref,
   articlePublicSlug
 } from "../article-url-map.mjs";
+import { publicStructuredDataJson } from "../public-route-structured-data.mjs";
 import { loadPublicContent } from "./load-public-content.mjs";
 
 const distDir = path.resolve("dist");
@@ -272,8 +273,8 @@ function contentRoute(item) {
     path: item.href,
     title: item.seoTitle || `${item.title}｜健康3.0`,
     description: item.seoDescription || item.excerpt || item.subtitle,
-    image: item.image,
-    imageAlt: item.imageAlt || item.title,
+    image: item.ogImage || item.image,
+    imageAlt: item.ogImageAlt || item.imageAlt || item.title,
     preloadImage: item.image,
     priority: item.isFeatured ? "0.82" : "0.72",
     type: "article",
@@ -319,181 +320,14 @@ function replaceAttr(html, selector, value) {
   return html.replace(selector, (_, before, _oldValue, after) => `${before}${escaped}${after}`);
 }
 
-const siteNavigation = [
-  ["關於歲悅", "/about"],
-  ["居家照顧", "/home-care"],
-  ["日間照顧", "/day-care"],
-  ["社區據點", "/community"],
-  ["健康3.0", "/health"],
-  ["課程報名", "/courses"],
-  ["人才招募", "/talent"],
-  ["聯絡我們", "/contact"]
-];
-
-function structuredDataForRoute(route) {
-  const canonical = absoluteUrl(route.path);
-  const isHome = route.path === "/";
-  const articleId = `${canonical}#article`;
-  const webpageId = isHome ? `${siteOrigin}/#webpage` : `${canonical}#webpage`;
-  const graph = [
-    {
-      "@type": ["Organization", "LocalBusiness"],
-      "@id": `${siteOrigin}/#organization`,
-      name: "歲悅長照集團",
-      alternateName: "Suiyuecare Corps.",
-      url: `${siteOrigin}/`,
-      logo: `${siteOrigin}/assets/company-logo.png`,
-      image: absoluteUrl("/assets/hero-care-hero-fast.jpg"),
-      telephone: "+886-2-6604-5432",
-      email: "generalaffairs@suiyuecare.com",
-      slogan: "照顧就像去超商，買牛奶一樣簡單。",
-      priceRange: "$$",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "臺北市",
-        addressRegion: "臺北市",
-        addressCountry: "TW"
-      },
-      areaServed: ["臺北市", "新北市", "桃園市"],
-      knowsAbout: ["居家照顧", "日間照顧", "社區據點", "護理復能", "移工培訓", "教育品管", "長照申請"],
-      contactPoint: [
-        {
-          "@type": "ContactPoint",
-          telephone: "+886-2-6604-5432",
-          contactType: "customer service",
-          areaServed: "TW",
-          availableLanguage: ["zh-Hant", "zh-TW"]
-        }
-      ],
-      openingHoursSpecification: [
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-          opens: "09:00",
-          closes: "18:00"
-        }
-      ],
-      sameAs: ["https://lin.ee/oaPkGiq"]
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${siteOrigin}/#website`,
-      name: "歲悅長照集團",
-      alternateName: "Suiyuecare Corps.",
-      url: `${siteOrigin}/`,
-      publisher: {
-        "@id": `${siteOrigin}/#organization`
-      },
-      inLanguage: "zh-Hant-TW"
-    },
-    {
-      "@type": "WebPage",
-      "@id": webpageId,
-      url: canonical,
-      name: route.title,
-      description: route.description,
-      isPartOf: {
-        "@id": `${siteOrigin}/#website`
-      },
-      about: {
-        "@id": `${siteOrigin}/#organization`
-      },
-      primaryImageOfPage: {
-        "@type": "ImageObject",
-        url: absoluteUrl(route.image)
-      },
-      ...(route.article ? { mainEntity: { "@id": articleId } } : {}),
-      inLanguage: "zh-Hant-TW"
-    },
-    {
-      "@type": "ItemList",
-      "@id": `${siteOrigin}/#site-navigation`,
-      name: "歲悅長照集團主要子目錄",
-      itemListElement: siteNavigation.map(([name, routePath], index) => ({
-        "@type": "SiteNavigationElement",
-        position: index + 1,
-        name,
-        url: absoluteUrl(routePath)
-      }))
-    }
-  ];
-
-  if (!isHome) {
-    const breadcrumbItems = [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "首頁",
-        item: `${siteOrigin}/`
-      }
-    ];
-    if (route.breadcrumbParent) {
-      breadcrumbItems.push({
-        "@type": "ListItem",
-        position: breadcrumbItems.length + 1,
-        name: route.breadcrumbParent.name,
-        item: absoluteUrl(route.breadcrumbParent.path)
-      });
-    }
-    breadcrumbItems.push({
-      "@type": "ListItem",
-      position: breadcrumbItems.length + 1,
-      name: route.title.replace(/｜.*$/, ""),
-      item: canonical
-    });
-    graph.push({
-      "@type": "BreadcrumbList",
-      "@id": `${canonical}#breadcrumb`,
-      itemListElement: breadcrumbItems
-    });
-  }
-
-  if (route.article) {
-    const authorName = route.article.author || "歲悅照顧編輯部";
-    const author = /歲悅/.test(authorName)
-      ? {
-          "@type": "Organization",
-          "@id": `${siteOrigin}/#organization`,
-          name: authorName
-        }
-      : {
-          "@type": "Person",
-          name: authorName
-        };
-    graph.push({
-      "@type": route.article.schemaType || "Article",
-      "@id": articleId,
-      mainEntityOfPage: {
-        "@id": webpageId
-      },
-      headline: route.article.title,
-      description: route.description,
-      image: [absoluteUrl(route.image)],
-      datePublished: route.article.publishedAt,
-      dateModified: route.article.updatedAt || route.article.publishedAt,
-      author,
-      publisher: {
-        "@id": `${siteOrigin}/#organization`
-      },
-      articleSection: route.article.category || "照顧知識",
-      keywords: route.article.seoKeywords?.length
-        ? route.article.seoKeywords
-        : route.article.tags || [],
-      isAccessibleForFree: true,
-      inLanguage: "zh-Hant-TW"
-    });
-  }
-
-  return JSON.stringify({ "@context": "https://schema.org", "@graph": graph }, null, 2);
-}
 
 function replaceStructuredData(html, route) {
-  const json = structuredDataForRoute(route)
+  const json = publicStructuredDataJson(route, siteOrigin)
     .replace(/</g, "\\u003c")
     .replace(/<\/script/gi, "<\\/script");
   return html.replace(
     /<script id="structuredData" type="application\/ld\+json">[\s\S]*?<\/script>/,
-    `<script id="structuredData" type="application/ld+json">\n${json}\n    </script>`
+    () => `<script id="structuredData" type="application/ld+json">\n${json}\n    </script>`
   );
 }
 
@@ -628,7 +462,7 @@ function routeHtml(baseHtml, route) {
     /(<meta name="robots" content=")(.*?)(" \/>)/,
     route.robots || (route.article ? "index, follow, max-image-preview:large" : "index, follow")
   );
-  html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1public-content-seo-20260727$3`);
+  html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1public-content-unified-20260909-1$3`);
   html = insertArticleMeta(html, route);
   html = replaceStructuredData(html, route);
   html = routeHashLinksToPaths(html);

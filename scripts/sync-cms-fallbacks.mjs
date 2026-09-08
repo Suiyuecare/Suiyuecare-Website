@@ -143,9 +143,10 @@ const [
       .eq("is_enabled", true)
       .eq("status", "published")
       .lte("published_at", now)
-      .order("is_featured", { ascending: false })
       .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(100)
+      .order("updated_at", { ascending: false, nullsFirst: false })
+      .order("public_number", { ascending: false, nullsFirst: false })
+      .limit(500)
   ),
   rows(
     "article_categories",
@@ -164,6 +165,8 @@ const [
       .eq("is_enabled", true)
       .eq("status", "published")
       .lte("published_at", now)
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .order("updated_at", { ascending: false, nullsFirst: false })
       .order("sort_order")
   ),
   rows(
@@ -174,6 +177,8 @@ const [
       .eq("is_enabled", true)
       .eq("status", "published")
       .lte("published_at", now)
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .order("updated_at", { ascending: false, nullsFirst: false })
       .order("sort_order")
   ),
   rows(
@@ -227,7 +232,7 @@ const mediaIds = [...new Set([
   ...recruitingOpenings.flatMap((item) => [item.hero_image_id, item.image_id]),
   ...courses.map((item) => item.cover_image_id),
   ...milestones.map((item) => item.image_id),
-  ...articles.map((item) => item.cover_image_id),
+  ...articles.flatMap((item) => [item.cover_image_id, item.og_image_id]),
   ...careStories.flatMap((item) => [item.cover_image_id, item.avatar_image_id]),
   ...expertTalks.map((item) => item.image_id),
   ...homeModules.map((item) => item.image_id),

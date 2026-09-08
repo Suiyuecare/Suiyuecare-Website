@@ -27,6 +27,11 @@
     <link rel="apple-touch-icon" href="/assets/milk-favicon.png?v=20260713-transparent" />
     <meta name="theme-color" content="#f08a24" />
     <meta name="deployment-version" content="assets-public-20260519" />
+    <style>
+      html[data-health-category-pending="true"] #pageView[data-prerendered-route="health"],#pageView.public-content-pending{position:relative;min-height:calc(100vh - 80px)}
+      html[data-health-category-pending="true"] #pageView[data-prerendered-route="health"]>*,#pageView.public-content-pending>*{visibility:hidden}
+      html[data-health-category-pending="true"] #pageView[data-prerendered-route="health"]::before,#pageView.public-content-pending::before{content:"分類文章載入中";position:absolute;inset:0;z-index:2;display:grid;place-items:center;min-height:min(520px,calc(100vh - 80px));color:#c85f06;background:#fffdf8;font-weight:900}
+    </style>
     <title>歲悅長照集團｜Suiyuecare Corps.</title>
     <script>
       (() => {
@@ -34,6 +39,15 @@
         const initialPath = window.location.pathname.replace(/^\/+|\/+$/g, "");
         const initialRoute = initialPath || initialHash || "home";
         document.documentElement.dataset.initialRoute = initialRoute;
+        const hashQuery = window.location.hash.includes("?") ? window.location.hash.slice(window.location.hash.indexOf("?")) : "";
+        if (initialRoute === "health" && /[?&]category=/.test(`${window.location.search}${hashQuery}`)) {
+          document.documentElement.dataset.healthCategoryPending = "true";
+          window.setTimeout(() => {
+            if (document.documentElement.dataset.healthCategoryPending !== "true") return;
+            delete document.documentElement.dataset.healthCategoryPending;
+            document.querySelector("#pageView")?.classList.remove("public-content-pending");
+          }, 8000);
+        }
         try {
           const introSeen = sessionStorage.getItem("suiyuecare_intro_seen") === "true";
           const shouldPlayIntro = initialRoute === "home" && !introSeen;
@@ -57,6 +71,13 @@
         }
       })();
     </script>
+    <noscript>
+      <style>
+        html[data-health-category-pending="true"] #pageView[data-prerendered-route="health"] { visibility: visible !important; }
+        html[data-health-category-pending="true"] #pageView[data-prerendered-route="health"] > * { visibility: visible !important; }
+        html[data-health-category-pending="true"] #pageView[data-prerendered-route="health"]::before { display: none !important; }
+      </style>
+    </noscript>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link id="heroPreload" rel="preload" as="image" href="/assets/hero-care-hero-fast.jpg" fetchpriority="high" media="(min-width: 641px)" />

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { publicStructuredDataObject } from "../public-route-structured-data.mjs";
 import { loadPublicContent } from "./load-public-content.mjs";
 
 const rootDir = path.resolve(import.meta.dirname, "..");
@@ -103,6 +104,20 @@ for (const item of publicContent.items) {
   }
 
   const structured = structuredDataFrom(html, item.href);
+  const expectedStructured = publicStructuredDataObject({
+    path: item.href,
+    title: item.seoTitle || `${item.title}｜健康3.0`,
+    description: item.seoDescription || item.excerpt || item.subtitle,
+    image: item.ogImage || item.image,
+    article: item,
+    breadcrumbParent: {
+      name: item.contentKind === "care-story" ? "照顧故事" : item.contentKind === "master-talk" ? "名人講堂" : "健康3.0",
+      path: "/health"
+    }
+  }, siteOrigin);
+  if (structured && JSON.stringify(structured) !== JSON.stringify(expectedStructured)) {
+    failures.push(`${item.href}: static structured data does not match the shared route adapter`);
+  }
   const graph = structured?.["@graph"] || [];
   const articleSchema = graph.find((entry) => ["Article", "BlogPosting"].includes(entry?.["@type"]));
   if (!articleSchema) {
