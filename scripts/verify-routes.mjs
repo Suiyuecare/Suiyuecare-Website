@@ -527,14 +527,17 @@ function verifyContactAnchorBehavior(appSource) {
   if (!appSource.includes("function handleContactAnchorClick")) {
     failures.push("app.js: contact anchors should use a dedicated navigation helper");
   }
-  if (!appSource.includes('activePage?.querySelector("#service-contact")')) {
+  if (!appSource.includes('activePage?.querySelector("#service-contact, [data-public-contact-page]")') || !appSource.includes('scrollToContactSection(localTarget, link)') || !appSource.includes('heading.focus({ preventScroll: true })') || !appSource.includes('target.scrollIntoView({ behavior: "instant", block: "start" })')) {
     failures.push("app.js: #contact links on service pages should scroll to #service-contact when available");
   }
-  if (!appSource.includes('window.location.href = "/#contact"')) {
-    failures.push("app.js: #contact links outside the home page should route to the home contact section");
+  if (!appSource.includes('window.location.href = "/contact"') || !appSource.includes('routeSlugFromPath() === "home" && href === "#contact"')) {
+    failures.push("app.js: contact links should open /contact while preserving the homepage local #contact form");
+  }
+  if (!appSource.includes('if (!pageView.querySelector("[data-public-contact-page]")) pageView.innerHTML = renderContactPage()') || !fs.readFileSync(path.join(distDir, "contact/index.html"), "utf8").includes("data-public-contact-page")) {
+    failures.push("contact: the direct route should contain a pre-rendered form and preserve existing form input during hydration");
   }
   if (!appSource.includes("pendingContactPresetKey") || !appSource.includes("applyPendingContactPreset")) {
-    failures.push("app.js: contact intent should persist when navigating to the home contact form");
+    failures.push("app.js: contact intent should persist when navigating to the direct contact form");
   }
   if (!appSource.includes("function focusContactForm") || !appSource.includes("preventScroll: true")) {
     failures.push("app.js: contact navigation should focus the contact form without causing an extra scroll jump");

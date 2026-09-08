@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { renderArticleSlideDeck } from "../article-slide-deck.js";
+import { renderContactPage } from "../contact-page.mjs";
 import {
   normalizePublicAssetUrl,
   renderPublicArticleLayout,
@@ -296,7 +297,9 @@ const routes = [
         ...route,
         prerenderedHtml: renderPublicHealthIndex(publicContent.articles, publicContent.categories)
       }
-    : route),
+    : route.slug === "contact"
+      ? { ...route, prerenderedHtml: renderContactPage() }
+      : route),
   ...publicContent.items.map(contentRoute)
 ];
 
