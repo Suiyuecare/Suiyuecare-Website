@@ -4365,7 +4365,8 @@ async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
   } catch (error) {
     console.warn(`Supabase enhanced service page unavailable for ${slug}.`, error);
   }
-  if (routeSlugFromLocation() !== slug) return;
+  // Tracking parameters do not change this service's identity; real route changes still cancel stale responses.
+  if (routeSlugFromLocation().split("?")[0] !== slug) return;
   pageView.innerHTML = fields.length ? applyCmsEnhancedServicePage(fallbackHtml, slug, fields) : fallbackHtml;
   hydrateServiceDecisionNavigation(pageView);
   hydrateServiceFeeCodeGroups(pageView);

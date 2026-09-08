@@ -25,7 +25,7 @@
     "verify:cms-fallbacks": "node scripts/verify-cms-fallback-snapshot.mjs",
     "verify:cms-fallbacks:live": "node scripts/sync-cms-fallbacks.mjs --check",
     "verify:department-access": "node scripts/verify-department-access.mjs",
-    "verify:ux-navigation": "node scripts/verify-article-reading-outline.mjs && node scripts/verify-health-contact-ux.mjs && node scripts/verify-service-decision-navigation.mjs && pnpm verify:migrant-training",
+    "verify:ux-navigation": "node scripts/verify-article-reading-outline.mjs && node scripts/verify-health-contact-ux.mjs && node scripts/verify-service-decision-navigation.mjs && node scripts/verify-service-query-rendering.mjs && pnpm verify:migrant-training",
     "verify:migrant-training": "node scripts/verify-migrant-training-portfolio.mjs",
     "verify:routes": "node scripts/verify-routes.mjs",
     "verify:public-content-seo": "node scripts/verify-public-content-seo.mjs",
