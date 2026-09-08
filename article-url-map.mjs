@@ -145,7 +145,10 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "long-term-care-required-field-check",
   "home-care-belongings-privacy-agreement",
   "day-care-quiet-space-support",
-  "community-care-program-co-design"
+  "community-care-program-co-design",
+  "reablement-right-level-of-help",
+  "migrant-care-training-language-profile",
+  "long-term-care-training-transfer-evaluation"
 ]);
 
 const sourceNumberMap = new Map(

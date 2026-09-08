@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">復能協助提示階梯</title>
+  <desc id="desc">從等待、口頭提示、手勢示範到必要的身體協助，依安全與當天能力逐步調整；完成後記下下次是否能少一層。</desc>
+  <rect width="1200" height="675" rx="34" fill="#fffaf3"/>
+  <text x="72" y="84" fill="#3c1f0b" font-family="Arial, PingFang TC, sans-serif" font-size="42" font-weight="700">先少一點幫忙，再看能不能自己完成</text>
+  <text x="72" y="126" fill="#725b4c" font-family="Arial, PingFang TC, sans-serif" font-size="23">依安全、專業指示與當天狀態，從較少介入開始</text>
+  <g font-family="Arial, PingFang TC, sans-serif">
+    <g transform="translate(72 190)"><rect width="232" height="220" rx="26" fill="#ead8bf"/><circle cx="42" cy="44" r="24" fill="#725b4c"/><text x="42" y="52" text-anchor="middle" fill="white" font-size="22" font-weight="700">1</text><text x="28" y="103" fill="#3c1f0b" font-size="31" font-weight="700">等待</text><text x="28" y="145" fill="#725b4c" font-size="21">給時間看、想、開始</text><text x="28" y="177" fill="#725b4c" font-size="21">不急著代做</text></g>
+    <path d="M320 300h42" stroke="#f58a1f" stroke-width="10" stroke-linecap="round"/><path d="m351 282 22 18-22 18" fill="none" stroke="#f58a1f" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(382 190)"><rect width="232" height="220" rx="26" fill="#dcecee"/><circle cx="42" cy="44" r="24" fill="#1595a8"/><text x="42" y="52" text-anchor="middle" fill="white" font-size="22" font-weight="700">2</text><text x="28" y="103" fill="#3c1f0b" font-size="31" font-weight="700">一句提示</text><text x="28" y="145" fill="#725b4c" font-size="21">只說下一個小步驟</text><text x="28" y="177" fill="#725b4c" font-size="21">說完再等</text></g>
+    <path d="M630 300h42" stroke="#f58a1f" stroke-width="10" stroke-linecap="round"/><path d="m661 282 22 18-22 18" fill="none" stroke="#f58a1f" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(692 190)"><rect width="232" height="220" rx="26" fill="#e6ebdc"/><circle cx="42" cy="44" r="24" fill="#758d60"/><text x="42" y="52" text-anchor="middle" fill="white" font-size="22" font-weight="700">3</text><text x="28" y="103" fill="#3c1f0b" font-size="31" font-weight="700">手勢示範</text><text x="28" y="145" fill="#725b4c" font-size="21">指向或做一次示範</text><text x="28" y="177" fill="#725b4c" font-size="21">讓本人接著做</text></g>
+    <path d="M940 300h42" stroke="#f58a1f" stroke-width="10" stroke-linecap="round"/><path d="m971 282 22 18-22 18" fill="none" stroke="#f58a1f" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(1002 190)"><rect width="126" height="220" rx="26" fill="#f8dfd7"/><circle cx="36" cy="44" r="24" fill="#d95f45"/><text x="36" y="52" text-anchor="middle" fill="white" font-size="22" font-weight="700">4</text><text x="22" y="100" fill="#3c1f0b" font-size="26" font-weight="700">必要</text><text x="22" y="134" fill="#3c1f0b" font-size="26" font-weight="700">協助</text><text x="22" y="174" fill="#725b4c" font-size="18">依專業</text><text x="22" y="199" fill="#725b4c" font-size="18">安全做</text></g>
+    <rect x="72" y="464" width="1056" height="128" rx="24" fill="#3c1f0b"/>
+    <text x="108" y="516" fill="#fffaf3" font-size="25" font-weight="700">每次只記三件事</text><text x="108" y="558" fill="#ead8bf" font-size="22">做的是什麼生活任務　｜　用了哪一層提示　｜　何時出現疼痛、暈眩或明顯改變</text>
+    <text x="72" y="636" fill="#725b4c" font-size="18">定性流程圖；不是診斷或固定訓練處方。若出現急症警訊，停止活動並依緊急流程求助。</text>
+  </g>
+</svg>

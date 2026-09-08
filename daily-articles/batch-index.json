@@ -169,6 +169,34 @@
           "contentHash": "sha256:5e4995e2312d03d1c00933d6856f5055153de5c0ebd31232959d83df855235a3"
         }
       ]
+    },
+    {
+      "date": "2026-09-08",
+      "displayDate": "2026.09.08",
+      "commit": "SELF",
+      "articles": [
+        {
+          "slug": "reablement-right-level-of-help",
+          "title": "復能練習該幫多少？家屬用四級提示保留長輩自己做的空間",
+          "businessItem": "護理復能",
+          "publicNumber": 147,
+          "contentHash": "sha256:73e971059dd50eca6e5854c37dc1b96d37b885fd7bb39c0a5063dd0b547fd18d"
+        },
+        {
+          "slug": "migrant-care-training-language-profile",
+          "title": "移工照顧培訓別只把講義翻譯：開課前先做三層語言需求盤點",
+          "businessItem": "移工培訓",
+          "publicNumber": 148,
+          "contentHash": "sha256:eb0a7732c40b9e29d351e7b2aa87fb3f839e1ea6304cf9f36f3008963d46749f"
+        },
+        {
+          "slug": "long-term-care-training-transfer-evaluation",
+          "title": "課程結束就算完成嗎？長照教育品管用四段證據追蹤現場改變",
+          "businessItem": "教育品管",
+          "publicNumber": 149,
+          "contentHash": "sha256:e041719ea7f6c2cdc76c0c7daed0c2f8dcef43f4afc380f6d0ac2803d63b33bb"
+        }
+      ]
     }
   ]
 }

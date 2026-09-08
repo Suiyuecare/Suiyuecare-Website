@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">移工培訓三層語言需求盤點</title>
+  <desc id="desc">開課前分別確認口語理解、文字與圖像、示範與回應方式，再用情境練習確認，不把國籍當成語言能力。</desc>
+  <rect width="1200" height="675" rx="34" fill="#fffaf3"/>
+  <text x="70" y="82" fill="#3c1f0b" font-family="Arial, PingFang TC, sans-serif" font-size="42" font-weight="700">別先問「哪一國」；先問「怎樣學最清楚」</text>
+  <text x="70" y="124" fill="#725b4c" font-family="Arial, PingFang TC, sans-serif" font-size="23">語言需求是個別資訊，開課前盤點、課中確認、課後可更新</text>
+  <g font-family="Arial, PingFang TC, sans-serif">
+    <g transform="translate(70 184)"><rect width="320" height="250" rx="28" fill="#dcecee"/><circle cx="50" cy="52" r="30" fill="#1595a8"/><text x="50" y="61" text-anchor="middle" fill="white" font-size="26" font-weight="700">A</text><text x="34" y="118" fill="#3c1f0b" font-size="32" font-weight="700">口語怎麼聽</text><text x="34" y="164" fill="#725b4c" font-size="22">偏好語言與熟悉詞</text><text x="34" y="199" fill="#725b4c" font-size="22">速度、口音、一次幾步</text></g>
+    <g transform="translate(440 184)"><rect width="320" height="250" rx="28" fill="#ead8bf"/><circle cx="50" cy="52" r="30" fill="#f58a1f"/><text x="50" y="61" text-anchor="middle" fill="white" font-size="26" font-weight="700">B</text><text x="34" y="118" fill="#3c1f0b" font-size="32" font-weight="700">資訊怎麼看</text><text x="34" y="164" fill="#725b4c" font-size="22">文字、圖片或實物</text><text x="34" y="199" fill="#725b4c" font-size="22">是否需要雙語版本</text></g>
+    <g transform="translate(810 184)"><rect width="320" height="250" rx="28" fill="#e6ebdc"/><circle cx="50" cy="52" r="30" fill="#758d60"/><text x="50" y="61" text-anchor="middle" fill="white" font-size="26" font-weight="700">C</text><text x="34" y="118" fill="#3c1f0b" font-size="32" font-weight="700">能力怎麼確認</text><text x="34" y="164" fill="#725b4c" font-size="22">看示範、分段練習</text><text x="34" y="199" fill="#725b4c" font-size="22">用情境回應說清楚</text></g>
+    <path d="M230 466v48h740v-48" fill="none" stroke="#4f77a8" stroke-width="8" stroke-linecap="round"/>
+    <rect x="238" y="494" width="724" height="104" rx="25" fill="#3c1f0b"/>
+    <text x="600" y="538" text-anchor="middle" fill="#fffaf3" font-size="27" font-weight="700">合成一個真實工作情境，再看哪裡需要換說法或補練習</text>
+    <text x="600" y="574" text-anchor="middle" fill="#ead8bf" font-size="21">高風險技巧仍由合格專業人員依規範教學與驗收</text>
+    <text x="70" y="640" fill="#725b4c" font-size="18">定性教學設計圖；不能用國籍、口音或識字程度推定專業能力，也不取代法定訓練。</text>
+  </g>
+</svg>

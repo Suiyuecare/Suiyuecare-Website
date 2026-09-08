@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">長照教育成效四段證據鏈</title>
+  <desc id="desc">從參與反應、課中學習、工作現場使用到服務結果，逐段收集適量證據；越往後越要考慮其他影響因素，不能把單一變化全歸因於課程。</desc>
+  <rect width="1200" height="675" rx="34" fill="#fffaf3"/>
+  <text x="70" y="82" fill="#3c1f0b" font-family="Arial, PingFang TC, sans-serif" font-size="42" font-weight="700">課程完成，不等於現場已經改變</text>
+  <text x="70" y="124" fill="#725b4c" font-family="Arial, PingFang TC, sans-serif" font-size="23">先決定要回答的問題，再選最小、可用的證據</text>
+  <g font-family="Arial, PingFang TC, sans-serif">
+    <g transform="translate(70 190)"><rect width="240" height="224" rx="28" fill="#ead8bf"/><text x="30" y="58" fill="#f58a1f" font-size="23" font-weight="700">01 課後</text><text x="30" y="106" fill="#3c1f0b" font-size="31" font-weight="700">參與反應</text><text x="30" y="150" fill="#725b4c" font-size="21">能否理解、是否相關</text><text x="30" y="184" fill="#725b4c" font-size="21">障礙在哪裡</text></g>
+    <path d="M324 302h30" stroke="#f58a1f" stroke-width="9" stroke-linecap="round"/><path d="m345 286 18 16-18 16" fill="none" stroke="#f58a1f" stroke-width="9"/>
+    <g transform="translate(375 190)"><rect width="240" height="224" rx="28" fill="#dcecee"/><text x="30" y="58" fill="#1595a8" font-size="23" font-weight="700">02 課中</text><text x="30" y="106" fill="#3c1f0b" font-size="31" font-weight="700">學習表現</text><text x="30" y="150" fill="#725b4c" font-size="21">是否做到目標步驟</text><text x="30" y="184" fill="#725b4c" font-size="21">錯誤出在哪裡</text></g>
+    <path d="M629 302h30" stroke="#f58a1f" stroke-width="9" stroke-linecap="round"/><path d="m650 286 18 16-18 16" fill="none" stroke="#f58a1f" stroke-width="9"/>
+    <g transform="translate(680 190)"><rect width="240" height="224" rx="28" fill="#e6ebdc"/><text x="30" y="58" fill="#758d60" font-size="23" font-weight="700">03 現場</text><text x="30" y="106" fill="#3c1f0b" font-size="31" font-weight="700">工作使用</text><text x="30" y="150" fill="#725b4c" font-size="21">有無機會、工具與支持</text><text x="30" y="184" fill="#725b4c" font-size="21">遇到什麼阻礙</text></g>
+    <path d="M934 302h30" stroke="#f58a1f" stroke-width="9" stroke-linecap="round"/><path d="m955 286 18 16-18 16" fill="none" stroke="#f58a1f" stroke-width="9"/>
+    <g transform="translate(985 190)"><rect width="145" height="224" rx="28" fill="#f8dfd7"/><text x="24" y="58" fill="#d95f45" font-size="23" font-weight="700">04 服務</text><text x="24" y="106" fill="#3c1f0b" font-size="28" font-weight="700">結果</text><text x="24" y="150" fill="#725b4c" font-size="18">趨勢與</text><text x="24" y="180" fill="#725b4c" font-size="18">其他因素</text></g>
+    <rect x="70" y="466" width="1060" height="126" rx="25" fill="#3c1f0b"/>
+    <text x="104" y="516" fill="#fffaf3" font-size="25" font-weight="700">品管回路</text><text x="104" y="558" fill="#ead8bf" font-size="22">找出卡點 → 補工具或督導支持 → 小幅調整課程 → 約定下一次回看</text>
+    <text x="70" y="638" fill="#725b4c" font-size="18">定性評估架構；現場與服務結果受個案、流程、人力與環境影響，不把單一變化全歸因於課程。</text>
+  </g>
+</svg>

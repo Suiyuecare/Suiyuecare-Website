@@ -1593,6 +1593,21 @@
       "source": "/article/community-care-program-co-design",
       "destination": "/article/article146",
       "permanent": true
+    },
+    {
+      "source": "/article/reablement-right-level-of-help",
+      "destination": "/article/article147",
+      "permanent": true
+    },
+    {
+      "source": "/article/migrant-care-training-language-profile",
+      "destination": "/article/article148",
+      "permanent": true
+    },
+    {
+      "source": "/article/long-term-care-training-transfer-evaluation",
+      "destination": "/article/article149",
+      "permanent": true
     }
   ],
   "rewrites": [
