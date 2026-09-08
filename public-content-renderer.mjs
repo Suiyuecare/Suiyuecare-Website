@@ -2,7 +2,6 @@ import {
   articlePublicHref,
   articlePublicSlug
 } from "./article-url-map.mjs";
-import { outlineArticleBody, renderArticleOutline } from "./article-reading-outline.mjs";
 import { renderHealthTopicNavigation } from "./health-topic-navigation.mjs";
 
 const SITE_ORIGIN = "https://www.suiyuecare.com";
@@ -262,52 +261,34 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
   const serviceNeeds = { "居家照顧": "居家照顧諮詢", "日間照顧": "日間照顧諮詢", "社區據點": "社區據點諮詢", "護理復能": "護理復能諮詢", "移工培訓": "移工培訓諮詢", "教育品管": "教育品管諮詢", "軟體系統": "軟體系統諮詢" };
   const contactNeed = serviceNeeds[article.relatedService || article.category] || "長照服務諮詢";
   const contactContext = `data-contact-need="${escapePublicHtml(contactNeed)}" data-contact-message="${escapePublicHtml(`我想了解${contactNeed}，剛閱讀了〈${article.title || "照顧知識"}〉。`)}"`;
-  const readingBody = outlineArticleBody(`
-    ${hasSlideDeck ? "" : renderCallout(article.warning)}
-    ${hasSlideDeck ? "" : contentHtml}
-    ${hasSlideDeck ? "" : (Array.isArray(article.checklists) ? article.checklists.map(renderChecklist).join("") : "")}
-    ${hasSlideDeck ? "" : (Array.isArray(article.tables) ? article.tables.map(renderTable).join("") : "")}
-    ${hasSlideDeck ? "" : (Array.isArray(article.faq) && article.faq.length ? `
-      <section class="article-faq">
-        <h2>常見問題</h2>
-        ${article.faq.map((item) => `<details><summary>${escapePublicHtml(item.question || "")}</summary><p>${escapePublicHtml(item.answer || "")}</p></details>`).join("")}
-      </section>
-    ` : "")}
-    <div class="article-cta">
-      <p>${escapePublicHtml(article.cta || "不確定下一步怎麼安排？留下需求，讓歲悅協助判斷。")}</p>
-      <a href="${escapePublicHtml(safePublicHref(article.ctaUrl, "/contact"))}" ${contactContext}>${escapePublicHtml(article.ctaText || "預約照顧諮詢")}</a>
-    </div>
-    ${renderReferences(article)}
-  `);
 
   return `
-    <article class="article-page article-page--reading ${isPptIconPack ? "article-page--ppt-icon-pack" : ""}" data-public-content-type="${escapePublicHtml(article.contentKind || "article")}">
+    <article class="article-page ${isPptIconPack ? "article-page--ppt-icon-pack" : ""}" data-public-content-type="${escapePublicHtml(article.contentKind || "article")}">
       <div class="article-topbar">
         <a class="article-back" href="/health">返回健康3.0</a>
         <span class="article-category">${escapePublicHtml(article.category || "照顧知識")}</span>
       </div>
 
       <header class="article-hero">
-        <div class="article-reading-heading">
-          <h1>${escapePublicHtml(article.title || "未命名文章")}</h1>
-          <p class="article-dek">${escapePublicHtml(article.subtitle || article.excerpt || "")}</p>
-          <div class="article-meta">
-            <span class="meta-editor">編輯人｜${escapePublicHtml(article.author || "歲悅照顧編輯部")}</span>
-            <time class="meta-date" datetime="${escapePublicHtml(article.publishedAt || String(article.date || "").replaceAll(".", "-"))}">${escapePublicHtml(article.date || publicDateLabel(article.publishedAt))}</time>
-            ${article.readingMinutes ? `<span class="meta-editor">閱讀時間｜${Number(article.readingMinutes)} 分鐘</span>` : ""}
-          </div>
-        </div>
         <figure>
           <img src="${escapePublicHtml(image)}" alt="${escapePublicHtml(imageAlt)}" style="object-position:${escapePublicHtml(objectPosition)}" fetchpriority="high" decoding="async" />
-          ${article.imageCaption ? `<figcaption class="article-hero-photo-caption">${escapePublicHtml(article.imageCaption)}</figcaption>` : ""}
+          <figcaption class="${isPptIconPack ? "article-hero-caption--sr-only" : ""}">
+            <h1>${escapePublicHtml(article.title || "未命名文章")}</h1>
+            <p>${escapePublicHtml(article.subtitle || article.excerpt || "")}</p>
+            ${article.imageCaption ? `<small class="article-hero-photo-caption">${escapePublicHtml(article.imageCaption)}</small>` : ""}
+          </figcaption>
         </figure>
       </header>
 
       <section class="article-layout">
         <div class="article-main">
-          ${article.targetAudience ? `<p class="article-audience">適合｜${escapePublicHtml(article.targetAudience)}</p>` : ""}
-          <nav class="article-tags" aria-label="文章標籤">${renderTagLinks(article.tags)}</nav>
-          ${renderArticleOutline(readingBody.headings)}
+          <div class="article-meta">
+            <span class="meta-editor">編輯人｜${escapePublicHtml(article.author || "歲悅照顧編輯部")}</span>
+            <time class="meta-date" datetime="${escapePublicHtml(article.publishedAt || "")}">${escapePublicHtml(article.date || publicDateLabel(article.publishedAt))}</time>
+            ${article.readingMinutes ? `<span class="meta-editor">閱讀時間｜${Number(article.readingMinutes)} 分鐘</span>` : ""}
+            ${article.targetAudience ? `<span class="meta-editor">適合｜${escapePublicHtml(article.targetAudience)}</span>` : ""}
+            ${renderTagLinks(article.tags)}
+          </div>
 
           ${renderVideo(article)}
           ${hasSlideDeck ? options.slideDeckHtml : (article.summary?.length ? `
@@ -318,7 +299,21 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
           ` : "")}
 
           <div class="article-body ${hasSlideDeck ? "article-body-compact" : ""}">
-            ${readingBody.content}
+            ${hasSlideDeck ? "" : renderCallout(article.warning)}
+            ${hasSlideDeck ? "" : contentHtml}
+            ${hasSlideDeck ? "" : (Array.isArray(article.checklists) ? article.checklists.map(renderChecklist).join("") : "")}
+            ${hasSlideDeck ? "" : (Array.isArray(article.tables) ? article.tables.map(renderTable).join("") : "")}
+            ${hasSlideDeck ? "" : (Array.isArray(article.faq) && article.faq.length ? `
+              <section class="article-faq">
+                <h2>常見問題</h2>
+                ${article.faq.map((item) => `<details><summary>${escapePublicHtml(item.question || "")}</summary><p>${escapePublicHtml(item.answer || "")}</p></details>`).join("")}
+              </section>
+            ` : "")}
+            <div class="article-cta">
+              <p>${escapePublicHtml(article.cta || "不確定下一步怎麼安排？留下需求，讓歲悅協助判斷。")}</p>
+              <a href="${escapePublicHtml(safePublicHref(article.ctaUrl, "/contact"))}" ${contactContext}>${escapePublicHtml(article.ctaText || "預約照顧諮詢")}</a>
+            </div>
+            ${renderReferences(article)}
           </div>
         </div>
 
