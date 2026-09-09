@@ -25,6 +25,7 @@
     "verify:cms-fallbacks": "node scripts/verify-cms-fallback-snapshot.mjs",
     "verify:cms-fallbacks:live": "node scripts/sync-cms-fallbacks.mjs --check",
     "verify:department-access": "node scripts/verify-department-access.mjs",
+    "verify:portal-care-entry": "node scripts/verify-portal-care-entry.mjs && node scripts/verify-portal-handoff.mjs && node scripts/verify-portal-finance-profile.mjs",
     "verify:ux-navigation": "node scripts/verify-article-classic-layout.mjs && node scripts/verify-health-contact-ux.mjs && node scripts/verify-service-presentation.mjs && node scripts/verify-service-query-rendering.mjs",
     "verify:routes": "node scripts/verify-routes.mjs",
     "verify:public-content-freshness": "node scripts/verify-public-content-freshness.mjs",
@@ -39,7 +40,7 @@
     "verify:security": "node scripts/verify-security.mjs",
     "verify:security:production": "VERIFY_PRODUCTION=1 node scripts/verify-security.mjs",
     "verify:production": "pnpm verify:routes:production && pnpm verify:security:production",
-    "verify:all": "pnpm build && pnpm verify:ux-navigation && pnpm verify:article-urls && pnpm verify:daily-articles && pnpm verify:article-redirects && pnpm verify:route-inventory && pnpm verify:cms-contract && pnpm verify:cms-fallbacks && pnpm verify:department-access && pnpm verify:routes && pnpm verify:public-content-freshness && pnpm verify:public-content-seo && pnpm verify:public-content-rebuild && pnpm verify:copy && pnpm verify:seo && pnpm verify:links && pnpm verify:accessibility && pnpm verify:performance && pnpm verify:security && pnpm audit:images:strict",
+    "verify:all": "pnpm verify:portal-care-entry && pnpm build && pnpm verify:ux-navigation && pnpm verify:article-urls && pnpm verify:daily-articles && pnpm verify:article-redirects && pnpm verify:route-inventory && pnpm verify:cms-contract && pnpm verify:cms-fallbacks && pnpm verify:department-access && pnpm verify:routes && pnpm verify:public-content-freshness && pnpm verify:public-content-seo && pnpm verify:public-content-rebuild && pnpm verify:copy && pnpm verify:seo && pnpm verify:links && pnpm verify:accessibility && pnpm verify:performance && pnpm verify:security && pnpm audit:images:strict",
     "cms:fallbacks:sync": "node scripts/sync-cms-fallbacks.mjs",
     "backup:supabase": "node scripts/backup-supabase.mjs",
     "restore:supabase": "node scripts/restore-supabase.mjs"
