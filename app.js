@@ -24,7 +24,7 @@ import {
 } from "./public-content-adapters.mjs";
 import { updatePublicStructuredData } from "./public-route-structured-data.mjs";
 
-const FRONTEND_BUILD_VERSION = "public-content-unified-20260909-1";
+const FRONTEND_BUILD_VERSION = "health-editorial-20260909-1";
 document.documentElement.dataset.frontendBuild = FRONTEND_BUILD_VERSION;
 
 let renderPublicArticleLayout;
@@ -11879,12 +11879,39 @@ menuToggle?.addEventListener("click", () => {
   document.body.classList.toggle("nav-open", Boolean(open));
   menuToggle.setAttribute("aria-expanded", String(Boolean(open)));
   menuToggle.setAttribute("aria-label", open ? "關閉主選單" : "開啟主選單");
+  if (open) {
+    document.querySelectorAll(".health-all-topics[open]").forEach((topics) => {
+      topics.open = false;
+    });
+  }
   if (!open) {
     navGroups.forEach((group) => {
       group.classList.remove("open");
       group.querySelector(".nav-trigger")?.setAttribute("aria-expanded", "false");
     });
   }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || document.querySelector(".course-modal:not([hidden])")) return;
+  if (nav?.classList.contains("open")) {
+    event.preventDefault();
+    nav.classList.remove("open");
+    document.body.classList.remove("nav-open");
+    menuToggle?.setAttribute("aria-expanded", "false");
+    menuToggle?.setAttribute("aria-label", "開啟主選單");
+    navGroups.forEach((group) => {
+      group.classList.remove("open");
+      group.querySelector(".nav-trigger")?.setAttribute("aria-expanded", "false");
+    });
+    menuToggle?.focus();
+    return;
+  }
+  const openTopics = document.querySelector(".health-all-topics[open]");
+  if (!openTopics) return;
+  event.preventDefault();
+  openTopics.open = false;
+  openTopics.querySelector("summary")?.focus();
 });
 
 bindNavigationDropdowns();

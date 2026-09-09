@@ -15,7 +15,9 @@ import {
 } from "./public-content-freshness.mjs";
 
 const SITE_ORIGIN = "https://www.suiyuecare.com";
-const HEALTH_ARTICLE_PREVIEW_LIMIT = 9;
+const HEALTH_CATEGORY_PREVIEW_LIMIT = 9;
+const HEALTH_HOME_LATEST_LIMIT = 6;
+const HEALTH_HOME_RAIL_LIMIT = 3;
 const PUBLIC_HEALTH_LAYOUT = "health-unified-v1";
 const HEALTH_FALLBACK_IMAGE = "/assets/fallbacks/health-article-fallback.jpg";
 
@@ -393,19 +395,6 @@ const healthSectionCategorySlugs = {
   videos: ["video", "影音", "影片", "short-video", "short_video", "shorts", "短影片"]
 };
 
-function articleMatchesHealthSection(article, aliases = []) {
-  const normalizedAliases = aliases.map(healthCategorySlug);
-  const values = [
-    article.categorySlug,
-    article.category,
-    article.contentType,
-    article.categoryType,
-    article.categorySection,
-    ...(Array.isArray(article.tags) ? article.tags : [])
-  ].map(healthCategorySlug);
-  return values.some((value) => normalizedAliases.some((alias) => value === alias || value.includes(alias)));
-}
-
 function healthImageAttrs(article = {}, { priority = false } = {}) {
   const focalPoint = String(article.focalPoint || "center").replace(/[^a-z0-9% .-]/gi, "");
   return [
@@ -435,30 +424,6 @@ function renderHealthListCard(item) {
   `;
 }
 
-function renderHealthResourceCard(item, label) {
-  return `
-    <a class="health-pack-card" href="${escapePublicHtml(safePublicHref(item.href, "/health"))}">
-      <img ${healthImageAttrs(item)} />
-      <div><span>${escapePublicHtml(label)}</span><h3>${escapePublicHtml(item.title)}</h3><p>${escapePublicHtml(item.subtitle || item.excerpt || "")}</p></div>
-    </a>
-  `;
-}
-
-function renderHealthVideoCard(item) {
-  const href = safePublicHref(item.href, "/health");
-  const media = item.videoEmbedUrl
-    ? item.videoProvider === "youtube" || item.videoProvider === "vimeo"
-      ? `<iframe src="${escapePublicHtml(item.videoEmbedUrl)}" title="${escapePublicHtml(item.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
-      : `<video src="${escapePublicHtml(item.videoEmbedUrl)}" controls preload="metadata" poster="${escapePublicHtml(normalizePublicAssetUrl(item.image))}"></video>`
-    : `<img ${healthImageAttrs(item)} />`;
-  return `
-    <article class="health-video-card ${item.videoEmbedUrl ? "has-video" : ""}">
-      ${media}
-      <div><span>${escapePublicHtml(item.videoLabel || item.category || "影音")}${item.videoDuration ? ` · ${escapePublicHtml(item.videoDuration)}` : ""}</span><h3>${escapePublicHtml(item.title)}</h3><p>${escapePublicHtml(item.videoCaption || item.subtitle || item.excerpt || "")}</p><a href="${escapePublicHtml(href)}">閱讀更多 &gt;</a></div>
-    </article>
-  `;
-}
-
 function healthSectionUrl(categories, aliases, fallbackQuery) {
   const normalizedAliases = aliases.map(healthCategorySlug);
   const matched = (Array.isArray(categories) ? categories : []).find((category) => {
@@ -469,9 +434,25 @@ function healthSectionUrl(categories, aliases, fallbackQuery) {
   return slug ? `/health?category=${encodeURIComponent(slug)}` : `/search?q=${encodeURIComponent(fallbackQuery)}`;
 }
 
+function partitionLatestArticlesByTitle(items = []) {
+  const current = [];
+  const superseded = [];
+  const titleKeys = new Set();
+  items.forEach((article) => {
+    const titleKey = String(article?.title || "").normalize("NFKC").replace(/\s+/g, " ").trim().toLocaleLowerCase("zh-Hant-TW");
+    if (!titleKey || !titleKeys.has(titleKey)) {
+      if (titleKey) titleKeys.add(titleKey);
+      current.push(article);
+      return;
+    }
+    superseded.push(article);
+  });
+  return { current, superseded };
+}
+
 export function renderPublicHealthIndex(items = [], categories = [], options = {}) {
   const selectedCategorySlug = typeof options === "string" ? options : options.selectedCategorySlug || "";
-  const allArticles = (Array.isArray(items) ? items.filter(Boolean) : [])
+  const sortedArticles = (Array.isArray(items) ? items.filter(Boolean) : [])
     .map((article, index) => ({ article, index }))
     .sort((left, right) => {
       const leftTime = publicContentPublishedTime(left.article) || 0;
@@ -479,70 +460,107 @@ export function renderPublicHealthIndex(items = [], categories = [], options = {
       return rightTime - leftTime || left.index - right.index;
     })
     .map(({ article }) => article);
-  const topics = getUniqueHealthTopics(categories, allArticles);
+  const topics = getUniqueHealthTopics(categories, sortedArticles);
   const selectedTopic = resolveHealthTopic(topics, selectedCategorySlug);
-  const articles = selectedCategorySlug
-    ? allArticles.filter((article) => articleMatchesHealthTopic(article, selectedTopic))
-    : allArticles;
-  const latestArticles = articles.slice(0, HEALTH_ARTICLE_PREVIEW_LIMIT);
-  const archivedArticles = articles.slice(HEALTH_ARTICLE_PREVIEW_LIMIT);
+  const uniqueInventory = partitionLatestArticlesByTitle(sortedArticles);
+  const selectedInventory = partitionLatestArticlesByTitle(selectedCategorySlug
+    ? sortedArticles.filter((article) => articleMatchesHealthTopic(article, selectedTopic))
+    : sortedArticles);
+  const articles = selectedInventory.current;
+  const supersededArticles = selectedCategorySlug ? [] : uniqueInventory.superseded;
   const feature = articles[0];
-  const guideArticles = allArticles.filter((article) => articleMatchesHealthSection(article, healthSectionCategorySlugs.guides)).slice(0, 6);
-  const eventArticles = allArticles.filter((article) => articleMatchesHealthSection(article, healthSectionCategorySlugs.events)).slice(0, 3);
-  const videoArticles = allArticles.filter((article) => articleMatchesHealthSection(article, healthSectionCategorySlugs.videos)).slice(0, 4);
-  const latestRevisionTime = allArticles.reduce((latest, article) => Math.max(latest, publicContentRevisionTime(article) || 0), 0);
+  const railArticles = selectedCategorySlug ? [] : articles.slice(1, 1 + HEALTH_HOME_RAIL_LIMIT);
+  const latestOffset = selectedCategorySlug ? 0 : 1 + railArticles.length;
+  const latestLimit = selectedCategorySlug ? HEALTH_CATEGORY_PREVIEW_LIMIT : HEALTH_HOME_LATEST_LIMIT;
+  const latestArticles = articles.slice(latestOffset, latestOffset + latestLimit);
+  const archivedArticles = articles.slice(latestOffset + latestLimit);
+  const guideUrl = healthSectionUrl(topics, healthSectionCategorySlugs.guides, "懶人包");
+  const eventUrl = healthSectionUrl(topics, healthSectionCategorySlugs.events, "活動專區");
+  const videoUrl = healthSectionUrl(topics, healthSectionCategorySlugs.videos, "影片");
+  const latestRevisionTime = sortedArticles.reduce((latest, article) => Math.max(latest, publicContentRevisionTime(article) || 0), 0);
   const latestRevision = latestRevisionTime ? new Date(latestRevisionTime).toISOString() : "";
   const contentMarkup = `
       <section class="health-hero">
-        <div class="health-topline">
-          <div>
-            <p class="eyebrow">Health 3.0</p>
+        <div class="health-hero-shell">
+          <div class="health-hero-copy">
+            <p class="eyebrow">Health 3.0 · 歲悅照顧知識庫</p>
             <h1>健康3.0</h1>
-            <p>照顧知識專欄，整理疾病徵兆、飲食營養、復能運動、失智照顧與家屬實用技巧。</p>
+            <p class="health-hero-lead">把複雜的照顧知識，整理成家人看得懂、今天做得到的方法。</p>
+            <div class="health-hero-proof" role="group" aria-label="健康3.0內容規模">
+              <span><strong>${uniqueInventory.current.length}</strong> 篇照顧文章</span>
+              <span><strong>${topics.length}</strong> 個實用主題</span>
+            </div>
           </div>
-          <form class="health-search" action="/search">
-            <input name="q" type="search" aria-label="搜尋健康3.0文章" placeholder="搜尋跌倒、失智、營養、復能" />
-            <button type="submit">搜尋</button>
-          </form>
+          <div class="health-discovery-panel">
+            <p class="health-discovery-kicker">從一個問題開始</p>
+            <h2>今天，想先解決什麼？</h2>
+            <form class="health-search" action="/search">
+              <input name="q" type="search" aria-label="搜尋健康3.0文章" placeholder="搜尋跌倒、失智、營養、復能" />
+              <button type="submit">搜尋</button>
+            </form>
+            ${renderHealthTopicNavigation(topics, sortedArticles, selectedCategorySlug)}
+          </div>
         </div>
-        ${renderHealthTopicNavigation(topics, allArticles, selectedCategorySlug)}
       </section>
 
       ${feature ? `
-        ${selectedCategorySlug ? "" : `<section class="health-board">
+        ${selectedCategorySlug ? "" : `<section class="health-board" aria-labelledby="health-featured-title">
+          <div class="health-section-head health-board-heading">
+            <div><p class="eyebrow">精選內容</p><h2 id="health-featured-title">現在最值得看</h2></div>
+            <p>先掌握最新重點，再依需求深入閱讀。</p>
+          </div>
+          <div class="health-board-grid">
           <article class="health-feature">
             <a href="${escapePublicHtml(safePublicHref(feature.href, "/health"))}">
               <img ${healthImageAttrs(feature, { priority: true })} />
-              <div><span class="health-tag">最新發布</span><h2>${escapePublicHtml(feature.title)}</h2><p>${escapePublicHtml(feature.subtitle || feature.excerpt || "")}</p><span class="health-readmore">閱讀更多</span></div>
+              <div class="health-feature-copy">
+                <div class="health-card-meta"><span class="health-tag">最新發布</span>${feature.date ? `<time>${escapePublicHtml(feature.date)}</time>` : ""}</div>
+                <h2>${escapePublicHtml(feature.title)}</h2>
+                <p>${escapePublicHtml(feature.subtitle || feature.excerpt || "")}</p>
+                <span class="health-readmore">閱讀文章 <span aria-hidden="true">→</span></span>
+              </div>
             </a>
           </article>
           <aside class="ranking-panel">
-            <div class="ranking-title"><span>Latest</span><h2>最新文章</h2></div>
-            <ol>${articles.slice(0, 8).map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}">${escapePublicHtml(item.title)}</a></li>`).join("")}</ol>
+            <div class="ranking-title"><span>Fresh</span><h2>最新文章</h2><p>接著看這 ${railArticles.length} 篇，不重複推薦。</p></div>
+            <ol>${railArticles.map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}"><span>${escapePublicHtml(item.category || "照顧知識")}</span><strong>${escapePublicHtml(item.title)}</strong>${item.date ? `<time>${escapePublicHtml(item.date)}</time>` : ""}</a></li>`).join("")}</ol>
+            <a class="health-view-all" href="/search">查看全部文章 <span aria-hidden="true">→</span></a>
           </aside>
+          </div>
         </section>`}
 
         <section class="health-latest ${selectedCategorySlug ? "health-category-results" : ""}" aria-labelledby="health-latest-title">
-          <div class="health-section-head"><div><p class="eyebrow">Articles</p><h2 id="health-latest-title">${escapePublicHtml(selectedCategorySlug ? `${selectedTopic?.name || "這個主題"}的全部文章` : "最新照顧文章")}</h2></div><span>共 ${articles.length} 篇</span></div>
+          <div class="health-section-head"><div><p class="eyebrow">${selectedCategorySlug ? "主題文章" : "持續更新"}</p><h2 id="health-latest-title">${escapePublicHtml(selectedCategorySlug ? `${selectedTopic?.name || "這個主題"}的全部文章` : "最新照顧文章")}</h2></div><span>共 ${articles.length} 篇</span></div>
           <div class="health-latest-grid">
             ${latestArticles.map(renderHealthListCard).join("")}
           </div>
           ${archivedArticles.length ? `
             <details class="health-archive-index">
-              <summary>展開完整文章索引（另有 ${archivedArticles.length} 篇）</summary>
+              <summary>瀏覽完整文章索引<span>另有 ${archivedArticles.length} 篇</span></summary>
               <ul>${archivedArticles.map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}">${escapePublicHtml(item.title)}</a></li>`).join("")}</ul>
+            </details>
+          ` : ""}
+          ${supersededArticles.length ? `
+            <details class="health-archive-index health-superseded-index">
+              <summary>歷史版本<span>${supersededArticles.length} 篇，主畫面已保留新版</span></summary>
+              <ul>${supersededArticles.map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}">${escapePublicHtml(item.title)}${item.date ? `（${escapePublicHtml(item.date)} 舊版）` : "（舊版）"}</a></li>`).join("")}</ul>
             </details>
           ` : ""}
         </section>
 
-        ${!selectedCategorySlug && guideArticles.length ? `<section class="health-pack-section"><div class="health-section-head"><div><p class="eyebrow">Guides</p><h2>懶人包</h2></div><a href="${escapePublicHtml(healthSectionUrl(topics, healthSectionCategorySlugs.guides, "懶人包"))}">更多懶人包</a></div><div class="health-pack-grid">${guideArticles.map((item) => renderHealthResourceCard(item, "懶人包")).join("")}</div></section>` : ""}
-        ${!selectedCategorySlug && eventArticles.length ? `<section class="health-event-section"><div class="health-section-head"><div><p class="eyebrow">Events</p><h2>活動專區</h2></div><a href="${escapePublicHtml(healthSectionUrl(topics, healthSectionCategorySlugs.events, "活動專區"))}">更多活動</a></div><div class="health-event-grid">${eventArticles.map((item) => renderHealthResourceCard(item, "活動" )).join("")}</div></section>` : ""}
-        ${!selectedCategorySlug && videoArticles.length ? `<section class="health-media-hub"><div class="health-section-head"><div><p class="eyebrow">Video</p><h2>影音與短影片</h2></div><a href="${escapePublicHtml(healthSectionUrl(topics, healthSectionCategorySlugs.videos, "影片"))}">更多影音</a></div><div class="health-media-grid">${videoArticles.map(renderHealthVideoCard).join("")}</div></section>` : ""}
+        ${!selectedCategorySlug ? `<section class="health-format-hub" aria-labelledby="health-format-title">
+          <div class="health-section-head"><div><p class="eyebrow">依照你的時間選擇</p><h2 id="health-format-title">換一種方式找答案</h2></div></div>
+          <nav class="health-format-grid" aria-label="健康3.0內容形式">
+            <a href="${escapePublicHtml(guideUrl)}"><span>01</span><div><strong>懶人包</strong><small>快速掌握照顧步驟</small></div><b aria-hidden="true">→</b></a>
+            <a href="${escapePublicHtml(eventUrl)}"><span>02</span><div><strong>活動專區</strong><small>找到課程與照顧活動</small></div><b aria-hidden="true">→</b></a>
+            <a href="${escapePublicHtml(videoUrl)}"><span>03</span><div><strong>影音內容</strong><small>用影片快速理解重點</small></div><b aria-hidden="true">→</b></a>
+          </nav>
+        </section>` : ""}
       ` : `<section class="health-empty-state"><h2>${selectedCategorySlug ? "這個分類目前還沒有已發布文章" : "文章整理中"}</h2><p>${selectedCategorySlug ? "可以先查看全部文章或搜尋其他照顧主題。" : "健康3.0內容會在審核發布後顯示於此。"}</p><a href="/health">查看全部文章</a></section>`}
   `;
   const batchRevision = publicContentBatchRevision(contentMarkup);
   return `
-    <div class="health-page" data-public-content-index="health" data-public-layout="${PUBLIC_HEALTH_LAYOUT}" data-health-content-revision="${escapePublicHtml(batchRevision)}" data-public-content-updated-at="${escapePublicHtml(latestRevision)}" data-health-article-count="${allArticles.length}" data-health-category="${escapePublicHtml(selectedCategorySlug)}">
+    <div class="health-page health-page--editorial" data-public-content-index="health" data-public-layout="${PUBLIC_HEALTH_LAYOUT}" data-health-design="editorial-20260909" data-health-content-revision="${escapePublicHtml(batchRevision)}" data-public-content-updated-at="${escapePublicHtml(latestRevision)}" data-health-article-count="${sortedArticles.length}" data-health-category="${escapePublicHtml(selectedCategorySlug)}">
       ${contentMarkup}
     </div>
   `;

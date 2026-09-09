@@ -2090,8 +2090,7 @@ body.modal-open .milk-helper {
 .health-preview.media-card {
   position: relative;
 }
-.health-preview.media-card::before,
-.health-video-card::before {
+.health-preview.media-card::before {
   content: "";
   position: absolute;
   z-index: 2;
@@ -2104,8 +2103,7 @@ body.modal-open .milk-helper {
   box-shadow: 0 14px 30px rgba(83,43,11,.2);
   transform: translate(-50%, -50%);
 }
-.health-preview.media-card::after,
-.health-video-card::after {
+.health-preview.media-card::after {
   content: "";
   position: absolute;
   z-index: 3;
@@ -2454,18 +2452,12 @@ a.health-preview,
 a.health-feature,
 a.health-card,
 a.health-list-card,
-a.health-pack-card,
-a.health-event-card,
-a.health-video-card,
 a.search-result-card {
   color: inherit;
   text-decoration: none;
 }
 a.health-preview,
-a.health-feature,
-a.health-pack-card,
-a.health-event-card,
-a.health-video-card {
+a.health-feature {
   display: block;
 }
 .story-slider article {
@@ -2633,10 +2625,7 @@ a.health-video-card {
   font-weight: 900;
   box-shadow: 0 12px 26px rgba(83,43,11,.06);
 }
-.health-pack-section,
-.health-latest,
-.health-event-section,
-.health-media-hub {
+.health-latest {
   padding: 26px clamp(32px,5vw,86px) 54px;
 }
 .health-section-head {
@@ -2659,47 +2648,6 @@ a.health-video-card {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-}
-.health-pack-grid,
-.health-event-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-.health-pack-card,
-.health-event-card {
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 28px;
-  background: #fff;
-  box-shadow: 0 18px 46px rgba(83,43,11,.08);
-}
-.health-pack-card img,
-.health-event-card img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-}
-.health-pack-card div,
-.health-event-card div {
-  padding: 22px;
-}
-.health-pack-card span,
-.health-event-card time {
-  color: var(--orange-dark);
-  font-size: 13px;
-  font-weight: 900;
-}
-.health-pack-card h3,
-.health-event-card h3 {
-  color: var(--brown);
-  font-size: 27px;
-  line-height: 1.32;
-}
-.health-pack-card p,
-.health-event-card p {
-  color: var(--muted);
-  line-height: 1.8;
 }
 .health-list-card {
   display: grid;
@@ -2744,86 +2692,6 @@ a.health-video-card {
 .search-result-card small {
   color: var(--muted);
   font-weight: 800;
-}
-.health-media-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-}
-.health-video-card {
-  position: relative;
-  min-height: 330px;
-  overflow: hidden;
-  border-radius: 28px;
-  background: var(--brown);
-  box-shadow: 0 18px 46px rgba(83,43,11,.08);
-}
-.health-video-card img,
-.health-video-card iframe,
-.health-video-card video {
-  border: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 330px;
-  object-fit: cover;
-}
-.health-video-card iframe,
-.health-video-card video {
-  background: #1f1209;
-}
-.health-video-card.has-video::after {
-  pointer-events: none;
-}
-.health-video-card.has-video iframe,
-.health-video-card.has-video video {
-  position: absolute;
-  inset: 0;
-}
-.health-video-card div {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  left: 22px;
-  right: 22px;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 130px 0 22px;
-  background: linear-gradient(180deg, transparent 36%, rgba(63,33,13,.82));
-  color: #fff;
-}
-.health-video-card span {
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: .12em;
-}
-.health-video-card h3 {
-  color: #fff;
-  font-size: 24px;
-  line-height: 1.35;
-}
-.health-video-card p {
-  color: rgba(255,255,255,.82);
-  font-size: 14px;
-  font-weight: 800;
-  line-height: 1.55;
-  margin-top: 8px;
-}
-.health-video-card a {
-  display: inline-flex;
-  align-self: flex-start;
-  margin-top: 12px;
-  color: #fff;
-  font-weight: 900;
-}
-.health-video-card .health-video-readmore {
-  display: inline-flex;
-  align-self: flex-start;
-  margin-top: 12px;
-  color: #fff;
-  font-weight: 900;
 }
 .search-page {
   background: var(--paper);
@@ -11551,10 +11419,7 @@ input[name="_honey"] { display: none !important; }
   }
   .health-grid { grid-template-columns: 1fr 1fr; }
   .health-board,
-  .health-latest-grid,
-  .health-media-grid,
-  .health-pack-grid,
-  .health-event-grid {
+  .health-latest-grid {
     grid-template-columns: 1fr 1fr;
   }
   .health-preview.feature img { height: 260px; }
@@ -11892,9 +11757,6 @@ input[name="_honey"] { display: none !important; }
   .celebrity-slider article { flex-basis: min(360px, 72vw); }
   .health-board,
   .health-latest-grid,
-  .health-media-grid,
-  .health-pack-grid,
-  .health-event-grid,
   .search-result-card {
     grid-template-columns: 1fr;
   }
@@ -12830,7 +12692,7 @@ input[name="_honey"] { display: none !important; }
   }
   .wall-main, .video-panel { min-height: 360px; border-radius: 24px; }
   .north-map { min-height: 0; border-radius: 24px; }
-  .care-flow, .service-grid, .contact-form, .detail-content, .footer-sitemap, .health-grid, .course-list, .course-search, .footer-main, .mini-article-grid, .media-row, .health-board, .health-latest-grid, .health-media-grid, .health-pack-grid, .health-event-grid, .investor-snapshot div, .career-growth-board, .career-role-grid, .software-module-grid, .software-screen-stats, .software-screen-table p, .software-problem-grid, .software-scenario-grid, .software-role-board, .software-package-grid, .software-control-grid, .homecare-hero-points, .homecare-problem-grid, .homecare-scenario-grid, .homecare-quality-grid, .homecare-family-board { grid-template-columns: 1fr; }
+  .care-flow, .service-grid, .contact-form, .detail-content, .footer-sitemap, .health-grid, .course-list, .course-search, .footer-main, .mini-article-grid, .media-row, .health-board, .health-latest-grid, .investor-snapshot div, .career-growth-board, .career-role-grid, .software-module-grid, .software-screen-stats, .software-screen-table p, .software-problem-grid, .software-scenario-grid, .software-role-board, .software-package-grid, .software-control-grid, .homecare-hero-points, .homecare-problem-grid, .homecare-scenario-grid, .homecare-quality-grid, .homecare-family-board { grid-template-columns: 1fr; }
   .ir-step-list div {
     grid-template-columns: 82px minmax(0, 1fr) 38px;
   }
@@ -13016,10 +12878,7 @@ input[name="_honey"] { display: none !important; }
   .home-health-section .article-row,
   .home-health-section .media-row,
   .home-health-section .mini-article-grid,
-  .health-latest-grid,
-  .health-pack-grid,
-  .health-event-grid,
-  .health-media-grid {
+  .health-latest-grid {
     display: flex;
     grid-template-columns: none;
     gap: 14px;
@@ -13044,19 +12903,13 @@ input[name="_honey"] { display: none !important; }
   .home-health-section .article-row::-webkit-scrollbar,
   .home-health-section .media-row::-webkit-scrollbar,
   .home-health-section .mini-article-grid::-webkit-scrollbar,
-  .health-latest-grid::-webkit-scrollbar,
-  .health-pack-grid::-webkit-scrollbar,
-  .health-event-grid::-webkit-scrollbar,
-  .health-media-grid::-webkit-scrollbar {
+  .health-latest-grid::-webkit-scrollbar {
     display: none;
   }
   .home-health-section .article-row > *,
   .home-health-section .media-row > *,
   .home-health-section .mini-article-grid > *,
-  .health-list-card,
-  .health-pack-card,
-  .health-event-card,
-  .health-video-card {
+  .health-list-card {
     flex: 0 0 min(310px, 82vw);
     scroll-snap-align: start;
   }
@@ -13067,11 +12920,7 @@ input[name="_honey"] { display: none !important; }
   .health-card img {
     height: 180px;
   }
-  .health-list-card img,
-  .health-video-card img,
-  .health-video-card iframe,
-  .health-video-card video,
-  .health-video-card {
+  .health-list-card img {
     min-height: 240px;
   }
   .search-result-card {

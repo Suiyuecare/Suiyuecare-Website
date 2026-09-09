@@ -20,7 +20,7 @@ import { dementiaSeriesArticles } from "../dementia-series-articles.mjs";
 import { strokeSeriesArticles } from "../stroke-series-articles.mjs";
 import { sarcopeniaSeriesArticles } from "../sarcopenia-series-articles.mjs";
 import { dailyArticles } from "../daily-articles/index.mjs";
-import { mergeLatestPublicContent, publicContentKey, publicContentRevisionTime } from "../public-content-freshness.mjs";
+import { mergeLatestPublicContent, publicContentKey, publicContentPublishedTime, publicContentRevisionTime } from "../public-content-freshness.mjs";
 import { publicStructuredDataJson } from "../public-route-structured-data.mjs";
 import { loadPublicContent } from "./load-public-content.mjs";
 
@@ -37,6 +37,7 @@ function firstHeadingAfter(html, marker, tagName) {
 function assertUnifiedHealthRoot(html, expectedCategory = "") {
   assert.equal(countMatches(html, /data-public-layout="health-unified-v1"/g), 1);
   assert.equal(countMatches(html, /data-public-content-index="health"/g), 1);
+  assert.equal(countMatches(html, /data-health-design="editorial-20260909"/g), 1);
   assert.match(html, new RegExp(`data-health-category="${expectedCategory}"`));
   assert.doesNotMatch(html, /health-board--prerendered|health-quick-grid/);
 }
@@ -352,6 +353,18 @@ const fixtureArticles = [
     publishedAt: "2026-07-01T00:00:00+08:00",
     updatedAt: "2026-07-01T00:00:00+08:00",
     date: "2026.07.01"
+  },
+  {
+    contentKind: "article",
+    slug: "article906",
+    href: "/article/article906",
+    category: "測試分類",
+    categorySlug: "test",
+    title: latestTitle,
+    image: "/assets/fallbacks/health-article-fallback.jpg",
+    publishedAt: "2026-01-01T00:00:00+08:00",
+    updatedAt: "2026-09-09T00:00:00+08:00",
+    date: "2026.01.01"
   }
 ];
 const rawFixtureCategories = [
@@ -364,16 +377,16 @@ const fixtureTopics = getUniqueHealthTopics(rawFixtureCategories, fixtureArticle
 const baseHealth = renderPublicHealthIndex(fixtureArticles, fixtureTopics);
 assertUnifiedHealthRoot(baseHealth);
 assert.equal(firstHeadingAfter(baseHealth, '<article class="health-feature">', "h2"), latestTitle);
-assert.equal(firstHeadingAfter(baseHealth, '<div class="health-latest-grid">', "h3"), latestTitle);
-assert.match(baseHealth, /<section class="health-board">/);
+assert.equal(firstHeadingAfter(baseHealth, '<div class="health-latest-grid">', "h3"), "測試影片");
+assert.match(baseHealth, /<section class="health-board"/);
 assert.match(baseHealth, /<section class="health-latest "/);
 assert.ok(baseHealth.indexOf('class="health-board"') < baseHealth.indexOf('class="health-latest '));
-for (const sectionClass of ["health-pack-section", "health-event-section", "health-media-hub"]) {
-  assert.match(baseHealth, new RegExp(`<section class="${sectionClass}">`));
-  assert.ok(baseHealth.indexOf(`class="${sectionClass}"`) > baseHealth.indexOf('class="health-latest '));
-}
+assert.match(baseHealth, /<section class="health-format-hub"/);
+assert.equal(countMatches(baseHealth, /class="health-format-grid"/g), 1);
+for (const sectionClass of ["health-pack-section", "health-event-section", "health-media-hub"]) assert.doesNotMatch(baseHealth, new RegExp(`<section class="${sectionClass}">`));
 assert.match(baseHealth, /共 5 篇/);
-for (const item of fixtureArticles) assert.match(baseHealth, new RegExp(`href="${item.href}"`));
+for (const item of fixtureArticles) assert.equal(countMatches(baseHealth, new RegExp(`href="${item.href}"`, "g")), 1, `${item.href} must remain crawlable exactly once`);
+assert.match(baseHealth, /class="health-archive-index health-superseded-index"[\s\S]*href="\/article\/article906"/, "An older duplicate title must move to the historical index");
 
 const categoryHealth = renderPublicHealthIndex(fixtureArticles, fixtureTopics, { selectedCategorySlug: "test" });
 assertUnifiedHealthRoot(categoryHealth, "test");
@@ -422,9 +435,25 @@ const publicContent = await loadPublicContent();
 assert.ok(publicContent.articles.length > 0, "Published article inventory must not be empty");
 const fullHealth = renderPublicHealthIndex(publicContent.articles, getUniqueHealthTopics(publicContent.categories, publicContent.articles));
 assertUnifiedHealthRoot(fullHealth);
-assert.match(fullHealth, new RegExp(`共 ${publicContent.articles.length} 篇`));
-for (const item of publicContent.articles) {
+const publicTitleKeys = new Set();
+const publicHealthArticles = publicContent.articles
+  .map((article, index) => ({ article, index }))
+  .sort((left, right) => (publicContentPublishedTime(right.article) || 0) - (publicContentPublishedTime(left.article) || 0) || left.index - right.index)
+  .map(({ article }) => article)
+  .filter((article) => {
+    const key = String(article.title || "").normalize("NFKC").replace(/\s+/g, " ").trim().toLocaleLowerCase("zh-Hant-TW");
+    if (!key || !publicTitleKeys.has(key)) {
+      if (key) publicTitleKeys.add(key);
+      return true;
+    }
+    return false;
+  });
+assert.match(fullHealth, new RegExp(`共 ${publicHealthArticles.length} 篇`));
+for (const item of publicHealthArticles) {
   assert.ok(fullHealth.includes(`href="${item.href}"`), `Health index dropped ${item.href}`);
+}
+for (const item of publicContent.articles.filter((article) => !publicHealthArticles.includes(article))) {
+  assert.match(fullHealth, new RegExp(`class="health-archive-index health-superseded-index"[\\s\\S]*href="${item.href}"`), `Health index must preserve the historical URL ${item.href}`);
 }
 assertUnifiedArticleRoot(publicContent.articles[0], "article");
 assertUnifiedArticleRoot(publicContent.stories[0], "care-story");

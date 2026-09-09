@@ -58,7 +58,7 @@ export function renderHealthTopicNavigation(categories = [], articles = [], acti
   const active = resolveHealthTopic(topics, activeCategorySlug);
   return `
     <div class="health-topic-navigation">
-      <p class="health-topic-heading">從常見需求開始找</p>
+      <p class="health-topic-heading">常見照顧需求</p>
       <nav class="health-common-needs" aria-label="常見照顧需求">
         ${COMMON_HEALTH_NEEDS.map(({ label, query }) => `<a href="/search?q=${encodeURIComponent(query)}">${escapeHtml(label)}</a>`).join("")}
       </nav>

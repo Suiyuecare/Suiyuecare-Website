@@ -462,7 +462,7 @@ function routeHtml(baseHtml, route) {
     /(<meta name="robots" content=")(.*?)(" \/>)/,
     route.robots || (route.article ? "index, follow, max-image-preview:large" : "index, follow")
   );
-  html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1public-content-unified-20260909-1$3`);
+  html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1health-editorial-20260909-1$3`);
   html = insertArticleMeta(html, route);
   html = replaceStructuredData(html, route);
   html = routeHashLinksToPaths(html);

@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { loadPublicContent } from "./load-public-content.mjs";
 import { getUniqueHealthTopics } from "../health-topic-navigation.mjs";
+import { publicContentPublishedTime } from "../public-content-freshness.mjs";
 
 const origin = process.env.QA_ORIGIN || "http://localhost:4183";
 assert.ok(/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin), "Fixture submissions are only allowed against a local preview.");
@@ -12,6 +13,20 @@ fs.mkdirSync(output, { recursive: true });
 const results = [];
 const content = await loadPublicContent();
 const expectedTopics = getUniqueHealthTopics(content.categories, content.articles).map((topic) => topic.name).sort();
+const expectedTitleKeys = new Set();
+const expectedIndexArticles = content.articles
+  .map((article, index) => ({ article, index }))
+  .sort((left, right) => (publicContentPublishedTime(right.article) || 0) - (publicContentPublishedTime(left.article) || 0) || left.index - right.index)
+  .map(({ article }) => article)
+  .filter((article) => {
+    const key = String(article.title || "").normalize("NFKC").replace(/\s+/g, " ").trim().toLocaleLowerCase("zh-Hant-TW");
+    if (!key || !expectedTitleKeys.has(key)) {
+      if (key) expectedTitleKeys.add(key);
+      return true;
+    }
+    return false;
+  });
+const expectedIndexHrefs = expectedIndexArticles.map((article) => article.href);
 function browser(...args) {
   const result = JSON.parse(execFileSync("agent-browser", ["--session", "ux-health-contact", "--json", ...args], { encoding: "utf8", maxBuffer: 4 * 1024 * 1024, timeout: 45000 }));
   assert.ok(result.success, JSON.stringify(result.error));
@@ -34,6 +49,7 @@ const hydrationState = () => evaluate(`({
     const root = document.querySelector('#pageView > [data-public-layout]');
     return root ? {
       layout: root.dataset.publicLayout || '',
+      design: root.dataset.healthDesign || '',
       revision: root.dataset.healthContentRevision || root.dataset.publicContentUpdatedAt || '',
       category: root.dataset.healthCategory || ''
     } : null;
@@ -45,20 +61,71 @@ browser("open", "--init-script", path.resolve("scripts/browser-public-content-in
 browser("open", origin);
 browser("network", "route", "**/api/send-email", "--abort");
 browser("network", "route", "https://ussnmxdpxeoshlrdchov.supabase.co/**", "--abort");
-for (const width of [1440, 1024, 390]) {
+for (const width of [1440, 1024, 900, 850, 841, 760, 430, 390, 375]) {
   browser("set", "viewport", String(width), "900");
   open("/health");
   browser("wait", ".health-common-needs");
-  const summary = evaluate(`({ common: document.querySelectorAll('.health-common-needs a').length, topics: Array.from(document.querySelectorAll('.health-topic-list a'), a => ({ text: a.textContent, href: a.getAttribute('href') })), open: document.querySelector('.health-all-topics').open })`);
+  const summary = evaluate(`(() => {
+    const contentLinks = Array.from(document.querySelectorAll('.health-feature a, .ranking-panel li a, .health-latest-grid a, .health-archive-index:not(.health-superseded-index) a'), a => a.pathname);
+    const allArticleLinks = Array.from(document.querySelectorAll('.health-page a[href^="/article/"]'), a => a.pathname);
+    const featureLink = document.querySelector('.health-feature > a')?.getBoundingClientRect();
+    const latestGrid = document.querySelector('.health-latest-grid');
+    const heroShell = document.querySelector('.health-hero-shell')?.getBoundingClientRect();
+    const heroPanel = document.querySelector('.health-discovery-panel')?.getBoundingClientRect();
+    return {
+      common: document.querySelectorAll('.health-common-needs a').length,
+      topics: Array.from(document.querySelectorAll('.health-topic-list a'), a => ({ text: a.textContent, href: a.getAttribute('href') })),
+      open: document.querySelector('.health-all-topics').open,
+      pageHeight: document.documentElement.scrollHeight,
+      contentLinks,
+      allArticleLinks,
+      supersededCount: document.querySelectorAll('.health-superseded-index a').length,
+      featureLink: featureLink ? { width: featureLink.width, height: featureLink.height } : null,
+      latestGrid: latestGrid ? { clientWidth: latestGrid.clientWidth, scrollWidth: latestGrid.scrollWidth, display: getComputedStyle(latestGrid).display } : null,
+      heroFits: !heroShell || !heroPanel || (heroPanel.left >= heroShell.left - 1 && heroPanel.right <= heroShell.right + 1),
+      featureCount: document.querySelectorAll('.health-feature').length,
+      railCount: document.querySelectorAll('.ranking-panel li').length,
+      latestCount: document.querySelectorAll('.health-latest-grid .health-list-card').length,
+      formatCount: document.querySelectorAll('.health-format-grid a').length,
+      helperControlExists: (() => {
+        const controlId = document.querySelector('[data-milk-helper-trigger]')?.getAttribute('aria-controls');
+        return Boolean(controlId && document.getElementById(controlId));
+      })(),
+      undersizedTargets: Array.from(document.querySelectorAll('.health-page a, .health-page button, .health-page summary, .footer-sitemap a'))
+        .filter((element) => element.getClientRects().length)
+        .filter((element) => {
+          const rect = element.getBoundingClientRect();
+          return rect.width < 44 || rect.height < 44;
+        })
+        .map((element) => element.textContent.trim()).slice(0, 5)
+    };
+  })()`);
   assert.equal(summary.common, 7);
   assert.equal(summary.open, false);
   assert.equal(summary.topics.length, new Set(summary.topics.map((item) => item.text)).size);
   assert.deepEqual(summary.topics.map((topic) => topic.text).sort(), expectedTopics, "Static and hydrated topic navigation must agree.");
   assert.ok(summary.topics.length > 40);
+  assert.equal(summary.featureCount, 1);
+  assert.equal(summary.railCount, 3);
+  assert.equal(summary.latestCount, 6);
+  assert.equal(summary.formatCount, 3);
+  assert.equal(summary.helperControlExists, true, "The helper trigger must reference a mounted dialog.");
+  assert.deepEqual(summary.contentLinks, expectedIndexHrefs, "Health homepage must keep only the newest entry for duplicate titles.");
+  assert.equal(new Set(summary.contentLinks).size, expectedIndexHrefs.length, "Health homepage article links must not repeat.");
+  assert.equal(summary.allArticleLinks.length, content.articles.length, "Every stable article URL must remain crawlable.");
+  assert.equal(new Set(summary.allArticleLinks).size, content.articles.length, "Every stable article URL must appear only once.");
+  assert.equal(summary.supersededCount, content.articles.length - expectedIndexHrefs.length, "Only older duplicate titles belong in the historical index.");
+  assert.ok(summary.featureLink?.width > 0 && summary.featureLink?.height > 0, "The featured article must expose a real focusable link box.");
+  assert.equal(summary.latestGrid?.display, "grid");
+  assert.equal(summary.latestGrid?.scrollWidth, summary.latestGrid?.clientWidth, "Latest articles must not use a clipped horizontal rail.");
+  assert.equal(summary.heroFits, true, `Health discovery panel must stay inside its shell at ${width}px.`);
+  assert.deepEqual(summary.undersizedTargets, [], `Health touch targets must be at least 44px at ${width}px.`);
+  assert.ok(summary.pageHeight < (width <= 760 ? 5200 : 4200), `Health page should stay concise at ${width}px.`);
   assert.equal(overflow(), false);
   const baseHydration = hydrationState();
   assert.equal(baseHydration.initial?.layout, "health-unified-v1");
   assert.equal(baseHydration.final?.layout, "health-unified-v1");
+  assert.equal(baseHydration.final?.design, "editorial-20260909");
   assert.equal(baseHydration.initial?.revision, baseHydration.final?.revision);
   assert.equal(baseHydration.directChildMutations, 0, "Unchanged /health data must preserve the prerendered DOM.");
   const boardLayout = evaluate(`(() => {
@@ -67,7 +134,7 @@ for (const width of [1440, 1024, 390]) {
     return feature && ranking ? { featureTop: feature.top, featureRight: feature.right, featureBottom: feature.bottom, rankingTop: ranking.top, rankingLeft: ranking.left } : null;
   })()`);
   assert.ok(boardLayout);
-  if (width > 900) {
+  if (width > 840) {
     assert.ok(Math.abs(boardLayout.featureTop - boardLayout.rankingTop) < 2, `Health feature and latest panel must share a row at ${width}px.`);
     assert.ok(boardLayout.featureRight <= boardLayout.rankingLeft + 1);
   } else {
@@ -79,6 +146,20 @@ for (const width of [1440, 1024, 390]) {
   assert.equal(evaluate("document.querySelector('.health-all-topics').open"), true);
   assert.equal(overflow(), false);
   screenshot(`health-topics-${width}.png`);
+  browser("press", "Escape");
+  assert.equal(evaluate("document.querySelector('.health-all-topics').open"), false);
+  assert.equal(evaluate("document.activeElement.matches('.health-all-topics summary')"), true);
+  if (width === 390) {
+    browser("focus", ".health-all-topics summary");
+    browser("press", "Enter");
+    assert.equal(evaluate("document.querySelector('.health-all-topics').open"), true);
+    browser("click", ".menu-toggle");
+    assert.equal(evaluate("document.querySelector('.menu-toggle').getAttribute('aria-expanded')"), "true");
+    assert.equal(evaluate("document.querySelector('.health-all-topics').open"), false, "Opening the top-layer menu must close the topic sheet.");
+    browser("press", "Escape");
+    assert.equal(evaluate("document.querySelector('.menu-toggle').getAttribute('aria-expanded')"), "false");
+    assert.equal(evaluate("document.querySelector('.primary-nav').classList.contains('open')"), false);
+  }
   const careTopic = summary.topics.find((topic) => topic.text === "照顧技巧");
   assert.ok(careTopic);
   open(careTopic.href);
@@ -106,7 +187,7 @@ for (const width of [1440, 1024, 390]) {
   assert.ok(form.fields.every((field) => field.font >= 16 && field.height >= 44));
   assert.equal(form.helper, "relative");
   screenshot(`contact-${width}.png`);
-  results.push({ width, common: summary.common, topics: summary.topics.length, categoryArticles: category.links.length, baseDomReplacements: baseHydration.directChildMutations, categoryDomReplacements: categoryHydration.directChildMutations, noOverflow: true, contactInputSize: true, helperDoesNotCoverForm: true });
+  results.push({ width, common: summary.common, topics: summary.topics.length, pageHeight: summary.pageHeight, uniqueArticleLinks: new Set(summary.contentLinks).size, categoryArticles: category.links.length, baseDomReplacements: baseHydration.directChildMutations, categoryDomReplacements: categoryHydration.directChildMutations, noOverflow: true, noClippedArticleRail: true, contactInputSize: true, helperDoesNotCoverForm: true });
   console.log(`Desktop/mobile health and contact layout passed at ${width}px.`);
 }
 
