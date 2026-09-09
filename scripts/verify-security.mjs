@@ -326,10 +326,11 @@ function verifyApmPortalHandoff() {
     "Portal must preserve the APM loading screen across Google OAuth startup and recover on failure."
   );
   assert(
-    portal.includes('function hideModuleLaunchLoading(moduleId = "apm")')
+    portal.includes("function hideModuleLaunchLoading(moduleId = activeModuleLaunchId)")
+      && portal.includes('if (!["apm", "day-care"].includes(moduleId) || moduleId !== activeModuleLaunchId) return;')
       && portal.includes("hideModuleLaunchLoading(module.id);")
       && portal.includes("hideModuleLaunchLoading(request.moduleId);"),
-    "Only the APM launch that owns the loading screen may clear it."
+    "Only the active APM or Daycare launch that owns the loading screen may clear it."
   );
   for (const expected of [
     'portalShell?.setAttribute("inert", "")',
