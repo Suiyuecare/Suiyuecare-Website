@@ -360,7 +360,7 @@ const moduleDescriptions = {
   announcements: "查看公告、任務提醒與重要消息",
   business: "查看居家、日照等服務入口",
   "home-care": "系統建置中，正式入口尚未開放",
-  "day-care": "日照管理驗證版，僅開放執行長；Google 登入設定中",
+  "day-care": "日照管理驗證版，僅開放執行長使用 Google 登入；登入後須完成雙因素驗證",
   hr: "查看人員、出勤與人事作業",
   accounting: "查看帳務、付款與報表",
   "general-affairs": "處理行政、總務與文件流程",
@@ -431,7 +431,7 @@ function getModuleLaunchProfile() {
   if (activeModuleLaunchId === "day-care") {
     return {
       title: "正在開啟日間照顧系統",
-      description: "即將前往日照登入頁。Google 登入設定中，完成後仍須獨立驗證執行長帳號。",
+      description: "即將前往日照管理驗證版登入頁。系統會獨立驗證執行長的公司 Google 帳號，登入後須完成雙因素驗證。",
       recoveryTitle: "日間照顧系統連線時間較久",
       recoveryDescription: "你可以再稍候一下，或回到模組頁後重新開啟日間照顧系統。"
     };
