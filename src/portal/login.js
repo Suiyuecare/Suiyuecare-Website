@@ -32,6 +32,7 @@ const portalProductionOrigin = "https://login.suiyuecare.com";
 const portalOAuthBridgeOrigin = "https://suiyuecare-website.vercel.app";
 let activeSessionProfile = null;
 let activeModuleLaunchButton = null;
+let activeModuleLaunchId = "apm";
 let moduleLaunchRecoveryTimer = null;
 
 const systemAnnouncementsModule = { id: "announcements", number: "0", name: "系統公告" };
@@ -345,9 +346,9 @@ const dataScopeDefinitions = [
 ];
 
 const moduleDisplayNames = {
-  business: "照顧服務",
-  "home-care": "居家照顧",
-  "day-care": "日間照顧",
+  business: "業務系統",
+  "home-care": "居家照顧系統",
+  "day-care": "日間照顧系統",
   apm: "敏捷專案管理系統"
 };
 
@@ -358,8 +359,8 @@ const ownerDisplayNames = {
 const moduleDescriptions = {
   announcements: "查看公告、任務提醒與重要消息",
   business: "查看居家、日照等服務入口",
-  "home-care": "照顧紀錄、排班與個案服務",
-  "day-care": "日照紀錄、活動與到退管理",
+  "home-care": "系統建置中，正式入口尚未開放",
+  "day-care": "日照管理驗證版，僅開放執行長；Google 登入設定中",
   hr: "查看人員、出勤與人事作業",
   accounting: "查看帳務、付款與報表",
   "general-affairs": "處理行政、總務與文件流程",
@@ -392,13 +393,14 @@ const moduleIcons = {
 };
 
 const moduleLaunchUrls = {
+  "day-care": "https://daycare.suiyuecare.com/login",
   accounting: "https://finance.suiyuecare.com/",
   edoc: "https://edoc.suiyuecare.com/",
   apm: "https://apm.suiyuecare.com/"
 };
 
 const connectedModuleIds = new Set(Object.keys(moduleLaunchUrls));
-const temporarilyOpenModuleIds = new Set(["accounting", "edoc", "apm", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
+const temporarilyOpenModuleIds = new Set(["day-care", "accounting", "edoc", "apm", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
 const sharedGeneralAffairsModules = new Set(["pdf-editor"]);
 const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions", "organization-chart", "employee-accounts"]);
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
@@ -425,13 +427,31 @@ const moduleLaunchDefaultDescription = "系統正在確認你的登入狀態，�
 const moduleLaunchRecoveryDelayMs = 30_000;
 const moduleLaunchRequestTimeoutMs = 20_000;
 
+function getModuleLaunchProfile() {
+  if (activeModuleLaunchId === "day-care") {
+    return {
+      title: "正在開啟日間照顧系統",
+      description: "即將前往日照登入頁。Google 登入設定中，完成後仍須獨立驗證執行長帳號。",
+      recoveryTitle: "日間照顧系統連線時間較久",
+      recoveryDescription: "你可以再稍候一下，或回到模組頁後重新開啟日間照顧系統。"
+    };
+  }
+  return {
+    title: moduleLaunchDefaultTitle,
+    description: moduleLaunchDefaultDescription,
+    recoveryTitle: "敏捷專案管理系統連線時間較久",
+    recoveryDescription: "你可以再稍候一下，或回到模組頁後重新開啟敏捷專案管理系統。"
+  };
+}
+
 function startModuleLaunchRecoveryTimer() {
   if (moduleLaunchRecoveryTimer) window.clearTimeout(moduleLaunchRecoveryTimer);
   moduleLaunchRecoveryTimer = window.setTimeout(() => {
     if (moduleLaunchLoading?.hidden) return;
-    if (moduleLaunchLoadingTitle) moduleLaunchLoadingTitle.textContent = "敏捷專案管理系統連線時間較久";
+    const profile = getModuleLaunchProfile();
+    if (moduleLaunchLoadingTitle) moduleLaunchLoadingTitle.textContent = profile.recoveryTitle;
     if (moduleLaunchLoadingDescription) {
-      moduleLaunchLoadingDescription.textContent = "你可以再稍候一下，或回到模組頁後重新開啟敏捷專案管理系統。";
+      moduleLaunchLoadingDescription.textContent = profile.recoveryDescription;
     }
     if (moduleLaunchRecoveryButton) moduleLaunchRecoveryButton.hidden = false;
   }, moduleLaunchRecoveryDelayMs);
@@ -440,13 +460,15 @@ function startModuleLaunchRecoveryTimer() {
 function resetModuleLaunchLoadingContent() {
   if (moduleLaunchRecoveryTimer) window.clearTimeout(moduleLaunchRecoveryTimer);
   moduleLaunchRecoveryTimer = null;
-  if (moduleLaunchLoadingTitle) moduleLaunchLoadingTitle.textContent = moduleLaunchDefaultTitle;
-  if (moduleLaunchLoadingDescription) moduleLaunchLoadingDescription.textContent = moduleLaunchDefaultDescription;
+  const profile = getModuleLaunchProfile();
+  if (moduleLaunchLoadingTitle) moduleLaunchLoadingTitle.textContent = profile.title;
+  if (moduleLaunchLoadingDescription) moduleLaunchLoadingDescription.textContent = profile.description;
   if (moduleLaunchRecoveryButton) moduleLaunchRecoveryButton.hidden = true;
 }
 
 function showModuleLaunchLoading(moduleId, trigger = null) {
-  if (moduleId !== "apm" || !moduleLaunchLoading) return;
+  if (!["apm", "day-care"].includes(moduleId) || !moduleLaunchLoading) return;
+  activeModuleLaunchId = moduleId;
 
   if (activeModuleLaunchButton && activeModuleLaunchButton !== trigger) {
     activeModuleLaunchButton.removeAttribute("aria-busy");
@@ -464,8 +486,8 @@ function showModuleLaunchLoading(moduleId, trigger = null) {
   startModuleLaunchRecoveryTimer();
 }
 
-function hideModuleLaunchLoading(moduleId = "apm") {
-  if (moduleId !== "apm") return;
+function hideModuleLaunchLoading(moduleId = activeModuleLaunchId) {
+  if (!["apm", "day-care"].includes(moduleId) || moduleId !== activeModuleLaunchId) return;
   const triggerToRestore = activeModuleLaunchButton;
   resetModuleLaunchLoadingContent();
   moduleLaunchLoading?.setAttribute("hidden", "");
@@ -480,7 +502,35 @@ function hideModuleLaunchLoading(moduleId = "apm") {
   triggerToRestore?.focus({ preventScroll: true });
 }
 
+function waitForModuleLaunchLoadingPaint(moduleId) {
+  if (moduleId !== "day-care" || !moduleLaunchLoading || moduleLaunchLoading.hidden) return Promise.resolve();
+  return new Promise((resolve) => {
+    // Let the existing progress animation paint before a plain-link navigation.
+    const fallback = window.setTimeout(resolve, 100);
+    window.requestAnimationFrame(() => window.setTimeout(() => {
+      window.clearTimeout(fallback);
+      resolve();
+    }, 0));
+  });
+}
+
+// Navigation visibility only: Daycare independently verifies Google identity,
+// the executive allowlist, MFA and record permissions on its own backend.
+function canOpenDaycareEntry(profile) {
+  if (!profile || profile.financeApmOnly) return false;
+  const role = profile.sourceProfileId || profile.roleKey || profile.id;
+  return String(profile.email || "").trim().toLowerCase() === "entrepreneur@suiyuecare.com"
+    && role === "ceo"
+    && Array.isArray(profile.modules)
+    && profile.modules.includes("day-care");
+}
+
 async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
+  if (moduleId === "day-care") {
+    if (!canOpenDaycareEntry(profile)) throw new Error("日間照顧系統目前僅開放執行長帳號。");
+    // Never forward Portal credentials, identity hints or caller-controlled URLs.
+    return moduleLaunchUrls["day-care"];
+  }
   const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
   if (!launchUrl) return null;
   if (postHandoffModuleIds.has(moduleId)) {
@@ -501,8 +551,12 @@ async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
 }
 
 async function launchConnectedModule(moduleId, profile, launchUrlOverride = "", navigationMode = "assign") {
+  if (moduleId === "day-care" && !canOpenDaycareEntry(profile)) {
+    throw new Error("日間照顧系統目前僅開放執行長帳號。");
+  }
   const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
   if (!launchUrl) return false;
+  await waitForModuleLaunchLoadingPaint(moduleId);
 
   if (postHandoffModuleIds.has(moduleId)) {
     const signedHandoff = await createSignedModuleHandoff(
@@ -2681,6 +2735,9 @@ function safeModuleLaunchRequest(rawNext = "", explicitModule = "") {
     const inferredModule = externalLaunchOrigins.get(origin);
     if (!inferredModule) return null;
     if (moduleId && moduleId !== inferredModule) return null;
+    if (inferredModule === "day-care") {
+      return { moduleId: inferredModule, returnTo: moduleLaunchUrls["day-care"] };
+    }
     return { moduleId: inferredModule, returnTo: url.toString() };
   } catch (error) {
     return null;
@@ -2786,6 +2843,7 @@ function modulePermissionAllowsRole(moduleId, roleId) {
 }
 
 function moduleIsAllowed(module, profile) {
+  if (module.id === "day-care") return canOpenDaycareEntry(profile);
   if (profile?.financeApmOnly) return module.id === "apm";
   const profileRoleId = profile.sourceProfileId || profile.id;
   if (module.id === "general-affairs") return true;
@@ -2806,7 +2864,7 @@ function getModuleAccessState(module, profile) {
     (child) => temporarilyOpenModuleIds.has(child.id) && moduleIsAllowed(child, profile)
   );
 
-  if (profile?.financeApmOnly && !allowed) {
+  if ((profile?.financeApmOnly || module.id === "day-care") && !allowed) {
     return {
       allowed: false,
       actionText: "此帳號無權限",
@@ -3020,6 +3078,7 @@ function renderLevelOne(profile = getStoredProfile()) {
   moduleLevelOne.classList.add("active");
   moduleLevelTwo.hidden = true;
   moduleLevelTwo.classList.remove("active");
+  delete moduleLevelTwo.dataset.parentModuleId;
   setStatus(`${profile.label} 可使用的工作區已載入。`, "info");
 }
 
@@ -3032,6 +3091,8 @@ function renderLevelTwo(parentModule, profile) {
   moduleLevelOne.classList.remove("active");
   moduleLevelTwo.hidden = false;
   moduleLevelTwo.classList.add("active");
+  moduleLevelTwo.dataset.parentModuleId = parentModule.id;
+  backToLevelOneButton?.focus({ preventScroll: true });
   setStatus(`已開啟 ${getModuleDisplayName(parentModule)}。`, "info");
 }
 
@@ -5513,7 +5574,14 @@ signOutButton?.addEventListener("click", () => {
   setStatus("已登出，請使用 Google 帳號重新登入。", "success");
 });
 
-backToLevelOneButton?.addEventListener("click", () => renderLevelOne());
+backToLevelOneButton?.addEventListener("click", () => {
+  const parentId = moduleLevelTwo?.dataset.parentModuleId;
+  renderLevelOne();
+  if (parentId) {
+    [...moduleLevelOneGrid.querySelectorAll("[data-module-id]")]
+      .find((button) => button.dataset.moduleId === parentId)?.focus({ preventScroll: true });
+  }
+});
 
 systemAnnouncementsButton?.addEventListener("click", () => {
   const profile = getStoredProfile();

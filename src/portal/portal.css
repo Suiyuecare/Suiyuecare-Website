@@ -530,6 +530,7 @@ button {
 
 .back-button {
   display: inline-flex;
+  min-height: 44px;
   align-items: center;
   padding: 0 18px;
   margin-bottom: 18px;
@@ -571,6 +572,12 @@ button {
   box-shadow: 0 18px 38px rgba(69, 37, 17, 0.09);
 }
 
+.module-card:focus-visible,
+.back-button:focus-visible {
+  outline: 3px solid var(--orange-dark);
+  outline-offset: 4px;
+}
+
 .module-card[data-access-status="building"] {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 249, 241, 0.42)),
@@ -608,6 +615,11 @@ button {
   color: var(--orange-dark);
   font-size: 12px;
   font-weight: 900;
+}
+
+.module-card[data-module-id="home-care"] .module-number,
+.module-card[data-module-id="day-care"] .module-number {
+  color: #a54e0f;
 }
 
 .module-card-main {
