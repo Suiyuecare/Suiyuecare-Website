@@ -100,8 +100,9 @@ await test("exact existing business hierarchy and display labels", () => {
   ]);
   check(subject.getModuleDisplayName(homecare), "居家照顧系統");
   check(subject.getModuleDisplayName(daycare), "日間照顧系統");
-  check(subject.moduleDescriptions["day-care"], "日照管理驗證版，僅開放執行長使用 Google 登入；登入後須完成雙因素驗證");
+  check(subject.moduleDescriptions["day-care"], "日照管理驗證版，僅開放執行長使用 Google 登入");
   ok(!subject.moduleDescriptions["day-care"].includes("Google 登入設定中"));
+  ok(!subject.moduleDescriptions["day-care"].includes("雙因素驗證"));
   check(subject.modules.filter((module) => module.id === "business").length, 1);
 });
 
@@ -380,9 +381,8 @@ for (const moduleId of ["apm", "day-care"]) {
     const expectedName = moduleId === "day-care" ? "日間照顧系統" : "敏捷專案管理系統";
     ok(ui.title.textContent.includes(expectedName));
     if (moduleId === "day-care") {
-      ok(ui.description.textContent.includes("日照管理驗證版登入頁"));
-      ok(ui.description.textContent.includes("獨立驗證執行長的公司 Google 帳號"));
-      ok(ui.description.textContent.includes("登入後須完成雙因素驗證"));
+      check(ui.description.textContent, "即將前往日照管理驗證版，系統會驗證執行長的公司 Google 帳號。");
+      ok(!ui.description.textContent.includes("雙因素驗證"));
       ok(!ui.description.textContent.includes("Google 登入設定中"));
       ok(!`${ui.title.textContent}${ui.description.textContent}`.includes("敏捷專案"));
     }
