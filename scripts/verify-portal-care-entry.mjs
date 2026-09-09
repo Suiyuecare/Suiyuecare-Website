@@ -409,9 +409,12 @@ await test("Finance/eDoc never acquire this APM/Daycare-only loading overlay", (
 
 await test("late APM completion cannot clear a newer Daycare owner", () => {
   const ui = loadingHarness();
-  ui.loading.showModuleLaunchLoading("apm", new ui.Button());
+  const apmTrigger = new ui.Button();
+  ui.loading.showModuleLaunchLoading("apm", apmTrigger);
   const daycareTrigger = new ui.Button();
   ui.loading.showModuleLaunchLoading("day-care", daycareTrigger);
+  check(apmTrigger.disabled, false);
+  check(apmTrigger.attributes.has("aria-busy"), false);
   ui.loading.hideModuleLaunchLoading("apm");
   check(ui.loading.owner(), "day-care");
   check(ui.overlay.hidden, false);
@@ -421,6 +424,7 @@ await test("late APM completion cannot clear a newer Daycare owner", () => {
   ui.loading.hideModuleLaunchLoading();
   check(ui.overlay.hidden, true);
   check(daycareTrigger.disabled, false);
+  check(apmTrigger.disabled, false);
   check(ui.shell.attributes.has("inert"), false);
 });
 

@@ -471,6 +471,7 @@ function showModuleLaunchLoading(moduleId, trigger = null) {
   activeModuleLaunchId = moduleId;
 
   if (activeModuleLaunchButton && activeModuleLaunchButton !== trigger) {
+    activeModuleLaunchButton.disabled = false;
     activeModuleLaunchButton.removeAttribute("aria-busy");
   }
   activeModuleLaunchButton = trigger instanceof HTMLButtonElement ? trigger : null;
