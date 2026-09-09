@@ -1,24 +1,4 @@
 const refs = {
-  pdpa: {
-    citation: "全國法規資料庫。個人資料保護法；資料查核日：2026-09-09。",
-    url: "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=I0050021", evidenceRank: 1
-  },
-  pdpaRules: {
-    citation: "全國法規資料庫。個人資料保護法施行細則；資料查核日：2026-09-09。",
-    url: "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=I0050022", evidenceRank: 1
-  },
-  nistAccess: {
-    citation: "National Institute of Standards and Technology. Security and Privacy Controls for Information Systems and Organizations, SP 800-53 Rev. 5, Update 1. 2021.",
-    url: "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final", doi: "10.6028/NIST.SP.800-53r5", evidenceRank: 1
-  },
-  nistPrivacy: {
-    citation: "National Institute of Standards and Technology. NIST Privacy Framework: A Tool for Improving Privacy through Enterprise Risk Management, Version 1.0. 2020.",
-    url: "https://www.nist.gov/privacy-framework", doi: "10.6028/NIST.CSWP.01162020", evidenceRank: 1
-  },
-  owaspAuthorization: {
-    citation: "OWASP Foundation. Authorization Cheat Sheet；資料查核日：2026-09-09。",
-    url: "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html", evidenceRank: 2
-  },
   taiwanApply: {
     citation: "衛生福利部長期照顧司。申請長照服務；資料查核日：2026-09-09。",
     url: "https://1966.gov.tw/LTC/cp-6533-70777-207.html", evidenceRank: 1
@@ -70,48 +50,6 @@ function dailyArticle(article) {
 }
 
 export const dailyArticles20260909 = [
-  dailyArticle({
-    slug: "long-term-care-access-lifecycle",
-    title: "長照系統權限不是開一次就好：從到職、調職到離職的四個節點",
-    dek: "帳號真正的風險，常不在第一次開通，而在工作已改變、權限卻還留著。把開通、異動、複核與停用接到人員流程，逐人回答需要看什麼、能做什麼、何時收回，才能讓照顧資料與工作責任一起移動。",
-    excerpt: "長照團隊用開通、異動、定期複核與停用四個節點管理系統權限，避免調職、代理結束或離職後仍保留不必要存取。",
-    category: "軟體系統", relatedService: "軟體系統", author: "歲悅軟體系統編輯部",
-    image: "assets/health3/daily/2026-09-09/access-lifecycle-hero.jpg",
-    imageAlt: "三名穿鮮橘色短袖 polo 的台灣長照營運人員在辦公桌旁檢視空白角色卡與權限流程",
-    imageCaption: "把權限當成會隨工作改變的生命週期，而不是一次性的帳號設定。AI 生成情境示意。",
-    focalPoint: "center", readingMinutes: 10,
-    targetAudience: "負責長照機構資訊系統、帳號申請、人員異動、稽核與資料保護的主管、行政與資訊協作人員",
-    tags: ["軟體系統", "權限管理", "帳號生命週期", "個資保護"],
-    keywords: "長照系統 權限 帳號 到職 調職 離職 停權 最小權限 稽核 個資",
-    seoTitle: "長照系統帳號權限四個生命週期節點｜歲悅長照",
-    seoDescription: "從到職開通、調職異動、定期複核到離職停用，建立可核對的長照系統權限流程，避免舊權限與共用帳號留下風險。",
-    summary: ["權限以當下職務與必要工作為基準，不用職稱直接套用一大包功能。", "代理、跨點支援與調職都有期限，工作一變就同步調整。", "定期複核要逐人逐權限確認，不只匯出一張帳號清單存檔。", "離職停權與交接同一流程完成，保留核准、時間與結果證據。"],
-    warning: { title: "不要用共用帳號填補流程缺口", body: "共用密碼會讓操作責任與異常追查變得模糊，也可能讓已離開工作的人繼續存取。緊急存取若確有需要，應由組織依風險、法規與系統能力設計受控流程，而不是口頭借帳號。若疑似帳號遭未授權使用，應立即依資安與個資事件程序處理。", items: ["本文是權限治理框架，不是特定系統已具備功能的承諾，也不取代法律與資安專業判斷。", "個資法規與技術來源查核日為 2026-09-09；組織仍應依實際資料類型、契約與主管機關要求辦理。"] },
-    content: [
-      ["真正容易被漏掉的，是人已換工作，帳號卻沒跟著變", ["新同仁到職時，團隊通常會積極把帳號開好；但代理結束、跨點支援停止、調職或離職時，權限調整常散落在訊息、紙本與不同系統。結果不是誰故意越權，而是沒有人清楚知道哪一個事件要通知誰、何時才算全部完成。", "NIST SP 800-53 的帳號管理控制涵蓋建立、啟用、修改、檢視、停用與移除，也把最小權限列為獨立控制。這些是通用資安框架，不等於照抄就符合法規；對長照團隊的實用提醒是：帳號要跟著工作生命週期移動，不能只管登入成功。"]],
-      ["第一節點是開通：先寫清楚工作，不從熟人或職稱猜權限", ["申請單先回答四件事：使用者是誰、目前負責什麼、需要看或修改哪一類資料、核准人是誰。像是「督導」同一職稱，在不同據點、案別或代理期間可能需要不同範圍；先由具責任的人確認工作需要，再由系統端設定，避免為求方便直接複製前一人的全部權限。", "OWASP 的授權指引主張最小權限、預設拒絕並在每次請求檢查權限。產品實作細節會因架構而異，但管理端至少要避免只在選單上藏起功能，後端仍能存取；也不要用測試帳號、前任帳號或群組密碼當成正式上線捷徑。"]],
-      ["第二節點是異動：調職、代理與跨點支援都要有生效與結束", ["人員調到另一據點時，不只是增加新權限，也要檢查舊案、舊報表與舊匯出是否還有必要。臨時代理則在核准時一併填結束日與撤回責任人；期限到時系統自動提醒或流程人工確認，避免「先開再說」變成永久保留。", "台灣個人資料保護法要求個資蒐集、處理與利用不得逾越特定目的必要範圍，並應與目的有正當合理關聯。實際適法性要由組織依情境判斷；工作已改變卻保留大量照顧資料存取，至少是應主動檢查的訊號。"]],
-      ["第三節點是複核：不是看帳號有沒有登入，而是權限是否仍合理", ["定期複核可由各責任主管逐人確認：仍在職嗎、角色正確嗎、是否還需要跨點或匯出、臨時期限是否已過。把高權限、久未使用、沒有明確負責人與共用帳號先列出，逐項決定保留、縮小、停用或補充證據，不用一口氣追求漂亮的完成率。", "NIST Privacy Framework 強調把資料處理活動、角色、風險與治理連起來。複核因此不只是一張技術清單；若主管看不懂權限名稱，產品與資訊人員要翻成真實工作動作，例如可看哪些案、可下載什麼、能否刪除或核准，讓核准是有內容的決定。"]],
-      ["第四節點是停用：離職日不是才開始找有哪些系統", ["在離職或合作結束前，由單一清單列出主要系統、行動裝置、API 金鑰、共享資料夾與代理關係；指定提出人、執行人和完成時間。停用後確認登入失效、代理權限回收、未完成工作轉交，並留下可稽核結果。若需依法保存紀錄，保存資料不等於保留原使用者登入權。", "施行細則把安全維護措施列出人員管理、事故預防與應變、使用紀錄與稽核軌跡等項目。組織採取哪些措施仍應考量規模、資料性質與風險；最小可行做法，是讓人員名冊與系統帳號清冊能對得上，異動不靠某位同仁記得。"]],
-      ["把例外也放進流程，團隊才不會在急件時繞過制度", ["夜間代班、緊急支援或系統維護可能需要臨時權限。申請時寫明目的、範圍、開始與結束，使用後由另一角色檢查活動與關閉狀態；若系統做不到自動到期，就建立明確的人工追蹤與逾期清單。不要為了速度跳過身分確認，也不要在群組貼密碼。", "最後用事件測試流程：明天若有人跨點支援、下週調職、月底離職，哪一張通知會啟動、誰要回覆、多久可證明完成？能沿著四個節點走通，權限管理才從文件變成日常營運。"]]
-    ],
-    inlineImages: [
-      { afterSection: 1, src: "assets/health3/daily/2026-09-09/access-lifecycle-change.jpg", alt: "兩名穿鮮橘色短袖 polo 的台灣長照人員在桌邊以空白核對表確認角色異動", caption: "工作角色一變，就同時檢查要新增與要收回的權限。AI 生成情境示意。" },
-      { afterSection: 3, src: "assets/health3/daily/2026-09-09/access-lifecycle-chart.svg", alt: "長照系統權限從開通、異動、複核到停用的四節點生命週期圖", caption: "定性治理流程；每個節點都留下核准、時間與完成證據。" },
-      { afterSection: 4, src: "assets/health3/daily/2026-09-09/access-lifecycle-review.jpg", alt: "兩名穿鮮橘色短袖 polo 的台灣長照人員在走廊看板前移除一張空白權限卡", caption: "複核的成果不是多一份表，而是把已不需要的存取真正收回。AI 生成情境示意。" }
-    ],
-    checklists: [{ title: "帳號生命週期六項核對", items: ["帳號對應到唯一使用者與明確負責主管。", "每項權限能說出當下工作需要與資料範圍。", "代理、跨點與臨時存取都有結束條件。", "調職同時處理新增與舊權限收回。", "定期複核逐人逐權限留下決定與證據。", "離職停用、工作交接與異常通報可在同一流程追蹤。"] }],
-    tables: [{ title: "四個節點各自要看什麼", headers: ["節點", "要回答的問題", "完成證據"], rows: [["開通", "這個工作現在需要什麼", "申請、核准與生效範圍"], ["異動", "新舊角色有哪些增減", "變更結果與臨時期限"], ["複核", "每項存取是否仍必要", "保留、縮小或停用決定"], ["停用", "所有入口是否同步關閉", "失效確認、交接與例外紀錄"]] }],
-    faq: [
-      { question: "多久複核一次權限才夠？", answer: "沒有適用所有機構的固定答案。依資料敏感度、人員流動、系統能力與風險訂週期；人員調職、代理結束、疑似事件等觸發點不應等到下一次例行複核。" },
-      { question: "帳號久沒登入，可以直接刪除嗎？", answer: "先確認是否仍有法定保存、交接、稽核或系統相依需求，再依組織程序停用或移除。資料保存與帳號可登入是兩件事，不應為了留紀錄而保留使用權。" },
-      { question: "小單位沒有專職資訊人員怎麼做？", answer: "先用一張名冊對照主要系統、角色、核准人與到期日，固定由具責任的人複核；再要求供應商提供可理解的權限與操作紀錄。不要以共用密碼取代管理。" }
-    ],
-    cta: "如果你的團隊說不清楚誰還能看到哪些資料，歲悅軟體系統可陪你從人員事件與真實工作出發，整理一套能被執行與稽核的權限生命週期。",
-    relatedSlugs: ["long-term-care-required-field-check", "long-term-care-notification-priority-loop", "long-term-care-system-downtime-continuity"],
-    references: [refs.pdpa, refs.pdpaRules, refs.nistAccess, refs.nistPrivacy, refs.owaspAuthorization]
-  }),
-
   dailyArticle({
     slug: "home-care-unplanned-request-conversation",
     title: "居服來了才想到要加做一件事？家屬先用三句話把新需求說清楚",

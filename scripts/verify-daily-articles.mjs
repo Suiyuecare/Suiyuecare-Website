@@ -62,14 +62,50 @@ const allNumbers = new Set();
 batchIndex.batches.forEach((batch) => {
   assert(/^\d{4}-\d{2}-\d{2}$/.test(batch.date), `Invalid batch date: ${batch.date}`);
   assert(batch.commit === "SELF" || /^[0-9a-f]{40}$/.test(batch.commit), `Invalid commit pointer for ${batch.date}`);
-  assert(batch.articles.length === 3, `${batch.date} must contain exactly three articles`);
-  const businessItems = batch.articles.map((item) => item.businessItem);
+  const withheldArticles = Array.isArray(batch.withheldArticles) ? batch.withheldArticles : [];
+  const isEditorialSelection = batch.publicationMode === "editorial-selection";
+  if (isEditorialSelection) {
+    assert(withheldArticles.length > 0, `${batch.date} editorial selection must record withheld articles`);
+    assert(
+      batch.articles.length + withheldArticles.length === 3,
+      `${batch.date} editorial selection must account for exactly three planned articles`
+    );
+  } else {
+    assert(!batch.publicationMode, `${batch.date} has an unsupported publication mode`);
+    assert(withheldArticles.length === 0, `${batch.date} cannot withhold articles without editorial selection`);
+    assert(batch.articles.length === 3, `${batch.date} must contain exactly three articles`);
+  }
+
+  const plannedArticles = [...batch.articles, ...withheldArticles];
+  const businessItems = plannedArticles.map((item) => item.businessItem);
   assert(new Set(businessItems).size === 3, `${batch.date} business items must be distinct`);
   const expected = expectedRotation[taipeiWeekday(batch.date)];
   assert(expected.every((item) => businessItems.includes(item)), `${batch.date} does not match the weekday rotation`);
 
   const numbers = batch.articles.map((item) => item.publicNumber).sort((a, b) => a - b);
-  assert(numbers[2] - numbers[0] === 2 && numbers[1] - numbers[0] === 1, `${batch.date} public numbers are not consecutive`);
+  assert(
+    numbers.length > 0 && numbers.every((number, index) => index === 0 || number === numbers[index - 1] + 1),
+    `${batch.date} published public numbers are not consecutive`
+  );
+
+  if (isEditorialSelection) {
+    const draftNumbers = plannedArticles.map((item) => item.draftNumber).sort((a, b) => a - b);
+    assert(
+      draftNumbers.every((number) => Number.isSafeInteger(number) && number > 0),
+      `${batch.date} editorial selection must preserve every draft number`
+    );
+    assert(
+      draftNumbers.every((number, index) => index === 0 || number === draftNumbers[index - 1] + 1),
+      `${batch.date} draft numbers are not consecutive`
+    );
+    withheldArticles.forEach((entry) => {
+      assert(entry.reason === "explicit-user-request", `Invalid withholding reason for ${entry.slug}`);
+      assert(!articleBySlug.has(entry.slug), `Withheld daily article was still installed: ${entry.slug}`);
+      assert(!indexedSlugs.has(entry.slug), `Withheld article still has a public URL: ${entry.slug}`);
+      assert(/^[a-z0-9]+(?:-[a-z0-9]+)+$/.test(entry.slug), `Invalid withheld slug: ${entry.slug}`);
+      assert(entry.title && entry.businessItem, `Withheld article metadata is incomplete: ${entry.slug}`);
+    });
+  }
 
   batch.articles.forEach((entry) => {
     const article = articleBySlug.get(entry.slug);

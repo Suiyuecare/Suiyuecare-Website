@@ -202,27 +202,32 @@
       "date": "2026-09-09",
       "displayDate": "2026.09.09",
       "commit": "SELF",
+      "publicationMode": "editorial-selection",
       "articles": [
         {
-          "slug": "long-term-care-access-lifecycle",
-          "title": "長照系統權限不是開一次就好：從到職、調職到離職的四個節點",
-          "businessItem": "軟體系統",
-          "publicNumber": 150,
-          "contentHash": "sha256:b2d6f5073f27c15298e826d705ace07b9951b82e02991170d8389b6a9db50cd2"
-        },
-        {
+          "draftNumber": 151,
           "slug": "home-care-unplanned-request-conversation",
           "title": "居服來了才想到要加做一件事？家屬先用三句話把新需求說清楚",
           "businessItem": "居家照顧",
-          "publicNumber": 151,
+          "publicNumber": 150,
           "contentHash": "sha256:71bfd5d5488451847558cf20ccb3febe49c42c74f2d63170b1e084df560b705c"
         },
         {
+          "draftNumber": 152,
           "slug": "day-care-meal-plan-update-handover",
           "title": "家屬說餐食要改，日照不能只靠口頭交代：四步更新吞嚥與備餐資訊",
           "businessItem": "日間照顧",
-          "publicNumber": 152,
+          "publicNumber": 151,
           "contentHash": "sha256:682d4f88907e91b27201db6484b668bc704e2e9a9870467d4dc096f395b6e694"
+        }
+      ],
+      "withheldArticles": [
+        {
+          "draftNumber": 150,
+          "slug": "long-term-care-access-lifecycle",
+          "title": "長照系統權限不是開一次就好：從到職、調職到離職的四個節點",
+          "businessItem": "軟體系統",
+          "reason": "explicit-user-request"
         }
       ]
     }
