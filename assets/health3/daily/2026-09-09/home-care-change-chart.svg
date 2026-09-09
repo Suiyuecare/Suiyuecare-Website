@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">居家照顧臨時新需求三段溝通流程</title>
+  <desc id="desc">先說明今天出現的新需要，再由第一線暫停判斷現場安全，最後透過督導或個管確認服務計畫與後續安排。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <text x="72" y="82" font-size="38" font-weight="700" fill="#3c1f0b" font-family="sans-serif">臨時想加做，先把需要說清楚</text>
+  <text x="72" y="124" font-size="22" fill="#725b4c" font-family="sans-serif">不在案家門口逼第一線立即承諾，也不讓真正的急需被漏掉</text>
+  <g font-family="sans-serif">
+    <rect x="70" y="210" width="300" height="250" rx="28" fill="#f58a1f"/><text x="220" y="275" text-anchor="middle" font-size="31" font-weight="700" fill="white">1 說需要</text><text x="100" y="330" font-size="21" fill="white">發生什麼變化？</text><text x="100" y="370" font-size="21" fill="white">今天最擔心什麼？</text><text x="100" y="410" font-size="21" fill="white">本人怎麼想？</text>
+    <path d="M390 335 H430" stroke="#725b4c" stroke-width="10" stroke-linecap="round"/><path d="M420 318 L442 335 L420 352" fill="none" stroke="#725b4c" stroke-width="8"/>
+    <rect x="450" y="210" width="300" height="250" rx="28" fill="#1595a8"/><text x="600" y="275" text-anchor="middle" font-size="31" font-weight="700" fill="white">2 先停看</text><text x="480" y="330" font-size="21" fill="white">是否有立即風險？</text><text x="480" y="370" font-size="21" fill="white">原服務能否完成？</text><text x="480" y="410" font-size="21" fill="white">需要找誰確認？</text>
+    <path d="M770 335 H810" stroke="#725b4c" stroke-width="10" stroke-linecap="round"/><path d="M800 318 L822 335 L800 352" fill="none" stroke="#725b4c" stroke-width="8"/>
+    <rect x="830" y="210" width="300" height="250" rx="28" fill="#758d60"/><text x="980" y="275" text-anchor="middle" font-size="31" font-weight="700" fill="white">3 正式確認</text><text x="860" y="330" font-size="21" fill="white">督導／個管回覆</text><text x="860" y="370" font-size="21" fill="white">費用與時程說明</text><text x="860" y="410" font-size="21" fill="white">更新後再執行</text>
+  </g>
+  <text x="600" y="545" text-anchor="middle" font-size="25" font-weight="700" fill="#3c1f0b" font-family="sans-serif">急症先依緊急流程處理；一般新需求則留下可追蹤的回覆</text>
+</svg>

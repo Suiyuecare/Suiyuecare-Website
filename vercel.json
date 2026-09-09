@@ -1608,6 +1608,21 @@
       "source": "/article/long-term-care-training-transfer-evaluation",
       "destination": "/article/article149",
       "permanent": true
+    },
+    {
+      "source": "/article/long-term-care-access-lifecycle",
+      "destination": "/article/article150",
+      "permanent": true
+    },
+    {
+      "source": "/article/home-care-unplanned-request-conversation",
+      "destination": "/article/article151",
+      "permanent": true
+    },
+    {
+      "source": "/article/day-care-meal-plan-update-handover",
+      "destination": "/article/article152",
+      "permanent": true
     }
   ],
   "rewrites": [

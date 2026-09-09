@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">日照餐食與吞嚥資訊更新四步閉環</title>
+  <desc id="desc">收到新資訊後，依序核對來源與生效日、由合適專業人員確認、同步照顧與備餐端，並在餐後觀察及交班。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <text x="72" y="84" font-size="38" font-weight="700" fill="#3c1f0b" font-family="sans-serif">一張新紙條，不能直接變成下一餐</text>
+  <text x="72" y="126" font-size="22" fill="#725b4c" font-family="sans-serif">餐食與吞嚥資訊要走完核對、同步、執行與回看</text>
+  <g font-family="sans-serif" text-anchor="middle">
+    <rect x="78" y="210" width="230" height="180" rx="25" fill="#4f77a8"/><text x="193" y="272" font-size="29" font-weight="700" fill="white">核對來源</text><text x="193" y="320" font-size="20" fill="white">內容・日期・對象</text><text x="193" y="354" font-size="20" fill="white">舊版先不覆蓋</text>
+    <rect x="350" y="210" width="230" height="180" rx="25" fill="#1595a8"/><text x="465" y="272" font-size="29" font-weight="700" fill="white">專業確認</text><text x="465" y="320" font-size="20" fill="white">不自行猜等級</text><text x="465" y="354" font-size="20" fill="white">疑問先暫停</text>
+    <rect x="622" y="210" width="230" height="180" rx="25" fill="#f58a1f"/><text x="737" y="272" font-size="29" font-weight="700" fill="white">雙端同步</text><text x="737" y="320" font-size="20" fill="white">照顧端・備餐端</text><text x="737" y="354" font-size="20" fill="white">回讀同一版本</text>
+    <rect x="894" y="210" width="230" height="180" rx="25" fill="#758d60"/><text x="1009" y="272" font-size="29" font-weight="700" fill="white">觀察交班</text><text x="1009" y="320" font-size="20" fill="white">實際反應</text><text x="1009" y="354" font-size="20" fill="white">異常與下一步</text>
+  </g>
+  <path d="M308 300 H346 M580 300 H618 M852 300 H890" stroke="#725b4c" stroke-width="8" stroke-linecap="round"/>
+  <rect x="150" y="470" width="900" height="106" rx="22" fill="#ead8bf" opacity=".6"/>
+  <text x="600" y="515" text-anchor="middle" font-size="25" font-weight="700" fill="#3c1f0b" font-family="sans-serif">吞嚥異常、呼吸困難或意識改變：停止進食並依緊急流程處理</text>
+  <text x="600" y="553" text-anchor="middle" font-size="19" fill="#725b4c" font-family="sans-serif">流程圖為定性管理工具，不是食物質地或液體稠度處方</text>
+</svg>

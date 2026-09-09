@@ -568,7 +568,7 @@ const runtimeTalkItems = publishedSnapshotRows(publicContent.snapshot.expertTalk
 const runtimeItems = addSameKindRelated([...runtimeArticles, ...runtimeStoryItems, ...runtimeTalkItems]);
 const runtimeItemsByHref = new Map(runtimeItems.map((item) => [item.href, item]));
 
-assert.equal(publicContent.articles.length, 149, "Every numbered public article must be generated");
+assert.equal(publicContent.articles.length, ARTICLE_SOURCE_SLUGS.length, "Every numbered public article must be generated");
 assert.equal(publicContent.stories.length, 4, "Every published care story must be generated");
 assert.equal(publicContent.talks.length, 3, "Every published expert talk must be generated");
 assert.equal(runtimeItems.length, publicContent.items.length, "Runtime and build must expose the same complete detail inventory");
