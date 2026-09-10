@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">社區據點第一次安心參與流程</title>
+  <desc id="desc">從出發前問本人、到場先觀察、選擇參與程度、隨時休息或離場，到回家後回看。每一步都保留暫停與退場。</desc>
+  <rect width="1200" height="675" fill="#fffaf3"/>
+  <rect x="0" y="0" width="1200" height="112" fill="#0f5c5e"/>
+  <text x="72" y="58" fill="#ffffff" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="34" font-weight="700">第一次去社區據點：把「可以停」放進每一步</text>
+  <text x="72" y="91" fill="#dff4ef" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="19">目標是認識與選擇，不是當天就要融入</text>
+  <g font-family="Noto Sans TC, PingFang TC, sans-serif">
+    <g transform="translate(68 178)">
+      <rect width="195" height="218" rx="22" fill="#ffffff" stroke="#0f5c5e" stroke-width="3"/>
+      <circle cx="40" cy="42" r="24" fill="#f28c45"/><text x="40" y="50" text-anchor="middle" fill="#ffffff" font-size="24" font-weight="700">1</text>
+      <text x="28" y="92" fill="#173f43" font-size="25" font-weight="700">出發前問本人</text>
+      <text x="28" y="130" fill="#3f5658" font-size="18"><tspan x="28">願不願意先看看？</tspan><tspan x="28" dy="31">怎麼稱呼、想坐哪裡</tspan><tspan x="28" dy="31">今天何時回家</tspan></text>
+    </g>
+    <path d="M276 287h44" stroke="#f28c45" stroke-width="7" stroke-linecap="round"/><path d="M312 275l16 12-16 12" fill="none" stroke="#f28c45" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(332 178)">
+      <rect width="195" height="218" rx="22" fill="#ffffff" stroke="#0f5c5e" stroke-width="3"/>
+      <circle cx="40" cy="42" r="24" fill="#f28c45"/><text x="40" y="50" text-anchor="middle" fill="#ffffff" font-size="24" font-weight="700">2</text>
+      <text x="28" y="92" fill="#173f43" font-size="25" font-weight="700">到場先觀察</text>
+      <text x="28" y="130" fill="#3f5658" font-size="18"><tspan x="28">先認出口、廁所</tspan><tspan x="28" dy="31">與安靜座位</tspan><tspan x="28" dy="31">不用立刻加入</tspan></text>
+    </g>
+    <path d="M540 287h44" stroke="#f28c45" stroke-width="7" stroke-linecap="round"/><path d="M576 275l16 12-16 12" fill="none" stroke="#f28c45" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(596 178)">
+      <rect width="195" height="218" rx="22" fill="#ffffff" stroke="#0f5c5e" stroke-width="3"/>
+      <circle cx="40" cy="42" r="24" fill="#f28c45"/><text x="40" y="50" text-anchor="middle" fill="#ffffff" font-size="24" font-weight="700">3</text>
+      <text x="28" y="92" fill="#173f43" font-size="25" font-weight="700">選參與程度</text>
+      <text x="28" y="130" fill="#3f5658" font-size="18"><tspan x="28">看一看、坐一下</tspan><tspan x="28" dy="31">幫一小段、再靠近</tspan><tspan x="28" dy="31">都算參與</tspan></text>
+    </g>
+    <path d="M804 287h44" stroke="#f28c45" stroke-width="7" stroke-linecap="round"/><path d="M840 275l16 12-16 12" fill="none" stroke="#f28c45" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(860 178)">
+      <rect width="272" height="218" rx="22" fill="#ffffff" stroke="#0f5c5e" stroke-width="3"/>
+      <circle cx="40" cy="42" r="24" fill="#f28c45"/><text x="40" y="50" text-anchor="middle" fill="#ffffff" font-size="24" font-weight="700">4</text>
+      <text x="28" y="92" fill="#173f43" font-size="25" font-weight="700">回家後回看</text>
+      <text x="28" y="130" fill="#3f5658" font-size="18"><tspan x="28">喜歡哪一段？</tspan><tspan x="28" dy="31">哪裡不舒服？</tspan><tspan x="28" dy="31">下次只改一兩件事</tspan></text>
+    </g>
+    <rect x="164" y="451" width="872" height="94" rx="47" fill="#f28c45"/>
+    <text x="600" y="492" text-anchor="middle" fill="#ffffff" font-size="27" font-weight="700">任何一步都可以：休息　｜　縮短　｜　離開</text>
+    <text x="600" y="522" text-anchor="middle" fill="#fff6ee" font-size="18">照原先約定退場，讓下次仍有選擇</text>
+    <text x="600" y="607" text-anchor="middle" fill="#4c6264" font-size="17">定性參與流程，非評估量表。參考：衛生福利部、WHO 高齡友善社區資料；查核 2026-09-10</text>
+  </g>
+</svg>

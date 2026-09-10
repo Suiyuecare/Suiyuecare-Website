@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">復能功能紀錄四欄</title>
+  <desc id="desc">四欄依序記錄生活任務、當時條件、實際協助、結果與下一步，讓交班能重現情境並安全回顧。</desc>
+  <rect width="1200" height="675" fill="#f5fbfa"/>
+  <rect x="0" y="0" width="1200" height="112" fill="#164f63"/>
+  <text x="68" y="58" fill="#ffffff" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="35" font-weight="700">功能紀錄別只寫「有進步」：四欄接得上下一班</text>
+  <text x="68" y="91" fill="#d9eef2" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="19">同一任務、相近條件，才有較可解讀的變化</text>
+  <g font-family="Noto Sans TC, PingFang TC, sans-serif">
+    <g transform="translate(62 168)">
+      <rect width="250" height="276" rx="20" fill="#ffffff" stroke="#2b7682" stroke-width="3"/>
+      <rect width="250" height="68" rx="20" fill="#2b7682"/><rect y="48" width="250" height="20" fill="#2b7682"/>
+      <text x="28" y="45" fill="#ffffff" font-size="25" font-weight="700">1　任務</text>
+      <text x="28" y="110" fill="#173f43" font-size="20" font-weight="700">要完成哪件生活事？</text>
+      <text x="28" y="150" fill="#425b5e" font-size="18"><tspan x="28">• 寫到可觀察的小步驟</tspan><tspan x="28" dy="34">• 連回本人在意的目的</tspan><tspan x="28" dy="34">• 不只寫「訓練」</tspan></text>
+    </g>
+    <g transform="translate(338 168)">
+      <rect width="250" height="276" rx="20" fill="#ffffff" stroke="#44766a" stroke-width="3"/>
+      <rect width="250" height="68" rx="20" fill="#44766a"/><rect y="48" width="250" height="20" fill="#44766a"/>
+      <text x="28" y="45" fill="#ffffff" font-size="25" font-weight="700">2　條件</text>
+      <text x="28" y="110" fill="#173f43" font-size="20" font-weight="700">當時情境是什麼？</text>
+      <text x="28" y="150" fill="#425b5e" font-size="18"><tspan x="28">• 時段、環境、用品</tspan><tspan x="28" dy="34">• 開始前的不同狀態</tspan><tspan x="28" dy="34">• 最新計畫或限制</tspan></text>
+    </g>
+    <g transform="translate(614 168)">
+      <rect width="250" height="276" rx="20" fill="#ffffff" stroke="#d97937" stroke-width="3"/>
+      <rect width="250" height="68" rx="20" fill="#d97937"/><rect y="48" width="250" height="20" fill="#d97937"/>
+      <text x="28" y="45" fill="#ffffff" font-size="25" font-weight="700">3　協助</text>
+      <text x="28" y="110" fill="#173f43" font-size="20" font-weight="700">實際提供了什麼？</text>
+      <text x="28" y="150" fill="#425b5e" font-size="18"><tspan x="28">• 等待、提示、示範</tspan><tspan x="28" dy="34">• 碰觸位置與人數</tspan><tspan x="28" dy="34">• 不推測態度</tspan></text>
+    </g>
+    <g transform="translate(890 168)">
+      <rect width="250" height="276" rx="20" fill="#ffffff" stroke="#b75c40" stroke-width="3"/>
+      <rect width="250" height="68" rx="20" fill="#b75c40"/><rect y="48" width="250" height="20" fill="#b75c40"/>
+      <text x="28" y="45" fill="#ffffff" font-size="25" font-weight="700">4　結果與下一步</text>
+      <text x="28" y="110" fill="#173f43" font-size="20" font-weight="700">完成到哪、本人怎麼說？</text>
+      <text x="28" y="150" fill="#425b5e" font-size="18"><tspan x="28">• 行為、症狀、回饋</tspan><tspan x="28" dy="34">• 一個可執行下一步</tspan><tspan x="28" dy="34">• 有警訊先回報</tspan></text>
+    </g>
+    <path d="M188 484v42h824v-42" fill="none" stroke="#164f63" stroke-width="5" stroke-linecap="round"/>
+    <rect x="338" y="516" width="524" height="72" rx="36" fill="#164f63"/>
+    <text x="600" y="559" text-anchor="middle" fill="#ffffff" font-size="25" font-weight="700">交班：說清楚變化、安全邊界與下一個決定</text>
+    <text x="600" y="630" text-anchor="middle" fill="#4a6267" font-size="17">定性紀錄框架，非經驗證量表。專業評估與單位法定欄位仍應完成；查核 2026-09-10</text>
+  </g>
+</svg>

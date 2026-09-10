@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">外籍家庭看護三條求助線</title>
+  <desc id="desc">眼前急症或火災撥打一一九，勞動權益、通譯或申訴撥打一九五五，非緊急長照申請與調整撥打一九六六或聯絡既有照顧團隊。</desc>
+  <rect width="1200" height="675" fill="#fffaf4"/>
+  <rect x="0" y="0" width="1200" height="112" fill="#273e55"/>
+  <text x="68" y="58" fill="#ffffff" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="36" font-weight="700">家裡出狀況：先分清楚三條求助線</text>
+  <text x="68" y="91" fill="#dde8ef" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="19">急症不等回覆；權益求助可私下進行；非緊急照顧再走服務線</text>
+  <g font-family="Noto Sans TC, PingFang TC, sans-serif">
+    <g transform="translate(62 166)">
+      <rect width="336" height="354" rx="24" fill="#ffffff" stroke="#c7483e" stroke-width="4"/>
+      <circle cx="168" cy="82" r="57" fill="#c7483e"/>
+      <text x="168" y="99" text-anchor="middle" fill="#ffffff" font-size="47" font-weight="800">119</text>
+      <text x="168" y="176" text-anchor="middle" fill="#8d2d29" font-size="27" font-weight="700">急症、火災、立即危險</text>
+      <text x="36" y="224" fill="#44555d" font-size="19"><tspan x="36">先說：地址、發生什麼事</tspan><tspan x="36" dy="34">幾個人需要幫助、目前反應</tspan><tspan x="36" dy="34">依派遣指示，不等雇主許可</tspan></text>
+    </g>
+    <g transform="translate(432 166)">
+      <rect width="336" height="354" rx="24" fill="#ffffff" stroke="#d97937" stroke-width="4"/>
+      <circle cx="168" cy="82" r="57" fill="#d97937"/>
+      <text x="168" y="99" text-anchor="middle" fill="#ffffff" font-size="47" font-weight="800">1955</text>
+      <text x="168" y="176" text-anchor="middle" fill="#9b4c21" font-size="27" font-weight="700">勞動權益、通譯、申訴</text>
+      <text x="36" y="224" fill="#44555d" font-size="19"><tspan x="36">工資工時、契約、仲介費</tspan><tspan x="36" dy="34">24 小時、免付費、多語服務</tspan><tspan x="36" dy="34">不是急救派遣電話</tspan></text>
+    </g>
+    <g transform="translate(802 166)">
+      <rect width="336" height="354" rx="24" fill="#ffffff" stroke="#22746d" stroke-width="4"/>
+      <circle cx="168" cy="82" r="57" fill="#22746d"/>
+      <text x="168" y="99" text-anchor="middle" fill="#ffffff" font-size="47" font-weight="800">1966</text>
+      <text x="168" y="176" text-anchor="middle" fill="#185951" font-size="27" font-weight="700">非緊急長照服務安排</text>
+      <text x="36" y="224" fill="#44555d" font-size="19"><tspan x="36">申請、服務量或安排調整</tspan><tspan x="36" dy="34">也可聯絡既有照顧團隊</tspan><tspan x="36" dy="34">不是醫療諮詢或急救</tspan></text>
+    </g>
+    <rect x="137" y="556" width="926" height="66" rx="33" fill="#273e55"/>
+    <text x="600" y="586" text-anchor="middle" fill="#ffffff" font-size="19" font-weight="700">來源：消防署、勞動力發展署、衛福部長照專區；查核 2026-09-10</text>
+    <text x="600" y="611" text-anchor="middle" fill="#dce7ed" font-size="16">服務內容與時間可能調整，請定期依官方公告更新求助卡</text>
+  </g>
+</svg>

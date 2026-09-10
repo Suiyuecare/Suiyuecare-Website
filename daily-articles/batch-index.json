@@ -230,6 +230,34 @@
           "reason": "explicit-user-request"
         }
       ]
+    },
+    {
+      "date": "2026-09-10",
+      "displayDate": "2026.09.10",
+      "commit": "SELF",
+      "articles": [
+        {
+          "slug": "community-first-visit-comfort-card",
+          "title": "第一次陪長輩去社區據點：一張安心參與卡，保留選擇與退場空間",
+          "businessItem": "社區據點",
+          "publicNumber": 152,
+          "contentHash": "sha256:8c73b5c73bf45bf513f5c1f0e60c2bbbfb2e80d878793d5d0e776da03f1c5705"
+        },
+        {
+          "slug": "reablement-functional-record-four-fields",
+          "title": "復能紀錄別只寫「今天有進步」：四欄留下能交班的功能變化",
+          "businessItem": "護理復能",
+          "publicNumber": 153,
+          "contentHash": "sha256:9b67636952f4f59ee16d98f121444a2e7b5564228b5f3542842665e1f0d481e7"
+        },
+        {
+          "slug": "migrant-care-three-help-routes",
+          "title": "家裡出狀況到底打給誰？替外籍家庭看護畫好三條求助線",
+          "businessItem": "移工培訓",
+          "publicNumber": 154,
+          "contentHash": "sha256:1cc06f2255eea2dbac1eb0a5a3f680fdf916bc656ec9776cf88558f09eae0361"
+        }
+      ]
     }
   ]
 }

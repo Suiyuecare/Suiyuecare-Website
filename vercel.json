@@ -1618,6 +1618,21 @@
       "source": "/article/day-care-meal-plan-update-handover",
       "destination": "/article/article151",
       "permanent": true
+    },
+    {
+      "source": "/article/community-first-visit-comfort-card",
+      "destination": "/article/article152",
+      "permanent": true
+    },
+    {
+      "source": "/article/reablement-functional-record-four-fields",
+      "destination": "/article/article153",
+      "permanent": true
+    },
+    {
+      "source": "/article/migrant-care-three-help-routes",
+      "destination": "/article/article154",
+      "permanent": true
     }
   ],
   "rewrites": [
