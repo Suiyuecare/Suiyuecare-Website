@@ -258,6 +258,45 @@
           "contentHash": "sha256:1cc06f2255eea2dbac1eb0a5a3f680fdf916bc656ec9776cf88558f09eae0361"
         }
       ]
+    },
+    {
+      "date": "2026-09-11",
+      "displayDate": "2026.09.11",
+      "commit": "SELF",
+      "topicMode": "disease",
+      "cycleDay": 1,
+      "articles": [
+        {
+          "slug": "sarcopenia-treatment-barriers-care",
+          "title": "肌少症治療卡關怎麼辦？從食慾、疼痛到活動中斷找原因",
+          "diseaseTopic": "肌少症",
+          "primaryQuestion": "已有肌少症運動與營養建議，卻因食慾、疼痛或生活安排做不下去時，如何找出中斷原因並安全調整？",
+          "careContext": "居家肌少症照顧中，家屬與護理復能團隊共同處理治療執行障礙",
+          "businessItem": "護理復能",
+          "publicNumber": 155,
+          "contentHash": "sha256:2bcf21f2f6e7aeb01334c5c0b261381e1e867e110dd1e888feee09d9a2ddd2ce"
+        },
+        {
+          "slug": "parkinsons-freezing-doorway-safe-cues",
+          "title": "帕金森氏症走到門口就卡住？認識凍結步態、治療與安全提示",
+          "diseaseTopic": "帕金森氏症",
+          "primaryQuestion": "帕金森氏症長輩在門口或轉彎時凍住，家屬如何安全回應並與團隊調整治療？",
+          "careContext": "已診斷帕金森氏症長輩在居家門口、起步、轉彎與日常移動時出現凍結步態的家庭照顧",
+          "businessItem": "護理復能",
+          "publicNumber": 156,
+          "contentHash": "sha256:344d2591cd1f83a4b19ebfff95e00402a1a50470961a551f8939eb84e7c019b5"
+        },
+        {
+          "slug": "dementia-acute-change-medical-handover",
+          "title": "失智症突然更混亂，真的是退化嗎？辨認急性改變與就醫準備",
+          "diseaseTopic": "失智症",
+          "primaryQuestion": "失智症長輩突然更混亂或變安靜時，如何辨認急性改變並準備醫療與日照交接？",
+          "careContext": "已確診失智症長輩在家庭或日照突然偏離平常狀態，從緊急評估到返家與日照恢復支持。",
+          "businessItem": "日間照顧",
+          "publicNumber": 157,
+          "contentHash": "sha256:ee9bea54ed56b6adccc3e510695d6ac6321a149a252785f0f994ee9d196e9d0b"
+        }
+      ]
     }
   ]
 }

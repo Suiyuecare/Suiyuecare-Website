@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="sarcopenia-barriers-title sarcopenia-barriers-desc">
+  <title id="sarcopenia-barriers-title">肌少症治療卡關：先看安全，再找原因</title>
+  <desc id="sarcopenia-barriers-desc">定性照顧流程。先辨識胸痛、明顯呼吸困難或昏厥等警訊，有警訊時停止活動並求助。沒有急症時，分別了解進食、身體與生活安排的卡點，和團隊先調整一件事、觀察反應，再約定回看。本圖不是診斷工具。</desc>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L9 5 L0 10" fill="none" stroke="#557b6b" stroke-width="1.8"/></marker></defs>
+  <rect width="1200" height="675" fill="#f7f7ef"/>
+  <g font-family="Noto Sans TC, PingFang TC, Microsoft JhengHei, sans-serif">
+    <text x="48" y="74" font-size="42" font-weight="700" fill="#203f34">肌少症治療卡關，先找出做不下去的原因</text>
+    <text x="48" y="119" font-size="25" fill="#51665a">從本人感受與實際生活開始，不用加練或催促代替評估。</text>
+    <rect x="48" y="150" width="1104" height="86" rx="18" fill="#fce8dd"/>
+    <text x="72" y="186" font-size="27" font-weight="700" fill="#933d29">先看安全警訊</text>
+    <text x="72" y="219" font-size="23" fill="#713f32">突然胸痛、明顯喘、昏厥等 → 停止活動並依緊急流程求助</text>
+    <text x="600" y="272" text-anchor="middle" font-size="23" fill="#51665a">沒有急症時，分辨主要卡點</text>
+    <rect x="48" y="293" width="344" height="166" rx="20" fill="#e1eee5"/>
+    <rect x="428" y="293" width="344" height="166" rx="20" fill="#e4edf3"/>
+    <rect x="808" y="293" width="344" height="166" rx="20" fill="#f1e8d8"/>
+    <text x="76" y="337" font-size="30" font-weight="700" fill="#203f34">進食卡點</text>
+    <text x="76" y="381" font-size="24" fill="#3d5548">食慾、咀嚼、餐後不適</text>
+    <text x="76" y="422" font-size="22" fill="#3d5548">記實際食量與困難時段</text>
+    <text x="456" y="337" font-size="30" font-weight="700" fill="#24495a">身體卡點</text>
+    <text x="456" y="381" font-size="24" fill="#3a5765">疼痛、頭暈、害怕跌倒</text>
+    <text x="456" y="422" font-size="22" fill="#3a5765">記症狀與引發的動作</text>
+    <text x="836" y="337" font-size="30" font-weight="700" fill="#624d2f">生活卡點</text>
+    <text x="836" y="381" font-size="24" fill="#66563e">時間、陪伴、照顧負擔</text>
+    <text x="836" y="422" font-size="22" fill="#66563e">找能持續的時段與分工</text>
+    <path d="M220 467 V489 H980 V467 M600 489 V511" fill="none" stroke="#557b6b" stroke-width="3" marker-end="url(#arrow)"/>
+    <rect x="48" y="522" width="1104" height="78" rx="20" fill="#285443"/>
+    <text x="600" y="570" text-anchor="middle" font-size="29" font-weight="700" fill="#fff">和團隊先改一件事 → 觀察反應 → 約定回看</text>
+    <text x="48" y="642" font-size="21" fill="#52675b">依本文整理的定性流程；無統計數據，不是診斷量表或個別治療處方。</text>
+  </g>
+</svg>

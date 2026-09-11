@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="chart-title chart-desc">
+  <title id="chart-title">凍結步態：先安全，再依個別計畫提示</title>
+  <desc id="chart-desc">定性家庭照顧流程。突然單側無力、說話不清或混亂時，立即撥119。沒有新警訊時，先暫停催促並減少干擾；平衡穩定才使用練過的單一提示；無效、不穩或疲累就停止，依計畫安全協助或求援。這不是診斷工具或標準移位技術。</desc>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6" fill="none" stroke="#517167" stroke-width="2"/></marker></defs>
+  <rect width="1200" height="675" rx="24" fill="#faf8f2"/>
+  <g font-family="Noto Sans TC, PingFang TC, Microsoft JhengHei, sans-serif" fill="#243e34">
+    <text x="64" y="78" font-size="36" font-weight="700">凍結步態：先安全，再依個別計畫提示</text>
+    <text x="64" y="113" font-size="20" fill="#546a62">家屬與照顧者的定性回應流程</text>
+    <rect x="64" y="145" width="1072" height="85" rx="15" fill="#fff0e6" stroke="#dd8151" stroke-width="2"/>
+    <text x="90" y="180" font-size="25" font-weight="700" fill="#914220">突然單側無力、說話不清或混亂？</text>
+    <text x="90" y="211" font-size="21" fill="#914220">立即停止活動、撥 119；不要等待提示或下次藥效。</text>
+    <text x="64" y="271" font-size="20" fill="#546a62">沒有新警訊時，依團隊教過的方法：</text>
+    <rect x="64" y="294" width="324" height="218" rx="18" fill="#e7efe9"/>
+    <text x="88" y="337" font-size="27" font-weight="700">1　暫停，減少干擾</text>
+    <text x="88" y="382" font-size="22">停止催促與多重指令</text>
+    <text x="88" y="418" font-size="22">不拉扯、不推動</text>
+    <text x="88" y="454" font-size="22">確認平衡與安全空間</text>
+    <path d="M399 401 H425" stroke="#517167" stroke-width="3" marker-end="url(#arrow)"/>
+    <rect x="438" y="294" width="324" height="218" rx="18" fill="#e7efe9"/>
+    <text x="462" y="337" font-size="27" font-weight="700">2　使用練過的提示</text>
+    <text x="462" y="382" font-size="22">本人穩定且願意繼續</text>
+    <text x="462" y="418" font-size="22">一次只給一個提示</text>
+    <text x="462" y="454" font-size="22">留時間，不急著換技巧</text>
+    <path d="M774 401 H800" stroke="#517167" stroke-width="3" marker-end="url(#arrow)"/>
+    <rect x="812" y="294" width="324" height="218" rx="18" fill="#e7efe9"/>
+    <text x="836" y="337" font-size="27" font-weight="700">3　無效或不穩就停</text>
+    <text x="836" y="382" font-size="22">依計畫安全協助或求援</text>
+    <text x="836" y="418" font-size="22">記錄情境、提示與反應</text>
+    <text x="836" y="454" font-size="22">反覆增加時提早回報</text>
+    <text x="64" y="565" font-size="21" font-weight="700">提示與陪同方式須先由治療師個別評估；這不是標準移位技術。</text>
+    <text x="64" y="601" font-size="18" fill="#546a62">依 APTA 指引、Parkinson's UK 與急症辨識原則整理；無數值或療效承諾。</text>
+    <text x="64" y="634" font-size="17" fill="#546a62">歲悅長照｜2026.09.11｜定性衛教流程</text>
+  </g>
+</svg>

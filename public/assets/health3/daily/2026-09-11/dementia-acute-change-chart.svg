@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+<title id="title">失智症突然改變：就醫與照顧交接流程</title>
+<desc id="desc">發現長輩與平常不同，突然混亂先立即尋求醫療評估，嚴重警訊撥119。準備平常能力、最後正常時間、變化和藥物資訊不可延誤求醫。依醫療建議處理並追蹤，回到家庭與日照時交接目前支持需求。定性流程，不是診斷量表。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#56776d"/></marker></defs>
+<rect width="1200" height="675" fill="#f5f6ee"/>
+<g font-family="PingFang TC, Noto Sans TC, Microsoft JhengHei, sans-serif">
+<text x="58" y="75" fill="#163e34" font-size="39" font-weight="700">失智症突然改變，先別只當成退化</text>
+<text x="60" y="120" fill="#53665e" font-size="24">看見和平常不同 → 及時求醫 → 把恢復中的需要接好</text>
+<g transform="translate(52 168)">
+<rect width="340" height="304" rx="22" fill="#fff" stroke="#d4dacf" stroke-width="2"/>
+<circle cx="43" cy="45" r="23" fill="#c75035"/><text x="43" y="54" text-anchor="middle" fill="#fff" font-size="25" font-weight="700">1</text>
+<text x="79" y="53" fill="#173f35" font-size="29" font-weight="700">先尋求醫療協助</text>
+<text x="28" y="113" fill="#334c42" font-size="24">突然混亂、反應或清醒改變</text>
+<text x="28" y="155" fill="#334c42" font-size="24">安靜嗜睡，也要留意</text>
+<text x="28" y="206" fill="#b24631" font-size="27" font-weight="700">立即醫療評估</text>
+<text x="28" y="252" fill="#334c42" font-size="23">嚴重警訊或難安全移動</text>
+<text x="28" y="282" fill="#b24631" font-size="23" font-weight="700">撥 119 求助</text>
+</g>
+<g transform="translate(430 168)">
+<rect width="340" height="304" rx="22" fill="#fff" stroke="#d4dacf" stroke-width="2"/>
+<circle cx="43" cy="45" r="23" fill="#db742d"/><text x="43" y="54" text-anchor="middle" fill="#fff" font-size="25" font-weight="700">2</text>
+<text x="79" y="53" fill="#173f35" font-size="29" font-weight="700">準備一頁資訊</text>
+<text x="28" y="113" fill="#334c42" font-size="24">平常說話、活動與清醒狀態</text>
+<text x="28" y="155" fill="#334c42" font-size="24">最後正常時間、今天的差異</text>
+<text x="28" y="197" fill="#334c42" font-size="24">完整藥物與近期變動</text>
+<rect x="20" y="223" width="300" height="57" rx="12" fill="#fff0df"/>
+<text x="170" y="259" text-anchor="middle" fill="#925020" font-size="23" font-weight="700">資料未齊，也不要等</text>
+</g>
+<g transform="translate(808 168)">
+<rect width="340" height="304" rx="22" fill="#fff" stroke="#d4dacf" stroke-width="2"/>
+<circle cx="43" cy="45" r="23" fill="#386b58"/><text x="43" y="54" text-anchor="middle" fill="#fff" font-size="25" font-weight="700">3</text>
+<text x="79" y="53" fill="#173f35" font-size="29" font-weight="700">處理後持續追蹤</text>
+<text x="28" y="113" fill="#334c42" font-size="24">依醫療建議找原因與處理</text>
+<text x="28" y="155" fill="#334c42" font-size="24">核對用藥、回診與警訊</text>
+<text x="28" y="197" fill="#334c42" font-size="24">交接目前能力與所需協助</text>
+<rect x="20" y="223" width="300" height="57" rx="12" fill="#e6f0e7"/>
+<text x="170" y="259" text-anchor="middle" fill="#335f4d" font-size="23" font-weight="700">家庭與日照共同調整</text>
+</g>
+<path d="M399 320 H423 M777 320 H801" stroke="#56776d" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="52" y="507" width="1096" height="88" rx="18" fill="#173f35"/>
+<text x="81" y="542" fill="#fff" font-size="24" font-weight="700">難以喚醒、呼吸困難、抽搐、新的單側無力或說話不清 → 119</text>
+<text x="81" y="574" fill="#e3ede5" font-size="22">不要自行加鎮靜藥；陪伴與記錄不能取代醫療評估。</text>
+<text x="60" y="635" fill="#627368" font-size="20">依 NICE CG103、NHS 與國健署衛教整理｜定性流程，非診斷量表或成效保證</text>
+</g></svg>

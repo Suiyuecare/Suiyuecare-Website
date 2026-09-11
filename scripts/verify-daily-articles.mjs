@@ -77,10 +77,19 @@ batchIndex.batches.forEach((batch) => {
   }
 
   const plannedArticles = [...batch.articles, ...withheldArticles];
-  const businessItems = plannedArticles.map((item) => item.businessItem);
-  assert(new Set(businessItems).size === 3, `${batch.date} business items must be distinct`);
-  const expected = expectedRotation[taipeiWeekday(batch.date)];
-  assert(expected.every((item) => businessItems.includes(item)), `${batch.date} does not match the weekday rotation`);
+  const isDiseaseBatch = batch.topicMode === "disease";
+  assert(!batch.topicMode || isDiseaseBatch, `${batch.date} has an unsupported topic mode`);
+  if (isDiseaseBatch) {
+    assert(!isEditorialSelection, `${batch.date} disease batch must publish all three prepared articles together`);
+    assert(Number.isInteger(batch.cycleDay) && batch.cycleDay >= 1 && batch.cycleDay <= 4, `${batch.date} disease cycle day must be 1–4`);
+    const topics = plannedArticles.map((item) => String(item.diseaseTopic || "").trim());
+    assert(topics.every(Boolean) && new Set(topics).size === 3, `${batch.date} disease topics must be present and distinct`);
+  } else {
+    const businessItems = plannedArticles.map((item) => item.businessItem);
+    assert(new Set(businessItems).size === 3, `${batch.date} business items must be distinct`);
+    const expected = expectedRotation[taipeiWeekday(batch.date)];
+    assert(expected.every((item) => businessItems.includes(item)), `${batch.date} does not match the weekday rotation`);
+  }
 
   const numbers = batch.articles.map((item) => item.publicNumber).sort((a, b) => a - b);
   assert(
@@ -126,6 +135,16 @@ batchIndex.batches.forEach((batch) => {
     assert(article.readingMinutes >= 8 && article.readingMinutes <= 12, `Reading time out of range: ${entry.slug}`);
     assert(article.content.length >= 5 && article.content.length <= 7, `Content section count out of range: ${entry.slug}`);
     assert(article.content.every((section) => Array.isArray(section[1]) && section[1].length === 2), `Each section needs two paragraphs: ${entry.slug}`);
+    if (isDiseaseBatch) {
+      assert(article.diseaseTopic === entry.diseaseTopic, `Disease topic mismatch for ${entry.slug}`);
+      for (const field of ["primaryQuestion", "careContext"]) {
+        assert(typeof article[field] === "string" && article[field].trim() && article[field] === entry[field], `Disease ${field} metadata missing or mismatched: ${entry.slug}`);
+      }
+      const headings = new Set(article.content.map((section) => section[0]));
+      for (const area of ["introduction", "treatment", "care"]) {
+        assert(headings.has(article.coverage?.[area]), `Disease ${area} section missing: ${entry.slug}`);
+      }
+    }
     assert(article.summary.length >= 3 && article.summary.length <= 5, `Summary point count out of range: ${entry.slug}`);
     assert(article.checklists.length === 1, `Each article needs one checklist: ${entry.slug}`);
     assert(article.tables.length === 1, `Each article needs one table: ${entry.slug}`);

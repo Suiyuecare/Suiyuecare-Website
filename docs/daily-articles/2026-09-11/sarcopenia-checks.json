@@ -1,0 +1,60 @@
+{
+  "bodyHan": 2282,
+  "bodyChars": 2555,
+  "sections": 7,
+  "paragraphCounts": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+  ],
+  "references": 5,
+  "summary": 4,
+  "related": [
+    "sarcopenia-awgs-diagnosis",
+    "sarcopenia-nutrition-protein",
+    "sarcopenia-exercise-plan"
+  ],
+  "images": [
+    {
+      "file": "assets/health3/daily/2026-09-11/sarcopenia-barriers-hero.jpg",
+      "bytes": 306438,
+      "sha256": "9a145ba61b3b8f07cc4f69b93745fc5b2c6073f0cd3f694d6babd6aa2d4ed412",
+      "mirrorsMatch": true,
+      "width": 1600,
+      "height": 900,
+      "visuallyReviewed": true
+    },
+    {
+      "file": "assets/health3/daily/2026-09-11/sarcopenia-barriers-inline-1.jpg",
+      "bytes": 318563,
+      "sha256": "c4364760496f45405a2ce43c1bfab5e8fb4f4a0338a6af9fc179c3e072aff248",
+      "mirrorsMatch": true,
+      "width": 1600,
+      "height": 900,
+      "visuallyReviewed": true
+    },
+    {
+      "file": "assets/health3/daily/2026-09-11/sarcopenia-barriers-chart.svg",
+      "bytes": 3209,
+      "sha256": "4305eb9bc5bf1cd044b3c1abced642a4aca2143fddbc710df2ea2715e2fcbfa4",
+      "mirrorsMatch": true,
+      "width": 1200,
+      "height": 675,
+      "visuallyReviewed": true
+    },
+    {
+      "file": "assets/health3/daily/2026-09-11/sarcopenia-barriers-inline-2.jpg",
+      "bytes": 328133,
+      "sha256": "62e7fbbf0d691855c4a80b33d46699e76e85552ce3889bf881aaf31b31debf79",
+      "mirrorsMatch": true,
+      "width": 1600,
+      "height": 900,
+      "visuallyReviewed": true
+    }
+  ],
+  "scopeChecks": "PASS: 7 sections x 2 paragraphs; body >=2000 Han; structure; existing related slugs; coverage headings; image positions 1,3,5; Traditional Chinese; accessible SVG."
+}

@@ -1633,6 +1633,21 @@
       "source": "/article/migrant-care-three-help-routes",
       "destination": "/article/article154",
       "permanent": true
+    },
+    {
+      "source": "/article/sarcopenia-treatment-barriers-care",
+      "destination": "/article/article155",
+      "permanent": true
+    },
+    {
+      "source": "/article/parkinsons-freezing-doorway-safe-cues",
+      "destination": "/article/article156",
+      "permanent": true
+    },
+    {
+      "source": "/article/dementia-acute-change-medical-handover",
+      "destination": "/article/article157",
+      "permanent": true
     }
   ],
   "rewrites": [
