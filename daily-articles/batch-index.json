@@ -297,6 +297,34 @@
           "contentHash": "sha256:ee9bea54ed56b6adccc3e510695d6ac6321a149a252785f0f994ee9d196e9d0b"
         }
       ]
+    },
+    {
+      "date": "2026-09-11",
+      "displayDate": "2026.09.11",
+      "commit": "SELF",
+      "articles": [
+        {
+          "slug": "long-term-care-rater-calibration",
+          "title": "同一個實作兩位講師打分不同？長照考核先做四步評分校準",
+          "businessItem": "教育品管",
+          "publicNumber": 158,
+          "contentHash": "sha256:ee98efa00688350650ff27b0f1551da498c30db57c55d43b50cad6f3931ad36e"
+        },
+        {
+          "slug": "long-term-care-voice-input-decision",
+          "title": "長照系統要開語音轉文字嗎？上線前先過隱私、正確性與退路四關",
+          "businessItem": "軟體系統",
+          "publicNumber": 159,
+          "contentHash": "sha256:42f0d5cf3398505de8bac4b29191b758aeb1923c4b9095af6c4cf7e357eb00ce"
+        },
+        {
+          "slug": "home-care-no-entry-agreement",
+          "title": "居服到門口卻聯絡不上：家屬先做四層未能入戶約定",
+          "businessItem": "居家照顧",
+          "publicNumber": 160,
+          "contentHash": "sha256:169c869521fab5789cd970724ce50082d88dd924a0a905853b3896f1f9abc465"
+        }
+      ]
     }
   ]
 }
