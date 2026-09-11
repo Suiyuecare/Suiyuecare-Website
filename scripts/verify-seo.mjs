@@ -83,15 +83,16 @@ for (const slug of slugs) {
   const graph = graphNodes(data);
   const currentPath = routePath(slug);
   const canonical = absoluteUrl(currentPath);
-  const organization = graph.find((node) => hasType(node, "Organization") && hasType(node, "LocalBusiness"));
+  const organization = graph.find((node) => hasType(node, "Organization") && node["@id"] === `${siteOrigin}/#organization`);
   const website = graph.find((node) => hasType(node, "WebSite"));
   const webpage = graph.find((node) => hasType(node, "WebPage"));
   const navigation = graph.find((node) => hasType(node, "ItemList") && node["@id"] === `${siteOrigin}/#site-navigation`);
   const breadcrumb = graph.find((node) => hasType(node, "BreadcrumbList"));
 
   if (!organization) {
-    failures.push(`${slug}: missing Organization + LocalBusiness node.`);
+    failures.push(`${slug}: missing group Organization node.`);
   } else {
+    if (hasType(organization, "LocalBusiness")) failures.push(`${slug}: the group must not stand in for a physical location without a street address.`);
     if (organization["@id"] !== `${siteOrigin}/#organization`) failures.push(`${slug}: organization @id should use www canonical origin.`);
     if (organization.url !== `${siteOrigin}/`) failures.push(`${slug}: organization url should be ${siteOrigin}/.`);
     if (!organization.logo?.startsWith(`${siteOrigin}/assets/`)) failures.push(`${slug}: organization logo should use absolute www asset URL.`);

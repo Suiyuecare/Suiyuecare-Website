@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { renderPublicArticleLayout } from "../public-content-renderer.mjs";
 import { articlePublicHref } from "../article-url-map.mjs";
+import { parseHTML } from "linkedom";
 
 const routes = [
   "about",
@@ -53,15 +54,26 @@ const knownRouteHashes = [
   "contact"
 ];
 const asyncRecruitingRoutes = new Set(["talent", "land", "investor-recruiting"]);
-const staleRecruitingShellMarkers = [
-  'class="hero talent-recruit-hero',
-  'class="hero service-detail-hero one-minute-service-hero land-recruit-hero',
-  'class="hero service-detail-hero one-minute-service-hero investor-recruit-hero',
-  "recruiting-cms-hero",
-  "career-page recruiting-cms-page",
-  "land-recruit-page",
-  "investor-recruit-page"
-];
+const publicSnapshot = JSON.parse(fs.readFileSync(path.resolve("public/cms-fallbacks.json"), "utf8"));
+const isPublished = (row) => row.status === "published" && row.is_enabled !== false
+  && (!row.published_at || new Date(row.published_at).getTime() <= Date.now());
+const normalizeText = (value) => String(value || "").replace(/\s+/g, " ").trim();
+
+function hasCurrentRecruitingContent(html, route) {
+  if (!asyncRecruitingRoutes.has(route)) return true;
+  const page = publicSnapshot.recruitingPages.find((row) => row.page_slug === route && isPublished(row));
+  if (!page) return false;
+  const document = parseHTML(html).document;
+  const pageView = document.querySelector("#pageView");
+  const hero = pageView?.querySelector(".recruiting-cms-hero");
+  if (pageView?.dataset.prerenderedRoute !== route || !pageView.classList.contains("active")) return false;
+  if (normalizeText(hero?.querySelector("h1")?.textContent) !== normalizeText(page.title)) return false;
+  if (!normalizeText(hero?.textContent).includes(normalizeText(page.body || page.subtitle))) return false;
+  const expected = new Set(publicSnapshot.recruitingOpenings.filter((row) => row.page_slug === route && isPublished(row)
+    && (route !== "land" || row.opening_slug === "daycare-site")).map((row) => row.id));
+  const actual = new Set([...pageView.querySelectorAll("[data-opening-id]")].map((node) => node.dataset.openingId).filter(Boolean));
+  return expected.size === actual.size && [...expected].every((id) => actual.has(id));
+}
 const criticalMobileHeroAssets = {
   home: "/assets/hero-care-hero-fast-mobile.jpg",
   about: "/assets/about/about-team-group-hero-v2-mobile.jpg",
@@ -118,13 +130,10 @@ const checks = [
     detail: () => "non-home routes must not ship the full static home page shell"
   },
   {
-    name: "async recruiting first paint",
+    name: "published recruiting first paint",
     test: (html, route) =>
-      !asyncRecruitingRoutes.has(route) ||
-      (!html.includes("initial-page-loader") &&
-        !html.includes("route-page-loader") &&
-        staleRecruitingShellMarkers.every((marker) => !html.includes(marker))),
-    detail: (route) => `dist/${route}/index.html must avoid loading chrome and stale recruiting content before app hydration`
+      !html.includes("initial-page-loader") && !html.includes("route-page-loader") && hasCurrentRecruitingContent(html, route),
+    detail: (route) => `dist/${route}/index.html must show the current published CMS hero and openings before hydration`
   },
   {
     name: "brand home link",
@@ -284,7 +293,7 @@ function verifyAsyncRendererAvoidsStaleFallback(source, name) {
   const awaitIndex = block.indexOf("await ");
   const fallbackIndex = block.indexOf("fallbackRenderer()");
   const fallbackHtmlIndex = block.indexOf("fallbackHtml");
-  const busyStartIndex = block.indexOf("setPageViewBusy(true)");
+  const busyStartIndex = block.search(/setPageViewBusy\((?:true|!hasPrerender)\)/);
   const innerFallbackIndex = block.search(/pageView\.innerHTML\s*=\s*(fallbackRenderer\(\)|fallbackHtml)/);
 
   if (loadingIndex >= 0) {
@@ -321,7 +330,7 @@ function verifyAsyncRendererAvoidsStaleFallback(source, name) {
     failures.push(`app.js: ${name} should keep fallback HTML offscreen for CMS field merging`);
   }
   if (busyStartIndex < 0 || busyStartIndex > awaitIndex) {
-    failures.push(`app.js: ${name} should mark #pageView busy before waiting for CMS data`);
+    failures.push(`app.js: ${name} should set loading state before waiting, while keeping matching prerender content usable`);
   }
 }
 
@@ -707,12 +716,13 @@ function verifyCoursesRouteStableFirstPaint(appSource) {
     return;
   }
   const awaitIndex = renderer.indexOf("await ");
-  const finalRenderIndex = renderer.indexOf("pageView.innerHTML = renderCoursesPage()");
+  const finalRenderIndex = renderer.indexOf("replacePublicPageContent(pageView, renderCoursesPage()");
   if (awaitIndex < 0 || finalRenderIndex < awaitIndex) {
     failures.push("app.js: courses must wait for published CMS data before rendering the visible page");
   }
-  if (countMatches(renderer, /pageView\.innerHTML\s*=/g) !== 2) {
-    failures.push("app.js: courses must clear once and render final content once");
+  if (!renderer.includes('if (!hasPrerender) pageView.innerHTML = ""') || countMatches(renderer, /replacePublicPageContent\(pageView,/g) !== 1
+    || !renderer.includes("!hasPrerender || !coursesLoadFailed") || !renderer.includes("preserveInput: hasPrerender")) {
+    failures.push("app.js: courses must preserve published prerenders and user input, then apply one successful CMS update");
   }
 }
 

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { publicStructuredDataObject } from "../public-route-structured-data.mjs";
+import { getPublicEditorialInfo } from "../public-editorial.mjs";
 import { loadPublicContent } from "./load-public-content.mjs";
 
 const rootDir = path.resolve(import.meta.dirname, "..");
@@ -125,7 +126,7 @@ for (const item of publicContent.items) {
   } else {
     if (articleSchema.headline !== item.title) failures.push(`${item.href}: schema headline is stale`);
     if (articleSchema.datePublished !== item.publishedAt) failures.push(`${item.href}: schema published date is stale`);
-    if (articleSchema.dateModified !== item.updatedAt) failures.push(`${item.href}: schema modified date is stale`);
+    if (articleSchema.dateModified !== (getPublicEditorialInfo(item).contentUpdatedAt || item.updatedAt)) failures.push(`${item.href}: schema modified date is stale`);
   }
   const breadcrumb = graph.find((entry) => entry?.["@type"] === "BreadcrumbList");
   if (!breadcrumb || breadcrumb.itemListElement?.length !== 3) {

@@ -3,6 +3,14 @@ import { fetchMediaImages, getFocalPointOption, getImageUsageOption, prepareImag
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatUpdatedAt } from "./utils.js";
 import { canEditScope, canPublishScope, contentSaveMessage } from "./content-scope.js";
+import "./article-editorial-fields.css";
+import {
+  editorialFieldName,
+  editorialFormValues,
+  mergeEditorialFormValues,
+  renderEditorialEditorFields,
+  validateEditorialFormValues
+} from "./article-editorial-fields.mjs";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -37,6 +45,8 @@ let isNewArticle = true;
 let categories = [];
 let selectedCoverMedia = null;
 let currentContentJson = {};
+let initialEditorialValues = {};
+let clearedEditorialGroups = [];
 let lastEditorRange = null;
 let adminPermissions = {};
 const articleScope = "health";
@@ -241,6 +251,51 @@ function simplifyArticleEditorLayout() {
 
   const remaining = [...rootGrid.children].filter((child) => child !== simpleSection && child !== advancedSection);
   remaining.forEach((child) => advancedGrid.append(child));
+  advancedSection.insertAdjacentHTML("beforebegin", renderEditorialEditorFields());
+  const editorialSection = form.querySelector("[data-article-editorial-fields]");
+  editorialSection?.addEventListener("input", (event) => event.target.setCustomValidity?.(""));
+  editorialSection?.addEventListener("change", (event) => event.target.setCustomValidity?.(""));
+  editorialSection?.addEventListener("invalid", () => { editorialSection.open = true; }, true);
+  editorialSection?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-editorial-clear]");
+    if (!button) return;
+    const group = button.dataset.editorialClear;
+    clearedEditorialGroups = [...new Set([...clearedEditorialGroups, group])];
+    editorialSection.querySelectorAll(`[data-editorial-group="${group}"]`).forEach((control) => {
+      control.value = "";
+      control.setCustomValidity("");
+    });
+    if (group === "reviewer") {
+      const reviewedAt = form.elements[editorialFieldName("reviewedAt")];
+      reviewedAt.value = "";
+      reviewedAt.setCustomValidity("");
+    }
+  });
+  for (const [legacyName, key] of [["author_name", "name"], ["author_title", "role"]]) {
+    form.elements[legacyName]?.addEventListener("input", () => {
+      const name = editorialFieldName("author", key);
+      const control = form.elements[name];
+      if (!control || clearedEditorialGroups.includes("author") || currentContentJson.editorial?.author?.[key] !== undefined || control.value !== initialEditorialValues[name]) return;
+      control.value = form.elements[legacyName].value;
+      initialEditorialValues[name] = control.value;
+    });
+  }
+}
+
+function readEditorialEditorValues() {
+  return Object.fromEntries([...form.querySelectorAll("[data-editorial-field]")].map((control) => [control.name, control.value]));
+}
+
+function fillEditorialEditorFields(article = {}) {
+  const values = editorialFormValues(currentContentJson, article);
+  for (const [name, value] of Object.entries(values)) {
+    const control = form.elements[name];
+    if (!control) continue;
+    control.value = value;
+    control.setCustomValidity("");
+  }
+  initialEditorialValues = readEditorialEditorValues();
+  clearedEditorialGroups = [];
 }
 
 function getArticleIdFromLocation() {
@@ -396,6 +451,7 @@ function fillForm(article) {
   form.elements.seo_keywords.value = Array.isArray(article.seo_keywords) ? article.seo_keywords.join(", ") : "";
   form.elements.canonical_url.value = article.canonical_url || currentContentJson.canonical_url || "";
   form.elements.faq_text.value = fromFaqItems(article.faq_json || currentContentJson.faq || []);
+  fillEditorialEditorFields(article);
 }
 
 function buildPayload() {
@@ -409,7 +465,7 @@ function buildPayload() {
   const videoDuration = form.elements.video_duration.value.trim();
   const videoLabel = form.elements.video_label.value.trim();
   const videoCaption = form.elements.video_caption.value.trim();
-  const contentJson = { ...currentContentJson };
+  const contentJson = { ...mergeEditorialFormValues(currentContentJson, initialEditorialValues, readEditorialEditorValues(), { clearedGroups: clearedEditorialGroups }) };
   const relatedSlugs = toTags(form.elements.related_slugs.value);
   if (relatedSlugs.length) {
     contentJson.related_slugs = relatedSlugs;
@@ -545,6 +601,7 @@ async function loadArticleEditor() {
     form.elements.published_at.value = toLocalDateTimeInput(new Date().toISOString());
     setRichEditorContent("");
     currentContentJson = {};
+    fillEditorialEditorFields({ author_name: form.elements.author_name.value, author_title: form.elements.author_title.value });
     selectedCoverMedia = null;
     renderCoverImage();
     setEditorStatus("", "success");
@@ -803,6 +860,20 @@ async function saveArticle(event) {
   const submitButton = document.querySelector('button[form="articleEditorForm"]');
   submitButton?.setAttribute("disabled", "true");
   setEditorStatus("正在儲存文章...", "info");
+
+  const editorialErrors = validateEditorialFormValues(initialEditorialValues, readEditorialEditorValues());
+  if (editorialErrors.length) {
+    const { name, message } = editorialErrors[0];
+    const section = form.querySelector("[data-article-editorial-fields]");
+    if (section) section.open = true;
+    const control = form.elements[name];
+    control?.setCustomValidity(message);
+    control?.focus();
+    control?.reportValidity();
+    setEditorStatus(message, "error");
+    submitButton?.removeAttribute("disabled");
+    return;
+  }
 
   const payload = buildPayload();
   if (!payload.title || !payload.slug) {

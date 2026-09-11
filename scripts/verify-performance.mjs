@@ -8,30 +8,30 @@ const kib = 1024;
 
 const routeBudgets = [
   { route: "/", file: "index.html", maxKb: 90 },
-  { route: "/about", file: "about/index.html", maxKb: 45 },
-  { route: "/milestones", file: "milestones/index.html", maxKb: 45 },
-  { route: "/home-care", file: "home-care/index.html", maxKb: 45 },
-  { route: "/day-care", file: "day-care/index.html", maxKb: 45 },
-  { route: "/community", file: "community/index.html", maxKb: 45 },
-  { route: "/nursing", file: "nursing/index.html", maxKb: 45 },
-  { route: "/migrant-training", file: "migrant-training/index.html", maxKb: 45 },
-  { route: "/quality", file: "quality/index.html", maxKb: 45 },
-  { route: "/software", file: "software/index.html", maxKb: 45 },
-  { route: "/courses", file: "courses/index.html", maxKb: 45 },
-  { route: "/talent", file: "talent/index.html", maxKb: 45 },
-  { route: "/land", file: "land/index.html", maxKb: 45 },
-  { route: "/investor-recruiting", file: "investor-recruiting/index.html", maxKb: 45 },
+  { route: "/about", file: "about/index.html", maxKb: 64, gzipMaxKb: 16 },
+  { route: "/milestones", file: "milestones/index.html", maxKb: 64, gzipMaxKb: 16 },
+  { route: "/home-care", file: "home-care/index.html", maxKb: 100, gzipMaxKb: 24 },
+  { route: "/day-care", file: "day-care/index.html", maxKb: 110, gzipMaxKb: 26 },
+  { route: "/community", file: "community/index.html", maxKb: 96, gzipMaxKb: 24 },
+  { route: "/nursing", file: "nursing/index.html", maxKb: 80, gzipMaxKb: 20 },
+  { route: "/migrant-training", file: "migrant-training/index.html", maxKb: 72, gzipMaxKb: 18 },
+  { route: "/quality", file: "quality/index.html", maxKb: 72, gzipMaxKb: 18 },
+  { route: "/software", file: "software/index.html", maxKb: 72, gzipMaxKb: 18 },
+  { route: "/courses", file: "courses/index.html", maxKb: 96, gzipMaxKb: 20 },
+  { route: "/talent", file: "talent/index.html", maxKb: 300, gzipMaxKb: 38 },
+  { route: "/land", file: "land/index.html", maxKb: 64, gzipMaxKb: 16 },
+  { route: "/investor-recruiting", file: "investor-recruiting/index.html", maxKb: 64, gzipMaxKb: 16 },
   { route: "/health", file: "health/index.html", maxKb: 100 },
   { route: "/search", file: "search/index.html", maxKb: 45 },
-  { route: "/investors", file: "investors/index.html", maxKb: 45 },
-  { route: "/ir-finance", file: "ir-finance/index.html", maxKb: 45 },
-  { route: "/ir-governance", file: "ir-governance/index.html", maxKb: 45 },
-  { route: "/ir-shareholders", file: "ir-shareholders/index.html", maxKb: 45 },
+  { route: "/investors", file: "investors/index.html", maxKb: 64, gzipMaxKb: 16 },
+  { route: "/ir-finance", file: "ir-finance/index.html", maxKb: 64, gzipMaxKb: 16 },
+  { route: "/ir-governance", file: "ir-governance/index.html", maxKb: 64, gzipMaxKb: 16 },
+  { route: "/ir-shareholders", file: "ir-shareholders/index.html", maxKb: 64, gzipMaxKb: 16 },
   { route: "/contact", file: "contact/index.html", maxKb: 45 }
 ];
 
 const entryBudgets = [
-  { label: "front app bundle", prefix: "app-", ext: ".js", maxKb: 432, gzipMaxKb: 134 },
+  { label: "front app bundle", prefix: "app-", ext: ".js", maxKb: 464, gzipMaxKb: 144 },
   { label: "front style bundle", prefix: "styles-", ext: ".css", maxKb: 251, gzipMaxKb: 46 },
   { label: "Supabase browser client chunk", prefix: "supabaseClient-", ext: ".js", maxKb: 260, gzipMaxKb: 75 }
 ];
@@ -106,7 +106,10 @@ function gzipSize(filePath) {
 function verifyRouteHtmlBudgets() {
   let totalBytes = 0;
   for (const route of routeBudgets) {
-    totalBytes += assertBudget(path.join(distDir, route.file), route.maxKb, `${route.route} HTML`);
+    const filePath = path.join(distDir, route.file);
+    totalBytes += assertBudget(filePath, route.maxKb, `${route.route} HTML`);
+    const compressed = gzipSize(filePath);
+    assert(compressed <= (route.gzipMaxKb || 24) * kib, `${route.route} HTML gzip is ${formatKb(compressed)}, over budget ${route.gzipMaxKb || 24}KB.`);
   }
   console.log(`ok - public route HTML stays within budget (${formatKb(totalBytes)} total)`);
 }

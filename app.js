@@ -1,3 +1,8 @@
+import { preparePrerenderedService, replacePublicPageContent } from "./public-service-prerender.mjs";
+import { getServiceLocationByRoute, renderServiceLocationPage, hydrateServiceLocationLinks, readServiceLocationManifest } from "./public-service-locations.mjs";
+import { EDITORIAL_POLICY_ROUTE, renderEditorialPolicyPage } from "./public-editorial.mjs";
+import "./public-service-locations.css";
+import "./public-editorial.css";
 import { supabase } from "./src/lib/supabaseClient.js";
 import { getUniqueHealthTopics, resolveHealthTopic, articleMatchesHealthTopic, renderHealthTopicNavigation } from "./health-topic-navigation.mjs";
 import { renderContactPage, renderContactNeedOptions, contactSubmissionErrorMessage } from "./contact-page.mjs";
@@ -23,6 +28,7 @@ import {
   normalizeStaticPublicArticle
 } from "./public-content-adapters.mjs";
 import { updatePublicStructuredData } from "./public-route-structured-data.mjs";
+import { homepageImageUrl } from "./home-image-variants.mjs";
 
 const FRONTEND_BUILD_VERSION = "health-editorial-20260909-1";
 document.documentElement.dataset.frontendBuild = FRONTEND_BUILD_VERSION;
@@ -382,6 +388,8 @@ function absoluteSiteUrl(path = "") {
 
 function routeCanonical(slug = "home") {
   if (!slug || slug === "home") return absoluteSiteUrl("/");
+  const serviceLocation = getServiceLocationByRoute(slug);
+  if (serviceLocation) return absoluteSiteUrl(serviceLocation.path);
   const articleMatch = String(slug).match(/^article-(.+)$/);
   if (articleMatch) return absoluteSiteUrl(articlePublicHref(articleMatch[1]));
   const storyMatch = String(slug).match(/^care-story-(.+)$/);
@@ -395,6 +403,7 @@ function routeSlugFromPath(pathname = window.location.pathname) {
   const cleaned = String(pathname || "/").replace(/^\/+|\/+$/g, "");
   if (!cleaned) return "home";
   const segments = cleaned.split("/");
+  if (segments[0] === "locations") return `locations-${segments.slice(1).join("/")}`;
   if (segments[0] === "article" && segments[1]) return `article-${segments.slice(1).join("/")}`;
   if (segments[0] === "care-story" && segments[1]) return `care-story-${segments.slice(1).join("/")}`;
   if (segments[0] === "master-talk" && segments[1]) return `master-talk-${segments.slice(1).join("/")}`;
@@ -402,7 +411,7 @@ function routeSlugFromPath(pathname = window.location.pathname) {
 }
 
 function isKnownRouteSlug(slug = "") {
-  return Boolean(routeSeoMap[slug]) || /^(article|care-story|master-talk)-/.test(slug);
+  return slug === "editorial-policy" || Boolean(getServiceLocationByRoute(slug)) || Boolean(routeSeoMap[slug]) || /^(article|care-story|master-talk)-/.test(slug);
 }
 
 function routeSlugFromLocation() {
@@ -551,7 +560,12 @@ function warmHeroImage(src = "") {
   image.decode?.().catch(() => {});
 }
 
-preloadHeroImage(routeHeroImageForViewport());
+const initialHeroRoute = routeSlugFromLocation().split("?")[0];
+if (initialHeroRoute !== "editorial-policy") {
+  const initialHero = getServiceLocationByRoute(initialHeroRoute, readServiceLocationManifest(document))?.image
+    || (routeHeroPreloads[initialHeroRoute] ? routeHeroImageForViewport(initialHeroRoute) : document.querySelector("#heroPreload")?.getAttribute("href"));
+  if (initialHero) preloadHeroImage(initialHero);
+}
 
 function absoluteImageUrl(image = DEFAULT_SEO.image) {
   try {
@@ -644,7 +658,8 @@ function setRouteSeo(slug = "home", overrides = {}) {
     description,
     image,
     article: seo.article || null,
-    breadcrumbParent: seo.breadcrumbParent || null
+    breadcrumbParent: seo.breadcrumbParent || null,
+    location: seo.location || null
   }, SITE_ORIGIN);
 }
 
@@ -3178,6 +3193,7 @@ function getArticleRewriteFields(slug = "") {
   const fields = {};
   [
     "contentRevision",
+    "editorial",
     "dek",
     "summary",
     "content",
@@ -4340,8 +4356,9 @@ function applyCmsEnhancedServicePage(html, slug, fields = []) {
 async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
   const fallbackHtml = fallbackRenderer();
   let fields = [];
-  pageView.innerHTML = "";
-  setPageViewBusy(true);
+  const hasPrerender = pageView.dataset.prerenderedRoute === slug && Boolean(pageView.innerHTML.trim());
+  if (!hasPrerender) pageView.innerHTML = "";
+  setPageViewBusy(!hasPrerender);
   try {
     fields = await fetchSupabaseServiceFields(slug);
   } catch (error) {
@@ -4349,8 +4366,13 @@ async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
   }
   // Tracking parameters do not change this service's identity; real route changes still cancel stale responses.
   if (routeSlugFromLocation().split("?")[0] !== slug) return;
-  pageView.innerHTML = fields.length ? applyCmsEnhancedServicePage(fallbackHtml, slug, fields) : fallbackHtml;
+  if (hasPrerender && !fields.length) {
+    setPageViewBusy(false);
+    return;
+  }
+  replacePublicPageContent(pageView, fields.length ? applyCmsEnhancedServicePage(fallbackHtml, slug, fields) : fallbackHtml, { preserveInput: hasPrerender });
   hydrateServiceLocalLinks(pageView);
+  hydrateServiceLocationLinks(pageView);
   hydrateServiceFeeCodeGroups(pageView);
   hydrateDayCareLocationContent(pageView);
   hydrateHomeCareLocationContent(pageView);
@@ -5780,7 +5802,7 @@ async function loadSupabaseRecruitingPage(slug) {
       }
     }
     if (!data) data = await loadCmsFallback("getRecruitingPage", slug);
-    if (!data || routeSlugFromLocation() !== slug) return "";
+    if (!data || routeSlugFromLocation().split("?")[0] !== slug) return "";
     const visibleOpenings = slug === "land"
       ? data.openings.filter((opening) => opening.opening_slug === "daycare-site")
       : data.openings;
@@ -6172,7 +6194,7 @@ function renderHomeHealthArticles(articles = getHealthArticleList()) {
   const featureHref = normalizePublicHref(feature.href);
   articleRow.innerHTML = `
     <a class="health-preview feature click-card" href="${escapeHTML(featureHref)}">
-      <img ${healthArticleImageAttrs(feature, { usage: feature.imageUsage || "article_cover", focalPoint: feature.focalPoint })} />
+      <img ${healthArticleImageAttrs(feature, { usage: feature.imageUsage || "article_cover", focalPoint: feature.focalPoint })} loading="lazy" decoding="async" />
       <div>
         <span>${escapeHTML(feature.category || "最新文章")}</span>
         <h3>${escapeHTML(feature.title)}</h3>
@@ -6185,7 +6207,7 @@ function renderHomeHealthArticles(articles = getHealthArticleList()) {
         const href = normalizePublicHref(post.href);
         return `
         <a class="health-preview compact click-card" href="${escapeHTML(href)}">
-          <img ${healthArticleImageAttrs(post, { usage: "card", focalPoint: post.focalPoint })} />
+          <img ${healthArticleImageAttrs(post, { usage: "card", focalPoint: post.focalPoint })} loading="lazy" decoding="async" />
           <div>
             <span>${escapeHTML(post.category || "照顧知識")}</span>
             <h3>${escapeHTML(post.title)}</h3>
@@ -6326,7 +6348,7 @@ function renderSupabaseRecruit(items) {
     return `
       <a href="${escapeHTML(normalizePublicHref(item.link_url || "/talent"))}">
         <figure>
-          <img src="${escapeHTML(image)}" alt="${escapeHTML(item.title || "員工招募")}" data-fallback-src="${escapeHTML(fallback)}" />
+          <img src="${escapeHTML(homepageImageUrl(image))}" alt="${escapeHTML(item.title || "員工招募")}" data-fallback-src="${escapeHTML(fallback)}" loading="lazy" decoding="async" />
           <figcaption>${escapeHTML(item.title || "員工招募")}</figcaption>
         </figure>
         <div><p>${escapeHTML(item.body || item.subtitle || "")}</p></div>
@@ -6377,7 +6399,7 @@ function renderSupabaseMasterTalk(items) {
     return `
       <article data-href="${escapeHTML(href)}">
         <figure>
-          <img src="${escapeHTML(image)}" alt="${escapeHTML(speaker)}" />
+          <img src="${escapeHTML(homepageImageUrl(image))}" alt="${escapeHTML(speaker)}" loading="lazy" decoding="async" />
           <figcaption>${escapeHTML(speaker)}</figcaption>
         </figure>
         <div>
@@ -6449,7 +6471,7 @@ function renderSupabaseServices(items) {
     const href = normalizePublicHref(item.link_url || "#contact");
     return `
       <a href="${escapeHTML(href)}">
-        <img src="${escapeHTML(image)}" alt="${escapeHTML(item.metadata?.image_alt || `${item.title}服務情境`)}" />
+        <img src="${escapeHTML(homepageImageUrl(image))}" alt="${escapeHTML(item.metadata?.image_alt || `${item.title}服務情境`)}" loading="lazy" decoding="async" />
         <span>${escapeHTML(item.badge_label || String(index + 1).padStart(2, "0"))}</span>
         <strong>${escapeHTML(item.title || "")}</strong>
         <p>${escapeHTML(item.body || item.subtitle || "")}</p>
@@ -6590,7 +6612,7 @@ function renderSupabasePartners(items) {
     const href = normalizePublicHref(item.link_url || "#contact");
     return `
       <a class="partner-item" href="${escapeHTML(href)}" target="_blank" rel="noopener">
-        <img src="${escapeHTML(image)}" alt="" />
+        <img src="${escapeHTML(image)}" alt="" loading="lazy" decoding="async" />
         <span>${escapeHTML(item.title || "")}</span>
       </a>
     `;
@@ -6937,7 +6959,7 @@ function renderCareStorySlider(stories) {
   if (!renderedStories.length || !slider) return false;
   slider.innerHTML = renderedStories.map((story) => `
     <article>
-      <img class="story-face" src="${escapeHTML(story.avatar)}" alt="${escapeHTML(story.name)}頭像" />
+      <img class="story-face" src="${escapeHTML(homepageImageUrl(story.avatar, "avatar"))}" alt="${escapeHTML(story.name)}頭像" width="62" height="62" loading="lazy" decoding="async" />
       <span class="story-meta"><b>${escapeHTML(story.name)}</b><em>${escapeHTML(story.service)}</em></span>
       <h3>${escapeHTML(story.title)}</h3>
       <div class="story-points"><p>${escapeHTML(story.praise)}</p></div>
@@ -6953,7 +6975,7 @@ function renderExpertTalkSlider(talks) {
   slider.innerHTML = homepageTalks.map((talk) => `
     <article data-href="${escapeHTML(normalizePublicHref(talk.href))}">
       <figure>
-        <img src="${escapeHTML(talk.portrait || talk.image)}" alt="${escapeHTML(`${talk.titleLabel} ${talk.speaker}`)}" />
+        <img src="${escapeHTML(homepageImageUrl(talk.portrait || talk.image))}" alt="${escapeHTML(`${talk.titleLabel} ${talk.speaker}`)}" loading="lazy" decoding="async" />
         <figcaption>${escapeHTML(`${talk.titleLabel} ${talk.speaker}`)}</figcaption>
       </figure>
       <div>
@@ -7338,14 +7360,14 @@ function formatCourseDate(value) {
   if (!value) return "可隨時觀看";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "日期待公告";
-  return new Intl.DateTimeFormat("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit" }).format(date).replace(/\//g, ".");
+  return new Intl.DateTimeFormat("zh-TW", { timeZone: "Asia/Taipei", year: "numeric", month: "2-digit", day: "2-digit" }).format(date).replace(/\//g, ".");
 }
 
 function formatCourseTime(start, end) {
   if (!start) return "可隨時觀看";
   const startDate = new Date(start);
   if (Number.isNaN(startDate.getTime())) return "時間待公告";
-  const formatter = new Intl.DateTimeFormat("zh-TW", { hour: "2-digit", minute: "2-digit", hour12: false });
+  const formatter = new Intl.DateTimeFormat("zh-TW", { timeZone: "Asia/Taipei", hour: "2-digit", minute: "2-digit", hour12: false });
   const startText = formatter.format(startDate);
   const endDate = end ? new Date(end) : null;
   return endDate && !Number.isNaN(endDate.getTime()) ? `${startText}-${formatter.format(endDate)}` : startText;
@@ -7509,19 +7531,20 @@ async function loadSupabaseCourses({ rerender = false } = {}) {
 }
 
 async function renderCoursesPageFromCms() {
+  if (!document.querySelector("#coursePageStyles")) document.head.insertAdjacentHTML("beforeend", '<link id="coursePageStyles" rel="stylesheet" href="/course-page.css">');
+  import(/* @vite-ignore */ "/course-page-interactions.js").catch((error) => console.warn("Course interactions unavailable.", error));
   home.classList.remove("active");
   pageView.classList.add("active");
-  pageView.innerHTML = "";
-  setPageViewBusy(true);
+  const hasPrerender = pageView.dataset.prerenderedRoute === "courses" && Boolean(pageView.innerHTML.trim());
+  if (!hasPrerender) pageView.innerHTML = "";
+  setPageViewBusy(!hasPrerender);
   if (!coursesLoadedFromSupabase && !coursesLoadFailed) await loadSupabaseCourses();
   if (routeSlugFromLocation().split("?")[0] !== "courses") return;
-  pageView.innerHTML = renderCoursesPage();
+  if (!hasPrerender || !coursesLoadFailed) replacePublicPageContent(pageView, renderCoursesPage(), { preserveInput: hasPrerender });
   setPageViewBusy(false);
 }
 
 function renderCoursesPage() {
-  if (!document.querySelector("#coursePageStyles")) document.head.insertAdjacentHTML("beforeend", '<link id="coursePageStyles" rel="stylesheet" href="/course-page.css">');
-  import(/* @vite-ignore */ "/course-page-interactions.js");
   const courses = getVisibleCourses();
   const featuredCourses = courses.filter((course) => course.isFeatured);
   const importantCourses = (featuredCourses.length ? featuredCourses : courses).slice(0, 6);
@@ -7538,8 +7561,8 @@ function renderCoursesPage() {
         <div class="course-hero-card">
           <h2>找一堂適合你的長照課</h2>
           <form class="course-search">
-            <input name="course_query" type="search" placeholder="搜尋課程或講師" />
-            <select name="course_location"><option value="">全部地點</option><option>台北</option><option>新北</option><option>線上</option></select>
+            <input name="course_query" type="search" placeholder="搜尋課程或講師" aria-label="搜尋課程或講師" />
+            <select name="course_location" aria-label="課程地點"><option value="">全部地點</option><option>台北</option><option>新北</option><option>線上</option></select>
             <button type="submit">搜尋</button>
           </form>
         </div>
@@ -11011,11 +11034,12 @@ async function loadArticlePage(slug, requestId = publicContentRouteRequestId) {
 
 async function renderRecruitingPageOnce(slug, fallbackRenderer) {
   const fallbackHtml = fallbackRenderer();
-  pageView.innerHTML = "";
-  setPageViewBusy(true);
+  const hasPrerender = pageView.dataset.prerenderedRoute === slug && Boolean(pageView.innerHTML.trim());
+  if (!hasPrerender) pageView.innerHTML = "";
+  setPageViewBusy(!hasPrerender);
   const renderedHtml = await loadSupabaseRecruitingPage(slug);
-  if (routeSlugFromLocation() !== slug) return;
-  pageView.innerHTML = renderedHtml || fallbackHtml;
+  if (routeSlugFromLocation().split("?")[0] !== slug) return;
+  if (!hasPrerender || renderedHtml) replacePublicPageContent(pageView, renderedHtml || fallbackHtml, { preserveInput: hasPrerender });
   setPageViewBusy(false);
   optimizeImageLoading(pageView);
   observeServiceMotion(pageView);
@@ -11197,8 +11221,22 @@ function renderPage(slug) {
   const publicRouteRequestId = ++publicContentRouteRequestId;
   const rawSlug = slug || "home";
   const [normalized, queryString = ""] = rawSlug.split("?");
-  preloadHeroImage(routeHeroImageForViewport(normalized));
+  if (normalized !== "editorial-policy") {
+    const hero = getServiceLocationByRoute(normalized, readServiceLocationManifest(document))?.image
+      || (routeHeroPreloads[normalized] ? routeHeroImageForViewport(normalized) : (pageView.dataset.prerenderedRoute === normalized ? document.querySelector("#heroPreload")?.getAttribute("href") : null));
+    if (hero) preloadHeroImage(hero);
+  }
   const searchParams = new URLSearchParams(queryString);
+  const publishedServiceLocations = readServiceLocationManifest(document);
+  let serviceLocation = getServiceLocationByRoute(normalized, publishedServiceLocations);
+  const existingLocationData = pageView.querySelector("#serviceLocationData");
+  if (existingLocationData && pageView.dataset.prerenderedRoute === normalized) {
+    try {
+      const publishedLocation = JSON.parse(existingLocationData.textContent);
+      if (publishedLocation.slug === normalized && publishedLocation.id === serviceLocation?.id) serviceLocation = publishedLocation;
+    } catch { /* Fall back to the shared public location data. */ }
+  }
+  const isEditorialPolicy = normalized === "editorial-policy";
   const articleSlug = normalized.startsWith("article-") ? normalized.replace("article-", "") : null;
   const careStorySlug = normalized.startsWith("care-story-") ? normalized.replace("care-story-", "") : null;
   const masterTalkSlug = normalized.startsWith("master-talk-") ? normalized.replace("master-talk-", "") : null;
@@ -11212,6 +11250,7 @@ function renderPage(slug) {
   const isHome = !articleSlug && !careStorySlug && !masterTalkSlug && (normalized === "home" || Boolean(anchorTarget));
   const hasMatchingPrerender = pageView.dataset.prerenderedRoute === normalized && Boolean(pageView.innerHTML.trim());
   const handledBySpecialCms =
+    Boolean(serviceLocation) || isEditorialPolicy ||
     normalized === "about" ||
     normalized === "milestones" ||
     normalized === "home-care" ||
@@ -11237,6 +11276,10 @@ function renderPage(slug) {
     if (!hasMatchingPrerender) {
       setRouteSeo(`master-talk-${masterTalkSlug}`, { title: "名人講堂載入中｜健康3.0", canonical: routeCanonical(`master-talk-${masterTalkSlug}`) });
     }
+  } else if (serviceLocation) {
+    setRouteSeo(normalized, { ...serviceLocation, canonical: absoluteSiteUrl(serviceLocation.path), location: serviceLocation, breadcrumbParent: { name: serviceLocation.serviceName, path: serviceLocation.parentPath } });
+  } else if (isEditorialPolicy) {
+    setRouteSeo(normalized, EDITORIAL_POLICY_ROUTE);
   } else {
     setRouteSeo(normalized || "home");
   }
@@ -11264,12 +11307,41 @@ function renderPage(slug) {
     pageView.classList.add("active");
     if (!hasMatchingPrerender) pageView.innerHTML = "";
     loadExpertTalkPage(masterTalkSlug, publicRouteRequestId);
+  } else if (serviceLocation) {
+    if (!hasMatchingPrerender) pageView.innerHTML = renderServiceLocationPage(serviceLocation, publishedServiceLocations);
+    pageView.dataset.prerenderedRoute = normalized;
+  } else if (isEditorialPolicy) {
+    if (!hasMatchingPrerender) pageView.innerHTML = renderEditorialPolicyPage();
+    pageView.dataset.prerenderedRoute = normalized;
   } else if (isContactPage) {
     home.classList.remove("active");
     pageView.classList.add("active");
     // Preserve a pre-rendered or already active form, including any user input.
     if (!pageView.querySelector("[data-public-contact-page]")) pageView.innerHTML = renderContactPage();
     pageView.dataset.prerenderedRoute = "contact";
+    const requestedLocation = getServiceLocationByRoute(`locations-${searchParams.get("location") || ""}`, publishedServiceLocations);
+    if (requestedLocation) {
+      const form = pageView.querySelector(".contact-form");
+      const select = form?.querySelector('select[name="需求"]');
+      if (select && !["user", "preset"].includes(select.dataset.needSource)) {
+        setContactNeedValue(select, `${requestedLocation.serviceName}諮詢`);
+        select.dataset.needSource = "preset";
+        select.dataset.needRoute = "contact";
+        const notes = form.querySelector('textarea[name="說明"]');
+        if (notes && !notes.value) notes.value = `我想了解${requestedLocation.name}的服務資格與安排。`;
+      }
+    }
+    if (searchParams.get("need") === "文章內容建議") {
+      const form = pageView.querySelector(".contact-form");
+      const select = form?.querySelector('select[name="需求"]');
+      if (select && !["user", "preset"].includes(select.dataset.needSource)) {
+        setContactNeedValue(select, "文章內容建議");
+        select.dataset.needSource = "preset";
+        select.dataset.needRoute = "contact";
+        const notes = form.querySelector('textarea[name="說明"]');
+        if (notes && !notes.value) notes.value = "文章網址：\n建議修正的內容：";
+      }
+    }
   } else if (normalized === "about") {
     home.classList.remove("active");
     pageView.classList.add("active");
@@ -11422,11 +11494,13 @@ function renderPage(slug) {
     loadSupabaseDetailPage(normalized);
   }
 
+  preparePrerenderedService(isHome ? home : pageView);
   optimizeImageLoading(isHome ? home : pageView);
   hydrateServiceFeeCodeGroups(isHome ? home : pageView);
   hydrateDayCareLocationContent(isHome ? home : pageView);
   hydrateHomeCareLocationContent(isHome ? home : pageView);
   hydrateCommunityContent(isHome ? home : pageView);
+  hydrateServiceLocationLinks(isHome ? home : pageView);
   syncContactNeedDefaults(document, normalized);
   if (isContactPage || window.location.hash === "#contact") {
     applyPendingContactPreset();
@@ -11453,13 +11527,15 @@ function observeServiceMotion(root = document) {
 function optimizeImageLoading(root = document) {
   const images = root.querySelectorAll?.("img") || [];
   images.forEach((image) => {
+    const isHomeImage = Boolean(image.closest("#home"));
     const isPriority =
-      image.closest(".hero, .service-detail-hero, .about-full-hero, .milestones-full-hero, .article-hero") ||
-      image.classList.contains("active") ||
-      image.classList.contains("map-image");
+      image.closest(".brand-mark") ||
+      image.closest(".hero, .service-detail-hero, .public-location-hero, .about-full-hero, .milestones-full-hero, .article-hero") ||
+      (!isHomeImage && (image.classList.contains("active") || image.classList.contains("map-image")));
     if (!isPriority) {
       const currentSrc = image.getAttribute("src") || "";
-      const displaySrc = displayAssetUrl(currentSrc);
+      const sizedSrc = isHomeImage ? homepageImageUrl(currentSrc, image.classList.contains("story-face") ? "avatar" : "card") : currentSrc;
+      const displaySrc = displayAssetUrl(sizedSrc);
       if (displaySrc && displaySrc !== currentSrc) image.setAttribute("src", displaySrc);
     }
     if (!image.hasAttribute("decoding")) image.setAttribute("decoding", "async");
@@ -11468,7 +11544,7 @@ function optimizeImageLoading(root = document) {
       image.setAttribute("loading", "eager");
     } else {
       image.setAttribute("loading", "lazy");
-      if (!image.hasAttribute("fetchpriority")) image.setAttribute("fetchpriority", "auto");
+      image.setAttribute("fetchpriority", "auto");
     }
   });
 }
@@ -11507,7 +11583,7 @@ function hydrateDayCareLocationContent(root = document) {
   if (!hasDayCareLocation && !dayCareLocationModulePromise) return;
   dayCareLocationModulePromise ||= import("./day-care-location.js");
   dayCareLocationModulePromise
-    .then(({ hydrateDayCareLocation }) => hydrateDayCareLocation(root))
+    .then(({ hydrateDayCareLocation }) => { hydrateDayCareLocation(root); hydrateServiceLocationLinks(root); })
     .catch((error) => console.warn(error));
 }
 
@@ -11516,7 +11592,7 @@ function hydrateHomeCareLocationContent(root = document) {
   if (!hasHomeCareLocation && !homeCareLocationModulePromise) return;
   homeCareLocationModulePromise ||= import("./home-care-location.js");
   homeCareLocationModulePromise
-    .then(({ hydrateHomeCareLocation }) => hydrateHomeCareLocation(root))
+    .then(({ hydrateHomeCareLocation }) => { hydrateHomeCareLocation(root); hydrateServiceLocationLinks(root); })
     .catch((error) => console.warn(error));
 }
 
@@ -11525,7 +11601,7 @@ function hydrateCommunityContent(root = document) {
   if (!hasCommunityContent && !communityModulePromise) return;
   communityModulePromise ||= import("./community-page.js");
   communityModulePromise
-    .then(({ hydrateCommunityPage }) => hydrateCommunityPage(root))
+    .then(({ hydrateCommunityPage }) => { hydrateCommunityPage(root); hydrateServiceLocationLinks(root); })
     .catch((error) => console.warn(error));
 }
 
@@ -11676,6 +11752,13 @@ if ("MutationObserver" in window && pageView) {
   serviceMotionMutationObserver.observe(pageView, { childList: true, subtree: true });
   const imageLoadingMutationObserver = new MutationObserver(() => scheduleImageLoadingOptimization(pageView));
   imageLoadingMutationObserver.observe(pageView, { childList: true, subtree: true });
+}
+
+if ("MutationObserver" in window && home) {
+  // CMS modules arrive after initial page setup. Templates already carry lazy
+  // attributes, and this pass also covers images inserted by later hydration.
+  const homeImageLoadingObserver = new MutationObserver(() => optimizeImageLoading(home));
+  homeImageLoadingObserver.observe(home, { childList: true, subtree: true });
 }
 
 document.addEventListener("click", (event) => {

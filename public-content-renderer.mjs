@@ -13,6 +13,7 @@ import {
   publicContentPublishedTime,
   publicContentRevisionTime
 } from "./public-content-freshness.mjs";
+import { getPublicEditorialInfo } from "./public-editorial.mjs";
 
 const SITE_ORIGIN = "https://www.suiyuecare.com";
 const HEALTH_CATEGORY_PREVIEW_LIMIT = 9;
@@ -232,7 +233,7 @@ function renderReferences(article = {}) {
     });
   if (!rows.length) return "";
   return `
-    <section class="article-references">
+    <section class="article-references" id="editorial-references">
       <h2>參考資料</h2>
       <ol>${rows.map((item) => {
         const label = escapePublicHtml(item.citation || item.name || item.url);
@@ -240,6 +241,24 @@ function renderReferences(article = {}) {
       }).join("")}</ol>
     </section>
   `;
+}
+
+function renderEditorialIdentity(identity, isAuthor = false) {
+  const name = escapePublicHtml(identity.name);
+  return identity.url ? `<a href="${escapePublicHtml(identity.url)}"${isAuthor ? ' rel="author"' : ""}>${name}</a>` : name;
+}
+
+function renderEditorialNote(article, editorial) {
+  const authorDetails = [editorial.author.role, editorial.author.credentials].filter(Boolean).join("・");
+  const hasReferences = article.references?.length || article.sourceName || article.sourceUrl;
+  return `
+    <aside class="article-editorial-note" aria-label="文章署名與資料說明">
+      ${authorDetails || editorial.author.description ? `<p>${escapePublicHtml(editorial.author.name)}${authorDetails ? `｜${escapePublicHtml(authorDetails)}` : ""}${editorial.author.description ? `<br>${escapePublicHtml(editorial.author.description)}` : ""}</p>` : ""}
+      ${editorial.reviewer ? `<p>內容審閱｜${renderEditorialIdentity(editorial.reviewer)}${editorial.reviewer.role || editorial.reviewer.credentials ? `（${escapePublicHtml([editorial.reviewer.role, editorial.reviewer.credentials].filter(Boolean).join("・"))}）` : ""} · <time datetime="${escapePublicHtml(editorial.reviewedAt)}">${publicDateLabel(editorial.reviewedAt)}</time></p>` : ""}
+      ${editorial.contentUpdatedAt ? `<p>內容更新｜<time datetime="${escapePublicHtml(editorial.contentUpdatedAt)}">${publicDateLabel(editorial.contentUpdatedAt)}</time></p>` : ""}
+      ${editorial.sourceCheckedAt ? `<p>資料查核｜<time datetime="${escapePublicHtml(editorial.sourceCheckedAt)}">${publicDateLabel(editorial.sourceCheckedAt)}</time></p>` : ""}
+      <p>${hasReferences ? `<a href="#editorial-references">查看參考資料</a> · ` : ""}<a href="${escapePublicHtml(editorial.policyUrl)}">編輯團隊與資料說明</a></p>
+    </aside>`;
 }
 
 function renderTagLinks(tags = []) {
@@ -264,6 +283,7 @@ function renderVideo(article = {}) {
 }
 
 export function renderPublicArticleLayout(article = {}, options = {}) {
+  const editorial = getPublicEditorialInfo(article);
   const related = Array.isArray(options.related) ? options.related : [];
   const hasSlideDeck = Boolean(options.slideDeckHtml);
   const isPptIconPack = article.visualFormat === "ppt-icon-pack";
@@ -303,8 +323,8 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
       <section class="article-layout">
         <div class="article-main">
           <div class="article-meta">
-            <span class="meta-editor">編輯人｜${escapePublicHtml(article.author || "歲悅照顧編輯部")}</span>
-            <time class="meta-date" datetime="${escapePublicHtml(article.publishedAt || "")}">${escapePublicHtml(article.date || publicDateLabel(article.publishedAt))}</time>
+            <span class="meta-editor">編輯人｜${renderEditorialIdentity(editorial.author, true)}</span>
+            <time class="meta-date" datetime="${escapePublicHtml(article.publishedAt || "")}">發布｜${escapePublicHtml(article.date || publicDateLabel(article.publishedAt))}</time>
             ${article.readingMinutes ? `<span class="meta-editor">閱讀時間｜${Number(article.readingMinutes)} 分鐘</span>` : ""}
             ${article.targetAudience ? `<span class="meta-editor">適合｜${escapePublicHtml(article.targetAudience)}</span>` : ""}
             ${renderTagLinks(article.tags)}
@@ -333,7 +353,9 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
               <p>${escapePublicHtml(article.cta || "不確定下一步怎麼安排？留下需求，讓歲悅協助判斷。")}</p>
               <a href="${escapePublicHtml(safePublicHref(article.ctaUrl, "/contact"))}" ${contactContext}>${escapePublicHtml(article.ctaText || "預約照顧諮詢")}</a>
             </div>
+            ${editorial.service ? `<p class="article-service-link">相關照顧服務：<a href="${escapePublicHtml(editorial.service.href)}">了解歲悅${escapePublicHtml(editorial.service.name)}</a></p>` : ""}
             ${renderReferences(article)}
+            ${renderEditorialNote(article, editorial)}
           </div>
         </div>
 

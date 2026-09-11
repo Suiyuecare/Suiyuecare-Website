@@ -1,3 +1,6 @@
+import { serviceLocationSchema } from "./public-service-locations.mjs";
+import { getPublicEditorialInfo, editorialIdentitySchema } from "./public-editorial.mjs";
+
 export const PUBLIC_SITE_ORIGIN = "https://www.suiyuecare.com";
 
 const SITE_NAVIGATION = [
@@ -36,6 +39,7 @@ export function publicStructuredDataObject(route = {}, siteOrigin = PUBLIC_SITE_
   const canonical = absolutePublicUrl(path, base);
   const isHome = new URL(canonical).pathname === "/";
   const article = route.article || null;
+  const editorial = article ? getPublicEditorialInfo(article) : null;
   const articleId = `${canonical}#article`;
   const webpageId = isHome ? `${base}/#webpage` : `${canonical}#webpage`;
   const image = absolutePublicUrl(route.image || "/assets/hero-care-hero-fast.jpg", base);
@@ -43,7 +47,7 @@ export function publicStructuredDataObject(route = {}, siteOrigin = PUBLIC_SITE_
   const description = route.description || "歲悅長照整合居家照顧、日間照顧、社區據點、護理復能、移工培訓與照顧知識。";
   const graph = [
     {
-      "@type": ["Organization", "LocalBusiness"],
+      "@type": "Organization",
       "@id": `${base}/#organization`,
       name: "歲悅長照集團",
       alternateName: "Suiyuecare Corps.",
@@ -53,7 +57,6 @@ export function publicStructuredDataObject(route = {}, siteOrigin = PUBLIC_SITE_
       telephone: "+886-2-6604-5432",
       email: "generalaffairs@suiyuecare.com",
       slogan: "照顧就像去超商，買牛奶一樣簡單。",
-      priceRange: "$$",
       address: {
         "@type": "PostalAddress",
         addressLocality: "臺北市",
@@ -69,14 +72,6 @@ export function publicStructuredDataObject(route = {}, siteOrigin = PUBLIC_SITE_
           contactType: "customer service",
           areaServed: "TW",
           availableLanguage: ["zh-Hant", "zh-TW"]
-        }
-      ],
-      openingHoursSpecification: [
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-          opens: "09:00",
-          closes: "18:00"
         }
       ],
       sameAs: ["https://lin.ee/oaPkGiq"]
@@ -100,6 +95,7 @@ export function publicStructuredDataObject(route = {}, siteOrigin = PUBLIC_SITE_
       about: { "@id": `${base}/#organization` },
       primaryImageOfPage: { "@type": "ImageObject", url: image },
       ...(article ? { mainEntity: { "@id": articleId } } : {}),
+      ...(editorial?.reviewer ? { reviewedBy: editorialIdentitySchema(editorial.reviewer, base), lastReviewed: editorial.reviewedAt } : {}),
       inLanguage: "zh-Hant-TW"
     },
     {
@@ -141,11 +137,14 @@ export function publicStructuredDataObject(route = {}, siteOrigin = PUBLIC_SITE_
     });
   }
 
+  if (route.location) {
+    const entity = serviceLocationSchema(route.location, base);
+    graph.push(entity);
+    graph.find((node) => node["@id"] === webpageId).mainEntity = { "@id": entity["@id"] };
+  }
+
   if (article) {
-    const authorName = article.author || "歲悅照顧編輯部";
-    const author = /歲悅/.test(authorName)
-      ? { "@type": "Organization", "@id": `${base}/#organization`, name: authorName }
-      : { "@type": "Person", name: authorName };
+    const author = editorialIdentitySchema(editorial.author, base);
     graph.push({
       "@type": article.schemaType || "Article",
       "@id": articleId,
@@ -154,7 +153,7 @@ export function publicStructuredDataObject(route = {}, siteOrigin = PUBLIC_SITE_
       description,
       image: [image],
       datePublished: article.publishedAt,
-      dateModified: article.updatedAt || article.publishedAt,
+      dateModified: editorial.contentUpdatedAt || article.updatedAt || article.publishedAt,
       author,
       publisher: { "@id": `${base}/#organization` },
       articleSection: article.category || "照顧知識",
@@ -168,7 +167,9 @@ export function publicStructuredDataObject(route = {}, siteOrigin = PUBLIC_SITE_
 }
 
 export function publicStructuredDataJson(route = {}, siteOrigin = PUBLIC_SITE_ORIGIN) {
-  return JSON.stringify(publicStructuredDataObject(route, siteOrigin), null, 2);
+  // The same output is embedded in server-rendered script tags and assigned
+  // through textContent in the browser. Do not allow bylines to close the tag.
+  return JSON.stringify(publicStructuredDataObject(route, siteOrigin), null, 2).replace(/</g, "\\u003c");
 }
 
 export function updatePublicStructuredData(documentRoot, route = {}, siteOrigin = PUBLIC_SITE_ORIGIN) {

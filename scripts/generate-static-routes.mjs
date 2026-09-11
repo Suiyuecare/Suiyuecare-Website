@@ -14,6 +14,10 @@ import {
 } from "../article-url-map.mjs";
 import { publicStructuredDataJson } from "../public-route-structured-data.mjs";
 import { loadPublicContent } from "./load-public-content.mjs";
+import { prerenderPublicPages } from "./prerender-public-pages.mjs";
+import { normalizePublicHtmlAssets } from "./public-html-assets.mjs";
+import { getPublicServiceLocations, serviceLocationRoutes } from "../public-service-locations.mjs";
+import { EDITORIAL_POLICY_ROUTE, getPublicEditorialInfo, renderEditorialPolicyPage } from "../public-editorial.mjs";
 
 const distDir = path.resolve("dist");
 const indexPath = path.join(distDir, "index.html");
@@ -149,6 +153,7 @@ const staticRoutes = [
   {
     slug: "courses",
     path: "/courses",
+    stylesheets: [{ id: "coursePageStyles", href: "/course-page.css" }],
     title: "課程報名｜歲悅長照集團",
     description: "查看歲悅照顧課程、移工培訓、家屬課程與專業研習，線上送出報名資訊。",
     image: "/assets/migrant-detail-01-classroom-hero-fast.jpg",
@@ -278,7 +283,7 @@ function contentRoute(item) {
     preloadImage: item.image,
     priority: item.isFeatured ? "0.82" : "0.72",
     type: "article",
-    lastmod: sitemapDate(item.lastmod || item.updatedAt || item.publishedAt),
+    lastmod: sitemapDate(getPublicEditorialInfo(item).contentUpdatedAt || item.lastmod || item.updatedAt || item.publishedAt),
     article: item,
     breadcrumbParent: {
       name: item.contentKind === "care-story" ? "照顧故事" : item.contentKind === "master-talk" ? "名人講堂" : "健康3.0",
@@ -292,6 +297,12 @@ function contentRoute(item) {
 }
 
 const publicContent = await loadPublicContent();
+const prerenderedPages = await prerenderPublicPages(publicContent.snapshot);
+const supplementalRoutes = [
+  ...serviceLocationRoutes(publicContent.snapshot),
+  { ...EDITORIAL_POLICY_ROUTE, slug: "editorial-policy", priority: "0.6", prerenderedHtml: renderEditorialPolicyPage() }
+];
+for (const route of supplementalRoutes) publicRoutePaths.set(route.slug, route.path);
 const routes = [
   ...staticRoutes.map((route) => route.slug === "health"
     ? {
@@ -300,7 +311,16 @@ const routes = [
       }
     : route.slug === "contact"
       ? { ...route, prerenderedHtml: renderContactPage() }
-      : route),
+      : prerenderedPages.has(route.slug)
+        ? {
+            ...route,
+            title: prerenderedPages.get(route.slug).title || route.title,
+            description: prerenderedPages.get(route.slug).description || route.description,
+            prerenderedHtml: prerenderedPages.get(route.slug).html,
+            inlineStyles: prerenderedPages.get(route.slug).inlineStyles
+          }
+        : route),
+  ...supplementalRoutes,
   ...publicContent.items.map(contentRoute)
 ];
 
@@ -428,7 +448,7 @@ function insertArticleMeta(html, route) {
   if (!route.article) return html;
   const articleMeta = [
     `<meta property="article:published_time" content="${route.article.publishedAt}" />`,
-    `<meta property="article:modified_time" content="${route.article.updatedAt || route.article.publishedAt}" />`,
+    `<meta property="article:modified_time" content="${getPublicEditorialInfo(route.article).contentUpdatedAt || route.article.updatedAt || route.article.publishedAt}" />`,
     `<meta property="article:section" content="${route.article.category || "照顧知識"}" />`,
     ...(route.article.tags || []).slice(0, 12)
       .map((tag) => `<meta property="article:tag" content="${String(tag).replace(/&/g, "&amp;").replace(/"/g, "&quot;")}" />`)
@@ -443,7 +463,7 @@ function routeHtml(baseHtml, route) {
   const preloadImage = route.preloadImage || route.image;
   let html = baseHtml;
   html = html.replace(/<html lang="zh-Hant">/, `<html lang="zh-Hant" data-initial-route="${route.slug}">`);
-  html = html.replace(/<title>.*?<\/title>/, `<title>${route.title}</title>`);
+  html = html.replace(/<title>.*?<\/title>/, () => `<title>${String(route.title).replace(/[&<>]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[character])}</title>`);
   html = replaceAttr(html, /(<meta name="description" content=")(.*?)(" \/>)/, route.description);
   html = replaceAttr(html, /(<link rel="canonical" href=")(.*?)(" \/>)/, canonical);
   html = replaceAttr(html, /(<meta property="og:type" content=")(.*?)(" \/>)/, route.article ? "article" : "website");
@@ -465,13 +485,23 @@ function routeHtml(baseHtml, route) {
   html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1health-editorial-20260909-1$3`);
   html = insertArticleMeta(html, route);
   html = replaceStructuredData(html, route);
-  html = routeHashLinksToPaths(html);
   if (route.path !== "/") {
     html = stripHomeShell(html, route);
   }
   html = injectPrerenderedContent(html, route);
+  html = routeHashLinksToPaths(html);
+  html = normalizePublicHtmlAssets(html);
   html = markCurrentRouteLinks(html, route);
   html = optimizeStaticImageTags(html);
+  for (const stylesheet of route.stylesheets || []) {
+    html = html.replace("</head>", () => `<link id="${stylesheet.id}" rel="stylesheet" href="${stylesheet.href}" />\n  </head>`);
+  }
+  if (route.inlineStyles) {
+    html = html.replace("</head>", () => `<style id="publicPrerenderHeroStyles">${route.inlineStyles.replace(/</g, "\\3C ")}</style>\n  </head>`);
+  }
+  if (route.slug === "editorial-policy") html = html.replace(/<link\b(?=[^>]*\bid="heroPreload")[^>]*>\s*/g, "");
+  const locationManifest = JSON.stringify(getPublicServiceLocations(publicContent.snapshot)).replace(/</g, "\\u003c");
+  html = html.replace("</body>", () => `<script id="publicServiceLocationManifest" type="application/json">${locationManifest}</script>\n  </body>`);
   return html;
 }
 

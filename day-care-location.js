@@ -1,3 +1,4 @@
+import { dayCareLocations } from "./service-location-data.mjs";
 import "./day-care-application-journey.css";
 import ArrowLeft from "lucide/dist/esm/icons/arrow-left.mjs";
 import ArrowRight from "lucide/dist/esm/icons/arrow-right.mjs";
@@ -505,37 +506,6 @@ function hydrateDayCareQuickSummary(root = document) {
   summary.dataset.dayCareHydrated = "true";
 }
 
-const dayCareLocations = {
-  "wanhua-one": {
-    image: "assets/location-wanhua-one-daycare-v2.jpg",
-    alt: "歲悅萬華社區長照機構一館照片",
-    mapLabel: "萬華一館",
-    mapQuery: "臺北市萬華區康定路43號",
-    type: "臺北市｜日間照顧中心",
-    name: "歲悅萬華社區長照機構",
-    desc: "萬華一館提供日間照顧服務，支持長輩白天生活照顧、活動參與與家庭照顧安排。",
-    services: "日間照顧、生活支持、家屬諮詢",
-    hours: "週一至週六 08:30-18:00",
-    phone: "02-6604-5432",
-    phoneHref: "tel:0266045432",
-    address: "108 臺北市萬華區康定路43號2樓"
-  },
-  "wanhua-two": {
-    image: "assets/location-wanhua-two-daycare-v2.jpg",
-    alt: "歲悅萬華二館社區長照機構照片",
-    mapLabel: "萬華二館",
-    mapQuery: "臺北市萬華區成都路159號",
-    type: "臺北市｜日間照顧中心",
-    name: "歲悅萬華二館社區長照機構",
-    desc: "萬華二館提供日間照顧服務，支持長輩白天生活照顧、活動參與與家庭照顧安排。",
-    services: "日間照顧、生活支持、家屬諮詢",
-    hours: "週一至週五 09:00-17:30",
-    phone: "02-6604-5432",
-    phoneHref: "tel:0266045432",
-    address: "108 臺北市萬華區西門里成都路159號2樓（雅香石頭火鍋二樓）"
-  }
-};
-
 function googleMapHref(location) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.mapQuery || location.address)}`;
 }
@@ -566,6 +536,7 @@ export function dayCareLocationMapMarkup() {
             title="${location.mapLabel} Google 地圖"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
+            allow="fullscreen"
             allowfullscreen
           ></iframe>
           <div class="day-care-map-summary">

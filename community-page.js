@@ -1,3 +1,4 @@
+import { communityLocations } from "./service-location-data.mjs";
 import "./day-care-application-journey.css";
 import "./community-page.css";
 import ArrowLeft from "lucide/dist/esm/icons/arrow-left.mjs";
@@ -71,39 +72,6 @@ const communityScenes = communityAssistance.map((item) => ({
   body: item.body,
   alt: item.alt
 }));
-
-const communityLocations = {
-  shilin: {
-    label: "士林據點",
-    shortAddress: "社子街 63 巷",
-    name: "歲悅士林失智症據點",
-    address: "臺北市士林區社子街63巷21弄2號1樓",
-    image: "assets/community-orientation-v3.jpg",
-    alt: "士林失智症據點定向感課程情境示意",
-    description: "提供生命徵象量測、定向感訓練、認知與健康促進課程及共餐。",
-    contactMessage: "我想了解士林失智症據點的服務資格、課程時段與報名方式。"
-  },
-  datong: {
-    label: "大同據點",
-    shortAddress: "承德路三段",
-    name: "歲悅大同失智症據點",
-    address: "臺北市大同區承德路三段24巷38弄17號1樓",
-    image: "assets/community-course-v3.jpg",
-    alt: "大同失智症據點認知課程情境示意",
-    description: "提供生命徵象量測、定向感訓練、認知與健康促進課程及共餐。",
-    contactMessage: "我想了解大同失智症據點的服務資格、課程時段與報名方式。"
-  },
-  xinyi: {
-    label: "信義據點",
-    shortAddress: "基隆路一段",
-    name: "歲悅信義失智症據點",
-    address: "臺北市信義區基隆路一段364巷6號1樓",
-    image: "assets/community-meal-v3.jpg",
-    alt: "信義失智症據點社區共餐情境示意",
-    description: "提供生命徵象量測、定向感訓練、認知與健康促進課程及共餐。",
-    contactMessage: "我想了解信義失智症據點的服務資格、課程時段與報名方式。"
-  }
-};
 
 const communityApplicationSteps = [
   {
@@ -556,6 +524,7 @@ function communityLocationMarkup() {
             title="${escapeText(location.label)} Google 地圖"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
+            allow="fullscreen"
             allowfullscreen
           ></iframe>
           <div>

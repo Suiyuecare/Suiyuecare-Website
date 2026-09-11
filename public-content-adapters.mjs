@@ -4,6 +4,7 @@ import {
   articlePublicSlug
 } from "./article-url-map.mjs";
 import { resolveHealthArticleImage } from "./health-article-images.mjs";
+import { normalizePublicEditorialMetadata } from "./public-editorial.mjs";
 
 function list(value) {
   return Array.isArray(value) ? value.filter(Boolean) : [];
@@ -150,6 +151,7 @@ export function normalizeStaticPublicArticle(card = {}, detail = {}, rewrite = {
     focalPoint: card.focalPoint || merged.focalPoint || "center",
     author: card.author || merged.author || "歲悅照顧編輯部",
     authorTitle: card.authorTitle || merged.authorTitle || "",
+    editorial: normalizePublicEditorialMetadata(merged.editorial, card.editorial),
     date: dateLabel(card.date || merged.date || publishedAt),
     publishedAt,
     updatedAt,
@@ -241,6 +243,7 @@ export function normalizeCmsPublicArticle(row = {}, options = {}) {
     focalPoint: cover?.focal_point || enriched.focalPoint || "center",
     author: row.author_name || enriched.author || "歲悅照顧編輯部",
     authorTitle: row.author_title || enriched.authorTitle || "",
+    editorial: normalizePublicEditorialMetadata(enriched.editorial, json.editorial, row.editorial),
     date: dateLabel(publishedAt),
     publishedAt,
     updatedAt,

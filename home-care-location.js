@@ -1,39 +1,9 @@
+import { homeCareLocations } from "./service-location-data.mjs";
 import "./day-care-application-journey.css";
 import "./home-care-location.css";
 import ArrowLeft from "lucide/dist/esm/icons/arrow-left.mjs";
 import ArrowRight from "lucide/dist/esm/icons/arrow-right.mjs";
 import createLucideElement from "lucide/dist/esm/createElement.mjs";
-
-const homeCareLocations = {
-  taipei: {
-    city: "臺北市",
-    image: "assets/homecare-scene-assessment-fast.jpg",
-    alt: "居家照顧服務員在長輩家中與家屬進行照顧需求評估",
-    type: "臺北市｜居家長照特約機構",
-    name: "臺北市歲悅居家長照機構",
-    desc: "由同一個居家長照團隊承接士林、北投與南港區的到宅需求，協助家庭安排照顧服務與後續追蹤。",
-    services: "身體照顧、生活支持、陪同外出、喘息服務",
-    districts: ["士林區", "北投區", "南港區"],
-    phone: "02-6604-5432",
-    phoneHref: "tel:0266045432",
-    dispatch: "依個案地址、希望時段、照顧強度與人力媒合確認",
-    contactMessage: "我住在臺北市士林、北投或南港區，想了解居家照顧服務，請協助確認可服務時段與申請方式。"
-  },
-  newtaipei: {
-    city: "新北市",
-    image: "assets/location-xindian-integrated-care-v2.jpg",
-    alt: "居家照顧團隊在新北市家庭中協助長輩步行並與家屬討論照顧安排",
-    type: "新北市｜居家長照特約機構",
-    name: "歲悅新店居家長照機構",
-    desc: "由新店團隊承接新店、中和與永和區的到宅需求，並可依長輩狀況協助銜接復能與家庭照顧資源。",
-    services: "身體照顧、生活支持、陪同就醫、家屬支持",
-    districts: ["新店區", "中和區", "永和區"],
-    phone: "02-6604-5432",
-    phoneHref: "tel:0266045432",
-    dispatch: "依個案地址、希望時段、照顧強度與人力媒合確認",
-    contactMessage: "我住在新北市新店、中和或永和區，想了解居家照顧服務，請協助確認可服務時段與申請方式。"
-  }
-};
 
 const homeCareAssistanceVisuals = {
   "身體照顧": {
