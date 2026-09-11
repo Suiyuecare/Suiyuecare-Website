@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">長照實作考核評分校準四步</title>
+  <desc id="desc">先定義評量支援的決定，再寫可觀察行為，以邊界案例獨立評分，最後比較分歧、修訂並用新案例重測。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="64" y="78" font-family="system-ui, sans-serif" font-size="38" font-weight="700" fill="#3c1f0b">實作考核校準：差異要回到證據</text>
+  <text x="64" y="118" font-family="system-ui, sans-serif" font-size="21" fill="#725b4c">同一段表現、先獨立評分，再討論規則為什麼不同</text>
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <g transform="translate(54 174)"><rect width="250" height="180" rx="26" fill="#ead8bf"/><circle cx="125" cy="50" r="28" fill="#725b4c"/><text x="125" y="60" font-size="27" font-weight="700" fill="#fffaf3">1</text><text x="125" y="105" font-size="27" font-weight="700" fill="#3c1f0b">定義決定</text><text x="125" y="140" font-size="18" fill="#725b4c">這一站要支持什麼判斷</text></g>
+    <path d="M312 264h38" stroke="#725b4c" stroke-width="7" stroke-linecap="round"/><path d="m338 250 18 14-18 14" fill="none" stroke="#725b4c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(366 174)"><rect width="250" height="180" rx="26" fill="#1595a8" opacity=".17"/><circle cx="125" cy="50" r="28" fill="#1595a8"/><text x="125" y="60" font-size="27" font-weight="700" fill="#fffaf3">2</text><text x="125" y="105" font-size="27" font-weight="700" fill="#3c1f0b">寫可觀察行為</text><text x="125" y="140" font-size="18" fill="#725b4c">看見、聽見，不猜態度</text></g>
+    <path d="M624 264h38" stroke="#725b4c" stroke-width="7" stroke-linecap="round"/><path d="m650 250 18 14-18 14" fill="none" stroke="#725b4c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(678 174)"><rect width="250" height="180" rx="26" fill="#f58a1f" opacity=".18"/><circle cx="125" cy="50" r="28" fill="#f58a1f"/><text x="125" y="60" font-size="27" font-weight="700" fill="#fffaf3">3</text><text x="125" y="105" font-size="27" font-weight="700" fill="#3c1f0b">邊界案例</text><text x="125" y="140" font-size="18" fill="#725b4c">先各自判，再揭露答案</text></g>
+    <path d="M936 264h38" stroke="#725b4c" stroke-width="7" stroke-linecap="round"/><path d="m962 250 18 14-18 14" fill="none" stroke="#725b4c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(990 174)"><rect width="156" height="180" rx="26" fill="#758d60" opacity=".20"/><circle cx="78" cy="50" r="28" fill="#758d60"/><text x="78" y="60" font-size="27" font-weight="700" fill="#fffaf3">4</text><text x="78" y="105" font-size="25" font-weight="700" fill="#3c1f0b">對齊分歧</text><text x="78" y="136" font-size="17" fill="#725b4c">修訂後</text><text x="78" y="160" font-size="17" fill="#725b4c">換案例重測</text></g>
+  </g>
+  <rect x="64" y="406" width="1072" height="138" rx="28" fill="#4f77a8" opacity=".12"/>
+  <text x="92" y="452" font-family="system-ui, sans-serif" font-size="25" font-weight="700" fill="#3c1f0b">分歧來源四選一</text>
+  <g font-family="system-ui, sans-serif" font-size="21" fill="#725b4c"><text x="92" y="500">① 觀察位置</text><text x="340" y="500">② 條目含糊</text><text x="594" y="500">③ 通過門檻不同</text><text x="874" y="500">④ 證據不足</text></g>
+  <text x="64" y="606" font-family="system-ui, sans-serif" font-size="20" fill="#d95f45">安全項出現立即風險：先停止演練，不為完整評分讓危險繼續</text>
+  <text x="64" y="642" font-family="system-ui, sans-serif" font-size="18" fill="#725b4c">定性流程圖｜依健康專業模擬評量與評分者認知研究整理；資料查核日：2026-09-11</text>
+</svg>

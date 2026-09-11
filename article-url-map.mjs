@@ -156,7 +156,10 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "migrant-care-three-help-routes",
   "sarcopenia-treatment-barriers-care",
   "parkinsons-freezing-doorway-safe-cues",
-  "dementia-acute-change-medical-handover"
+  "dementia-acute-change-medical-handover",
+  "long-term-care-rater-calibration",
+  "long-term-care-voice-input-decision",
+  "home-care-no-entry-agreement"
 ]);
 
 const sourceNumberMap = new Map(

@@ -1648,6 +1648,21 @@
       "source": "/article/dementia-acute-change-medical-handover",
       "destination": "/article/article157",
       "permanent": true
+    },
+    {
+      "source": "/article/long-term-care-rater-calibration",
+      "destination": "/article/article158",
+      "permanent": true
+    },
+    {
+      "source": "/article/long-term-care-voice-input-decision",
+      "destination": "/article/article159",
+      "permanent": true
+    },
+    {
+      "source": "/article/home-care-no-entry-agreement",
+      "destination": "/article/article160",
+      "permanent": true
     }
   ],
   "rewrites": [

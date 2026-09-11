@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">居服未能入戶四層約定</title>
+  <desc id="desc">從平常進門方式、聯絡順序、鑰匙與進入權限，到一般未回應、需關注與立即危險的安全升級，事前由長輩、家屬與單位說清楚。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="64" y="78" font-family="system-ui, sans-serif" font-size="38" font-weight="700" fill="#3c1f0b">居服到門口聯絡不上：四層先約定</text>
+  <text x="64" y="118" font-family="system-ui, sans-serif" font-size="21" fill="#725b4c">未接電話不是原因，也不是急症證明；看現場線索走對路</text>
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <g transform="translate(64 170)"><rect width="250" height="160" rx="26" fill="#ead8bf"/><circle cx="125" cy="45" r="26" fill="#725b4c"/><text x="125" y="54" font-size="25" font-weight="700" fill="#fffaf3">1</text><text x="125" y="96" font-size="27" font-weight="700" fill="#3c1f0b">平常怎麼進門</text><text x="125" y="130" font-size="18" fill="#725b4c">門鈴・電話・等待・取消</text></g>
+    <g transform="translate(338 170)"><rect width="250" height="160" rx="26" fill="#1595a8" opacity=".16"/><circle cx="125" cy="45" r="26" fill="#1595a8"/><text x="125" y="54" font-size="25" font-weight="700" fill="#fffaf3">2</text><text x="125" y="96" font-size="27" font-weight="700" fill="#3c1f0b">聯絡順序</text><text x="125" y="130" font-size="18" fill="#725b4c">主要・備援・各自能做什麼</text></g>
+    <g transform="translate(612 170)"><rect width="250" height="160" rx="26" fill="#f58a1f" opacity=".18"/><circle cx="125" cy="45" r="26" fill="#f58a1f"/><text x="125" y="54" font-size="25" font-weight="700" fill="#fffaf3">3</text><text x="125" y="96" font-size="27" font-weight="700" fill="#3c1f0b">鑰匙與權限</text><text x="125" y="130" font-size="18" fill="#725b4c">另依政策書面約定</text></g>
+    <g transform="translate(886 170)"><rect width="250" height="160" rx="26" fill="#758d60" opacity=".18"/><circle cx="125" cy="45" r="26" fill="#758d60"/><text x="125" y="54" font-size="25" font-weight="700" fill="#fffaf3">4</text><text x="125" y="96" font-size="27" font-weight="700" fill="#3c1f0b">安全升級</text><text x="125" y="130" font-size="18" fill="#725b4c">依具體線索分三路</text></g>
+  </g>
+  <path d="M1011 348v50H188v38" fill="none" stroke="#725b4c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m173 424 15 20 15-20" fill="none" stroke="#725b4c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <g transform="translate(64 456)"><rect width="330" height="108" rx="24" fill="#4f77a8" opacity=".14"/><text x="165" y="43" font-size="25" font-weight="700" fill="#3c1f0b">一般未回應</text><text x="165" y="78" font-size="19" fill="#725b4c">依約等待、聯絡、記錄</text></g>
+    <g transform="translate(435 456)"><rect width="330" height="108" rx="24" fill="#f58a1f" opacity=".18"/><text x="165" y="43" font-size="25" font-weight="700" fill="#3c1f0b">有需關注的變化</text><text x="165" y="78" font-size="19" fill="#725b4c">回到督導與照顧團隊評估</text></g>
+    <g transform="translate(806 456)"><rect width="330" height="108" rx="24" fill="#d95f45"/><text x="165" y="43" font-size="25" font-weight="700" fill="#fffaf3">具體立即危險</text><text x="165" y="78" font-size="19" fill="#fffaf3">依緊急流程聯絡 119 等窗口</text></g>
+  </g>
+  <text x="64" y="626" font-family="system-ui, sans-serif" font-size="18" fill="#725b4c">定性流程圖｜服務與法規資訊查核日：2026-09-11；實際等待、收費與入戶規則依單位及契約</text>
+</svg>

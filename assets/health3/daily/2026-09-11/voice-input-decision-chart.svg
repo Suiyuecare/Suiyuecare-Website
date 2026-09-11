@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">長照語音轉文字上線前四關</title>
+  <desc id="desc">依序確認用途、資料與隱私、真實條件下的正確性，以及人工覆核和手動退路；任何一關無法說清楚就先限縮、重設或停止。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="64" y="78" font-family="system-ui, sans-serif" font-size="38" font-weight="700" fill="#3c1f0b">語音轉文字：四關都過才進試行</text>
+  <text x="64" y="118" font-family="system-ui, sans-serif" font-size="21" fill="#725b4c">草稿不是正式紀錄；不願使用或系統失效時仍能完整完成</text>
+  <g font-family="system-ui, sans-serif">
+    <g transform="translate(64 166)"><rect width="1072" height="88" rx="24" fill="#ead8bf"/><circle cx="48" cy="44" r="27" fill="#725b4c"/><text x="48" y="54" font-size="26" font-weight="700" text-anchor="middle" fill="#fffaf3">1</text><text x="92" y="38" font-size="27" font-weight="700" fill="#3c1f0b">用途</text><text x="92" y="66" font-size="19" fill="#725b4c">哪個低風險流程、誰使用、誰覆核、哪些情境禁止</text></g>
+    <g transform="translate(64 270)"><rect width="1072" height="88" rx="24" fill="#1595a8" opacity=".16"/><circle cx="48" cy="44" r="27" fill="#1595a8"/><text x="48" y="54" font-size="26" font-weight="700" text-anchor="middle" fill="#fffaf3">2</text><text x="92" y="38" font-size="27" font-weight="700" fill="#3c1f0b">資料與隱私</text><text x="92" y="66" font-size="19" fill="#725b4c">錄什麼、傳哪裡、留多久、誰能看、如何刪除</text></g>
+    <g transform="translate(64 374)"><rect width="1072" height="88" rx="24" fill="#f58a1f" opacity=".18"/><circle cx="48" cy="44" r="27" fill="#f58a1f"/><text x="48" y="54" font-size="26" font-weight="700" text-anchor="middle" fill="#fffaf3">3</text><text x="92" y="38" font-size="27" font-weight="700" fill="#3c1f0b">真實正確性</text><text x="92" y="66" font-size="19" fill="#725b4c">口音、噪音、否定詞、數字、專有詞與不同使用者差異</text></g>
+    <g transform="translate(64 478)"><rect width="1072" height="88" rx="24" fill="#758d60" opacity=".18"/><circle cx="48" cy="44" r="27" fill="#758d60"/><text x="48" y="54" font-size="26" font-weight="700" text-anchor="middle" fill="#fffaf3">4</text><text x="92" y="38" font-size="27" font-weight="700" fill="#3c1f0b">人工覆核與退路</text><text x="92" y="66" font-size="19" fill="#725b4c">可改、可放棄、可追溯；不用語音也能完成同一工作</text></g>
+  </g>
+  <rect x="64" y="590" width="1072" height="48" rx="24" fill="#d95f45"/>
+  <text x="600" y="622" font-family="system-ui, sans-serif" font-size="22" font-weight="700" text-anchor="middle" fill="#fffaf3">任一關說不清楚 → 先限縮、重設或停止，不以方便取代風險證據</text>
+</svg>
