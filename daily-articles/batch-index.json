@@ -325,6 +325,45 @@
           "contentHash": "sha256:169c869521fab5789cd970724ce50082d88dd924a0a905853b3896f1f9abc465"
         }
       ]
+    },
+    {
+      "date": "2026-09-12",
+      "displayDate": "2026.09.12",
+      "commit": "SELF",
+      "topicMode": "disease",
+      "cycleDay": 2,
+      "articles": [
+        {
+          "slug": "late-life-depression-functional-change-care",
+          "title": "長輩不像在難過，卻什麼都不想做？從功能退步辨認老年憂鬱症",
+          "diseaseTopic": "老年憂鬱症",
+          "primaryQuestion": "長輩沒有明說難過，卻逐漸不吃、不睡、不出門或生活功能變差時，家屬如何辨認老年憂鬱症並陪伴就醫？",
+          "careContext": "居家生活中由家屬觀察晚年情緒與功能改變、準備評估並銜接日常支持",
+          "businessItem": "居家照顧",
+          "publicNumber": 161,
+          "contentHash": "sha256:860a286bb994a53931da246425067df3242eeb5cfcf9491bde00c2dd125fa788"
+        },
+        {
+          "slug": "sarcopenia-progress-function-tracking",
+          "title": "肌少症追蹤別只看體重：用肌力、起立與生活任務看治療反應",
+          "diseaseTopic": "肌少症",
+          "primaryQuestion": "肌少症開始運動與營養治療後，家屬和第一線如何不只看體重，而是安全追蹤肌力、身體表現與生活功能？",
+          "careContext": "已接受肌少症評估與個別治療計畫的長輩，在居家與護理復能服務中共同追蹤反應",
+          "businessItem": "護理復能",
+          "publicNumber": 162,
+          "contentHash": "sha256:c36ab84e198a2b106a410dd422114f4ce82696679c09b6c93e231f8fdead9a05"
+        },
+        {
+          "slug": "parkinsons-orthostatic-hypotension-care",
+          "title": "帕金森氏症起身就頭暈？認識姿勢性低血壓與安全照顧",
+          "diseaseTopic": "帕金森氏症",
+          "primaryQuestion": "帕金森氏症長輩在離床、站起或飯後反覆頭暈時，家屬與照顧團隊如何辨認姿勢性低血壓並安全照顧？",
+          "careContext": "已診斷帕金森氏症長輩在居家與門診處理起身頭暈、跌倒風險及跨專業用藥檢視",
+          "businessItem": "護理復能",
+          "publicNumber": 163,
+          "contentHash": "sha256:8b4978ea06d9cd19718756ffa9f2798c02b1db624f0a66ea3f7f5f0d4b64b67c"
+        }
+      ]
     }
   ]
 }

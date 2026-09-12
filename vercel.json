@@ -1665,6 +1665,21 @@
       "permanent": true
     },
     {
+      "source": "/article/late-life-depression-functional-change-care",
+      "destination": "/article/article161",
+      "permanent": true
+    },
+    {
+      "source": "/article/sarcopenia-progress-function-tracking",
+      "destination": "/article/article162",
+      "permanent": true
+    },
+    {
+      "source": "/article/parkinsons-orthostatic-hypotension-care",
+      "destination": "/article/article163",
+      "permanent": true
+    },
+    {
       "source": "/article/article43",
       "destination": "/article/article7",
       "permanent": true

@@ -194,12 +194,14 @@ let expectedPages = new Map();
 let supplementalRoutes = [];
 try {
   const snapshot = await deployedPublishedSnapshot(manifest);
-  expectedPages = await prerenderPublicPages(snapshot);
+  const { articles } = await loadPublicContent(snapshot);
+  expectedPages = await prerenderPublicPages(snapshot, { articles });
   const locationRoutes = serviceLocationRoutes(snapshot);
   check(locationRoutes.length === 6, allFailures, "published snapshot should provide the six released service location pages");
   supplementalRoutes = [
     ...locationRoutes.map((route) => ({ ...route, expectedSchemaType: route.location.isPhysicalLocation ? "LocalBusiness" : "Service" })),
-    { ...EDITORIAL_POLICY_ROUTE, slug: "editorial-policy", prerenderedHtml: renderEditorialPolicyPage(), expectedSchemaType: "WebPage" }
+    { ...EDITORIAL_POLICY_ROUTE, slug: "editorial-policy", prerenderedHtml: renderEditorialPolicyPage(), expectedSchemaType: "WebPage" },
+    { ...DAY_CARE_GUIDE_ROUTE, prerenderedHtml: renderDayCareGuidePage(articles), expectedSchemaType: "WebPage" }
   ];
 } catch (error) {
   allFailures.push(`cms-fallbacks.json: deployed published content check failed - ${error.message}`);
@@ -258,7 +260,7 @@ if (allFailures.length) {
   if (!warnOnly) process.exit(1);
   console.log("warn-only mode: not failing the command.");
 } else {
-  console.log(`ok - production routes match their published snapshot, including 17 complete pages, six service locations and editorial policy at ${siteOrigin}`);
+  console.log(`ok - production routes match their published snapshot, including 17 complete pages, six service locations, editorial policy and day-care guide at ${siteOrigin}`);
 }
 }
 
@@ -271,3 +273,5 @@ import { parseHTML } from "linkedom";
 import { prerenderPublicPages, PUBLIC_PRERENDER_SLUGS } from "./prerender-public-pages.mjs";
 import { serviceLocationRoutes } from "../public-service-locations.mjs";
 import { EDITORIAL_POLICY_ROUTE, renderEditorialPolicyPage } from "../public-editorial.mjs";
+import { DAY_CARE_GUIDE_ROUTE, renderDayCareGuidePage } from "../public-topic-guides.mjs";
+import { loadPublicContent } from "./load-public-content.mjs";

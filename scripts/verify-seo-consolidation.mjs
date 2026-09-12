@@ -6,6 +6,9 @@ import { parseHTML } from "linkedom";
 import { ARTICLE_SOURCE_SLUGS, articlePublicHref } from "../article-url-map.mjs";
 import { ARTICLE_CONSOLIDATIONS, canonicalArticleHref, canonicalizeArticleLink, consolidatePublicArticles } from "../article-consolidation.mjs";
 import { loadPublicContent } from "./load-public-content.mjs";
+import { prerenderPublicPages } from "./prerender-public-pages.mjs";
+import { verifyRouteDocument } from "./verify-production-routes.mjs";
+import { DAY_CARE_GUIDE_ROUTE, renderDayCareGuidePage } from "../public-topic-guides.mjs";
 
 assert.equal(ARTICLE_SOURCE_SLUGS[42], "day-care-transition", "Retired public number stays reserved");
 assert.equal(articlePublicHref("day-care-transition"), "/article/article43", "Raw identity remains stable for CMS records");
@@ -23,7 +26,29 @@ assert.deepEqual(consolidatePublicArticles([duplicate, retained]), [retained]);
 assert.deepEqual(consolidatePublicArticles([duplicate]), [duplicate], "Do not hide the only available article");
 assert.equal(retained.title, "Original", "Do not invent a new byline, date or merge identity");
 
-const { articles } = await loadPublicContent();
+const { articles, snapshot } = await loadPublicContent();
+const explicitSnapshot = {
+  ...snapshot,
+  articles: [{ slug: ARTICLE_SOURCE_SLUGS[6], public_number: 7, title: "Explicit deployed snapshot article title", status: "published", is_enabled: true, published_at: "2020-01-01T00:00:00Z", updated_at: "2099-01-01T00:00:00Z" }]
+};
+const snapshotBefore = JSON.stringify(explicitSnapshot);
+const readFileSync = fs.readFileSync;
+let explicitContent;
+try {
+  fs.readFileSync = function (filename, ...args) {
+    assert.ok(!String(filename).endsWith("cms-fallbacks.json"), "An explicit deployed snapshot must not reread the local CMS fallback");
+    return readFileSync.call(this, filename, ...args);
+  };
+  explicitContent = await loadPublicContent(explicitSnapshot);
+} finally {
+  fs.readFileSync = readFileSync;
+}
+assert.equal(explicitContent.snapshot, explicitSnapshot);
+assert.equal(explicitContent.articles.find((item) => item.publicNumber === 7).title, "Explicit deployed snapshot article title", "Article cards must come from the explicitly supplied deployed snapshot");
+assert.equal(JSON.stringify(explicitSnapshot), snapshotBefore, "Loading public content must not mutate the supplied snapshot");
+for (const invalid of [null, [], "snapshot"]) await assert.rejects(loadPublicContent(invalid), /snapshot must be an object/);
+const expectedPages = await prerenderPublicPages(snapshot, { articles });
+const cachedResponse = new Response("", { status: 200, headers: { "cache-control": "no-cache, no-store, must-revalidate" } });
 const sitemap = fs.readFileSync("dist/sitemap.xml", "utf8");
 const redirects = JSON.parse(fs.readFileSync("vercel.json", "utf8")).redirects;
 for (const { source, target } of ARTICLE_CONSOLIDATIONS) {
@@ -48,6 +73,7 @@ for (const route of ["health", "day-care", "home-care", "guides/day-care", "arti
   if (["day-care", "home-care"].includes(route)) {
     assert.ok(document.querySelector('[data-service-topic-reading] a[href^="/article/"]'), `${route}: related reading is present before JavaScript`);
     assert.equal(document.querySelectorAll(".service-contact-section form").length, 1, `${route}: inquiry form retained`);
+    assert.deepEqual(verifyRouteDocument(route, { response: cachedResponse, html: document.toString() }, { expectedHtml: expectedPages.get(route).html }), [], `${route}: production verification includes the published related reading in its complete body comparison`);
   }
 }
 const homeDocument = parseHTML(fs.readFileSync("dist/index.html", "utf8")).document;
@@ -89,6 +115,11 @@ assert.equal(anchorLayouts, 1);
 anchorContext.alignAnchor(undefined, { once: true });
 assert.equal(anchorScrolls, 1, "Later hydration observations must not repeatedly pull the visitor back to the anchor");
 const guide = parseHTML(fs.readFileSync("dist/guides/day-care/index.html", "utf8")).document;
+const guideOptions = { pathname: DAY_CARE_GUIDE_ROUTE.path, expectedHtml: renderDayCareGuidePage(articles), requirePrerender: true, requireNoCache: false, expectedSchemaType: "WebPage" };
+assert.deepEqual(verifyRouteDocument(DAY_CARE_GUIDE_ROUTE.slug, { response: new Response("", { status: 200 }), html: guide.toString() }, guideOptions), [], "The built guide must pass the same complete-body contract used for production supplemental routes");
+const staleGuide = parseHTML(guide.toString()).document;
+staleGuide.querySelector(".topic-reading-list").remove();
+assert.ok(verifyRouteDocument(DAY_CARE_GUIDE_ROUTE.slug, { response: cachedResponse, html: staleGuide.toString() }, guideOptions).some((failure) => failure.includes("complete first-paint body")), "A guide missing published article links must fail production verification");
 assert.equal(guide.querySelectorAll("#pageView h1").length, 1);
 assert.equal(guide.querySelector('link[rel="canonical"]').getAttribute("href"), "https://www.suiyuecare.com/guides/day-care");
 assert.ok(!guide.querySelector('meta[name="robots"]').getAttribute("content").includes("noindex"));

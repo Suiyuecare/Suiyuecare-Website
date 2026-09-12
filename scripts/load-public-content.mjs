@@ -57,11 +57,18 @@ function loadStaticArticleState() {
 }
 
 
-export async function loadPublicContent() {
-  if (!fs.existsSync(snapshotPath)) {
-    throw new Error("public/cms-fallbacks.json is missing. Run pnpm cms:fallbacks:sync before building.");
+export async function loadPublicContent(snapshot) {
+  // Production verification supplies the hash-checked deployed snapshot directly.
+  // Keep the normal build's local fallback behavior without replacing that file.
+  if (snapshot === undefined) {
+    if (!fs.existsSync(snapshotPath)) {
+      throw new Error("public/cms-fallbacks.json is missing. Run pnpm cms:fallbacks:sync before building.");
+    }
+    snapshot = JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
   }
-  const snapshot = JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
+  if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
+    throw new TypeError("Public content snapshot must be an object.");
+  }
   const staticState = loadStaticArticleState();
   const rewriteModule = await import("../article-rewrites.js");
   const rewrites = Object.fromEntries(Object.entries(rewriteModule.default || {}).map(([slug, rewrite]) => [
