@@ -159,7 +159,10 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "dementia-acute-change-medical-handover",
   "long-term-care-rater-calibration",
   "long-term-care-voice-input-decision",
-  "home-care-no-entry-agreement"
+  "home-care-no-entry-agreement",
+  "late-life-depression-functional-change-care",
+  "sarcopenia-progress-function-tracking",
+  "parkinsons-orthostatic-hypotension-care"
 ]);
 
 const sourceNumberMap = new Map(

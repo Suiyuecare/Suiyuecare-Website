@@ -9,8 +9,10 @@ import { dailyArticles20260909 } from "./2026-09-09.mjs";
 import { dailyArticles20260910 } from "./2026-09-10.mjs";
 import { dailyArticles20260911 } from "./2026-09-11.mjs";
 import { dailyBusinessArticles20260911 } from "./2026-09-11-business.mjs";
+import { dailyArticles20260912 } from "./2026-09-12.mjs";
 
 export const dailyArticles = [
+  ...dailyArticles20260912,
   ...dailyBusinessArticles20260911,
   ...dailyArticles20260911,
   ...dailyArticles20260910,
