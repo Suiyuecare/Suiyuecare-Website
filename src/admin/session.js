@@ -42,7 +42,11 @@ function showAdminToast(message, type = "info") {
   toast.dataset.status = type;
   toast.setAttribute("role", type === "error" ? "alert" : "status");
   const title = type === "success" ? "已完成" : type === "error" ? "操作失敗" : "處理中";
-  toast.innerHTML = `<strong>${title}</strong><span>${message}</span>`;
+  const titleNode = document.createElement("strong");
+  titleNode.textContent = title;
+  const messageNode = document.createElement("span");
+  messageNode.textContent = message;
+  toast.append(titleNode, messageNode);
   region.appendChild(toast);
 
   const timeout = type === "info" ? 2600 : 4600;

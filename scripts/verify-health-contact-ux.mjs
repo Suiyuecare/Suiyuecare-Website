@@ -1,3 +1,4 @@
+import { ARTICLE_CONSOLIDATIONS, consolidatePublicArticles } from "../article-consolidation.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
@@ -570,10 +571,10 @@ const runtimeSnapshotSource = {
   media: publicContent.snapshot.media || []
 };
 const runtimeCmsArticles = runtimeNormalizers.normalizeFallbackHealthArticles(runtimeSnapshotSource);
-const runtimeArticles = mergeLatestPublicContent(runtimeStaticArticles, runtimeCmsArticles);
+const runtimeArticles = consolidatePublicArticles(mergeLatestPublicContent(runtimeStaticArticles, runtimeCmsArticles));
 const runtimeCategories = runtimeFallbackCategories(publicContent.snapshot, runtimeNormalizers.categorySlug);
 const runtimeHealth = renderPublicHealthIndex(runtimeArticles, runtimeCategories);
-assert.equal(runtimeArticles.length, ARTICLE_SOURCE_SLUGS.length, "Merged runtime inventory must cover every public article number");
+assert.equal(runtimeArticles.length, ARTICLE_SOURCE_SLUGS.length - ARTICLE_CONSOLIDATIONS.length, "Merged runtime inventory must retain every active article; consolidated public numbers stay reserved");
 assert.equal(runtimeCmsArticles.length, publicContent.snapshot.articles.length, "Runtime must normalize every published CMS snapshot article");
 assert.equal(runtimeArticles.length, publicContent.articles.length, "Runtime and build health inventories must have the same article count");
 assert.deepEqual(
@@ -597,7 +598,7 @@ const runtimeTalkItems = publishedSnapshotRows(publicContent.snapshot.expertTalk
 const runtimeItems = addSameKindRelated([...runtimeArticles, ...runtimeStoryItems, ...runtimeTalkItems]);
 const runtimeItemsByHref = new Map(runtimeItems.map((item) => [item.href, item]));
 
-assert.equal(publicContent.articles.length, ARTICLE_SOURCE_SLUGS.length, "Every numbered public article must be generated");
+assert.equal(publicContent.articles.length, ARTICLE_SOURCE_SLUGS.length - ARTICLE_CONSOLIDATIONS.length, "Every active numbered article must be generated; retired numbers have explicit redirects");
 assert.equal(publicContent.stories.length, 4, "Every published care story must be generated");
 assert.equal(publicContent.talks.length, 3, "Every published expert talk must be generated");
 assert.equal(runtimeItems.length, publicContent.items.length, "Runtime and build must expose the same complete detail inventory");

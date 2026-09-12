@@ -1,3 +1,7 @@
+import { analyticsPagePath } from "./analytics-route.mjs";
+import { canonicalArticleHref, canonicalArticleSourceSlug, canonicalizeArticleLink, consolidatePublicArticles } from "./article-consolidation.mjs";
+import { DAY_CARE_GUIDE_ROUTE, renderDayCareGuidePage, hydrateServiceTopicReading, selectTopicRelatedArticles } from "./public-topic-guides.mjs";
+import "./public-topic-guides.css";
 import { preparePrerenderedService, replacePublicPageContent } from "./public-service-prerender.mjs";
 import { getServiceLocationByRoute, renderServiceLocationPage, hydrateServiceLocationLinks, readServiceLocationManifest } from "./public-service-locations.mjs";
 import { EDITORIAL_POLICY_ROUTE, renderEditorialPolicyPage } from "./public-editorial.mjs";
@@ -391,7 +395,8 @@ function routeCanonical(slug = "home") {
   const serviceLocation = getServiceLocationByRoute(slug);
   if (serviceLocation) return absoluteSiteUrl(serviceLocation.path);
   const articleMatch = String(slug).match(/^article-(.+)$/);
-  if (articleMatch) return absoluteSiteUrl(articlePublicHref(articleMatch[1]));
+  if (articleMatch) return absoluteSiteUrl(canonicalArticleHref(articleMatch[1]));
+  if (slug === DAY_CARE_GUIDE_ROUTE.slug) return DAY_CARE_GUIDE_ROUTE.canonical;
   const storyMatch = String(slug).match(/^care-story-(.+)$/);
   if (storyMatch) return absoluteSiteUrl(`/care-story/${storyMatch[1]}`);
   const talkMatch = String(slug).match(/^master-talk-(.+)$/);
@@ -403,6 +408,7 @@ function routeSlugFromPath(pathname = window.location.pathname) {
   const cleaned = String(pathname || "/").replace(/^\/+|\/+$/g, "");
   if (!cleaned) return "home";
   const segments = cleaned.split("/");
+  if (segments[0] === "guides" && segments[1] === "day-care") return DAY_CARE_GUIDE_ROUTE.slug;
   if (segments[0] === "locations") return `locations-${segments.slice(1).join("/")}`;
   if (segments[0] === "article" && segments[1]) return `article-${segments.slice(1).join("/")}`;
   if (segments[0] === "care-story" && segments[1]) return `care-story-${segments.slice(1).join("/")}`;
@@ -411,7 +417,7 @@ function routeSlugFromPath(pathname = window.location.pathname) {
 }
 
 function isKnownRouteSlug(slug = "") {
-  return slug === "editorial-policy" || Boolean(getServiceLocationByRoute(slug)) || Boolean(routeSeoMap[slug]) || /^(article|care-story|master-talk)-/.test(slug);
+  return slug === DAY_CARE_GUIDE_ROUTE.slug || slug === "editorial-policy" || Boolean(getServiceLocationByRoute(slug)) || Boolean(routeSeoMap[slug]) || /^(article|care-story|master-talk)-/.test(slug);
 }
 
 function routeSlugFromLocation() {
@@ -426,16 +432,35 @@ function routeSlugFromLocation() {
   return hashValue || pathSlug;
 }
 
-function scrollToCurrentPageAnchor(hashSlug = window.location.hash.slice(1).split("?")[0]) {
+let lastPublicAnchorRoute = "";
+function scrollToCurrentPageAnchor(hashSlug = window.location.hash.slice(1).split("?")[0], { once = false } = {}) {
   if (!hashSlug || isKnownRouteSlug(hashSlug)) return false;
+  // Service fees above the location can change page height during lazy hydration.
+  // Wait for that content before recording the one-time initial anchor alignment.
+  if (routeSlugFromPath() === "day-care" && (pageView?.getAttribute("aria-busy") === "true"
+    || pageView?.querySelector('[data-fee-groups]:not([data-loaded]), [data-fee-groups][data-loaded="loading"]'))) return false;
+  const anchorRoute = `${window.location.pathname}#${hashSlug}`;
+  if (once && lastPublicAnchorRoute === anchorRoute) return true;
   const target = document.getElementById(hashSlug);
   if (!target || !pageView?.contains(target)) return false;
+  if (routeSlugFromPath() === "day-care") {
+    // content-visibility uses estimated heights offscreen. For explicit anchor
+    // navigation, lay out preceding sections before calculating the destination.
+    for (const section of pageView.querySelectorAll(".one-minute-service-page section, .service-template-page section")) {
+      const precedesTarget = Boolean(section.compareDocumentPosition(target) & 4); // DOCUMENT_POSITION_FOLLOWING
+      if ((section === target || section.contains(target) || precedesTarget)
+        && window.getComputedStyle(section).contentVisibility === "auto") section.style.contentVisibility = "visible";
+    }
+    target.style.contentVisibility = "visible";
+    target.getBoundingClientRect();
+  }
   target.scrollIntoView({ behavior: "smooth", block: "start" });
+  lastPublicAnchorRoute = anchorRoute;
   return true;
 }
 
 function normalizePublicHref(href = "#home") {
-  const raw = String(href || "#home").trim();
+  const raw = canonicalizeArticleLink(String(href || "#home").trim());
   const articleMatch = raw.match(/^#article-([^?]+)(\?.*)?$/i);
   if (articleMatch) return `${articlePublicHref(articleMatch[1])}${articleMatch[2] || ""}`;
   const articlePathMatch = raw.match(/^\/article\/([^?/#]+)(\?.*)?$/i);
@@ -561,7 +586,7 @@ function warmHeroImage(src = "") {
 }
 
 const initialHeroRoute = routeSlugFromLocation().split("?")[0];
-if (initialHeroRoute !== "editorial-policy") {
+if (!["editorial-policy", DAY_CARE_GUIDE_ROUTE.slug].includes(initialHeroRoute)) {
   const initialHero = getServiceLocationByRoute(initialHeroRoute, readServiceLocationManifest(document))?.image
     || (routeHeroPreloads[initialHeroRoute] ? routeHeroImageForViewport(initialHeroRoute) : document.querySelector("#heroPreload")?.getAttribute("href"));
   if (initialHero) preloadHeroImage(initialHero);
@@ -772,7 +797,7 @@ function trackAnalyticsEvent(eventType, options = {}) {
     ...analyticsBasePayload(),
     event_type: eventType,
     event_label: options.label || null,
-    page_path: location.hash || "#home",
+    page_path: analyticsPagePath(location, options.pagePath),
     target_url: options.targetUrl || null,
     value: options.value || null,
     metadata: options.metadata || {}
@@ -893,7 +918,7 @@ async function recordFormSubmission(form, formType = "contact") {
     email: formDataValue(formData, ["Email", "信箱", "email"]),
     subject: formDataValue(formData, ["需求", "課程", "您本次報名的課程", "course", "subject"]) || formType,
     message,
-    source_path: location.hash || "#home",
+    source_path: analyticsPagePath(location),
     metadata: {
       page_title: document.title,
       form_id: form.id || null,
@@ -937,7 +962,7 @@ async function sendBackendForm(form, formType = "contact") {
     opening_slug: formDataValue(formData, ["opening_slug"]),
     resume,
     _honey: formDataValue(formData, ["_honey"]),
-    source_path: location.hash || "#home",
+    source_path: analyticsPagePath(location),
     page_title: document.title,
     user_agent: navigator.userAgent
   };
@@ -983,13 +1008,14 @@ function flushPageEngagement() {
   const durationSeconds = Math.max(1, Math.round((Date.now() - analyticsState.pageStartedAt) / 1000));
   trackAnalyticsEvent("page_engagement", {
     label: analyticsState.currentPath,
+    pagePath: analyticsState.currentPath,
     value: durationSeconds,
     metadata: { duration_seconds: durationSeconds }
   });
 }
 
 function trackPageView(path) {
-  const normalizedPath = path || location.hash || "#home";
+  const normalizedPath = analyticsPagePath(location, path);
   if (analyticsState.currentPath === normalizedPath) return;
   flushPageEngagement();
   analyticsState.currentPath = normalizedPath;
@@ -1004,9 +1030,7 @@ function trackPageView(path) {
     browser_language: navigator.language,
     user_agent: navigator.userAgent,
     metadata: {
-      pathname: location.pathname,
-      search: location.search,
-      hash: location.hash,
+      route: normalizedPath,
       viewport_width: window.innerWidth,
       viewport_height: window.innerHeight
     }
@@ -3172,7 +3196,20 @@ function formatArticleDate(dateValue) {
 
 function getHealthArticleList() {
   const staticArticles = healthArticles.map(normalizeStaticArticle);
-  return mergeLatestPublicContent(staticArticles, supabaseHealthArticles);
+  return consolidatePublicArticles(mergeLatestPublicContent(staticArticles, supabaseHealthArticles));
+}
+
+// A small published card manifest keeps service reading links complete while
+// the full health article packs load lazily. It contains no article body or private data.
+let publishedTopicArticleSeed = null;
+function getTopicArticleList() {
+  if (!publishedTopicArticleSeed) {
+    try {
+      const rows = JSON.parse(document.querySelector("#publicTopicArticleManifest")?.textContent || "[]");
+      publishedTopicArticleSeed = Array.isArray(rows) ? rows.filter((row) => row && typeof row === "object") : [];
+    } catch { publishedTopicArticleSeed = []; }
+  }
+  return consolidatePublicArticles(mergeLatestPublicContent(publishedTopicArticleSeed, getHealthArticleList()));
 }
 
 function categorySlug(value = "") {
@@ -4373,6 +4410,7 @@ async function renderCmsEnhancedServicePageOnce(slug, fallbackRenderer) {
   replacePublicPageContent(pageView, fields.length ? applyCmsEnhancedServicePage(fallbackHtml, slug, fields) : fallbackHtml, { preserveInput: hasPrerender });
   hydrateServiceLocalLinks(pageView);
   hydrateServiceLocationLinks(pageView);
+  hydrateServiceTopicReading(pageView, slug, getTopicArticleList());
   hydrateServiceFeeCodeGroups(pageView);
   hydrateDayCareLocationContent(pageView);
   hydrateHomeCareLocationContent(pageView);
@@ -10882,39 +10920,14 @@ function renderNotFoundPage(slug = "") {
 }
 
 function getRelatedArticles(slug) {
-  const normalizeRelatedArticle = (item) => {
-    const href = normalizePublicHref(item?.href);
-    if (!/^\/article\/article\d+(?:[?#].*)?$/i.test(href)) return null;
-    return {
-      href,
-      image: item.image,
-      category: item.category,
-      title: item.title,
-      focalPoint: item.focalPoint
-    };
-  };
-  const current = getHealthArticleList().find((item) => articleRouteMatches(item, slug));
-  const relatedSlugs = Array.isArray(current?.relatedSlugs) ? current.relatedSlugs : [];
-  const curatedRelated = relatedSlugs
-    .map((relatedSlug) => getHealthArticleList().find((item) => articleRouteMatches(item, relatedSlug)))
-    .filter(Boolean)
-    .map(normalizeRelatedArticle)
-    .filter(Boolean);
-  if (curatedRelated.length) return curatedRelated.slice(0, 7);
-
-  const cmsRelated = getHealthArticleList()
-    .filter((item) => !articleRouteMatches(item, slug))
-    .slice(0, 7)
-    .map(normalizeRelatedArticle)
-    .filter(Boolean);
-
-  if (cmsRelated.length) return cmsRelated;
-  return relatedArticleCards
-    .filter((item) => normalizePublicHref(item.href) !== articleHref(slug))
-    .slice(0, 7)
-    .map(normalizeRelatedArticle)
-    .filter(Boolean);
+  const articles = getHealthArticleList();
+  const current = articles.find((item) => articleRouteMatches(item, slug));
+  return current ? selectTopicRelatedArticles(current, articles).map((item) => ({
+    href: canonicalizeArticleLink(item.href), image: item.image, category: item.category,
+    title: item.title, focalPoint: item.focalPoint
+  })) : [];
 }
+
 
 function renderArticleLayout(article, relatedOverride = null) {
   const related = Array.isArray(relatedOverride)
@@ -11219,9 +11232,20 @@ function renderPage(slug) {
   if (!home || !pageView) return;
 
   const publicRouteRequestId = ++publicContentRouteRequestId;
-  const rawSlug = slug || "home";
+  let rawSlug = slug || "home";
+  const requestedArticle = rawSlug.split("?")[0].match(/^article-(.+)$/)?.[1];
+  if (requestedArticle && canonicalArticleSourceSlug(requestedArticle) !== (articleSourceSlug(requestedArticle) || requestedArticle)) {
+    const destination = canonicalArticleHref(requestedArticle);
+    // Also consolidate legacy hash navigation and Vite preview routes.
+    window.history.replaceState(null, "", `${destination}${window.location.search}`);
+    rawSlug = `article-${destination.split("/").pop()}`;
+  }
   const [normalized, queryString = ""] = rawSlug.split("?");
-  if (normalized !== "editorial-policy") {
+  if (normalized === DAY_CARE_GUIDE_ROUTE.slug && window.location.pathname.replace(/\/+$/, "") !== DAY_CARE_GUIDE_ROUTE.path) {
+    // Give legacy hash navigation a stable pathname before section anchors replace the hash.
+    window.history.replaceState(null, "", `${DAY_CARE_GUIDE_ROUTE.path}${queryString ? `?${queryString}` : window.location.search}`);
+  }
+  if (!["editorial-policy", DAY_CARE_GUIDE_ROUTE.slug].includes(normalized)) {
     const hero = getServiceLocationByRoute(normalized, readServiceLocationManifest(document))?.image
       || (routeHeroPreloads[normalized] ? routeHeroImageForViewport(normalized) : (pageView.dataset.prerenderedRoute === normalized ? document.querySelector("#heroPreload")?.getAttribute("href") : null));
     if (hero) preloadHeroImage(hero);
@@ -11237,6 +11261,7 @@ function renderPage(slug) {
     } catch { /* Fall back to the shared public location data. */ }
   }
   const isEditorialPolicy = normalized === "editorial-policy";
+  const isTopicGuide = normalized === DAY_CARE_GUIDE_ROUTE.slug;
   const articleSlug = normalized.startsWith("article-") ? normalized.replace("article-", "") : null;
   const careStorySlug = normalized.startsWith("care-story-") ? normalized.replace("care-story-", "") : null;
   const masterTalkSlug = normalized.startsWith("master-talk-") ? normalized.replace("master-talk-", "") : null;
@@ -11250,7 +11275,7 @@ function renderPage(slug) {
   const isHome = !articleSlug && !careStorySlug && !masterTalkSlug && (normalized === "home" || Boolean(anchorTarget));
   const hasMatchingPrerender = pageView.dataset.prerenderedRoute === normalized && Boolean(pageView.innerHTML.trim());
   const handledBySpecialCms =
-    Boolean(serviceLocation) || isEditorialPolicy ||
+    Boolean(serviceLocation) || isEditorialPolicy || isTopicGuide ||
     normalized === "about" ||
     normalized === "milestones" ||
     normalized === "home-care" ||
@@ -11278,6 +11303,8 @@ function renderPage(slug) {
     }
   } else if (serviceLocation) {
     setRouteSeo(normalized, { ...serviceLocation, canonical: absoluteSiteUrl(serviceLocation.path), location: serviceLocation, breadcrumbParent: { name: serviceLocation.serviceName, path: serviceLocation.parentPath } });
+  } else if (isTopicGuide) {
+    setRouteSeo(normalized, DAY_CARE_GUIDE_ROUTE);
   } else if (isEditorialPolicy) {
     setRouteSeo(normalized, EDITORIAL_POLICY_ROUTE);
   } else {
@@ -11309,6 +11336,9 @@ function renderPage(slug) {
     loadExpertTalkPage(masterTalkSlug, publicRouteRequestId);
   } else if (serviceLocation) {
     if (!hasMatchingPrerender) pageView.innerHTML = renderServiceLocationPage(serviceLocation, publishedServiceLocations);
+    pageView.dataset.prerenderedRoute = normalized;
+  } else if (isTopicGuide) {
+    if (!hasMatchingPrerender) pageView.innerHTML = renderDayCareGuidePage(getTopicArticleList());
     pageView.dataset.prerenderedRoute = normalized;
   } else if (isEditorialPolicy) {
     if (!hasMatchingPrerender) pageView.innerHTML = renderEditorialPolicyPage();
@@ -11501,6 +11531,7 @@ function renderPage(slug) {
   hydrateHomeCareLocationContent(isHome ? home : pageView);
   hydrateCommunityContent(isHome ? home : pageView);
   hydrateServiceLocationLinks(isHome ? home : pageView);
+  hydrateServiceTopicReading(pageView, normalized, getTopicArticleList());
   syncContactNeedDefaults(document, normalized);
   if (isContactPage || window.location.hash === "#contact") {
     applyPendingContactPreset();
@@ -11583,7 +11614,17 @@ function hydrateDayCareLocationContent(root = document) {
   if (!hasDayCareLocation && !dayCareLocationModulePromise) return;
   dayCareLocationModulePromise ||= import("./day-care-location.js");
   dayCareLocationModulePromise
-    .then(({ hydrateDayCareLocation }) => { hydrateDayCareLocation(root); hydrateServiceLocationLinks(root); })
+    .then(({ hydrateDayCareLocation }) => {
+      hydrateDayCareLocation(root);
+      hydrateServiceLocationLinks(root);
+      if (root === pageView && routeSlugFromLocation().split("?")[0] === "day-care") {
+        Promise.resolve(serviceFeeDataPromise).catch(() => {}).then(() => {
+          window.requestAnimationFrame(() => {
+            if (routeSlugFromLocation().split("?")[0] === "day-care") scrollToCurrentPageAnchor(undefined, { once: true });
+          });
+        });
+      }
+    })
     .catch((error) => console.warn(error));
 }
 

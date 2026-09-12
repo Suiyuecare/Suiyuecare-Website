@@ -1,3 +1,4 @@
+import { consolidatePublicArticles } from "../article-consolidation.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -190,7 +191,7 @@ export async function loadPublicContent() {
     staticDetails,
     rewrites
   }));
-  const articleItems = mergeLatestPublicContent(staticItems, cmsItems);
+  const articleItems = consolidatePublicArticles(mergeLatestPublicContent(staticItems, cmsItems));
   const invalidArticle = articleItems.find((item) => !item.publicNumber || !item.publicSlug);
   if (invalidArticle) {
     throw new Error(`Published article is missing a stable public number: ${invalidArticle.slug}`);

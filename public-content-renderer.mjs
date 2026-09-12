@@ -1,3 +1,4 @@
+import { canonicalizeArticleLink } from "./article-consolidation.mjs";
 import {
   articlePublicHref,
   articlePublicSlug
@@ -70,7 +71,7 @@ export function publicDateLabel(value = "") {
 }
 
 function safePublicHref(value = "", fallback = "/contact") {
-  const raw = String(value || "").trim();
+  const raw = canonicalizeArticleLink(String(value || "").trim());
   if (!raw) return fallback;
   if (/^\s*(javascript|data:text)/i.test(raw)) return fallback;
   if (raw === "#contact") return "/contact";
@@ -94,6 +95,7 @@ function sanitizeApprovedArticleHtml(value = "") {
     .replace(/<(script|style|noscript|object|embed|form|input|button|meta|link)\b[^>]*\/?>/gi, "")
     .replace(/\s+on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
     .replace(/\s+(href|src)\s*=\s*(["'])\s*(?:javascript|data:text)[\s\S]*?\2/gi, "");
+  html = html.replace(/\bhref=(["'])([^"'<>]+)\1/g, (_match, quote, href) => `href=${quote}${canonicalizeArticleLink(href)}${quote}`);
   return html.trim();
 }
 

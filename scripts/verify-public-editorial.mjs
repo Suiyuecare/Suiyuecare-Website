@@ -1,3 +1,4 @@
+import { DAY_CARE_GUIDE_ROUTE } from "../public-topic-guides.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
@@ -65,7 +66,7 @@ const appSource = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8")
 const routeMap = appSource.match(/const routeSeoMap = \{[\s\S]*?\n\};/)?.[0];
 const routePredicate = appSource.match(/function isKnownRouteSlug\(slug = ""\) \{[\s\S]*?\n\}/)?.[0];
 assert.ok(routeMap && routePredicate, "application route predicate must be available");
-const routeContext = { DEFAULT_SEO: {}, getServiceLocationByRoute };
+const routeContext = { DEFAULT_SEO: {}, getServiceLocationByRoute, DAY_CARE_GUIDE_ROUTE };
 vm.createContext(routeContext);
 vm.runInContext(`${routeMap}\n${routePredicate}\nglobalThis.knownRoute = isKnownRouteSlug;`, routeContext);
 assert.equal(routeContext.knownRoute("article-references"), true, "regression trigger: article-* hashes navigate");

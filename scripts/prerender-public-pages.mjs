@@ -1,3 +1,5 @@
+import { canonicalArticleHref } from "../article-consolidation.mjs";
+import { DAY_CARE_GUIDE_ROUTE } from "../public-topic-guides.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -8,6 +10,7 @@ import { parseHTML } from "linkedom";
 import { renderContactNeedOptions } from "../contact-page.mjs";
 import { updatePublicStructuredData } from "../public-route-structured-data.mjs";
 import { renderMilestonesPage } from "../milestones-page.js";
+import { hydrateServiceTopicReading } from "../public-topic-guides.mjs";
 import { getServiceLocationByRoute, hydrateServiceLocationLinks } from "../public-service-locations.mjs";
 import { EDITORIAL_POLICY_ROUTE } from "../public-editorial.mjs";
 import { preparePrerenderedService } from "../public-service-prerender.mjs";
@@ -200,7 +203,7 @@ function responsiveHeroStyles(root, slug, renderers, window) {
 
 // Build execution is sequential: native icon modules access document while creating SVG nodes.
 // Restore every temporary DOM global even when rendering fails, and let failures stop the build.
-export async function prerenderPublicPages(snapshot, { verifyHydration = false } = {}) {
+export async function prerenderPublicPages(snapshot, { verifyHydration = false, articles = [] } = {}) {
   const source = fs.readFileSync(path.join(rootDir, "app.js"), "utf8");
   const entrypoints = [...Object.values(rendererNames), "applyCmsEnhancedServicePage", "hydrateServiceLocalLinks", "renderRecruitingTalentPage", "renderFixedRecruitingOpportunityPage", "escapeHTML", "heroImageForViewport", "contentImageUrl"];
   const code = rendererSource(source, entrypoints);
@@ -213,7 +216,7 @@ export async function prerenderPublicPages(snapshot, { verifyHydration = false }
     const previous = new Map(["document", "window", "HTMLElement"].map((name) => [name, Object.getOwnPropertyDescriptor(globalThis, name)]));
     try {
       Object.assign(globalThis, { document, window, HTMLElement });
-      const sandbox = { document, window, location: window.location, URL, console, renderContactNeedOptions, updatePublicStructuredData, getServiceLocationByRoute: (route) => getServiceLocationByRoute(route, snapshot), EDITORIAL_POLICY_ROUTE };
+      const sandbox = { document, window, location: window.location, URL, console, renderContactNeedOptions, updatePublicStructuredData, getServiceLocationByRoute: (route) => getServiceLocationByRoute(route, snapshot), EDITORIAL_POLICY_ROUTE, DAY_CARE_GUIDE_ROUTE, canonicalArticleHref };
       vm.createContext(sandbox);
       new vm.Script(code, { filename: "app.public-renderers.js" }).runInContext(sandbox, { timeout: 5_000 });
       const renderers = sandbox.publicRenderers;
@@ -244,6 +247,7 @@ export async function prerenderPublicPages(snapshot, { verifyHydration = false }
       if (slug === "home-care") homeCare.hydrateHomeCareLocation(root);
       if (slug === "community") community.hydrateCommunityPage(root);
       hydrateServiceLocationLinks(root, snapshot);
+      hydrateServiceTopicReading(root, slug, articles);
       for (const node of root.querySelectorAll(".service-motion, .reveal")) node.classList.add("in-view");
       if (SERVICE_PRERENDER_SLUGS.includes(slug)) root.firstElementChild.setAttribute("data-public-service-prerendered", "true");
       if (verifyHydration && SERVICE_PRERENDER_SLUGS.includes(slug)) {

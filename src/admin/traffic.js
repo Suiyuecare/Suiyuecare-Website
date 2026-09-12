@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabaseClient.js";
 import { bindAdminLogout, bootProtectedAdminPage, reportAdminBootError } from "./session.js";
 import { escapeHTML, formatCount, formatUpdatedAt } from "./utils.js";
+import { initSearchConsolePanel } from "./search-console-panel.js";
 
 const shell = document.querySelector(".admin-app-shell");
 const loading = document.querySelector("#adminLoading");
@@ -361,27 +362,23 @@ function renderSeo() {
     const issues = [];
     if (!page.seo_title) issues.push("缺少 meta title");
     if (!page.seo_description) issues.push("缺少 meta description");
-    if (!page.title) issues.push("缺少 H1 對應標題");
-    const score = Math.max(30, 100 - issues.length * 18);
-    return { ...page, issues, score };
+    if (!page.title) issues.push("缺少頁面標題欄位");
+    return { ...page, issues };
   });
-  const avgScore = rows.length ? rows.reduce((sum, row) => sum + row.score, 0) / rows.length : 0;
   const missingDesc = rows.filter((row) => row.issues.includes("缺少 meta description")).length;
   const missingTitle = rows.filter((row) => row.issues.includes("缺少 meta title")).length;
   document.querySelector("#seoSummary").innerHTML = [
-    ["SEO 平均分數", Math.round(avgScore), "Score"],
+    ["已讀取 CMS 頁面", rows.length, "Pages"],
     ["缺少描述", missingDesc, "Descriptions"],
     ["缺少標題", missingTitle, "Titles"],
     ["404 頁面", state.events.filter((event) => event.event_type === "error_404").length, "404"]
   ].map(([label, value, meta]) => `<article><span>${escapeHTML(meta)}</span><strong>${formatCount(value)}</strong><p>${escapeHTML(label)}</p></article>`).join("");
-  renderTable("#seoAuditTable", ["頁面", "Meta Title", "Meta Description", "H1", "Canonical/Index", "SEO 分數", "問題"], rows.map((row) => [
+  renderTable("#seoAuditTable", ["CMS 頁面", "SEO 標題欄位", "SEO 描述欄位", "頁面標題欄位", "待補欄位"], rows.map((row) => [
     `<strong>${escapeHTML(row.title || row.slug)}</strong><small>/${escapeHTML(row.slug)}</small>`,
     row.seo_title ? "OK" : "缺少",
     row.seo_description ? "OK" : "缺少",
     row.title ? "OK" : "缺少",
-    "可索引",
-    formatCount(row.score),
-    escapeHTML(row.issues.join("、") || "良好")
+    escapeHTML(row.issues.join("、") || "欄位已填寫")
   ]));
 }
 
@@ -576,7 +573,8 @@ reportScheduleForm?.addEventListener("submit", async (event) => {
   fetchData();
 });
 
-function bootTrafficCenter() {
+function bootTrafficCenter(_session, permissions) {
+  initSearchConsolePanel(document.querySelector("#searchConsolePanel"), { canExport: permissions?.can_export_analytics === true });
   const end = new Date();
   const start = new Date(Date.now() - 6 * 86400000);
   if (startInput) startInput.value = todayString(start);

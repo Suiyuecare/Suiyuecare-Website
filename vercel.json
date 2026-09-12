@@ -1076,7 +1076,7 @@
     },
     {
       "source": "/article/day-care-transition",
-      "destination": "/article/article43",
+      "destination": "/article/article7",
       "permanent": true
     },
     {
@@ -1662,6 +1662,11 @@
     {
       "source": "/article/home-care-no-entry-agreement",
       "destination": "/article/article160",
+      "permanent": true
+    },
+    {
+      "source": "/article/article43",
+      "destination": "/article/article7",
       "permanent": true
     }
   ],

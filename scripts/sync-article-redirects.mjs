@@ -1,3 +1,5 @@
+import { ARTICLE_CONSOLIDATIONS, canonicalArticleHref } from "../article-consolidation.mjs";
+import { articlePublicHref } from "../article-url-map.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { ARTICLE_SOURCE_SLUGS } from "../article-url-map.mjs";
@@ -11,25 +13,24 @@ const isManagedArticleRedirect = (item = {}) =>
   /^\/article\/[a-z0-9-]+$/.test(item.source || "") &&
   /^\/article\/article\d+$/.test(item.destination || "");
 
+const articleRedirects = [
+  ...ARTICLE_SOURCE_SLUGS.map((sourceSlug) => ({
+    source: `/article/${sourceSlug}`, destination: canonicalArticleHref(sourceSlug), permanent: true
+  })),
+  ...ARTICLE_CONSOLIDATIONS.map(({ source, target }) => ({
+    source: articlePublicHref(source), destination: articlePublicHref(target), permanent: true
+  }))
+];
 const redirects = [
   ...(config.redirects || []).filter((item) => !isManagedArticleRedirect(item)),
-  ...ARTICLE_SOURCE_SLUGS.map((sourceSlug, index) => ({
-    source: `/article/${sourceSlug}`,
-    destination: `/article/article${index + 1}`,
-    permanent: true
-  }))
+  ...articleRedirects
 ];
 
 const output = `${JSON.stringify({ ...config, redirects }, null, 2)}\n`;
 
 if (checkOnly) {
   const managedRedirects = (config.redirects || []).filter(isManagedArticleRedirect);
-  const expectedRedirects = new Map(
-    ARTICLE_SOURCE_SLUGS.map((sourceSlug, index) => [
-      `/article/${sourceSlug}`,
-      `/article/article${index + 1}`
-    ])
-  );
+  const expectedRedirects = new Map(articleRedirects.map((item) => [item.source, item.destination]));
   const redirectsAreCurrent =
     managedRedirects.length === expectedRedirects.size &&
     managedRedirects.every((item) =>

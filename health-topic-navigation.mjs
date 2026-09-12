@@ -5,7 +5,7 @@ export const COMMON_HEALTH_NEEDS = [
   { label: "預防跌倒", query: "跌倒" },
   { label: "飲食與營養", query: "營養" },
   { label: "在家照顧", query: "居家" },
-  { label: "認識日照", query: "日照" },
+  { label: "認識日照", query: "日照", href: "/guides/day-care" },
   { label: "復能與活動", query: "復能" },
   { label: "家屬支持", query: "家屬" }
 ];
@@ -60,7 +60,7 @@ export function renderHealthTopicNavigation(categories = [], articles = [], acti
     <div class="health-topic-navigation">
       <p class="health-topic-heading">常見照顧需求</p>
       <nav class="health-common-needs" aria-label="常見照顧需求">
-        ${COMMON_HEALTH_NEEDS.map(({ label, query }) => `<a href="/search?q=${encodeURIComponent(query)}">${escapeHtml(label)}</a>`).join("")}
+        ${COMMON_HEALTH_NEEDS.map(({ label, query, href }) => `<a href="${href || `/search?q=${encodeURIComponent(query)}`}">${escapeHtml(label)}</a>`).join("")}
       </nav>
       <div class="health-topic-tools">
         <a class="health-all-articles" href="/search">全部文章</a>

@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/src/admin/admin.css" />
+    <link rel="stylesheet" href="/src/admin/search-console.css" />
   </head>
   <body class="admin-app-page">
     <div class="admin-app-shell" hidden>
@@ -97,7 +98,7 @@
           <button type="button" data-traffic-tab="sources">來源分析</button>
           <button type="button" data-traffic-tab="pages">頁面表現</button>
           <button type="button" data-traffic-tab="conversions">轉換追蹤</button>
-          <button type="button" data-traffic-tab="seo">SEO 健康度</button>
+          <button type="button" data-traffic-tab="seo">SEO 與搜尋成效</button>
           <button type="button" data-traffic-tab="health">網站健康度</button>
           <button type="button" data-traffic-tab="alerts">異常警示</button>
           <button type="button" data-traffic-tab="reports">報表中心</button>
@@ -159,6 +160,40 @@
         </section>
 
         <section class="traffic-panel" data-traffic-panel="seo">
+          <article class="admin-workspace-panel gsc-panel" id="searchConsolePanel">
+            <div class="admin-workspace-head"><div><p class="admin-eyebrow">Search Console CSV</p><h2>搜尋成效與改善機會</h2><p class="traffic-muted">Google 帳號連線：未設定。請匯入自己的 Search Console CSV，檔案只在這個分頁分析，重新整理後清除。</p></div></div>
+            <details class="gsc-help"><summary>如何取得可分析的 CSV？</summary><ol><li>在 Search Console 的「搜尋成效」選擇日期、搜尋類型及篩選條件，開啟點擊、曝光、CTR、平均排名四項指標。</li><li>選「匯出 → CSV」。如果下載的是 ZIP，先解壓，再選 Queries（查詢）或 Pages（網頁）CSV。</li><li>一次匯入一個單一期間的資料表；查詢與網頁會分開保留。圖表、篩選器與比較期間 CSV 尚不支援。</li></ol><a href="https://support.google.com/webmasters/answer/12919797?hl=zh-Hant" target="_blank" rel="noopener noreferrer">查看 Google 匯出說明 ↗</a></details>
+            <form id="gscImportForm" class="gsc-import-form">
+              <label class="gsc-file-label" for="gscFile">查詢或網頁 CSV（UTF-8，最多 5 MB）<input id="gscFile" type="file" accept=".csv,text/csv" required /></label>
+              <label for="gscPeriodStart">匯出期間開始（選填）<input id="gscPeriodStart" type="date" /></label>
+              <label for="gscPeriodEnd">匯出期間結束（選填）<input id="gscPeriodEnd" type="date" /></label>
+              <button type="submit" id="gscImportButton">分析 CSV</button>
+            </form>
+            <p class="traffic-muted gsc-range-note">期間由你自行填寫，用來識別匯出檔；不會隨上方的網站流量日期篩選改變，也不會重新篩選 CSV 內的資料。</p>
+            <p id="gscStatus" class="admin-data-status" role="status" aria-live="polite" hidden></p>
+            <div id="gscEmpty" class="admin-empty-state">尚未匯入資料。匯入後即可查看曝光、點擊與優先檢查的查詢或網頁。</div>
+            <div id="gscResults" hidden>
+              <div class="gsc-result-toolbar">
+                <label for="gscDimension">分析資料<select id="gscDimension"><option value="query">查詢（尚未匯入）</option><option value="page">網頁（尚未匯入）</option></select></label>
+                <div class="traffic-actions"><button type="button" id="gscExport" disabled>匯出目前清單</button><button type="button" id="gscClear">清除匯入資料</button></div>
+              </div>
+              <p id="gscSource" class="gsc-source"></p>
+              <div id="gscSummary" class="traffic-kpi-grid compact"></div>
+              <p class="traffic-muted gsc-data-note">指標只計算目前維度的匯入列，CTR 由點擊 ÷ 曝光重算。Google 匯出表格通常最多 1,000 列，且可能省略部分查詢，與整站總計可能不同；查詢與網頁的數字不可相加。未知值顯示「—」。</p>
+              <div class="gsc-controls">
+                <label for="gscMinImpressions">機會最低曝光<input id="gscMinImpressions" type="number" min="0" max="1000000000" step="1" value="100" /></label>
+                <label for="gscMaxCtr">低 CTR 門檻（%）<input id="gscMaxCtr" type="number" min="0" max="100" step="0.1" value="2" /></label>
+                <label for="gscOpportunity">顯示<select id="gscOpportunity"><option value="all">全部匯入列</option><option value="low-ctr">前 10 名低 CTR</option><option value="ranking">平均排名 4–20</option></select></label>
+                <label for="gscSort">排序<select id="gscSort"><option value="opportunity">優先機會，再依曝光</option><option value="impressions">曝光由多到少</option><option value="clicks">點擊由多到少</option><option value="position">平均排名由前到後</option></select></label>
+                <label class="gsc-search-label" for="gscSearch">搜尋清單<input id="gscSearch" type="search" placeholder="查詢字詞或網頁網址" /></label>
+              </div>
+              <p class="traffic-muted">排序規則：達到曝光門檻後，標出「前 10 名且低於 CTR 門檻」或「平均排名 4–20」的項目，依曝光由多到少、CTR 由低到高排列。這是人工檢查順序，不是 Google 評分或成效預測。</p>
+              <p id="gscResultCount" class="gsc-result-count" aria-live="polite"></p>
+              <div id="gscTable" class="gsc-table"></div>
+              <div class="gsc-pagination"><button type="button" id="gscPrevious">上一頁</button><span id="gscPageInfo"></span><button type="button" id="gscNext">下一頁</button></div>
+            </div>
+          </article>
+          <div><h2>CMS 欄位完整度</h2><p class="traffic-muted">此表檢查 CMS 欄位是否填寫；實際索引與搜尋排名請查看 Search Console。</p></div>
           <div id="seoSummary" class="traffic-kpi-grid compact"></div>
           <div id="seoAuditTable" class="traffic-table-card"></div>
         </section>

@@ -1,3 +1,5 @@
+import { canonicalizeArticleLink } from "../article-consolidation.mjs";
+import { DAY_CARE_GUIDE_ROUTE, renderDayCareGuidePage } from "../public-topic-guides.mjs";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -297,8 +299,9 @@ function contentRoute(item) {
 }
 
 const publicContent = await loadPublicContent();
-const prerenderedPages = await prerenderPublicPages(publicContent.snapshot);
+const prerenderedPages = await prerenderPublicPages(publicContent.snapshot, { articles: publicContent.articles });
 const supplementalRoutes = [
+  { ...DAY_CARE_GUIDE_ROUTE, priority: "0.7", prerenderedHtml: renderDayCareGuidePage(publicContent.articles) },
   ...serviceLocationRoutes(publicContent.snapshot),
   { ...EDITORIAL_POLICY_ROUTE, slug: "editorial-policy", priority: "0.6", prerenderedHtml: renderEditorialPolicyPage() }
 ];
@@ -490,6 +493,7 @@ function routeHtml(baseHtml, route) {
   }
   html = injectPrerenderedContent(html, route);
   html = routeHashLinksToPaths(html);
+  html = html.replace(/(<a\b[^>]*?\bhref=")([^"<>]+)(")/g, (_match, before, href, after) => `${before}${canonicalizeArticleLink(href)}${after}`);
   html = normalizePublicHtmlAssets(html);
   html = markCurrentRouteLinks(html, route);
   html = optimizeStaticImageTags(html);
@@ -499,7 +503,14 @@ function routeHtml(baseHtml, route) {
   if (route.inlineStyles) {
     html = html.replace("</head>", () => `<style id="publicPrerenderHeroStyles">${route.inlineStyles.replace(/</g, "\\3C ")}</style>\n  </head>`);
   }
-  if (route.slug === "editorial-policy") html = html.replace(/<link\b(?=[^>]*\bid="heroPreload")[^>]*>\s*/g, "");
+  if (["editorial-policy", DAY_CARE_GUIDE_ROUTE.slug].includes(route.slug)) html = html.replace(/<link\b(?=[^>]*\bid="heroPreload")[^>]*>\s*/g, "");
+  const topicNumbers = new Set([7, 12, 29, 133, 134, 137, 138]);
+  const topicManifest = JSON.stringify(publicContent.articles.filter((item) => topicNumbers.has(item.publicNumber)).map((item) => ({
+    contentKind: "article", slug: item.slug, sourceSlug: item.sourceSlug, publicSlug: item.publicSlug,
+    publicNumber: item.publicNumber, href: item.href, title: item.title, category: item.category,
+    excerpt: item.excerpt, publishedAt: item.publishedAt, updatedAt: item.updatedAt
+  }))).replace(/</g, "\\u003c");
+  html = html.replace("</body>", () => `<script id="publicTopicArticleManifest" type="application/json">${topicManifest}</script>\n  </body>`);
   const locationManifest = JSON.stringify(getPublicServiceLocations(publicContent.snapshot)).replace(/</g, "\\u003c");
   html = html.replace("</body>", () => `<script id="publicServiceLocationManifest" type="application/json">${locationManifest}</script>\n  </body>`);
   return html;

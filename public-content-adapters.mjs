@@ -1,3 +1,4 @@
+import { selectTopicRelatedArticles } from "./public-topic-guides.mjs";
 import {
   articlePublicHref,
   articlePublicNumber,
@@ -410,7 +411,8 @@ export function addSameKindRelated(items = []) {
       .map((slug) => bySlug.get(slug))
       .filter((candidate) => candidate?.contentKind === item.contentKind);
     const fallback = rows.filter((candidate, candidateIndex) => candidateIndex !== index && candidate.contentKind === item.contentKind);
-    const related = (curated.length ? curated : fallback).slice(0, 7).map((candidate) => ({
+    const selected = item.contentKind === "article" ? selectTopicRelatedArticles(item, rows.filter((row) => row.contentKind === "article")) : (curated.length ? curated : fallback);
+    const related = selected.slice(0, 7).map((candidate) => ({
       href: candidate.href,
       image: candidate.image,
       category: candidate.category,

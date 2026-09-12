@@ -1,3 +1,4 @@
+import { loadPublicContent } from "./load-public-content.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
@@ -7,7 +8,7 @@ import { normalizePublicHtmlAssets } from "./public-html-assets.mjs";
 
 const rootDir = path.resolve(import.meta.dirname, "..");
 const snapshot = JSON.parse(fs.readFileSync(path.join(rootDir, "public/cms-fallbacks.json"), "utf8"));
-const pages = await prerenderPublicPages(snapshot, { verifyHydration: true });
+const pages = await prerenderPublicPages(snapshot, { verifyHydration: true, articles: (await loadPublicContent()).articles });
 const normalize = (text) => String(text || "").replace(/\s+/g, " ").trim();
 const documentFor = (html) => parseHTML(`<!doctype html><html><body><main>${html}</main></body></html>`).document;
 const assetFixture = `<img src="assets/a.jpg" data-fallback-src="assets/fallback.jpg" srcset="assets/a.jpg 1x, ./assets/b.jpg 2x" alt="A > B"><a href='assets/info.pdf'>Read</a><div style="background-image:url('assets/hero.jpg')"></div><script src="assets/example.js">const html = '<img src="assets/inside-script.jpg">';</script><script type="application/json">{"src":"assets/snapshot.jpg"}</script>`;

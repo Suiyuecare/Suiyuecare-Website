@@ -40,14 +40,15 @@
     "verify:security": "node scripts/verify-security.mjs",
     "verify:security:production": "VERIFY_PRODUCTION=1 node scripts/verify-security.mjs",
     "verify:production": "pnpm verify:routes:production && pnpm verify:security:production",
-    "verify:all": "pnpm verify:portal-care-entry && pnpm build && pnpm verify:ux-navigation && pnpm verify:article-urls && pnpm verify:daily-articles && pnpm verify:article-redirects && pnpm verify:route-inventory && pnpm verify:cms-contract && pnpm verify:cms-fallbacks && pnpm verify:department-access && pnpm verify:routes && pnpm verify:public-content-freshness && pnpm verify:public-content-seo && pnpm verify:public-content-rebuild && pnpm verify:copy && pnpm verify:seo && pnpm verify:public-page-prerender && pnpm verify:service-locations && pnpm verify:public-editorial && pnpm verify:home-image-loading && pnpm verify:links && pnpm verify:accessibility && pnpm verify:performance && pnpm verify:security && pnpm audit:images:strict",
+    "verify:all": "pnpm verify:portal-care-entry && pnpm build && pnpm verify:ux-navigation && pnpm verify:article-urls && pnpm verify:daily-articles && pnpm verify:article-redirects && pnpm verify:route-inventory && pnpm verify:cms-contract && pnpm verify:cms-fallbacks && pnpm verify:department-access && pnpm verify:routes && pnpm verify:public-content-freshness && pnpm verify:public-content-seo && pnpm verify:public-content-rebuild && pnpm verify:copy && pnpm verify:seo && pnpm verify:public-page-prerender && pnpm verify:service-locations && pnpm verify:public-editorial && pnpm verify:home-image-loading && pnpm verify:seo-next && pnpm verify:links && pnpm verify:accessibility && pnpm verify:performance && pnpm verify:security && pnpm audit:images:strict",
     "cms:fallbacks:sync": "node scripts/sync-cms-fallbacks.mjs",
     "backup:supabase": "node scripts/backup-supabase.mjs",
     "restore:supabase": "node scripts/restore-supabase.mjs",
     "verify:public-page-prerender": "node scripts/verify-public-page-prerender.mjs",
     "verify:service-locations": "node scripts/verify-service-locations.mjs",
     "verify:public-editorial": "node scripts/verify-public-editorial.mjs && node scripts/verify-article-editorial-fields.mjs",
-    "verify:home-image-loading": "node scripts/verify-home-image-loading.mjs"
+    "verify:home-image-loading": "node scripts/verify-home-image-loading.mjs",
+    "verify:seo-next": "node scripts/verify-analytics-route.mjs && node scripts/verify-search-console-import.mjs && node scripts/verify-admin-toast-text.mjs && node scripts/verify-topic-guides.mjs && node scripts/verify-seo-consolidation.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",

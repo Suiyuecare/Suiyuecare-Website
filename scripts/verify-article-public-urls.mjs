@@ -1,3 +1,4 @@
+import { canonicalArticleHref } from "../article-consolidation.mjs";
 import {
   ARTICLE_SOURCE_SLUGS,
   articlePublicHref,
@@ -36,7 +37,7 @@ if (new Set(publicHrefs).size !== publicHrefs.length) {
   failures.push("public article hrefs are not unique");
 }
 
-const expectedInitialHrefs = ARTICLE_SOURCE_SLUGS.map((sourceSlug) => articlePublicHref(sourceSlug));
+const expectedInitialHrefs = [...new Set(ARTICLE_SOURCE_SLUGS.map((sourceSlug) => canonicalArticleHref(sourceSlug)))];
 expectedInitialHrefs.forEach((href) => {
   if (!publicHrefs.includes(href)) failures.push(`current public content is missing ${href}`);
 });

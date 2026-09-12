@@ -12,7 +12,7 @@ const end = source.indexOf("\nasync function loadSupabaseServiceTemplatePage(", 
 assert.ok(start >= 0 && end > start, "Locate the real shared service renderer");
 const rendererSource = source.slice(start, end);
 const hydrationNames = [
-  "hydrateServiceLocalLinks", "hydrateServiceLocationLinks", "hydrateServiceFeeCodeGroups",
+  "hydrateServiceLocalLinks", "hydrateServiceLocationLinks", "hydrateServiceTopicReading", "hydrateServiceFeeCodeGroups",
   "hydrateDayCareLocationContent", "hydrateHomeCareLocationContent",
   "hydrateCommunityContent",
   "optimizeImageLoading", "observeServiceMotion"
@@ -39,6 +39,7 @@ function harness(functionSource, initialRoute, { prerenderedRoute, initialHtml =
   };
   const context = vm.createContext({
     pageView,
+    getTopicArticleList: () => [],
     routeSlugFromLocation: () => route,
     setPageViewBusy: (value) => busy.push(value),
     replacePublicPageContent: (node, nextHtml, options) => {

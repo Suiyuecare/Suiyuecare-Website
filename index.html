@@ -83,7 +83,7 @@
     <link id="heroPreload" rel="preload" as="image" href="/assets/hero-care-hero-fast.jpg" fetchpriority="high" media="(min-width: 641px)" />
     <script>
       (() => {
-        if (document.documentElement.dataset.initialRoute === "editorial-policy") return;
+        if (["editorial-policy", "guides/day-care", "guides-day-care"].includes(document.documentElement.dataset.initialRoute)) return;
         const heroPreloads = {
           "#home": "/assets/hero-care-hero-fast.jpg",
           "#about": "/assets/about/about-team-group-hero-v2.jpg",
