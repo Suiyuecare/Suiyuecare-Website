@@ -10,8 +10,8 @@ export const DAY_CARE_GUIDE_ROUTE = Object.freeze({
   title: "日照入門指南：申請、費用、參觀與接送準備｜歲悅長照",
   description: "第一次安排日間照顧，從申請與費用說明、參觀準備，到前兩週適應與接送交接，依序找到歲悅現有照顧文章與服務資訊。",
   h1: "日照入門指南：從申請、參觀到接送準備",
-  image: "/assets/hero-care-hero-fast.jpg",
-  imageAlt: "歲悅長照照顧服務",
+  image: "/assets/daycare-detail-01-exercise-hero-fast.jpg",
+  imageAlt: "日照人員陪伴長輩一起參與伸展活動的照顧情境",
   breadcrumbParent: Object.freeze({ name: "健康3.0", path: "/health" })
 });
 
@@ -88,31 +88,54 @@ function selectedArticles(articles, slugs) {
   return slugs.map((slug) => byHref.get(`/article/${slug}`)).filter(Boolean);
 }
 
+// Article covers come from the same published inventory as the links. A missing
+// or unsafe cover stays a text link; it must not invent an available article.
+function topicImageSrc(value) {
+  const raw = text(value, 2000);
+  if (!raw || /[\u0000-\u0020\u007f\\]/.test(raw) || raw.startsWith("//")) return "";
+  const source = raw.startsWith("assets/") ? `/${raw}` : raw;
+  try {
+    const url = new URL(source, SITE_ORIGIN);
+    if (url.protocol !== "https:" || url.username || url.password) return "";
+    if (url.origin === SITE_ORIGIN) return url.pathname.startsWith("/assets/") ? `${url.pathname}${url.search}` : "";
+    return /^https:\/\//i.test(source) ? url.href : "";
+  } catch { return ""; }
+}
+
 function renderReadingLinks(articles) {
   if (!articles.length) return "";
-  return `<ul class="topic-reading-list">${articles.map((article) => `<li><a href="${escapeHtml(article.href)}"><span>${escapeHtml(article.title)}</span><span class="topic-reading-arrow" aria-hidden="true">→</span></a></li>`).join("")}</ul>`;
+  return `<ul class="topic-reading-list">${articles.map((article) => {
+    const src = topicImageSrc(article.image);
+    const alt = text(article.imageAlt, 300);
+    const cover = src ? `<span class="topic-reading-image"><img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" width="720" height="480" loading="lazy" decoding="async"></span>` : "";
+    return `<li><a class="topic-reading-link${src ? " topic-reading-link--image" : ""}" href="${escapeHtml(article.href)}">${cover}<span class="topic-reading-caption"><span class="topic-reading-title">${escapeHtml(article.title)}</span><span class="topic-reading-label">閱讀文章<span class="topic-reading-arrow" aria-hidden="true">→</span></span></span></a></li>`;
+  }).join("")}</ul>`;
 }
 
 /** Render a guide without creating links for absent or unpublished articles. */
 export function renderDayCareGuidePage(articles = []) {
+  const [heading, introduction] = DAY_CARE_GUIDE_ROUTE.h1.split("：");
   return `
     <article class="topic-guide-page" data-public-topic-guide="day-care">
       <nav class="topic-guide-breadcrumb" aria-label="麵包屑"><a href="/">首頁</a><span aria-hidden="true">／</span><a href="/health">健康3.0</a><span aria-hidden="true">／</span><span aria-current="page">日照入門指南</span></nav>
-      <header class="topic-guide-intro"><p class="topic-guide-eyebrow">健康3.0 · 日間照顧</p><h1>${escapeHtml(DAY_CARE_GUIDE_ROUTE.h1)}</h1><p>第一次安排日照，先從目前最想確認的事情開始。這份指南把服務資訊與照顧文章放在一起，方便你一步一步準備。</p></header>
-      <nav class="topic-guide-steps" aria-label="指南閱讀順序">${GUIDE_STEPS.map((step, index) => `<a href="#${step.id}"><span aria-hidden="true">0${index + 1}</span>${step.label}</a>`).join("")}</nav>
+      <header class="topic-guide-hero">
+        <picture class="topic-guide-hero-media"><source media="(max-width: 640px)" srcset="/assets/daycare-detail-01-exercise-hero-fast-mobile.jpg"><img src="${DAY_CARE_GUIDE_ROUTE.image}" alt="${escapeHtml(DAY_CARE_GUIDE_ROUTE.imageAlt)}" width="2400" height="1350" loading="eager" fetchpriority="high" decoding="async"></picture>
+        <div class="topic-guide-hero-inner"><div class="topic-guide-intro"><p class="topic-guide-eyebrow">健康3.0 · 日間照顧</p><h1><span class="topic-guide-title">${escapeHtml(heading)}：</span><span class="topic-guide-subtitle">${escapeHtml(introduction)}</span></h1><p>第一次安排日照，先從目前最想確認的事情開始。這份指南把服務資訊與照顧文章放在一起，方便你一步一步準備。</p></div></div>
+      </header>
+      <nav class="topic-guide-steps" aria-label="指南閱讀順序">${GUIDE_STEPS.map((step, index) => `<a href="#${step.id}"><span class="topic-guide-step-number" aria-hidden="true">0${index + 1}</span><span>${step.label}</span><span class="topic-guide-step-arrow" aria-hidden="true">↓</span></a>`).join("")}</nav>
       <div class="topic-guide-sections">${GUIDE_STEPS.map((step, index) => `
-        <section class="topic-guide-section" id="${step.id}" aria-labelledby="${step.id}-title"><p class="topic-guide-number" aria-hidden="true">0${index + 1}</p><div><h2 id="${step.id}-title">${step.title}</h2><p>${step.body}</p>${renderReadingLinks(selectedArticles(articles, step.articles))}${index === 0 ? '<a class="topic-guide-service-link" href="/day-care">查看日間照顧服務與費用說明 →</a>' : ""}</div></section>`).join("")}</div>
+        <section class="topic-guide-section" id="${step.id}" aria-labelledby="${step.id}-title"><div class="topic-guide-section-copy"><p class="topic-guide-number" aria-hidden="true">0${index + 1}</p><h2 id="${step.id}-title">${step.title}</h2><p>${step.body}</p>${index === 0 ? '<a class="topic-guide-service-link" href="/day-care">查看日間照顧服務與費用說明 →</a>' : ""}</div>${renderReadingLinks(selectedArticles(articles, step.articles))}</section>`).join("")}</div>
       <section class="topic-guide-next" aria-labelledby="topic-next-title"><h2 id="topic-next-title">把閱讀中的問題，帶到下一次諮詢</h2><p>想了解歲悅日照的地點、參觀與服務安排，可以從服務頁查看據點，再留下你的需求。</p><div class="topic-guide-actions"><a href="/day-care#day-care-service-locations">查看日照服務據點</a><a href="/contact" data-contact-need="日間照顧諮詢" data-contact-message="我閱讀了日照入門指南，想了解日照的資格、費用與參觀安排。">留下日照諮詢需求</a></div></section>
     </article>`;
 }
 
-/** Small text links keep the service page fast and its main contact form intact. */
+/** Optional lazy covers keep service reading separate from its contact form. */
 export function renderServiceTopicReading(serviceSlug, articles = []) {
   const config = Object.hasOwn(SERVICE_READING, serviceSlug) ? SERVICE_READING[serviceSlug] : null;
   if (!config) return "";
   const selected = selectedArticles(articles, config.articles);
   if (!selected.length) return "";
-  return `<section class="service-topic-reading" data-service-topic-reading="${serviceSlug}" aria-labelledby="topic-reading-${serviceSlug}"><h2 id="topic-reading-${serviceSlug}">${config.title}</h2><p>${config.description}</p>${renderReadingLinks(selected)}${serviceSlug === "day-care" ? `<a class="topic-guide-service-link" href="${DAY_CARE_GUIDE_ROUTE.path}">依序閱讀日照入門指南 →</a>` : ""}</section>`;
+  return `<section class="service-topic-reading" data-service-topic-reading="${serviceSlug}" aria-labelledby="topic-reading-${serviceSlug}"><div class="service-topic-reading-intro"><p class="topic-guide-eyebrow">延伸閱讀</p><h2 id="topic-reading-${serviceSlug}">${config.title}</h2><p>${config.description}</p></div>${renderReadingLinks(selected)}${serviceSlug === "day-care" ? `<a class="topic-guide-service-link" href="${DAY_CARE_GUIDE_ROUTE.path}">依序閱讀日照入門指南 →</a>` : ""}</section>`;
 }
 
 /** Returns true only when a matching service page's reading block changed. */

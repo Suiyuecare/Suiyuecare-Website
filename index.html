@@ -83,9 +83,13 @@
     <link id="heroPreload" rel="preload" as="image" href="/assets/hero-care-hero-fast.jpg" fetchpriority="high" media="(min-width: 641px)" />
     <script>
       (() => {
-        if (["editorial-policy", "guides/day-care", "guides-day-care"].includes(document.documentElement.dataset.initialRoute)) return;
+        if (document.documentElement.dataset.initialRoute === "editorial-policy") return;
         const heroPreloads = {
           "#home": "/assets/hero-care-hero-fast.jpg",
+          "#health": "/assets/hero-care-hero-fast.jpg",
+          "/health": "/assets/hero-care-hero-fast.jpg",
+          "#guides-day-care": "/assets/daycare-detail-01-exercise-hero-fast.jpg",
+          "/guides/day-care": "/assets/daycare-detail-01-exercise-hero-fast.jpg",
           "#about": "/assets/about/about-team-group-hero-v2.jpg",
           "#milestones": "/assets/milestones/milestones-team-care-planning-hero-v2.jpg",
           "#home-care": "/assets/homecare-detail-01-greeting-hero-fast.jpg",
@@ -113,6 +117,10 @@
         };
         const heroMobilePreloads = {
           "#home": "/assets/hero-care-hero-fast-mobile.jpg",
+          "#health": "/assets/hero-care-hero-fast-mobile.jpg",
+          "/health": "/assets/hero-care-hero-fast-mobile.jpg",
+          "#guides-day-care": "/assets/daycare-detail-01-exercise-hero-fast-mobile.jpg",
+          "/guides/day-care": "/assets/daycare-detail-01-exercise-hero-fast-mobile.jpg",
           "#about": "/assets/about/about-team-group-hero-v2-mobile.jpg",
           "#milestones": "/assets/milestones/milestones-team-care-planning-hero-v2.jpg",
           "#home-care": "/assets/homecare-detail-01-greeting-hero-fast-mobile.jpg",
@@ -163,6 +171,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="article-reading-ux.css" />
+    <link rel="stylesheet" href="health-article-layout.css" />
     <style>
       html[data-initial-route]:not([data-initial-route="home"]):not([data-app-ready="true"]) body {
         background: #fffdf8;

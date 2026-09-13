@@ -69,7 +69,8 @@ for (const href of ["https://evil.example/article/article7", "//www.suiyuecare.c
   assert.deepEqual(articleLinks(renderDayCareGuidePage([{ ...fixtures[0], href }])), [], href);
 }
 const escaped = documentFrom(renderDayCareGuidePage([{ ...fixtures[0], title: '<img src=x onerror="alert(1)"> & 作者' }]));
-assert.equal(escaped.querySelectorAll("img, script, [onerror]").length, 0);
+assert.equal(escaped.querySelectorAll('img[src="x"], script, [onerror]').length, 0);
+assert.equal(escaped.querySelector('a[href="/article/article7"]').querySelectorAll("img, script, [onerror]").length, 0, "An untrusted title remains text inside the article link");
 assert.ok(escaped.querySelector('a[href="/article/article7"]').textContent.includes("<img src=x"));
 
 const current = { ...fixtures[0], relatedSlugs: ["article7", "day-care-activity-refusal-choice", "article138", "missing", "article43"] };

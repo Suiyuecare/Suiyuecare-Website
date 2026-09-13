@@ -197,8 +197,8 @@ const staticRoutes = [
     path: "/health",
     title: "健康3.0｜歲悅長照照顧知識",
     description: "健康3.0整理長照申請、居家照顧、日照、復能、營養、失智與家屬支持文章。",
-    image: "/assets/homepage-batch/18-health-fall-prevention-cover-fast.jpg",
-    imageAlt: "健康3.0照顧知識文章封面",
+    image: "/assets/hero-care-hero-fast.jpg",
+    imageAlt: "照顧服務人員陪伴長輩活動",
     priority: "0.78"
   },
   {
@@ -485,7 +485,7 @@ function routeHtml(baseHtml, route) {
     /(<meta name="robots" content=")(.*?)(" \/>)/,
     route.robots || (route.article ? "index, follow, max-image-preview:large" : "index, follow")
   );
-  html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1health-editorial-20260909-1$3`);
+  html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1health-care-journal-20260913$3`);
   html = insertArticleMeta(html, route);
   html = replaceStructuredData(html, route);
   if (route.path !== "/") {
@@ -503,12 +503,12 @@ function routeHtml(baseHtml, route) {
   if (route.inlineStyles) {
     html = html.replace("</head>", () => `<style id="publicPrerenderHeroStyles">${route.inlineStyles.replace(/</g, "\\3C ")}</style>\n  </head>`);
   }
-  if (["editorial-policy", DAY_CARE_GUIDE_ROUTE.slug].includes(route.slug)) html = html.replace(/<link\b(?=[^>]*\bid="heroPreload")[^>]*>\s*/g, "");
+  if (route.slug === "editorial-policy") html = html.replace(/<link\b(?=[^>]*\bid="heroPreload")[^>]*>\s*/g, "");
   const topicNumbers = new Set([7, 12, 29, 133, 134, 137, 138]);
   const topicManifest = JSON.stringify(publicContent.articles.filter((item) => topicNumbers.has(item.publicNumber)).map((item) => ({
     contentKind: "article", slug: item.slug, sourceSlug: item.sourceSlug, publicSlug: item.publicSlug,
     publicNumber: item.publicNumber, href: item.href, title: item.title, category: item.category,
-    excerpt: item.excerpt, publishedAt: item.publishedAt, updatedAt: item.updatedAt
+    excerpt: item.excerpt, image: item.image, imageAlt: item.imageAlt, publishedAt: item.publishedAt, updatedAt: item.updatedAt
   }))).replace(/</g, "\\u003c");
   html = html.replace("</body>", () => `<script id="publicTopicArticleManifest" type="application/json">${topicManifest}</script>\n  </body>`);
   const locationManifest = JSON.stringify(getPublicServiceLocations(publicContent.snapshot)).replace(/</g, "\\u003c");

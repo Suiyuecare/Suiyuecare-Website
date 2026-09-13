@@ -227,6 +227,8 @@ const LEGACY_HOME_UNIT_VIDEO_ID = "dQw4w9WgXcQ";
 const YOUTUBE_IFRAME_ALLOW = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
 const routeHeroPreloads = {
   home: HOME_HERO_INSTANT_IMAGE,
+  health: "assets/hero-care-hero-fast.jpg",
+  "guides-day-care": "assets/daycare-detail-01-exercise-hero-fast.jpg",
   about: "assets/about/about-team-group-hero-v2.jpg",
   milestones: "assets/milestones/milestones-team-care-planning-hero-v2.jpg",
   "home-care": "assets/homecare-detail-01-greeting-hero-fast.jpg",
@@ -242,6 +244,8 @@ const routeHeroPreloads = {
 };
 const routeHeroMobilePreloads = {
   home: HOME_HERO_MOBILE_IMAGE,
+  health: "assets/hero-care-hero-fast-mobile.jpg",
+  "guides-day-care": "assets/daycare-detail-01-exercise-hero-fast-mobile.jpg",
   about: "assets/about/about-team-group-hero-v2-mobile.jpg",
   milestones: "assets/milestones/milestones-team-care-planning-hero-v2.jpg",
   "home-care": "assets/homecare-detail-01-greeting-hero-fast-mobile.jpg",
@@ -338,8 +342,8 @@ const routeSeoMap = {
   health: {
     title: "健康3.0｜歲悅長照照顧知識",
     description: "健康3.0整理長照申請、居家照顧、日照、復能、營養、失智與家屬支持文章。",
-    image: "assets/homepage-batch/18-health-fall-prevention-cover-fast.jpg",
-    imageAlt: "健康3.0照顧知識文章封面"
+    image: "assets/hero-care-hero-fast.jpg",
+    imageAlt: "照顧服務人員陪伴長輩活動"
   },
   search: {
     title: "搜尋照顧知識｜健康3.0",
@@ -586,7 +590,7 @@ function warmHeroImage(src = "") {
 }
 
 const initialHeroRoute = routeSlugFromLocation().split("?")[0];
-if (!["editorial-policy", DAY_CARE_GUIDE_ROUTE.slug].includes(initialHeroRoute)) {
+if (initialHeroRoute !== "editorial-policy") {
   const initialHero = getServiceLocationByRoute(initialHeroRoute, readServiceLocationManifest(document))?.image
     || (routeHeroPreloads[initialHeroRoute] ? routeHeroImageForViewport(initialHeroRoute) : document.querySelector("#heroPreload")?.getAttribute("href"));
   if (initialHero) preloadHeroImage(initialHero);
@@ -11245,7 +11249,7 @@ function renderPage(slug) {
     // Give legacy hash navigation a stable pathname before section anchors replace the hash.
     window.history.replaceState(null, "", `${DAY_CARE_GUIDE_ROUTE.path}${queryString ? `?${queryString}` : window.location.search}`);
   }
-  if (!["editorial-policy", DAY_CARE_GUIDE_ROUTE.slug].includes(normalized)) {
+  if (normalized !== "editorial-policy") {
     const hero = getServiceLocationByRoute(normalized, readServiceLocationManifest(document))?.image
       || (routeHeroPreloads[normalized] ? routeHeroImageForViewport(normalized) : (pageView.dataset.prerenderedRoute === normalized ? document.querySelector("#heroPreload")?.getAttribute("href") : null));
     if (hero) preloadHeroImage(hero);
@@ -11561,7 +11565,7 @@ function optimizeImageLoading(root = document) {
     const isHomeImage = Boolean(image.closest("#home"));
     const isPriority =
       image.closest(".brand-mark") ||
-      image.closest(".hero, .service-detail-hero, .public-location-hero, .about-full-hero, .milestones-full-hero, .article-hero") ||
+      image.closest(".hero, .service-detail-hero, .public-location-hero, .about-full-hero, .milestones-full-hero, .article-hero, .health-hero-media, .topic-guide-hero-media") ||
       (!isHomeImage && (image.classList.contains("active") || image.classList.contains("map-image")));
     if (!isPriority) {
       const currentSrc = image.getAttribute("src") || "";

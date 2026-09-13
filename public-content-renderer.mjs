@@ -305,13 +305,23 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
   const contentUpdatedAt = contentRevisionTime === null ? "" : new Date(contentRevisionTime).toISOString();
 
   const html = `
-    <article class="article-page ${isPptIconPack ? "article-page--ppt-icon-pack" : ""}" data-public-layout="article-unified-v1" data-public-content-type="${escapePublicHtml(contentKind)}" data-public-content-key="${escapePublicHtml(contentKey)}" data-public-content-updated-at="${escapePublicHtml(contentUpdatedAt)}">
+    <article class="article-page ${contentKind === "article" ? "article-page--health-story " : ""}${isPptIconPack ? "article-page--ppt-icon-pack" : ""}" data-public-layout="article-unified-v1" data-public-content-type="${escapePublicHtml(contentKind)}" data-public-content-key="${escapePublicHtml(contentKey)}" data-public-content-updated-at="${escapePublicHtml(contentUpdatedAt)}">
       <div class="article-topbar">
         <a class="article-back" href="/health">返回健康3.0</a>
         <span class="article-category">${escapePublicHtml(article.category || "照顧知識")}</span>
       </div>
 
-      <header class="article-hero">
+      ${contentKind === "article" ? `<header class="article-hero">
+        <div class="article-heading">
+          <p class="article-section-label">健康3.0 · ${escapePublicHtml(article.category || "照顧知識")}</p>
+          <h1>${escapePublicHtml(article.title || "未命名文章")}</h1>
+          <p class="article-dek">${escapePublicHtml(article.subtitle || article.excerpt || "")}</p>
+        </div>
+        <figure>
+          <img src="${escapePublicHtml(image)}" alt="${escapePublicHtml(imageAlt)}" data-fallback-src="${HEALTH_FALLBACK_IMAGE}" style="object-position:${escapePublicHtml(objectPosition)}" loading="eager" fetchpriority="high" decoding="async" />
+          ${article.imageCaption ? `<figcaption>${escapePublicHtml(article.imageCaption)}</figcaption>` : ""}
+        </figure>
+      </header>` : `      <header class="article-hero">
         <figure>
           <img src="${escapePublicHtml(image)}" alt="${escapePublicHtml(imageAlt)}" data-fallback-src="${HEALTH_FALLBACK_IMAGE}" style="object-position:${escapePublicHtml(objectPosition)}" loading="eager" fetchpriority="high" decoding="async" />
           <figcaption class="${isPptIconPack ? "article-hero-caption--sr-only" : ""}">
@@ -320,7 +330,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
             ${article.imageCaption ? `<small class="article-hero-photo-caption">${escapePublicHtml(article.imageCaption)}</small>` : ""}
           </figcaption>
         </figure>
-      </header>
+      </header>`}
 
       <section class="article-layout">
         <div class="article-main">
@@ -505,38 +515,41 @@ export function renderPublicHealthIndex(items = [], categories = [], options = {
   const latestRevision = latestRevisionTime ? new Date(latestRevisionTime).toISOString() : "";
   const contentMarkup = `
       <section class="health-hero">
+        <picture class="health-hero-media">
+          <source media="(max-width: 640px)" srcset="/assets/hero-care-hero-fast-mobile.jpg" />
+          <img src="/assets/hero-care-hero-fast.jpg" alt="照顧服務人員陪伴長輩活動，彼此微笑交流" width="1672" height="941" loading="eager" fetchpriority="high" decoding="async" />
+        </picture>
         <div class="health-hero-shell">
           <div class="health-hero-copy">
-            <p class="eyebrow">Health 3.0 · 歲悅照顧知識庫</p>
+            <p class="eyebrow">HEALTH 3.0 · 歲悅照顧知識</p>
             <h1>健康3.0</h1>
+            <p class="health-hero-slogan">讓照顧，回到生活。</p>
             <p class="health-hero-lead">把複雜的照顧知識，整理成家人看得懂、今天做得到的方法。</p>
-            <div class="health-hero-proof" role="group" aria-label="健康3.0內容規模">
-              <span><strong>${uniqueInventory.current.length}</strong> 篇照顧文章</span>
-              <span><strong>${topics.length}</strong> 個實用主題</span>
-            </div>
-          </div>
-          <div class="health-discovery-panel">
-            <p class="health-discovery-kicker">從一個問題開始</p>
-            <h2>今天，想先解決什麼？</h2>
-            <form class="health-search" action="/search">
-              <input name="q" type="search" aria-label="搜尋健康3.0文章" placeholder="搜尋跌倒、失智、營養、復能" />
-              <button type="submit">搜尋</button>
-            </form>
-            ${renderHealthTopicNavigation(topics, sortedArticles, selectedCategorySlug)}
+            <a class="health-hero-action" href="#health-reading">開始閱讀 <span aria-hidden="true">↓</span></a>
           </div>
         </div>
       </section>
+      <section class="health-discovery" aria-labelledby="health-discovery-title">
+        <div class="health-discovery-top">
+          <div><p class="eyebrow">從日常的需要開始</p><h2 id="health-discovery-title">找到你想了解的照顧知識</h2></div>
+          <form class="health-search" action="/search">
+            <input name="q" type="search" aria-label="搜尋健康3.0文章" placeholder="搜尋跌倒、失智、營養、復能" />
+            <button type="submit">搜尋</button>
+          </form>
+        </div>
+        ${renderHealthTopicNavigation(topics, sortedArticles, selectedCategorySlug)}
+      </section>
 
       ${feature ? `
-        ${selectedCategorySlug ? "" : `<section class="health-board" aria-labelledby="health-featured-title">
+        ${selectedCategorySlug ? "" : `<section class="health-board" id="health-reading" aria-labelledby="health-featured-title">
           <div class="health-section-head health-board-heading">
-            <div><p class="eyebrow">精選內容</p><h2 id="health-featured-title">現在最值得看</h2></div>
-            <p>先掌握最新重點，再依需求深入閱讀。</p>
+            <div><p class="eyebrow">一起讀，一起照顧</p><h2 id="health-featured-title">近期照顧文章</h2></div>
+            <a class="health-section-link" href="/search">全部文章 <span aria-hidden="true">→</span></a>
           </div>
           <div class="health-board-grid">
           <article class="health-feature">
             <a href="${escapePublicHtml(safePublicHref(feature.href, "/health"))}">
-              <img ${healthImageAttrs(feature, { priority: true })} />
+              <img ${healthImageAttrs(feature)} />
               <div class="health-feature-copy">
                 <div class="health-card-meta"><span class="health-tag">最新發布</span>${feature.date ? `<time>${escapePublicHtml(feature.date)}</time>` : ""}</div>
                 <h2>${escapePublicHtml(feature.title)}</h2>
@@ -546,15 +559,14 @@ export function renderPublicHealthIndex(items = [], categories = [], options = {
             </a>
           </article>
           <aside class="ranking-panel">
-            <div class="ranking-title"><span>Fresh</span><h2>最新文章</h2><p>接著看這 ${railArticles.length} 篇，不重複推薦。</p></div>
-            <ol>${railArticles.map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}"><span>${escapePublicHtml(item.category || "照顧知識")}</span><strong>${escapePublicHtml(item.title)}</strong>${item.date ? `<time>${escapePublicHtml(item.date)}</time>` : ""}</a></li>`).join("")}</ol>
-            <a class="health-view-all" href="/search">查看全部文章 <span aria-hidden="true">→</span></a>
+            <div class="ranking-title"><span>繼續探索</span><h2>接著閱讀</h2></div>
+            <ol>${railArticles.map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}"><img ${healthImageAttrs(item)} /><div><span>${escapePublicHtml(item.category || "照顧知識")}</span><strong>${escapePublicHtml(item.title)}</strong>${item.date ? `<time>${escapePublicHtml(item.date)}</time>` : ""}</div></a></li>`).join("")}</ol>
           </aside>
           </div>
         </section>`}
 
-        <section class="health-latest ${selectedCategorySlug ? "health-category-results" : ""}" aria-labelledby="health-latest-title">
-          <div class="health-section-head"><div><p class="eyebrow">${selectedCategorySlug ? "主題文章" : "持續更新"}</p><h2 id="health-latest-title">${escapePublicHtml(selectedCategorySlug ? `${selectedTopic?.name || "這個主題"}的全部文章` : "最新照顧文章")}</h2></div><span>共 ${articles.length} 篇</span></div>
+        <section class="health-latest ${selectedCategorySlug ? "health-category-results" : ""}"${selectedCategorySlug ? ' id="health-reading"' : ""} aria-labelledby="health-latest-title">
+          <div class="health-section-head"><div><p class="eyebrow">${selectedCategorySlug ? "主題文章" : "持續更新"}</p><h2 id="health-latest-title">${escapePublicHtml(selectedCategorySlug ? `${selectedTopic?.name || "這個主題"}的全部文章` : "更多照顧知識")}</h2></div><span>共 ${articles.length} 篇</span></div>
           <div class="health-latest-grid">
             ${latestArticles.map(renderHealthListCard).join("")}
           </div>
@@ -580,11 +592,11 @@ export function renderPublicHealthIndex(items = [], categories = [], options = {
             <a href="${escapePublicHtml(videoUrl)}"><span>03</span><div><strong>影音內容</strong><small>用影片快速理解重點</small></div><b aria-hidden="true">→</b></a>
           </nav>
         </section>` : ""}
-      ` : `<section class="health-empty-state"><h2>${selectedCategorySlug ? "這個分類目前還沒有已發布文章" : "文章整理中"}</h2><p>${selectedCategorySlug ? "可以先查看全部文章或搜尋其他照顧主題。" : "健康3.0內容會在審核發布後顯示於此。"}</p><a href="/health">查看全部文章</a></section>`}
+      ` : `<section class="health-empty-state" id="health-reading"><h2>${selectedCategorySlug ? "這個分類目前還沒有已發布文章" : "文章整理中"}</h2><p>${selectedCategorySlug ? "可以先查看全部文章或搜尋其他照顧主題。" : "健康3.0內容會在審核發布後顯示於此。"}</p><a href="/health">查看全部文章</a></section>`}
   `;
   const batchRevision = publicContentBatchRevision(contentMarkup);
   return `
-    <div class="health-page health-page--editorial" data-public-content-index="health" data-public-layout="${PUBLIC_HEALTH_LAYOUT}" data-health-design="editorial-20260909" data-health-content-revision="${escapePublicHtml(batchRevision)}" data-public-content-updated-at="${escapePublicHtml(latestRevision)}" data-health-article-count="${sortedArticles.length}" data-health-category="${escapePublicHtml(selectedCategorySlug)}">
+    <div class="health-page health-page--editorial" data-public-content-index="health" data-public-layout="${PUBLIC_HEALTH_LAYOUT}" data-health-design="care-journal-20260913" data-health-content-revision="${escapePublicHtml(batchRevision)}" data-public-content-updated-at="${escapePublicHtml(latestRevision)}" data-health-article-count="${sortedArticles.length}" data-health-category="${escapePublicHtml(selectedCategorySlug)}">
       ${contentMarkup}
     </div>
   `;

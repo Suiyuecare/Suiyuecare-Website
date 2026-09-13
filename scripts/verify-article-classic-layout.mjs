@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
+import { parseHTML } from "linkedom";
 import { renderPublicArticleLayout } from "../public-content-renderer.mjs";
 
 const html = renderPublicArticleLayout({
-  title: "手機文章上一版版型",
-  subtitle: "標題與摘要覆蓋在主圖上",
+  title: "照顧文章閱讀版型",
+  subtitle: "標題、摘要與主圖各自清楚呈現",
   author: "歲悅照顧編輯部",
   publishedAt: "2026-09-08",
   date: "2026.09.08",
@@ -25,9 +26,19 @@ const html = renderPublicArticleLayout({
   references: [{ citation: "測試參考資料", url: "https://example.com/reference" }]
 });
 
-assert.match(html, /<article class="article-page "/);
+assert.match(html, /<article class="article-page article-page--health-story /);
 assert.doesNotMatch(html, /article-page--reading|article-reading-heading|article-toc|data-article-anchor/);
-assert.match(html, /<header class="article-hero">[\s\S]*?<figure>[\s\S]*?<img[\s\S]*?<figcaption[\s\S]*?<h1>手機文章上一版版型<\/h1>/);
+const document = parseHTML(html).document;
+assert.equal(document.querySelectorAll("h1").length, 1);
+assert.equal(document.querySelector(".article-heading h1").textContent, "照顧文章閱讀版型");
+assert.equal(document.querySelector("h1").closest("figure"), null, "The readable heading is separate from the photograph");
+assert.equal(document.querySelector(".article-hero figure img").getAttribute("alt"), "文章測試主圖");
+assert.equal(document.querySelector(".article-hero figcaption").textContent, "測試圖說");
+for (const contentKind of ["care-story", "master-talk"]) {
+  const originalKind = parseHTML(renderPublicArticleLayout({ contentKind, title: "保留其他內容版型", image: "assets/test.jpg" })).document;
+  assert.equal(originalKind.querySelectorAll(".article-page--health-story").length, 0);
+  assert.equal(originalKind.querySelector(".article-hero figcaption h1").textContent, "保留其他內容版型");
+}
 
 const hero = html.slice(html.indexOf('<header class="article-hero">'), html.indexOf("</header>") + 9);
 assert.doesNotMatch(hero, /article-meta/);
@@ -39,6 +50,6 @@ assert.match(html, /保留文章正文/);
 assert.match(html, /保留常見問題/);
 assert.match(html, /測試參考資料/);
 assert.match(html, /data-contact-need="護理復能諮詢"/);
-assert.match(html, /data-contact-message="我想了解護理復能諮詢，剛閱讀了〈手機文章上一版版型〉。"/);
+assert.match(html, /data-contact-message="我想了解護理復能諮詢，剛閱讀了〈照顧文章閱讀版型〉。"/);
 
-console.log("ok - classic article layout restored while content and contact context remain intact");
+console.log("ok - photo-led health article layout preserves content, editorial identity, contact context, and other content kinds");
