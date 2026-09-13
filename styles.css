@@ -12,6 +12,9 @@
   --green: #758d62;
   --shadow: 0 30px 90px rgba(83, 43, 11, 0.16);
   --header-height: 96px;
+  --content-section-size: clamp(36px, 4.4vw, 64px);
+  --content-card-size: 27px;
+  --content-compact-size: 23px;
 }
 
 /* Land recruiting — property-owner focused landing page */
@@ -678,7 +681,7 @@ h1 {
 h2 {
   margin-bottom: 0;
   color: var(--brown);
-  font-size: clamp(36px, 4.4vw, 64px);
+  font-size: var(--content-section-size);
   font-weight: 900;
   line-height: 1.12;
 }
@@ -2082,7 +2085,7 @@ body.modal-open .milk-helper {
 .health-preview.compact div { padding: 18px; }
 .health-preview.compact h3 {
   margin-top: 12px;
-  font-size: 23px;
+  font-size: var(--content-compact-size);
 }
 .health-preview.media-card img {
   height: 170px;
@@ -2133,7 +2136,7 @@ body.modal-open .milk-helper {
 .health-preview h3 {
   margin: 14px 0 10px;
   color: var(--brown);
-  font-size: 27px;
+  font-size: var(--content-card-size);
   line-height: 1.35;
 }
 .health-preview p {
@@ -11921,7 +11924,8 @@ input[name="_honey"] { display: none !important; }
   .brand { gap: 8px; }
   .brand strong { max-width: calc(100vw - 148px); font-size: 18px; }
   h1 { font-size: clamp(34px, 9.6vw, 40px); line-height: 1.12; }
-  h2 { font-size: clamp(30px, 8.6vw, 38px); }
+  :root { --content-section-size: clamp(30px, 8.6vw, 38px); }
+  h2 { font-size: var(--content-section-size); }
   .hero, .section, .detail-hero, .detail-content, .site-footer, .health-hero, .health-grid, .courses-hero, .course-list, .article-topbar, .article-layout, .investor-hero, .investor-panel, .ir-sub-hero, .ir-tab-panel, .career-hero, .career-tab-panel, .career-openings, .about-hero, .about-story, .about-belief, .about-principles, .about-system, .about-team-section, .about-method, .about-quality-section, .about-future, .about-stats, .milestone-stats, .milestone-journey, .service-detail-hero, .service-detail-section { padding-inline: 20px; }
   .one-minute-service-hero,
   .one-minute-service-summary,

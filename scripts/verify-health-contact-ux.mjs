@@ -2,6 +2,7 @@ import { ARTICLE_CONSOLIDATIONS, consolidatePublicArticles } from "../article-co
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
+import { parseHTML } from "linkedom";
 import { COMMON_HEALTH_NEEDS, getUniqueHealthTopics, resolveHealthTopic, articleMatchesHealthTopic, normalizeHealthTopic, renderHealthTopicNavigation } from "../health-topic-navigation.mjs";
 import { CONTACT_NEED_GROUPS, renderContactPage, renderContactNeedOptions, contactSubmissionErrorMessage } from "../contact-page.mjs";
 import { normalizePublicAssetUrl, renderPublicArticleLayout, renderPublicHealthIndex } from "../public-content-renderer.mjs";
@@ -38,9 +39,60 @@ function firstHeadingAfter(html, marker, tagName) {
 function assertUnifiedHealthRoot(html, expectedCategory = "") {
   assert.equal(countMatches(html, /data-public-layout="health-unified-v1"/g), 1);
   assert.equal(countMatches(html, /data-public-content-index="health"/g), 1);
-  assert.equal(countMatches(html, /data-health-design="homepage-cis-20260913"/g), 1);
+  assert.equal(countMatches(html, /data-health-design="editorial-home-type-20260914"/g), 1);
   assert.match(html, new RegExp(`data-health-category="${expectedCategory}"`));
   assert.doesNotMatch(html, /health-board--prerendered|health-quick-grid/);
+}
+
+function healthDocument(html) {
+  return parseHTML(`<!doctype html><html><body>${html}</body></html>`).document;
+}
+
+function articleLinks(root, selector = 'a[href^="/article/"]') {
+  return [...root.querySelectorAll(selector)].map((anchor) => anchor.getAttribute("href"));
+}
+
+function assertHealthIndexDocument(html, { inventory, current, historical = [], category = "" }) {
+  assertUnifiedHealthRoot(html, category);
+  const document = healthDocument(html);
+  const latestLimit = category ? 9 : 8;
+  const expectedIndex = [...current, ...historical].map((item) => item.href);
+  const actualIndex = articleLinks(document, '.health-latest a[href^="/article/"], .health-library .health-archive-index a[href^="/article/"]');
+  assert.deepEqual(actualIndex, expectedIndex, "The main latest/archive index must retain every current and historical article exactly once, in publication order within each group");
+  assert.equal(new Set(actualIndex).size, actualIndex.length, "Curated repeats must not leak into the complete main index");
+  assert.deepEqual(articleLinks(document, '.health-latest a[href^="/article/"]'), current.slice(0, latestLimit).map((item) => item.href), "Latest articles start with the actual newest article and fill the correct home/category allocation");
+  const allowedHrefs = new Set(expectedIndex);
+  for (const href of articleLinks(document)) assert.ok(allowedHrefs.has(href), `Editorial sections may only link an article in this public selection: ${href}`);
+  assert.equal(document.querySelectorAll("h1").length, 1);
+  assert.equal(Number(document.querySelector('[data-public-content-index="health"]').dataset.healthArticleCount), inventory.length, "Inventory metadata must reflect the actual provided inventory");
+  const search = document.querySelector('form.health-search[action="/search"]');
+  assert.ok(search?.querySelector('input[name="q"][type="search"][aria-label]'), "Health search must retain its native form and SPA event contract");
+  assert.ok(search.querySelector('button[type="submit"][aria-label]'));
+  const priorityImages = [...document.querySelectorAll('img[data-health-priority="true"]')];
+  assert.equal(priorityImages.length, current.length ? 1 : 0, "Exactly the real first image gets high priority; empty results have no priority image");
+  if (current.length) {
+    assert.equal(priorityImages[0].closest("a").getAttribute("href"), current[0].href);
+    assert.equal(priorityImages[0].getAttribute("loading"), "eager");
+    assert.equal(priorityImages[0].getAttribute("fetchpriority"), "high");
+    assert.match(document.querySelector(".health-library-heading p").textContent, new RegExp(`^${current.length} 篇文章`), "Visible article counts must come from the selected inventory");
+    const archiveCount = current.length - latestLimit;
+    const archive = document.querySelector(".health-library .health-archive-index:not(.health-superseded-index)");
+    assert.equal(Boolean(archive), archiveCount > 0);
+    if (archive) assert.equal(archive.querySelector("summary span").textContent, `另有 ${archiveCount} 篇`);
+    const history = document.querySelector(".health-superseded-index");
+    assert.equal(Boolean(history), historical.length > 0);
+    if (history) assert.match(history.querySelector("summary span").textContent, new RegExp(`^${historical.length} 篇`));
+  } else {
+    assert.ok(document.querySelector('.health-empty-state a[href="/health"]'));
+    assert.equal(document.querySelectorAll(".health-board, .health-latest, .health-library, .health-paths, .health-format-hub").length, 0, "Empty results must not invent articles or populated content modules");
+  }
+  if (category) assert.equal(document.querySelectorAll(".health-board, .health-paths, .health-format-hub").length, 0, "Category results must not add unrelated curated articles");
+  const ids = [...document.querySelectorAll("[id]")].map((node) => node.id);
+  assert.equal(new Set(ids).size, ids.length, "Portal section IDs must be unique");
+  for (const anchor of document.querySelectorAll('a[href^="#"]')) {
+    assert.ok(document.getElementById(anchor.getAttribute("href").slice(1)), `Every portal section link must have a target: ${anchor.getAttribute("href")}`);
+  }
+  return document;
 }
 
 function healthContentRevision(html) {
@@ -274,7 +326,19 @@ assert.doesNotMatch(nav, /<details class="health-all-topics" open>/);
 assert.match(nav, /目前：失智照顧/);
 assert.match(nav, /href="\/search"/);
 assert.equal((nav.match(/>失智照顧<\/a>/g) || []).length, 1);
-assert.doesNotMatch(renderHealthTopicNavigation([{ name: '<script>alert("x")</script>', slug: '" onclick="evil' }]), /<script>| onclick="evil/);
+const hostileTopic = { name: '<script>alert("x")</script>', slug: '" onclick="evil' };
+const hostileNav = healthDocument(renderHealthTopicNavigation([hostileTopic], [{ category: hostileTopic.name, categorySlug: hostileTopic.slug }]));
+assert.equal(hostileNav.querySelectorAll("script, [onclick]").length, 0);
+assert.equal(hostileNav.querySelector(".health-topic-list a").textContent, hostileTopic.name, "An available untrusted category must remain escaped text");
+const emptyTopics = Array.from({ length: 16 }, (_, index) => ({ name: `尚無文章 ${index}`, slug: `empty-${index}` }));
+const topicsWithEmpty = getUniqueHealthTopics([...topics, ...emptyTopics], articles);
+const filteredNav = healthDocument(renderHealthTopicNavigation(topicsWithEmpty, articles));
+assert.equal(filteredNav.querySelectorAll(".health-topic-list a").length, 2, "Empty CMS categories must not appear as dead discovery entries");
+assert.equal(filteredNav.querySelector(".health-topic-count").textContent, "（2）", "The visible topic count must match the actual available links");
+for (const topic of emptyTopics) {
+  assert.ok(resolveHealthTopic(topicsWithEmpty, topic.slug), "Hiding an empty navigation entry must preserve legacy category URL resolution");
+  assert.equal(filteredNav.querySelector(`a[href="/health?category=${topic.slug}"]`), null);
+}
 const form = renderContactPage();
 assert.equal((form.match(/<form /g) || []).length, 1);
 for (const field of ["form_type", "_subject", "_template", "_captcha", "_honey", "姓名", "電話", "需求", "Email", "說明"]) assert.ok(form.includes(`name="${field}"`), `Missing form field ${field}`);
@@ -376,27 +440,30 @@ const rawFixtureCategories = [
 ];
 const fixtureTopics = getUniqueHealthTopics(rawFixtureCategories, fixtureArticles);
 const baseHealth = renderPublicHealthIndex(fixtureArticles, fixtureTopics);
-assertUnifiedHealthRoot(baseHealth);
+const fixtureCurrent = [fixtureArticles[1], fixtureArticles[0], ...fixtureArticles.slice(2, 5)];
+const baseDocument = assertHealthIndexDocument(baseHealth, { inventory: fixtureArticles, current: fixtureCurrent, historical: [fixtureArticles[5]] });
 assert.equal(firstHeadingAfter(baseHealth, '<article class="health-feature">', "h2"), latestTitle);
-assert.equal(firstHeadingAfter(baseHealth, '<div class="health-latest-grid">', "h3"), "測試影片");
-assert.match(baseHealth, /<section class="health-board"/);
-assert.match(baseHealth, /<section class="health-latest "/);
-assert.ok(baseHealth.indexOf('class="health-board"') < baseHealth.indexOf('class="health-latest '));
-assert.match(baseHealth, /<section class="health-format-hub"/);
-assert.equal(countMatches(baseHealth, /class="health-format-grid"/g), 1);
-for (const sectionClass of ["health-pack-section", "health-event-section", "health-media-hub"]) assert.doesNotMatch(baseHealth, new RegExp(`<section class="${sectionClass}">`));
-assert.match(baseHealth, /共 5 篇/);
-for (const item of fixtureArticles) assert.equal(countMatches(baseHealth, new RegExp(`href="${item.href}"`, "g")), 1, `${item.href} must remain crawlable exactly once`);
-assert.match(baseHealth, /class="health-archive-index health-superseded-index"[\s\S]*href="\/article\/article906"/, "An older duplicate title must move to the historical index");
+assert.equal(firstHeadingAfter(baseHealth, '<div class="health-latest-grid">', "h3"), latestTitle);
+assert.deepEqual(articleLinks(baseDocument, '.ranking-panel a[href^="/article/"]'), fixtureArticles.slice(2, 5).map((item) => item.href), "Recommendations must skip the lead's category and use the newest article from three other categories");
+assert.equal(baseDocument.querySelectorAll(".health-paths, .health-format-hub").length, 0, "Absent curated identities or slide data must not create placeholder article modules");
 
 const categoryHealth = renderPublicHealthIndex(fixtureArticles, fixtureTopics, { selectedCategorySlug: "test" });
-assertUnifiedHealthRoot(categoryHealth, "test");
-assert.doesNotMatch(categoryHealth, /class="health-board"/);
-assert.match(categoryHealth, /class="health-latest health-category-results"/);
-assert.match(categoryHealth, /共 2 篇/);
-assert.match(categoryHealth, /href="\/article\/article901"/);
-assert.match(categoryHealth, /href="\/article\/article902"/);
-assert.doesNotMatch(categoryHealth, /href="\/article\/article90[345]"/);
+assertHealthIndexDocument(categoryHealth, { inventory: fixtureArticles, current: fixtureCurrent.slice(0, 2), category: "test" });
+for (const [inventory, selectedCategorySlug] of [[[], ""], [fixtureArticles, "empty-0"], [fixtureArticles, "unknown-category"]]) {
+  const emptyHealth = renderPublicHealthIndex(inventory, [...fixtureTopics, ...emptyTopics], { selectedCategorySlug });
+  assertHealthIndexDocument(emptyHealth, { inventory, current: [], category: selectedCategorySlug });
+}
+
+const tiedArticles = [0, 1, 2].map((index) => ({ ...fixtureArticles[1], href: `/article/article${920 + index}`, title: `同日文章 ${index}` }));
+const tiedHealth = renderPublicHealthIndex(tiedArticles, fixtureTopics);
+assertHealthIndexDocument(tiedHealth, { inventory: tiedArticles, current: tiedArticles });
+
+const hostileArticle = { ...fixtureArticles[1], title: '<img src=x onerror="alert(1)"> & 照顧', excerpt: '<script>alert("excerpt")</script>', imageAlt: '" onload="alert(1)', focalPoint: 'center; background:url("javascript:alert(1)")' };
+const hostileHealth = renderPublicHealthIndex([hostileArticle], fixtureTopics);
+const hostileDocument = assertHealthIndexDocument(hostileHealth, { inventory: [hostileArticle], current: [hostileArticle] });
+assert.equal(hostileDocument.querySelectorAll("script, [onerror], [onload], img[src=x]").length, 0, "CMS titles, excerpts and image attributes must remain data");
+assert.equal(hostileDocument.querySelector(".health-feature h2").textContent, hostileArticle.title);
+assert.equal(hostileDocument.querySelector(".health-feature-copy p").textContent, hostileArticle.excerpt);
 
 const rawCategoryHealth = renderPublicHealthIndex(fixtureArticles, rawFixtureCategories);
 assert.equal(
@@ -449,12 +516,56 @@ const publicHealthArticles = publicContent.articles
     }
     return false;
   });
-assert.match(fullHealth, new RegExp(`共 ${publicHealthArticles.length} 篇`));
-for (const item of publicHealthArticles) {
-  assert.ok(fullHealth.includes(`href="${item.href}"`), `Health index dropped ${item.href}`);
+const historicalHealthArticles = publicContent.articles
+  .map((article, index) => ({ article, index }))
+  .sort((left, right) => (publicContentPublishedTime(right.article) || 0) - (publicContentPublishedTime(left.article) || 0) || left.index - right.index)
+  .map(({ article }) => article)
+  .filter((article) => !publicHealthArticles.includes(article));
+const fullDocument = assertHealthIndexDocument(fullHealth, { inventory: publicContent.articles, current: publicHealthArticles, historical: historicalHealthArticles });
+assert.equal(new Set(articleLinks(fullDocument)).size, publicContent.articles.length, "Editorial repeats must not inflate the number of distinct crawlable public articles");
+const publicByHref = new Map(publicContent.articles.map((item) => [item.href, item]));
+const recommendations = articleLinks(fullDocument, '.ranking-panel a[href^="/article/"]').map((href) => publicByHref.get(href));
+assert.equal(recommendations.length, 3);
+assert.equal(new Set([publicHealthArticles[0].category, ...recommendations.map((item) => item.category)]).size, 4, "The lead and recommendations must introduce four different subjects");
+for (const recommendation of recommendations) {
+  assert.equal(recommendation.href, publicHealthArticles.find((item) => item.category === recommendation.category).href, "Each recommended subject must use its newest published article");
 }
-for (const item of publicContent.articles.filter((article) => !publicHealthArticles.includes(article))) {
-  assert.match(fullHealth, new RegExp(`class="health-archive-index health-superseded-index"[\\s\\S]*href="${item.href}"`), `Health index must preserve the historical URL ${item.href}`);
+const expectedPaths = [[91, 106, 107, 157], [12, 29, 7, 134], [119, 123, 122, 162]];
+const readingPaths = [...fullDocument.querySelectorAll(".health-reading-path")];
+assert.equal(readingPaths.length, 3, "The full public inventory supports the three editorial reading paths");
+for (const [index, path] of readingPaths.entries()) {
+  assert.deepEqual(articleLinks(path), expectedPaths[index].map((number) => `/article/article${number}`));
+  for (const href of articleLinks(path)) assert.ok(path.textContent.includes(publicByHref.get(href).title), "Reading paths must show the actual published article title");
+}
+const visualHrefs = articleLinks(fullDocument, '.health-format-hub a[href^="/article/"]');
+assert.deepEqual(visualHrefs, [89, 92, 95].map((number) => `/article/article${number}`));
+for (const href of visualHrefs) {
+  const item = publicByHref.get(href);
+  assert.ok(item.visualFormat && item.slides?.length, `A visual reading card requires real slide content: ${href}`);
+}
+
+const partialCuratedInventory = [106, 7, 89].map((number) => publicByHref.get(`/article/article${number}`));
+const partialCuratedDocument = healthDocument(renderPublicHealthIndex(partialCuratedInventory, publicContent.categories));
+assert.deepEqual(articleLinks(partialCuratedDocument, '.health-paths a[href^="/article/"]'), ["/article/article106", "/article/article7"], "Partial public data may use remaining reading steps but must not invent the missing curated articles");
+assert.deepEqual(articleLinks(partialCuratedDocument, '.health-format-hub a[href^="/article/"]'), ["/article/article89"]);
+for (const patch of [{ slides: [] }, { visualFormat: "" }]) {
+  const withoutSlides = healthDocument(renderPublicHealthIndex(partialCuratedInventory.map((item) => ({ ...item, ...patch })), publicContent.categories));
+  assert.equal(withoutSlides.querySelector(".health-format-hub"), null, "A fixed curated identity alone must not claim to offer slide content");
+}
+const hostileCurated = partialCuratedInventory.map((item) => ({ ...item, title: `${item.href}: <svg onload="alert(1)">`, imageAlt: '<img src=x onerror="alert(1)">' }));
+const escapedCuratedDocument = healthDocument(renderPublicHealthIndex(hostileCurated, publicContent.categories));
+assert.equal(escapedCuratedDocument.querySelectorAll("[onload], [onerror], img[src=x]").length, 0);
+assert.ok(escapedCuratedDocument.querySelector(".health-path-feature h4").textContent.includes('<svg onload="alert(1)">'), "Curated feature titles must remain literal text");
+assert.ok(escapedCuratedDocument.querySelector(".health-visual-card h3").textContent.includes('<svg onload="alert(1)">'), "Visual card titles must remain literal text");
+
+const allPublicTopics = getUniqueHealthTopics(publicContent.categories, publicContent.articles);
+const visiblePublicTopics = allPublicTopics.filter((topic) => publicContent.articles.some((article) => articleMatchesHealthTopic(article, topic)));
+assert.deepEqual([...fullDocument.querySelectorAll(".health-topic-list a")].map((anchor) => anchor.getAttribute("href")), visiblePublicTopics.map((topic) => `/health?category=${encodeURIComponent(topic.slug)}`), "Only topics with real public articles may be offered as navigation entries");
+assert.equal(fullDocument.querySelector(".health-topic-count").textContent, `（${visiblePublicTopics.length}）`);
+for (const topic of allPublicTopics) {
+  const selectedArticles = publicHealthArticles.filter((article) => articleMatchesHealthTopic(article, topic));
+  const selectedHtml = renderPublicHealthIndex(publicContent.articles, allPublicTopics, { selectedCategorySlug: topic.slug });
+  assertHealthIndexDocument(selectedHtml, { inventory: publicContent.articles, current: selectedArticles, category: topic.slug });
 }
 assertUnifiedArticleRoot(publicContent.articles[0], "article");
 assertUnifiedArticleRoot(publicContent.stories[0], "care-story");
@@ -728,5 +839,8 @@ if (fs.existsSync("dist/health/index.html")) {
   assert.match(generatedHealth, /health-topic-navigation/);
   assert.equal(countMatches(generatedHealth, /data-public-layout="health-unified-v1"/g), 1);
   assert.doesNotMatch(generatedHealth, /health-board--prerendered|health-quick-grid/);
+  assert.equal(healthContentRevision(generatedHealth), healthContentRevision(fullHealth), "Built health HTML must expose the same current public-content revision as the runtime renderer");
+  const generatedRoot = healthDocument(generatedHealth).querySelector('[data-public-layout="health-unified-v1"]');
+  assertHealthIndexDocument(generatedRoot.outerHTML, { inventory: publicContent.articles, current: publicHealthArticles, historical: historicalHealthArticles });
 }
-console.log("Unified health/article rendering, latest-content order, complete links, and contact form contract verified.");
+console.log(`Unified health/article rendering, editorial selections, ${publicContent.articles.length} unique public articles in the complete main index, latest-content order, and contact form contract verified.`);

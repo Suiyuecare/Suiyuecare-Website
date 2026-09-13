@@ -56,6 +56,7 @@ export function articleMatchesHealthTopic(article, topic) {
 export function renderHealthTopicNavigation(categories = [], articles = [], activeCategorySlug = "") {
   const topics = getUniqueHealthTopics(categories, articles);
   const active = resolveHealthTopic(topics, activeCategorySlug);
+  const availableTopics = topics.filter((topic) => articles.some((article) => articleMatchesHealthTopic(article, topic)));
   return `
     <div class="health-topic-navigation">
       <p class="health-topic-heading">常見照顧需求</p>
@@ -65,9 +66,9 @@ export function renderHealthTopicNavigation(categories = [], articles = [], acti
       <div class="health-topic-tools">
         <a class="health-all-articles" href="/search">全部文章</a>
         <details class="health-all-topics">
-          <summary>全部主題<span class="health-topic-count">（${topics.length}）</span>${active ? `<span class="health-current-topic">目前：${escapeHtml(active.name)}</span>` : ""}</summary>
+          <summary>全部主題<span class="health-topic-count">（${availableTopics.length}）</span>${active ? `<span class="health-current-topic">目前：${escapeHtml(active.name)}</span>` : ""}</summary>
           <nav class="health-topic-list" aria-label="全部文章主題">
-            ${topics.map((topic) => `<a href="/health?category=${encodeURIComponent(topic.slug)}"${active?.key === topic.key ? ' aria-current="page"' : ""}>${escapeHtml(topic.name)}</a>`).join("")}
+            ${availableTopics.map((topic) => `<a href="/health?category=${encodeURIComponent(topic.slug)}"${active?.key === topic.key ? ' aria-current="page"' : ""}>${escapeHtml(topic.name)}</a>`).join("")}
           </nav>
         </details>
       </div>
