@@ -370,7 +370,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
             ` : "")}
             <div class="article-cta">
               <p>${escapePublicHtml(article.cta || "不確定下一步怎麼安排？留下需求，讓歲悅協助判斷。")}</p>
-              <a href="${escapePublicHtml(safePublicHref(article.ctaUrl, "/contact"))}" ${contactContext}>${escapePublicHtml(article.ctaText || "預約照顧諮詢")}</a>
+              <a ${contentKind === "article" ? 'class="primary-button" ' : ""}href="${escapePublicHtml(safePublicHref(article.ctaUrl, "/contact"))}" ${contactContext}>${escapePublicHtml(article.ctaText || "預約照顧諮詢")}</a>
             </div>
             ${editorial.service ? `<p class="article-service-link">相關照顧服務：<a href="${escapePublicHtml(editorial.service.href)}">了解歲悅${escapePublicHtml(editorial.service.name)}</a></p>` : ""}
             ${renderReferences(article)}
@@ -573,7 +573,7 @@ export function renderPublicHealthIndex(items = [], categories = [], options = {
                   <div class="health-card-meta"><span class="health-tag">${escapePublicHtml(feature.category || "照顧知識")}</span>${feature.date ? `<time>${escapePublicHtml(feature.date)}</time>` : ""}</div>
                   <h2>${escapePublicHtml(feature.title)}</h2>
                   <p>${escapePublicHtml(feature.excerpt || feature.subtitle || "")}</p>
-                  <span class="health-readmore">閱讀文章 <span aria-hidden="true">→</span></span>
+                  <span class="health-readmore primary-button">閱讀文章 <span aria-hidden="true">→</span></span>
                 </div>
               </a>
             </article>
@@ -607,7 +607,7 @@ export function renderPublicHealthIndex(items = [], categories = [], options = {
   `;
   const renderRevision = publicContentBatchRevision(contentMarkup);
   return `
-    <div class="health-page health-page--editorial" data-public-content-index="health" data-public-layout="${PUBLIC_HEALTH_LAYOUT}" data-health-design="magazine-cis-20260913" data-health-content-revision="${escapePublicHtml(renderRevision)}" data-public-content-updated-at="${escapePublicHtml(latestRevision)}" data-health-article-count="${sortedArticles.length}" data-health-category="${escapePublicHtml(selectedCategorySlug)}">
+    <div class="health-page health-page--editorial" data-public-content-index="health" data-public-layout="${PUBLIC_HEALTH_LAYOUT}" data-health-design="homepage-cis-20260913" data-health-content-revision="${escapePublicHtml(renderRevision)}" data-public-content-updated-at="${escapePublicHtml(latestRevision)}" data-health-article-count="${sortedArticles.length}" data-health-category="${escapePublicHtml(selectedCategorySlug)}">
       ${contentMarkup}
     </div>
   `;
