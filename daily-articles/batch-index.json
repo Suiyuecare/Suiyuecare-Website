@@ -364,6 +364,47 @@
           "contentHash": "sha256:8b4978ea06d9cd19718756ffa9f2798c02b1db624f0a66ea3f7f5f0d4b64b67c"
         }
       ]
+    },
+    {
+      "date": "2026-09-13",
+      "displayDate": "2026.09.13",
+      "commit": "SELF",
+      "seriesId": "ltc3-ba-code-series-v1",
+      "batchId": "ltc3-ba-code-series-v1-2026-09-13",
+      "catalogCheckedAt": "2026-09-13",
+      "expectedCount": 3,
+      "articles": [
+        {
+          "slug": "ba01-basic-body-cleaning-guide",
+          "title": "BA01 基本身體清潔是擦澡還是洗澡？先看服務內容與不能併計的界線",
+          "baCode": "BA01",
+          "primaryQuestion": "家中長輩不方便進浴室時，BA01 基本身體清潔可以做哪些事，又和 BA07、BA23 有什麼差別？",
+          "careContext": "長者因失能需要在床邊完成身體清潔，家屬正與照管中心、個案管理員及特約居家服務單位安排服務",
+          "businessItem": "居家照顧",
+          "publicNumber": 164,
+          "contentHash": "sha256:21f80f9a55d496f3116203ee7b2c10326f2b0037bd515162114ad6f41d48b659"
+        },
+        {
+          "slug": "ba02-basic-daily-care-guide",
+          "title": "BA02 基本日常照顧可以做哪些事？30 分鐘一單位，也有不能併用的規則",
+          "baCode": "BA02",
+          "primaryQuestion": "長輩一天需要多項生活協助時，BA02 可以做到哪裡、如何計時，又為什麼不能和其他組合併用？",
+          "careContext": "長者在起身、移位、穿衣、如廁或整理床鋪等日常活動需要部分協助，家庭正安排居家服務",
+          "businessItem": "居家照顧",
+          "publicNumber": 165,
+          "contentHash": "sha256:f5f77fd54f8f88b20066553e37a93735a48af8d5103a96982f5558e1ffd2e762"
+        },
+        {
+          "slug": "ba03-vital-signs-monitoring-guide",
+          "title": "BA03 測量生命徵象何時能申請？不是每次服務前量血壓都能另計",
+          "baCode": "BA03",
+          "primaryQuestion": "長輩需要固定量血壓、體溫、脈搏與呼吸時，什麼情況可核定 BA03，何時只是其他服務前後的觀察？",
+          "careContext": "長者因疾病與生理狀況需要在家獨立監測生命徵象，家庭需建立一致的量測、紀錄與異常通報方式",
+          "businessItem": "居家照顧",
+          "publicNumber": 166,
+          "contentHash": "sha256:3ebee60feb41c9e4eee2a2b57ce55d06492c6b983c8c3493a46cde06d8ecd035"
+        }
+      ]
     }
   ]
 }

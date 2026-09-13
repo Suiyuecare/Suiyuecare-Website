@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">BA03 測量生命徵象與異常通報流程</title>
+  <desc id="desc">先確認為獨立核定服務，再固定條件測量血壓、體溫、脈搏與呼吸；記錄症狀後，正常則持續追蹤，異常依個別計畫通知，急症直接求助。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="65" y="86" font-family="sans-serif" font-size="42" font-weight="700" fill="#3c1f0b">BA03 測量生命徵象｜數字要接得上行動</text>
+  <text x="65" y="128" font-family="sans-serif" font-size="22" fill="#725b4c">個別警戒值由醫療團隊設定；急症不等待重測</text>
+  <g font-family="sans-serif" text-anchor="middle">
+    <g transform="translate(60 185)"><rect width="205" height="155" rx="24" fill="#ead8bf"/><text x="102" y="55" font-size="25" font-weight="700" fill="#3c1f0b">獨立核定</text><text x="102" y="96" font-size="19" fill="#3c1f0b">不是其他服務</text><text x="102" y="124" font-size="19" fill="#3c1f0b">前後順手觀察</text></g>
+    <g transform="translate(305 185)"><rect width="265" height="155" rx="24" fill="#dcebea"/><text x="132" y="48" font-size="25" font-weight="700" fill="#3c1f0b">固定條件量測</text><text x="132" y="89" font-size="19" fill="#3c1f0b">血壓・體溫</text><text x="132" y="119" font-size="19" fill="#3c1f0b">脈搏・呼吸</text></g>
+    <g transform="translate(610 185)"><rect width="225" height="155" rx="24" fill="#e5eadf"/><text x="112" y="55" font-size="25" font-weight="700" fill="#3c1f0b">完整記錄</text><text x="112" y="96" font-size="19" fill="#3c1f0b">時間、姿勢</text><text x="112" y="124" font-size="19" fill="#3c1f0b">數值與症狀</text></g>
+    <g transform="translate(875 185)"><rect width="265" height="155" rx="24" fill="#e1e7f0"/><text x="132" y="55" font-size="25" font-weight="700" fill="#3c1f0b">一起判讀</text><text x="132" y="96" font-size="19" fill="#3c1f0b">和平常相比</text><text x="132" y="124" font-size="19" fill="#3c1f0b">有沒有不舒服</text></g>
+  </g>
+  <path d="M265 262h40m265 0h40m225 0h40" stroke="#725b4c" stroke-width="8" stroke-linecap="round"/>
+  <path d="M1005 340v70M1005 410H360M360 410v42M1005 410v42" fill="none" stroke="#725b4c" stroke-width="6" stroke-linecap="round"/>
+  <g font-family="sans-serif" text-anchor="middle">
+    <g transform="translate(165 452)"><rect width="390" height="130" rx="24" fill="#e5eadf" stroke="#758d60" stroke-width="4"/><text x="195" y="45" font-size="27" font-weight="700" fill="#3c1f0b">穩定或可依計畫重測</text><text x="195" y="86" font-size="20" fill="#3c1f0b">持續記錄・帶回追蹤</text></g>
+    <g transform="translate(645 452)"><rect width="495" height="130" rx="24" fill="#f2ddd7" stroke="#d95f45" stroke-width="4"/><text x="247" y="42" font-size="27" font-weight="700" fill="#3c1f0b">異常＋症狀</text><text x="247" y="79" font-size="20" fill="#3c1f0b">依計畫通知；急症直接 119／急診</text><text x="247" y="108" font-size="17" fill="#725b4c">不自行加藥、停藥或改劑量</text></g>
+  </g>
+  <text x="600" y="635" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#725b4c">來源：長期照顧服務申請及給付辦法附表四，查核日 2026-09-13</text>
+</svg>

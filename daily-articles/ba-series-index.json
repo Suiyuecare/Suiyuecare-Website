@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "seriesId": "ltc3-ba-code-series-v1",
+  "title": "長照 3.0 BA 碼逐碼介紹",
+  "timezone": "Asia/Taipei",
+  "catalogCheckedAt": "2026-09-13",
+  "regulationRevisionDate": "2025-06-19",
+  "correctionDate": "2025-10-03",
+  "effectiveDates": {
+    "generalRevision": "2025-09-01",
+    "BA08_BA09_BA09a": "2026-01-01",
+    "smartAssistiveTechnologyExcluded": "2026-07-01"
+  },
+  "officialSources": [
+    "https://laws.gov.taipei/law/LawSearch/LawFileList/FL098057",
+    "https://laws.gov.taipei/law/File/0000398331",
+    "https://www.mohw.gov.tw/dl-97629-9ca5aed2-743b-46ed-8659-4e45d9996257.html",
+    "https://laws.gov.taipei/law/LawSearch/LawExport/FL098057?chapterno=5&type=1",
+    "https://1966.gov.tw/LTC/cp-6572-85008-207.html",
+    "https://org.vghtpe.gov.tw/savh/freePage/-1/492"
+  ],
+  "stableQueue": [
+    { "code": "BA01", "name": "基本身體清潔", "status": "validated", "batchId": "ltc3-ba-code-series-v1-2026-09-13", "completedOn": "2026-09-13", "slug": "ba01-basic-body-cleaning-guide", "publicNumber": 164, "title": "BA01 基本身體清潔是擦澡還是洗澡？先看服務內容與不能併計的界線", "contentHash": "sha256:21f80f9a55d496f3116203ee7b2c10326f2b0037bd515162114ad6f41d48b659", "articlePath": "daily-articles/2026-09-13-ba.mjs", "assets": ["assets/health3/daily/2026-09-13/ba01-basic-body-cleaning-hero.jpg", "assets/health3/daily/2026-09-13/ba01-basic-body-cleaning-prep.jpg", "assets/health3/daily/2026-09-13/ba01-basic-body-cleaning-flow.svg", "assets/health3/daily/2026-09-13/ba01-basic-body-cleaning-choice.jpg"] },
+    { "code": "BA02", "name": "基本日常照顧", "status": "validated", "batchId": "ltc3-ba-code-series-v1-2026-09-13", "completedOn": "2026-09-13", "slug": "ba02-basic-daily-care-guide", "publicNumber": 165, "title": "BA02 基本日常照顧可以做哪些事？30 分鐘一單位，也有不能併用的規則", "contentHash": "sha256:f5f77fd54f8f88b20066553e37a93735a48af8d5103a96982f5558e1ffd2e762", "articlePath": "daily-articles/2026-09-13-ba.mjs", "assets": ["assets/health3/daily/2026-09-13/ba02-basic-daily-care-hero.jpg", "assets/health3/daily/2026-09-13/ba02-basic-daily-care-button.jpg", "assets/health3/daily/2026-09-13/ba02-basic-daily-care-flow.svg", "assets/health3/daily/2026-09-13/ba02-basic-daily-care-handover.jpg"] },
+    { "code": "BA03", "name": "測量生命徵象", "status": "validated", "batchId": "ltc3-ba-code-series-v1-2026-09-13", "completedOn": "2026-09-13", "slug": "ba03-vital-signs-monitoring-guide", "publicNumber": 166, "title": "BA03 測量生命徵象何時能申請？不是每次服務前量血壓都能另計", "contentHash": "sha256:3ebee60feb41c9e4eee2a2b57ce55d06492c6b983c8c3493a46cde06d8ecd035", "articlePath": "daily-articles/2026-09-13-ba.mjs", "assets": ["assets/health3/daily/2026-09-13/ba03-vital-signs-hero.jpg", "assets/health3/daily/2026-09-13/ba03-vital-signs-temperature.jpg", "assets/health3/daily/2026-09-13/ba03-vital-signs-flow.svg", "assets/health3/daily/2026-09-13/ba03-vital-signs-handover.jpg"] },
+    { "code": "BA04", "name": "協助進食或管灌餵食", "status": "pending" },
+    { "code": "BA05", "name": "餐食照顧", "status": "pending" },
+    { "code": "BA07", "name": "協助沐浴及洗頭", "status": "pending" },
+    { "code": "BA08", "name": "足部照護", "status": "pending" },
+    { "code": "BA09", "name": "到宅沐浴車服務—第一型", "status": "pending" },
+    { "code": "BA09a", "name": "到宅沐浴車服務—第二型", "status": "pending" },
+    { "code": "BA10", "name": "翻身拍背", "status": "pending" },
+    { "code": "BA11", "name": "肢體關節活動", "status": "pending" },
+    { "code": "BA12", "name": "協助上（下）樓梯", "status": "pending" },
+    { "code": "BA13", "name": "陪同外出", "status": "pending" },
+    { "code": "BA14", "name": "陪同就醫", "status": "pending" },
+    { "code": "BA15-1", "name": "家務協助（自用）", "status": "pending" },
+    { "code": "BA15-2", "name": "家務協助（共用）", "status": "pending" },
+    { "code": "BA16-1", "name": "代購或代領或代送服務（自用）", "status": "pending" },
+    { "code": "BA16-2", "name": "代購或代領或代送服務（共用）", "status": "pending" },
+    { "code": "BA17a", "name": "人工氣道管內（非氣管內管）分泌物抽吸", "status": "pending" },
+    { "code": "BA17b", "name": "口腔內（懸壅垂之前）分泌物抽吸", "status": "pending" },
+    { "code": "BA17c", "name": "尿管及鼻胃管之清潔與固定", "status": "pending" },
+    { "code": "BA17d1", "name": "血糖機驗血糖", "status": "pending" },
+    { "code": "BA17d2", "name": "甘油球通便", "status": "pending" },
+    { "code": "BA17e", "name": "依指示置入藥盒", "status": "pending" },
+    { "code": "BA18", "name": "安全看視", "status": "pending" },
+    { "code": "BA20", "name": "陪伴服務", "status": "pending" },
+    { "code": "BA22", "name": "巡視服務", "status": "pending" },
+    { "code": "BA23", "name": "協助洗頭", "status": "pending" },
+    { "code": "BA24", "name": "協助排泄", "status": "pending" }
+  ],
+  "retiredOrExcluded": [
+    { "code": "BA06", "reason": "已刪除，僅可作歷史說明，不列現行系列目標。" },
+    { "code": "BA19", "reason": "已刪除，僅可作歷史說明，不列現行系列目標。" },
+    { "code": "BA21", "reason": "已刪除，僅可作歷史說明，不列現行系列目標。" },
+    { "code": "BA17", "reason": "群組碼不另立文章；由 BA17a、BA17b、BA17c、BA17d1、BA17d2、BA17e 分別介紹。" },
+    { "code": "BA17d", "reason": "群組碼不另立文章；由 BA17d1、BA17d2 分別介紹。" },
+    { "code": "附表四之一智慧科技輔具", "reason": "2026-07-01 生效但非 BA 照顧服務碼，不加入本系列。" }
+  ],
+  "batches": [
+    {
+      "batchId": "ltc3-ba-code-series-v1-2026-09-13",
+      "batchDate": "2026-09-13",
+      "completedOn": "2026-09-13",
+      "codes": ["BA01", "BA02", "BA03"],
+      "expectedCount": 3,
+      "status": "validated",
+      "commit": "SELF",
+      "remoteBranch": "origin/codex/daily-business-articles",
+      "remoteVerification": "Count as complete only after the containing commit is fetched from the remote branch.",
+      "validation": {
+        "referencesReachable": true,
+        "assetMirrorsMatch": true,
+        "verifyAll": "passed: 172 static content pages, 166 redirects, SEO, links, accessibility, security and strict image audit",
+        "browserDesktop": "passed: 1440px, article164-166, all article assets loaded, no overlay, no broken images or page overflow",
+        "browserMobile": "passed: 390px, article164-166, one H1, three FAQ, references, SVG, table horizontal scroll, no page overflow"
+      }
+    }
+  ]
+}

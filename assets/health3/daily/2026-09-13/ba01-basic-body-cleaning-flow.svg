@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">BA01 基本身體清潔五步流程</title>
+  <desc id="desc">從照管評估核定、確認長者偏好、準備隱私與用品、執行核定清潔，到記錄異常與調整照顧計畫。</desc>
+  <rect width="1200" height="675" rx="36" fill="#fffaf3"/>
+  <text x="70" y="90" font-family="sans-serif" font-size="42" font-weight="700" fill="#3c1f0b">BA01 基本身體清潔｜先同意，再協助</text>
+  <text x="70" y="132" font-family="sans-serif" font-size="22" fill="#725b4c">定性服務流程・依核定計畫與當次需要調整</text>
+  <g font-family="sans-serif" text-anchor="middle">
+    <g transform="translate(70 190)"><rect width="190" height="260" rx="24" fill="#ead8bf"/><circle cx="95" cy="64" r="34" fill="#f58a1f"/><text x="95" y="75" font-size="30" font-weight="700" fill="#fffaf3">1</text><text x="95" y="132" font-size="26" font-weight="700" fill="#3c1f0b">評估核定</text><text x="95" y="176" font-size="20" fill="#3c1f0b">確認需要與</text><text x="95" y="207" font-size="20" fill="#3c1f0b">服務頻率</text></g>
+    <g transform="translate(285 190)"><rect width="190" height="260" rx="24" fill="#dcebea"/><circle cx="95" cy="64" r="34" fill="#1595a8"/><text x="95" y="75" font-size="30" font-weight="700" fill="#fffaf3">2</text><text x="95" y="132" font-size="26" font-weight="700" fill="#3c1f0b">詢問偏好</text><text x="95" y="176" font-size="20" fill="#3c1f0b">順序、用品</text><text x="95" y="207" font-size="20" fill="#3c1f0b">與在場人員</text></g>
+    <g transform="translate(500 190)"><rect width="190" height="260" rx="24" fill="#e5eadf"/><circle cx="95" cy="64" r="34" fill="#758d60"/><text x="95" y="75" font-size="30" font-weight="700" fill="#fffaf3">3</text><text x="95" y="132" font-size="26" font-weight="700" fill="#3c1f0b">保暖遮蔽</text><text x="95" y="176" font-size="20" fill="#3c1f0b">備妥衣物</text><text x="95" y="207" font-size="20" fill="#3c1f0b">毛巾與環境</text></g>
+    <g transform="translate(715 190)"><rect width="190" height="260" rx="24" fill="#e1e7f0"/><circle cx="95" cy="64" r="34" fill="#4f77a8"/><text x="95" y="75" font-size="30" font-weight="700" fill="#fffaf3">4</text><text x="95" y="132" font-size="26" font-weight="700" fill="#3c1f0b">分段協助</text><text x="95" y="176" font-size="20" fill="#3c1f0b">保留本人</text><text x="95" y="207" font-size="20" fill="#3c1f0b">能做的步驟</text></g>
+    <g transform="translate(930 190)"><rect width="190" height="260" rx="24" fill="#f2ddd7"/><circle cx="95" cy="64" r="34" fill="#d95f45"/><text x="95" y="75" font-size="30" font-weight="700" fill="#fffaf3">5</text><text x="95" y="132" font-size="26" font-weight="700" fill="#3c1f0b">記錄回報</text><text x="95" y="176" font-size="20" fill="#3c1f0b">皮膚、疼痛</text><text x="95" y="207" font-size="20" fill="#3c1f0b">與計畫調整</text></g>
+  </g>
+  <path d="M260 320h25m190 0h25m190 0h25m190 0h25" stroke="#725b4c" stroke-width="8" stroke-linecap="round"/>
+  <rect x="135" y="510" width="930" height="92" rx="22" fill="#3c1f0b"/>
+  <text x="600" y="548" text-anchor="middle" font-family="sans-serif" font-size="23" fill="#fffaf3">同一時段不可併同申報 BA07 協助沐浴及洗頭、BA23 協助洗頭</text>
+  <text x="600" y="581" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#ead8bf">來源：長期照顧服務申請及給付辦法附表四，查核日 2026-09-13</text>
+</svg>

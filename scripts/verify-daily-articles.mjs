@@ -7,6 +7,11 @@ import { dailyArticles } from "../daily-articles/index.mjs";
 const rootDir = path.resolve(import.meta.dirname, "..");
 const batchIndexPath = path.join(rootDir, "daily-articles", "batch-index.json");
 const batchIndex = JSON.parse(fs.readFileSync(batchIndexPath, "utf8"));
+const baSeriesIndexPath = path.join(rootDir, "daily-articles", "ba-series-index.json");
+const baSeriesIndex = fs.existsSync(baSeriesIndexPath)
+  ? JSON.parse(fs.readFileSync(baSeriesIndexPath, "utf8"))
+  : null;
+const BA_SERIES_ID = "ltc3-ba-code-series-v1";
 const expectedRotation = {
   0: ["移工培訓", "教育品管", "軟體系統"],
   1: ["居家照顧", "日間照顧", "社區據點"],
@@ -54,16 +59,58 @@ function verifyAsset(assetPath, label) {
   }
 }
 
+function expectedBaCodes(queue, completedCodes) {
+  const remaining = queue.filter((item) => !completedCodes.has(item.code));
+  return remaining.slice(0, Math.min(3, remaining.length)).map((item) => item.code);
+}
+
+function verifyBaBatchShape(batch, queue, completedCodes) {
+  const codes = batch.articles.map((item) => String(item.baCode || "").trim());
+  const expected = expectedBaCodes(queue, completedCodes);
+  assert(codes.length === expected.length, `${batch.date} BA batch must contain ${expected.length} article(s)`);
+  assert(new Set(codes).size === codes.length, `${batch.date} BA codes must be distinct full code strings`);
+  assert(codes.every((code, index) => code === expected[index]), `${batch.date} BA codes must follow the stable queue: ${expected.join(", ")}`);
+  assert(batch.expectedCount === expected.length, `${batch.date} BA expectedCount does not match remaining catalog`);
+  assert(codes.length === 3 || completedCodes.size + codes.length === queue.length, `${batch.date} may contain fewer than three BA articles only in the final batch`);
+  codes.forEach((code) => completedCodes.add(code));
+}
+
+function selfTestBaBatchRules() {
+  const queue = [{ code: "BA01" }, { code: "BA02" }, { code: "BA03" }, { code: "BA04" }, { code: "BA05" }];
+  verifyBaBatchShape({ date: "fixture-first", expectedCount: 3, articles: [{ baCode: "BA01" }, { baCode: "BA02" }, { baCode: "BA03" }] }, queue, new Set());
+  const finalCompleted = new Set(["BA01", "BA02", "BA03"]);
+  verifyBaBatchShape({ date: "fixture-final", expectedCount: 2, articles: [{ baCode: "BA04" }, { baCode: "BA05" }] }, queue, finalCompleted);
+  for (const fixture of [
+    { date: "fixture-duplicate", expectedCount: 3, articles: [{ baCode: "BA01" }, { baCode: "BA01" }, { baCode: "BA03" }] },
+    { date: "fixture-short", expectedCount: 2, articles: [{ baCode: "BA01" }, { baCode: "BA02" }] }
+  ]) {
+    let rejected = false;
+    try { verifyBaBatchShape(fixture, queue, new Set()); } catch { rejected = true; }
+    assert(rejected, `${fixture.date} must be rejected by BA batch rules`);
+  }
+}
+
+selfTestBaBatchRules();
+
 const indexedSlugs = new Set(ARTICLE_SOURCE_SLUGS);
 const articleBySlug = new Map(dailyArticles.map((article) => [article.slug, article]));
 const allTitles = new Set();
 const allNumbers = new Set();
+const baQueue = baSeriesIndex?.stableQueue || [];
+const completedBaCodes = new Set();
+
+if (baSeriesIndex) {
+  assert(baSeriesIndex.seriesId === BA_SERIES_ID, "Unexpected BA series id");
+  assert(baQueue.length === 29, "BA series must contain 29 independent code or subcode targets");
+  assert(new Set(baQueue.map((item) => item.code)).size === baQueue.length, "BA series queue contains duplicate codes");
+}
 
 batchIndex.batches.forEach((batch) => {
   assert(/^\d{4}-\d{2}-\d{2}$/.test(batch.date), `Invalid batch date: ${batch.date}`);
   assert(batch.commit === "SELF" || /^[0-9a-f]{40}$/.test(batch.commit), `Invalid commit pointer for ${batch.date}`);
   const withheldArticles = Array.isArray(batch.withheldArticles) ? batch.withheldArticles : [];
   const isEditorialSelection = batch.publicationMode === "editorial-selection";
+  const isBaSeries = batch.seriesId === BA_SERIES_ID;
   if (isEditorialSelection) {
     assert(withheldArticles.length > 0, `${batch.date} editorial selection must record withheld articles`);
     assert(
@@ -73,7 +120,12 @@ batchIndex.batches.forEach((batch) => {
   } else {
     assert(!batch.publicationMode, `${batch.date} has an unsupported publication mode`);
     assert(withheldArticles.length === 0, `${batch.date} cannot withhold articles without editorial selection`);
-    assert(batch.articles.length === 3, `${batch.date} must contain exactly three articles`);
+    if (isBaSeries) {
+      assert(baSeriesIndex, `${batch.date} BA batch requires ba-series-index.json`);
+      verifyBaBatchShape(batch, baQueue, completedBaCodes);
+    } else {
+      assert(batch.articles.length === 3, `${batch.date} must contain exactly three articles`);
+    }
   }
 
   const plannedArticles = [...batch.articles, ...withheldArticles];
@@ -84,7 +136,7 @@ batchIndex.batches.forEach((batch) => {
     assert(Number.isInteger(batch.cycleDay) && batch.cycleDay >= 1 && batch.cycleDay <= 4, `${batch.date} disease cycle day must be 1–4`);
     const topics = plannedArticles.map((item) => String(item.diseaseTopic || "").trim());
     assert(topics.every(Boolean) && new Set(topics).size === 3, `${batch.date} disease topics must be present and distinct`);
-  } else {
+  } else if (!isBaSeries) {
     const businessItems = plannedArticles.map((item) => item.businessItem);
     assert(new Set(businessItems).size === 3, `${batch.date} business items must be distinct`);
     const expected = expectedRotation[taipeiWeekday(batch.date)];
@@ -144,6 +196,24 @@ batchIndex.batches.forEach((batch) => {
       for (const area of ["introduction", "treatment", "care"]) {
         assert(headings.has(article.coverage?.[area]), `Disease ${area} section missing: ${entry.slug}`);
       }
+    }
+    if (isBaSeries) {
+      const catalogItem = baQueue.find((item) => item.code === entry.baCode);
+      assert(catalogItem, `BA code is not in the current series catalog: ${entry.baCode}`);
+      assert(article.seriesId === BA_SERIES_ID && article.baCode === entry.baCode, `BA metadata mismatch for ${entry.slug}`);
+      assert(article.policyCheckedAt === batch.catalogCheckedAt, `BA policy check date mismatch for ${entry.slug}`);
+      for (const field of ["primaryQuestion", "careContext"]) {
+        assert(typeof article[field] === "string" && article[field].trim() && article[field] === entry[field], `BA ${field} metadata missing or mismatched: ${entry.slug}`);
+      }
+      assert(article.title.includes(entry.baCode) && article.title.includes(catalogItem.name), `BA title must include code and official name: ${entry.slug}`);
+      const searchable = JSON.stringify([article.dek, article.summary, article.content, article.tables, article.faq]);
+      for (const required of [entry.baCode, catalogItem.name, "核定", "支付價格", "個案管理員"]) {
+        assert(searchable.includes(required), `BA article is missing required coverage '${required}': ${entry.slug}`);
+      }
+      assert(/不得|不能|不包含|不適用/.test(searchable), `BA service boundary is missing: ${entry.slug}`);
+      const seriesEntry = baQueue.find((item) => item.code === entry.baCode);
+      assert(seriesEntry.slug === entry.slug && seriesEntry.publicNumber === entry.publicNumber, `BA persistent index mismatch: ${entry.slug}`);
+      assert(seriesEntry.contentHash === entry.contentHash && seriesEntry.batchId === batch.batchId, `BA hash or batch id mismatch: ${entry.slug}`);
     }
     assert(article.summary.length >= 3 && article.summary.length <= 5, `Summary point count out of range: ${entry.slug}`);
     assert(article.checklists.length === 1, `Each article needs one checklist: ${entry.slug}`);

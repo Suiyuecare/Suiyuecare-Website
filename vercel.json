@@ -1680,6 +1680,21 @@
       "permanent": true
     },
     {
+      "source": "/article/ba01-basic-body-cleaning-guide",
+      "destination": "/article/article164",
+      "permanent": true
+    },
+    {
+      "source": "/article/ba02-basic-daily-care-guide",
+      "destination": "/article/article165",
+      "permanent": true
+    },
+    {
+      "source": "/article/ba03-vital-signs-monitoring-guide",
+      "destination": "/article/article166",
+      "permanent": true
+    },
+    {
       "source": "/article/article43",
       "destination": "/article/article7",
       "permanent": true

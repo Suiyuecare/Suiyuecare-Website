@@ -162,7 +162,10 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "home-care-no-entry-agreement",
   "late-life-depression-functional-change-care",
   "sarcopenia-progress-function-tracking",
-  "parkinsons-orthostatic-hypotension-care"
+  "parkinsons-orthostatic-hypotension-care",
+  "ba01-basic-body-cleaning-guide",
+  "ba02-basic-daily-care-guide",
+  "ba03-vital-signs-monitoring-guide"
 ]);
 
 const sourceNumberMap = new Map(
