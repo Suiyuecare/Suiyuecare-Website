@@ -40,9 +40,11 @@ for (const contentKind of ["care-story", "master-talk"]) {
   assert.equal(originalKind.querySelector(".article-hero figcaption h1").textContent, "保留其他內容版型");
 }
 
-const hero = html.slice(html.indexOf('<header class="article-hero">'), html.indexOf("</header>") + 9);
-assert.doesNotMatch(hero, /article-meta/);
-assert.ok(html.indexOf('<div class="article-meta">') > html.indexOf('<div class="article-main">'));
+const hero = document.querySelector(".article-hero").outerHTML;
+assert.match(hero, /article-meta/);
+assert.equal(document.querySelectorAll(".article-meta").length, 1);
+assert.ok(hero.indexOf('class="article-meta"') < hero.indexOf("<figure>"), "Byline and dates precede the article photo");
+assert.equal(document.querySelectorAll(".health-publication-header h1").length, 0, "Publication branding must not add a second h1");
 assert.match(html, /適合｜家庭照顧者/);
 assert.match(html, /保留本文重點/);
 assert.match(html, /保留提醒內容/);
@@ -52,4 +54,4 @@ assert.match(html, /測試參考資料/);
 assert.match(html, /data-contact-need="護理復能諮詢"/);
 assert.match(html, /data-contact-message="我想了解護理復能諮詢，剛閱讀了〈照顧文章閱讀版型〉。"/);
 
-console.log("ok - photo-led health article layout preserves content, editorial identity, contact context, and other content kinds");
+console.log("ok - media health article layout preserves content, editorial identity, contact context, and other content kinds");

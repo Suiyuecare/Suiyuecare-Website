@@ -480,12 +480,17 @@ function routeHtml(baseHtml, route) {
   html = replaceAttr(html, /(<meta name="twitter:image" content=")(.*?)(" \/>)/, image);
   html = replaceAttr(html, /(<meta name="twitter:image:alt" content=")(.*?)(" \/>)/, imageAlt);
   html = replaceAttr(html, /(<link id="heroPreload" rel="preload" as="image" href=")(.*?)(" fetchpriority="high"(?: media="[^"]*")? \/>)/, preloadImage);
+  // Inner pages already have their own hero at build time. The home document
+  // activates its dormant link inline after resolving legacy hash routes.
+  if (route.slug !== "home") {
+    html = html.replace(/(<link id="heroPreload"[^>]* media=")[^"]*"/, '$1(min-width: 641px)"');
+  }
   html = replaceAttr(
     html,
     /(<meta name="robots" content=")(.*?)(" \/>)/,
     route.robots || (route.article ? "index, follow, max-image-preview:large" : "index, follow")
   );
-  html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1health-care-journal-20260913$3`);
+  html = html.replace(/(<meta name="deployment-version" content=")(.*?)(" \/>)/, `$1health-media-cis-20260913$3`);
   html = insertArticleMeta(html, route);
   html = replaceStructuredData(html, route);
   if (route.path !== "/") {
@@ -503,7 +508,7 @@ function routeHtml(baseHtml, route) {
   if (route.inlineStyles) {
     html = html.replace("</head>", () => `<style id="publicPrerenderHeroStyles">${route.inlineStyles.replace(/</g, "\\3C ")}</style>\n  </head>`);
   }
-  if (route.slug === "editorial-policy") html = html.replace(/<link\b(?=[^>]*\bid="heroPreload")[^>]*>\s*/g, "");
+  if (route.slug === "health" || route.slug === "editorial-policy") html = html.replace(/<link\b(?=[^>]*\bid="heroPreload")[^>]*>\s*/g, "");
   const topicNumbers = new Set([7, 12, 29, 133, 134, 137, 138]);
   const topicManifest = JSON.stringify(publicContent.articles.filter((item) => topicNumbers.has(item.publicNumber)).map((item) => ({
     contentKind: "article", slug: item.slug, sourceSlug: item.sourceSlug, publicSlug: item.publicSlug,

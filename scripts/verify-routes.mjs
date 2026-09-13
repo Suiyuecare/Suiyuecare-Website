@@ -221,7 +221,13 @@ function verifySeoTags(html, route) {
   if (route !== "search" && robots !== "index, follow") {
     failures.push(`${route}: robots meta should be index, follow`);
   }
-  if (!preloadHref) {
+  if (route === "health") {
+    if (preloadHref) failures.push("health: the media index must not preload the removed brand hero");
+    const priorityImage = html.match(/<img\b[^>]*data-health-priority="true"[^>]*>/)?.[0] || "";
+    if (!priorityImage.includes('loading="eager"') || !priorityImage.includes('fetchpriority="high"')) {
+      failures.push("health: the real lead article image must load eagerly with high priority");
+    }
+  } else if (!preloadHref) {
     failures.push(`${route}: hero image preload is missing`);
   } else {
     const expectedPreloadHref = ogImage.replace(siteOrigin, "");

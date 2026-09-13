@@ -34,7 +34,7 @@ import {
 import { updatePublicStructuredData } from "./public-route-structured-data.mjs";
 import { homepageImageUrl } from "./home-image-variants.mjs";
 
-const FRONTEND_BUILD_VERSION = "health-editorial-20260909-1";
+const FRONTEND_BUILD_VERSION = "health-media-cis-20260913";
 document.documentElement.dataset.frontendBuild = FRONTEND_BUILD_VERSION;
 
 let renderPublicArticleLayout;
@@ -227,7 +227,6 @@ const LEGACY_HOME_UNIT_VIDEO_ID = "dQw4w9WgXcQ";
 const YOUTUBE_IFRAME_ALLOW = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
 const routeHeroPreloads = {
   home: HOME_HERO_INSTANT_IMAGE,
-  health: "assets/hero-care-hero-fast.jpg",
   "guides-day-care": "assets/daycare-detail-01-exercise-hero-fast.jpg",
   about: "assets/about/about-team-group-hero-v2.jpg",
   milestones: "assets/milestones/milestones-team-care-planning-hero-v2.jpg",
@@ -244,7 +243,6 @@ const routeHeroPreloads = {
 };
 const routeHeroMobilePreloads = {
   home: HOME_HERO_MOBILE_IMAGE,
-  health: "assets/hero-care-hero-fast-mobile.jpg",
   "guides-day-care": "assets/daycare-detail-01-exercise-hero-fast-mobile.jpg",
   about: "assets/about/about-team-group-hero-v2-mobile.jpg",
   milestones: "assets/milestones/milestones-team-care-planning-hero-v2.jpg",
@@ -590,7 +588,7 @@ function warmHeroImage(src = "") {
 }
 
 const initialHeroRoute = routeSlugFromLocation().split("?")[0];
-if (initialHeroRoute !== "editorial-policy") {
+if (initialHeroRoute !== "health" && initialHeroRoute !== "editorial-policy") {
   const initialHero = getServiceLocationByRoute(initialHeroRoute, readServiceLocationManifest(document))?.image
     || (routeHeroPreloads[initialHeroRoute] ? routeHeroImageForViewport(initialHeroRoute) : document.querySelector("#heroPreload")?.getAttribute("href"));
   if (initialHero) preloadHeroImage(initialHero);
@@ -11249,7 +11247,7 @@ function renderPage(slug) {
     // Give legacy hash navigation a stable pathname before section anchors replace the hash.
     window.history.replaceState(null, "", `${DAY_CARE_GUIDE_ROUTE.path}${queryString ? `?${queryString}` : window.location.search}`);
   }
-  if (normalized !== "editorial-policy") {
+  if (normalized !== "health" && normalized !== "editorial-policy") {
     const hero = getServiceLocationByRoute(normalized, readServiceLocationManifest(document))?.image
       || (routeHeroPreloads[normalized] ? routeHeroImageForViewport(normalized) : (pageView.dataset.prerenderedRoute === normalized ? document.querySelector("#heroPreload")?.getAttribute("href") : null));
     if (hero) preloadHeroImage(hero);
@@ -11564,6 +11562,7 @@ function optimizeImageLoading(root = document) {
   images.forEach((image) => {
     const isHomeImage = Boolean(image.closest("#home"));
     const isPriority =
+      image.getAttribute("data-health-priority") === "true" ||
       image.closest(".brand-mark") ||
       image.closest(".hero, .service-detail-hero, .public-location-hero, .about-full-hero, .milestones-full-hero, .article-hero, .health-hero-media, .topic-guide-hero-media") ||
       (!isHomeImage && (image.classList.contains("active") || image.classList.contains("map-image")));

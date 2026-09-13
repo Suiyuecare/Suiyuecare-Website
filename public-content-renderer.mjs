@@ -303,9 +303,19 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
   const contentKey = publicContentKey({ ...article, contentKind }) || `content:${contentKind}:${article.publicSlug || article.slug || ""}`;
   const contentRevisionTime = publicContentRevisionTime(article);
   const contentUpdatedAt = contentRevisionTime === null ? "" : new Date(contentRevisionTime).toISOString();
+  const tagLinks = renderTagLinks(article.tags);
+
+  const articleMetaMarkup = `<div class="article-meta">
+            <span class="meta-editor">編輯人｜${renderEditorialIdentity(editorial.author, true)}</span>
+            <time class="meta-date" datetime="${escapePublicHtml(article.publishedAt || "")}">發布｜${escapePublicHtml(article.date || publicDateLabel(article.publishedAt))}</time>
+            ${article.readingMinutes ? `<span class="meta-editor">閱讀時間｜${Number(article.readingMinutes)} 分鐘</span>` : ""}
+            ${article.targetAudience ? `<span class="meta-editor">適合｜${escapePublicHtml(article.targetAudience)}</span>` : ""}
+            ${contentKind === "article" && tagLinks ? `<div class="article-meta-tags">${tagLinks}</div>` : tagLinks}
+          </div>`;
 
   const html = `
     <article class="article-page ${contentKind === "article" ? "article-page--health-story " : ""}${isPptIconPack ? "article-page--ppt-icon-pack" : ""}" data-public-layout="article-unified-v1" data-public-content-type="${escapePublicHtml(contentKind)}" data-public-content-key="${escapePublicHtml(contentKey)}" data-public-content-updated-at="${escapePublicHtml(contentUpdatedAt)}">
+      ${contentKind === "article" ? renderHealthPublicationHeader() : ""}
       <div class="article-topbar">
         <a class="article-back" href="/health">返回健康3.0</a>
         <span class="article-category">${escapePublicHtml(article.category || "照顧知識")}</span>
@@ -317,6 +327,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
           <h1>${escapePublicHtml(article.title || "未命名文章")}</h1>
           <p class="article-dek">${escapePublicHtml(article.subtitle || article.excerpt || "")}</p>
         </div>
+        ${articleMetaMarkup}
         <figure>
           <img src="${escapePublicHtml(image)}" alt="${escapePublicHtml(imageAlt)}" data-fallback-src="${HEALTH_FALLBACK_IMAGE}" style="object-position:${escapePublicHtml(objectPosition)}" loading="eager" fetchpriority="high" decoding="async" />
           ${article.imageCaption ? `<figcaption>${escapePublicHtml(article.imageCaption)}</figcaption>` : ""}
@@ -334,13 +345,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
 
       <section class="article-layout">
         <div class="article-main">
-          <div class="article-meta">
-            <span class="meta-editor">編輯人｜${renderEditorialIdentity(editorial.author, true)}</span>
-            <time class="meta-date" datetime="${escapePublicHtml(article.publishedAt || "")}">發布｜${escapePublicHtml(article.date || publicDateLabel(article.publishedAt))}</time>
-            ${article.readingMinutes ? `<span class="meta-editor">閱讀時間｜${Number(article.readingMinutes)} 分鐘</span>` : ""}
-            ${article.targetAudience ? `<span class="meta-editor">適合｜${escapePublicHtml(article.targetAudience)}</span>` : ""}
-            ${renderTagLinks(article.tags)}
-          </div>
+          ${contentKind === "article" ? "" : articleMetaMarkup}
 
           ${renderVideo(article)}
           ${hasSlideDeck ? options.slideDeckHtml : (article.summary?.length ? `
@@ -372,9 +377,9 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
         </div>
 
         <aside class="article-ads" aria-label="側邊推薦">
-          <a class="article-ad featured" href="/contact" ${contactContext}><span>Suiyuecare Corps.</span><strong>第一次照顧諮詢</strong><p>不知道該選居家、日照還是復能？讓專人協助判斷。</p><em>預約諮詢</em></a>
-          <a class="article-ad" href="/courses"><span>Care Course</span><strong>家屬照顧課</strong><p>把移位、用餐、跌倒預防變成看得懂的日常技巧。</p></a>
-          <a class="article-ad" href="/talent"><span>We want you</span><strong>加入歲悅團隊</strong><p>居服員、督導、日照照服員招募中。</p></a>
+          <a class="article-ad featured" href="/contact" ${contactContext}><span>${contentKind === "article" ? "歲悅陪你照顧" : "Suiyuecare Corps."}</span><strong>第一次照顧諮詢</strong><p>不知道該選居家、日照還是復能？讓專人協助判斷。</p><em>預約諮詢</em></a>
+          <a class="article-ad" href="/courses"><span>${contentKind === "article" ? "照顧學習" : "Care Course"}</span><strong>家屬照顧課</strong><p>把移位、用餐、跌倒預防變成看得懂的日常技巧。</p></a>
+          <a class="article-ad" href="/talent"><span>${contentKind === "article" ? "歲悅團隊" : "We want you"}</span><strong>加入歲悅團隊</strong><p>居服員、督導、日照照服員招募中。</p></a>
         </aside>
 
         ${related.length ? `
@@ -438,15 +443,15 @@ function healthImageAttrs(article = {}, { priority = false } = {}) {
     `style="object-position:${escapePublicHtml(focalPoint)}"`,
     `loading="${priority ? "eager" : "lazy"}"`,
     `decoding="async"`,
-    priority ? `fetchpriority="high"` : ""
+    priority ? `fetchpriority="high" data-health-priority="true"` : ""
   ].filter(Boolean).join(" ");
 }
 
-function renderHealthListCard(item) {
+function renderHealthListCard(item, { priority = false } = {}) {
   return `
     <article class="health-list-card">
       <a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}">
-        <img ${healthImageAttrs(item)} />
+        <img ${healthImageAttrs(item, { priority })} width="1600" height="900" />
         <div>
           <span>${escapePublicHtml(item.category || "照顧知識")}</span>
           <h3>${escapePublicHtml(item.title)}</h3>
@@ -484,6 +489,40 @@ function partitionLatestArticlesByTitle(items = []) {
   return { current, superseded };
 }
 
+export function renderHealthPublicationHeader({ home = false } = {}) {
+  return `<header class="health-publication-header">
+    <div class="health-publication-brand">
+      <p>歲悅長照・照顧知識</p>
+      ${home ? '<h1>健康<span>3.0</span></h1>' : '<a href="/health" aria-label="健康3.0首頁">健康<span>3.0</span></a>'}
+    </div>
+    <p class="health-publication-promise">陪你照顧家人，也照顧自己。</p>
+    <form class="health-search" action="/search" role="search">
+      <input name="q" type="search" aria-label="搜尋健康3.0文章" placeholder="搜尋失智、營養、日照…" />
+      <button type="submit" aria-label="搜尋"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+    </form>
+  </header>`;
+}
+
+function renderHealthLearningSidebar() {
+  const topicLinks = [
+    ["失智", "失智照顧", "理解變化，陪伴日常生活"],
+    ["營養", "飲食與營養", "從日常飲食找到照顧方法"],
+    ["復能", "復能與活動", "一起維持生活中的活動能力"],
+    ["家屬", "家庭照顧", "照顧家人，也安頓自己的心"]
+  ];
+  return `<aside class="health-learning-sidebar" aria-label="照顧主題與閱讀資源">
+    <section class="health-sidebar-topics">
+      <div class="health-sidebar-heading"><span aria-hidden="true"></span><h2>從主題開始讀</h2></div>
+      <nav aria-label="照顧知識主題">${topicLinks.map(([query, title, description]) => `<a href="/search?q=${encodeURIComponent(query)}"><div><strong>${title}</strong><small>${description}</small></div><span aria-hidden="true">↗</span></a>`).join("")}</nav>
+    </section>
+    <a class="health-guide-promo" href="/guides/day-care">
+      <img src="/assets/daycare-detail-01-exercise-fast.jpg" alt="照服員陪伴長輩參與日間照顧活動" width="800" height="450" loading="lazy" decoding="async" />
+      <div><span>給第一次接觸日照的你</span><h2>日照入門指南</h2><p>從申請、參觀到接送準備，循序找到需要的資訊。</p><strong>閱讀指南 <span aria-hidden="true">→</span></strong></div>
+    </a>
+    <a class="health-editorial-link" href="/editorial-policy"><span>認識健康3.0</span><strong>我們如何整理照顧知識 <span aria-hidden="true">↗</span></strong></a>
+  </aside>`;
+}
+
 export function renderPublicHealthIndex(items = [], categories = [], options = {}) {
   const selectedCategorySlug = typeof options === "string" ? options : options.selectedCategorySlug || "";
   const sortedArticles = (Array.isArray(items) ? items.filter(Boolean) : [])
@@ -514,89 +553,59 @@ export function renderPublicHealthIndex(items = [], categories = [], options = {
   const latestRevisionTime = sortedArticles.reduce((latest, article) => Math.max(latest, publicContentRevisionTime(article) || 0), 0);
   const latestRevision = latestRevisionTime ? new Date(latestRevisionTime).toISOString() : "";
   const contentMarkup = `
-      <section class="health-hero">
-        <picture class="health-hero-media">
-          <source media="(max-width: 640px)" srcset="/assets/hero-care-hero-fast-mobile.jpg" />
-          <img src="/assets/hero-care-hero-fast.jpg" alt="照顧服務人員陪伴長輩活動，彼此微笑交流" width="1672" height="941" loading="eager" fetchpriority="high" decoding="async" />
-        </picture>
-        <div class="health-hero-shell">
-          <div class="health-hero-copy">
-            <p class="eyebrow">HEALTH 3.0 · 歲悅照顧知識</p>
-            <h1>健康3.0</h1>
-            <p class="health-hero-slogan">讓照顧，回到生活。</p>
-            <p class="health-hero-lead">把複雜的照顧知識，整理成家人看得懂、今天做得到的方法。</p>
-            <a class="health-hero-action" href="#health-reading">開始閱讀 <span aria-hidden="true">↓</span></a>
-          </div>
-        </div>
-      </section>
-      <section class="health-discovery" aria-labelledby="health-discovery-title">
-        <div class="health-discovery-top">
-          <div><p class="eyebrow">從日常的需要開始</p><h2 id="health-discovery-title">找到你想了解的照顧知識</h2></div>
-          <form class="health-search" action="/search">
-            <input name="q" type="search" aria-label="搜尋健康3.0文章" placeholder="搜尋跌倒、失智、營養、復能" />
-            <button type="submit">搜尋</button>
-          </form>
-        </div>
+      ${renderHealthPublicationHeader({ home: true })}
+      <section class="health-discovery" aria-label="照顧主題導覽">
         ${renderHealthTopicNavigation(topics, sortedArticles, selectedCategorySlug)}
       </section>
-
       ${feature ? `
         ${selectedCategorySlug ? "" : `<section class="health-board" id="health-reading" aria-labelledby="health-featured-title">
-          <div class="health-section-head health-board-heading">
-            <div><p class="eyebrow">一起讀，一起照顧</p><h2 id="health-featured-title">近期照顧文章</h2></div>
-            <a class="health-section-link" href="/search">全部文章 <span aria-hidden="true">→</span></a>
+          <div class="health-section-head">
+            <div><span class="health-section-mark" aria-hidden="true"></span><h2 id="health-featured-title">焦點文章</h2></div>
+            <p>把照顧知識，帶進每一天</p>
           </div>
           <div class="health-board-grid">
-          <article class="health-feature">
-            <a href="${escapePublicHtml(safePublicHref(feature.href, "/health"))}">
-              <img ${healthImageAttrs(feature)} />
-              <div class="health-feature-copy">
-                <div class="health-card-meta"><span class="health-tag">最新發布</span>${feature.date ? `<time>${escapePublicHtml(feature.date)}</time>` : ""}</div>
-                <h2>${escapePublicHtml(feature.title)}</h2>
-                <p>${escapePublicHtml(feature.subtitle || feature.excerpt || "")}</p>
-                <span class="health-readmore">閱讀文章 <span aria-hidden="true">→</span></span>
-              </div>
-            </a>
-          </article>
-          <aside class="ranking-panel">
-            <div class="ranking-title"><span>繼續探索</span><h2>接著閱讀</h2></div>
-            <ol>${railArticles.map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}"><img ${healthImageAttrs(item)} /><div><span>${escapePublicHtml(item.category || "照顧知識")}</span><strong>${escapePublicHtml(item.title)}</strong>${item.date ? `<time>${escapePublicHtml(item.date)}</time>` : ""}</div></a></li>`).join("")}</ol>
-          </aside>
+            <article class="health-feature">
+              <a href="${escapePublicHtml(safePublicHref(feature.href, "/health"))}">
+                <img ${healthImageAttrs(feature, { priority: true })} width="1600" height="900" />
+                <div class="health-feature-copy">
+                  <div class="health-card-meta"><span class="health-tag">${escapePublicHtml(feature.category || "照顧知識")}</span>${feature.date ? `<time>${escapePublicHtml(feature.date)}</time>` : ""}</div>
+                  <h2>${escapePublicHtml(feature.title)}</h2>
+                  <p>${escapePublicHtml(feature.subtitle || feature.excerpt || "")}</p>
+                  <span class="health-readmore">閱讀文章 <span aria-hidden="true">→</span></span>
+                </div>
+              </a>
+            </article>
+            <aside class="ranking-panel" aria-labelledby="health-next-title">
+              <div class="ranking-title"><h2 id="health-next-title">接著閱讀</h2><span>照顧新知</span></div>
+              <ol>${railArticles.map((item, index) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}"><img ${healthImageAttrs(item)} width="160" height="120" /><div><span>${escapePublicHtml(item.category || "照顧知識")}</span><strong>${escapePublicHtml(item.title)}</strong>${item.date ? `<time>${escapePublicHtml(item.date)}</time>` : ""}</div></a></li>`).join("")}</ol>
+              <a class="health-rail-more" href="/search">探索全部文章 <span aria-hidden="true">→</span></a>
+            </aside>
           </div>
         </section>`}
-
-        <section class="health-latest ${selectedCategorySlug ? "health-category-results" : ""}"${selectedCategorySlug ? ' id="health-reading"' : ""} aria-labelledby="health-latest-title">
-          <div class="health-section-head"><div><p class="eyebrow">${selectedCategorySlug ? "主題文章" : "持續更新"}</p><h2 id="health-latest-title">${escapePublicHtml(selectedCategorySlug ? `${selectedTopic?.name || "這個主題"}的全部文章` : "更多照顧知識")}</h2></div><span>共 ${articles.length} 篇</span></div>
-          <div class="health-latest-grid">
-            ${latestArticles.map(renderHealthListCard).join("")}
-          </div>
-          ${archivedArticles.length ? `
-            <details class="health-archive-index">
-              <summary>瀏覽完整文章索引<span>另有 ${archivedArticles.length} 篇</span></summary>
-              <ul>${archivedArticles.map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}">${escapePublicHtml(item.title)}</a></li>`).join("")}</ul>
-            </details>
-          ` : ""}
-          ${supersededArticles.length ? `
-            <details class="health-archive-index health-superseded-index">
-              <summary>歷史版本<span>${supersededArticles.length} 篇，主畫面已保留新版</span></summary>
-              <ul>${supersededArticles.map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}">${escapePublicHtml(item.title)}${item.date ? `（${escapePublicHtml(item.date)} 舊版）` : "（舊版）"}</a></li>`).join("")}</ul>
-            </details>
-          ` : ""}
-        </section>
-
+        <div class="health-content-columns">
+          <section class="health-latest ${selectedCategorySlug ? "health-category-results" : ""}"${selectedCategorySlug ? ' id="health-reading"' : ""} aria-labelledby="health-latest-title">
+            <div class="health-section-head"><div><span class="health-section-mark" aria-hidden="true"></span><h2 id="health-latest-title">${escapePublicHtml(selectedCategorySlug ? `${selectedTopic?.name || "這個主題"}的全部文章` : "最新文章")}</h2></div><span>共 ${articles.length} 篇</span></div>
+            <div class="health-latest-grid">
+              ${latestArticles.map((item, index) => renderHealthListCard(item, { priority: Boolean(selectedCategorySlug) && index === 0 })).join("")}
+            </div>
+            ${archivedArticles.length ? `<details class="health-archive-index"><summary>瀏覽完整文章索引<span>另有 ${archivedArticles.length} 篇</span></summary><ul>${archivedArticles.map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}">${escapePublicHtml(item.title)}</a></li>`).join("")}</ul></details>` : ""}
+            ${supersededArticles.length ? `<details class="health-archive-index health-superseded-index"><summary>歷史版本<span>${supersededArticles.length} 篇，主畫面已保留新版</span></summary><ul>${supersededArticles.map((item) => `<li><a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}">${escapePublicHtml(item.title)}${item.date ? `（${escapePublicHtml(item.date)} 舊版）` : "（舊版）"}</a></li>`).join("")}</ul></details>` : ""}
+          </section>
+          ${renderHealthLearningSidebar()}
+        </div>
         ${!selectedCategorySlug ? `<section class="health-format-hub" aria-labelledby="health-format-title">
-          <div class="health-section-head"><div><p class="eyebrow">依照你的時間選擇</p><h2 id="health-format-title">換一種方式找答案</h2></div></div>
+          <div class="health-section-head"><div><span class="health-section-mark" aria-hidden="true"></span><h2 id="health-format-title">照顧知識，多一種讀法</h2></div></div>
           <nav class="health-format-grid" aria-label="健康3.0內容形式">
-            <a href="${escapePublicHtml(guideUrl)}"><span>01</span><div><strong>懶人包</strong><small>快速掌握照顧步驟</small></div><b aria-hidden="true">→</b></a>
-            <a href="${escapePublicHtml(eventUrl)}"><span>02</span><div><strong>活動專區</strong><small>找到課程與照顧活動</small></div><b aria-hidden="true">→</b></a>
-            <a href="${escapePublicHtml(videoUrl)}"><span>03</span><div><strong>影音內容</strong><small>用影片快速理解重點</small></div><b aria-hidden="true">→</b></a>
+            <a href="${escapePublicHtml(guideUrl)}"><span>01</span><div><strong>圖解與懶人包</strong><small>照顧步驟，清楚掌握</small></div><b aria-hidden="true">→</b></a>
+            <a href="${escapePublicHtml(videoUrl)}"><span>02</span><div><strong>影音文章</strong><small>照顧主題，延伸探索</small></div><b aria-hidden="true">→</b></a>
+            <a href="${escapePublicHtml(eventUrl)}"><span>03</span><div><strong>照顧活動</strong><small>一起學習，一起參與</small></div><b aria-hidden="true">→</b></a>
           </nav>
         </section>` : ""}
-      ` : `<section class="health-empty-state" id="health-reading"><h2>${selectedCategorySlug ? "這個分類目前還沒有已發布文章" : "文章整理中"}</h2><p>${selectedCategorySlug ? "可以先查看全部文章或搜尋其他照顧主題。" : "健康3.0內容會在審核發布後顯示於此。"}</p><a href="/health">查看全部文章</a></section>`}
+      ` : `<section class="health-empty-state" id="health-reading"><h2>${escapePublicHtml(selectedTopic?.name || "照顧文章")}</h2><p>這個主題目前還沒有文章，先從其他照顧知識開始閱讀。</p><a href="/health">回到健康3.0 <span aria-hidden="true">→</span></a></section>`}
   `;
-  const batchRevision = publicContentBatchRevision(contentMarkup);
+  const renderRevision = publicContentBatchRevision(contentMarkup);
   return `
-    <div class="health-page health-page--editorial" data-public-content-index="health" data-public-layout="${PUBLIC_HEALTH_LAYOUT}" data-health-design="care-journal-20260913" data-health-content-revision="${escapePublicHtml(batchRevision)}" data-public-content-updated-at="${escapePublicHtml(latestRevision)}" data-health-article-count="${sortedArticles.length}" data-health-category="${escapePublicHtml(selectedCategorySlug)}">
+    <div class="health-page health-page--editorial" data-public-content-index="health" data-public-layout="${PUBLIC_HEALTH_LAYOUT}" data-health-design="media-cis-20260913" data-health-content-revision="${escapePublicHtml(renderRevision)}" data-public-content-updated-at="${escapePublicHtml(latestRevision)}" data-health-article-count="${sortedArticles.length}" data-health-category="${escapePublicHtml(selectedCategorySlug)}">
       ${contentMarkup}
     </div>
   `;
