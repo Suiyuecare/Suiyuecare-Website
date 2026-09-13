@@ -34,7 +34,7 @@ import {
 import { updatePublicStructuredData } from "./public-route-structured-data.mjs";
 import { homepageImageUrl } from "./home-image-variants.mjs";
 
-const FRONTEND_BUILD_VERSION = "health-editorial-home-type-20260914";
+const FRONTEND_BUILD_VERSION = "health-cis-motion-20260914";
 document.documentElement.dataset.frontendBuild = FRONTEND_BUILD_VERSION;
 
 let renderPublicArticleLayout;
@@ -3222,9 +3222,6 @@ function categorySlug(value = "") {
     .replace(/^-+|-+$/g, "");
 }
 
-function getHealthCategoryList() {
-  return getUniqueHealthTopics(supabaseArticleCategories, getHealthArticleList());
-}
 
 function getArticleRewriteFields(slug = "") {
   const rewrite = articlePages[slug] || articleRewriteFields[slug];
@@ -7285,11 +7282,8 @@ function bindLocationControls() {
 }
 
 function renderHealthPage(selectedCategorySlug = "") {
-  return renderPublicHealthIndex(
-    getHealthArticleList(),
-    getHealthCategoryList(),
-    { selectedCategorySlug }
-  );
+  const articles = getHealthArticleList();
+  return renderPublicHealthIndex(articles, getUniqueHealthTopics(supabaseArticleCategories, articles), { selectedCategorySlug });
 }
 
 function renderSearchPage(query = "") {

@@ -39,7 +39,7 @@ function firstHeadingAfter(html, marker, tagName) {
 function assertUnifiedHealthRoot(html, expectedCategory = "") {
   assert.equal(countMatches(html, /data-public-layout="health-unified-v1"/g), 1);
   assert.equal(countMatches(html, /data-public-content-index="health"/g), 1);
-  assert.equal(countMatches(html, /data-health-design="editorial-home-type-20260914"/g), 1);
+  assert.equal(countMatches(html, /data-health-design="editorial-cis-motion-20260914"/g), 1);
   assert.match(html, new RegExp(`data-health-category="${expectedCategory}"`));
   assert.doesNotMatch(html, /health-board--prerendered|health-quick-grid/);
 }

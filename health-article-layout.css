@@ -256,7 +256,7 @@
   margin: 0 0 36px;
   padding: 26px 30px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 28px;
   background: var(--story-soft);
   box-shadow: none;
 }
@@ -434,7 +434,7 @@
 .article-page.article-page--health-story .article-ad.featured {
   padding: 26px 24px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 28px;
   background: var(--story-soft);
 }
 
@@ -452,10 +452,10 @@
 .article-page.article-page--health-story .article-related-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; padding: 0; }
 .article-page.article-page--health-story .article-related-grid a { grid-template-rows: auto auto 1fr; gap: 12px; min-height: 0; padding: 0 0 24px; overflow: hidden; border: 1px solid var(--line); border-radius: 28px; background: #fff; box-shadow: 0 18px 46px color-mix(in srgb, var(--brown) 8%, transparent); }
 .article-page.article-page--health-story .article-related-grid img { width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 0; object-fit: cover; }
-.article-page.article-page--health-story .article-related-grid :is(span, b) { margin-inline: 20px; }
+.article-page.article-page--health-story .article-related-grid :is(span:not(.health-card-image), b) { margin-inline: 20px; }
 .article-page.article-page--health-story .article-related-grid span { color: var(--story-accent); font-size: 13px; font-weight: 900; line-height: 1.7; }
 .article-page.article-page--health-story .article-related-grid b { color: var(--story-ink); font-size: var(--content-compact-size, 23px); font-weight: 700; line-height: 1.35; word-break: normal; overflow-wrap: anywhere; }
-.article-page.article-page--health-story .article-related-grid a:hover b { color: var(--story-accent); text-decoration: underline; text-underline-offset: 5px; }
+.article-page.article-page--health-story .article-related-grid .health-card-image { margin: 0; border-radius: 0; }
 
 .article-page.article-page--health-story :is(a, button, summary, video, [tabindex]):focus-visible {
   outline: 3px solid var(--story-accent);
