@@ -34,7 +34,7 @@ import {
 import { updatePublicStructuredData } from "./public-route-structured-data.mjs";
 import { homepageImageUrl } from "./home-image-variants.mjs";
 
-const FRONTEND_BUILD_VERSION = "health-media-cis-20260913";
+const FRONTEND_BUILD_VERSION = "health-magazine-cis-20260913";
 document.documentElement.dataset.frontendBuild = FRONTEND_BUILD_VERSION;
 
 let renderPublicArticleLayout;

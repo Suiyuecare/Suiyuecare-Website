@@ -292,6 +292,8 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
   const image = normalizePublicAssetUrl(article.image);
   const imageAlt = article.imageAlt || article.title || "健康3.0文章主圖";
   const objectPosition = String(article.focalPoint || "center").replace(/[^a-z0-9% .-]/gi, "");
+  // Lift the default crop slightly so square portraits keep faces in the reading hero.
+  const healthObjectPosition = objectPosition === "center" ? "center 25%" : objectPosition;
   const contentHtml = Array.isArray(article.content)
     ? article.content.map((section, index) => renderContentSection(section, index, article.inlineImages || [])).join("")
     : renderMarkdownLikeContent(article.content);
@@ -329,7 +331,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
         </div>
         ${articleMetaMarkup}
         <figure>
-          <img src="${escapePublicHtml(image)}" alt="${escapePublicHtml(imageAlt)}" data-fallback-src="${HEALTH_FALLBACK_IMAGE}" style="object-position:${escapePublicHtml(objectPosition)}" loading="eager" fetchpriority="high" decoding="async" />
+          <img src="${escapePublicHtml(image)}" alt="${escapePublicHtml(imageAlt)}" data-fallback-src="${HEALTH_FALLBACK_IMAGE}" style="object-position:${escapePublicHtml(healthObjectPosition)}" loading="eager" fetchpriority="high" decoding="async" />
           ${article.imageCaption ? `<figcaption>${escapePublicHtml(article.imageCaption)}</figcaption>` : ""}
         </figure>
       </header>` : `      <header class="article-hero">
@@ -497,7 +499,7 @@ export function renderHealthPublicationHeader({ home = false } = {}) {
     </div>
     <p class="health-publication-promise">陪你照顧家人，也照顧自己。</p>
     <form class="health-search" action="/search" role="search">
-      <input name="q" type="search" aria-label="搜尋健康3.0文章" placeholder="搜尋失智、營養、日照…" />
+      <input name="q" type="search" aria-label="搜尋健康3.0文章" placeholder="搜尋照顧知識" />
       <button type="submit" aria-label="搜尋"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
     </form>
   </header>`;
@@ -570,7 +572,7 @@ export function renderPublicHealthIndex(items = [], categories = [], options = {
                 <div class="health-feature-copy">
                   <div class="health-card-meta"><span class="health-tag">${escapePublicHtml(feature.category || "照顧知識")}</span>${feature.date ? `<time>${escapePublicHtml(feature.date)}</time>` : ""}</div>
                   <h2>${escapePublicHtml(feature.title)}</h2>
-                  <p>${escapePublicHtml(feature.subtitle || feature.excerpt || "")}</p>
+                  <p>${escapePublicHtml(feature.excerpt || feature.subtitle || "")}</p>
                   <span class="health-readmore">閱讀文章 <span aria-hidden="true">→</span></span>
                 </div>
               </a>
@@ -605,7 +607,7 @@ export function renderPublicHealthIndex(items = [], categories = [], options = {
   `;
   const renderRevision = publicContentBatchRevision(contentMarkup);
   return `
-    <div class="health-page health-page--editorial" data-public-content-index="health" data-public-layout="${PUBLIC_HEALTH_LAYOUT}" data-health-design="media-cis-20260913" data-health-content-revision="${escapePublicHtml(renderRevision)}" data-public-content-updated-at="${escapePublicHtml(latestRevision)}" data-health-article-count="${sortedArticles.length}" data-health-category="${escapePublicHtml(selectedCategorySlug)}">
+    <div class="health-page health-page--editorial" data-public-content-index="health" data-public-layout="${PUBLIC_HEALTH_LAYOUT}" data-health-design="magazine-cis-20260913" data-health-content-revision="${escapePublicHtml(renderRevision)}" data-public-content-updated-at="${escapePublicHtml(latestRevision)}" data-health-article-count="${sortedArticles.length}" data-health-category="${escapePublicHtml(selectedCategorySlug)}">
       ${contentMarkup}
     </div>
   `;
