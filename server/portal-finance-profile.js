@@ -196,14 +196,15 @@ function projectSafeProfile(rows, expectedEmail) {
   }
 
   // Deliberately omit Finance role, approval, supervisor and Auth identifiers.
-  // The public profile response only proves that the signed-in person may reach APM.
+  // The profile enables existing employee entry points only. Each destination
+  // independently resolves authoritative Finance roles and data scope.
   return {
-    source: "finance-apm-self",
+    source: "finance-portal-self",
     email,
     displayName,
     jobTitle,
     departmentCode,
-    allowedModules: ["apm"]
+    allowedModules: ["accounting", "apm", "edoc"]
   };
 }
 
