@@ -1695,6 +1695,21 @@
       "permanent": true
     },
     {
+      "source": "/article/ba04-feeding-tube-feeding-support-guide",
+      "destination": "/article/article167",
+      "permanent": true
+    },
+    {
+      "source": "/article/ba05-meal-preparation-care-guide",
+      "destination": "/article/article168",
+      "permanent": true
+    },
+    {
+      "source": "/article/ba07-bathing-shampoo-assistance-guide",
+      "destination": "/article/article169",
+      "permanent": true
+    },
+    {
       "source": "/article/article43",
       "destination": "/article/article7",
       "permanent": true

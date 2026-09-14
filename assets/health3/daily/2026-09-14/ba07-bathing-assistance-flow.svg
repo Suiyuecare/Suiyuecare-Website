@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">BA07 協助沐浴及洗頭安全流程</title>
+  <desc id="desc">從確認狀況與意願、準備浴間安全、協助沐浴洗頭、保暖整理，到記錄與調整計畫的五步流程。</desc>
+  <rect width="1200" height="675" fill="#fffaf4"/>
+  <text x="70" y="88" font-family="system-ui, sans-serif" font-size="42" font-weight="700" fill="#402f25">BA07 從進浴室前就開始</text>
+  <text x="70" y="132" font-family="system-ui, sans-serif" font-size="23" fill="#705a4a">把意願、移動安全、保暖與隱私都排進同一組服務</text>
+  <path d="M135 330h930" stroke="#f0c4a7" stroke-width="18" stroke-linecap="round"/>
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <g transform="translate(90 210)"><circle cx="70" cy="120" r="64" fill="#e66f26"/><text x="70" y="132" font-size="38" font-weight="700" fill="#fff">1</text><text x="70" y="218" font-size="23" font-weight="700" fill="#402f25">先問意願</text><text x="70" y="250" font-size="19" fill="#705a4a">確認當天狀況</text></g>
+    <g transform="translate(320 210)"><circle cx="70" cy="120" r="64" fill="#e66f26"/><text x="70" y="132" font-size="38" font-weight="700" fill="#fff">2</text><text x="70" y="218" font-size="23" font-weight="700" fill="#402f25">準備浴間</text><text x="70" y="250" font-size="19" fill="#705a4a">防滑、扶手、用品</text></g>
+    <g transform="translate(550 210)"><circle cx="70" cy="120" r="64" fill="#e66f26"/><text x="70" y="132" font-size="38" font-weight="700" fill="#fff">3</text><text x="70" y="218" font-size="23" font-weight="700" fill="#402f25">沐浴洗頭</text><text x="70" y="250" font-size="19" fill="#705a4a">保留本人參與</text></g>
+    <g transform="translate(780 210)"><circle cx="70" cy="120" r="64" fill="#e66f26"/><text x="70" y="132" font-size="38" font-weight="700" fill="#fff">4</text><text x="70" y="218" font-size="23" font-weight="700" fill="#402f25">保暖整理</text><text x="70" y="250" font-size="19" fill="#705a4a">穿衣與善後</text></g>
+    <g transform="translate(1010 210)"><circle cx="70" cy="120" r="64" fill="#c65316"/><text x="70" y="132" font-size="38" font-weight="700" fill="#fff">5</text><text x="70" y="218" font-size="23" font-weight="700" fill="#402f25">記錄調整</text><text x="70" y="250" font-size="19" fill="#705a4a">異常就回報</text></g>
+  </g>
+  <rect x="92" y="520" width="1016" height="92" rx="20" fill="#49372d"/>
+  <text x="600" y="558" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" font-weight="700" fill="#fff">浴間沐浴屬 BA07；床上擦澡通常屬 BA01</text>
+  <text x="600" y="590" text-anchor="middle" font-family="system-ui, sans-serif" font-size="21" fill="#ffe5d1">同一時段不可把 BA01 或 BA23 再重複申報</text>
+</svg>

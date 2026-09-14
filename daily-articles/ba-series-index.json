@@ -3,7 +3,7 @@
   "seriesId": "ltc3-ba-code-series-v1",
   "title": "長照 3.0 BA 碼逐碼介紹",
   "timezone": "Asia/Taipei",
-  "catalogCheckedAt": "2026-09-13",
+  "catalogCheckedAt": "2026-09-14",
   "regulationRevisionDate": "2025-06-19",
   "correctionDate": "2025-10-03",
   "effectiveDates": {
@@ -23,9 +23,9 @@
     { "code": "BA01", "name": "基本身體清潔", "status": "validated", "batchId": "ltc3-ba-code-series-v1-2026-09-13", "completedOn": "2026-09-13", "slug": "ba01-basic-body-cleaning-guide", "publicNumber": 164, "title": "BA01 基本身體清潔是擦澡還是洗澡？先看服務內容與不能併計的界線", "contentHash": "sha256:21f80f9a55d496f3116203ee7b2c10326f2b0037bd515162114ad6f41d48b659", "articlePath": "daily-articles/2026-09-13-ba.mjs", "assets": ["assets/health3/daily/2026-09-13/ba01-basic-body-cleaning-hero.jpg", "assets/health3/daily/2026-09-13/ba01-basic-body-cleaning-prep.jpg", "assets/health3/daily/2026-09-13/ba01-basic-body-cleaning-flow.svg", "assets/health3/daily/2026-09-13/ba01-basic-body-cleaning-choice.jpg"] },
     { "code": "BA02", "name": "基本日常照顧", "status": "validated", "batchId": "ltc3-ba-code-series-v1-2026-09-13", "completedOn": "2026-09-13", "slug": "ba02-basic-daily-care-guide", "publicNumber": 165, "title": "BA02 基本日常照顧可以做哪些事？30 分鐘一單位，也有不能併用的規則", "contentHash": "sha256:f5f77fd54f8f88b20066553e37a93735a48af8d5103a96982f5558e1ffd2e762", "articlePath": "daily-articles/2026-09-13-ba.mjs", "assets": ["assets/health3/daily/2026-09-13/ba02-basic-daily-care-hero.jpg", "assets/health3/daily/2026-09-13/ba02-basic-daily-care-button.jpg", "assets/health3/daily/2026-09-13/ba02-basic-daily-care-flow.svg", "assets/health3/daily/2026-09-13/ba02-basic-daily-care-handover.jpg"] },
     { "code": "BA03", "name": "測量生命徵象", "status": "validated", "batchId": "ltc3-ba-code-series-v1-2026-09-13", "completedOn": "2026-09-13", "slug": "ba03-vital-signs-monitoring-guide", "publicNumber": 166, "title": "BA03 測量生命徵象何時能申請？不是每次服務前量血壓都能另計", "contentHash": "sha256:3ebee60feb41c9e4eee2a2b57ce55d06492c6b983c8c3493a46cde06d8ecd035", "articlePath": "daily-articles/2026-09-13-ba.mjs", "assets": ["assets/health3/daily/2026-09-13/ba03-vital-signs-hero.jpg", "assets/health3/daily/2026-09-13/ba03-vital-signs-temperature.jpg", "assets/health3/daily/2026-09-13/ba03-vital-signs-flow.svg", "assets/health3/daily/2026-09-13/ba03-vital-signs-handover.jpg"] },
-    { "code": "BA04", "name": "協助進食或管灌餵食", "status": "pending" },
-    { "code": "BA05", "name": "餐食照顧", "status": "pending" },
-    { "code": "BA07", "name": "協助沐浴及洗頭", "status": "pending" },
+    { "code": "BA04", "name": "協助進食或管灌餵食", "status": "validated", "batchId": "ltc3-ba-code-series-v1-2026-09-14", "completedOn": "2026-09-14", "slug": "ba04-feeding-tube-feeding-support-guide", "publicNumber": 167, "title": "BA04 協助進食或管灌餵食怎麼用？一餐一組，也要觀察反應", "contentHash": "sha256:283988db601b727fb438023b10d867c2428120485a4fdfe614351052649f7df9", "articlePath": "daily-articles/2026-09-14-ba.mjs", "assets": ["assets/health3/daily/2026-09-14/ba04-feeding-support-hero.jpg", "assets/health3/daily/2026-09-14/ba04-feeding-support-observe.jpg", "assets/health3/daily/2026-09-14/ba04-feeding-support-flow.svg", "assets/health3/daily/2026-09-14/ba04-feeding-support-handover.jpg"] },
+    { "code": "BA05", "name": "餐食照顧", "status": "validated", "batchId": "ltc3-ba-code-series-v1-2026-09-14", "completedOn": "2026-09-14", "slug": "ba05-meal-preparation-care-guide", "publicNumber": 168, "title": "BA05 餐食照顧包含哪些事？分清備餐、加熱與管灌飲食", "contentHash": "sha256:ac76c09fb1134cf88693d0328671c447751f5fae67b09f789f95735563a9fa2f", "articlePath": "daily-articles/2026-09-14-ba.mjs", "assets": ["assets/health3/daily/2026-09-14/ba05-meal-preparation-hero.jpg", "assets/health3/daily/2026-09-14/ba05-meal-preparation-texture.jpg", "assets/health3/daily/2026-09-14/ba05-meal-preparation-boundary.svg", "assets/health3/daily/2026-09-14/ba05-meal-preparation-handover.jpg"] },
+    { "code": "BA07", "name": "協助沐浴及洗頭", "status": "validated", "batchId": "ltc3-ba-code-series-v1-2026-09-14", "completedOn": "2026-09-14", "slug": "ba07-bathing-shampoo-assistance-guide", "publicNumber": 169, "title": "BA07 協助沐浴及洗頭怎麼安排？從安全進浴室到不能重複計價", "contentHash": "sha256:70f907c58bc62b6279a22d993ad7a40b3a623e5bf21cb9903162f038e4ee947d", "articlePath": "daily-articles/2026-09-14-ba.mjs", "assets": ["assets/health3/daily/2026-09-14/ba07-bathing-assistance-hero.jpg", "assets/health3/daily/2026-09-14/ba07-bathing-assistance-safety.jpg", "assets/health3/daily/2026-09-14/ba07-bathing-assistance-flow.svg", "assets/health3/daily/2026-09-14/ba07-bathing-assistance-choice.jpg"] },
     { "code": "BA08", "name": "足部照護", "status": "pending" },
     { "code": "BA09", "name": "到宅沐浴車服務—第一型", "status": "pending" },
     { "code": "BA09a", "name": "到宅沐浴車服務—第二型", "status": "pending" },
@@ -75,6 +75,24 @@
         "verifyAll": "passed: 172 static content pages, 166 redirects, SEO, links, accessibility, security and strict image audit",
         "browserDesktop": "passed: 1440px, article164-166, all article assets loaded, no overlay, no broken images or page overflow",
         "browserMobile": "passed: 390px, article164-166, one H1, three FAQ, references, SVG, table horizontal scroll, no page overflow"
+      }
+    },
+    {
+      "batchId": "ltc3-ba-code-series-v1-2026-09-14",
+      "batchDate": "2026-09-14",
+      "completedOn": "2026-09-14",
+      "codes": ["BA04", "BA05", "BA07"],
+      "expectedCount": 3,
+      "status": "validated",
+      "commit": "SELF",
+      "remoteBranch": "origin/codex/daily-business-articles",
+      "remoteVerification": "Count as complete only after the containing commit is fetched from the remote branch.",
+      "validation": {
+        "referencesReachable": true,
+        "assetMirrorsMatch": true,
+        "verifyAll": "passed: 175 static content pages, 169 redirects, SEO, links, accessibility, security and strict image audit",
+        "browserDesktop": "passed: 1440px, article167-169, all article assets loaded, one H1, no overlay, broken images or page overflow",
+        "browserMobile": "passed: 390px, article167-169, one H1, three FAQ, references, SVG, table horizontal scroll, no page overflow"
       }
     }
   ]

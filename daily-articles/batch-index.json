@@ -405,6 +405,47 @@
           "contentHash": "sha256:3ebee60feb41c9e4eee2a2b57ce55d06492c6b983c8c3493a46cde06d8ecd035"
         }
       ]
+    },
+    {
+      "date": "2026-09-14",
+      "displayDate": "2026.09.14",
+      "commit": "SELF",
+      "seriesId": "ltc3-ba-code-series-v1",
+      "batchId": "ltc3-ba-code-series-v1-2026-09-14",
+      "catalogCheckedAt": "2026-09-14",
+      "expectedCount": 3,
+      "articles": [
+        {
+          "slug": "ba04-feeding-tube-feeding-support-guide",
+          "title": "BA04 協助進食或管灌餵食怎麼用？一餐一組，也要觀察反應",
+          "baCode": "BA04",
+          "primaryQuestion": "家中長輩需要餵飯或依既定計畫管灌時，BA04 可以做到哪些事，單純加熱和現場備餐又該怎麼分？",
+          "careContext": "長者因動作、認知或吞嚥相關需要，在家用餐時需有人協助進食，或依既定專業計畫協助管灌餵食",
+          "businessItem": "居家照顧",
+          "publicNumber": 167,
+          "contentHash": "sha256:283988db601b727fb438023b10d867c2428120485a4fdfe614351052649f7df9"
+        },
+        {
+          "slug": "ba05-meal-preparation-care-guide",
+          "title": "BA05 餐食照顧包含哪些事？分清備餐、加熱與管灌飲食",
+          "baCode": "BA05",
+          "primaryQuestion": "照顧服務員在家煮飯、只把餐點加熱，或準備自製管灌飲食時，哪些屬 BA05，如何計算一組？",
+          "careContext": "長者因失能需要在案家準備適合的一餐，或依既定專業計畫製作一日份自製管灌飲食",
+          "businessItem": "居家照顧",
+          "publicNumber": 168,
+          "contentHash": "sha256:ac76c09fb1134cf88693d0328671c447751f5fae67b09f789f95735563a9fa2f"
+        },
+        {
+          "slug": "ba07-bathing-shampoo-assistance-guide",
+          "title": "BA07 協助沐浴及洗頭怎麼安排？從安全進浴室到不能重複計價",
+          "baCode": "BA07",
+          "primaryQuestion": "長輩需要協助進浴室洗澡與洗頭時，BA07 從哪一步開始，和床上擦澡、單獨洗頭怎麼分？",
+          "careContext": "長者可以或經協助可到浴間或類似場所沐浴，但在移動、穿衣、洗澡、洗頭或安全監測上需要支持",
+          "businessItem": "居家照顧",
+          "publicNumber": 169,
+          "contentHash": "sha256:70f907c58bc62b6279a22d993ad7a40b3a623e5bf21cb9903162f038e4ee947d"
+        }
+      ]
     }
   ]
 }

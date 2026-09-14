@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">BA04 協助進食或管灌餵食五步流程</title>
+  <desc id="desc">從確認核定與餐食型態、用餐前確認、依計畫協助與觀察、清潔記錄，到異常回報與調整的流程。</desc>
+  <rect width="1200" height="675" fill="#fffaf4"/>
+  <text x="70" y="90" font-family="system-ui, sans-serif" font-size="42" font-weight="700" fill="#402f25">BA04 一餐一組，重點不只「餵完」</text>
+  <text x="70" y="134" font-family="system-ui, sans-serif" font-size="23" fill="#705a4a">依核定內容與本人狀況完成協助、觀察和交班</text>
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <g transform="translate(55 205)"><rect width="190" height="245" rx="24" fill="#fff" stroke="#e66f26" stroke-width="4"/><circle cx="95" cy="64" r="34" fill="#e66f26"/><text x="95" y="74" font-size="28" font-weight="700" fill="#fff">1</text><text x="95" y="128" font-size="25" font-weight="700" fill="#402f25">確認核定</text><text x="95" y="170" font-size="20" fill="#705a4a">餐食型態</text><text x="95" y="202" font-size="20" fill="#705a4a">吞嚥與管灌計畫</text></g>
+    <path d="M253 328h34" stroke="#e66f26" stroke-width="5"/><path d="m278 316 16 12-16 12" fill="none" stroke="#e66f26" stroke-width="5"/>
+    <g transform="translate(295 205)"><rect width="190" height="245" rx="24" fill="#fff" stroke="#e66f26" stroke-width="4"/><circle cx="95" cy="64" r="34" fill="#e66f26"/><text x="95" y="74" font-size="28" font-weight="700" fill="#fff">2</text><text x="95" y="128" font-size="25" font-weight="700" fill="#402f25">餐前確認</text><text x="95" y="170" font-size="20" fill="#705a4a">意願與姿勢</text><text x="95" y="202" font-size="20" fill="#705a4a">食物溫度與用具</text></g>
+    <path d="M493 328h34" stroke="#e66f26" stroke-width="5"/><path d="m518 316 16 12-16 12" fill="none" stroke="#e66f26" stroke-width="5"/>
+    <g transform="translate(535 205)"><rect width="190" height="245" rx="24" fill="#fff" stroke="#e66f26" stroke-width="4"/><circle cx="95" cy="64" r="34" fill="#e66f26"/><text x="95" y="74" font-size="28" font-weight="700" fill="#fff">3</text><text x="95" y="128" font-size="25" font-weight="700" fill="#402f25">協助與觀察</text><text x="95" y="170" font-size="20" fill="#705a4a">保留本人參與</text><text x="95" y="202" font-size="20" fill="#705a4a">留意攝取與反應</text></g>
+    <path d="M733 328h34" stroke="#e66f26" stroke-width="5"/><path d="m758 316 16 12-16 12" fill="none" stroke="#e66f26" stroke-width="5"/>
+    <g transform="translate(775 205)"><rect width="190" height="245" rx="24" fill="#fff" stroke="#e66f26" stroke-width="4"/><circle cx="95" cy="64" r="34" fill="#e66f26"/><text x="95" y="74" font-size="28" font-weight="700" fill="#fff">4</text><text x="95" y="128" font-size="25" font-weight="700" fill="#402f25">清潔記錄</text><text x="95" y="170" font-size="20" fill="#705a4a">完成善後</text><text x="95" y="202" font-size="20" fill="#705a4a">記下攝取與反應</text></g>
+    <path d="M973 328h34" stroke="#e66f26" stroke-width="5"/><path d="m998 316 16 12-16 12" fill="none" stroke="#e66f26" stroke-width="5"/>
+    <g transform="translate(1015 205)"><rect width="150" height="245" rx="24" fill="#fff0e6" stroke="#c65316" stroke-width="4"/><circle cx="75" cy="64" r="34" fill="#c65316"/><text x="75" y="74" font-size="28" font-weight="700" fill="#fff">5</text><text x="75" y="128" font-size="24" font-weight="700" fill="#402f25">回報調整</text><text x="75" y="170" font-size="19" fill="#705a4a">異常就通知</text><text x="75" y="202" font-size="19" fill="#705a4a">需求改變就重談</text></g>
+  </g>
+  <rect x="70" y="505" width="1060" height="100" rx="20" fill="#49372d"/>
+  <text x="600" y="548" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" font-weight="700" fill="#fff">出現明顯嗆咳、呼吸困難、意識改變或管路異常</text>
+  <text x="600" y="581" text-anchor="middle" font-family="system-ui, sans-serif" font-size="21" fill="#ffe5d1">停止餵食並依照顧計畫通報；急症立即撥 119</text>
+</svg>
