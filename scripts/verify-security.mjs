@@ -365,7 +365,9 @@ function verifyApmPortalHandoff() {
   for (const expected of [
     "isSignedModule(moduleId)",
     "staticPortalGrantAllows(email, moduleId)",
-    'if (moduleId !== "apm")',
+    'profile?.source !== "finance-portal-self"',
+    'normalizeEmail(profile.email) !== email',
+    '!profile.allowedModules.includes(moduleId)',
     "await dependencies.financeLookup(email",
     "environment.APM_PORTAL_SIGNING_SECRET",
     'returnTo: normalizeApmReturnTo(payload.returnTo)',
@@ -394,10 +396,10 @@ function verifyApmPortalHandoff() {
 
   for (const expected of [
     'fetch("/api/portal-handoff", {\n    method: "GET"',
-    'profile = await findFinanceApmProfile(data.session, email)',
-    'financeApmOnly: true',
-    'if (profile?.financeApmOnly) return module.id === "apm"',
-    'modules: ["apm"]'
+    'profile = await findFinancePortalProfile(data.session, email)',
+    'financeManaged: true',
+    'if (profile?.financeManaged) return profile.modules.includes(module.id)',
+    'modules: ["accounting", "apm", "edoc"]'
   ]) {
     assert(portal.includes(expected), `Portal Finance fallback guard is missing ${expected}.`);
   }
@@ -419,7 +421,7 @@ function verifyApmPortalHandoff() {
     'url.searchParams.set("org_status", "eq.active")',
     'url.searchParams.set("org_source", `in.(${financeRosterSources.join(",")})`)',
     'const financeProjectRef = "udtlppnrugmtzhigdsxo"',
-    'allowedModules: ["apm"]',
+    'allowedModules: ["accounting", "apm", "edoc"]',
     "isConfirmedGoogleUser(data.user, email)",
     'configuration.isOpaqueSecret ? {} : { Authorization: `Bearer ${configuration.key}` }'
   ]) {
@@ -432,8 +434,9 @@ function verifyApmPortalHandoff() {
 
   run(process.execPath, ["scripts/verify-portal-finance-profile.mjs"]);
   run(process.execPath, ["scripts/verify-portal-handoff.mjs"]);
+  run(process.execPath, ["scripts/verify-portal-employee-modules.mjs"]);
 
-  log("APM/EDOC server-authorized handoff and Finance APM-only fallback are present");
+  log("APM/EDOC server-authorized handoff and Finance employee-only connected module fallback are present");
 }
 
 function verifyDist() {

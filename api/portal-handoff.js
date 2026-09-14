@@ -155,14 +155,16 @@ async function authorizeModule(moduleId, email, dependencies) {
   if (staticPortalGrantAllows(email, moduleId)) {
     return "portal-static-roster";
   }
-  if (moduleId !== "apm") {
+  // Revalidate the active Finance employee for every signed handoff. Portal
+  // profiles and browser permission overrides never authorize the destination.
+  const profile = await dependencies.financeLookup(email, dependencies.environment, dependencies.fetchImplementation);
+  if (profile?.source !== "finance-portal-self"
+    || normalizeEmail(profile.email) !== email
+    || !Array.isArray(profile.allowedModules)
+    || !profile.allowedModules.includes(moduleId)) {
     throw new SafeHttpError(403, "This account is not authorized for this module.");
   }
-
-  // Finance fallback identities are deliberately APM-only. Re-run the exact,
-  // server-side self lookup here so a caller cannot skip the Portal UI check.
-  await dependencies.financeLookup(email, dependencies.environment, dependencies.fetchImplementation);
-  return "finance-apm-self";
+  return "finance-portal-self";
 }
 
 function normalizePayload(rawPayload, user, moduleId, issuedAt, randomUUID) {

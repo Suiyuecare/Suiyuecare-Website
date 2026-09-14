@@ -119,8 +119,7 @@ const allowedProfiles = [
   ["normalized email", { ...ceo, email: "  ENTREPRENEUR@SUIYUECARE.COM  " }],
   ["roleKey fallback", { ...ceo, sourceProfileId: "", roleKey: "ceo" }],
   ["id fallback", { ...ceo, sourceProfileId: undefined, roleKey: undefined, id: "ceo" }],
-  ["source role takes precedence", { ...ceo, sourceProfileId: "ceo", roleKey: "staff", id: "staff" }],
-  ["additional metadata grants nothing beyond the same explicit module", { ...ceo, financeManaged: true }]
+  ["source role takes precedence", { ...ceo, sourceProfileId: "ceo", roleKey: "staff", id: "staff" }]
 ];
 for (const [name, profile] of allowedProfiles) {
   await test(`allow matrix: ${name}`, () => {
@@ -133,6 +132,7 @@ for (const [name, profile] of allowedProfiles) {
 }
 
 const deniedProfiles = [
+  ["Finance-managed employees cannot inherit spoofed CEO fields", { ...ceo, financeManaged: true }],
   ["null", null], ["undefined", undefined], ["empty", {}],
   ["missing email", { ...ceo, email: undefined }],
   ["other account with CEO role", { ...ceo, email: "other@example.test" }],

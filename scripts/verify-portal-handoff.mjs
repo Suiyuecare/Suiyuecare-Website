@@ -192,8 +192,8 @@ function handlerFor(user, overrides = {}) {
   assert.equal(result.headers.getHeader("vary"), "Authorization");
 }
 
-// A Finance fallback identity is revalidated server-side and can only receive
-// an APM identity assertion, never an EDOC assertion.
+// A Finance fallback identity is revalidated for both signed destinations;
+// each assertion contains identity only, never browser roles or approval scope.
 {
   const email = "homecare.tpe1@suiyuecare.com";
   const calls = [];
@@ -201,7 +201,7 @@ function handlerFor(user, overrides = {}) {
   const handler = handlerFor(user, {
     financeLookup: async (...args) => {
       calls.push(args);
-      return { email, allowedModules: ["apm"] };
+      return { source: "finance-portal-self", email, allowedModules: ["accounting", "apm", "edoc"] };
     }
   });
   const apmResult = await invoke(handler, requestFor({
@@ -227,9 +227,13 @@ function handlerFor(user, overrides = {}) {
   assert.equal(Object.hasOwn(apmPayload, "role"), false);
 
   const edocResult = await invoke(handler, requestFor({ moduleId: "edoc", email, role: "ceo" }));
-  assert.equal(edocResult.status, 403);
-  assert.equal(edocResult.body.ok, false);
-  assert.equal(calls.length, 1, "EDOC denial must not consult or inherit the APM fallback grant");
+  assert.equal(edocResult.status, 200);
+  assert.equal(calls.length, 2, "EDOC must independently revalidate the Finance employee");
+  assert.deepEqual(decodeSignedPayload(edocResult), {
+    email, iat: Math.floor(issuedAtMs / 1000), exp: Math.floor(issuedAtMs / 1000) + 600,
+    jti: fixedJti, source: "logging-portal", aud: "edoc", moduleId: "edoc",
+    authUserId: "portal-auth-user-id"
+  });
 }
 
 // Modules that do not consume signed Portal assertions cannot be requested by

@@ -27,7 +27,7 @@ const environment = {
   const staticLookup = portalSource.indexOf("let profile = findProfileByEmail(email);");
   const fallbackGuard = portalSource.indexOf("if (!profile) {", staticLookup);
   const financeLookup = portalSource.indexOf(
-    "profile = await findFinanceApmProfile(data.session, email)",
+    "profile = await findFinancePortalProfile(data.session, email)",
     fallbackGuard
   );
   assert.ok(staticLookup >= 0 && fallbackGuard > staticLookup && financeLookup > fallbackGuard);
@@ -35,8 +35,8 @@ const environment = {
     portalSource.slice(staticLookup, financeLookup).includes("if (!profile)"),
     "Finance lookup must remain a static-profile miss fallback"
   );
-  assert.ok(portalSource.includes('if (profile?.financeApmOnly) return module.id === "apm"'));
-  assert.ok(portalSource.includes('modules: ["apm"]'));
+  assert.ok(portalSource.includes('if (profile?.financeManaged) return profile.modules.includes(module.id)'));
+  assert.ok(portalSource.includes('modules: ["accounting", "apm", "edoc"]'));
 }
 
 function responseRecorder() {
@@ -137,12 +137,12 @@ function financeRow(overrides = {}) {
   assert.deepEqual(result.body, {
     ok: true,
     profile: {
-      source: "finance-apm-self",
+      source: "finance-portal-self",
       email: portalEmail,
       displayName: "尤䅍笙",
       jobTitle: "臺北居家服務課專員",
       departmentCode: "B1101",
-      allowedModules: ["apm"]
+      allowedModules: ["accounting", "apm", "edoc"]
     }
   });
   assert.equal(result.headers.getHeader("cache-control"), "no-store");
@@ -268,7 +268,7 @@ function financeRow(overrides = {}) {
     })
   ], "homecare.taipei2@suiyuecare.com");
   assert.equal(profile.email, "homecare.taipei2@suiyuecare.com");
-  assert.deepEqual(profile.allowedModules, ["apm"]);
+  assert.deepEqual(profile.allowedModules, ["accounting", "apm", "edoc"]);
 }
 
 {

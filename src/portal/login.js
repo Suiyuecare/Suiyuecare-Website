@@ -518,7 +518,7 @@ function waitForModuleLaunchLoadingPaint(moduleId) {
 // Navigation visibility only: Daycare independently verifies Google identity,
 // the executive allowlist, MFA and record permissions on its own backend.
 function canOpenDaycareEntry(profile) {
-  if (!profile || profile.financeApmOnly) return false;
+  if (!profile || profile.financeManaged || profile.financeApmOnly) return false;
   const role = profile.sourceProfileId || profile.roleKey || profile.id;
   return String(profile.email || "").trim().toLowerCase() === "entrepreneur@suiyuecare.com"
     && role === "ceo"
@@ -532,6 +532,8 @@ async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
     // Never forward Portal credentials, identity hints or caller-controlled URLs.
     return moduleLaunchUrls["day-care"];
   }
+  // Finance verifies its own Google session; this entry grants no role or scope.
+  if (moduleId === "accounting" && profile?.financeManaged) return moduleLaunchUrls.accounting;
   const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
   if (!launchUrl) return null;
   if (postHandoffModuleIds.has(moduleId)) {
@@ -2643,7 +2645,7 @@ function findProfileByEmail(email) {
   return null;
 }
 
-async function findFinanceApmProfile(session, expectedEmail) {
+async function findFinancePortalProfile(session, expectedEmail) {
   const token = session?.access_token;
   if (!token) {
     const error = new Error("Portal 登入階段已失效，請重新登入。");
@@ -2670,14 +2672,16 @@ async function findFinanceApmProfile(session, expectedEmail) {
 
   const source = result.profile;
   const email = normalizeEmail(source?.email);
-  const allowedModules = Array.isArray(source?.allowedModules) ? source.allowedModules : [];
+  const allowedModules = Array.isArray(source?.allowedModules) ? [...source.allowedModules].sort() : [];
   if (
-    source?.source !== "finance-apm-self"
+    source?.source !== "finance-portal-self"
     || email !== normalizeEmail(expectedEmail)
     || !source?.displayName
     || !source?.jobTitle
-    || allowedModules.length !== 1
-    || allowedModules[0] !== "apm"
+    || allowedModules.length !== 3
+    || allowedModules[0] !== "accounting"
+    || allowedModules[1] !== "apm"
+    || allowedModules[2] !== "edoc"
   ) {
     const error = new Error("Portal 人員資料格式無效，請聯絡系統管理員。");
     error.statusCode = 502;
@@ -2685,17 +2689,17 @@ async function findFinanceApmProfile(session, expectedEmail) {
   }
 
   return {
-    id: "finance-apm-self",
+    id: "finance-portal-self",
     label: String(source.displayName),
     title: String(source.jobTitle),
     email,
     scope: "self",
-    modules: ["apm"],
-    sourceProfileId: "finance-apm-member",
+    modules: ["accounting", "apm", "edoc"],
+    sourceProfileId: "finance-employee-member",
     accountStatus: "啟用",
     departmentCode: String(source.departmentCode || ""),
-    note: "Finance 正式人員｜僅開放敏捷專案管理系統",
-    financeApmOnly: true
+    note: "Finance 正式人員｜會計、敏捷專案管理與電子公文",
+    financeManaged: true
   };
 }
 
@@ -2815,7 +2819,7 @@ async function applyGoogleSession() {
   let profile = findProfileByEmail(email);
   if (!profile) {
     try {
-      profile = await findFinanceApmProfile(data.session, email);
+      profile = await findFinancePortalProfile(data.session, email);
     } catch (profileError) {
       clearStoredProfile();
       if (profileError.statusCode === 401) await supabase.auth.signOut();
@@ -2845,7 +2849,7 @@ function modulePermissionAllowsRole(moduleId, roleId) {
 
 function moduleIsAllowed(module, profile) {
   if (module.id === "day-care") return canOpenDaycareEntry(profile);
-  if (profile?.financeApmOnly) return module.id === "apm";
+  if (profile?.financeManaged) return profile.modules.includes(module.id);
   const profileRoleId = profile.sourceProfileId || profile.id;
   if (module.id === "general-affairs") return true;
   if (sharedGeneralAffairsModules.has(module.id)) return true;
@@ -2865,7 +2869,7 @@ function getModuleAccessState(module, profile) {
     (child) => temporarilyOpenModuleIds.has(child.id) && moduleIsAllowed(child, profile)
   );
 
-  if ((profile?.financeApmOnly || module.id === "day-care") && !allowed) {
+  if ((profile?.financeManaged || module.id === "day-care") && !allowed) {
     return {
       allowed: false,
       actionText: "此帳號無權限",
