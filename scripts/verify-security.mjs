@@ -357,7 +357,7 @@ function verifyApmPortalHandoff() {
   );
   assert(
     portal.includes('"尤䅍笙", "homecare.taipei2@suiyuecare.com"')
-      && portal.includes('"林瓊芠", "daycare.wanhua@suiyuecare.com"')
+      && portal.includes('"楊晴懿", "daycare.wanhua@suiyuecare.com"')
       && !portal.includes('[35, "林方春"'),
     "Portal current personnel labels must match the Finance active roster."
   );
