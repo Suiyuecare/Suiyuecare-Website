@@ -165,7 +165,11 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "parkinsons-orthostatic-hypotension-care",
   "ba01-basic-body-cleaning-guide",
   "ba02-basic-daily-care-guide",
-  "ba03-vital-signs-monitoring-guide"
+  "ba03-vital-signs-monitoring-guide",
+  "ba07-bathing-family-preparation",
+  "ba08-diabetes-foot-care-guide",
+  "cataract-series-1-symptoms-warning-signs",
+  "cataract-series-2-surgery-shared-decision"
 ]);
 
 const sourceNumberMap = new Map(

@@ -1695,6 +1695,26 @@
       "permanent": true
     },
     {
+      "source": "/article/ba07-bathing-family-preparation",
+      "destination": "/article/article167",
+      "permanent": true
+    },
+    {
+      "source": "/article/ba08-diabetes-foot-care-guide",
+      "destination": "/article/article168",
+      "permanent": true
+    },
+    {
+      "source": "/article/cataract-series-1-symptoms-warning-signs",
+      "destination": "/article/article169",
+      "permanent": true
+    },
+    {
+      "source": "/article/cataract-series-2-surgery-shared-decision",
+      "destination": "/article/article170",
+      "permanent": true
+    },
+    {
       "source": "/article/article43",
       "destination": "/article/article7",
       "permanent": true

@@ -3,7 +3,7 @@
   "seriesId": "ltc3-ba-code-series-v1",
   "title": "長照 3.0 BA 碼逐碼介紹",
   "timezone": "Asia/Taipei",
-  "catalogCheckedAt": "2026-09-13",
+  "catalogCheckedAt": "2026-09-15",
   "regulationRevisionDate": "2025-06-19",
   "correctionDate": "2025-10-03",
   "effectiveDates": {
@@ -25,8 +25,8 @@
     { "code": "BA03", "name": "測量生命徵象", "status": "validated", "batchId": "ltc3-ba-code-series-v1-2026-09-13", "completedOn": "2026-09-13", "slug": "ba03-vital-signs-monitoring-guide", "publicNumber": 166, "title": "BA03 測量生命徵象何時能申請？不是每次服務前量血壓都能另計", "contentHash": "sha256:3ebee60feb41c9e4eee2a2b57ce55d06492c6b983c8c3493a46cde06d8ecd035", "articlePath": "daily-articles/2026-09-13-ba.mjs", "assets": ["assets/health3/daily/2026-09-13/ba03-vital-signs-hero.jpg", "assets/health3/daily/2026-09-13/ba03-vital-signs-temperature.jpg", "assets/health3/daily/2026-09-13/ba03-vital-signs-flow.svg", "assets/health3/daily/2026-09-13/ba03-vital-signs-handover.jpg"] },
     { "code": "BA04", "name": "協助進食或管灌餵食", "status": "pending" },
     { "code": "BA05", "name": "餐食照顧", "status": "pending" },
-    { "code": "BA07", "name": "協助沐浴及洗頭", "status": "pending" },
-    { "code": "BA08", "name": "足部照護", "status": "pending" },
+    {"code":"BA07","name":"協助沐浴及洗頭","status":"approved-for-publication","batchId":"approved-drafts-2026-09-15","completedOn":"2026-09-15","slug":"ba07-bathing-family-preparation","publicNumber":167,"title":"BA07 協助沐浴及洗頭：先把洗澡前後的照顧安排好","contentHash":"sha256:a45f69fd6534c97410ffa64777747ab9be0fc1806b65e6cd4c11197cfd5394a9","articlePath":"daily-articles/2026-09-15-approved.mjs","assets":["assets/health3/daily/2026-09-15/ba07-bathing-plan.svg"]},
+    {"code":"BA08","name":"足部照護","status":"approved-for-publication","batchId":"approved-drafts-2026-09-15","completedOn":"2026-09-15","slug":"ba08-diabetes-foot-care-guide","publicNumber":168,"title":"BA08 足部照護：糖尿病長輩的雙腳，先評估再安排照顧","contentHash":"sha256:a936efcd92c080521256939b7b95ce9320b0b41e6b941c091f35c4197fc1ae9a","articlePath":"daily-articles/2026-09-15-approved.mjs","assets":["assets/health3/daily/2026-09-15/ba08-foot-care.svg"]},
     { "code": "BA09", "name": "到宅沐浴車服務—第一型", "status": "pending" },
     { "code": "BA09a", "name": "到宅沐浴車服務—第二型", "status": "pending" },
     { "code": "BA10", "name": "翻身拍背", "status": "pending" },
@@ -59,6 +59,7 @@
     { "code": "附表四之一智慧科技輔具", "reason": "2026-07-01 生效但非 BA 照顧服務碼，不加入本系列。" }
   ],
   "batches": [
+    {"batchId":"approved-drafts-2026-09-15","batchDate":"2026-09-15","codes":["BA07","BA08"],"expectedCount":2,"status":"approved-for-publication","publicationMode":"user-approved-drafts","commit":"SELF","approvalSource":"explicit-user-message","approvalRecordedAt":"2026-09-15T05:07:20.803Z","sourceProgress":"User confirmed prior coverage through BA06; BA07 and BA08 explicitly approved. No historical queue entries or publication numbers are inferred.","validation":{"sourceIntegrity":"approved Markdown prose, inline citations, reference entries and original SVG hashes preserved","verifyAll":"passed 2026-09-15; all frontend checks and approved-draft integrity verified","production":"not yet verified"}},
     {
       "batchId": "ltc3-ba-code-series-v1-2026-09-13",
       "batchDate": "2026-09-13",

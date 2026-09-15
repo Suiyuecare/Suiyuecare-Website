@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1070" viewBox="0 0 900 1070" role="img" aria-labelledby="title desc">
+<title id="title">白內障手術，門診一起做決定</title><desc id="desc">四步門診共同決策：說明生活目標、確認眼睛狀態、比較治療選項、安排支持與追蹤。暫緩手術者也要約定回診與提早求助條件。</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#63817b" stroke-width="1.5"/></marker></defs>
+<rect width="900" height="1070" fill="#f5f4ef"/>
+<g font-family="PingFang TC, Noto Sans CJK TC, Microsoft JhengHei, sans-serif" fill="#183e38">
+<text x="60" y="57" font-size="21" font-weight="700" letter-spacing="2">歲悅長照・老人疾病三集系列</text>
+<text x="60" y="113" font-size="36" font-weight="700">白內障手術，門診一起做決定</text>
+<rect x="60" y="155" width="780" height="154" rx="20" fill="#ffffff" stroke="#d5dfd9" stroke-width="2"/>
+<circle cx="104" cy="197" r="23" fill="#276554"/><text x="96" y="206" font-size="26" fill="#ffffff" font-weight="700">1</text>
+<text x="142" y="208" font-size="30" fill="#284943" font-weight="700">說明生活目標</text>
+<text x="90" y="253" font-size="25" fill="#284943" font-weight="400">哪件事看不清？換眼鏡後仍卡在哪裡？</text>
+<text x="90" y="290" font-size="25" fill="#284943" font-weight="400">例如讀藥袋、看字幕或辨認公車號碼。</text>
+<path d="M450,316 L450,338" stroke="#63817b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="60" y="343" width="780" height="154" rx="20" fill="#ffffff" stroke="#d5dfd9" stroke-width="2"/>
+<circle cx="104" cy="385" r="23" fill="#276554"/><text x="96" y="394" font-size="26" fill="#ffffff" font-weight="700">2</text>
+<text x="142" y="396" font-size="30" fill="#284943" font-weight="700">確認眼睛狀態</text>
+<text x="90" y="441" font-size="25" fill="#284943" font-weight="400">視覺問題有哪些來自白內障？</text>
+<text x="90" y="478" font-size="25" fill="#284943" font-weight="400">其他眼疾會不會限制術後改善？</text>
+<path d="M450,504 L450,526" stroke="#63817b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="60" y="531" width="780" height="154" rx="20" fill="#ffffff" stroke="#d5dfd9" stroke-width="2"/>
+<circle cx="104" cy="573" r="23" fill="#276554"/><text x="96" y="582" font-size="26" fill="#ffffff" font-weight="700">3</text>
+<text x="142" y="584" font-size="30" fill="#284943" font-weight="700">比較治療選項</text>
+<text x="90" y="629" font-size="25" fill="#284943" font-weight="400">談手術效益、風險、本人意願與晶體選擇。</text>
+<text x="90" y="666" font-size="25" fill="#284943" font-weight="400">確認術後仍可能需要眼鏡。</text>
+<path d="M450,692 L450,714" stroke="#63817b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="60" y="719" width="780" height="154" rx="20" fill="#ffffff" stroke="#d5dfd9" stroke-width="2"/>
+<circle cx="104" cy="761" r="23" fill="#276554"/><text x="96" y="770" font-size="26" fill="#ffffff" font-weight="700">4</text>
+<text x="142" y="772" font-size="30" fill="#284943" font-weight="700">安排支持與追蹤</text>
+<text x="90" y="817" font-size="25" fill="#284943" font-weight="400">問清用藥、禁食、接送、點藥與回診。</text>
+<text x="90" y="854" font-size="25" fill="#284943" font-weight="400">每項指示依實際醫療團隊安排。</text>
+<text x="60" y="944" font-size="27" fill="#9b3d22" font-weight="700">若暫緩手術，也要約定回診與求助條件。</text>
+<text x="60" y="995" font-size="23" fill="#284943" font-weight="400">定性討論流程・非手術適應症評分工具</text>
+<text x="60" y="1033" font-size="21" fill="#284943" font-weight="400">資料查核：2026-09-15｜本文提供一般衛教</text>
+</g></svg>

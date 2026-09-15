@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1080" viewBox="0 0 900 1080" role="img" aria-labelledby="title desc">
+<title id="title">視力變化，先看發生速度</title><desc id="desc">突然看不見、黑幕、飛蚊或閃光增加、劇烈眼痛或視力驟降：立即就醫，不自行駕車。逐漸模糊或眩光：安排眼科，帶生活紀錄與藥單，預先安排散瞳接送。</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#63817b" stroke-width="1.5"/></marker></defs>
+<rect width="900" height="1080" fill="#f5f4ef"/>
+<g font-family="PingFang TC, Noto Sans CJK TC, Microsoft JhengHei, sans-serif" fill="#183e38">
+<text x="60" y="57" font-size="21" font-weight="700" letter-spacing="2">歲悅長照・老人疾病三集系列</text>
+<text x="60" y="113" font-size="36" font-weight="700">視力變化，先看發生速度</text>
+<rect x="60" y="155" width="780" height="120" rx="20" fill="#e5efe9" stroke="#d5dfd9" stroke-width="2"/>
+<text x="90" y="201" font-size="29" fill="#284943" font-weight="700">先分辨：突然改變，還是逐漸困擾？</text>
+<text x="90" y="242" font-size="26" fill="#284943" font-weight="400">已知有白內障，也不能忽略新的急性症狀。</text>
+<path d="M450,280 L450,315" stroke="#63817b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="60" y="337" width="780" height="178" rx="20" fill="#fff0e9" stroke="#d97d55" stroke-width="2"/>
+<text x="90" y="382" font-size="30" fill="#9b3d22" font-weight="700">突然出現警訊 → 立即就醫</text>
+<text x="90" y="423" font-size="24" fill="#284943" font-weight="400">突然看不見、視力驟降、黑幕、飛蚊驟增或閃光</text>
+<text x="90" y="458" font-size="24" fill="#284943" font-weight="400">劇烈眼痛、紅眼合併頭痛、噁心或嘔吐</text>
+<text x="90" y="493" font-size="24" fill="#9b3d22" font-weight="700">不要自行駕車，立即就醫。</text>
+<text x="70" y="554" font-size="24" fill="#284943" font-weight="700">沒有上述急症警訊，但逐漸模糊或眩光</text>
+<rect x="60" y="579" width="780" height="133" rx="20" fill="#ffffff" stroke="#d5dfd9" stroke-width="2"/>
+<text x="90" y="624" font-size="30" fill="#284943" font-weight="700">安排眼科評估</text>
+<text x="90" y="669" font-size="26" fill="#284943" font-weight="400">不等「熟了再看」，不在家自行確定病因。</text>
+<path d="M450,717 L450,750" stroke="#63817b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="60" y="773" width="780" height="149" rx="20" fill="#ffffff" stroke="#d5dfd9" stroke-width="2"/>
+<text x="90" y="817" font-size="30" fill="#284943" font-weight="700">帶一頁紀錄，安排接送</text>
+<text x="90" y="860" font-size="25" fill="#284943" font-weight="400">何時開始・哪眼不適・生活影響・完整藥單</text>
+<text x="90" y="898" font-size="24" fill="#284943" font-weight="400">散瞳後可能模糊、怕光，預先安排返家協助。</text>
+<text x="60" y="984" font-size="26" fill="#9b3d22" font-weight="700">症狀突然改變時，改走立即就醫路徑。</text>
+<text x="60" y="1030" font-size="21" fill="#284943" font-weight="400">定性就醫流程・非診斷工具｜資料查核：2026-09-15</text>
+</g></svg>
