@@ -1,4 +1,6 @@
-/* Health articles only. Care stories and expert talks retain their own layout. */
+/* Health articles only. Care stories and expert talks retain their own layout.
+ * Restore the warm surfaces and orange accents retained in styles.css before
+ * dfe598f, while keeping the current reading layout and uncropped diagrams. */
 .article-page.article-page--health-story {
   --story-ink: var(--brown);
   --story-muted: var(--muted);
@@ -17,7 +19,9 @@
   margin: 0;
   padding: 0 0 80px;
   overflow: visible;
-  background: var(--story-paper);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(240,138,36,.12), transparent 30%),
+    linear-gradient(180deg, #fffaf2 0%, #fffdf8 52%, #f8efe4 100%);
   color: var(--story-ink);
   font-family: inherit;
   font-weight: 400;
@@ -59,6 +63,15 @@
   font-weight: 400;
 }
 
+.article-page.article-page--health-story .article-category {
+  padding: 0 16px;
+  border: 1px solid var(--story-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--story-accent);
+  font-weight: 900;
+}
+
 .article-page.article-page--health-story .article-hero {
   grid-column: content-start / content-end;
   grid-row: 3;
@@ -91,7 +104,7 @@
 .article-page.article-page--health-story .article-hero h1 {
   max-width: 100%;
   margin: 0 0 24px;
-  color: var(--story-ink);
+  color: var(--story-accent);
   font-size: var(--content-section-size, clamp(36px, 4.4vw, 64px));
   font-weight: 900;
   line-height: 1.12;
@@ -163,7 +176,13 @@
   object-fit: contain;
 }
 
-.article-page .article-system-screenshot img {
+.article-page .article-system-screenshot,
+.article-page .article-editorial-image {
+  margin: 28px 0;
+}
+
+.article-page .article-system-screenshot img,
+.article-page .article-editorial-image img {
   display: block;
   width: 100%;
   height: auto;
@@ -231,7 +250,8 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0 16px;
+  gap: 8px 10px;
+  margin-top: 8px;
 }
 
 .article-page.article-page--health-story .article-meta :is(span, time, a) {
@@ -257,13 +277,18 @@
 }
 
 .article-page.article-page--health-story .article-meta a.meta-tag:is(:hover, :focus-visible) {
-  background: transparent;
-  color: var(--story-ink);
+  background: var(--story-ink);
+  color: #fff;
   box-shadow: none;
   transform: none;
 }
 
 .article-page.article-page--health-story .article-meta a.meta-tag {
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: var(--story-orange);
+  color: var(--story-ink);
+  font-weight: 900;
   text-decoration: none;
 }
 
@@ -274,21 +299,20 @@
 
 .article-page.article-page--health-story .article-summary {
   margin: 0 0 36px;
-  padding: 26px 30px;
-  border: 0;
-  border-radius: 28px;
-  background: var(--story-soft);
-  box-shadow: none;
+  padding: 24px 26px;
+  border: 1px solid var(--story-line);
+  border-radius: 26px;
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 18px 46px rgba(83,43,11,.08);
 }
 
 .article-page.article-page--health-story .article-callout {
   margin: 28px 0 40px;
-  padding: 6px 0 6px 22px;
-  border: 0;
-  border-left: 2px solid var(--story-orange);
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
+  padding: 26px 28px;
+  border: 1px solid rgba(240,138,36,.28);
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(240,138,36,.12), rgba(255,255,255,.96));
+  box-shadow: 0 18px 48px rgba(83,43,11,.08);
 }
 
 .article-page.article-page--health-story .article-body .article-checklist {
@@ -327,7 +351,7 @@
 
 .article-page.article-page--health-story .article-body h2 {
   margin: 0 0 22px;
-  color: var(--story-ink);
+  color: var(--story-accent);
   font-size: var(--content-card-size, 27px);
   font-weight: 700;
   line-height: 1.35;
@@ -395,14 +419,15 @@
 .article-page.article-page--health-story .article-faq details p { margin: 0 0 20px; }
 
 .article-page.article-page--health-story .article-cta {
-  padding: 30px;
+  padding: 28px;
   border: 0;
-  border-radius: 16px;
-  background: var(--story-beige);
+  border-radius: 28px;
+  background: var(--story-orange);
 }
 
 .article-page.article-page--health-story .article-body .article-cta p { color: var(--story-ink); font-size: 16px; }
-.article-page.article-page--health-story .article-body .article-cta a { min-height: 52px; padding: 13px 24px; border-radius: 999px; background: var(--orange); color: #fff; font-weight: 900; text-decoration: none; }
+.article-page.article-page--health-story .article-body .article-cta a { min-height: 52px; padding: 13px 24px; border-radius: 999px; background: #fff; color: var(--story-ink); font-weight: 900; text-decoration: none; }
+.article-page.article-page--health-story .article-body .article-cta a:focus-visible { outline-color: var(--story-ink); }
 
 .article-page.article-page--health-story .article-references { margin-top: 40px; border-top: 1px solid var(--story-line); }
 .article-page.article-page--health-story .article-body .article-references li { margin: 8px 0; font-size: 16px; line-height: 1.9; }
@@ -509,7 +534,7 @@
   .article-page.article-page--health-story .article-hero .article-meta,
   .article-page.article-page--health-story .article-meta-tags { justify-content: flex-start; }
   .article-page.article-page--health-story :is(.article-summary, .article-cta) { padding: 22px; }
-  .article-page.article-page--health-story .article-callout { padding-left: 18px; }
+  .article-page.article-page--health-story .article-callout { padding: 22px; }
   .article-page.article-page--health-story .article-body { margin-top: 30px; }
   .article-page.article-page--health-story .article-body h2 { scroll-margin-top: 96px; }
   .article-page.article-page--health-story .article-editorial-note { padding: 22px 0; }

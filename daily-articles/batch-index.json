@@ -434,53 +434,157 @@
           "draftNumber": 1,
           "draftKey": "care-code:BA07",
           "sourceFile": "01-ba07.md",
-          "sourceSha256": "10b6c2cf4b8f590dd08787fdf4b7d816f9ca4ec5ccc65d1d6cd57903cfe88e2c",
-          "contentHash": "sha256:a45f69fd6534c97410ffa64777747ab9be0fc1806b65e6cd4c11197cfd5394a9",
+          "sourceSha256": "45cdca720e30dd1484735d41706a19aeceda050df31097426cff183577b9b4be",
+          "contentHash": "sha256:0e5ccdca3199d103640694ae3bb98e7d176bdbba051cdaa9810d8f8fcaf5cef0",
           "assets": [
             {
-              "path": "assets/health3/daily/2026-09-15/ba07-bathing-plan.svg",
+              "path": "/assets/health3/daily/2026-09-15/image-completion/ba07-hero.jpg",
+              "sha256": "4f9b6aea142c3d5ca4bf87d44fd96e4b83084a3a79a39b11eb1b6967c118ddff"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/ba07-bathing-plan.svg",
               "sha256": "46c967224f5f28c58d9dafbf311af5914e7d3c07adf04210a9b436359ebec22c"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/image-completion/ba07-bathroom-preparation.jpg",
+              "sha256": "1f1a0b4bbc689430bd2c7c39749666b182122bc416fd4e2370c2cec76a008f78"
             }
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "10b6c2cf4b8f590dd08787fdf4b7d816f9ca4ec5ccc65d1d6cd57903cfe88e2c",
+              "contentHash": "sha256:a45f69fd6534c97410ffa64777747ab9be0fc1806b65e6cd4c11197cfd5394a9",
+              "assets": [
+                {
+                  "path": "assets/health3/daily/2026-09-15/ba07-bathing-plan.svg",
+                  "sha256": "46c967224f5f28c58d9dafbf311af5914e7d3c07adf04210a9b436359ebec22c"
+                }
+              ]
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         },
         {
           "draftNumber": 2,
           "draftKey": "care-code:BA08",
           "sourceFile": "02-ba08.md",
-          "sourceSha256": "31e35efe3869c07d3cecb7aafd11c5094f6710633ded7345534a6bcd5afdc1f3",
-          "contentHash": "sha256:a936efcd92c080521256939b7b95ce9320b0b41e6b941c091f35c4197fc1ae9a",
+          "sourceSha256": "ab39d50fafbe23535d8067273e43c70b990d35f8683b12d4abdc9756a77c89dc",
+          "contentHash": "sha256:1497d4bb9099cf21b5aabcb26eba3dcf3f1eae19d9d94523e51109d41577c85f",
           "assets": [
             {
-              "path": "assets/health3/daily/2026-09-15/ba08-foot-care.svg",
+              "path": "/assets/health3/daily/2026-09-15/image-completion/ba08-hero.jpg",
+              "sha256": "69637bb5f77bf00e4cd96f9bf965397353cb92260ba9fe7d9cf7400658706de8"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/ba08-foot-care.svg",
               "sha256": "594f39bd15fb8d3164850595fdcaedb82dfcb20b7c498e500978a05c361e9a75"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/image-completion/ba08-daily-foot-check.jpg",
+              "sha256": "41e15e1a8eca869271045cf37c89110c16e3e5ced0f207a2944f0d4b8af669f0"
             }
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "31e35efe3869c07d3cecb7aafd11c5094f6710633ded7345534a6bcd5afdc1f3",
+              "contentHash": "sha256:a936efcd92c080521256939b7b95ce9320b0b41e6b941c091f35c4197fc1ae9a",
+              "assets": [
+                {
+                  "path": "assets/health3/daily/2026-09-15/ba08-foot-care.svg",
+                  "sha256": "594f39bd15fb8d3164850595fdcaedb82dfcb20b7c498e500978a05c361e9a75"
+                }
+              ]
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         },
         {
           "draftNumber": 3,
           "draftKey": "disease:cataract:episode-1",
           "sourceFile": "03-disease-cataract-episode-1.md",
-          "sourceSha256": "8ba705bb2eb320f37ac962e724c53ad2706bc42665e400bc25528fdfb3ef0ead",
-          "contentHash": "sha256:88a9817b4b7aa9dec1091daf5ba11e54030bbd705d0f934367f6b96025bd8994",
+          "sourceSha256": "8cc6fb98077fcd3b60f49036180f48772f1d865b668a986b7fd67a69643c4d9a",
+          "contentHash": "sha256:191ef555607ca597c7496d6d3914e9a18582aff41babba7fcd95b0aea7064080",
           "assets": [
             {
-              "path": "assets/health3/daily/2026-09-15/disease-cataract-episode-1.svg",
+              "path": "/assets/health3/daily/2026-09-15/image-completion/cataract-episode-1-hero.jpg",
+              "sha256": "79fcf2e68ba864b9a1c1d3285c83763ad8d5bba19750f28efcf784526835aec4"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/disease-cataract-episode-1.svg",
               "sha256": "6cc2ad6624954dd1b5d5cc05baa0607880c5eb28275b48c0a47ba9315aab97e2"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/image-completion/cataract-episode-1-daily-observation.jpg",
+              "sha256": "a598ef673794dae2911fb1a3a8918ec85991df57b6b31633129ef9dd578e66ec"
             }
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "8ba705bb2eb320f37ac962e724c53ad2706bc42665e400bc25528fdfb3ef0ead",
+              "contentHash": "sha256:88a9817b4b7aa9dec1091daf5ba11e54030bbd705d0f934367f6b96025bd8994",
+              "assets": [
+                {
+                  "path": "assets/health3/daily/2026-09-15/disease-cataract-episode-1.svg",
+                  "sha256": "6cc2ad6624954dd1b5d5cc05baa0607880c5eb28275b48c0a47ba9315aab97e2"
+                }
+              ]
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         },
         {
           "draftNumber": 4,
           "draftKey": "disease:cataract:episode-2",
           "sourceFile": "04-disease-cataract-episode-2.md",
-          "sourceSha256": "23ea97f71b776fe2a415497e190f8c6941a32358362feecd6420ce07435d1e57",
-          "contentHash": "sha256:5ea244b9484bf7b03264651c4ed1b97de1ba1d1c8f70e3c53569392c96a087a1",
+          "sourceSha256": "efbd317fc2c4f3e96c3de422c339d837788bbd9cffb9c25bd4f1bb5fe1ce3f21",
+          "contentHash": "sha256:44ce0b94894be53c416ba240076b84d8650a5c191a339329f61aa7f5dd3a7c8c",
           "assets": [
             {
-              "path": "assets/health3/daily/2026-09-15/disease-cataract-episode-2.svg",
+              "path": "/assets/health3/daily/2026-09-15/image-completion/cataract-episode-2-hero.jpg",
+              "sha256": "a3d117fb0700761624417ab319bd281f95702a1cdb72a0b04e34eaf057a125fe"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/disease-cataract-episode-2.svg",
               "sha256": "67f7a7358c6ff3882c2884b4997fd3a99869a86fff99a5a2708af6d51ac47ba8"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/image-completion/cataract-episode-2-visit-preparation.jpg",
+              "sha256": "24de1ec4da51fee719852122acf7cb7ac62020ae4165c784f412a6b7588caf90"
             }
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "23ea97f71b776fe2a415497e190f8c6941a32358362feecd6420ce07435d1e57",
+              "contentHash": "sha256:5ea244b9484bf7b03264651c4ed1b97de1ba1d1c8f70e3c53569392c96a087a1",
+              "assets": [
+                {
+                  "path": "assets/health3/daily/2026-09-15/disease-cataract-episode-2.svg",
+                  "sha256": "67f7a7358c6ff3882c2884b4997fd3a99869a86fff99a5a2708af6d51ac47ba8"
+                }
+              ]
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         }
       ],
       "withheldArticles": [
@@ -507,9 +611,9 @@
           "publicNumber": 167,
           "draftNumber": 1,
           "draftKey": "care-code:BA07",
-          "sourceSha256": "10b6c2cf4b8f590dd08787fdf4b7d816f9ca4ec5ccc65d1d6cd57903cfe88e2c",
-          "contentHash": "sha256:a45f69fd6534c97410ffa64777747ab9be0fc1806b65e6cd4c11197cfd5394a9",
-          "bodyTextHash": "sha256:099ddd4be4a38cd2b72d68be1c966e9d13cc48a8053a35e61fecede2dd269a38",
+          "sourceSha256": "45cdca720e30dd1484735d41706a19aeceda050df31097426cff183577b9b4be",
+          "contentHash": "sha256:0e5ccdca3199d103640694ae3bb98e7d176bdbba051cdaa9810d8f8fcaf5cef0",
+          "bodyTextHash": "sha256:db9283b2781abdb6ab5fe256b24d1d5525eb7cd7b62397ab860de08f6abfb9ad",
           "primaryQuestion": "BA07 協助沐浴及洗頭：先把洗澡前後的照顧安排好",
           "careContext": "以洗澡前後分工與家屬準備辨識服務邊界",
           "baCode": "BA07",
@@ -524,10 +628,43 @@
           ],
           "assets": [
             {
-              "path": "assets/health3/daily/2026-09-15/ba07-bathing-plan.svg",
+              "path": "/assets/health3/daily/2026-09-15/image-completion/ba07-hero.jpg",
+              "sha256": "4f9b6aea142c3d5ca4bf87d44fd96e4b83084a3a79a39b11eb1b6967c118ddff"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/ba07-bathing-plan.svg",
               "sha256": "46c967224f5f28c58d9dafbf311af5914e7d3c07adf04210a9b436359ebec22c"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/image-completion/ba07-bathroom-preparation.jpg",
+              "sha256": "1f1a0b4bbc689430bd2c7c39749666b182122bc416fd4e2370c2cec76a008f78"
             }
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "10b6c2cf4b8f590dd08787fdf4b7d816f9ca4ec5ccc65d1d6cd57903cfe88e2c",
+              "contentHash": "sha256:a45f69fd6534c97410ffa64777747ab9be0fc1806b65e6cd4c11197cfd5394a9",
+              "bodyTextHash": "sha256:099ddd4be4a38cd2b72d68be1c966e9d13cc48a8053a35e61fecede2dd269a38",
+              "assets": [
+                {
+                  "path": "assets/health3/daily/2026-09-15/ba07-bathing-plan.svg",
+                  "sha256": "46c967224f5f28c58d9dafbf311af5914e7d3c07adf04210a9b436359ebec22c"
+                }
+              ],
+              "supersededBy": {
+                "source": "explicit-user-message",
+                "recordedAt": "2026-09-15T09:07:47.223Z",
+                "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+                "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+              }
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         },
         {
           "slug": "ba08-diabetes-foot-care-guide",
@@ -536,9 +673,9 @@
           "publicNumber": 168,
           "draftNumber": 2,
           "draftKey": "care-code:BA08",
-          "sourceSha256": "31e35efe3869c07d3cecb7aafd11c5094f6710633ded7345534a6bcd5afdc1f3",
-          "contentHash": "sha256:a936efcd92c080521256939b7b95ce9320b0b41e6b941c091f35c4197fc1ae9a",
-          "bodyTextHash": "sha256:9d45a4d492e060b4c236bebdc535ea7392a2b749924ae7f08a5a3b8c9d75d783",
+          "sourceSha256": "ab39d50fafbe23535d8067273e43c70b990d35f8683b12d4abdc9756a77c89dc",
+          "contentHash": "sha256:1497d4bb9099cf21b5aabcb26eba3dcf3f1eae19d9d94523e51109d41577c85f",
+          "bodyTextHash": "sha256:9bca9186c904c0787a3dde5a9b8052a8acbf94c9df65249e061b260d3b5604c6",
           "primaryQuestion": "BA08 足部照護：糖尿病長輩的雙腳，先評估再安排照顧",
           "careContext": "115年新制資格、勘誤人員規定與日常修剪／醫療分流",
           "baCode": "BA08",
@@ -554,10 +691,43 @@
           ],
           "assets": [
             {
-              "path": "assets/health3/daily/2026-09-15/ba08-foot-care.svg",
+              "path": "/assets/health3/daily/2026-09-15/image-completion/ba08-hero.jpg",
+              "sha256": "69637bb5f77bf00e4cd96f9bf965397353cb92260ba9fe7d9cf7400658706de8"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/ba08-foot-care.svg",
               "sha256": "594f39bd15fb8d3164850595fdcaedb82dfcb20b7c498e500978a05c361e9a75"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/image-completion/ba08-daily-foot-check.jpg",
+              "sha256": "41e15e1a8eca869271045cf37c89110c16e3e5ced0f207a2944f0d4b8af669f0"
             }
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "31e35efe3869c07d3cecb7aafd11c5094f6710633ded7345534a6bcd5afdc1f3",
+              "contentHash": "sha256:a936efcd92c080521256939b7b95ce9320b0b41e6b941c091f35c4197fc1ae9a",
+              "bodyTextHash": "sha256:9d45a4d492e060b4c236bebdc535ea7392a2b749924ae7f08a5a3b8c9d75d783",
+              "assets": [
+                {
+                  "path": "assets/health3/daily/2026-09-15/ba08-foot-care.svg",
+                  "sha256": "594f39bd15fb8d3164850595fdcaedb82dfcb20b7c498e500978a05c361e9a75"
+                }
+              ],
+              "supersededBy": {
+                "source": "explicit-user-message",
+                "recordedAt": "2026-09-15T09:07:47.223Z",
+                "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+                "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+              }
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         },
         {
           "slug": "cataract-series-1-symptoms-warning-signs",
@@ -566,9 +736,9 @@
           "publicNumber": 169,
           "draftNumber": 3,
           "draftKey": "disease:cataract:episode-1",
-          "sourceSha256": "8ba705bb2eb320f37ac962e724c53ad2706bc42665e400bc25528fdfb3ef0ead",
-          "contentHash": "sha256:88a9817b4b7aa9dec1091daf5ba11e54030bbd705d0f934367f6b96025bd8994",
-          "bodyTextHash": "sha256:d0289bfe1bcda3cde0d032eb37991a59fe16fc05364287822f25fc72ca83fd75",
+          "sourceSha256": "8cc6fb98077fcd3b60f49036180f48772f1d865b668a986b7fd67a69643c4d9a",
+          "contentHash": "sha256:191ef555607ca597c7496d6d3914e9a18582aff41babba7fcd95b0aea7064080",
+          "bodyTextHash": "sha256:215361a3d5896526ec4a020ef9f52fe8950381e1795bfc237d016dad07ad79be",
           "primaryQuestion": "白內障第 1 集｜長輩看東西霧霧的：認識症狀，分清不能等的警訊",
           "careContext": "從漸進視覺變化辨認白內障與需立即就醫的眼科警訊",
           "diseaseTopic": "白內障",
@@ -585,10 +755,43 @@
           ],
           "assets": [
             {
-              "path": "assets/health3/daily/2026-09-15/disease-cataract-episode-1.svg",
+              "path": "/assets/health3/daily/2026-09-15/image-completion/cataract-episode-1-hero.jpg",
+              "sha256": "79fcf2e68ba864b9a1c1d3285c83763ad8d5bba19750f28efcf784526835aec4"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/disease-cataract-episode-1.svg",
               "sha256": "6cc2ad6624954dd1b5d5cc05baa0607880c5eb28275b48c0a47ba9315aab97e2"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/image-completion/cataract-episode-1-daily-observation.jpg",
+              "sha256": "a598ef673794dae2911fb1a3a8918ec85991df57b6b31633129ef9dd578e66ec"
             }
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "8ba705bb2eb320f37ac962e724c53ad2706bc42665e400bc25528fdfb3ef0ead",
+              "contentHash": "sha256:88a9817b4b7aa9dec1091daf5ba11e54030bbd705d0f934367f6b96025bd8994",
+              "bodyTextHash": "sha256:d0289bfe1bcda3cde0d032eb37991a59fe16fc05364287822f25fc72ca83fd75",
+              "assets": [
+                {
+                  "path": "assets/health3/daily/2026-09-15/disease-cataract-episode-1.svg",
+                  "sha256": "6cc2ad6624954dd1b5d5cc05baa0607880c5eb28275b48c0a47ba9315aab97e2"
+                }
+              ],
+              "supersededBy": {
+                "source": "explicit-user-message",
+                "recordedAt": "2026-09-15T09:07:47.223Z",
+                "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+                "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+              }
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         },
         {
           "slug": "cataract-series-2-surgery-shared-decision",
@@ -597,9 +800,9 @@
           "publicNumber": 170,
           "draftNumber": 4,
           "draftKey": "disease:cataract:episode-2",
-          "sourceSha256": "23ea97f71b776fe2a415497e190f8c6941a32358362feecd6420ce07435d1e57",
-          "contentHash": "sha256:5ea244b9484bf7b03264651c4ed1b97de1ba1d1c8f70e3c53569392c96a087a1",
-          "bodyTextHash": "sha256:d4c3df1063c94c38aa28ecee237109849db16681e454bbe688fa1ccca4f97a99",
+          "sourceSha256": "efbd317fc2c4f3e96c3de422c339d837788bbd9cffb9c25bd4f1bb5fe1ce3f21",
+          "contentHash": "sha256:44ce0b94894be53c416ba240076b84d8650a5c191a339329f61aa7f5dd3a7c8c",
+          "bodyTextHash": "sha256:3ee5bab55252a9bb46a5ca707cc07db6d9b247349cabc985a2040ca1a55d0238",
           "primaryQuestion": "白內障第 2 集｜什麼時候考慮手術？從生活需求到門診決策",
           "careContext": "由生活影響決定是否評估手術，解釋治療、人工晶體與門診共同決策",
           "diseaseTopic": "白內障",
@@ -616,12 +819,51 @@
           ],
           "assets": [
             {
-              "path": "assets/health3/daily/2026-09-15/disease-cataract-episode-2.svg",
+              "path": "/assets/health3/daily/2026-09-15/image-completion/cataract-episode-2-hero.jpg",
+              "sha256": "a3d117fb0700761624417ab319bd281f95702a1cdb72a0b04e34eaf057a125fe"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/disease-cataract-episode-2.svg",
               "sha256": "67f7a7358c6ff3882c2884b4997fd3a99869a86fff99a5a2708af6d51ac47ba8"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/image-completion/cataract-episode-2-visit-preparation.jpg",
+              "sha256": "24de1ec4da51fee719852122acf7cb7ac62020ae4165c784f412a6b7588caf90"
             }
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "23ea97f71b776fe2a415497e190f8c6941a32358362feecd6420ce07435d1e57",
+              "contentHash": "sha256:5ea244b9484bf7b03264651c4ed1b97de1ba1d1c8f70e3c53569392c96a087a1",
+              "bodyTextHash": "sha256:d4c3df1063c94c38aa28ecee237109849db16681e454bbe688fa1ccca4f97a99",
+              "assets": [
+                {
+                  "path": "assets/health3/daily/2026-09-15/disease-cataract-episode-2.svg",
+                  "sha256": "67f7a7358c6ff3882c2884b4997fd3a99869a86fff99a5a2708af6d51ac47ba8"
+                }
+              ],
+              "supersededBy": {
+                "source": "explicit-user-message",
+                "recordedAt": "2026-09-15T09:07:47.223Z",
+                "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+                "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+              }
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         }
-      ]
+      ],
+      "imageRevisionApproval": {
+        "source": "explicit-user-message",
+        "recordedAt": "2026-09-15T09:07:47.223Z",
+        "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+        "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+      }
     },
     {
       "date": "2026-09-15",
@@ -648,8 +890,8 @@
           "draftNumber": 5,
           "draftKey": "service/software/integrated-ltc-erp-overview/v2",
           "sourceFile": "05-service-software-first-consultation.md",
-          "sourceSha256": "66387f66c9882f11100d7eb84cb4d13ef2f30e6192b4d95a271fb24345dd5236",
-          "contentHash": "sha256:169b1b54cdf1a1d5442c2cd8943cf2e6cf0e4e4489d79a9c1bf5dc7210c36d44",
+          "sourceSha256": "83f74b4d64a155a2248dbf56b94c3718755614b2693ab8a3b01909396189f792",
+          "contentHash": "sha256:154b88661eb18a6997a43f1b0778f8b49f67f66259b7a5eab367c4a2017366b4",
           "assets": [
             {
               "path": "/assets/health3/daily/2026-09-15/system-screenshots/portal-workspaces-1440.png",
@@ -658,15 +900,41 @@
             {
               "path": "/assets/health3/daily/2026-09-15/system-screenshots/finance-request-list.png",
               "sha256": "fd9870489bdebd2e99777904008d202b1f533c25ee5e9fbfdae65730302bfda0"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/finance-approval-flow.png",
+              "sha256": "426f1427b395e96984e76d9fd2bbbdd28ae55c3d68b0a637ef6a4883295a8b1b"
             }
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "66387f66c9882f11100d7eb84cb4d13ef2f30e6192b4d95a271fb24345dd5236",
+              "contentHash": "sha256:169b1b54cdf1a1d5442c2cd8943cf2e6cf0e4e4489d79a9c1bf5dc7210c36d44",
+              "assets": [
+                {
+                  "path": "/assets/health3/daily/2026-09-15/system-screenshots/portal-workspaces-1440.png",
+                  "sha256": "b7fd9cbe9956168a402dde4c1a02841eec23ae0d46b6e8755db9aa48fe90b3c3"
+                },
+                {
+                  "path": "/assets/health3/daily/2026-09-15/system-screenshots/finance-request-list.png",
+                  "sha256": "fd9870489bdebd2e99777904008d202b1f533c25ee5e9fbfdae65730302bfda0"
+                }
+              ]
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         },
         {
           "draftNumber": 6,
           "draftKey": "service/software/integrated-ltc-erp-workday-handover/v2",
           "sourceFile": "06-service-quality-material-version.md",
-          "sourceSha256": "88114cb77f71b9992aaf426f9dfd3998841ee40347af1a25453275e3072dbd31",
-          "contentHash": "sha256:a9860f6c078d310c13e4a99cac3305c60ff60a1e1479fa3de823b0eed153db23",
+          "sourceSha256": "3666db0a8c3773354a0cd1036e541c59babec2e7a232bb34bc14500e9c9ff573",
+          "contentHash": "sha256:dde0136563975c662e3258574de0575e2165789403d1a41726c039d309cb9484",
           "assets": [
             {
               "path": "/assets/health3/daily/2026-09-15/system-screenshots/apm-projects-demo.png",
@@ -675,8 +943,34 @@
             {
               "path": "/assets/health3/daily/2026-09-15/system-screenshots/edoc-compose.png",
               "sha256": "ce6ea6200176144bf4c66a61f632bb277040c8f0d1c2f42930061f0366d69e80"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/apm-dashboard-demo.png",
+              "sha256": "84c08a9b74e8fac5ad10640b3caf7a95587d00b90675df7f0fb3f7450a4478d1"
             }
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "88114cb77f71b9992aaf426f9dfd3998841ee40347af1a25453275e3072dbd31",
+              "contentHash": "sha256:a9860f6c078d310c13e4a99cac3305c60ff60a1e1479fa3de823b0eed153db23",
+              "assets": [
+                {
+                  "path": "/assets/health3/daily/2026-09-15/system-screenshots/apm-projects-demo.png",
+                  "sha256": "921e1fa0d7af2c987f823209b26d2fa16ff60339fcee9a9c2ae4c6082abe994d"
+                },
+                {
+                  "path": "/assets/health3/daily/2026-09-15/system-screenshots/edoc-compose.png",
+                  "sha256": "ce6ea6200176144bf4c66a61f632bb277040c8f0d1c2f42930061f0366d69e80"
+                }
+              ]
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         }
       ],
       "withheldArticles": [],
@@ -689,8 +983,8 @@
           "draftNumber": 5,
           "draftKey": "service/software/integrated-ltc-erp-overview/v2",
           "sourceFile": "05-service-software-first-consultation.md",
-          "sourceSha256": "66387f66c9882f11100d7eb84cb4d13ef2f30e6192b4d95a271fb24345dd5236",
-          "contentHash": "sha256:169b1b54cdf1a1d5442c2cd8943cf2e6cf0e4e4489d79a9c1bf5dc7210c36d44",
+          "sourceSha256": "83f74b4d64a155a2248dbf56b94c3718755614b2693ab8a3b01909396189f792",
+          "contentHash": "sha256:154b88661eb18a6997a43f1b0778f8b49f67f66259b7a5eab367c4a2017366b4",
           "assets": [
             {
               "path": "/assets/health3/daily/2026-09-15/system-screenshots/portal-workspaces-1440.png",
@@ -699,15 +993,48 @@
             {
               "path": "/assets/health3/daily/2026-09-15/system-screenshots/finance-request-list.png",
               "sha256": "fd9870489bdebd2e99777904008d202b1f533c25ee5e9fbfdae65730302bfda0"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/finance-approval-flow.png",
+              "sha256": "426f1427b395e96984e76d9fd2bbbdd28ae55c3d68b0a637ef6a4883295a8b1b"
             }
           ],
-          "bodyTextHash": "sha256:6dbdb429c7695845fb997ab17b7cec9d9743c8bf8502154b009ee0f1ad8cde26",
+          "bodyTextHash": "sha256:5095221d4ff0642f468d2362bbe8372ae4bfeb152e39773e78710f6bdc45fabd",
           "primaryQuestion": "歲悅長照 ERP：讓第一線照顧與行政，回到同一套系統",
           "careContext": "產品整體介紹：第一線日常照顧與會計、人資、公文、專案、PDF、居家及日照業務在同一 ERP 體系，減少分散工具間的工作負擔。",
           "referenceUrls": [
             "https://www.suiyuecare.com/software",
             "https://www.suiyuecare.com/"
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "66387f66c9882f11100d7eb84cb4d13ef2f30e6192b4d95a271fb24345dd5236",
+              "contentHash": "sha256:169b1b54cdf1a1d5442c2cd8943cf2e6cf0e4e4489d79a9c1bf5dc7210c36d44",
+              "bodyTextHash": "sha256:6dbdb429c7695845fb997ab17b7cec9d9743c8bf8502154b009ee0f1ad8cde26",
+              "assets": [
+                {
+                  "path": "/assets/health3/daily/2026-09-15/system-screenshots/portal-workspaces-1440.png",
+                  "sha256": "b7fd9cbe9956168a402dde4c1a02841eec23ae0d46b6e8755db9aa48fe90b3c3"
+                },
+                {
+                  "path": "/assets/health3/daily/2026-09-15/system-screenshots/finance-request-list.png",
+                  "sha256": "fd9870489bdebd2e99777904008d202b1f533c25ee5e9fbfdae65730302bfda0"
+                }
+              ],
+              "supersededBy": {
+                "source": "explicit-user-message",
+                "recordedAt": "2026-09-15T09:07:47.223Z",
+                "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+                "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+              }
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         },
         {
           "slug": "suiyue-ltc-erp-workday-handover",
@@ -717,8 +1044,8 @@
           "draftNumber": 6,
           "draftKey": "service/software/integrated-ltc-erp-workday-handover/v2",
           "sourceFile": "06-service-quality-material-version.md",
-          "sourceSha256": "88114cb77f71b9992aaf426f9dfd3998841ee40347af1a25453275e3072dbd31",
-          "contentHash": "sha256:a9860f6c078d310c13e4a99cac3305c60ff60a1e1479fa3de823b0eed153db23",
+          "sourceSha256": "3666db0a8c3773354a0cd1036e541c59babec2e7a232bb34bc14500e9c9ff573",
+          "contentHash": "sha256:dde0136563975c662e3258574de0575e2165789403d1a41726c039d309cb9484",
           "assets": [
             {
               "path": "/assets/health3/daily/2026-09-15/system-screenshots/apm-projects-demo.png",
@@ -727,17 +1054,56 @@
             {
               "path": "/assets/health3/daily/2026-09-15/system-screenshots/edoc-compose.png",
               "sha256": "ce6ea6200176144bf4c66a61f632bb277040c8f0d1c2f42930061f0366d69e80"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/apm-dashboard-demo.png",
+              "sha256": "84c08a9b74e8fac5ad10640b3caf7a95587d00b90675df7f0fb3f7450a4478d1"
             }
           ],
-          "bodyTextHash": "sha256:e0c61f31c178d57fe5a8b69099bd734de6aecd48f5e0c957388a91c793767b50",
+          "bodyTextHash": "sha256:6140d90f00c7199b5b1261661c5e5318925de61474ce9bdf74fbcad11e02cb9e",
           "primaryQuestion": "從照顧現場到後勤支援：歲悅長照 ERP 接起一天的工作",
           "careContext": "依常見工作日與角色交接，介紹第一線、督導、行政、主管如何透過業務及後勤模組接續處理工作。",
           "referenceUrls": [
             "https://www.suiyuecare.com/software",
             "https://www.suiyuecare.com/"
-          ]
+          ],
+          "revisionHistory": [
+            {
+              "sourceSha256": "88114cb77f71b9992aaf426f9dfd3998841ee40347af1a25453275e3072dbd31",
+              "contentHash": "sha256:a9860f6c078d310c13e4a99cac3305c60ff60a1e1479fa3de823b0eed153db23",
+              "bodyTextHash": "sha256:e0c61f31c178d57fe5a8b69099bd734de6aecd48f5e0c957388a91c793767b50",
+              "assets": [
+                {
+                  "path": "/assets/health3/daily/2026-09-15/system-screenshots/apm-projects-demo.png",
+                  "sha256": "921e1fa0d7af2c987f823209b26d2fa16ff60339fcee9a9c2ae4c6082abe994d"
+                },
+                {
+                  "path": "/assets/health3/daily/2026-09-15/system-screenshots/edoc-compose.png",
+                  "sha256": "ce6ea6200176144bf4c66a61f632bb277040c8f0d1c2f42930061f0366d69e80"
+                }
+              ],
+              "supersededBy": {
+                "source": "explicit-user-message",
+                "recordedAt": "2026-09-15T09:07:47.223Z",
+                "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+                "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+              }
+            }
+          ],
+          "revisionApproval": {
+            "source": "explicit-user-message",
+            "recordedAt": "2026-09-15T09:07:47.223Z",
+            "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+            "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+          }
         }
-      ]
+      ],
+      "imageRevisionApproval": {
+        "source": "explicit-user-message",
+        "recordedAt": "2026-09-15T09:07:47.223Z",
+        "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
+        "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
+      }
     }
   ]
 }
