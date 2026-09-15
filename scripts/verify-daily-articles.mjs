@@ -65,6 +65,86 @@ function verifyAsset(assetPath, label, approvedDraft = false) {
   }
 }
 
+function hasImageDescription(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function verifyImageSet(hero, bodyImages, label, fingerprint) {
+  assert(/\.(?:jpe?g|png|webp|avif)(?:[?#]|$)/i.test(hero || ""), `${label} needs a raster cover image for the article list`);
+  assert(bodyImages.length >= 2, `${label} needs at least two inline images in addition to the cover`);
+  assert(bodyImages.every(image => image.src && hasImageDescription(image.alt) && hasImageDescription(image.caption)), `${label} inline image descriptions are incomplete`);
+  const heroHash = fingerprint(hero);
+  const inlineHashes = new Set(bodyImages.map(image => fingerprint(image.src)).filter(hash => hash !== heroHash));
+  assert(inlineHashes.size >= 2, `${label} needs two distinct inline images; duplicate files and the cover do not count`);
+}
+
+function renderedArticleBodyImages(article) {
+  // Match renderPublicArticleLayout: inlineImages are inserted only into array
+  // sections whose index equals Number(afterSection). String bodies own their HTML.
+  if (Array.isArray(article.content)) {
+    return (article.inlineImages || []).filter(image => article.content.some((_, index) => Number(image.afterSection) === index));
+  }
+  if (typeof article.content === "string") {
+    const { document } = parseHTML(`<html><body>${article.content}</body></html>`);
+    return [...document.querySelectorAll("img")].map(image => ({
+      src: image.getAttribute("src"),
+      alt: image.getAttribute("alt"),
+      caption: image.closest("figure")?.querySelector("figcaption")?.textContent?.trim()
+    }));
+  }
+  return [];
+}
+
+function verifyArticleImageCompleteness(article, fingerprint = asset => {
+  const filename = path.join(rootDir, localAsset(asset));
+  assert(fs.existsSync(filename), `${article.slug} image is missing: ${asset}`);
+  return crypto.createHash("sha256").update(fs.readFileSync(filename)).digest("hex");
+}) {
+  assert(hasImageDescription(article.imageAlt) && hasImageDescription(article.imageCaption), `${article.slug} cover alt or caption is missing`);
+  verifyImageSet(article.image, renderedArticleBodyImages(article), article.slug, fingerprint);
+}
+
+function selfTestImageCompleteness() {
+  const image = src => ({ src, alt: "Illustration", caption: "Caption" });
+  const fingerprint = src => src.replace(/^\//, "").replace("renamed-cover.jpg", "cover.jpg").replace("duplicate-one.jpg", "one.jpg");
+  verifyImageSet("cover.jpg", [image("one.jpg"), image("two.svg")], "complete image set", fingerprint);
+  for (const [hero, inlines] of [
+    ["cover.svg", [image("one.jpg"), image("two.jpg")]],
+    ["cover.jpg", [image("one.jpg")]],
+    ["cover.jpg", [image("one.jpg"), image("duplicate-one.jpg")]],
+    ["cover.jpg", [image("renamed-cover.jpg"), image("one.jpg")]],
+    ["cover.jpg", [image("one.jpg"), { ...image("two.jpg"), alt: "" }]],
+    ["cover.jpg", [image("one.jpg"), { ...image("two.jpg"), caption: "" }]],
+    ["cover.jpg", [image("one.jpg"), { ...image("two.jpg"), alt: "  \t" }]],
+    ["cover.jpg", [image("one.jpg"), { ...image("two.jpg"), caption: "\n " }]]
+  ]) {
+    let rejected = false;
+    try { verifyImageSet(hero, inlines, "incomplete image fixture", fingerprint); } catch { rejected = true; }
+    assert(rejected, "Incomplete or duplicated article images must be rejected");
+  }
+
+  const fixture = {
+    slug: "rendered-image-fixture", image: "cover.jpg", imageAlt: "Cover", imageCaption: "Cover caption",
+    content: [["First", ["Text"]], ["Second", ["Text"]]],
+    inlineImages: [{ ...image("one.jpg"), afterSection: 0 }, { ...image("two.svg"), afterSection: 1 }]
+  };
+  const figure = src => `<figure><img src="${src}" alt="Illustration"><figcaption>Caption</figcaption></figure>`;
+  verifyArticleImageCompleteness(fixture, fingerprint);
+  verifyArticleImageCompleteness({ ...fixture, content: figure("one.jpg") + figure("two.svg"), inlineImages: [] }, fingerprint);
+  for (const invalid of [
+    { ...fixture, content: "<p>Metadata images are not rendered in a string body.</p>" },
+    { ...fixture, content: figure("one.jpg") },
+    { ...fixture, inlineImages: fixture.inlineImages.map(item => ({ ...item, afterSection: 999 })) },
+    { ...fixture, inlineImages: [fixture.inlineImages[0], { ...fixture.inlineImages[1], afterSection: -1 }] },
+    { ...fixture, imageAlt: " \t" },
+    { ...fixture, imageCaption: "\n " }
+  ]) {
+    let rejected = false;
+    try { verifyArticleImageCompleteness(invalid, fingerprint); } catch { rejected = true; }
+    assert(rejected, "Unrendered body images or blank cover descriptions must be rejected");
+  }
+}
+
 // Approval metadata preserves the reviewed batch. It does not grant publishing
 // permission; explicit user approval is recorded before these entries are made.
 function verifyApprovedBatch(batch) {
@@ -107,7 +187,7 @@ function verifyApprovedArticle(article, entry) {
   assert(article.relatedSlugs?.length === 3 && article.relatedSlugs.every(slug => indexedSlugs.has(slug)), `${entry.slug} related articles invalid`);
   assert(article.references?.length >= 2 && article.references.every(ref => /^https:\/\//.test(ref.url) && ref.citation && Number.isFinite(ref.evidenceRank)), `${entry.slug} source references incomplete`);
   assert(JSON.stringify(article.references.map(ref => ref.url)) === JSON.stringify(entry.referenceUrls), `${entry.slug} references differ from reviewed manifest`);
-  assert(article.imageAlt && article.imageCaption, `${entry.slug} illustration description is missing`);
+  assert(hasImageDescription(article.imageAlt) && hasImageDescription(article.imageCaption), `${entry.slug} illustration description is missing`);
   const usedAssets = new Set([article.image, ...[...document.querySelectorAll("img")].map(img => img.getAttribute("src")), ...article.inlineImages.map(img => img.src)]);
   assert(entry.assets.length === usedAssets.size && entry.assets.every(asset => usedAssets.has(asset.path)), `${entry.slug} unapproved or missing illustration`);
   for (const asset of entry.assets) {
@@ -181,6 +261,7 @@ function selfTestBaBatchRules() {
 
 selfTestBaBatchRules();
 selfTestApprovedBatchRules();
+selfTestImageCompleteness();
 
 const indexedSlugs = new Set(ARTICLE_SOURCE_SLUGS);
 const articleBySlug = new Map(dailyArticles.map((article) => [article.slug, article]));
@@ -277,6 +358,7 @@ batchIndex.batches.forEach((batch) => {
     assert(!allTitles.has(titleKey), `Duplicate normalized title: ${article.title}`);
     allTitles.add(titleKey);
     assert(/^[a-z0-9]+(?:-[a-z0-9]+)+$/.test(article.slug), `Invalid slug: ${article.slug}`);
+    verifyArticleImageCompleteness(article);
     if (isApprovedDraft) {
       verifyApprovedArticle(article, entry);
       return;
@@ -324,13 +406,13 @@ batchIndex.batches.forEach((batch) => {
       if (reference.pmid) assert(/^\d{7,9}$/.test(reference.pmid), `Invalid PMID: ${reference.pmid}`);
       if (reference.doi) assert(/^10\.\d{4,9}\//.test(reference.doi), `Invalid DOI: ${reference.doi}`);
     });
-    assert(article.imageAlt && article.imageCaption, `Hero alt or caption missing: ${entry.slug}`);
+    assert(hasImageDescription(article.imageAlt) && hasImageDescription(article.imageCaption), `Hero alt or caption missing: ${entry.slug}`);
     verifyAsset(article.image, `${entry.slug} hero`);
     const rasters = article.inlineImages.filter((item) => !item.src.endsWith(".svg"));
     const charts = article.inlineImages.filter((item) => item.src.endsWith(".svg"));
     assert(article.inlineImages.length >= 3 && rasters.length >= 2 && charts.length === 1, `Inline image mix invalid: ${entry.slug}`);
     article.inlineImages.forEach((image, index) => {
-      assert(image.alt && image.caption, `Inline image alt or caption missing: ${entry.slug} #${index + 1}`);
+      assert(hasImageDescription(image.alt) && hasImageDescription(image.caption), `Inline image alt or caption missing: ${entry.slug} #${index + 1}`);
       verifyAsset(image.src, `${entry.slug} inline #${index + 1}`);
     });
   });
