@@ -157,6 +157,20 @@
   object-fit: contain;
 }
 
+/* Preserve the full application interface in approved product screenshots. */
+.article-page.article-page--health-story .article-hero img[src*="/system-screenshots/"] {
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
+.article-page .article-system-screenshot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
 .article-page.article-page--health-story .article-hero figcaption {
   position: static;
   width: auto;

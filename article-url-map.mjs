@@ -169,7 +169,9 @@ export const ARTICLE_SOURCE_SLUGS = Object.freeze([
   "ba07-bathing-family-preparation",
   "ba08-diabetes-foot-care-guide",
   "cataract-series-1-symptoms-warning-signs",
-  "cataract-series-2-surgery-shared-decision"
+  "cataract-series-2-surgery-shared-decision",
+  "suiyue-ltc-erp-integrated-modules",
+  "suiyue-ltc-erp-workday-handover"
 ]);
 
 const sourceNumberMap = new Map(
