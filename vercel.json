@@ -1715,6 +1715,16 @@
       "permanent": true
     },
     {
+      "source": "/article/suiyue-ltc-erp-integrated-modules",
+      "destination": "/article/article171",
+      "permanent": true
+    },
+    {
+      "source": "/article/suiyue-ltc-erp-workday-handover",
+      "destination": "/article/article172",
+      "permanent": true
+    },
+    {
       "source": "/article/article43",
       "destination": "/article/article7",
       "permanent": true

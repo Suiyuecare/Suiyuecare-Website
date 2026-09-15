@@ -622,6 +622,122 @@
           ]
         }
       ]
+    },
+    {
+      "date": "2026-09-15",
+      "displayDate": "2026.09.15",
+      "commit": "SELF",
+      "publicationMode": "user-approved-drafts",
+      "batchId": "approved-erp-drafts-2026-09-15",
+      "catalogCheckedAt": "2026-09-15",
+      "expectedCount": 2,
+      "approval": {
+        "source": "explicit-user-message",
+        "recordedAt": "2026-09-15T05:54:11.234Z",
+        "message": "好～推到前台",
+        "approvedDraftOrdinals": [
+          5,
+          6
+        ],
+        "pendingDraftOrdinals": [
+          7
+        ]
+      },
+      "approvedDrafts": [
+        {
+          "draftNumber": 5,
+          "draftKey": "service/software/integrated-ltc-erp-overview/v2",
+          "sourceFile": "05-service-software-first-consultation.md",
+          "sourceSha256": "66387f66c9882f11100d7eb84cb4d13ef2f30e6192b4d95a271fb24345dd5236",
+          "contentHash": "sha256:169b1b54cdf1a1d5442c2cd8943cf2e6cf0e4e4489d79a9c1bf5dc7210c36d44",
+          "assets": [
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/portal-workspaces-1440.png",
+              "sha256": "b7fd9cbe9956168a402dde4c1a02841eec23ae0d46b6e8755db9aa48fe90b3c3"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/finance-request-list.png",
+              "sha256": "fd9870489bdebd2e99777904008d202b1f533c25ee5e9fbfdae65730302bfda0"
+            }
+          ]
+        },
+        {
+          "draftNumber": 6,
+          "draftKey": "service/software/integrated-ltc-erp-workday-handover/v2",
+          "sourceFile": "06-service-quality-material-version.md",
+          "sourceSha256": "88114cb77f71b9992aaf426f9dfd3998841ee40347af1a25453275e3072dbd31",
+          "contentHash": "sha256:a9860f6c078d310c13e4a99cac3305c60ff60a1e1479fa3de823b0eed153db23",
+          "assets": [
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/apm-projects-demo.png",
+              "sha256": "921e1fa0d7af2c987f823209b26d2fa16ff60339fcee9a9c2ae4c6082abe994d"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/edoc-compose.png",
+              "sha256": "ce6ea6200176144bf4c66a61f632bb277040c8f0d1c2f42930061f0366d69e80"
+            }
+          ]
+        }
+      ],
+      "withheldArticles": [],
+      "articles": [
+        {
+          "slug": "suiyue-ltc-erp-integrated-modules",
+          "title": "歲悅長照 ERP：讓第一線照顧與行政，回到同一套系統",
+          "businessItem": "軟體系統",
+          "publicNumber": 171,
+          "draftNumber": 5,
+          "draftKey": "service/software/integrated-ltc-erp-overview/v2",
+          "sourceFile": "05-service-software-first-consultation.md",
+          "sourceSha256": "66387f66c9882f11100d7eb84cb4d13ef2f30e6192b4d95a271fb24345dd5236",
+          "contentHash": "sha256:169b1b54cdf1a1d5442c2cd8943cf2e6cf0e4e4489d79a9c1bf5dc7210c36d44",
+          "assets": [
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/portal-workspaces-1440.png",
+              "sha256": "b7fd9cbe9956168a402dde4c1a02841eec23ae0d46b6e8755db9aa48fe90b3c3"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/finance-request-list.png",
+              "sha256": "fd9870489bdebd2e99777904008d202b1f533c25ee5e9fbfdae65730302bfda0"
+            }
+          ],
+          "bodyTextHash": "sha256:6dbdb429c7695845fb997ab17b7cec9d9743c8bf8502154b009ee0f1ad8cde26",
+          "primaryQuestion": "歲悅長照 ERP：讓第一線照顧與行政，回到同一套系統",
+          "careContext": "產品整體介紹：第一線日常照顧與會計、人資、公文、專案、PDF、居家及日照業務在同一 ERP 體系，減少分散工具間的工作負擔。",
+          "referenceUrls": [
+            "https://www.suiyuecare.com/software",
+            "https://www.suiyuecare.com/"
+          ]
+        },
+        {
+          "slug": "suiyue-ltc-erp-workday-handover",
+          "title": "從照顧現場到後勤支援：歲悅長照 ERP 接起一天的工作",
+          "businessItem": "軟體系統",
+          "publicNumber": 172,
+          "draftNumber": 6,
+          "draftKey": "service/software/integrated-ltc-erp-workday-handover/v2",
+          "sourceFile": "06-service-quality-material-version.md",
+          "sourceSha256": "88114cb77f71b9992aaf426f9dfd3998841ee40347af1a25453275e3072dbd31",
+          "contentHash": "sha256:a9860f6c078d310c13e4a99cac3305c60ff60a1e1479fa3de823b0eed153db23",
+          "assets": [
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/apm-projects-demo.png",
+              "sha256": "921e1fa0d7af2c987f823209b26d2fa16ff60339fcee9a9c2ae4c6082abe994d"
+            },
+            {
+              "path": "/assets/health3/daily/2026-09-15/system-screenshots/edoc-compose.png",
+              "sha256": "ce6ea6200176144bf4c66a61f632bb277040c8f0d1c2f42930061f0366d69e80"
+            }
+          ],
+          "bodyTextHash": "sha256:e0c61f31c178d57fe5a8b69099bd734de6aecd48f5e0c957388a91c793767b50",
+          "primaryQuestion": "從照顧現場到後勤支援：歲悅長照 ERP 接起一天的工作",
+          "careContext": "依常見工作日與角色交接，介紹第一線、督導、行政、主管如何透過業務及後勤模組接續處理工作。",
+          "referenceUrls": [
+            "https://www.suiyuecare.com/software",
+            "https://www.suiyuecare.com/"
+          ]
+        }
+      ]
     }
   ]
 }

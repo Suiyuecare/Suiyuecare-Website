@@ -1,3 +1,4 @@
+import { approvedErpArticles20260915 } from "./2026-09-15-erp.mjs";
 import { approvedArticles20260915 } from "./2026-09-15-approved.mjs";
 import { dailyArticles20260901 } from "./2026-09-01.mjs";
 import { dailyArticles20260902 } from "./2026-09-02.mjs";
@@ -14,6 +15,7 @@ import { dailyArticles20260912 } from "./2026-09-12.mjs";
 import { dailyBaArticles20260913 } from "./2026-09-13-ba.mjs";
 
 export const dailyArticles = [
+  ...approvedErpArticles20260915,
   ...approvedArticles20260915,
   ...dailyBaArticles20260913,
   ...dailyArticles20260912,
