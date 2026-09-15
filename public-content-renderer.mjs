@@ -284,12 +284,6 @@ function renderVideo(article = {}) {
   `;
 }
 
-function healthArticleHeading(title = "未命名文章") {
-  const split = String(title).indexOf("？");
-  if (split < 6 || split >= title.length - 4) return escapePublicHtml(title);
-  return `${escapePublicHtml(title.slice(0, split + 1))}<br />${escapePublicHtml(title.slice(split + 1))}`;
-}
-
 export function renderPublicArticleLayout(article = {}, options = {}) {
   const editorial = getPublicEditorialInfo(article);
   const related = Array.isArray(options.related) ? options.related : [];
@@ -298,8 +292,6 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
   const image = normalizePublicAssetUrl(article.image);
   const imageAlt = article.imageAlt || article.title || "健康3.0文章主圖";
   const objectPosition = String(article.focalPoint || "center").replace(/[^a-z0-9% .-]/gi, "");
-  // Lift the default crop slightly so square portraits keep faces in the reading hero.
-  const healthObjectPosition = objectPosition === "center" ? "center 25%" : objectPosition;
   const contentHtml = Array.isArray(article.content)
     ? article.content.map((section, index) => renderContentSection(section, index, article.inlineImages || [])).join("")
     : renderMarkdownLikeContent(article.content);
@@ -308,6 +300,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
   const contactContext = `data-contact-need="${escapePublicHtml(contactNeed)}" data-contact-message="${escapePublicHtml(`我想了解${contactNeed}，剛閱讀了〈${article.title || "照顧知識"}〉。`)}"`;
 
   const contentKind = article.contentKind || "article";
+  const preserveHeroDetails = contentKind === "article" && (article.imageUsage === "actual_ui_screenshot" || /\.svg(?:[?#]|$)/i.test(image));
   const contentKey = publicContentKey({ ...article, contentKind }) || `content:${contentKind}:${article.publicSlug || article.slug || ""}`;
   const contentRevisionTime = publicContentRevisionTime(article);
   const contentUpdatedAt = contentRevisionTime === null ? "" : new Date(contentRevisionTime).toISOString();
@@ -318,29 +311,17 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
             <time class="meta-date" datetime="${escapePublicHtml(article.publishedAt || "")}">發布｜${escapePublicHtml(article.date || publicDateLabel(article.publishedAt))}</time>
             ${article.readingMinutes ? `<span class="meta-editor">閱讀時間｜${Number(article.readingMinutes)} 分鐘</span>` : ""}
             ${article.targetAudience ? `<span class="meta-editor">適合｜${escapePublicHtml(article.targetAudience)}</span>` : ""}
-            ${contentKind === "article" && tagLinks ? `<div class="article-meta-tags">${tagLinks}</div>` : tagLinks}
+            ${tagLinks}
           </div>`;
 
   const html = `
-    <article class="article-page ${contentKind === "article" ? "article-page--health-story " : ""}${isPptIconPack ? "article-page--ppt-icon-pack" : ""}" data-public-layout="article-unified-v1" data-public-content-type="${escapePublicHtml(contentKind)}" data-public-content-key="${escapePublicHtml(contentKey)}" data-public-content-updated-at="${escapePublicHtml(contentUpdatedAt)}">
-      ${contentKind === "article" ? renderHealthPublicationHeader() : ""}
+    <article class="article-page ${contentKind === "article" ? "article-page--classic-health " : ""}${preserveHeroDetails ? "article-page--uncropped-hero " : ""}${isPptIconPack ? "article-page--ppt-icon-pack" : ""}" data-public-layout="article-unified-v1" data-public-content-type="${escapePublicHtml(contentKind)}" data-public-content-key="${escapePublicHtml(contentKey)}" data-public-content-updated-at="${escapePublicHtml(contentUpdatedAt)}">
       <div class="article-topbar">
         <a class="article-back" href="/health">返回健康3.0</a>
         <span class="article-category">${escapePublicHtml(article.category || "照顧知識")}</span>
       </div>
 
-      ${contentKind === "article" ? `<header class="article-hero">
-        <div class="article-heading">
-          <p class="article-section-label">健康3.0 · ${escapePublicHtml(article.category || "照顧知識")}</p>
-          <h1>${healthArticleHeading(article.title || "未命名文章")}</h1>
-          <p class="article-dek">${escapePublicHtml(article.subtitle || article.excerpt || "")}</p>
-        </div>
-        ${articleMetaMarkup}
-        <figure>
-          <img src="${escapePublicHtml(image)}" alt="${escapePublicHtml(imageAlt)}" data-fallback-src="${HEALTH_FALLBACK_IMAGE}" style="object-position:${escapePublicHtml(healthObjectPosition)}" loading="eager" fetchpriority="high" decoding="async" />
-          ${article.imageCaption ? `<figcaption>${escapePublicHtml(article.imageCaption)}</figcaption>` : ""}
-        </figure>
-      </header>` : `      <header class="article-hero">
+      <header class="article-hero">
         <figure>
           <img src="${escapePublicHtml(image)}" alt="${escapePublicHtml(imageAlt)}" data-fallback-src="${HEALTH_FALLBACK_IMAGE}" style="object-position:${escapePublicHtml(objectPosition)}" loading="eager" fetchpriority="high" decoding="async" />
           <figcaption class="${isPptIconPack ? "article-hero-caption--sr-only" : ""}">
@@ -349,11 +330,11 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
             ${article.imageCaption ? `<small class="article-hero-photo-caption">${escapePublicHtml(article.imageCaption)}</small>` : ""}
           </figcaption>
         </figure>
-      </header>`}
+      </header>
 
       <section class="article-layout">
         <div class="article-main">
-          ${contentKind === "article" ? "" : articleMetaMarkup}
+          ${articleMetaMarkup}
 
           ${renderVideo(article)}
           ${hasSlideDeck ? options.slideDeckHtml : (article.summary?.length ? `
@@ -376,7 +357,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
             ` : "")}
             <div class="article-cta">
               <p>${escapePublicHtml(article.cta || "不確定下一步怎麼安排？留下需求，讓歲悅協助判斷。")}</p>
-              <a ${contentKind === "article" ? 'class="primary-button" ' : ""}href="${escapePublicHtml(safePublicHref(article.ctaUrl, "/contact"))}" ${contactContext}>${escapePublicHtml(article.ctaText || "預約照顧諮詢")}</a>
+              <a href="${escapePublicHtml(safePublicHref(article.ctaUrl, "/contact"))}" ${contactContext}>${escapePublicHtml(article.ctaText || "預約照顧諮詢")}</a>
             </div>
             ${editorial.service ? `<p class="article-service-link">相關照顧服務：<a href="${escapePublicHtml(editorial.service.href)}">了解歲悅${escapePublicHtml(editorial.service.name)}</a></p>` : ""}
             ${renderReferences(article)}
@@ -396,7 +377,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
             <div class="article-related-grid">
               ${related.slice(0, 7).map((item) => `
                 <a href="${escapePublicHtml(safePublicHref(item.href, "/health"))}">
-                  ${contentKind === "article" ? '<span class="health-card-image">' : ""}<img src="${escapePublicHtml(normalizePublicAssetUrl(item.image))}" alt="${escapePublicHtml(item.title || "延伸閱讀")}" data-fallback-src="${HEALTH_FALLBACK_IMAGE}" loading="lazy" decoding="async" />${contentKind === "article" ? "</span>" : ""}
+                  <img src="${escapePublicHtml(normalizePublicAssetUrl(item.image))}" alt="${escapePublicHtml(item.title || "延伸閱讀")}" data-fallback-src="${HEALTH_FALLBACK_IMAGE}" loading="lazy" decoding="async" />
                   <span>${escapePublicHtml(item.category || "照顧知識")}</span>
                   <b>${escapePublicHtml(item.title || "")}</b>
                 </a>

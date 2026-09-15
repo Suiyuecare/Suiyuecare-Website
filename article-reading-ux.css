@@ -40,12 +40,12 @@
 .article-page--reading :is(.article-toc a, .article-toc summary, .article-tags a, .article-back):focus-visible { outline: 3px solid #1595a8; outline-offset: 3px; }
 .article-page--reading .article-body h2:focus { outline: 2px solid #1595a8; outline-offset: 5px; }
 /* Keep the helper accessible without covering reading, service decisions, or search results. */
-body:has(.page.active :is(.article-page--reading, .article-page--health-story, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper { position: relative; inset: auto; width: auto; display: flex; justify-content: flex-end; padding: 0 24px 24px; z-index: 10; }
-body:has(.page.active :is(.article-page--reading, .article-page--health-story, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper-trigger { width: auto; height: 48px; min-height: 48px; display: flex; gap: 8px; align-items: center; padding: 4px 14px 4px 6px; border: 1px solid #ead8bf; border-radius: 999px; background: white; box-shadow: none; transform: none; animation: none; }
-body:has(.page.active :is(.article-page--reading, .article-page--health-story, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper-trigger img { width: 40px; height: 40px; order: -1; filter: none; }
-body:has(.page.active :is(.article-page--reading, .article-page--health-story, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper-nudge { position: static; inset: auto; transform: none; padding: 0; font-size: 14px; white-space: normal; background: transparent; box-shadow: none; color: #725b4c; }
-body:has(.page.active :is(.article-page--reading, .article-page--health-story, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper.is-open .milk-helper-nudge { display: block; }
-body:has(.page.active :is(.article-page--reading, .article-page--health-story, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper-dialog { position: absolute; right: 24px; bottom: 82px; width: min(360px, calc(100vw - 40px)); }
+body:has(.page.active :is(.article-page--reading, .article-page--health-story, .article-page--classic-health, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper { position: relative; inset: auto; width: auto; display: flex; justify-content: flex-end; padding: 0 24px 24px; z-index: 10; }
+body:has(.page.active :is(.article-page--reading, .article-page--health-story, .article-page--classic-health, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper-trigger { width: auto; height: 48px; min-height: 48px; display: flex; gap: 8px; align-items: center; padding: 4px 14px 4px 6px; border: 1px solid #ead8bf; border-radius: 999px; background: white; box-shadow: none; transform: none; animation: none; }
+body:has(.page.active :is(.article-page--reading, .article-page--health-story, .article-page--classic-health, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper-trigger img { width: 40px; height: 40px; order: -1; filter: none; }
+body:has(.page.active :is(.article-page--reading, .article-page--health-story, .article-page--classic-health, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper-nudge { position: static; inset: auto; transform: none; padding: 0; font-size: 14px; white-space: normal; background: transparent; box-shadow: none; color: #725b4c; }
+body:has(.page.active :is(.article-page--reading, .article-page--health-story, .article-page--classic-health, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper.is-open .milk-helper-nudge { display: block; }
+body:has(.page.active :is(.article-page--reading, .article-page--health-story, .article-page--classic-health, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper-dialog { position: absolute; right: 24px; bottom: 82px; width: min(360px, calc(100vw - 40px)); }
 @media (max-width: 760px) {
   .article-page--reading .article-reading-heading { padding: 0 20px; margin-bottom: 22px; }
   .article-page--reading .article-hero h1 { max-width: 100%; font-size: 28px; line-height: 1.5; }
@@ -62,6 +62,6 @@ body:has(.page.active :is(.article-page--reading, .article-page--health-story, .
   .article-page--reading .article-body ol { font-size: 17px; line-height: 1.85; }
   .article-page--reading .article-toc ol { padding-left: 36px; }
   .article-page--reading .article-summary { padding: 20px; }
-  body:has(.page.active :is(.article-page--reading, .article-page--health-story, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper { padding-right: 20px; }
-  body:has(.page.active :is(.article-page--reading, .article-page--health-story, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper-dialog { right: 20px; }
+  body:has(.page.active :is(.article-page--reading, .article-page--health-story, .article-page--classic-health, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper { padding-right: 20px; }
+  body:has(.page.active :is(.article-page--reading, .article-page--health-story, .article-page--classic-health, .topic-guide-page, .service-detail-page, .health-page, .search-page)) .milk-helper-dialog { right: 20px; }
 }
