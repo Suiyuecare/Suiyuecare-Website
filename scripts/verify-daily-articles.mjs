@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { parseHTML } from "linkedom";
 import { ARTICLE_SOURCE_SLUGS, articlePublicNumber } from "../article-url-map.mjs";
 import { dailyArticles } from "../daily-articles/index.mjs";
 
@@ -43,7 +44,7 @@ function localAsset(value) {
   return String(value || "").replace(/^\/?/, "");
 }
 
-function verifyAsset(assetPath, label) {
+function verifyAsset(assetPath, label, approvedDraft = false) {
   const relative = localAsset(assetPath);
   const sourcePath = path.join(rootDir, relative);
   const mirrorPath = path.join(rootDir, "public", relative);
@@ -54,8 +55,96 @@ function verifyAsset(assetPath, label) {
   assert(size > 10_000 || relative.endsWith(".svg"), `${label} asset is unexpectedly small: ${relative}`);
   if (relative.endsWith(".svg")) {
     const svg = fs.readFileSync(sourcePath, "utf8");
-    assert(/<svg[^>]+width="1200"[^>]+height="675"/.test(svg), `${label} SVG must be 1200x675`);
+    if (approvedDraft) {
+      const box = svg.match(/viewBox="\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*"/);
+      assert(box && Number(box[3]) > 0 && Number(box[4]) > 0, `${label} approved SVG needs a valid viewBox`);
+    } else {
+      assert(/<svg[^>]+width="1200"[^>]+height="675"/.test(svg), `${label} SVG must be 1200x675`);
+    }
     assert(/role="img"/.test(svg) && /<title\b/.test(svg) && /<desc\b/.test(svg), `${label} SVG accessibility metadata is incomplete`);
+  }
+}
+
+// Approval metadata preserves the reviewed batch. It does not grant publishing
+// permission; explicit user approval is recorded before these entries are made.
+function verifyApprovedBatch(batch) {
+  assert(batch.approval?.source === "explicit-user-message" && Number.isFinite(Date.parse(batch.approval.recordedAt)), `${batch.date} needs explicit approval provenance`);
+  assert(Number.isSafeInteger(batch.expectedCount) && batch.expectedCount > 0 && batch.articles.length === batch.expectedCount, `${batch.date} approved article count mismatch`);
+  assert(Array.isArray(batch.approvedDrafts) && batch.approvedDrafts.length === batch.expectedCount, `${batch.date} approval manifest count mismatch`);
+  const ordinals = new Set(batch.approvedDrafts.map(item => item.draftNumber));
+  assert(ordinals.size === batch.expectedCount && [...ordinals].every(n => Number.isSafeInteger(n) && n > 0), `${batch.date} duplicate or invalid approved draft numbers`);
+  const declared = batch.approval.approvedDraftOrdinals;
+  const pending = batch.approval.pendingDraftOrdinals;
+  assert(Array.isArray(declared) && declared.length === ordinals.size && new Set(declared).size === ordinals.size && declared.every(n => ordinals.has(n)), `${batch.date} manifest differs from the explicitly approved draft numbers`);
+  assert(Array.isArray(pending) && new Set(pending).size === pending.length && pending.every(n => Number.isSafeInteger(n) && n > 0 && !ordinals.has(n)), `${batch.date} pending drafts must not be published`);
+  const publishedOrdinals = new Set();
+  batch.articles.forEach(entry => {
+    const approved = batch.approvedDrafts.find(item => item.draftNumber === entry.draftNumber);
+    assert(approved && !publishedOrdinals.has(entry.draftNumber), `${batch.date} article lacks unique approval: ${entry.slug}`);
+    publishedOrdinals.add(entry.draftNumber);
+    assert(approved.draftKey && approved.sourceFile && /^[a-f0-9]{64}$/.test(approved.sourceSha256), `${entry.slug} draft provenance incomplete`);
+    assert(entry.sourceSha256 === approved.sourceSha256, `${entry.slug} reviewed source hash differs`);
+    assert(entry.contentHash === approved.contentHash, `${entry.slug} formatted content differs from approval manifest`);
+    assert(JSON.stringify(entry.assets) === JSON.stringify(approved.assets) && entry.assets?.length > 0, `${entry.slug} approved assets differ`);
+  });
+  for (const item of batch.withheldArticles || []) {
+    assert(pending.includes(item.draftNumber) && !ordinals.has(item.draftNumber) && item.title && item.reason === "not-approved", `${batch.date} invalid pending draft`);
+  }
+}
+
+function verifyApprovedArticle(article, entry) {
+  assert(typeof article.content === "string" && article.content.length > 900, `${entry.slug} approved article body is missing`);
+  const { document } = parseHTML(`<html><body>${article.content}</body></html>`);
+  const bodyText = document.body.textContent.replace(/\s+/g, " ").trim();
+  assert(entry.bodyTextHash === `sha256:${crypto.createHash("sha256").update(bodyText).digest("hex")}`, `${entry.slug} approved body text differs`);
+  assert(document.querySelectorAll("h2, h3").length >= 3, `${entry.slug} approved article sections are missing`);
+  assert(!document.querySelector("script, iframe, object, embed, form"), `${entry.slug} unsafe article markup`);
+  for (const node of document.querySelectorAll("*")) {
+    assert([...node.attributes].every(attr => !/^on/i.test(attr.name)), `${entry.slug} inline event handler is not allowed`);
+    for (const attr of ["href", "src"]) assert(!/^\s*(javascript|data):/i.test(node.getAttribute(attr) || ""), `${entry.slug} unsafe URL`);
+  }
+  assert(article.readingMinutes >= 3 && article.readingMinutes <= 15 && article.summary?.length >= 1, `${entry.slug} reading metadata incomplete`);
+  assert(article.relatedSlugs?.length === 3 && article.relatedSlugs.every(slug => indexedSlugs.has(slug)), `${entry.slug} related articles invalid`);
+  assert(article.references?.length >= 2 && article.references.every(ref => /^https:\/\//.test(ref.url) && ref.citation && Number.isFinite(ref.evidenceRank)), `${entry.slug} source references incomplete`);
+  assert(JSON.stringify(article.references.map(ref => ref.url)) === JSON.stringify(entry.referenceUrls), `${entry.slug} references differ from reviewed manifest`);
+  assert(article.imageAlt && article.imageCaption, `${entry.slug} illustration description is missing`);
+  const usedAssets = new Set([article.image, ...[...document.querySelectorAll("img")].map(img => img.getAttribute("src")), ...article.inlineImages.map(img => img.src)]);
+  assert(entry.assets.length === usedAssets.size && entry.assets.every(asset => usedAssets.has(asset.path)), `${entry.slug} unapproved or missing illustration`);
+  for (const asset of entry.assets) {
+    verifyAsset(asset.path, entry.slug, true);
+    const actual = crypto.createHash("sha256").update(fs.readFileSync(path.join(rootDir, localAsset(asset.path)))).digest("hex");
+    assert(actual === asset.sha256, `${entry.slug} illustration differs from approved source`);
+  }
+  if (entry.baCode) {
+    const item = baQueue.find(item => item.code === entry.baCode);
+    assert(item && article.baCode === entry.baCode && article.seriesId === BA_SERIES_ID, `${entry.slug} BA metadata invalid`);
+    assert(article.title.includes(entry.baCode) && article.title.includes(item.name), `${entry.slug} BA official name missing`);
+    assert(item.slug === entry.slug && item.publicNumber === entry.publicNumber && item.contentHash === entry.contentHash, `${entry.slug} BA index differs`);
+    completedBaCodes.add(entry.baCode);
+  }
+}
+
+function selfTestApprovedBatchRules() {
+  const approved = { draftNumber: 1, draftKey: "fixture:approved", sourceFile: "approved.md", sourceSha256: "a".repeat(64), contentHash: `sha256:${"b".repeat(64)}`, assets: [{ path: "assets/approved.svg", sha256: "c".repeat(64) }] };
+  const fixture = { date: "fixture-approval", expectedCount: 1, approval: { source: "explicit-user-message", recordedAt: "2026-09-15T00:00:00Z", approvedDraftOrdinals: [1], pendingDraftOrdinals: [2] }, approvedDrafts: [approved], articles: [{ ...approved, slug: "approved-article" }], withheldArticles: [{ draftNumber: 2, title: "Pending draft", reason: "not-approved" }] };
+  verifyApprovedBatch(fixture);
+  for (const mutate of [
+    batch => { batch.articles[0].draftNumber = 2; },
+    batch => { batch.articles.push({ ...batch.articles[0], draftNumber: 2 }); },
+    batch => { batch.articles[0].sourceSha256 = "d".repeat(64); },
+    batch => { batch.articles[0].contentHash = `sha256:${"d".repeat(64)}`; },
+    batch => { batch.articles[0].assets[0].sha256 = "d".repeat(64); },
+    batch => { batch.expectedCount = 2; batch.approvedDrafts.push({ ...approved, draftNumber: 2 }); batch.articles.push({ ...approved, draftNumber: 2, slug: "pending-article" }); },
+    batch => { batch.approval.pendingDraftOrdinals.push(1); },
+    batch => { batch.approval.source = "automatic"; }
+  ]) {
+    const invalid = structuredClone(fixture);
+    // Separate the fixture's approval and article asset arrays before mutation.
+    invalid.articles[0].assets = structuredClone(invalid.articles[0].assets);
+    mutate(invalid);
+    let rejected = false;
+    try { verifyApprovedBatch(invalid); } catch { rejected = true; }
+    assert(rejected, "Unapproved or changed drafts must be rejected");
   }
 }
 
@@ -91,6 +180,7 @@ function selfTestBaBatchRules() {
 }
 
 selfTestBaBatchRules();
+selfTestApprovedBatchRules();
 
 const indexedSlugs = new Set(ARTICLE_SOURCE_SLUGS);
 const articleBySlug = new Map(dailyArticles.map((article) => [article.slug, article]));
@@ -110,8 +200,11 @@ batchIndex.batches.forEach((batch) => {
   assert(batch.commit === "SELF" || /^[0-9a-f]{40}$/.test(batch.commit), `Invalid commit pointer for ${batch.date}`);
   const withheldArticles = Array.isArray(batch.withheldArticles) ? batch.withheldArticles : [];
   const isEditorialSelection = batch.publicationMode === "editorial-selection";
+  const isApprovedDraft = batch.publicationMode === "user-approved-drafts";
   const isBaSeries = batch.seriesId === BA_SERIES_ID;
-  if (isEditorialSelection) {
+  if (isApprovedDraft) {
+    verifyApprovedBatch(batch);
+  } else if (isEditorialSelection) {
     assert(withheldArticles.length > 0, `${batch.date} editorial selection must record withheld articles`);
     assert(
       batch.articles.length + withheldArticles.length === 3,
@@ -136,7 +229,7 @@ batchIndex.batches.forEach((batch) => {
     assert(Number.isInteger(batch.cycleDay) && batch.cycleDay >= 1 && batch.cycleDay <= 4, `${batch.date} disease cycle day must be 1–4`);
     const topics = plannedArticles.map((item) => String(item.diseaseTopic || "").trim());
     assert(topics.every(Boolean) && new Set(topics).size === 3, `${batch.date} disease topics must be present and distinct`);
-  } else if (!isBaSeries) {
+  } else if (!isBaSeries && !isApprovedDraft) {
     const businessItems = plannedArticles.map((item) => item.businessItem);
     assert(new Set(businessItems).size === 3, `${batch.date} business items must be distinct`);
     const expected = expectedRotation[taipeiWeekday(batch.date)];
@@ -184,6 +277,10 @@ batchIndex.batches.forEach((batch) => {
     assert(!allTitles.has(titleKey), `Duplicate normalized title: ${article.title}`);
     allTitles.add(titleKey);
     assert(/^[a-z0-9]+(?:-[a-z0-9]+)+$/.test(article.slug), `Invalid slug: ${article.slug}`);
+    if (isApprovedDraft) {
+      verifyApprovedArticle(article, entry);
+      return;
+    }
     assert(article.readingMinutes >= 8 && article.readingMinutes <= 12, `Reading time out of range: ${entry.slug}`);
     assert(article.content.length >= 5 && article.content.length <= 7, `Content section count out of range: ${entry.slug}`);
     assert(article.content.every((section) => Array.isArray(section[1]) && section[1].length === 2), `Each section needs two paragraphs: ${entry.slug}`);

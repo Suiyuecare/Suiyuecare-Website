@@ -151,6 +151,12 @@
   object-fit: contain;
 }
 
+/* Keep the full text and labels of editorial diagrams visible. */
+.article-page.article-page--health-story .article-hero img[src$=".svg"] {
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
 .article-page.article-page--health-story .article-hero figcaption {
   position: static;
   width: auto;
