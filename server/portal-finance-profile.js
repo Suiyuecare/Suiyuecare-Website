@@ -49,7 +49,7 @@ async function requirePortalUser(request, createPortalClient, environment) {
 
   const portalClient = createPortalClient(environment);
   const { data, error } = await portalClient.auth.getUser(token);
-  const email = normalizeEmail(data?.user?.email);
+  const email = preferredGoogleIdentityEmail(data?.user);
   if (error || !data?.user || !email) {
     throw new SafeHttpError(401, "Portal session is invalid or expired.");
   }
@@ -63,7 +63,20 @@ function normalizeEmail(value) {
   return String(value || "").trim().toLowerCase();
 }
 
-function isConfirmedGoogleUser(user, expectedEmail = normalizeEmail(user?.email)) {
+function preferredGoogleIdentityEmail(user) {
+  // Workspace primary-address changes can leave user.email stale. Only a
+  // provider-verified Google address may replace it; never use editable metadata.
+  const identities = Array.isArray(user?.identities)
+    ? user.identities.filter((identity) =>
+      identity?.provider === "google" && normalizeEmail(identity?.identity_data?.email))
+    : [];
+  const emails = new Set(identities.map((identity) => normalizeEmail(identity.identity_data.email)));
+  if (emails.size > 1) return "";
+  const verified = identities.find((identity) => identity.identity_data.email_verified === true);
+  return normalizeEmail(verified?.identity_data?.email || user?.email);
+}
+
+function isConfirmedGoogleUser(user, expectedEmail = preferredGoogleIdentityEmail(user)) {
   if (!user?.id || !expectedEmail || !user.email_confirmed_at) return false;
   const providerValues = new Set([
     user.app_metadata?.provider,
@@ -75,6 +88,7 @@ function isConfirmedGoogleUser(user, expectedEmail = normalizeEmail(user?.email)
   if (!Array.isArray(user.identities) || user.identities.length === 0) return true;
   return user.identities.some((identity) =>
     identity?.provider === "google"
+    && identity?.identity_data?.email_verified !== false
     && normalizeEmail(identity?.identity_data?.email) === expectedEmail
   );
 }
@@ -274,5 +288,6 @@ module.exports.createPortalFinanceProfileHandler = createPortalFinanceProfileHan
 module.exports.financeConfiguration = financeConfiguration;
 module.exports.financeRequestHeaders = financeRequestHeaders;
 module.exports.isConfirmedGoogleUser = isConfirmedGoogleUser;
+module.exports.preferredGoogleIdentityEmail = preferredGoogleIdentityEmail;
 module.exports.lookupFinanceProfile = lookupFinanceProfile;
 module.exports.projectSafeProfile = projectSafeProfile;

@@ -2633,6 +2633,19 @@ function getStoredProfile() {
   return { ...profile, email: storedEmail };
 }
 
+function preferredGoogleIdentityEmail(user) {
+  // Workspace primary-address changes can leave user.email stale. Only a
+  // provider-verified Google address may replace it; never use editable metadata.
+  const identities = Array.isArray(user?.identities)
+    ? user.identities.filter((identity) =>
+      identity?.provider === "google" && normalizeEmail(identity?.identity_data?.email))
+    : [];
+  const emails = new Set(identities.map((identity) => normalizeEmail(identity.identity_data.email)));
+  if (emails.size > 1) return "";
+  const verified = identities.find((identity) => identity.identity_data.email_verified === true);
+  return normalizeEmail(verified?.identity_data?.email || user?.email);
+}
+
 function findProfileByEmail(email) {
   const normalizedEmail = email.trim().toLowerCase();
   const employeeProfile = findEmployeeProfileByEmail(normalizedEmail);
@@ -2809,7 +2822,7 @@ async function applyGoogleSession() {
     return null;
   }
 
-  const email = data.session?.user?.email || "";
+  const email = preferredGoogleIdentityEmail(data.session?.user);
   if (!email) {
     clearStoredProfile();
     renderSession(null);

@@ -8,7 +8,8 @@ const {
 const {
   createPortalFinanceProfileHandler,
   isConfirmedGoogleUser,
-  lookupFinanceProfile
+  lookupFinanceProfile,
+  preferredGoogleIdentityEmail
 } = require("../server/portal-finance-profile.js");
 
 const apmOrigin = "https://apm.suiyuecare.com";
@@ -85,7 +86,7 @@ async function requireUser(request, createPortalClient, environment) {
 
   const supabase = createPortalClient(environment);
   const { data, error } = await supabase.auth.getUser(token);
-  const email = normalizeEmail(data?.user?.email);
+  const email = preferredGoogleIdentityEmail(data?.user);
   if (error || !data?.user || !email) {
     throw new SafeHttpError(401, "Portal session is invalid or expired.");
   }

@@ -434,6 +434,7 @@ function verifyApmPortalHandoff() {
 
   run(process.execPath, ["scripts/verify-portal-finance-profile.mjs"]);
   run(process.execPath, ["scripts/verify-portal-handoff.mjs"]);
+  run(process.execPath, ["scripts/verify-portal-google-email.mjs"]);
   run(process.execPath, ["scripts/verify-portal-employee-modules.mjs"]);
 
   log("APM/EDOC server-authorized handoff and Finance employee-only connected module fallback are present");
