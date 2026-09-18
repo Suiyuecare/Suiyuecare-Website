@@ -34,7 +34,7 @@ import {
 import { updatePublicStructuredData } from "./public-route-structured-data.mjs";
 import { homepageImageUrl } from "./home-image-variants.mjs";
 
-const FRONTEND_BUILD_VERSION = "health-cis-motion-20260914";
+const FRONTEND_BUILD_VERSION = "daycare-20260918";
 document.documentElement.dataset.frontendBuild = FRONTEND_BUILD_VERSION;
 
 let renderPublicArticleLayout;
@@ -3950,7 +3950,8 @@ function renderFixedServiceTemplate(slug, fields = []) {
   const secondaryUrl = getTemplateText(fieldMap, "secondary_cta_url", "#network");
   const featureCards = getTemplateArray(fieldMap, "feature_cards");
   const flowCards = getTemplateArray(fieldMap, "flow_cards");
-  const enrollmentItems = getTemplateArray(fieldMap, "enrollment_items");
+  const enrollmentItems = getTemplateArray(fieldMap, "enrollment_items")
+    .filter((item) => slug !== "day-care" || item.title !== "沐浴用品");
   const faqItems = getTemplateArray(fieldMap, "faq_items");
 
   return `
@@ -4352,7 +4353,8 @@ function applyCmsEnhancedServicePage(html, slug, fields = []) {
   setNodeText(root, ".service-contact-section > div > p:not(.eyebrow)", getTemplateText(fieldMap, "cta_body", ""));
   setNodeText(root, ".service-contact-section button[type='submit']", getTemplateText(fieldMap, "cta_button_text", ""));
 
-  const enrollmentItems = getTemplateArray(fieldMap, "enrollment_items");
+  const enrollmentItems = getTemplateArray(fieldMap, "enrollment_items")
+    .filter((item) => slug !== "day-care" || item.title !== "沐浴用品");
   const enrollmentSection = root.querySelector(".day-care-start-section, .service-notes-section");
   if (enrollmentSection) {
     setNodeText(enrollmentSection, ".service-section-head .eyebrow", getTemplateText(fieldMap, "enrollment_eyebrow", ""));
@@ -9242,7 +9244,6 @@ function renderDayCareStartChecklist() {
     "個人物品，如牙籤牙線、梳子",
     "保溫瓶與盥洗用品",
     "棉被或薄毯、替換衣物",
-    "沐浴用品，建議按壓式瓶裝",
     "藥盒與服藥說明",
     "尿布、看護墊等必要衛生用品"
   ];
