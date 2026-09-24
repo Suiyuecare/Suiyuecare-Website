@@ -260,7 +260,7 @@ function verifyApmPortalHandoff() {
     'moduleId === "edoc"\n    ? [["token", signedHandoff.token]]',
     ': [["payload", signedHandoff.payload], ["signature", signedHandoff.signature]]',
     'moduleReturnPath(moduleId, launchUrl)',
-    'returnTo: returnTo || "/dashboard"',
+    'returnTo: returnTo || "/tasks"',
     '"project_you@suiyuecare.com"'
   ]) {
     assert(portal.includes(expected), `Portal APM launch contract is missing ${expected}.`);

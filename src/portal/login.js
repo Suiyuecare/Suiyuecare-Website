@@ -416,10 +416,12 @@ const apmWorkspacePaths = [
   "/calendar",
   "/dashboard",
   "/department",
+  "/journal",
   "/kpi",
   "/notifications",
   "/projects",
   "/settings",
+  "/surveys",
   "/tasks"
 ];
 const moduleLaunchDefaultTitle = "正在進入敏捷專案管理系統";
@@ -615,7 +617,7 @@ function moduleReturnPath(moduleId, rawLaunchUrl) {
   if (url.origin !== configuredUrl.origin || url.username || url.password || url.hash) {
     throw new Error("敏捷專案管理系統返回網址不在允許清單內。");
   }
-  const path = url.pathname === "/" ? "/dashboard" : url.pathname;
+  const path = url.pathname === "/" ? "/tasks" : url.pathname;
   if (!apmWorkspacePaths.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) {
     throw new Error("敏捷專案管理系統返回頁面不在允許清單內。");
   }
@@ -651,7 +653,7 @@ function buildModuleLaunchPayload(moduleId, profile, returnTo = "") {
     actions: modulePermissions.actions,
     moduleActions: modulePermissions.actions,
     modulePermissions,
-    ...(moduleId === "apm" ? { returnTo: returnTo || "/dashboard" } : {}),
+    ...(moduleId === "apm" ? { returnTo: returnTo || "/tasks" } : {}),
     ...organization,
     launchedAt: new Date().toISOString()
   };
