@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-08T16:58:45.646Z",
-  "contentHash": "5316da7e1d59f919b33e9f3de05d4a8d05972e97810a51dc8880604d15f7afc7",
+  "generatedAt": "2026-09-24T15:46:52.186Z",
+  "contentHash": "7f717ea9f32359cc9a2278105aeb496405e99f6cf12939be86f3ad666b663c2f",
   "schemaVersion": 1,
   "serviceSlugs": [
     "about",
@@ -2503,7 +2503,7 @@
       "field_key": "hero_image",
       "field_label": "Hero 圖片",
       "field_type": "image",
-      "text_value": "assets/homepage-batch/01-care-home-greeting.png",
+      "text_value": "assets/homepage-batch/01-care-home-greeting-fast.jpg",
       "number_value": null,
       "boolean_value": null,
       "image_id": null,
@@ -3056,7 +3056,7 @@
       "json_value": [
         {
           "body": "服務員進門後先問候、觀察精神與情緒，讓長輩知道今天不是被處理，而是被陪伴。",
-          "image": "assets/homecare-detail-01-greeting.png",
+          "image": "assets/homecare-detail-01-greeting-fast.jpg",
           "title": "進門先看見人"
         },
         {
@@ -4004,7 +4004,7 @@
       "json_value": [
         {
           "body": "把照顧技能拆成步驟，讓移工不只聽懂，也能操作。",
-          "image": "assets/migrant-detail-01-classroom.png",
+          "image": "assets/migrant-detail-01-classroom-fast.jpg",
           "title": "課堂示範與分組練習"
         },
         {
@@ -5414,7 +5414,7 @@
         },
         {
           "body": "用安全步調陪長輩一步一步找回移動把握。",
-          "image": "assets/nursing-detail-02-walking.png",
+          "image": "assets/nursing-detail-02-walking-fast.jpg",
           "title": "步行與移位練習"
         },
         {
@@ -6239,7 +6239,7 @@
         },
         {
           "body": "把問題轉成下一輪改善行動。",
-          "image": "assets/quality-detail-04-improvement.png",
+          "image": "assets/quality-detail-04-improvement-fast.jpg",
           "title": "品質改善會議"
         }
       ],
@@ -6860,7 +6860,7 @@
       "subtitle": "尋找理解長照產業、認同長期服務網絡的投資夥伴。",
       "body": "歲悅長照集團以北北桃為核心，整合居家、日照、社區據點、護理復能、培訓與品管，建立可治理、可複製的照顧網絡。",
       "hero_image_id": "b6973773-1eec-4c48-a696-d9ca7e5d302b",
-      "hero_image_url": "/assets/homepage-batch/04-admin-team-office.png",
+      "hero_image_url": "/assets/homepage-batch/04-admin-team-office-fast.jpg",
       "hero_badge": "Suiyuecare Growth",
       "hero_card_title": "把長照需求，變成可治理、可複製、可長期信任的服務網絡。",
       "primary_cta_text": "預約投資洽談",
@@ -6949,7 +6949,7 @@
       "title": "投資合作洽談",
       "description": "提供公司簡介、展店模型、營運進度與合作架構說明。",
       "image_id": "b6973773-1eec-4c48-a696-d9ca7e5d302b",
-      "image_url": "/assets/homepage-batch/04-admin-team-office.png",
+      "image_url": "/assets/homepage-batch/04-admin-team-office-fast.jpg",
       "highlights": [
         "展店模型",
         "營運數據",
@@ -7147,7 +7147,7 @@
           "caption": "跨部門會議"
         },
         {
-          "image": "/assets/admin-recruit-02-operations.png",
+          "image": "/assets/admin-recruit-02-operations-fast.jpg",
           "caption": "營運調度支援"
         }
       ],
@@ -7176,7 +7176,7 @@
       "salary_text": "依投資架構洽談",
       "capacity_label": "預約洽談",
       "image_id": "b6973773-1eec-4c48-a696-d9ca7e5d302b",
-      "image_url": "/assets/homepage-batch/04-admin-team-office.png",
+      "image_url": "/assets/homepage-batch/04-admin-team-office-fast.jpg",
       "duties": [
         "了解投資人背景與合作期待",
         "提供展店模型與營運進度說明",
@@ -12602,7 +12602,7 @@
             "value": "97%"
           }
         ],
-        "image_url": "assets/homepage-batch/01-care-home-greeting.png",
+        "image_url": "assets/homepage-batch/01-care-home-greeting-fast.jpg",
         "secondary_url": "#care-system",
         "image_position": "center",
         "secondary_text": "觀看照顧系統"
@@ -13975,7 +13975,7 @@
       "badge_label": "07",
       "metadata": {
         "image_alt": "軟體系統營運儀表板情境",
-        "image_url": "assets/admin-recruit-02-operations.png"
+        "image_url": "assets/admin-recruit-02-operations-fast.jpg"
       },
       "sort_order": 70,
       "is_featured": false,
@@ -14801,7 +14801,7 @@
   "media": [
     {
       "id": "01d9c8d0-8382-4e0a-a9a2-2a30d091fdf1",
-      "public_url": "/assets/homepage-batch/01-care-home-greeting.png",
+      "public_url": "/assets/homepage-batch/01-care-home-greeting-fast.jpg",
       "alt_text": "照顧服務員到宅問候長輩",
       "file_name": "01-care-home-greeting.png",
       "image_usage": "article_cover",
@@ -15129,7 +15129,7 @@
     },
     {
       "id": "b6973773-1eec-4c48-a696-d9ca7e5d302b",
-      "public_url": "/assets/homepage-batch/04-admin-team-office.png",
+      "public_url": "/assets/homepage-batch/04-admin-team-office-fast.jpg",
       "alt_text": "歲悅長照營運與合作會議",
       "file_name": "04-admin-team-office.png",
       "image_usage": "service_hero",

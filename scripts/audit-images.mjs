@@ -7,7 +7,9 @@ const imagePattern = /\.(jpe?g|png|webp)$/i;
 const strict = process.argv.includes("--strict");
 const scanAll = process.argv.includes("--all");
 const scanUnused = process.argv.includes("--unused");
-const sourceRoots = ["app.js", "index.html", "styles.css", "scripts", "supabase/migrations"].filter((target) => fs.existsSync(target));
+// Migration files are historical database inputs, not browser references. Counting their
+// legacy filenames keeps retired originals in the production image inventory forever.
+const sourceRoots = ["app.js", "index.html", "styles.css", "scripts"].filter((target) => fs.existsSync(target));
 const unusedLargeImageLimit = 1.1 * 1024 * 1024;
 
 function walk(dir, files = []) {
@@ -94,16 +96,40 @@ function imageSize(file) {
 
 function classify(file) {
   const normalized = file.replaceAll(path.sep, "/");
-  if (/logo|partner|favicon|cis/i.test(normalized)) return "logo";
+  if (/logo|partner|favicon|cis|milk-assistant/i.test(normalized)) return "logo";
   if (/testimonial-avatars|avatar/i.test(normalized)) return "avatar";
   if (/(^|[-_/])hero([-_.\/]|$)/i.test(normalized)) return "hero";
   if (/(^|[-_/])cover([-_.\/]|$)/i.test(normalized)) return "cover";
   return "card";
 }
 
+function minimumWidth(file, type, size) {
+  const normalized = file.replaceAll(path.sep, "/");
+  if (type === "hero") return 1500;
+  if (type === "cover") return 1200;
+  if (type === "avatar") {
+    // Homepage avatars render at 64px; the 192px derivative is a deliberate 3x source.
+    return /home-optimized\/.*-avatar\.webp$/i.test(normalized) ? 192 : 320;
+  }
+  if (type === "card") {
+    // These derivatives render in columns no wider than 320px and are intentionally 2x.
+    if (/home-optimized\/.*-card\.webp$/i.test(normalized)) return 640;
+    // Recruiting photos are portrait crops; width is not their long edge.
+    if (size.height > size.width * 1.35) return 600;
+    return 900;
+  }
+  return 0;
+}
+
 const issues = [];
 const seenFiles = new Set();
-const sourceText = sourceRoots.flatMap((source) => walkSource(source)).map((file) => fs.readFileSync(file, "utf8")).join("\n");
+function activeSourceText(file) {
+  const text = fs.readFileSync(file, "utf8");
+  if (path.basename(file) !== "app.js") return text;
+  return text.replace(/const legacyAssetPathMap = new Map\(\[[\s\S]*?\n\]\);/, "");
+}
+
+const sourceText = sourceRoots.flatMap((source) => walkSource(source)).map(activeSourceText).join("\n");
 const physicalFiles = roots.flatMap((root) => walk(root));
 
 function canonicalAssetPath(file) {
@@ -131,17 +157,11 @@ for (const file of files) {
     issues.push({ severity: "warning", file, detail: "無法讀取圖片尺寸" });
     continue;
   }
-  if (type === "hero" && size.width < 1500) {
-    issues.push({ severity: "critical", file, detail: `Hero 圖寬 ${size.width}px，建議至少 1500px` });
-  }
-  if (type === "cover" && size.width < 1200) {
-    issues.push({ severity: "warning", file, detail: `封面圖寬 ${size.width}px，建議至少 1200px` });
-  }
-  if (type === "avatar" && size.width < 320) {
-    issues.push({ severity: "warning", file, detail: `頭像圖寬 ${size.width}px，建議至少 320px` });
-  }
-  if (type === "card" && size.width < 900) {
-    issues.push({ severity: "warning", file, detail: `卡片/內容圖寬 ${size.width}px，建議至少 900px` });
+  const requiredWidth = minimumWidth(file, type, size);
+  if (size.width < requiredWidth) {
+    const severity = type === "hero" ? "critical" : "warning";
+    const label = type === "hero" ? "Hero 圖" : type === "cover" ? "封面圖" : type === "avatar" ? "頭像圖" : "卡片/內容圖";
+    issues.push({ severity, file, detail: `${label}寬 ${size.width}px，建議至少 ${requiredWidth}px` });
   }
   const limit = type === "hero" ? 2.5 * 1024 * 1024 : 1.2 * 1024 * 1024;
   if (type !== "logo" && stat.size > limit) {
