@@ -246,6 +246,14 @@ await test("Finance keeps its existing unsigned launch contract", async () => {
   });
 });
 
+await test("APM journal and survey notifications retain their exact destination", async () => {
+  for (const path of ["/journal?date=2026-09-25&view=team", "/surveys/campaign-1?mode=answer"]) {
+    check(subject.moduleReturnPath("apm", `https://apm.suiyuecare.com${path}`), path);
+    check(await subject.launchConnectedModule("apm", ceo, `https://apm.suiyuecare.com${path}`), true);
+    check(calls.payload.at(-1).returnTo, path);
+  }
+});
+
 for (const moduleId of ["apm", "edoc"]) {
   await test(`${moduleId} retains signed POST handoff instead of token query strings`, async () => {
     await assert.rejects(() => subject.buildModuleLaunchUrl(moduleId, ceo), /POST/u);

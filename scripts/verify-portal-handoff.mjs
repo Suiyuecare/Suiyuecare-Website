@@ -236,6 +236,21 @@ function handlerFor(user, overrides = {}) {
   });
 }
 
+// Notification destinations are preserved without accepting an external redirect.
+{
+  const email = "homecare.tpe1@suiyuecare.com";
+  const handler = handlerFor(verifiedGoogleUser(email), {
+    financeLookup: async () => ({ source: "finance-portal-self", email, allowedModules: ["apm"] })
+  });
+  for (const returnTo of ["/journal?date=2026-09-25&view=team", "/surveys/campaign-1?mode=answer"]) {
+    const result = await invoke(handler, requestFor({ moduleId: "apm", email, returnTo }));
+    assert.equal(result.status, 200);
+    assert.equal(decodeSignedPayload(result).returnTo, returnTo);
+  }
+  const unsafe = await invoke(handler, requestFor({ moduleId: "apm", email, returnTo: "//outside.example/surveys" }));
+  assert.equal(unsafe.status, 400);
+}
+
 // Modules that do not consume signed Portal assertions cannot be requested by
 // calling the API directly.
 {

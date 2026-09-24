@@ -18,10 +18,12 @@ const apmWorkspacePaths = [
   "/calendar",
   "/dashboard",
   "/department",
+  "/journal",
   "/kpi",
   "/notifications",
   "/projects",
   "/settings",
+  "/surveys",
   "/tasks"
 ];
 
@@ -129,7 +131,7 @@ function signPayload(payload, moduleId, environment = process.env) {
 }
 
 function normalizeApmReturnTo(rawReturnTo) {
-  const candidate = String(rawReturnTo || "/dashboard").trim();
+  const candidate = String(rawReturnTo || "/tasks").trim();
   if (
     !candidate.startsWith("/")
     || candidate.startsWith("//")
