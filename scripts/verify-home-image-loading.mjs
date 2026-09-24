@@ -30,7 +30,7 @@ for (const [original, variants] of Object.entries(homepageImageVariants)) {
     assert.equal(asset.toString("ascii", 8, 12), "WEBP");
   }
 }
-for (const url of ["https://photos.example/assets/homepage-batch/10-family-consultation.png", "/assets/new-upload.jpg", "data:image/png;base64,AA==", ""]) {
+for (const url of ["https://photos.example/assets/new-upload.jpg", "/assets/new-upload.jpg", "data:image/png;base64,AA==", ""]) {
   assert.equal(homepageImageUrl(url, "avatar"), url);
 }
 

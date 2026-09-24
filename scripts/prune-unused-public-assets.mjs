@@ -8,7 +8,6 @@ const sourceRoots = [
   "index.html",
   "styles.css",
   "scripts",
-  "supabase/migrations",
   "public/cms-fallbacks.json",
   "dist"
 ].filter((target) => fs.existsSync(target));
@@ -57,9 +56,15 @@ function removeEmptyDirs(dir, stopDir) {
   }
 }
 
+function activeSourceText(file) {
+  const text = fs.readFileSync(file, "utf8");
+  if (path.basename(file) !== "app.js") return text;
+  return text.replace(/const legacyAssetPathMap = new Map\(\[[\s\S]*?\n\]\);/, "");
+}
+
 const sourceText = sourceRoots
   .flatMap((source) => walkSource(source))
-  .map((file) => fs.readFileSync(file, "utf8"))
+  .map(activeSourceText)
   .join("\n");
 
 let removedCount = 0;

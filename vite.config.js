@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   build: {
+    cssMinify: "lightningcss",
     rollupOptions: {
       input: {
         main: "index.html",
