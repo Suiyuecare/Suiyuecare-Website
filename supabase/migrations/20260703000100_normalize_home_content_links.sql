@@ -41,10 +41,14 @@ where target_slug = 'home'
   and module_key = 'care_story';
 
 update public.page_sections
-set metadata = jsonb_set(metadata, '{button_href}', to_jsonb('/health'::text), false)
-where page_slug = 'home'
+set content_json = jsonb_set(content_json, '{button_href}', to_jsonb('/health'::text), false)
+where exists (
+  select 1 from public.pages
+  where public.pages.id = public.page_sections.page_id
+    and public.pages.slug = 'home'
+)
   and section_key = 'home-health'
-  and metadata ->> 'button_href' = '#' || 'health';
+  and content_json ->> 'button_href' = '#' || 'health';
 
 update public.site_settings
 set

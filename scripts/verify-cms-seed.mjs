@@ -20,7 +20,28 @@ try {
   await db.exec(seed);
   assert.equal((await db.query('select count(*)::int count from public.pages')).rows[0].count, 17);
   assert.deepEqual((await db.query('select published_at from public.pages order by sort_order')).rows.map(page => page.published_at), pages.rows.map(page => page.published_at));
-  console.log('ok - CMS seed executes against original schema, preserves 17 pages and remains idempotent');
+  const sectionsSchema = baseline.match(/create table if not exists public\.page_sections \([\s\S]*?\n\);/i)?.[0];
+  assert.ok(sectionsSchema);
+  await db.exec(sectionsSchema);
+  await db.exec(`insert into public.page_sections(page_id, section_key, content_json)
+    select id, 'home-health', '{"button_href":"#health","preserve":"home"}'::jsonb from public.pages where slug='home';
+    insert into public.page_sections(page_id, section_key, content_json)
+    select id, 'home-health', '{"button_href":"#health","preserve":"about"}'::jsonb from public.pages where slug='about';
+    insert into public.page_sections(page_id, section_key, content_json)
+    select id, 'other-section', '{"button_href":"#health"}'::jsonb from public.pages where slug='home';`);
+  const normalization = await readFile(new URL('../supabase/migrations/20260703000100_normalize_home_content_links.sql', import.meta.url), 'utf8');
+  const sectionUpdate = normalization.match(/update public\.page_sections\s[\s\S]*?;/i)?.[0];
+  assert.ok(sectionUpdate, 'Exercise the actual historical section normalization statement.');
+  await db.exec(sectionUpdate);
+  const sections = (await db.query('select p.slug, s.section_key, s.content_json from public.page_sections s join public.pages p on p.id=s.page_id order by p.slug,s.section_key')).rows;
+  assert.deepEqual(sections, [
+    {slug:'about',section_key:'home-health',content_json:{button_href:'#health',preserve:'about'}},
+    {slug:'home',section_key:'home-health',content_json:{button_href:'/health',preserve:'home'}},
+    {slug:'home',section_key:'other-section',content_json:{button_href:'#health'}}
+  ]);
+  await db.exec(sectionUpdate);
+  assert.deepEqual((await db.query('select p.slug, s.section_key, s.content_json from public.page_sections s join public.pages p on p.id=s.page_id order by p.slug,s.section_key')).rows, sections);
+  console.log('ok - CMS seeds preserve 17 pages; original-schema home link normalization is scoped and idempotent');
 } finally {
   await db.close();
 }
