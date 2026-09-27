@@ -20,3 +20,4 @@ dist
 /assets/backups/
 /public/assets/backups/
 /supabase/.temp/
+.env*

@@ -76,6 +76,7 @@ function portalClientFor(user, error = null, calls = []) {
       }
     : user;
   return () => ({
+    rpc:async(name)=>{assert.equal(name,'portal_session_status');return{data:{active:true,userId:authenticatedUser?.id},error:null};},
     auth: {
       async getUser(token) {
         calls.push(token);

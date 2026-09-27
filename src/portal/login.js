@@ -1,3 +1,5 @@
+const portalLogoutPendingKey='suiyuecare.portal.pendingModuleLogout.v1';
+let portalLogoutRunning=false;
 import { supabase } from "../lib/supabaseClient.js";
 
 const signOutButton = document.querySelector("#signOutButton");
@@ -393,6 +395,7 @@ const moduleIcons = {
 };
 
 const moduleLaunchUrls = {
+  hr: "https://hr.suiyuecare.com/",
   "day-care": "https://daycare.suiyuecare.com/login",
   accounting: "https://finance.suiyuecare.com/",
   edoc: "https://edoc.suiyuecare.com/",
@@ -400,14 +403,14 @@ const moduleLaunchUrls = {
 };
 
 const connectedModuleIds = new Set(Object.keys(moduleLaunchUrls));
-const temporarilyOpenModuleIds = new Set(["day-care", "accounting", "edoc", "apm", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
+const temporarilyOpenModuleIds = new Set(["hr", "day-care", "accounting", "edoc", "apm", "system-permissions", "organization-chart", "employee-accounts", "pdf-editor"]);
 const sharedGeneralAffairsModules = new Set(["pdf-editor"]);
 const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions", "organization-chart", "employee-accounts"]);
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
-const signedHandoffModuleIds = new Set(["edoc", "apm"]);
+const signedHandoffModuleIds = new Set(["edoc", "apm", "hr"]);
 // Signed assertions for eDoc/APM must never be placed in query strings. Both
 // modules accept the same no-store POST handoff shape at /api/auth/handoff.
-const postHandoffModuleIds = new Set(["edoc", "apm"]);
+const postHandoffModuleIds = new Set(["edoc", "apm", "hr"]);
 const externalLaunchOrigins = new Map(
   Object.entries(moduleLaunchUrls).map(([moduleId, launchUrl]) => [new URL(launchUrl).origin, moduleId])
 );
@@ -2811,6 +2814,7 @@ async function launchRequestedModuleIfReady(profile) {
 }
 
 async function applyGoogleSession() {
+  if(portalLogoutIsPending())return null;
   if (!supabase) {
     clearStoredProfile();
     renderSession(null);
@@ -2829,6 +2833,10 @@ async function applyGoogleSession() {
     clearStoredProfile();
     renderSession(null);
     return null;
+  }
+  const active=await supabase.rpc('portal_session_status');
+  if(active.error||active.data?.active!==true||active.data?.userId!==data.session?.user.id){
+    clearStoredProfile();renderSession(null);setStatus('登入狀態已失效或暫時無法確認，請重新登入。','error');return null;
   }
 
   let profile = findProfileByEmail(email);
@@ -5577,6 +5585,7 @@ function renderSecurityRestrictionTool(profile) {
 }
 
 async function bootPortalLogin() {
+  if(portalLogoutIsPending()){await performPortalLogout();return;}
   rememberRequestedModuleLaunch();
   const requestedLaunch = consumeRequestedModuleLaunch();
   showModuleLaunchLoading(requestedLaunch?.moduleId);
@@ -5586,13 +5595,34 @@ async function bootPortalLogin() {
   if (!(await launchRequestedModuleIfReady(profile))) hideModuleLaunchLoading(requestedLaunch?.moduleId);
 }
 
-signOutButton?.addEventListener("click", () => {
-  clearStoredProfile();
-  window.sessionStorage.removeItem(pendingModuleLaunchKey);
-  supabase?.auth.signOut();
-  renderSession(null);
-  setStatus("已登出，請使用 Google 帳號重新登入。", "success");
-});
+function portalLogoutIsPending(){return window.sessionStorage.getItem(portalLogoutPendingKey)==='1';}
+function showPortalLogoutProgress(message,busy,complete=false){
+  let panel=document.querySelector('#portal-module-logout');
+  if(!panel){panel=document.createElement('section');panel.id='portal-module-logout';panel.setAttribute('role','status');panel.setAttribute('aria-live','polite');panel.style.cssText='position:fixed;inset:0;z-index:99999;background:#fff8ef;display:grid;place-content:center;gap:20px;padding:24px;text-align:center;color:#4a3f35;';document.body.appendChild(panel);}
+  panel.replaceChildren();
+  const title=document.createElement('h1');title.textContent=complete?'已登出':'正在登出';title.style.cssText='font-size:24px;margin:0';panel.appendChild(title);
+  const text=document.createElement('p');text.textContent=message;panel.appendChild(text);
+  if(!busy){const button=document.createElement('button');button.type='button';button.textContent=complete?'回模組頁':'重試登出';button.className='primary-button';button.style.minHeight='44px';button.addEventListener('click',complete?()=>window.location.replace(portalHomePath):performPortalLogout);panel.appendChild(button);button.focus();}
+}
+async function performPortalLogout(){
+  if(portalLogoutRunning)return;
+  portalLogoutRunning=true;window.sessionStorage.setItem(portalLogoutPendingKey,'1');
+  clearStoredProfile();window.sessionStorage.removeItem(pendingModuleLaunchKey);renderSession(null);
+  if(userSummary)userSummary.textContent='';
+  showPortalLogoutProgress('正在登出人資、會計與模組頁…',true);
+  try{
+    const current=await supabase?.auth.getSession();
+    if(!current?.data.session)throw new Error('session');
+    const result=await fetch('/api/portal-handoff?action=logout',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${current.data.session.access_token}`},body:JSON.stringify({source:'portal'}),cache:'no-store',credentials:'omit',redirect:'error',signal:AbortSignal.timeout(30000)});
+    const data=await result.json();
+    if(!result.ok||data?.ok!==true||!Array.isArray(data.revokedModules)||!['hr','finance','portal'].every(id=>data.revokedModules.includes(id)))throw new Error('incomplete');
+    const out=await supabase.auth.signOut({scope:'local'});if(out.error)throw new Error('local');
+    window.sessionStorage.removeItem(portalLogoutPendingKey);
+    showPortalLogoutProgress('已登出人資、會計與模組頁。',false,true);
+  }catch{showPortalLogoutProgress('登出未全部完成，請重試；其他模組的結果尚未確認。',false);}
+  finally{portalLogoutRunning=false;}
+}
+signOutButton?.addEventListener('click',performPortalLogout);
 
 backToLevelOneButton?.addEventListener("click", () => {
   const parentId = moduleLevelTwo?.dataset.parentModuleId;

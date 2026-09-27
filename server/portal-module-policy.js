@@ -1,4 +1,4 @@
-const signedModuleIds = new Set(["apm", "edoc"]);
+const signedModuleIds = new Set(["apm", "edoc", "hr"]);
 
 // This is the immutable, server-owned subset of the Portal roster that is
 // currently marked 啟用 in src/portal/login.js. Browser localStorage overrides

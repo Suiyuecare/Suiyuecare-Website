@@ -39,7 +39,7 @@ export function employeeHandler(email, options = {}) {
       FINANCE_SOURCE_SECRET_KEY: "sb_secret_" + "f".repeat(48),
       APM_PORTAL_SIGNING_SECRET: secrets.apm, EDOC_PORTAL_HANDOFF_SECRET: secrets.edoc
     },
-    createPortalClient: () => ({ auth: { getUser: async (token) => ({
+    createPortalClient: () => ({ rpc:async()=>({data:{active:true,userId:user?.id},error:null}),auth: { getUser: async (token) => ({
       data: { user: token === fixtureToken ? user : null }, error: null
     }) } }),
     fetchImplementation: async (input, init) => {
@@ -121,7 +121,7 @@ export async function verifyEmployeeModules() {
     }
     assert.equal(reads.length, 3, "Profile and both signed handoffs revalidate independently"); checks++;
     for (const moduleId of ["accounting", "website-backoffice", "system-permissions", "hr"]) {
-      assert.equal((await invokePortal(handler, "POST", { moduleId, email })).statusCode, 400); checks++;
+      assert.equal((await invokePortal(handler, "POST", { moduleId, email })).statusCode, moduleId === "hr" ? 403 : 400); checks++;
     }
     // A malicious or stale profile cannot add a fourth module or lose exact identity.
     for (const patch of [{ allowedModules: [...allowedModules, "website-backoffice"] }, { allowedModules: ["apm"] }, { email: "someone-else@suiyuecare.com" }]) {
