@@ -59,7 +59,7 @@ function parseBody(body) {
   return typeof body === "object" && !Array.isArray(body) ? body : {};
 }
 
-function getSupabaseClient(environment = process.env) {
+function getSupabaseClient(environment = process.env, token = '') {
   const supabaseUrl = environment.SUPABASE_URL || environment.VITE_SUPABASE_URL;
   const publishableKey = environment.VITE_SUPABASE_ANON_KEY || environment.SUPABASE_PUBLISHABLE_KEY;
   if (!supabaseUrl || !publishableKey) {
@@ -67,6 +67,7 @@ function getSupabaseClient(environment = process.env) {
   }
 
   return createClient(supabaseUrl, publishableKey, {
+    global: {headers: token ? {Authorization:`Bearer ${token}`} : {}},
     auth: {
       persistSession: false,
       autoRefreshToken: false,
@@ -86,7 +87,7 @@ async function requireUser(request, createPortalClient, environment) {
     throw new SafeHttpError(401, "Portal session is required.");
   }
 
-  const supabase = createPortalClient(environment);
+  const supabase = createPortalClient(environment, token);
   const { data, error } = await supabase.auth.getUser(token);
   const email = preferredGoogleIdentityEmail(data?.user);
   if (error || !data?.user || !email) {
@@ -95,6 +96,8 @@ async function requireUser(request, createPortalClient, environment) {
   if (!isConfirmedGoogleUser(data.user, email)) {
     throw new SafeHttpError(403, "A confirmed Google identity is required.");
   }
+  const active = await supabase.rpc('portal_session_status');
+  if(active.error || active.data?.active!==true || active.data?.userId!==data.user.id) throw new SafeHttpError(401,'Portal session is no longer active.');
   return { ...data.user, email };
 }
 
@@ -107,7 +110,7 @@ function base64Url(value) {
 }
 
 function signPayload(payload, moduleId, environment = process.env) {
-  const secret = moduleId === "apm"
+  const secret = moduleId === "hr" ? environment.HR_PORTAL_SIGNING_SECRET : moduleId === "apm"
     ? environment.APM_PORTAL_SIGNING_SECRET
     : environment.PORTAL_HANDOFF_SIGNING_SECRET || environment.EDOC_PORTAL_HANDOFF_SECRET;
   if (!secret || Buffer.byteLength(secret, "utf8") < 32) {
@@ -155,6 +158,9 @@ async function authorizeModule(moduleId, email, dependencies) {
   if (!isSignedModule(moduleId)) {
     throw new SafeHttpError(400, "Module is not allowed for Portal handoff.");
   }
+  // HR independently requires an existing exact Google identity and fresh
+  // server-owned employer membership before it can create a session.
+  if(moduleId==='hr')return 'hr-current-membership';
   if (staticPortalGrantAllows(email, moduleId)) {
     return "portal-static-roster";
   }
@@ -183,6 +189,11 @@ function normalizePayload(rawPayload, user, moduleId, issuedAt, randomUUID) {
     exp: issuedAt + 10 * 60,
     jti: randomUUID()
   };
+  if(moduleId==='hr'){
+    const google=(user.identities||[]).filter(identity=>identity.provider==='google'&&identity.identity_data?.email_verified===true&&normalizeEmail(identity.identity_data?.email)===user.email&&typeof identity.identity_data?.sub==='string');
+    if(google.length!==1 || !google[0].identity_data.sub || google[0].identity_data.sub.length>256)throw new SafeHttpError(403,'A unique confirmed Google identity is required.');
+    return {...commonIdentity,exp:issuedAt+60,aud:'hr',source:'logging-portal',googleSubject:google[0].identity_data.sub};
+  }
   if (moduleId === "apm") {
     return {
       ...commonIdentity,
@@ -253,8 +264,12 @@ function createPortalHandoffHandler(dependencies = {}) {
 function createPortalApiHandler(dependencies = {}) {
   const financeProfileHandler = createPortalFinanceProfileHandler(dependencies);
   const handoffHandler = createPortalHandoffHandler(dependencies);
+  const logoutHandler = require('../server/portal-logout.js').createPortalLogoutHandler(dependencies);
 
   return async function handler(request, response) {
+    if (request.query?.action === 'logout' || new URL(request.url || '/', 'https://login.suiyuecare.com').searchParams.get('action') === 'logout') {
+      return logoutHandler(request, response);
+    }
     if (request.method === "GET") {
       return financeProfileHandler(request, response);
     }

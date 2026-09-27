@@ -26,13 +26,14 @@ function bearerToken(request) {
   return String(header).match(/^Bearer\s+([^\s]+)$/i)?.[1] || "";
 }
 
-function portalSupabaseClient(environment = process.env) {
+function portalSupabaseClient(environment = process.env, token='') {
   const url = environment.SUPABASE_URL || environment.VITE_SUPABASE_URL;
   const key = environment.VITE_SUPABASE_ANON_KEY || environment.SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) {
     throw new SafeHttpError(503, "Portal profile service is not configured.");
   }
   return createClient(url, key, {
+    global:{headers:token?{Authorization:`Bearer ${token}`}:{}} ,
     auth: {
       persistSession: false,
       autoRefreshToken: false,
@@ -47,7 +48,7 @@ async function requirePortalUser(request, createPortalClient, environment) {
     throw new SafeHttpError(401, "Portal session is required.");
   }
 
-  const portalClient = createPortalClient(environment);
+  const portalClient = createPortalClient(environment,token);
   const { data, error } = await portalClient.auth.getUser(token);
   const email = preferredGoogleIdentityEmail(data?.user);
   if (error || !data?.user || !email) {
@@ -56,6 +57,8 @@ async function requirePortalUser(request, createPortalClient, environment) {
   if (!isConfirmedGoogleUser(data.user, email)) {
     throw new SafeHttpError(403, "A confirmed Google identity is required.");
   }
+  const active=await portalClient.rpc('portal_session_status');
+  if(active.error || active.data?.active!==true || active.data?.userId!==data.user.id)throw new SafeHttpError(401,'Portal session is no longer active.');
   return { id: data.user.id, email };
 }
 

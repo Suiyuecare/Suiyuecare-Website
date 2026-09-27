@@ -110,8 +110,8 @@ await test("daycare is connected without joining the signed-handoff policy", () 
   assertCleanDaycareUrl(subject.moduleLaunchUrls["day-care"]);
   check(subject.connectedModuleIds.has("day-care"), true);
   check(subject.temporarilyOpenModuleIds.has("day-care"), true);
-  check(Array.from(subject.signedHandoffModuleIds).sort(), ["apm", "edoc"]);
-  check(Array.from(subject.postHandoffModuleIds).sort(), ["apm", "edoc"]);
+  check(Array.from(subject.signedHandoffModuleIds).sort(), ["apm", "edoc", "hr"]);
+  check(Array.from(subject.postHandoffModuleIds).sort(), ["apm", "edoc", "hr"]);
 });
 
 const allowedProfiles = [
@@ -149,7 +149,7 @@ const deniedProfiles = [
   ["string modules cannot impersonate array", { ...ceo, modules: "day-care" }],
   ["custom includes is not a module array", { ...ceo, modules: { includes: () => true } }],
   ["Finance APM-only may not enter even with spoofed CEO fields", { ...ceo, financeApmOnly: true }],
-  ["Finance-managed missing module", { ...ceo, financeManaged: true, modules: ["apm", "edoc"] }],
+  ["Finance-managed missing module", { ...ceo, financeManaged: true, modules: ["apm", "edoc", "hr"] }],
   ["client permission strings alone", { email: ceo.email, role: "ceo", modulePermissions: { roleKey: "ceo" }, modules: ["day-care"] }]
 ];
 for (const [name, profile] of deniedProfiles) {
@@ -254,7 +254,7 @@ await test("APM journal and survey notifications retain their exact destination"
   }
 });
 
-for (const moduleId of ["apm", "edoc"]) {
+for (const moduleId of ["apm", "edoc", "hr"]) {
   await test(`${moduleId} retains signed POST handoff instead of token query strings`, async () => {
     await assert.rejects(() => subject.buildModuleLaunchUrl(moduleId, ceo), /POST/u);
     assertions += 1;

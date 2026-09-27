@@ -48,7 +48,7 @@ async function invoke(authUser, method, claimedEmail = email) {
       FINANCE_SOURCE_SUPABASE_URL: "https://udtlppnrugmtzhigdsxo.supabase.co",
       FINANCE_SOURCE_SECRET_KEY: `sb_secret_${"f".repeat(48)}`
     },
-    createPortalClient: () => ({ auth: { getUser: async token => {
+    createPortalClient: () => ({ rpc:async()=>({data:{active:true,userId:authUser?.id},error:null}),auth: { getUser: async token => {
       assert.equal(token, "verified-session");
       return { data: { user: authUser }, error: null };
     } } }),

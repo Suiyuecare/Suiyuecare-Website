@@ -255,7 +255,7 @@ function verifyApmPortalHandoff() {
 
   for (const expected of [
     'apm: "https://apm.suiyuecare.com/"',
-    'const postHandoffModuleIds = new Set(["edoc", "apm"])',
+    'const postHandoffModuleIds = new Set(["edoc", "apm", "hr"])',
     'form.action = new URL("/api/auth/handoff", configuredUrl).toString()',
     'moduleId === "edoc"\n    ? [["token", signedHandoff.token]]',
     ': [["payload", signedHandoff.payload], ["signature", signedHandoff.signature]]',
@@ -388,10 +388,10 @@ function verifyApmPortalHandoff() {
     "Portal handoff must use server grants and must not copy browser authorization fields."
   );
   assert(
-    modulePolicy.includes('const signedModuleIds = new Set(["apm", "edoc"])')
+    modulePolicy.includes('const signedModuleIds = new Set(["apm", "edoc", "hr"])')
       && !modulePolicy.includes('"accounting"')
       && !modulePolicy.includes('"website-backoffice"'),
-    "Only APM and EDOC may consume signed Portal assertions."
+    "Only reviewed APM, EDOC and HR receivers may consume signed Portal assertions."
   );
 
   for (const expected of [

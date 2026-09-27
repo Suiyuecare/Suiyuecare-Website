@@ -34,6 +34,7 @@ function verifiedGoogleUser(email, overrides = {}) {
 
 function portalClientFor(user, error = null, calls = []) {
   return () => ({
+    rpc:async(name)=>{assert.equal(name,'portal_session_status');return {data:{active:true,userId:user?.id},error:null};},
     auth: {
       async getUser(token) {
         calls.push(token);
