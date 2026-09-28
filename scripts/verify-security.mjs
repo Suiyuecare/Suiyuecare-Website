@@ -398,7 +398,7 @@ function verifyApmPortalHandoff() {
     'fetch("/api/portal-handoff", {\n    method: "GET"',
     'profile = await findFinancePortalProfile(data.session, email)',
     'financeManaged: true',
-    'if (profile?.financeManaged) return profile.modules.includes(module.id)',
+    'if (profile?.financeManaged) return module.id === "hr" || profile.modules.includes(module.id)',
     'modules: ["accounting", "apm", "edoc"]'
   ]) {
     assert(portal.includes(expected), `Portal Finance fallback guard is missing ${expected}.`);

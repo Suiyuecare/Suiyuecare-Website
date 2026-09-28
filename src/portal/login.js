@@ -2872,7 +2872,10 @@ function modulePermissionAllowsRole(moduleId, roleId) {
 
 function moduleIsAllowed(module, profile) {
   if (module.id === "day-care") return canOpenDaycareEntry(profile);
-  if (profile?.financeManaged) return profile.modules.includes(module.id);
+  // Finance proves the person's Portal identity, not their HR authorization.
+  // Let a confirmed Finance-managed user request HR entry; HR checks its own
+  // current Google identity and employer membership before opening a session.
+  if (profile?.financeManaged) return module.id === "hr" || profile.modules.includes(module.id);
   const profileRoleId = profile.sourceProfileId || profile.id;
   if (module.id === "general-affairs") return true;
   if (sharedGeneralAffairsModules.has(module.id)) return true;
@@ -2886,6 +2889,9 @@ function moduleIsAllowed(module, profile) {
 function getModuleAccessState(module, profile) {
   const hasChildren = Array.isArray(module.children) && module.children.length > 0;
   const allowed = moduleIsAllowed(module, profile);
+  if (profile?.financeManaged && module.id === "hr") {
+    return { allowed: true, actionText: "核對權限", status: "ready" };
+  }
   const hasAllowedChild = hasChildren && module.children.some((child) => moduleIsAllowed(child, profile));
   const isTemporarilyOpen = temporarilyOpenModuleIds.has(module.id);
   const hasOpenChild = hasChildren && module.children.some(
@@ -3035,7 +3041,7 @@ function createModuleButton(module, profile) {
     <span class="module-number">${moduleIcons[module.id] || module.number}</span>
     <span class="module-card-main">
       <strong>${getModuleDisplayName(module)}</strong>
-      <small>${moduleDescriptions[module.id] || "依角色權限開放"}</small>
+      <small>${profile?.financeManaged && module.id === "hr" ? "由人資系統確認授權" : moduleDescriptions[module.id] || "依角色權限開放"}</small>
     </span>
     <span class="module-card-footer">
       <span>${getOwnerDisplayName(owner)}｜${scopeText}</span>
