@@ -35,7 +35,9 @@ const environment = {
     portalSource.slice(staticLookup, financeLookup).includes("if (!profile)"),
     "Finance lookup must remain a static-profile miss fallback"
   );
-  assert.ok(portalSource.includes('if (profile?.financeManaged) return profile.modules.includes(module.id)'));
+  assert.ok(portalSource.includes('if (profile?.financeManaged) return module.id === "hr" || profile.modules.includes(module.id)'));
+  assert.ok(portalSource.includes('actionText: "核對權限"'));
+  assert.ok(portalSource.includes('由人資系統確認授權'));
   assert.ok(portalSource.includes('modules: ["accounting", "apm", "edoc"]'));
 }
 

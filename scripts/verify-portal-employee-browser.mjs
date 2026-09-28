@@ -5,7 +5,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-import { employeeEmails, employeeHandler, invokePortal, verifyAssertion, fixtureToken } from "./verify-portal-employee-modules.mjs";
+import { employeeEmails, employeeHandler, invokePortal, verifyAssertion, fixtureToken, entryModules } from "./verify-portal-employee-modules.mjs";
 
 const require = createRequire(import.meta.url);
 const { chromium } = process.env.PORTAL_PLAYWRIGHT_MODULE
@@ -31,7 +31,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === "/src/lib/supabaseClient.js") {
       res.writeHead(200, { "content-type": "text/javascript" });
-      res.end(`export const supabase = {auth:{async getSession(){return {data:{session:{access_token:${JSON.stringify(fixtureToken)},user:{id:'fictional-browser-auth',email:window.__fixtureEmail}}},error:null}},async signOut(){return {}},async signInWithOAuth(){throw new Error('No real OAuth in this test')}}};`);
+      res.end(`export const supabase = {rpc:async(name)=>({data:{active:name==='portal_session_status',userId:'fictional-browser-auth'},error:null}),auth:{async getSession(){return {data:{session:{access_token:${JSON.stringify(fixtureToken)},user:{id:'fictional-browser-auth',email:window.__fixtureEmail}}},error:null}},async signOut(){return {}},async signInWithOAuth(){throw new Error('No real OAuth in this test')}}};`);
       return;
     }
     const target = path.join(root, pathname === "/portal/" ? "portal/index.html" : pathname.replace(/^\//, ""));
@@ -58,7 +58,7 @@ try {
         const request = route.request();
         const url = new URL(request.url());
         if (url.origin === origin) return route.continue();
-        if (["finance.suiyuecare.com", "edoc.suiyuecare.com", "apm.suiyuecare.com"].includes(url.hostname)) {
+        if (["finance.suiyuecare.com", "edoc.suiyuecare.com", "apm.suiyuecare.com", "hr.suiyuecare.com"].includes(url.hostname)) {
           received.push({ url: url.toString(), method: request.method(), body: request.postData() });
           return route.fulfill({ status: 200, contentType: "text/html", body: "<p>Local destination fixture</p>" });
         }
@@ -72,15 +72,16 @@ try {
       };
       await open();
       const cards = await page.locator("#moduleLevelOneGrid .module-card").evaluateAll((nodes) => nodes.map((node) => ({ id: node.dataset.moduleId, status: node.dataset.accessStatus })));
-      assert.deepEqual(cards.filter((card) => card.status === "ready").map((card) => card.id).sort(), ["accounting", "apm", "edoc"]);
-      assert.equal(cards.filter((card) => !["accounting", "apm", "edoc"].includes(card.id)).every((card) => card.status === "denied"), true);
+      assert.deepEqual(cards.filter((card) => card.status === "ready").map((card) => card.id).sort(), [...entryModules].sort());
+      assert.equal(cards.filter((card) => !entryModules.includes(card.id)).every((card) => card.status === "denied"), true);
+      assert.match(await page.locator('[data-module-id="hr"]').textContent(), /由人資系統確認授權.*核對權限/s);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
       assert.equal(overflow, false);
       if (index === 1) await page.screenshot({ path: path.join(output, `modules-${width}.png`), fullPage: true });
       await page.locator('[data-module-id="website-backoffice"]').click({ force: true });
       assert.match(await page.locator("#loginStatus").textContent(), /此帳號無權限/);
       assert.equal(received.length, 0);
-      for (const moduleId of ["accounting", "edoc", "apm"]) {
+      for (const moduleId of ["accounting", "edoc", "apm", "hr"]) {
         if (moduleId !== "accounting") await open();
         const count = received.length;
         await page.locator(`[data-module-id="${moduleId}"]`).click();
@@ -97,7 +98,7 @@ try {
           verifyAssertion({ statusCode: 200, headers: { "cache-control": "no-store" }, body: { payload, signature } }, moduleId, email);
         }
       }
-      evidence.cases.push({ width, identity: index, threeModulesVisible: true, deniedAdminClick: true, ownFinanceEntry: true, signedEdocAndApm: true, overflow });
+      evidence.cases.push({ width, identity: index, threeFinanceGrantsAndHrCheckVisible: true, deniedAdminClick: true, ownFinanceEntry: true, signedEdocApmAndHr: true, overflow });
       await context.close();
     }
     for (const [name, options] of [["inactive", { rows: [] }], ["unverified", { user: { email_confirmed_at: null } }]]) {
@@ -118,7 +119,7 @@ try {
   assert.deepEqual(evidence.errors, []);
   assert.deepEqual(hashes(), before);
   evidence.ok = true;
-  console.log(`ok - ${evidence.cases.length} desktop/mobile Portal scenarios, 18 real destination clicks, no external network or page errors`);
+  console.log(`ok - ${evidence.cases.length} desktop/mobile Portal scenarios, 24 real destination clicks, no external network or page errors`);
 } finally {
   evidence.after = hashes();
   fs.writeFileSync(path.join(output, "evidence.json"), JSON.stringify(evidence, null, 2));

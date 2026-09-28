@@ -12,8 +12,9 @@ const source = fs.readFileSync(new URL("../src/portal/login.js", import.meta.url
 const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
 export const employeeEmails = ["reference@example.suiyuecare.com", "new-employee-one@example.suiyuecare.com", "new-employee-two@example.suiyuecare.com"];
 export const allowedModules = ["accounting", "apm", "edoc"];
+export const entryModules = [...allowedModules, "hr"];
 export const fixtureToken = "fictional-local-session-only";
-const secrets = { apm: "a".repeat(48), edoc: "e".repeat(48) };
+const secrets = { apm: "a".repeat(48), edoc: "e".repeat(48), hr: "h".repeat(48) };
 
 // All identities and transport results are local fixtures. No real session is
 // requested and no real account, role, roster or notification is written.
@@ -23,7 +24,7 @@ export function employeeHandler(email, options = {}) {
     id: "fictional-portal-auth-id", email,
     email_confirmed_at: "2026-09-14T00:00:00Z",
     app_metadata: { provider: "google", providers: ["google"] },
-    identities: [{ provider: "google", identity_data: { email } }],
+    identities: [{ provider: "google", identity_data: { email, email_verified: true, sub: "fictional-google-subject" } }],
     ...options.user
   };
   const row = {
@@ -37,7 +38,8 @@ export function employeeHandler(email, options = {}) {
       SUPABASE_PUBLISHABLE_KEY: "sb_publishable_localfixture",
       FINANCE_SOURCE_SUPABASE_URL: "https://udtlppnrugmtzhigdsxo.supabase.co",
       FINANCE_SOURCE_SECRET_KEY: "sb_secret_" + "f".repeat(48),
-      APM_PORTAL_SIGNING_SECRET: secrets.apm, EDOC_PORTAL_HANDOFF_SECRET: secrets.edoc
+      APM_PORTAL_SIGNING_SECRET: secrets.apm, EDOC_PORTAL_HANDOFF_SECRET: secrets.edoc,
+      HR_PORTAL_SIGNING_SECRET: secrets.hr
     },
     createPortalClient: () => ({ rpc:async()=>({data:{active:true,userId:user?.id},error:null}),auth: { getUser: async (token) => ({
       data: { user: token === fixtureToken ? user : null }, error: null
@@ -72,10 +74,16 @@ export function verifyAssertion(result, moduleId, email) {
   const claim = JSON.parse(Buffer.from(body.payload, "base64url").toString());
   assert.equal(claim.email, email);
   assert.equal(claim.aud, moduleId);
-  assert.equal(claim.exp - claim.iat, 600);
-  assert.deepEqual(Object.keys(claim).sort(), (moduleId === "edoc"
+  assert.equal(claim.exp - claim.iat, moduleId === "hr" ? 60 : 600);
+  assert.deepEqual(Object.keys(claim).sort(), (moduleId === "hr"
+    ? ["email", "iat", "exp", "jti", "source", "aud", "googleSubject"]
+    : moduleId === "edoc"
     ? ["email", "iat", "exp", "jti", "source", "aud", "moduleId", "authUserId"]
     : ["email", "iat", "exp", "jti", "aud", "returnTo"]).sort());
+  if (moduleId === "hr") {
+    assert.equal(claim.googleSubject, "fictional-google-subject");
+    assert.equal(claim.source, "logging-portal");
+  }
   assert.equal(result.headers["cache-control"], "no-store");
   return claim;
 }
@@ -101,7 +109,7 @@ export async function verifyEmployeeModules() {
       modulePermissionAllowsRole: () => true, sharedGeneralAffairsModules: new Set(["pdf-editor"]),
       restrictedGeneralAffairsModules: new Set(["system-permissions", "organization-chart"]),
       generalAffairsManagers: new Set(["ceo"]),
-      temporarilyOpenModuleIds: new Set(allowedModules), connectedModuleIds: new Set(allowedModules)
+      temporarilyOpenModuleIds: new Set(entryModules), connectedModuleIds: new Set(entryModules)
     });
     vm.runInContext(realFunctions(["normalizeEmail", "findFinancePortalProfile", "canOpenDaycareEntry", "moduleIsAllowed", "getModuleAccessState", "buildModuleLaunchUrl"]), context);
     const profile = await context.findFinancePortalProfile({ access_token: fixtureToken }, email);
@@ -111,17 +119,21 @@ export async function verifyEmployeeModules() {
     for (const moduleId of allowedModules) {
       assert.equal(context.getModuleAccessState({ id: moduleId }, profile).status, "ready"); checks++;
     }
-    for (const moduleId of ["hr", "day-care", "website-backoffice", "system-permissions", "employee-accounts", "organization-chart", "general-affairs", "pdf-editor"]) {
+    const hrAccess = context.getModuleAccessState({ id: "hr" }, profile);
+    assert.equal(hrAccess.status, "ready");
+    assert.equal(hrAccess.actionText, "核對權限"); checks++;
+    for (const moduleId of ["day-care", "website-backoffice", "system-permissions", "employee-accounts", "organization-chart", "general-affairs", "pdf-editor"]) {
       assert.equal(context.getModuleAccessState({ id: moduleId }, profile).status, "denied", moduleId); checks++;
     }
     assert.equal(await context.buildModuleLaunchUrl("accounting", profile, "https://attacker.invalid/"), "https://finance.suiyuecare.com/"); checks++;
-    for (const moduleId of ["apm", "edoc"]) {
+    for (const moduleId of ["apm", "edoc", "hr"]) {
       const assertion = await invokePortal(handler, "POST", { moduleId, email, role: "ceo", scope: "group", actions: ["manage"], authUserId: "attacker", returnTo: "/tasks" });
-      verifyAssertion(assertion, moduleId, email); checks++;
+      const claim = verifyAssertion(assertion, moduleId, email);
+      assert.equal(Object.hasOwn(claim, "role"), false); checks++;
     }
-    assert.equal(reads.length, 3, "Profile and both signed handoffs revalidate independently"); checks++;
-    for (const moduleId of ["accounting", "website-backoffice", "system-permissions", "hr"]) {
-      assert.equal((await invokePortal(handler, "POST", { moduleId, email })).statusCode, moduleId === "hr" ? 403 : 400); checks++;
+    assert.equal(reads.length, 3, "HR authorization remains with HR; only APM and eDoc re-read Finance"); checks++;
+    for (const moduleId of ["accounting", "website-backoffice", "system-permissions"]) {
+      assert.equal((await invokePortal(handler, "POST", { moduleId, email })).statusCode, 400); checks++;
     }
     // A malicious or stale profile cannot add a fourth module or lose exact identity.
     for (const patch of [{ allowedModules: [...allowedModules, "website-backoffice"] }, { allowedModules: ["apm"] }, { email: "someone-else@suiyuecare.com" }]) {
