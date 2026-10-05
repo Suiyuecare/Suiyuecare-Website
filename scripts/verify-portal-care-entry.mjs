@@ -9,13 +9,14 @@ const source = fs.readFileSync(new URL("../src/portal/login.js", import.meta.url
 const functionNames = [
   "normalizeEmail", "getModuleDisplayName", "canOpenDaycareEntry", "moduleIsAllowed",
   "getModuleAccessState", "buildModuleLaunchUrl", "launchConnectedModule",
-  "safeModuleLaunchRequest", "moduleReturnPath"
+  "safeModuleLaunchRequest", "moduleReturnPath", "getPortalRedirectUrl"
 ];
 const declarationNames = [
   "modules", "moduleDisplayNames", "moduleDescriptions", "moduleLaunchUrls", "connectedModuleIds",
   "temporarilyOpenModuleIds", "sharedGeneralAffairsModules", "restrictedGeneralAffairsModules",
   "generalAffairsManagers", "signedHandoffModuleIds", "postHandoffModuleIds",
-  "externalLaunchOrigins", "apmWorkspacePaths", "portalProductionOrigin"
+  "externalLaunchOrigins", "apmWorkspacePaths", "portalProductionOrigin",
+  "portalOAuthBridgeOrigin", "portalHomePath"
 ];
 
 function functionSource(name) {
@@ -34,8 +35,10 @@ function declarationSource(name) {
 
 const calls = { payload: [], signed: [], submit: [], encoded: [], navigation: [], paint: [], network: [] };
 let broadRolePermission = false;
+let requestedRedirectLaunch = null;
 const context = vm.createContext({
   URL, URLSearchParams, console,
+  consumeRequestedModuleLaunch: () => requestedRedirectLaunch,
   modulePermissionAllowsRole: () => broadRolePermission,
   buildModuleLaunchPayload(moduleId, profile, returnTo = "") {
     calls.payload.push({ moduleId, returnTo });
@@ -50,6 +53,7 @@ const context = vm.createContext({
   async waitForModuleLaunchLoadingPaint(moduleId) { calls.paint.push(moduleId); },
   fetch(...args) { calls.network.push(args); throw new Error("REAL_NETWORK_FORBIDDEN_IN_CARE_ENTRY_TEST"); },
   window: { location: {
+    protocol: "https:", hostname: "login.suiyuecare.com", origin: "https://login.suiyuecare.com",
     assign(url) { calls.navigation.push({ mode: "assign", url }); },
     replace(url) { calls.navigation.push({ mode: "replace", url }); }
   } }
@@ -59,10 +63,14 @@ vm.runInContext([
   `globalThis.subject = { ${[...declarationNames, ...functionNames].join(", ")} };`
 ].join("\n"), context, { timeout: 1000, filename: "portal-care-entry-extracted.js" });
 const subject = context.subject;
-const daycareUrl = "https://daycare.suiyuecare.com/login";
+const daycareUrl = "https://daycare.suiyuecare.com/app";
 const ceo = {
   id: "synthetic-employee", sourceProfileId: "ceo", roleKey: "ceo",
   email: "entrepreneur@suiyuecare.com", modules: ["business", "home-care", "day-care", "accounting", "edoc", "apm"]
+};
+const director = {
+  id: "synthetic-director", sourceProfileId: "section-chief", roleKey: "section-chief",
+  email: "daycare.wanhua@suiyuecare.com", modules: ["business", "day-care"]
 };
 const business = subject.modules.find((module) => module.id === "business");
 const daycare = business?.children.find((module) => module.id === "day-care");
@@ -72,7 +80,7 @@ let cases = 0;
 let assertions = 0;
 function check(actual, expected, message) { assertions += 1; assert.deepEqual(plain(actual), plain(expected), message); }
 function ok(value, message) { assertions += 1; assert.ok(value, message); }
-function resetCalls() { for (const value of Object.values(calls)) value.length = 0; broadRolePermission = false; }
+function resetCalls() { for (const value of Object.values(calls)) value.length = 0; broadRolePermission = false; requestedRedirectLaunch = null; }
 async function test(name, run) {
   resetCalls();
   try { await run(); cases += 1; }
@@ -100,22 +108,33 @@ await test("exact existing business hierarchy and display labels", () => {
   ]);
   check(subject.getModuleDisplayName(homecare), "居家照顧系統");
   check(subject.getModuleDisplayName(daycare), "日間照顧系統");
-  check(subject.moduleDescriptions["day-care"], "日照管理驗證版，僅開放執行長使用 Google 登入");
+  check(subject.moduleDescriptions["day-care"], "登入後直接進入日照工作台");
   ok(!subject.moduleDescriptions["day-care"].includes("Google 登入設定中"));
   ok(!subject.moduleDescriptions["day-care"].includes("雙因素驗證"));
   check(subject.modules.filter((module) => module.id === "business").length, 1);
 });
 
-await test("daycare is connected without joining the signed-handoff policy", () => {
+await test("daycare is connected through signed POST handoff", () => {
   assertCleanDaycareUrl(subject.moduleLaunchUrls["day-care"]);
   check(subject.connectedModuleIds.has("day-care"), true);
   check(subject.temporarilyOpenModuleIds.has("day-care"), true);
-  check(Array.from(subject.signedHandoffModuleIds).sort(), ["apm", "edoc", "hr"]);
-  check(Array.from(subject.postHandoffModuleIds).sort(), ["apm", "edoc", "hr"]);
+  check(Array.from(subject.signedHandoffModuleIds).sort(), ["apm", "day-care", "edoc", "hr"]);
+  check(Array.from(subject.postHandoffModuleIds).sort(), ["apm", "day-care", "edoc", "hr"]);
+});
+
+await test("fresh Google OAuth preserves only the Daycare module, not client paths, on its bridge return", () => {
+  requestedRedirectLaunch = { moduleId: "day-care", returnTo: `${daycareUrl}/staff/assessments/physical?client=synthetic` };
+  check(subject.getPortalRedirectUrl(),
+    "https://suiyuecare-website.vercel.app/portal/?module=day-care");
+  requestedRedirectLaunch = { moduleId: "day-care", returnTo: "https://evil.example/app" };
+  check(subject.getPortalRedirectUrl(), "https://suiyuecare-website.vercel.app/portal/");
+  requestedRedirectLaunch = { moduleId: "apm", returnTo: "https://apm.suiyuecare.com/tasks" };
+  check(subject.getPortalRedirectUrl(), "https://suiyuecare-website.vercel.app/portal/");
 });
 
 const allowedProfiles = [
   ["exact CEO", ceo],
+  ["exact director", director],
   ["normalized email", { ...ceo, email: "  ENTREPRENEUR@SUIYUECARE.COM  " }],
   ["roleKey fallback", { ...ceo, sourceProfileId: "", roleKey: "ceo" }],
   ["id fallback", { ...ceo, sourceProfileId: undefined, roleKey: undefined, id: "ceo" }],
@@ -137,6 +156,8 @@ const deniedProfiles = [
   ["missing email", { ...ceo, email: undefined }],
   ["other account with CEO role", { ...ceo, email: "other@example.test" }],
   ["company colleague with CEO role", { ...ceo, email: "colleague@suiyuecare.com" }],
+  ["director email with CEO role", { ...ceo, email: director.email }],
+  ["director role with CEO email", { ...director, email: ceo.email }],
   ["lookalike email suffix", { ...ceo, email: "entrepreneur@suiyuecare.com.evil.example" }],
   ["staff source overrides spoofed CEO role", { ...ceo, sourceProfileId: "staff", roleKey: "ceo", id: "ceo" }],
   ["staff roleKey overrides spoofed CEO id", { ...ceo, sourceProfileId: "", roleKey: "staff", id: "ceo" }],
@@ -160,8 +181,8 @@ for (const [name, profile] of deniedProfiles) {
     const state = subject.getModuleAccessState(daycare, profile);
     check(state.allowed, false);
     check(state.status, "denied");
-    await assert.rejects(() => subject.buildModuleLaunchUrl("day-care", profile), /僅開放執行長帳號/u);
-    await assert.rejects(() => subject.launchConnectedModule("day-care", profile), /僅開放執行長帳號/u);
+    await assert.rejects(() => subject.buildModuleLaunchUrl("day-care", profile), /尚未開通/u);
+    await assert.rejects(() => subject.launchConnectedModule("day-care", profile), /尚未開通/u);
     assertions += 2;
     check(calls.navigation.length, 0);
     assertNoIdentityTransfer();
@@ -180,26 +201,38 @@ await test("business is a usable folder for CEO, homecare remains unconfigured",
   assertNoIdentityTransfer();
 });
 
-for (const override of [
-  "", "https://evil.example/", "//evil.example/", "javascript:alert(1)",
-  "https://finance.suiyuecare.com/", "https://daycare.suiyuecare.com/app/dashboard?email=synthetic&role=admin#access_token=synthetic",
-  "https://daycare.suiyuecare.com/login?next=https://evil.example&payload=synthetic&signature=synthetic"
+for (const [url, returnTo] of [
+  ["", "/app"],
+  [daycareUrl, "/app"],
+  ["https://daycare.suiyuecare.com/app/staff/assessments/abcd?client=123", "/app/staff/assessments/abcd?client=123"]
 ]) {
-  await test(`daycare launch ignores override (${override ? "provided" : "empty"})`, async () => {
-    assertCleanDaycareUrl(await subject.buildModuleLaunchUrl("day-care", ceo, override));
-    check(await subject.launchConnectedModule("day-care", ceo, override), true);
-    check(calls.navigation.length, 1);
-    check(calls.navigation[0].mode, "assign");
-    assertCleanDaycareUrl(calls.navigation[0].url);
-    assertNoIdentityTransfer();
+  await test(`daycare creates signed POST for ${returnTo}`, async () => {
+    await assert.rejects(() => subject.buildModuleLaunchUrl("day-care", ceo, url), /POST/u);
+    assertions += 1;
+    check(await subject.launchConnectedModule("day-care", ceo, url), true);
+    check(calls.payload.length, 1);
+    check(calls.payload[0].returnTo, returnTo);
+    check(calls.signed.length, 1);
+    check(calls.submit.length, 1);
+    check(calls.submit[0].moduleId, "day-care");
+    check(calls.navigation.length, 0);
+    check(calls.encoded.length, 0);
+    check(calls.network.length, 0);
   });
 }
 
-await test("replace navigation stays fixed and carries no identity", async () => {
-  check(await subject.launchConnectedModule("day-care", ceo, "https://evil.example", "replace"), true);
-  check(calls.navigation, [{ mode: "replace", url: daycareUrl }]);
-  assertNoIdentityTransfer();
-});
+for (const override of [
+  "https://evil.example/", "//evil.example/", "javascript:alert(1)",
+  "https://finance.suiyuecare.com/", "https://daycare.suiyuecare.com/app/dashboard#access_token=synthetic",
+  "https://daycare.suiyuecare.com/auth/callback?code=synthetic"
+]) {
+  await test(`daycare rejects unsafe direct override ${override}`, async () => {
+    await assert.rejects(() => subject.launchConnectedModule("day-care", ceo, override), /返回/u);
+    assertions += 1;
+    assertNoIdentityTransfer();
+    check(calls.navigation.length, 0);
+  });
+}
 
 for (const rawNext of [
   "https://daycare.suiyuecare.com/",
@@ -208,13 +241,33 @@ for (const rawNext of [
   "https://daycare.suiyuecare.com/auth/callback?code=synthetic"
 ]) {
   for (const explicit of ["", "day-care"]) {
-    await test("same-origin daycare deep links canonicalize to clean login", () => {
+    await test("non-workspace daycare links canonicalize to the workbench", () => {
       check(subject.safeModuleLaunchRequest(rawNext, explicit), { moduleId: "day-care", returnTo: daycareUrl });
     });
   }
 }
 
-await test("explicit daycare with no return destination uses canonical login", () => {
+await test("valid daycare workbench deep links survive portal return", () => {
+  const next = "https://daycare.suiyuecare.com/app/staff/assessments/abcd?client=123";
+  check(subject.safeModuleLaunchRequest(next, "day-care"), { moduleId: "day-care", returnTo: next });
+  check(subject.moduleReturnPath("day-care", next), "/app/staff/assessments/abcd?client=123");
+});
+
+await test("daycare signed-out redirect accepts only explicit local workspace paths", () => {
+  const next = "/app/staff/assessments/abcd?client=123";
+  check(subject.safeModuleLaunchRequest(next, "day-care"), {
+    moduleId: "day-care",
+    returnTo: `https://daycare.suiyuecare.com${next}`
+  });
+  check(subject.safeModuleLaunchRequest("/app", "day-care"), { moduleId: "day-care", returnTo: daycareUrl });
+  check(subject.safeModuleLaunchRequest(next, ""), null);
+  for (const unsafe of ["//evil.example/app", "/app/../login", "/auth/callback", "/app#token=synthetic", "/app\\evil", "/app/%2e%2e/login"]) {
+    const request = subject.safeModuleLaunchRequest(unsafe, "day-care");
+    ok(request === null || request.returnTo === daycareUrl, `Unsafe Daycare return path was forwarded: ${unsafe}`);
+  }
+});
+
+await test("explicit daycare with no return destination uses canonical workbench", () => {
   check(subject.safeModuleLaunchRequest("", "day-care"), { moduleId: "day-care", returnTo: daycareUrl });
   check(subject.safeModuleLaunchRequest("", "home-care"), null);
 });
@@ -389,7 +442,7 @@ for (const moduleId of ["apm", "day-care"]) {
     const expectedName = moduleId === "day-care" ? "日間照顧系統" : "敏捷專案管理系統";
     ok(ui.title.textContent.includes(expectedName));
     if (moduleId === "day-care") {
-      check(ui.description.textContent, "即將前往日照管理驗證版，系統會驗證執行長的公司 Google 帳號。");
+      check(ui.description.textContent, "正在確認你的公司帳號，確認後會直接開啟日照工作台。");
       ok(!ui.description.textContent.includes("雙因素驗證"));
       ok(!ui.description.textContent.includes("Google 登入設定中"));
       ok(!`${ui.title.textContent}${ui.description.textContent}`.includes("敏捷專案"));

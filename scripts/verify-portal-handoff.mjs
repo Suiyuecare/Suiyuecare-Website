@@ -13,11 +13,13 @@ const issuedAtMs = 1_785_632_400_000;
 const fixedJti = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const apmSecret = "a".repeat(48);
 const edocSecret = "e".repeat(48);
+const daycareSecret = "d".repeat(48);
 const environment = {
   NODE_ENV: "test",
   SUPABASE_URL: "https://portalref.supabase.co",
   SUPABASE_PUBLISHABLE_KEY: `sb_publishable_${"p".repeat(36)}`,
   APM_PORTAL_SIGNING_SECRET: apmSecret,
+  PORTAL_DAYCARE_HANDOFF_SECRET: daycareSecret,
   EDOC_PORTAL_HANDOFF_SECRET: edocSecret
 };
 
@@ -27,7 +29,9 @@ function verifiedGoogleUser(email, overrides = {}) {
     email,
     email_confirmed_at: "2026-08-02T00:00:00.000Z",
     app_metadata: { provider: "google", providers: ["google"] },
-    identities: [{ provider: "google", identity_data: { email } }],
+    identities: [{ provider: "google", id: "google-sub-123", identity_data: {
+      email, email_verified: true, sub: "google-sub-123"
+    } }],
     ...overrides
   };
 }
@@ -83,20 +87,20 @@ function requestFor(payload, overrides = {}) {
 function decodeSignedPayload(result) {
   assert.equal(result.body.ok, true);
   const encoded = result.body.payload;
+  const audience = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8")).aud;
+  const secret = audience === "apm" ? apmSecret : audience === "daycare" ? daycareSecret : edocSecret;
   const expected = crypto
-    .createHmac("sha256", result.body.token === `${encoded}.${result.body.signature}`
-      && JSON.parse(Buffer.from(encoded, "base64url").toString("utf8")).aud === "apm"
-      ? apmSecret
-      : edocSecret)
+    .createHmac("sha256", secret)
     .update(encoded)
     .digest("base64url");
+  assert.equal(result.body.token, `${encoded}.${result.body.signature}`);
   assert.equal(result.body.signature, expected);
   return JSON.parse(Buffer.from(encoded, "base64url").toString("utf8"));
 }
 
 function handlerFor(user, overrides = {}) {
   return createPortalApiHandler({
-    environment,
+    environment: overrides.environment || environment,
     createPortalClient: portalClientFor(user, overrides.authError, overrides.authCalls),
     financeLookup: overrides.financeLookup || (async () => {
       throw Object.assign(new Error("This account is not an active Finance employee profile."), {
@@ -148,6 +152,13 @@ function handlerFor(user, overrides = {}) {
   assert.deepEqual(
     [...staticPortalModuleGrants.get("admin.ntpc@suiyuecare.com")].sort(),
     ["apm", "edoc"]
+  );
+  for (const email of ["entrepreneur@suiyuecare.com", "daycare.wanhua@suiyuecare.com"]) {
+    assert.deepEqual([...staticPortalModuleGrants.get(email)].sort(), ["apm", "day-care", "edoc"]);
+  }
+  assert.deepEqual(
+    [...staticPortalModuleGrants].filter(([, modules]) => modules.has("day-care")).map(([email]) => email).sort(),
+    ["daycare.wanhua@suiyuecare.com", "entrepreneur@suiyuecare.com"]
   );
 }
 
@@ -250,6 +261,98 @@ function handlerFor(user, overrides = {}) {
   }
   const unsafe = await invoke(handler, requestFor({ moduleId: "apm", email, returnTo: "//outside.example/surveys" }));
   assert.equal(unsafe.status, 400);
+}
+
+// Daycare handoff binds the pre-approved employee to the same immutable Google
+// subject. No browser role, scope or claimed subject is copied into the HMAC.
+{
+  for (const email of ["entrepreneur@suiyuecare.com", "daycare.wanhua@suiyuecare.com"]) {
+    let financeCalls = 0;
+    const handler = handlerFor(verifiedGoogleUser(email), {
+      financeLookup: async () => { financeCalls += 1; throw new Error("Daycare must not use Finance grants"); }
+    });
+    const result = await invoke(handler, requestFor({
+      moduleId: "day-care",
+      email,
+      returnTo: "/app/staff/assessments/abcd?client=123",
+      role: "ceo",
+      scope: "group",
+      googleSub: "attacker-chosen-subject"
+    }));
+    assert.equal(result.status, 200);
+    assert.equal(financeCalls, 0);
+    assert.deepEqual(decodeSignedPayload(result), {
+      email,
+      iat: Math.floor(issuedAtMs / 1000),
+      exp: Math.floor(issuedAtMs / 1000) + 600,
+      jti: fixedJti,
+      aud: "daycare",
+      googleSub: "google-sub-123",
+      returnTo: "/app/staff/assessments/abcd?client=123"
+    });
+    assert.equal(result.headers.getHeader("cache-control"), "no-store");
+  }
+
+  const unauthorized = await invoke(
+    handlerFor(verifiedGoogleUser("admin@suiyuecare.com"), {
+      financeLookup: async () => ({ source: "finance-portal-self", email: "admin@suiyuecare.com", allowedModules: ["day-care"] })
+    }),
+    requestFor({ moduleId: "day-care", role: "ceo", email: "admin@suiyuecare.com" })
+  );
+  assert.equal(unauthorized.status, 403);
+  assert.equal(unauthorized.body.signature, undefined);
+
+  const email = "entrepreneur@suiyuecare.com";
+  const providerSubject = await invoke(
+    handlerFor(verifiedGoogleUser(email, { identities: [
+      { provider: "google", provider_id: "google-sub-123", id: "identity-row-id", identity_data: {
+        email, sub: "google-sub-123", email_verified: true
+      } }
+    ] })),
+    requestFor({ moduleId: "day-care", email })
+  );
+  assert.equal(providerSubject.status, 200);
+  assert.equal(decodeSignedPayload(providerSubject).googleSub, "google-sub-123");
+  const missingSubject = await invoke(
+    handlerFor(verifiedGoogleUser(email, { identities: [
+      { provider: "google", identity_data: { email, email_verified: true } }
+    ] })),
+    requestFor({ moduleId: "day-care", email })
+  );
+  assert.equal(missingSubject.status, 403);
+  const unverifiedIdentity = await invoke(
+    handlerFor(verifiedGoogleUser(email, { identities: [
+      { provider: "google", identity_data: { email, sub: "google-sub-123", email_verified: false } }
+    ] })),
+    requestFor({ moduleId: "day-care", email })
+  );
+  assert.equal(unverifiedIdentity.status, 403);
+  const mismatchedSubject = await invoke(
+    handlerFor(verifiedGoogleUser(email, { identities: [
+      { provider: "google", id: "other-subject", identity_data: { email, sub: "google-sub-123", email_verified: true } }
+    ] })),
+    requestFor({ moduleId: "day-care", email })
+  );
+  assert.equal(mismatchedSubject.status, 403);
+  const duplicateIdentity = await invoke(
+    handlerFor(verifiedGoogleUser(email, { identities: [
+      { provider: "google", id: "google-sub-123", identity_data: { email, sub: "google-sub-123", email_verified: true } },
+      { provider: "google", id: "google-sub-456", identity_data: { email, sub: "google-sub-456", email_verified: true } }
+    ] })),
+    requestFor({ moduleId: "day-care", email })
+  );
+  assert.equal(duplicateIdentity.status, 403);
+
+  for (const returnTo of ["//evil.example/app", "/login", "/api/auth/handoff", "/app#token=secret", "/app\\evil", "/app/%2fadmin", "/app/%5cadmin", "/app/%00admin", { path: "/app" }] ) {
+    const rejected = await invoke(handlerFor(verifiedGoogleUser(email)), requestFor({ moduleId: "day-care", email, returnTo }));
+    assert.equal(rejected.status, 400, returnTo);
+  }
+
+  const noSecret = await invoke(
+    handlerFor(verifiedGoogleUser(email), { environment: { ...environment, PORTAL_DAYCARE_HANDOFF_SECRET: "" } }),
+    requestFor({ moduleId: "day-care", email })
+  );
+  assert.equal(noSecret.status, 503);
 }
 
 // Modules that do not consume signed Portal assertions cannot be requested by

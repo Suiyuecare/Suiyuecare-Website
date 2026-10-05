@@ -362,7 +362,7 @@ const moduleDescriptions = {
   announcements: "查看公告、任務提醒與重要消息",
   business: "查看居家、日照等服務入口",
   "home-care": "系統建置中，正式入口尚未開放",
-  "day-care": "日照管理驗證版，僅開放執行長使用 Google 登入",
+  "day-care": "登入後直接進入日照工作台",
   hr: "查看人員、出勤與人事作業",
   accounting: "查看帳務、付款與報表",
   "general-affairs": "處理行政、總務與文件流程",
@@ -396,7 +396,7 @@ const moduleIcons = {
 
 const moduleLaunchUrls = {
   hr: "https://hr.suiyuecare.com/",
-  "day-care": "https://daycare.suiyuecare.com/login",
+  "day-care": "https://daycare.suiyuecare.com/app",
   accounting: "https://finance.suiyuecare.com/",
   edoc: "https://edoc.suiyuecare.com/",
   apm: "https://apm.suiyuecare.com/"
@@ -407,10 +407,10 @@ const temporarilyOpenModuleIds = new Set(["hr", "day-care", "accounting", "edoc"
 const sharedGeneralAffairsModules = new Set(["pdf-editor"]);
 const restrictedGeneralAffairsModules = new Set(["contract", "system-permissions", "organization-chart", "employee-accounts"]);
 const generalAffairsManagers = new Set(["ceo", "admin-director"]);
-const signedHandoffModuleIds = new Set(["edoc", "apm", "hr"]);
-// Signed assertions for eDoc/APM must never be placed in query strings. Both
-// modules accept the same no-store POST handoff shape at /api/auth/handoff.
-const postHandoffModuleIds = new Set(["edoc", "apm", "hr"]);
+const signedHandoffModuleIds = new Set(["edoc", "apm", "hr", "day-care"]);
+// Signed assertions never appear in query strings. The receiving modules
+// accept a no-store POST at /api/auth/handoff.
+const postHandoffModuleIds = new Set(["edoc", "apm", "hr", "day-care"]);
 const externalLaunchOrigins = new Map(
   Object.entries(moduleLaunchUrls).map(([moduleId, launchUrl]) => [new URL(launchUrl).origin, moduleId])
 );
@@ -436,7 +436,7 @@ function getModuleLaunchProfile() {
   if (activeModuleLaunchId === "day-care") {
     return {
       title: "正在開啟日間照顧系統",
-      description: "即將前往日照管理驗證版，系統會驗證執行長的公司 Google 帳號。",
+      description: "正在確認你的公司帳號，確認後會直接開啟日照工作台。",
       recoveryTitle: "日間照顧系統連線時間較久",
       recoveryDescription: "你可以再稍候一下，或回到模組頁後重新開啟日間照顧系統。"
     };
@@ -520,22 +520,20 @@ function waitForModuleLaunchLoadingPaint(moduleId) {
   });
 }
 
-// Navigation visibility only: Daycare independently verifies Google identity,
-// the executive allowlist, MFA and record permissions on its own backend.
+// Navigation visibility only. The Portal server and Daycare independently
+// verify the actual Google identity and current Daycare authorization.
 function canOpenDaycareEntry(profile) {
   if (!profile || profile.financeManaged || profile.financeApmOnly) return false;
   const role = profile.sourceProfileId || profile.roleKey || profile.id;
-  return String(profile.email || "").trim().toLowerCase() === "entrepreneur@suiyuecare.com"
-    && role === "ceo"
-    && Array.isArray(profile.modules)
-    && profile.modules.includes("day-care");
+  const email = normalizeEmail(profile.email);
+  const approved = (email === "entrepreneur@suiyuecare.com" && role === "ceo")
+    || (email === "daycare.wanhua@suiyuecare.com" && role === "section-chief");
+  return approved && Array.isArray(profile.modules) && profile.modules.includes("day-care");
 }
 
 async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
-  if (moduleId === "day-care") {
-    if (!canOpenDaycareEntry(profile)) throw new Error("日間照顧系統目前僅開放執行長帳號。");
-    // Never forward Portal credentials, identity hints or caller-controlled URLs.
-    return moduleLaunchUrls["day-care"];
+  if (moduleId === "day-care" && !canOpenDaycareEntry(profile)) {
+    throw new Error("此帳號尚未開通日間照顧系統。");
   }
   // Finance verifies its own Google session; this entry grants no role or scope.
   if (moduleId === "accounting" && profile?.financeManaged) return moduleLaunchUrls.accounting;
@@ -560,7 +558,7 @@ async function buildModuleLaunchUrl(moduleId, profile, launchUrlOverride = "") {
 
 async function launchConnectedModule(moduleId, profile, launchUrlOverride = "", navigationMode = "assign") {
   if (moduleId === "day-care" && !canOpenDaycareEntry(profile)) {
-    throw new Error("日間照顧系統目前僅開放執行長帳號。");
+    throw new Error("此帳號尚未開通日間照顧系統。");
   }
   const launchUrl = launchUrlOverride || moduleLaunchUrls[moduleId];
   if (!launchUrl) return false;
@@ -614,6 +612,26 @@ function submitSignedModuleHandoff(moduleId, launchUrl, signedHandoff) {
 }
 
 function moduleReturnPath(moduleId, rawLaunchUrl) {
+  if (moduleId === "day-care") {
+    if (typeof rawLaunchUrl !== "string" || rawLaunchUrl.includes("\\") || /[\u0000-\u001f\u007f]/.test(rawLaunchUrl)) {
+      throw new Error("日間照顧系統返回網址格式無效。");
+    }
+    const configuredUrl = new URL(moduleLaunchUrls["day-care"]);
+    const url = new URL(rawLaunchUrl, configuredUrl);
+    if (url.origin !== configuredUrl.origin || url.username || url.password || url.hash) {
+      throw new Error("日間照顧系統返回網址不在允許清單內。");
+    }
+    if (url.pathname === "/" || url.pathname === "/login") return "/app";
+    const path = url.pathname;
+    if (/%(?:2f|5c|0[0-9a-f]|1[0-9a-f]|7f)/i.test(path) || (path !== "/app" && !path.startsWith("/app/"))) {
+      throw new Error("日間照顧系統返回頁面不在允許清單內。");
+    }
+    const returnTo = `${path}${url.search}`;
+    if (returnTo.length > 512 || returnTo.includes("\\") || /[\u0000-\u001f\u007f]/.test(returnTo)) {
+      throw new Error("日間照顧系統返回網址格式無效。");
+    }
+    return returnTo;
+  }
   if (moduleId !== "apm") return "";
   const configuredUrl = new URL(moduleLaunchUrls.apm);
   const url = new URL(rawLaunchUrl, configuredUrl);
@@ -657,6 +675,7 @@ function buildModuleLaunchPayload(moduleId, profile, returnTo = "") {
     moduleActions: modulePermissions.actions,
     modulePermissions,
     ...(moduleId === "apm" ? { returnTo: returnTo || "/tasks" } : {}),
+    ...(moduleId === "day-care" ? { returnTo: returnTo || "/app" } : {}),
     ...organization,
     launchedAt: new Date().toISOString()
   };
@@ -2735,13 +2754,29 @@ function clearStoredProfile() {
 
 function getPortalRedirectUrl() {
   if (window.location.protocol === "file:") return null;
+  let destination;
   if (["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)) {
-    return `${portalProductionOrigin}${portalHomePath}`;
+    destination = `${portalProductionOrigin}${portalHomePath}`;
+  } else if (window.location.hostname === "login.suiyuecare.com") {
+    destination = `${portalOAuthBridgeOrigin}${portalHomePath}`;
+  } else {
+    destination = `${window.location.origin}${portalHomePath}`;
   }
-  if (window.location.hostname === "login.suiyuecare.com") {
-    return `${portalOAuthBridgeOrigin}${portalHomePath}`;
+
+  // Google OAuth returns to the Vercel bridge origin, which has a different
+  // sessionStorage from login.suiyuecare.com. Carry only the module ID across
+  // OAuth. A Daycare work path can contain a client identifier and must not be
+  // sent to the identity provider as part of its redirect URL.
+  const requestedLaunch = consumeRequestedModuleLaunch();
+  if (requestedLaunch?.moduleId !== "day-care") return destination;
+  try {
+    moduleReturnPath("day-care", requestedLaunch.returnTo);
+    const url = new URL(destination);
+    url.searchParams.set("module", "day-care");
+    return url.toString();
+  } catch {
+    return destination;
   }
-  return `${window.location.origin}${portalHomePath}`;
 }
 
 function safeModuleLaunchRequest(rawNext = "", explicitModule = "") {
@@ -2752,6 +2787,14 @@ function safeModuleLaunchRequest(rawNext = "", explicitModule = "") {
     return { moduleId, returnTo: moduleLaunchUrls[moduleId] };
   }
   if (!rawNext) return null;
+  if (moduleId === "day-care" && rawNext.startsWith("/") && !rawNext.startsWith("//")) {
+    try {
+      const returnTo = moduleReturnPath(moduleId, rawNext);
+      return { moduleId, returnTo: new URL(returnTo, moduleLaunchUrls[moduleId]).toString() };
+    } catch {
+      return null;
+    }
+  }
   try {
     const url = new URL(rawNext, portalProductionOrigin);
     const origin = url.origin;
@@ -2759,7 +2802,12 @@ function safeModuleLaunchRequest(rawNext = "", explicitModule = "") {
     if (!inferredModule) return null;
     if (moduleId && moduleId !== inferredModule) return null;
     if (inferredModule === "day-care") {
-      return { moduleId: inferredModule, returnTo: moduleLaunchUrls["day-care"] };
+      try {
+        const returnTo = moduleReturnPath(inferredModule, url.toString());
+        return { moduleId: inferredModule, returnTo: new URL(returnTo, url.origin).toString() };
+      } catch {
+        return { moduleId: inferredModule, returnTo: moduleLaunchUrls["day-care"] };
+      }
     }
     return { moduleId: inferredModule, returnTo: url.toString() };
   } catch (error) {

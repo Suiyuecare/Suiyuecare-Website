@@ -13,6 +13,7 @@ const {
 } = require("../server/portal-finance-profile.js");
 
 const apmOrigin = "https://apm.suiyuecare.com";
+const daycareOrigin = "https://daycare.suiyuecare.com";
 const apmWorkspacePaths = [
   "/approvals",
   "/calendar",
@@ -110,8 +111,9 @@ function base64Url(value) {
 }
 
 function signPayload(payload, moduleId, environment = process.env) {
-  const secret = moduleId === "hr" ? environment.HR_PORTAL_SIGNING_SECRET : moduleId === "apm"
-    ? environment.APM_PORTAL_SIGNING_SECRET
+  const secret = moduleId === "hr" ? environment.HR_PORTAL_SIGNING_SECRET
+    : moduleId === "apm" ? environment.APM_PORTAL_SIGNING_SECRET
+    : moduleId === "day-care" ? environment.PORTAL_DAYCARE_HANDOFF_SECRET
     : environment.PORTAL_HANDOFF_SIGNING_SECRET || environment.EDOC_PORTAL_HANDOFF_SECRET;
   if (!secret || Buffer.byteLength(secret, "utf8") < 32) {
     throw new SafeHttpError(503, "Module handoff is not securely configured.");
@@ -154,6 +156,56 @@ function normalizeApmReturnTo(rawReturnTo) {
   return `${url.pathname}${url.search}`;
 }
 
+function normalizeDaycareReturnTo(rawReturnTo) {
+  if (rawReturnTo != null && typeof rawReturnTo !== "string") {
+    throw new SafeHttpError(400, "日間照顧系統返回路徑格式無效。");
+  }
+  const candidate = String(rawReturnTo || "/app").trim();
+  if (
+    !candidate.startsWith("/")
+    || candidate.startsWith("//")
+    || candidate.includes("\\")
+    || candidate.length > 512
+    || /[\u0000-\u001f\u007f]/.test(candidate)
+  ) {
+    throw new SafeHttpError(400, "日間照顧系統返回路徑無效。");
+  }
+  const url = new URL(candidate, daycareOrigin);
+  if (
+    url.origin !== daycareOrigin
+    || url.hash
+    || /%(?:2f|5c|0[0-9a-f]|1[0-9a-f]|7f)/i.test(url.pathname)
+    || (url.pathname !== "/app" && !url.pathname.startsWith("/app/"))
+  ) {
+    throw new SafeHttpError(400, "日間照顧系統返回路徑不在允許清單內。");
+  }
+  return `${url.pathname}${url.search}`;
+}
+
+function confirmedGoogleSubject(user) {
+  const matches = Array.isArray(user?.identities)
+    ? user.identities.filter((identity) =>
+      identity?.provider === "google"
+      && identity.identity_data?.email_verified === true
+      && normalizeEmail(identity.identity_data?.email) === user.email
+    )
+    : [];
+  if (matches.length !== 1) {
+    throw new SafeHttpError(403, "A unique confirmed Google identity is required.");
+  }
+  const identity = matches[0];
+  const subject = identity.identity_data?.sub;
+  const providerSubject = identity.provider_id || identity.id;
+  if (
+    typeof subject !== "string"
+    || !/^[A-Za-z0-9_-]{8,255}$/.test(subject)
+    || (providerSubject !== undefined && providerSubject !== subject)
+  ) {
+    throw new SafeHttpError(403, "A consistent Google identity is required.");
+  }
+  return subject;
+}
+
 async function authorizeModule(moduleId, email, dependencies) {
   if (!isSignedModule(moduleId)) {
     throw new SafeHttpError(400, "Module is not allowed for Portal handoff.");
@@ -161,6 +213,11 @@ async function authorizeModule(moduleId, email, dependencies) {
   // HR independently requires an existing exact Google identity and fresh
   // server-owned employer membership before it can create a session.
   if(moduleId==='hr')return 'hr-current-membership';
+  // Daycare is limited to its explicitly launched staff. Finance membership
+  // alone must never grant access to sensitive care records.
+  if (moduleId === "day-care" && !staticPortalGrantAllows(email, moduleId)) {
+    throw new SafeHttpError(403, "This account is not authorized for Daycare.");
+  }
   if (staticPortalGrantAllows(email, moduleId)) {
     return "portal-static-roster";
   }
@@ -199,6 +256,14 @@ function normalizePayload(rawPayload, user, moduleId, issuedAt, randomUUID) {
       ...commonIdentity,
       aud: "apm",
       returnTo: normalizeApmReturnTo(payload.returnTo)
+    };
+  }
+  if (moduleId === "day-care") {
+    return {
+      ...commonIdentity,
+      aud: "daycare",
+      googleSub: confirmedGoogleSubject(user),
+      returnTo: normalizeDaycareReturnTo(payload.returnTo)
     };
   }
 
@@ -289,4 +354,5 @@ module.exports.authorizeModule = authorizeModule;
 module.exports.createPortalApiHandler = createPortalApiHandler;
 module.exports.createPortalHandoffHandler = createPortalHandoffHandler;
 module.exports.normalizeApmReturnTo = normalizeApmReturnTo;
+module.exports.normalizeDaycareReturnTo = normalizeDaycareReturnTo;
 module.exports.normalizePayload = normalizePayload;
