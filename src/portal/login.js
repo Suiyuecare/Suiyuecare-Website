@@ -2754,13 +2754,29 @@ function clearStoredProfile() {
 
 function getPortalRedirectUrl() {
   if (window.location.protocol === "file:") return null;
+  let destination;
   if (["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)) {
-    return `${portalProductionOrigin}${portalHomePath}`;
+    destination = `${portalProductionOrigin}${portalHomePath}`;
+  } else if (window.location.hostname === "login.suiyuecare.com") {
+    destination = `${portalOAuthBridgeOrigin}${portalHomePath}`;
+  } else {
+    destination = `${window.location.origin}${portalHomePath}`;
   }
-  if (window.location.hostname === "login.suiyuecare.com") {
-    return `${portalOAuthBridgeOrigin}${portalHomePath}`;
+
+  // Google OAuth returns to the Vercel bridge origin, which has a different
+  // sessionStorage from login.suiyuecare.com. Carry only the module ID across
+  // OAuth. A Daycare work path can contain a client identifier and must not be
+  // sent to the identity provider as part of its redirect URL.
+  const requestedLaunch = consumeRequestedModuleLaunch();
+  if (requestedLaunch?.moduleId !== "day-care") return destination;
+  try {
+    moduleReturnPath("day-care", requestedLaunch.returnTo);
+    const url = new URL(destination);
+    url.searchParams.set("module", "day-care");
+    return url.toString();
+  } catch {
+    return destination;
   }
-  return `${window.location.origin}${portalHomePath}`;
 }
 
 function safeModuleLaunchRequest(rawNext = "", explicitModule = "") {

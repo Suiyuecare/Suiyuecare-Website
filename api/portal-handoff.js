@@ -198,7 +198,7 @@ function confirmedGoogleSubject(user) {
   const providerSubject = identity.provider_id || identity.id;
   if (
     typeof subject !== "string"
-    || !/^[A-Za-z0-9_-]{1,256}$/.test(subject)
+    || !/^[A-Za-z0-9_-]{8,255}$/.test(subject)
     || (providerSubject !== undefined && providerSubject !== subject)
   ) {
     throw new SafeHttpError(403, "A consistent Google identity is required.");

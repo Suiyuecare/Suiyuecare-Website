@@ -9,13 +9,14 @@ const source = fs.readFileSync(new URL("../src/portal/login.js", import.meta.url
 const functionNames = [
   "normalizeEmail", "getModuleDisplayName", "canOpenDaycareEntry", "moduleIsAllowed",
   "getModuleAccessState", "buildModuleLaunchUrl", "launchConnectedModule",
-  "safeModuleLaunchRequest", "moduleReturnPath"
+  "safeModuleLaunchRequest", "moduleReturnPath", "getPortalRedirectUrl"
 ];
 const declarationNames = [
   "modules", "moduleDisplayNames", "moduleDescriptions", "moduleLaunchUrls", "connectedModuleIds",
   "temporarilyOpenModuleIds", "sharedGeneralAffairsModules", "restrictedGeneralAffairsModules",
   "generalAffairsManagers", "signedHandoffModuleIds", "postHandoffModuleIds",
-  "externalLaunchOrigins", "apmWorkspacePaths", "portalProductionOrigin"
+  "externalLaunchOrigins", "apmWorkspacePaths", "portalProductionOrigin",
+  "portalOAuthBridgeOrigin", "portalHomePath"
 ];
 
 function functionSource(name) {
@@ -34,8 +35,10 @@ function declarationSource(name) {
 
 const calls = { payload: [], signed: [], submit: [], encoded: [], navigation: [], paint: [], network: [] };
 let broadRolePermission = false;
+let requestedRedirectLaunch = null;
 const context = vm.createContext({
   URL, URLSearchParams, console,
+  consumeRequestedModuleLaunch: () => requestedRedirectLaunch,
   modulePermissionAllowsRole: () => broadRolePermission,
   buildModuleLaunchPayload(moduleId, profile, returnTo = "") {
     calls.payload.push({ moduleId, returnTo });
@@ -50,6 +53,7 @@ const context = vm.createContext({
   async waitForModuleLaunchLoadingPaint(moduleId) { calls.paint.push(moduleId); },
   fetch(...args) { calls.network.push(args); throw new Error("REAL_NETWORK_FORBIDDEN_IN_CARE_ENTRY_TEST"); },
   window: { location: {
+    protocol: "https:", hostname: "login.suiyuecare.com", origin: "https://login.suiyuecare.com",
     assign(url) { calls.navigation.push({ mode: "assign", url }); },
     replace(url) { calls.navigation.push({ mode: "replace", url }); }
   } }
@@ -76,7 +80,7 @@ let cases = 0;
 let assertions = 0;
 function check(actual, expected, message) { assertions += 1; assert.deepEqual(plain(actual), plain(expected), message); }
 function ok(value, message) { assertions += 1; assert.ok(value, message); }
-function resetCalls() { for (const value of Object.values(calls)) value.length = 0; broadRolePermission = false; }
+function resetCalls() { for (const value of Object.values(calls)) value.length = 0; broadRolePermission = false; requestedRedirectLaunch = null; }
 async function test(name, run) {
   resetCalls();
   try { await run(); cases += 1; }
@@ -116,6 +120,16 @@ await test("daycare is connected through signed POST handoff", () => {
   check(subject.temporarilyOpenModuleIds.has("day-care"), true);
   check(Array.from(subject.signedHandoffModuleIds).sort(), ["apm", "day-care", "edoc", "hr"]);
   check(Array.from(subject.postHandoffModuleIds).sort(), ["apm", "day-care", "edoc", "hr"]);
+});
+
+await test("fresh Google OAuth preserves only the Daycare module, not client paths, on its bridge return", () => {
+  requestedRedirectLaunch = { moduleId: "day-care", returnTo: `${daycareUrl}/staff/assessments/physical?client=synthetic` };
+  check(subject.getPortalRedirectUrl(),
+    "https://suiyuecare-website.vercel.app/portal/?module=day-care");
+  requestedRedirectLaunch = { moduleId: "day-care", returnTo: "https://evil.example/app" };
+  check(subject.getPortalRedirectUrl(), "https://suiyuecare-website.vercel.app/portal/");
+  requestedRedirectLaunch = { moduleId: "apm", returnTo: "https://apm.suiyuecare.com/tasks" };
+  check(subject.getPortalRedirectUrl(), "https://suiyuecare-website.vercel.app/portal/");
 });
 
 const allowedProfiles = [
