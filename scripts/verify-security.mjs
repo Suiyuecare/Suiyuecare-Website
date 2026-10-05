@@ -255,12 +255,14 @@ function verifyApmPortalHandoff() {
 
   for (const expected of [
     'apm: "https://apm.suiyuecare.com/"',
-    'const postHandoffModuleIds = new Set(["edoc", "apm", "hr"])',
+    '"day-care": "https://daycare.suiyuecare.com/app"',
+    'const postHandoffModuleIds = new Set(["edoc", "apm", "hr", "day-care"])',
     'form.action = new URL("/api/auth/handoff", configuredUrl).toString()',
     'moduleId === "edoc"\n    ? [["token", signedHandoff.token]]',
     ': [["payload", signedHandoff.payload], ["signature", signedHandoff.signature]]',
     'moduleReturnPath(moduleId, launchUrl)',
     'returnTo: returnTo || "/tasks"',
+    'returnTo: returnTo || "/app"',
     '"project_you@suiyuecare.com"'
   ]) {
     assert(portal.includes(expected), `Portal APM launch contract is missing ${expected}.`);
@@ -370,7 +372,11 @@ function verifyApmPortalHandoff() {
     '!profile.allowedModules.includes(moduleId)',
     "await dependencies.financeLookup(email",
     "environment.APM_PORTAL_SIGNING_SECRET",
+    "environment.PORTAL_DAYCARE_HANDOFF_SECRET",
     'returnTo: normalizeApmReturnTo(payload.returnTo)',
+    'returnTo: normalizeDaycareReturnTo(payload.returnTo)',
+    'googleSub: confirmedGoogleSubject(user)',
+    'moduleId === "day-care" && !staticPortalGrantAllows(email, moduleId)',
     'apmWorkspacePaths.some((path)',
     'moduleId: "edoc"',
     "authUserId: user.id",
@@ -388,10 +394,10 @@ function verifyApmPortalHandoff() {
     "Portal handoff must use server grants and must not copy browser authorization fields."
   );
   assert(
-    modulePolicy.includes('const signedModuleIds = new Set(["apm", "edoc", "hr"])')
+    modulePolicy.includes('const signedModuleIds = new Set(["apm", "edoc", "hr", "day-care"])')
       && !modulePolicy.includes('"accounting"')
       && !modulePolicy.includes('"website-backoffice"'),
-    "Only reviewed APM, EDOC and HR receivers may consume signed Portal assertions."
+    "Only reviewed APM, EDOC, HR and Daycare receivers may consume signed Portal assertions."
   );
 
   for (const expected of [
@@ -437,7 +443,7 @@ function verifyApmPortalHandoff() {
   run(process.execPath, ["scripts/verify-portal-google-email.mjs"]);
   run(process.execPath, ["scripts/verify-portal-employee-modules.mjs"]);
 
-  log("APM/EDOC server-authorized handoff and Finance employee-only connected module fallback are present");
+  log("APM/EDOC/Daycare server-authorized handoff and Finance employee-only connected module fallback are present");
 }
 
 function verifyDist() {

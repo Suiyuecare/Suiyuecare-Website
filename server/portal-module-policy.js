@@ -1,11 +1,11 @@
-const signedModuleIds = new Set(["apm", "edoc", "hr"]);
+const signedModuleIds = new Set(["apm", "edoc", "hr", "day-care"]);
 
 // This is the immutable, server-owned subset of the Portal roster that is
 // currently marked 啟用 in src/portal/login.js. Browser localStorage overrides
 // are intentionally excluded: client-side permission settings are display
 // preferences, never authorization input.
 const staticPortalModuleGrants = new Map([
-  ["entrepreneur@suiyuecare.com", new Set(["apm", "edoc"])],
+  ["entrepreneur@suiyuecare.com", new Set(["apm", "edoc", "day-care"])],
   ["admin@suiyuecare.com", new Set(["apm", "edoc"])],
   ["suiyue.acct@suiyuecare.com", new Set(["apm", "edoc"])],
   ["suiyue.hr@suiyuecare.com", new Set(["apm", "edoc"])],
@@ -13,7 +13,7 @@ const staticPortalModuleGrants = new Map([
   ["investorrelations@suiyuecare.com", new Set(["apm", "edoc"])],
   ["homecare.taipei@suiyuecare.com", new Set(["apm", "edoc"])],
   ["homecare.taipei2@suiyuecare.com", new Set(["apm", "edoc"])],
-  ["daycare.wanhua@suiyuecare.com", new Set(["apm", "edoc"])],
+  ["daycare.wanhua@suiyuecare.com", new Set(["apm", "edoc", "day-care"])],
   ["daycare.shilin@suiyuecare.com", new Set(["apm", "edoc"])],
   ["daycare.datong@suiyuecare.com", new Set(["apm", "edoc"])],
   ["edu.control@suiyuecare.com", new Set(["apm", "edoc"])],
