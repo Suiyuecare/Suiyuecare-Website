@@ -1725,6 +1725,146 @@
       "permanent": true
     },
     {
+      "source": "/article/disease-cataract-episode-3",
+      "destination": "/article/article173",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-glaucoma-episode-1",
+      "destination": "/article/article174",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-glaucoma-episode-2",
+      "destination": "/article/article175",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-glaucoma-episode-3",
+      "destination": "/article/article176",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-age-related-macular-degeneration-episode-1",
+      "destination": "/article/article177",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-age-related-macular-degeneration-episode-2",
+      "destination": "/article/article178",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-age-related-macular-degeneration-episode-3",
+      "destination": "/article/article179",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-age-related-hearing-loss-episode-1",
+      "destination": "/article/article180",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-age-related-hearing-loss-episode-2",
+      "destination": "/article/article181",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-age-related-hearing-loss-episode-3",
+      "destination": "/article/article182",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-anxiety-disorders-episode-1",
+      "destination": "/article/article183",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-anxiety-disorders-episode-2",
+      "destination": "/article/article184",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-anxiety-disorders-episode-3",
+      "destination": "/article/article185",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-late-life-depression-episode-1",
+      "destination": "/article/article186",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-late-life-depression-episode-2",
+      "destination": "/article/article187",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-late-life-depression-episode-3",
+      "destination": "/article/article188",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-peripheral-artery-disease-episode-1",
+      "destination": "/article/article189",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-peripheral-artery-disease-episode-2",
+      "destination": "/article/article190",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-peripheral-artery-disease-episode-3",
+      "destination": "/article/article191",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-dyslipidemia-episode-1",
+      "destination": "/article/article192",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-dyslipidemia-episode-2",
+      "destination": "/article/article193",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-dyslipidemia-episode-3",
+      "destination": "/article/article194",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-gout-episode-1",
+      "destination": "/article/article195",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-gout-episode-2",
+      "destination": "/article/article196",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-gout-episode-3",
+      "destination": "/article/article197",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-hypothyroidism-episode-1",
+      "destination": "/article/article198",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-hypothyroidism-episode-2",
+      "destination": "/article/article199",
+      "permanent": true
+    },
+    {
+      "source": "/article/disease-hypothyroidism-episode-3",
+      "destination": "/article/article200",
+      "permanent": true
+    },
+    {
       "source": "/article/article43",
       "destination": "/article/article7",
       "permanent": true

@@ -1104,6 +1104,1556 @@
         "message": "健康3.0的文章內頁回歸以前橘色的樣式；補生成每天新增文章的主頁圖片和內頁至少2張圖片，並寫入未來生成規範。",
         "scope": "Repair images and styling of already published articles167–172; original article prose and references preserved."
       }
+    },
+    {
+      "date": "2026-10-06",
+      "displayDate": "2026.10.06",
+      "commit": "SELF",
+      "publicationMode": "user-approved-drafts",
+      "batchId": "approved-disease-backlog-20261006",
+      "catalogCheckedAt": "2026-10-06",
+      "expectedCount": 28,
+      "approval": {
+        "source": "explicit-user-message",
+        "recordedAt": "2026-10-06T14:34:59.421Z",
+        "message": "幫我上架你這邊所有的疾病類型的文章就好",
+        "approvedDraftOrdinals": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "pendingDraftOrdinals": []
+      },
+      "approvedDrafts": [
+        {
+          "draftNumber": 1,
+          "draftKey": "disease:cataract:episode-3",
+          "sourceFile": "03-cataract-3.md",
+          "sourceSha256": "c162624033cb8b9a992af23a756f6843ee3d7bc8f08881a7348dc9f241eb93a0",
+          "contentHash": "sha256:1cb1114948dc9f315d3581ee48cfc7e569bfde3eb863203946ca34a9fa22aca9",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-cataract-3-cover.png",
+              "sha256": "7c9eaf034ccc474f153c90fe81456b093e0f700803f993560caefe96fd78f79f"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-cataract-3-care-map.svg",
+              "sha256": "8fbe991b3cd7c9987ec341c4771a24ea224c228fe14f0dcdc6f7e89a417b7d3a"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-cataract-3-recovery-signals.svg",
+              "sha256": "cf7542f7e29ea70333d3fb5204bb8624ef1371f3af8f36b4ced54be907673f96"
+            }
+          ]
+        },
+        {
+          "draftNumber": 2,
+          "draftKey": "disease:glaucoma:episode-1",
+          "sourceFile": "04-glaucoma-1.md",
+          "sourceSha256": "eaf9493b600c12c990760a6e55300310ca524fed4a16e5bf6ad78649c18e99d7",
+          "contentHash": "sha256:cc6a9b6d3b1c36ed60a3c8c77dccceb29f06f81f24a610ee45545f2fce4c6f88",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-1-cover.png",
+              "sha256": "3a367238bca765a11447a8fa2aeeb526a8ede8b0d292e87769a57d179ddd29a1"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-1-exam-pieces.svg",
+              "sha256": "293acd194d4d67a74bdf36852f0ab2080e83e25d0c409e55560c041afb0d9313"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-1-help-route.svg",
+              "sha256": "912d944fd8dd3e93123bd8fee2406c061b623111ca5d7e2d22b984f52c33405e"
+            }
+          ]
+        },
+        {
+          "draftNumber": 3,
+          "draftKey": "disease:glaucoma:episode-2",
+          "sourceFile": "03-glaucoma-2.md",
+          "sourceSha256": "8d7f502ed94ee50e4e0d7ca336fd45b8cb1b7b724d5a960aab68da3e7907fa36",
+          "contentHash": "sha256:5b4df3aa92a648f09bfb52e188978302d2805929fb7d86ed1a82c792ce1535d2",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-glaucoma-2-cover.png",
+              "sha256": "4f145f5b83f108f5d091ff83c84aab2dd334b9662b2e8cc9d6f7de5cc50885c8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-glaucoma-2-options.svg",
+              "sha256": "6332f3263302213b056ea80f7a259fca14a21ee99e1fb403cf34665cc845bd93"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-glaucoma-2-followup.svg",
+              "sha256": "ac3ee7ca3be478f1a79c87157623519c37162771a2f3532a485c480239fd4539"
+            }
+          ]
+        },
+        {
+          "draftNumber": 4,
+          "draftKey": "disease:glaucoma:episode-3",
+          "sourceFile": "04-glaucoma-3.md",
+          "sourceSha256": "395f4cc76e46496a93bdff26dbe041b8dbc64a082bef3a063567f093d85e8ab9",
+          "contentHash": "sha256:bd7b3a3c3fd3560290926dd0f2bcb32e201900bae749bc430dfac2c428153ece",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-3-cover.png",
+              "sha256": "0ce4abc374f5e0446704ff84f41c1b942a4cacf5de1a3d0b5e76795e4a2424be"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-3-day.svg",
+              "sha256": "ed5591acbcc6c86940fda05f7efddeafaae757cf1511849b737edf70c1d3bbd4"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-3-home.svg",
+              "sha256": "6cc18799b0dd864243b1330b78b77882c44ff257b44e57afeb3bb7e188cc5f48"
+            }
+          ]
+        },
+        {
+          "draftNumber": 5,
+          "draftKey": "disease:age-related-macular-degeneration:episode-1",
+          "sourceFile": "03-amd-1.md",
+          "sourceSha256": "2900a67158a9385694805b3e2beaefd0179e100807a7302ec1e36a99740464e1",
+          "contentHash": "sha256:966833563421a567f02f20f4a49456355fb160e80ed9af0bac495e898fd2da56",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-1-cover.png",
+              "sha256": "da39406502d2442cec3818223fb3c565e89f4500581097412bc6cb92023f9f15"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-1-types.svg",
+              "sha256": "e873169f3a8fb01187eeec40db72cd21631ad0d8839f8a46a75ccdd1aea0ed62"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-1-signs.svg",
+              "sha256": "8905605a77306d63d9979c06b9a55ed912dd9735ea8872da51d0adab35854a0f"
+            }
+          ]
+        },
+        {
+          "draftNumber": 6,
+          "draftKey": "disease:age-related-macular-degeneration:episode-2",
+          "sourceFile": "04-amd-2.md",
+          "sourceSha256": "4ff98913fa7d8575be9e6a0387beaa4c2dfb61a51f1e01ca1ce2fb9580b5b65b",
+          "contentHash": "sha256:3afc2e9a821da2d863790785fe987276abe9647f2a0fe50ae286aa410c18f4c6",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-amd-2-cover.png",
+              "sha256": "a3003aa625fc67eccccab3a48caf6b70d9b03a9a7cf448029bfdab15387739c8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-amd-2-path.svg",
+              "sha256": "454b93db16403576a845b8c604044e9adc453eefd34ad1e5c5df116ef12fe952"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-amd-2-visit.svg",
+              "sha256": "c1a4490f9d4d9ea2644286a43800e440654e8dd497fdc77a928ab94629db1d86"
+            }
+          ]
+        },
+        {
+          "draftNumber": 7,
+          "draftKey": "disease:age-related-macular-degeneration:episode-3",
+          "sourceFile": "03-amd-3.md",
+          "sourceSha256": "4b9cf3241d66a4b6e89ff7b9b3ae09deeb4b5717ce75664f138c5a2aaabfa8f0",
+          "contentHash": "sha256:4e422327eaac0d1c357ddb838fbe95fced7def070da051f6591d22b818b4825e",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-3-cover.png",
+              "sha256": "a33258f8fc4ffb122934c7fc3387ff7989f3c8df0e34f3cbe7deb70ae4d12d56"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-3-home.svg",
+              "sha256": "ca8e2761676d1c0eec6f077b6d2dde85e3de7cbf679be51fa41a7ead6d10b4fb"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-3-support.svg",
+              "sha256": "46a9fd1987870b63516afe9832f2d3271e51f92ccdad157e16d873d31b6691c8"
+            }
+          ]
+        },
+        {
+          "draftNumber": 8,
+          "draftKey": "disease:age-related-hearing-loss:episode-1",
+          "sourceFile": "04-hearing-1.md",
+          "sourceSha256": "6a53d62209db3f73a996744021bf21166a97a447f14d6abd85fc5df50cde7850",
+          "contentHash": "sha256:1f228a961ab6c9e930aa2584283c05c6ecd982c7a9c15983a239f5031e7d4738",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-1-cover.png",
+              "sha256": "5c3f57c723e7bf24d737134240e88246b0c454b9409b67e93b122796391bb0df"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-1-signs.svg",
+              "sha256": "de23f67216ed46acc2f2b35693b08e72215eff83a84fcbda39421b26ede4f8ee"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-1-urgent.svg",
+              "sha256": "5c232e40e6608c4c443cca04e06491cd9ff9a9358c060252166c26140579c611"
+            }
+          ]
+        },
+        {
+          "draftNumber": 9,
+          "draftKey": "disease:age-related-hearing-loss:episode-2",
+          "sourceFile": "03-hearing-2.md",
+          "sourceSha256": "29815e861d420913ee14ad5bebdd8c8b15ffc29c90880dab5e2bec99fe41af25",
+          "contentHash": "sha256:2f4b281e810796255325868c08da9e08dee45ccd566e9f5b028df9a108b261c9",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-hearing-2-cover.png",
+              "sha256": "6d6da9f1bf7daaa3b438efabde77ff2eded5fa2494eb38f74d4c9bfa9937a54f"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-hearing-2-route.svg",
+              "sha256": "94828da57d5048eeb0ab74ceedfed19fe800c6d97bade59429d5a258abc4cef3"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-hearing-2-fit.svg",
+              "sha256": "37152180f28bcd802817d9057a7d131de9c4317a5f35c497a2ca1d34e65a2942"
+            }
+          ]
+        },
+        {
+          "draftNumber": 10,
+          "draftKey": "disease:age-related-hearing-loss:episode-3",
+          "sourceFile": "04-hearing-3.md",
+          "sourceSha256": "19d61bd6e38650e6033e7daaf545b7cda144cc539758540593da57cbc22d5ff4",
+          "contentHash": "sha256:55ee2d85843198d18cdf7d0531fcf30fa0d744b349cb12399f2c7e7b9d54479e",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-3-cover.png",
+              "sha256": "5e3f7b4e93e8b8064f98f9f1b0195d821ffe6edd1b1dcb0a673d879ec695ece8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-3-talk.svg",
+              "sha256": "c594ff79a17d8d069c8e90a1bf67fc6f8554f28faf237787542e0df79c587d48"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-3-safe.svg",
+              "sha256": "dd02513605a254619d760bedcda398b126a3e2e221573a4230f4dbb8378d9402"
+            }
+          ]
+        },
+        {
+          "draftNumber": 11,
+          "draftKey": "disease:anxiety-disorders:episode-1",
+          "sourceFile": "03-anxiety-1.md",
+          "sourceSha256": "b40e9f709742bfced3fa171b336087ed7fc3bbf38af4abe56b047c93d982f670",
+          "contentHash": "sha256:d9f6c9a7ab5b8acc1b36697737bfbda66fe721cc1dca456a860e85e73f8d8dc4",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-1-cover.png",
+              "sha256": "ead17654017c179f32b42550ba04ce1b73a6ecf3e53133cff6fb0877e247bb42"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-1-signs.svg",
+              "sha256": "ea354035351558f0866df87ece3db2c7c63f0c172c8eeb73725607e48f4b8b80"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-1-record.svg",
+              "sha256": "fb6a3db7ecc275a3bced1f834ff2227baac3165b80271958f96be50a887189e6"
+            }
+          ]
+        },
+        {
+          "draftNumber": 12,
+          "draftKey": "disease:anxiety-disorders:episode-2",
+          "sourceFile": "04-anxiety-2.md",
+          "sourceSha256": "1490877c829d7414d186bad3763891d3bc4d40471f1d6c44a75542b3417d01fc",
+          "contentHash": "sha256:a8a37c56986afad2e62a5b6ca31b6a413825cb558a395251cffcf4fb04c8e195",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-anxiety-2-cover.png",
+              "sha256": "7641bfe3ec3f930c406048998a26a02258edcc3b16576ffe2a10e43462330466"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-anxiety-2-plan.svg",
+              "sha256": "02d715b83d9eec7bddfa96c618aa161d27317fc9b42dd75048e33f695cf7f712"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-anxiety-2-visit.svg",
+              "sha256": "6df2f164a11c63e66166634bfaa30d0cae0e0bdb8d549bb19369f7a85665f362"
+            }
+          ]
+        },
+        {
+          "draftNumber": 13,
+          "draftKey": "disease:anxiety-disorders:episode-3",
+          "sourceFile": "03-anxiety-3.md",
+          "sourceSha256": "4ba1ff4a89ac685f061aa229cf95b531b40b9560b469841fe18e938dbf7b288a",
+          "contentHash": "sha256:fe523d7d305ce8c513f9bc872cf106f844dc539e1579f14a4071beaf4eb37cc1",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-3-cover.png",
+              "sha256": "a996797ddf149f5d8e73c783d176b618e674e250a6134eca41026a418bdfefc6"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-3-support.svg",
+              "sha256": "c18d088396d0f8142a5170fd0cf890cbde2c7c1d101470c40d1d0f1e15edfce8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-3-record.svg",
+              "sha256": "2336ffd051f6baeaccccbfe72933106b3420a1d72f93ce76c1cadb3bfd166f71"
+            }
+          ]
+        },
+        {
+          "draftNumber": 14,
+          "draftKey": "disease:late-life-depression:episode-1",
+          "sourceFile": "04-depression-1.md",
+          "sourceSha256": "1b81c28e3520d1ff27e6dfcfad3c663f076b118f2a3de8c853e6ddd9754338b8",
+          "contentHash": "sha256:651ec526bffde13b6bb15b8b337096a0d83a7a55707c161d199dd55434711b4d",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-1-cover.png",
+              "sha256": "ffbf6e6b4643776f01d3b78a14745f09762e65ccc929527e01817aca2ef274e4"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-1-signs.svg",
+              "sha256": "9d7bec3340947d78cd1845ebe9fb71f390dd488cec2a3afad762a1ab388aeb27"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-1-record.svg",
+              "sha256": "e4e9346c47f025ea6631da81bb273222308623193dee43b92418096a0fbd97a5"
+            }
+          ]
+        },
+        {
+          "draftNumber": 15,
+          "draftKey": "disease:late-life-depression:episode-2",
+          "sourceFile": "03-depression-2.md",
+          "sourceSha256": "ee49b30eab6b4904725efc2f38b9a908acb3f2ecd5edbe660f2101e763dcb6da",
+          "contentHash": "sha256:f374b94523703eebebc1b942f2be91f21c872d396901b324f3af06f87fc2da0a",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-depression-2-cover.png",
+              "sha256": "e2235e473cff59f5dcfe5980efc010290aede2ba58752c453f07e61c37b2b749"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-depression-2-plan.svg",
+              "sha256": "bcc9b3312e9886d2f49102e14198c04cd8c3e79dd32fb2b1451abc86f7023c46"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-depression-2-visit.svg",
+              "sha256": "4394a738d22bbf10306d27da3011d97a7439df2d1669d3b3e99505efa016acc1"
+            }
+          ]
+        },
+        {
+          "draftNumber": 16,
+          "draftKey": "disease:late-life-depression:episode-3",
+          "sourceFile": "04-depression-3.md",
+          "sourceSha256": "f64bc3bbcb1080d5a0d99989f5649eb12b890d1fcbc719b6dbdba71ca58ccdde",
+          "contentHash": "sha256:777d54af6185537c9917b12d4db1c0286fae0049400106f588f3d281c1ecad26",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-3-cover.png",
+              "sha256": "aca88f0cccad542179288e80b80d163afd60f60092edc988cbc51ada5c4b738a"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-3-support.svg",
+              "sha256": "7949759d1d31f326efa113898b383894c11889859e5bbcbc0e0bb5e695e57ac0"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-3-safety.svg",
+              "sha256": "19f7cecb537dba09b900af8398f99f45c9539f9e7be483225c1cf4767b7bb6df"
+            }
+          ]
+        },
+        {
+          "draftNumber": 17,
+          "draftKey": "disease:peripheral-artery-disease:episode-1",
+          "sourceFile": "03-pad-1.md",
+          "sourceSha256": "0d13183727f512ec1bdd7f9c90e66606a95b10b709aacd43bbf3fa2ca815fc89",
+          "contentHash": "sha256:804dae6781e6993369786d29a49cf13abebfa16ec39b172a5e54d633c69f4335",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-pad-1-cover.png",
+              "sha256": "7136e97571c93dbda7e98f14051568a8308d01d40f67f5698bac34386b199446"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-pad-1-signs.svg",
+              "sha256": "b701a795238b252bd023b83598cbcf72575d7f2f3defca5c067796d8e7cb1927"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-pad-1-alert.svg",
+              "sha256": "cef2f58e3c1cb10f4193806675eb9728375b243b2cb76b96ba68b3c3eecd58b1"
+            }
+          ]
+        },
+        {
+          "draftNumber": 18,
+          "draftKey": "disease:peripheral-artery-disease:episode-2",
+          "sourceFile": "04-pad-2.md",
+          "sourceSha256": "22cdea68499d5aa93d37279bb1d093d8bb5f483fb4923153c4507e53647ac50e",
+          "contentHash": "sha256:d97a5d52a5d38d03b1dd35478780a463d9d67b312ce4c638fb60f002791cd94e",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-pad-2-cover.png",
+              "sha256": "b98b48ff6ac654039fe0fda4f76dc85e67a416aeed23756f30b1cfa2cc49c4e0"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-pad-2-visit.svg",
+              "sha256": "89ad18c681704defd9879b09f7c56feb3880647e2956b0ade9602fbae9e31859"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-pad-2-plan.svg",
+              "sha256": "d4238b1a0c530bf846a0eba70ac9944df223ea06ceebf1ce8fe7de955a650622"
+            }
+          ]
+        },
+        {
+          "draftNumber": 19,
+          "draftKey": "disease:peripheral-artery-disease:episode-3",
+          "sourceFile": "01-pad-3.md",
+          "sourceSha256": "40f459173e13f5e6d5c65a83556ce80eb9dac2bc5b21dc471079499045c587a0",
+          "contentHash": "sha256:ca84893ab4f642eaead4fd0f0584a01366ee6c7b4033abb5faa2026583e26712",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-pad-3-cover.png",
+              "sha256": "ef32288a8d7524a7a530c628c8a69221abac8828b9b278318a946a965888776d"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-pad-3-daily.svg",
+              "sha256": "b48bd042419615e538fe62d67221ab0b3b8731ceaec298956b46c955bfec58d7"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-pad-3-alert.svg",
+              "sha256": "eb8ecc09ed037ed274f4a92cdf7063a3bc9b018e90d771efb15d15626c35e88d"
+            }
+          ]
+        },
+        {
+          "draftNumber": 20,
+          "draftKey": "disease:dyslipidemia:episode-1",
+          "sourceFile": "02-lipid-1.md",
+          "sourceSha256": "c056edb530216d82df959eef897103818cd2fe914f9cd050a28277a8b622fddf",
+          "contentHash": "sha256:03c9c259a31e94deda95d92ec263edd0658625668c393bdaae2bccad5998336b",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-1-cover.png",
+              "sha256": "9444eca22afbffc91a7e9024d35579e62dc91478e5fa28194b4f3919cf107d82"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-1-types.svg",
+              "sha256": "7501e538c22addc2f7843fe9cfa2825bb81e3646bb67af7e56e085665c9e5145"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-1-risk.svg",
+              "sha256": "a13b5f7f14133abf2945543a459da669076ad32614da40bdf016448710856602"
+            }
+          ]
+        },
+        {
+          "draftNumber": 21,
+          "draftKey": "disease:dyslipidemia:episode-2",
+          "sourceFile": "01-lipid-2.md",
+          "sourceSha256": "462c0971d1e13ebe3354a67e87b7cdd6a06f72245998b6fa614c664c6d43e986",
+          "contentHash": "sha256:9d82d646a915aa6155a2eaba02a4c7ca65a11a002d9e11f4d182aedf6476c424",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-lipid-2-cover.png",
+              "sha256": "028da19377ba6e623a6fca16396d644a65098163b0702de15abbe724703aee8b"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-lipid-2-plan.svg",
+              "sha256": "5236101297881939b41be4d65db01df33a0543f9ec607baa518a20edc08c5706"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-lipid-2-visit.svg",
+              "sha256": "adef583866f4be1094f940a9775761f2992e1127080d668393c24b2469884324"
+            }
+          ]
+        },
+        {
+          "draftNumber": 22,
+          "draftKey": "disease:dyslipidemia:episode-3",
+          "sourceFile": "02-lipid-3.md",
+          "sourceSha256": "c44f15a83e31493b537dc71205cfb5138cf6e31e14883054157356c5001ac840",
+          "contentHash": "sha256:0257c18b2f6b6f8cc412e86d91841e9b39daeb511d2f4a19d2bcfeb7c8f7b00b",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-3-cover.png",
+              "sha256": "6e321c901b4455a2c6c0ca44e174e744b141a19d0861681482639a4c585d7c7a"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-3-daily.svg",
+              "sha256": "66595e5335c983ef5b1c51049f5fe13527b6fad785f2b9082c10ff50a529bfc6"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-3-alert.svg",
+              "sha256": "5ebb21ebe699c59ee2d8e9e73f5ca9046db851307ee79e20a677e02154337e20"
+            }
+          ]
+        },
+        {
+          "draftNumber": 23,
+          "draftKey": "disease:gout:episode-1",
+          "sourceFile": "01-gout-1.md",
+          "sourceSha256": "e92729bff00431d29bc4cd86b40c707d1e3d30db7623d2b23ed4afb45f0f7ba0",
+          "contentHash": "sha256:f6c9c669167e40fd889ee668b4dd70f70ec186220feda8d2d16bcbe829b54500",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-1-cover.png",
+              "sha256": "e7b40e97d7e9353bd26264e8832206e9031d71fe2f9a4b6c482bc06bb8aefc24"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-1-signs.svg",
+              "sha256": "e1febe4163675099dc960fc8931a1d6a41e8ebd4c27d0e33f55a29dcbb633f51"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-1-alert.svg",
+              "sha256": "743e60f245f7c093c961323fed39aa958d0c961c3c0346e5812221332d6fc81f"
+            }
+          ]
+        },
+        {
+          "draftNumber": 24,
+          "draftKey": "disease:gout:episode-2",
+          "sourceFile": "02-gout-2.md",
+          "sourceSha256": "84509e76f47f3f065abc79027bb4cb4db10a3614c43b2b4f73e57cff824fc5bc",
+          "contentHash": "sha256:12705ab0a4eca736c11a5010f4b3de6b68fdd59344cb163231dc1b4452cbd8ed",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-gout-2-cover.png",
+              "sha256": "67e519130925ce279fa4ae9c47378d01368d0e27859d64bfce5a07224ee29c7c"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-gout-2-diagnosis.svg",
+              "sha256": "b10bc01429c11ee7e7226837f81dda5df4bb5d74103230080e039e2351d3cc90"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-gout-2-plan.svg",
+              "sha256": "0d83bbbea373f53db024661365d0ac8f5ea647d0727472ebce705ccfb7b35bc4"
+            }
+          ]
+        },
+        {
+          "draftNumber": 25,
+          "draftKey": "disease:gout:episode-3",
+          "sourceFile": "01-gout-3.md",
+          "sourceSha256": "4c775b09d1975f4797ca9baa1420ca21c28fb64635a4cbb7437f7b2955502d78",
+          "contentHash": "sha256:dec656fa97e05abb028cf54209c0c0773283c01b47e4bc610942b7ed9c3d78de",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-3-cover.png",
+              "sha256": "8effd87c435fec663e3a5daaf718c5d73a497286d3ebe79c67ad9e66a6f9453c"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-3-flare.svg",
+              "sha256": "9f0c938f79e186dd42b26de449107a811f2fe59de9155748d00f2227b652199d"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-3-record.svg",
+              "sha256": "48ce27fc13e2c29297fc2c0ad974d4948a15b7afeb83ceeea2ddc6c8299b6244"
+            }
+          ]
+        },
+        {
+          "draftNumber": 26,
+          "draftKey": "disease:hypothyroidism:episode-1",
+          "sourceFile": "02-hypothyroidism-1.md",
+          "sourceSha256": "cb38522ddb7562609c1a030b434fc55dada4bc1663505a43450ea7db06a8bf9d",
+          "contentHash": "sha256:536c62018f7cd00dec16ed8ca3c2d4e26a3c6b579f121d2839fe636a8786870c",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-1-cover.png",
+              "sha256": "9e782e169d6f7b10827065fa63145c77faa8f31a11ad02980cbee7b49e4ffcd8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-1-signs.svg",
+              "sha256": "a95bd2a689064bc58597f750b234ccb1fe4fd2e8c0ebdc8d97a106dc2b91d8a8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-1-visit.svg",
+              "sha256": "71dd945b075f3ce272fad24fef1f2e3d11515139baa24d49165b9aaa165f03e7"
+            }
+          ]
+        },
+        {
+          "draftNumber": 27,
+          "draftKey": "disease:hypothyroidism:episode-2",
+          "sourceFile": "01-hypothyroidism-2.md",
+          "sourceSha256": "84697ae526972e5110cb2aebb92c2bcaf07694d776c33965a5693de49e1b7cfb",
+          "contentHash": "sha256:ce0fe2ec3b11e1246c685cd15677eff7ac82b92582ec11bdf099bafc0097a1b8",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-hypothyroidism-2-cover.png",
+              "sha256": "612ef1f7c5d355698368fe971927bf6afff672c95b9c5a0d3cb464cb41498d34"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-hypothyroidism-2-assess.svg",
+              "sha256": "f1836ef3c7482621e682b8f28db46d5b39f7d97c6fac52a1a3ef69315e4b5327"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-hypothyroidism-2-follow.svg",
+              "sha256": "9a5e7b648fb8154c67b581e0a1d815ca0d97eba50b874cc4bdb57e2eb1f78c73"
+            }
+          ]
+        },
+        {
+          "draftNumber": 28,
+          "draftKey": "disease:hypothyroidism:episode-3",
+          "sourceFile": "02-hypothyroidism-3.md",
+          "sourceSha256": "5c6f07243d3d7189e792f1cba35a3da108857fd6b4bacd2d198166d73fa5f2cd",
+          "contentHash": "sha256:2c2e4bb38c38a8d67b988ee4cb62ea818b5c6da3022307f03c142e924ab27dd2",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-3-cover.png",
+              "sha256": "c43d43bf869c398d3785e9a9c46d83f1257a9dc530f89bccff3cecdd53ed0ba8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-3-med.svg",
+              "sha256": "28aa7d9b86721d69c288b8c9b585b7cf315e91f5e2e124abc1edc27e7317427c"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-3-observe.svg",
+              "sha256": "e06068929dae674f02d636e5f1b64eeb9416e4d94cb88c9cfb66b554106eeb10"
+            }
+          ]
+        }
+      ],
+      "withheldArticles": [],
+      "articles": [
+        {
+          "slug": "disease-cataract-episode-3",
+          "title": "白內障第 3 集｜從等待治療到術後返家，把每天的照顧安排好",
+          "businessItem": "護理復能",
+          "publicNumber": 173,
+          "draftNumber": 1,
+          "draftKey": "disease:cataract:episode-3",
+          "sourceFile": "03-cataract-3.md",
+          "sourceSha256": "c162624033cb8b9a992af23a756f6843ee3d7bc8f08881a7348dc9f241eb93a0",
+          "contentHash": "sha256:1cb1114948dc9f315d3581ee48cfc7e569bfde3eb863203946ca34a9fa22aca9",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-cataract-3-cover.png",
+              "sha256": "7c9eaf034ccc474f153c90fe81456b093e0f700803f993560caefe96fd78f79f"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-cataract-3-care-map.svg",
+              "sha256": "8fbe991b3cd7c9987ec341c4771a24ea224c228fe14f0dcdc6f7e89a417b7d3a"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-cataract-3-recovery-signals.svg",
+              "sha256": "cf7542f7e29ea70333d3fb5204bb8624ef1371f3af8f36b4ced54be907673f96"
+            }
+          ],
+          "bodyTextHash": "sha256:91028022e75730566e38eaf1dc1e8fa909364d03f07562c62c66d1e9a0288b00",
+          "primaryQuestion": "白內障第 3 集｜從等待治療到術後返家，把每天的照顧安排好",
+          "careContext": "等待治療至術後返家的家庭照顧、點藥交班、異常求助與回診分工",
+          "referenceUrls": [
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/cataracts",
+            "https://www.guysandstthomas.nhs.uk/health-information/cataract-surgery/after-cataract-surgery",
+            "https://www.nhs.uk/tests-and-treatments/cataract-surgery/",
+            "https://epaper.ntuh.gov.tw/health/202104/health_4.html",
+            "https://epaper.ntuh.gov.tw/health/201807/health_2.html",
+            "https://www.nhs.uk/conditions/vision-loss/"
+          ]
+        },
+        {
+          "slug": "disease-glaucoma-episode-1",
+          "title": "青光眼第 1 集｜看得清楚也不能放心：認識無聲的視神經損傷",
+          "businessItem": "護理復能",
+          "publicNumber": 174,
+          "draftNumber": 2,
+          "draftKey": "disease:glaucoma:episode-1",
+          "sourceFile": "04-glaucoma-1.md",
+          "sourceSha256": "eaf9493b600c12c990760a6e55300310ca524fed4a16e5bf6ad78649c18e99d7",
+          "contentHash": "sha256:cc6a9b6d3b1c36ed60a3c8c77dccceb29f06f81f24a610ee45545f2fce4c6f88",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-1-cover.png",
+              "sha256": "3a367238bca765a11447a8fa2aeeb526a8ede8b0d292e87769a57d179ddd29a1"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-1-exam-pieces.svg",
+              "sha256": "293acd194d4d67a74bdf36852f0ab2080e83e25d0c409e55560c041afb0d9313"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-1-help-route.svg",
+              "sha256": "912d944fd8dd3e93123bd8fee2406c061b623111ca5d7e2d22b984f52c33405e"
+            }
+          ],
+          "bodyTextHash": "sha256:bd431f4d60cb0929b0ffc83817357d7c6a3773cd374904c0ab8cc00db5e545e7",
+          "primaryQuestion": "青光眼第 1 集｜看得清楚也不能放心：認識無聲的視神經損傷",
+          "careContext": "視神經疾病、無症狀慢性進展、正常眼壓不排除、不同檢查與急性警訊",
+          "referenceUrls": [
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/glaucoma",
+            "https://hmc.ntuh.gov.tw/disease-symptoms/0m154803344894433790",
+            "https://www.nei.nih.gov/about/education-and-outreach/glaucoma-resources/national-eye-institute-statement-detection-glaucoma-and-adult-vision-screening",
+            "https://www.nhs.uk/conditions/glaucoma/",
+            "https://www.nhs.uk/conditions/vision-loss/"
+          ]
+        },
+        {
+          "slug": "disease-glaucoma-episode-2",
+          "title": "青光眼第 2 集｜眼藥水、雷射與手術，治療後為什麼還要回診？",
+          "businessItem": "護理復能",
+          "publicNumber": 175,
+          "draftNumber": 3,
+          "draftKey": "disease:glaucoma:episode-2",
+          "sourceFile": "03-glaucoma-2.md",
+          "sourceSha256": "8d7f502ed94ee50e4e0d7ca336fd45b8cb1b7b724d5a960aab68da3e7907fa36",
+          "contentHash": "sha256:5b4df3aa92a648f09bfb52e188978302d2805929fb7d86ed1a82c792ce1535d2",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-glaucoma-2-cover.png",
+              "sha256": "4f145f5b83f108f5d091ff83c84aab2dd334b9662b2e8cc9d6f7de5cc50885c8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-glaucoma-2-options.svg",
+              "sha256": "6332f3263302213b056ea80f7a259fca14a21ee99e1fb403cf34665cc845bd93"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-glaucoma-2-followup.svg",
+              "sha256": "ac3ee7ca3be478f1a79c87157623519c37162771a2f3532a485c480239fd4539"
+            }
+          ],
+          "bodyTextHash": "sha256:000d5afd974daca389c4ed2d8b51e7ff5ac7275bc591ef784e7be10e19640b85",
+          "primaryQuestion": "青光眼第 2 集｜眼藥水、雷射與手術，治療後為什麼還要回診？",
+          "careContext": "治療選項與追蹤",
+          "referenceUrls": [
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/glaucoma",
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/glaucoma/glaucoma-medicines",
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/glaucoma/treatment",
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/glaucoma/glaucoma-surgery"
+          ]
+        },
+        {
+          "slug": "disease-glaucoma-episode-3",
+          "title": "青光眼第 3 集｜把點藥、回診和居家動線接成一份照顧計畫",
+          "businessItem": "護理復能",
+          "publicNumber": 176,
+          "draftNumber": 4,
+          "draftKey": "disease:glaucoma:episode-3",
+          "sourceFile": "04-glaucoma-3.md",
+          "sourceSha256": "395f4cc76e46496a93bdff26dbe041b8dbc64a082bef3a063567f093d85e8ab9",
+          "contentHash": "sha256:bd7b3a3c3fd3560290926dd0f2bcb32e201900bae749bc430dfac2c428153ece",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-3-cover.png",
+              "sha256": "0ce4abc374f5e0446704ff84f41c1b942a4cacf5de1a3d0b5e76795e4a2424be"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-3-day.svg",
+              "sha256": "ed5591acbcc6c86940fda05f7efddeafaae757cf1511849b737edf70c1d3bbd4"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-glaucoma-3-home.svg",
+              "sha256": "6cc18799b0dd864243b1330b78b77882c44ff257b44e57afeb3bb7e188cc5f48"
+            }
+          ],
+          "bodyTextHash": "sha256:22b2b73fd13ca2df63054ffbbe39f72be25c430fd4852c13d3a80b35d0ee7a39",
+          "primaryQuestion": "青光眼第 3 集｜把點藥、回診和居家動線接成一份照顧計畫",
+          "careContext": "日常照顧、低視能與急症",
+          "referenceUrls": [
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/glaucoma",
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/glaucoma/glaucoma-medicines",
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/low-vision"
+          ]
+        },
+        {
+          "slug": "disease-age-related-macular-degeneration-episode-1",
+          "title": "老年性黃斑部病變第 1 集｜直線變彎、中央模糊，別只當作老花",
+          "businessItem": "護理復能",
+          "publicNumber": 177,
+          "draftNumber": 5,
+          "draftKey": "disease:age-related-macular-degeneration:episode-1",
+          "sourceFile": "03-amd-1.md",
+          "sourceSha256": "2900a67158a9385694805b3e2beaefd0179e100807a7302ec1e36a99740464e1",
+          "contentHash": "sha256:966833563421a567f02f20f4a49456355fb160e80ed9af0bac495e898fd2da56",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-1-cover.png",
+              "sha256": "da39406502d2442cec3818223fb3c565e89f4500581097412bc6cb92023f9f15"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-1-types.svg",
+              "sha256": "e873169f3a8fb01187eeec40db72cd21631ad0d8839f8a46a75ccdd1aea0ed62"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-1-signs.svg",
+              "sha256": "8905605a77306d63d9979c06b9a55ed912dd9735ea8872da51d0adab35854a0f"
+            }
+          ],
+          "bodyTextHash": "sha256:401b61d8252e74c1aaf90f0d5af965f975b67be24e6dfc80bb8ce481555a8760",
+          "primaryQuestion": "老年性黃斑部病變第 1 集｜直線變彎、中央模糊，別只當作老花",
+          "careContext": "疾病介紹與警訊",
+          "referenceUrls": [
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/age-related-macular-degeneration",
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/low-vision"
+          ]
+        },
+        {
+          "slug": "disease-age-related-macular-degeneration-episode-2",
+          "title": "老年性黃斑部病變第 2 集｜乾性、濕性治療不同，保健品不能自己配",
+          "businessItem": "護理復能",
+          "publicNumber": 178,
+          "draftNumber": 6,
+          "draftKey": "disease:age-related-macular-degeneration:episode-2",
+          "sourceFile": "04-amd-2.md",
+          "sourceSha256": "4ff98913fa7d8575be9e6a0387beaa4c2dfb61a51f1e01ca1ce2fb9580b5b65b",
+          "contentHash": "sha256:3afc2e9a821da2d863790785fe987276abe9647f2a0fe50ae286aa410c18f4c6",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-amd-2-cover.png",
+              "sha256": "a3003aa625fc67eccccab3a48caf6b70d9b03a9a7cf448029bfdab15387739c8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-amd-2-path.svg",
+              "sha256": "454b93db16403576a845b8c604044e9adc453eefd34ad1e5c5df116ef12fe952"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-amd-2-visit.svg",
+              "sha256": "c1a4490f9d4d9ea2644286a43800e440654e8dd497fdc77a928ab94629db1d86"
+            }
+          ],
+          "bodyTextHash": "sha256:27abadb4ae638e6be26b8114ad27ce1bf19743c3fc81629e1b1252ae16d0e709",
+          "primaryQuestion": "老年性黃斑部病變第 2 集｜乾性、濕性治療不同，保健品不能自己配",
+          "careContext": "治療與就醫",
+          "referenceUrls": [
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/age-related-macular-degeneration",
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/age-related-macular-degeneration/treatments-wet-amd-advanced-neovascular-amd",
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/low-vision"
+          ]
+        },
+        {
+          "slug": "disease-age-related-macular-degeneration-episode-3",
+          "title": "老年性黃斑部病變第 3 集｜中央看不清，居家照顧如何保留自主？",
+          "businessItem": "護理復能",
+          "publicNumber": 179,
+          "draftNumber": 7,
+          "draftKey": "disease:age-related-macular-degeneration:episode-3",
+          "sourceFile": "03-amd-3.md",
+          "sourceSha256": "4b9cf3241d66a4b6e89ff7b9b3ae09deeb4b5717ce75664f138c5a2aaabfa8f0",
+          "contentHash": "sha256:4e422327eaac0d1c357ddb838fbe95fced7def070da051f6591d22b818b4825e",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-3-cover.png",
+              "sha256": "a33258f8fc4ffb122934c7fc3387ff7989f3c8df0e34f3cbe7deb70ae4d12d56"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-3-home.svg",
+              "sha256": "ca8e2761676d1c0eec6f077b6d2dde85e3de7cbf679be51fa41a7ead6d10b4fb"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-amd-3-support.svg",
+              "sha256": "46a9fd1987870b63516afe9832f2d3271e51f92ccdad157e16d873d31b6691c8"
+            }
+          ],
+          "bodyTextHash": "sha256:22f60bdfebc70874ab7915c02a7a5f62623f25466095a4ec2ffeeff6e49be733",
+          "primaryQuestion": "老年性黃斑部病變第 3 集｜中央看不清，居家照顧如何保留自主？",
+          "careContext": "日常照顧策略",
+          "referenceUrls": [
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/low-vision",
+            "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/age-related-macular-degeneration"
+          ]
+        },
+        {
+          "slug": "disease-age-related-hearing-loss-episode-1",
+          "title": "老年性聽力損失第 1 集｜一直叫人重複，不一定只是沒專心",
+          "businessItem": "護理復能",
+          "publicNumber": 180,
+          "draftNumber": 8,
+          "draftKey": "disease:age-related-hearing-loss:episode-1",
+          "sourceFile": "04-hearing-1.md",
+          "sourceSha256": "6a53d62209db3f73a996744021bf21166a97a447f14d6abd85fc5df50cde7850",
+          "contentHash": "sha256:1f228a961ab6c9e930aa2584283c05c6ecd982c7a9c15983a239f5031e7d4738",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-1-cover.png",
+              "sha256": "5c3f57c723e7bf24d737134240e88246b0c454b9409b67e93b122796391bb0df"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-1-signs.svg",
+              "sha256": "de23f67216ed46acc2f2b35693b08e72215eff83a84fcbda39421b26ede4f8ee"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-1-urgent.svg",
+              "sha256": "5c232e40e6608c4c443cca04e06491cd9ff9a9358c060252166c26140579c611"
+            }
+          ],
+          "bodyTextHash": "sha256:9536e603b16c626e5a4bf5bdb014a96dcbb111ec0d61f49af5c8be1c9063c647",
+          "primaryQuestion": "老年性聽力損失第 1 集｜一直叫人重複，不一定只是沒專心",
+          "careContext": "疾病介紹與警訊",
+          "referenceUrls": [
+            "https://www.nidcd.nih.gov/health/age-related-hearing-loss",
+            "https://www.nidcd.nih.gov/health/hearing-aids",
+            "https://www.nidcd.nih.gov/health/sudden-deafness"
+          ]
+        },
+        {
+          "slug": "disease-age-related-hearing-loss-episode-2",
+          "title": "老年性聽力損失第 2 集｜助聽器、人工電子耳與就醫評估怎麼選？",
+          "businessItem": "護理復能",
+          "publicNumber": 181,
+          "draftNumber": 9,
+          "draftKey": "disease:age-related-hearing-loss:episode-2",
+          "sourceFile": "03-hearing-2.md",
+          "sourceSha256": "29815e861d420913ee14ad5bebdd8c8b15ffc29c90880dab5e2bec99fe41af25",
+          "contentHash": "sha256:2f4b281e810796255325868c08da9e08dee45ccd566e9f5b028df9a108b261c9",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-hearing-2-cover.png",
+              "sha256": "6d6da9f1bf7daaa3b438efabde77ff2eded5fa2494eb38f74d4c9bfa9937a54f"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-hearing-2-route.svg",
+              "sha256": "94828da57d5048eeb0ab74ceedfed19fe800c6d97bade59429d5a258abc4cef3"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-hearing-2-fit.svg",
+              "sha256": "37152180f28bcd802817d9057a7d131de9c4317a5f35c497a2ca1d34e65a2942"
+            }
+          ],
+          "bodyTextHash": "sha256:9484c103feead48be2d40983c8b2df139e48dceb99ba2677b78cd6a3240caf5e",
+          "primaryQuestion": "老年性聽力損失第 2 集｜助聽器、人工電子耳與就醫評估怎麼選？",
+          "careContext": "治療與就醫",
+          "referenceUrls": [
+            "https://www.nidcd.nih.gov/health/age-related-hearing-loss",
+            "https://www.nidcd.nih.gov/health/hearing-aids",
+            "https://www.nidcd.nih.gov/health/sudden-deafness"
+          ]
+        },
+        {
+          "slug": "disease-age-related-hearing-loss-episode-3",
+          "title": "老年性聽力損失第 3 集｜家人別用吼的：讓長者聽得懂的溝通方式",
+          "businessItem": "護理復能",
+          "publicNumber": 182,
+          "draftNumber": 10,
+          "draftKey": "disease:age-related-hearing-loss:episode-3",
+          "sourceFile": "04-hearing-3.md",
+          "sourceSha256": "19d61bd6e38650e6033e7daaf545b7cda144cc539758540593da57cbc22d5ff4",
+          "contentHash": "sha256:55ee2d85843198d18cdf7d0531fcf30fa0d744b349cb12399f2c7e7b9d54479e",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-3-cover.png",
+              "sha256": "5e3f7b4e93e8b8064f98f9f1b0195d821ffe6edd1b1dcb0a673d879ec695ece8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-3-talk.svg",
+              "sha256": "c594ff79a17d8d069c8e90a1bf67fc6f8554f28faf237787542e0df79c587d48"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-hearing-3-safe.svg",
+              "sha256": "dd02513605a254619d760bedcda398b126a3e2e221573a4230f4dbb8378d9402"
+            }
+          ],
+          "bodyTextHash": "sha256:8b70b8b29d7a0a51860357693dfe2d7e15f40df7591fb8aa086f3b12644b3316",
+          "primaryQuestion": "老年性聽力損失第 3 集｜家人別用吼的：讓長者聽得懂的溝通方式",
+          "careContext": "日常照顧策略",
+          "referenceUrls": [
+            "https://www.nidcd.nih.gov/health/age-related-hearing-loss",
+            "https://www.nidcd.nih.gov/health/hearing-aids",
+            "https://www.nidcd.nih.gov/health/sudden-deafness"
+          ]
+        },
+        {
+          "slug": "disease-anxiety-disorders-episode-1",
+          "title": "高齡焦慮症第 1 集｜不只是想太多：症狀、身體表現與就醫警訊",
+          "businessItem": "護理復能",
+          "publicNumber": 183,
+          "draftNumber": 11,
+          "draftKey": "disease:anxiety-disorders:episode-1",
+          "sourceFile": "03-anxiety-1.md",
+          "sourceSha256": "b40e9f709742bfced3fa171b336087ed7fc3bbf38af4abe56b047c93d982f670",
+          "contentHash": "sha256:d9f6c9a7ab5b8acc1b36697737bfbda66fe721cc1dca456a860e85e73f8d8dc4",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-1-cover.png",
+              "sha256": "ead17654017c179f32b42550ba04ce1b73a6ecf3e53133cff6fb0877e247bb42"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-1-signs.svg",
+              "sha256": "ea354035351558f0866df87ece3db2c7c63f0c172c8eeb73725607e48f4b8b80"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-1-record.svg",
+              "sha256": "fb6a3db7ecc275a3bced1f834ff2227baac3165b80271958f96be50a887189e6"
+            }
+          ],
+          "bodyTextHash": "sha256:7ede053509d7d216e40172e1ac94566c979b6b4d0f0428278f00e672ae6974f6",
+          "primaryQuestion": "高齡焦慮症第 1 集｜不只是想太多：症狀、身體表現與就醫警訊",
+          "careContext": "疾病介紹與警訊",
+          "referenceUrls": [
+            "https://www.nimh.nih.gov/health/topics/anxiety-disorders",
+            "https://www.nimh.nih.gov/health/publications/generalized-anxiety-disorder-gad"
+          ]
+        },
+        {
+          "slug": "disease-anxiety-disorders-episode-2",
+          "title": "高齡焦慮症第 2 集｜怎麼治療？心理治療、藥物與回診評估",
+          "businessItem": "護理復能",
+          "publicNumber": 184,
+          "draftNumber": 12,
+          "draftKey": "disease:anxiety-disorders:episode-2",
+          "sourceFile": "04-anxiety-2.md",
+          "sourceSha256": "1490877c829d7414d186bad3763891d3bc4d40471f1d6c44a75542b3417d01fc",
+          "contentHash": "sha256:a8a37c56986afad2e62a5b6ca31b6a413825cb558a395251cffcf4fb04c8e195",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-anxiety-2-cover.png",
+              "sha256": "7641bfe3ec3f930c406048998a26a02258edcc3b16576ffe2a10e43462330466"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-anxiety-2-plan.svg",
+              "sha256": "02d715b83d9eec7bddfa96c618aa161d27317fc9b42dd75048e33f695cf7f712"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-anxiety-2-visit.svg",
+              "sha256": "6df2f164a11c63e66166634bfaa30d0cae0e0bdb8d549bb19369f7a85665f362"
+            }
+          ],
+          "bodyTextHash": "sha256:b63076d5ef598b9c5e198d339754274ff1433a31e94da5f05232cc35af895bde",
+          "primaryQuestion": "高齡焦慮症第 2 集｜怎麼治療？心理治療、藥物與回診評估",
+          "careContext": "治療與就醫",
+          "referenceUrls": [
+            "https://www.nimh.nih.gov/health/publications/generalized-anxiety-disorder-gad",
+            "https://www.nimh.nih.gov/health/topics/anxiety-disorders"
+          ]
+        },
+        {
+          "slug": "disease-anxiety-disorders-episode-3",
+          "title": "高齡焦慮症第 3 集｜日常照顧策略：陪伴、作息與安全觀察",
+          "businessItem": "護理復能",
+          "publicNumber": 185,
+          "draftNumber": 13,
+          "draftKey": "disease:anxiety-disorders:episode-3",
+          "sourceFile": "03-anxiety-3.md",
+          "sourceSha256": "4ba1ff4a89ac685f061aa229cf95b531b40b9560b469841fe18e938dbf7b288a",
+          "contentHash": "sha256:fe523d7d305ce8c513f9bc872cf106f844dc539e1579f14a4071beaf4eb37cc1",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-3-cover.png",
+              "sha256": "a996797ddf149f5d8e73c783d176b618e674e250a6134eca41026a418bdfefc6"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-3-support.svg",
+              "sha256": "c18d088396d0f8142a5170fd0cf890cbde2c7c1d101470c40d1d0f1e15edfce8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-anxiety-3-record.svg",
+              "sha256": "2336ffd051f6baeaccccbfe72933106b3420a1d72f93ce76c1cadb3bfd166f71"
+            }
+          ],
+          "bodyTextHash": "sha256:04653c29e1e32db468c30581be5c300f13456c690dd5f3186ca519f2c02afdfc",
+          "primaryQuestion": "高齡焦慮症第 3 集｜日常照顧策略：陪伴、作息與安全觀察",
+          "careContext": "日常照顧策略",
+          "referenceUrls": [
+            "https://www.nimh.nih.gov/health/topics/anxiety-disorders",
+            "https://www.nimh.nih.gov/health/publications/generalized-anxiety-disorder-gad"
+          ]
+        },
+        {
+          "slug": "disease-late-life-depression-episode-1",
+          "title": "高齡憂鬱症第 1 集｜不只是心情不好：表現、風險與求助警訊",
+          "businessItem": "護理復能",
+          "publicNumber": 186,
+          "draftNumber": 14,
+          "draftKey": "disease:late-life-depression:episode-1",
+          "sourceFile": "04-depression-1.md",
+          "sourceSha256": "1b81c28e3520d1ff27e6dfcfad3c663f076b118f2a3de8c853e6ddd9754338b8",
+          "contentHash": "sha256:651ec526bffde13b6bb15b8b337096a0d83a7a55707c161d199dd55434711b4d",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-1-cover.png",
+              "sha256": "ffbf6e6b4643776f01d3b78a14745f09762e65ccc929527e01817aca2ef274e4"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-1-signs.svg",
+              "sha256": "9d7bec3340947d78cd1845ebe9fb71f390dd488cec2a3afad762a1ab388aeb27"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-1-record.svg",
+              "sha256": "e4e9346c47f025ea6631da81bb273222308623193dee43b92418096a0fbd97a5"
+            }
+          ],
+          "bodyTextHash": "sha256:85c2460fb7a9d58ea8c2f8224d05456a8dcd464291273fddcba7e5a1b5bb4106",
+          "primaryQuestion": "高齡憂鬱症第 1 集｜不只是心情不好：表現、風險與求助警訊",
+          "careContext": "疾病介紹與警訊",
+          "referenceUrls": [
+            "https://www.who.int/news-room/fact-sheets/detail/depression",
+            "https://www.nimh.nih.gov/health/topics/depression"
+          ]
+        },
+        {
+          "slug": "disease-late-life-depression-episode-2",
+          "title": "高齡憂鬱症第 2 集｜治療與就醫：評估、心理治療和藥物追蹤",
+          "businessItem": "護理復能",
+          "publicNumber": 187,
+          "draftNumber": 15,
+          "draftKey": "disease:late-life-depression:episode-2",
+          "sourceFile": "03-depression-2.md",
+          "sourceSha256": "ee49b30eab6b4904725efc2f38b9a908acb3f2ecd5edbe660f2101e763dcb6da",
+          "contentHash": "sha256:f374b94523703eebebc1b942f2be91f21c872d396901b324f3af06f87fc2da0a",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-depression-2-cover.png",
+              "sha256": "e2235e473cff59f5dcfe5980efc010290aede2ba58752c453f07e61c37b2b749"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-depression-2-plan.svg",
+              "sha256": "bcc9b3312e9886d2f49102e14198c04cd8c3e79dd32fb2b1451abc86f7023c46"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-depression-2-visit.svg",
+              "sha256": "4394a738d22bbf10306d27da3011d97a7439df2d1669d3b3e99505efa016acc1"
+            }
+          ],
+          "bodyTextHash": "sha256:62aa59c56b70a47258c051acaefd63f6f963aa73dfbf1af1d20fd2ba5e22bc6e",
+          "primaryQuestion": "高齡憂鬱症第 2 集｜治療與就醫：評估、心理治療和藥物追蹤",
+          "careContext": "治療與就醫",
+          "referenceUrls": [
+            "https://www.who.int/news-room/fact-sheets/detail/depression",
+            "https://www.nimh.nih.gov/health/topics/depression"
+          ]
+        },
+        {
+          "slug": "disease-late-life-depression-episode-3",
+          "title": "高齡憂鬱症第 3 集｜照顧策略：維持連結、降低壓力與守住安全",
+          "businessItem": "護理復能",
+          "publicNumber": 188,
+          "draftNumber": 16,
+          "draftKey": "disease:late-life-depression:episode-3",
+          "sourceFile": "04-depression-3.md",
+          "sourceSha256": "f64bc3bbcb1080d5a0d99989f5649eb12b890d1fcbc719b6dbdba71ca58ccdde",
+          "contentHash": "sha256:777d54af6185537c9917b12d4db1c0286fae0049400106f588f3d281c1ecad26",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-3-cover.png",
+              "sha256": "aca88f0cccad542179288e80b80d163afd60f60092edc988cbc51ada5c4b738a"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-3-support.svg",
+              "sha256": "7949759d1d31f326efa113898b383894c11889859e5bbcbc0e0bb5e695e57ac0"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-depression-3-safety.svg",
+              "sha256": "19f7cecb537dba09b900af8398f99f45c9539f9e7be483225c1cf4767b7bb6df"
+            }
+          ],
+          "bodyTextHash": "sha256:dfb7ace76333918e5e3a2956ba032595aff3fca755f49e8b14bc391c40a56f41",
+          "primaryQuestion": "高齡憂鬱症第 3 集｜照顧策略：維持連結、降低壓力與守住安全",
+          "careContext": "日常照顧策略",
+          "referenceUrls": [
+            "https://www.who.int/news-room/fact-sheets/detail/depression",
+            "https://www.nimh.nih.gov/health/topics/depression"
+          ]
+        },
+        {
+          "slug": "disease-peripheral-artery-disease-episode-1",
+          "title": "周邊動脈疾病第 1 集｜走路腿痛別只當老化：症狀與危險警訊",
+          "businessItem": "護理復能",
+          "publicNumber": 189,
+          "draftNumber": 17,
+          "draftKey": "disease:peripheral-artery-disease:episode-1",
+          "sourceFile": "03-pad-1.md",
+          "sourceSha256": "0d13183727f512ec1bdd7f9c90e66606a95b10b709aacd43bbf3fa2ca815fc89",
+          "contentHash": "sha256:804dae6781e6993369786d29a49cf13abebfa16ec39b172a5e54d633c69f4335",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-pad-1-cover.png",
+              "sha256": "7136e97571c93dbda7e98f14051568a8308d01d40f67f5698bac34386b199446"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-pad-1-signs.svg",
+              "sha256": "b701a795238b252bd023b83598cbcf72575d7f2f3defca5c067796d8e7cb1927"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/03-pad-1-alert.svg",
+              "sha256": "cef2f58e3c1cb10f4193806675eb9728375b243b2cb76b96ba68b3c3eecd58b1"
+            }
+          ],
+          "bodyTextHash": "sha256:083d1c32acf0aaa31d31a5389f83e6b436b1a262a7c7f898eb8331408571fa00",
+          "primaryQuestion": "周邊動脈疾病第 1 集｜走路腿痛別只當老化：症狀與危險警訊",
+          "careContext": "疾病介紹與警訊",
+          "referenceUrls": [
+            "https://www.nhlbi.nih.gov/health/peripheral-artery-disease",
+            "https://www.nhlbi.nih.gov/health/peripheral-artery-disease/treatment"
+          ]
+        },
+        {
+          "slug": "disease-peripheral-artery-disease-episode-2",
+          "title": "周邊動脈疾病第 2 集｜怎麼檢查與治療？血管風險和足部照護",
+          "businessItem": "護理復能",
+          "publicNumber": 190,
+          "draftNumber": 18,
+          "draftKey": "disease:peripheral-artery-disease:episode-2",
+          "sourceFile": "04-pad-2.md",
+          "sourceSha256": "22cdea68499d5aa93d37279bb1d093d8bb5f483fb4923153c4507e53647ac50e",
+          "contentHash": "sha256:d97a5d52a5d38d03b1dd35478780a463d9d67b312ce4c638fb60f002791cd94e",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-pad-2-cover.png",
+              "sha256": "b98b48ff6ac654039fe0fda4f76dc85e67a416aeed23756f30b1cfa2cc49c4e0"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-pad-2-visit.svg",
+              "sha256": "89ad18c681704defd9879b09f7c56feb3880647e2956b0ade9602fbae9e31859"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/04-pad-2-plan.svg",
+              "sha256": "d4238b1a0c530bf846a0eba70ac9944df223ea06ceebf1ce8fe7de955a650622"
+            }
+          ],
+          "bodyTextHash": "sha256:79a837c954ad608d8fc7fbe5b7c8a26f4b784b14e699a826887b161531105355",
+          "primaryQuestion": "周邊動脈疾病第 2 集｜怎麼檢查與治療？血管風險和足部照護",
+          "careContext": "治療與就醫",
+          "referenceUrls": [
+            "https://www.nhlbi.nih.gov/health/peripheral-artery-disease/treatment",
+            "https://www.nhlbi.nih.gov/health/peripheral-artery-disease"
+          ]
+        },
+        {
+          "slug": "disease-peripheral-artery-disease-episode-3",
+          "title": "周邊動脈疾病第 3 集｜居家照顧：走路練習、足部檢查與傷口警訊",
+          "businessItem": "護理復能",
+          "publicNumber": 191,
+          "draftNumber": 19,
+          "draftKey": "disease:peripheral-artery-disease:episode-3",
+          "sourceFile": "01-pad-3.md",
+          "sourceSha256": "40f459173e13f5e6d5c65a83556ce80eb9dac2bc5b21dc471079499045c587a0",
+          "contentHash": "sha256:ca84893ab4f642eaead4fd0f0584a01366ee6c7b4033abb5faa2026583e26712",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-pad-3-cover.png",
+              "sha256": "ef32288a8d7524a7a530c628c8a69221abac8828b9b278318a946a965888776d"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-pad-3-daily.svg",
+              "sha256": "b48bd042419615e538fe62d67221ab0b3b8731ceaec298956b46c955bfec58d7"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-pad-3-alert.svg",
+              "sha256": "eb8ecc09ed037ed274f4a92cdf7063a3bc9b018e90d771efb15d15626c35e88d"
+            }
+          ],
+          "bodyTextHash": "sha256:3b5b9b5d2c1061ed89269ab684769933b7a7ad6363f9de6799a2ab362d5dd176",
+          "primaryQuestion": "周邊動脈疾病第 3 集｜居家照顧：走路練習、足部檢查與傷口警訊",
+          "careContext": "日常照顧策略",
+          "referenceUrls": [
+            "https://www.nhlbi.nih.gov/health/peripheral-artery-disease/living-with",
+            "https://www.nhlbi.nih.gov/health/peripheral-artery-disease",
+            "https://www.nhlbi.nih.gov/health/peripheral-artery-disease/treatment"
+          ]
+        },
+        {
+          "slug": "disease-dyslipidemia-episode-1",
+          "title": "高齡血脂異常第 1 集｜沒有症狀也要注意：血脂、風險與檢查",
+          "businessItem": "護理復能",
+          "publicNumber": 192,
+          "draftNumber": 20,
+          "draftKey": "disease:dyslipidemia:episode-1",
+          "sourceFile": "02-lipid-1.md",
+          "sourceSha256": "c056edb530216d82df959eef897103818cd2fe914f9cd050a28277a8b622fddf",
+          "contentHash": "sha256:03c9c259a31e94deda95d92ec263edd0658625668c393bdaae2bccad5998336b",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-1-cover.png",
+              "sha256": "9444eca22afbffc91a7e9024d35579e62dc91478e5fa28194b4f3919cf107d82"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-1-types.svg",
+              "sha256": "7501e538c22addc2f7843fe9cfa2825bb81e3646bb67af7e56e085665c9e5145"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-1-risk.svg",
+              "sha256": "a13b5f7f14133abf2945543a459da669076ad32614da40bdf016448710856602"
+            }
+          ],
+          "bodyTextHash": "sha256:7d883fc4781df30f8ad4f28f513798bcc73bc55dff8562cdafdbd54642568627",
+          "primaryQuestion": "高齡血脂異常第 1 集｜沒有症狀也要注意：血脂、風險與檢查",
+          "careContext": "疾病介紹與警訊",
+          "referenceUrls": [
+            "https://www.nhlbi.nih.gov/health/blood-cholesterol",
+            "https://www.nhlbi.nih.gov/health/blood-cholesterol/treatment"
+          ]
+        },
+        {
+          "slug": "disease-dyslipidemia-episode-2",
+          "title": "高齡血脂異常第2集｜治療怎麼選？生活調整、藥物與回診",
+          "businessItem": "護理復能",
+          "publicNumber": 193,
+          "draftNumber": 21,
+          "draftKey": "disease:dyslipidemia:episode-2",
+          "sourceFile": "01-lipid-2.md",
+          "sourceSha256": "462c0971d1e13ebe3354a67e87b7cdd6a06f72245998b6fa614c664c6d43e986",
+          "contentHash": "sha256:9d82d646a915aa6155a2eaba02a4c7ca65a11a002d9e11f4d182aedf6476c424",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-lipid-2-cover.png",
+              "sha256": "028da19377ba6e623a6fca16396d644a65098163b0702de15abbe724703aee8b"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-lipid-2-plan.svg",
+              "sha256": "5236101297881939b41be4d65db01df33a0543f9ec607baa518a20edc08c5706"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-lipid-2-visit.svg",
+              "sha256": "adef583866f4be1094f940a9775761f2992e1127080d668393c24b2469884324"
+            }
+          ],
+          "bodyTextHash": "sha256:3d27a5c9a9b76fe44e9bf6af1758d1cb344caf448c10f51587b4e64ed91b58e3",
+          "primaryQuestion": "高齡血脂異常第2集｜治療怎麼選？生活調整、藥物與回診",
+          "careContext": "治療與就醫",
+          "referenceUrls": [
+            "https://www.nhlbi.nih.gov/health/blood-cholesterol/treatment",
+            "https://www.nhlbi.nih.gov/health/blood-cholesterol"
+          ]
+        },
+        {
+          "slug": "disease-dyslipidemia-episode-3",
+          "title": "高齡血脂異常第3集｜日常照顧：飲食、服藥與副作用觀察",
+          "businessItem": "護理復能",
+          "publicNumber": 194,
+          "draftNumber": 22,
+          "draftKey": "disease:dyslipidemia:episode-3",
+          "sourceFile": "02-lipid-3.md",
+          "sourceSha256": "c44f15a83e31493b537dc71205cfb5138cf6e31e14883054157356c5001ac840",
+          "contentHash": "sha256:0257c18b2f6b6f8cc412e86d91841e9b39daeb511d2f4a19d2bcfeb7c8f7b00b",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-3-cover.png",
+              "sha256": "6e321c901b4455a2c6c0ca44e174e744b141a19d0861681482639a4c585d7c7a"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-3-daily.svg",
+              "sha256": "66595e5335c983ef5b1c51049f5fe13527b6fad785f2b9082c10ff50a529bfc6"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-lipid-3-alert.svg",
+              "sha256": "5ebb21ebe699c59ee2d8e9e73f5ca9046db851307ee79e20a677e02154337e20"
+            }
+          ],
+          "bodyTextHash": "sha256:883a2942890e4fa938067a27f718177a73477aedb20a3264c657263abe7555dc",
+          "primaryQuestion": "高齡血脂異常第3集｜日常照顧：飲食、服藥與副作用觀察",
+          "careContext": "日常照顧策略",
+          "referenceUrls": [
+            "https://www.nhlbi.nih.gov/health/blood-cholesterol/living-with",
+            "https://www.nhlbi.nih.gov/health/blood-cholesterol",
+            "https://www.nhlbi.nih.gov/health/blood-cholesterol/treatment"
+          ]
+        },
+        {
+          "slug": "disease-gout-episode-1",
+          "title": "痛風第1集｜不只是大拇趾痛：高齡者要認得的急性警訊",
+          "businessItem": "護理復能",
+          "publicNumber": 195,
+          "draftNumber": 23,
+          "draftKey": "disease:gout:episode-1",
+          "sourceFile": "01-gout-1.md",
+          "sourceSha256": "e92729bff00431d29bc4cd86b40c707d1e3d30db7623d2b23ed4afb45f0f7ba0",
+          "contentHash": "sha256:f6c9c669167e40fd889ee668b4dd70f70ec186220feda8d2d16bcbe829b54500",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-1-cover.png",
+              "sha256": "e7b40e97d7e9353bd26264e8832206e9031d71fe2f9a4b6c482bc06bb8aefc24"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-1-signs.svg",
+              "sha256": "e1febe4163675099dc960fc8931a1d6a41e8ebd4c27d0e33f55a29dcbb633f51"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-1-alert.svg",
+              "sha256": "743e60f245f7c093c961323fed39aa958d0c961c3c0346e5812221332d6fc81f"
+            }
+          ],
+          "bodyTextHash": "sha256:2cf20fb42404ddb742c7d0bdbaa9d8c9a0419dedbe1acec650dab3a938f2984a",
+          "primaryQuestion": "痛風第1集｜不只是大拇趾痛：高齡者要認得的急性警訊",
+          "careContext": "疾病介紹與警訊",
+          "referenceUrls": [
+            "https://www.niams.nih.gov/health-topics/gout",
+            "https://www.niams.nih.gov/health-topics/gout/diagnosis-treatment-and-steps-to-take"
+          ]
+        },
+        {
+          "slug": "disease-gout-episode-2",
+          "title": "痛風第2集｜怎麼診斷與治療？急性止痛和長期降尿酸要分清楚",
+          "businessItem": "護理復能",
+          "publicNumber": 196,
+          "draftNumber": 24,
+          "draftKey": "disease:gout:episode-2",
+          "sourceFile": "02-gout-2.md",
+          "sourceSha256": "84509e76f47f3f065abc79027bb4cb4db10a3614c43b2b4f73e57cff824fc5bc",
+          "contentHash": "sha256:12705ab0a4eca736c11a5010f4b3de6b68fdd59344cb163231dc1b4452cbd8ed",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-gout-2-cover.png",
+              "sha256": "67e519130925ce279fa4ae9c47378d01368d0e27859d64bfce5a07224ee29c7c"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-gout-2-diagnosis.svg",
+              "sha256": "b10bc01429c11ee7e7226837f81dda5df4bb5d74103230080e039e2351d3cc90"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-gout-2-plan.svg",
+              "sha256": "0d83bbbea373f53db024661365d0ac8f5ea647d0727472ebce705ccfb7b35bc4"
+            }
+          ],
+          "bodyTextHash": "sha256:4c999513c4463e6b2d28d60c36409a1c68342b2c512a4fa95327704a92f1e877",
+          "primaryQuestion": "痛風第2集｜怎麼診斷與治療？急性止痛和長期降尿酸要分清楚",
+          "careContext": "治療與就醫",
+          "referenceUrls": [
+            "https://www.niams.nih.gov/health-topics/gout/diagnosis-treatment-and-steps-to-take",
+            "https://www.niams.nih.gov/health-topics/gout"
+          ]
+        },
+        {
+          "slug": "disease-gout-episode-3",
+          "title": "痛風第3集｜日常怎麼照顧？飲食、喝水、服藥與發作紀錄",
+          "businessItem": "護理復能",
+          "publicNumber": 197,
+          "draftNumber": 25,
+          "draftKey": "disease:gout:episode-3",
+          "sourceFile": "01-gout-3.md",
+          "sourceSha256": "4c775b09d1975f4797ca9baa1420ca21c28fb64635a4cbb7437f7b2955502d78",
+          "contentHash": "sha256:dec656fa97e05abb028cf54209c0c0773283c01b47e4bc610942b7ed9c3d78de",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-3-cover.png",
+              "sha256": "8effd87c435fec663e3a5daaf718c5d73a497286d3ebe79c67ad9e66a6f9453c"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-3-flare.svg",
+              "sha256": "9f0c938f79e186dd42b26de449107a811f2fe59de9155748d00f2227b652199d"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-gout-3-record.svg",
+              "sha256": "48ce27fc13e2c29297fc2c0ad974d4948a15b7afeb83ceeea2ddc6c8299b6244"
+            }
+          ],
+          "bodyTextHash": "sha256:462f93dcc1e7ee1f5209f111c2196e828163678b98ddb63c6a20b54bba127db1",
+          "primaryQuestion": "痛風第3集｜日常怎麼照顧？飲食、喝水、服藥與發作紀錄",
+          "careContext": "日常照顧策略",
+          "referenceUrls": [
+            "https://www.niams.nih.gov/health-topics/gout",
+            "https://www.niams.nih.gov/health-topics/gout/diagnosis-treatment-and-steps-to-take"
+          ]
+        },
+        {
+          "slug": "disease-hypothyroidism-episode-1",
+          "title": "甲狀腺功能低下第1集｜疲倦、怕冷、便祕，不一定只是老化",
+          "businessItem": "護理復能",
+          "publicNumber": 198,
+          "draftNumber": 26,
+          "draftKey": "disease:hypothyroidism:episode-1",
+          "sourceFile": "02-hypothyroidism-1.md",
+          "sourceSha256": "cb38522ddb7562609c1a030b434fc55dada4bc1663505a43450ea7db06a8bf9d",
+          "contentHash": "sha256:536c62018f7cd00dec16ed8ca3c2d4e26a3c6b579f121d2839fe636a8786870c",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-1-cover.png",
+              "sha256": "9e782e169d6f7b10827065fa63145c77faa8f31a11ad02980cbee7b49e4ffcd8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-1-signs.svg",
+              "sha256": "a95bd2a689064bc58597f750b234ccb1fe4fd2e8c0ebdc8d97a106dc2b91d8a8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-1-visit.svg",
+              "sha256": "71dd945b075f3ce272fad24fef1f2e3d11515139baa24d49165b9aaa165f03e7"
+            }
+          ],
+          "bodyTextHash": "sha256:ebe364ad3370accdfbe4b9f3868528966857ee83b7b3ac824e92fd75b89db371",
+          "primaryQuestion": "甲狀腺功能低下第1集｜疲倦、怕冷、便祕，不一定只是老化",
+          "careContext": "疾病介紹與警訊",
+          "referenceUrls": [
+            "https://www.niddk.nih.gov/health-information/endocrine-diseases/hypothyroidism",
+            "https://medlineplus.gov/druginfo/meds/a682461.html"
+          ]
+        },
+        {
+          "slug": "disease-hypothyroidism-episode-2",
+          "title": "甲狀腺功能低下第2集｜治療與回診：藥怎麼吃、檢驗怎麼追蹤",
+          "businessItem": "護理復能",
+          "publicNumber": 199,
+          "draftNumber": 27,
+          "draftKey": "disease:hypothyroidism:episode-2",
+          "sourceFile": "01-hypothyroidism-2.md",
+          "sourceSha256": "84697ae526972e5110cb2aebb92c2bcaf07694d776c33965a5693de49e1b7cfb",
+          "contentHash": "sha256:ce0fe2ec3b11e1246c685cd15677eff7ac82b92582ec11bdf099bafc0097a1b8",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-hypothyroidism-2-cover.png",
+              "sha256": "612ef1f7c5d355698368fe971927bf6afff672c95b9c5a0d3cb464cb41498d34"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-hypothyroidism-2-assess.svg",
+              "sha256": "f1836ef3c7482621e682b8f28db46d5b39f7d97c6fac52a1a3ef69315e4b5327"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/01-hypothyroidism-2-follow.svg",
+              "sha256": "9a5e7b648fb8154c67b581e0a1d815ca0d97eba50b874cc4bdb57e2eb1f78c73"
+            }
+          ],
+          "bodyTextHash": "sha256:d052ae2eeab4274ef43bc76162075294e850cb72a6e53ffbc18ab0ef57315aa4",
+          "primaryQuestion": "甲狀腺功能低下第2集｜治療與回診：藥怎麼吃、檢驗怎麼追蹤",
+          "careContext": "治療與就醫",
+          "referenceUrls": [
+            "https://www.niddk.nih.gov/health-information/endocrine-diseases/hypothyroidism",
+            "https://medlineplus.gov/druginfo/meds/a682461.html"
+          ]
+        },
+        {
+          "slug": "disease-hypothyroidism-episode-3",
+          "title": "甲狀腺功能低下第3集｜日常照顧：服藥時間、症狀與安全觀察",
+          "businessItem": "護理復能",
+          "publicNumber": 200,
+          "draftNumber": 28,
+          "draftKey": "disease:hypothyroidism:episode-3",
+          "sourceFile": "02-hypothyroidism-3.md",
+          "sourceSha256": "5c6f07243d3d7189e792f1cba35a3da108857fd6b4bacd2d198166d73fa5f2cd",
+          "contentHash": "sha256:2c2e4bb38c38a8d67b988ee4cb62ea818b5c6da3022307f03c142e924ab27dd2",
+          "assets": [
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-3-cover.png",
+              "sha256": "c43d43bf869c398d3785e9a9c46d83f1257a9dc530f89bccff3cecdd53ed0ba8"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-3-med.svg",
+              "sha256": "28aa7d9b86721d69c288b8c9b585b7cf315e91f5e2e124abc1edc27e7317427c"
+            },
+            {
+              "path": "assets/health3/disease-release/2026-10-06/02-hypothyroidism-3-observe.svg",
+              "sha256": "e06068929dae674f02d636e5f1b64eeb9416e4d94cb88c9cfb66b554106eeb10"
+            }
+          ],
+          "bodyTextHash": "sha256:c747c7ae581fe2177719bad8c812c04e1054bfb52157356c42c1168a5ffa1911",
+          "primaryQuestion": "甲狀腺功能低下第3集｜日常照顧：服藥時間、症狀與安全觀察",
+          "careContext": "日常照顧策略",
+          "referenceUrls": [
+            "https://www.niddk.nih.gov/health-information/endocrine-diseases/hypothyroidism",
+            "https://medlineplus.gov/druginfo/meds/a682461.html"
+          ]
+        }
+      ]
     }
   ]
 }
