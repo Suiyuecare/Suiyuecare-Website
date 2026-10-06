@@ -1,0 +1,237 @@
+{
+  "publicationPaused": true,
+  "effectiveAt": "2026-10-06T14:58:57.836656+00:00",
+  "instruction": "為何這些文章都沒圖片了，請退回這些文章，然後先停止文章上架",
+  "scope": "All article publication paused; draft generation may continue locally.",
+  "withdrawnArticles": [
+    {
+      "key": "disease:cataract:episode-3",
+      "title": "白內障第 3 集｜從等待治療到術後返家，把每天的照顧安排好",
+      "slug": "disease-cataract-episode-3",
+      "publicNumber": 173,
+      "url": "https://www.suiyuecare.com/article/article173"
+    },
+    {
+      "key": "disease:glaucoma:episode-1",
+      "title": "青光眼第 1 集｜看得清楚也不能放心：認識無聲的視神經損傷",
+      "slug": "disease-glaucoma-episode-1",
+      "publicNumber": 174,
+      "url": "https://www.suiyuecare.com/article/article174"
+    },
+    {
+      "key": "disease:glaucoma:episode-2",
+      "title": "青光眼第 2 集｜眼藥水、雷射與手術，治療後為什麼還要回診？",
+      "slug": "disease-glaucoma-episode-2",
+      "publicNumber": 175,
+      "url": "https://www.suiyuecare.com/article/article175"
+    },
+    {
+      "key": "disease:glaucoma:episode-3",
+      "title": "青光眼第 3 集｜把點藥、回診和居家動線接成一份照顧計畫",
+      "slug": "disease-glaucoma-episode-3",
+      "publicNumber": 176,
+      "url": "https://www.suiyuecare.com/article/article176"
+    },
+    {
+      "key": "disease:age-related-macular-degeneration:episode-1",
+      "title": "老年性黃斑部病變第 1 集｜直線變彎、中央模糊，別只當作老花",
+      "slug": "disease-age-related-macular-degeneration-episode-1",
+      "publicNumber": 177,
+      "url": "https://www.suiyuecare.com/article/article177"
+    },
+    {
+      "key": "disease:age-related-macular-degeneration:episode-2",
+      "title": "老年性黃斑部病變第 2 集｜乾性、濕性治療不同，保健品不能自己配",
+      "slug": "disease-age-related-macular-degeneration-episode-2",
+      "publicNumber": 178,
+      "url": "https://www.suiyuecare.com/article/article178"
+    },
+    {
+      "key": "disease:age-related-macular-degeneration:episode-3",
+      "title": "老年性黃斑部病變第 3 集｜中央看不清，居家照顧如何保留自主？",
+      "slug": "disease-age-related-macular-degeneration-episode-3",
+      "publicNumber": 179,
+      "url": "https://www.suiyuecare.com/article/article179"
+    },
+    {
+      "key": "disease:age-related-hearing-loss:episode-1",
+      "title": "老年性聽力損失第 1 集｜一直叫人重複，不一定只是沒專心",
+      "slug": "disease-age-related-hearing-loss-episode-1",
+      "publicNumber": 180,
+      "url": "https://www.suiyuecare.com/article/article180"
+    },
+    {
+      "key": "disease:age-related-hearing-loss:episode-2",
+      "title": "老年性聽力損失第 2 集｜助聽器、人工電子耳與就醫評估怎麼選？",
+      "slug": "disease-age-related-hearing-loss-episode-2",
+      "publicNumber": 181,
+      "url": "https://www.suiyuecare.com/article/article181"
+    },
+    {
+      "key": "disease:age-related-hearing-loss:episode-3",
+      "title": "老年性聽力損失第 3 集｜家人別用吼的：讓長者聽得懂的溝通方式",
+      "slug": "disease-age-related-hearing-loss-episode-3",
+      "publicNumber": 182,
+      "url": "https://www.suiyuecare.com/article/article182"
+    },
+    {
+      "key": "disease:anxiety-disorders:episode-1",
+      "title": "高齡焦慮症第 1 集｜不只是想太多：症狀、身體表現與就醫警訊",
+      "slug": "disease-anxiety-disorders-episode-1",
+      "publicNumber": 183,
+      "url": "https://www.suiyuecare.com/article/article183"
+    },
+    {
+      "key": "disease:anxiety-disorders:episode-2",
+      "title": "高齡焦慮症第 2 集｜怎麼治療？心理治療、藥物與回診評估",
+      "slug": "disease-anxiety-disorders-episode-2",
+      "publicNumber": 184,
+      "url": "https://www.suiyuecare.com/article/article184"
+    },
+    {
+      "key": "disease:anxiety-disorders:episode-3",
+      "title": "高齡焦慮症第 3 集｜日常照顧策略：陪伴、作息與安全觀察",
+      "slug": "disease-anxiety-disorders-episode-3",
+      "publicNumber": 185,
+      "url": "https://www.suiyuecare.com/article/article185"
+    },
+    {
+      "key": "disease:late-life-depression:episode-1",
+      "title": "高齡憂鬱症第 1 集｜不只是心情不好：表現、風險與求助警訊",
+      "slug": "disease-late-life-depression-episode-1",
+      "publicNumber": 186,
+      "url": "https://www.suiyuecare.com/article/article186"
+    },
+    {
+      "key": "disease:late-life-depression:episode-2",
+      "title": "高齡憂鬱症第 2 集｜治療與就醫：評估、心理治療和藥物追蹤",
+      "slug": "disease-late-life-depression-episode-2",
+      "publicNumber": 187,
+      "url": "https://www.suiyuecare.com/article/article187"
+    },
+    {
+      "key": "disease:late-life-depression:episode-3",
+      "title": "高齡憂鬱症第 3 集｜照顧策略：維持連結、降低壓力與守住安全",
+      "slug": "disease-late-life-depression-episode-3",
+      "publicNumber": 188,
+      "url": "https://www.suiyuecare.com/article/article188"
+    },
+    {
+      "key": "disease:peripheral-artery-disease:episode-1",
+      "title": "周邊動脈疾病第 1 集｜走路腿痛別只當老化：症狀與危險警訊",
+      "slug": "disease-peripheral-artery-disease-episode-1",
+      "publicNumber": 189,
+      "url": "https://www.suiyuecare.com/article/article189"
+    },
+    {
+      "key": "disease:peripheral-artery-disease:episode-2",
+      "title": "周邊動脈疾病第 2 集｜怎麼檢查與治療？血管風險和足部照護",
+      "slug": "disease-peripheral-artery-disease-episode-2",
+      "publicNumber": 190,
+      "url": "https://www.suiyuecare.com/article/article190"
+    },
+    {
+      "key": "disease:peripheral-artery-disease:episode-3",
+      "title": "周邊動脈疾病第 3 集｜居家照顧：走路練習、足部檢查與傷口警訊",
+      "slug": "disease-peripheral-artery-disease-episode-3",
+      "publicNumber": 191,
+      "url": "https://www.suiyuecare.com/article/article191"
+    },
+    {
+      "key": "disease:dyslipidemia:episode-1",
+      "title": "高齡血脂異常第 1 集｜沒有症狀也要注意：血脂、風險與檢查",
+      "slug": "disease-dyslipidemia-episode-1",
+      "publicNumber": 192,
+      "url": "https://www.suiyuecare.com/article/article192"
+    },
+    {
+      "key": "disease:dyslipidemia:episode-2",
+      "title": "高齡血脂異常第2集｜治療怎麼選？生活調整、藥物與回診",
+      "slug": "disease-dyslipidemia-episode-2",
+      "publicNumber": 193,
+      "url": "https://www.suiyuecare.com/article/article193"
+    },
+    {
+      "key": "disease:dyslipidemia:episode-3",
+      "title": "高齡血脂異常第3集｜日常照顧：飲食、服藥與副作用觀察",
+      "slug": "disease-dyslipidemia-episode-3",
+      "publicNumber": 194,
+      "url": "https://www.suiyuecare.com/article/article194"
+    },
+    {
+      "key": "disease:gout:episode-1",
+      "title": "痛風第1集｜不只是大拇趾痛：高齡者要認得的急性警訊",
+      "slug": "disease-gout-episode-1",
+      "publicNumber": 195,
+      "url": "https://www.suiyuecare.com/article/article195"
+    },
+    {
+      "key": "disease:gout:episode-2",
+      "title": "痛風第2集｜怎麼診斷與治療？急性止痛和長期降尿酸要分清楚",
+      "slug": "disease-gout-episode-2",
+      "publicNumber": 196,
+      "url": "https://www.suiyuecare.com/article/article196"
+    },
+    {
+      "key": "disease:gout:episode-3",
+      "title": "痛風第3集｜日常怎麼照顧？飲食、喝水、服藥與發作紀錄",
+      "slug": "disease-gout-episode-3",
+      "publicNumber": 197,
+      "url": "https://www.suiyuecare.com/article/article197"
+    },
+    {
+      "key": "disease:hypothyroidism:episode-1",
+      "title": "甲狀腺功能低下第1集｜疲倦、怕冷、便祕，不一定只是老化",
+      "slug": "disease-hypothyroidism-episode-1",
+      "publicNumber": 198,
+      "url": "https://www.suiyuecare.com/article/article198"
+    },
+    {
+      "key": "disease:hypothyroidism:episode-2",
+      "title": "甲狀腺功能低下第2集｜治療與回診：藥怎麼吃、檢驗怎麼追蹤",
+      "slug": "disease-hypothyroidism-episode-2",
+      "publicNumber": 199,
+      "url": "https://www.suiyuecare.com/article/article199"
+    },
+    {
+      "key": "disease:hypothyroidism:episode-3",
+      "title": "甲狀腺功能低下第3集｜日常照顧：服藥時間、症狀與安全觀察",
+      "slug": "disease-hypothyroidism-episode-3",
+      "publicNumber": 200,
+      "url": "https://www.suiyuecare.com/article/article200"
+    }
+  ],
+  "reservedPublicNumbers": [
+    173,
+    174,
+    175,
+    176,
+    177,
+    178,
+    179,
+    180,
+    181,
+    182,
+    183,
+    184,
+    185,
+    186,
+    187,
+    188,
+    189,
+    190,
+    191,
+    192,
+    193,
+    194,
+    195,
+    196,
+    197,
+    198,
+    199,
+    200
+  ],
+  "resumeCondition": "User explicitly resumes article publication and approves the specific articles and all images again.",
+  "priorApprovalRevoked": true,
+  "withdrawalEvidence": "/Users/seniorlifepr/Documents/seniorlife-article-drafts/research/2026-10-06/disease-withdrawal"
+}
