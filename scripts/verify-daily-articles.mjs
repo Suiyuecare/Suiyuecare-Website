@@ -52,15 +52,7 @@ function verifyAsset(assetPath, label, approvedDraft = false) {
   assert(fs.existsSync(mirrorPath), `${label} public mirror is missing: ${relative}`);
   assert(fs.readFileSync(sourcePath).equals(fs.readFileSync(mirrorPath)), `${label} mirror differs: ${relative}`);
   const size = fs.statSync(sourcePath).size;
-  const bytes = fs.readFileSync(sourcePath);
-  // Flat original illustrations can compress below 10 KB while retaining a
-  // full-sized cover. Validate the PNG signature and pixel dimensions instead
-  // of rejecting an explicitly approved image solely for efficient compression.
-  const fullSizedApprovedPng = approvedDraft && size > 1_000 && relative.endsWith(".png")
-    && bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
-    && bytes.subarray(12, 16).toString() === "IHDR"
-    && bytes.readUInt32BE(16) >= 600 && bytes.readUInt32BE(20) >= 300;
-  assert(size > 10_000 || relative.endsWith(".svg") || fullSizedApprovedPng, `${label} asset is unexpectedly small: ${relative}`);
+  assert(size > 10_000 || relative.endsWith(".svg"), `${label} asset is unexpectedly small: ${relative}`);
   if (relative.endsWith(".svg")) {
     const svg = fs.readFileSync(sourcePath, "utf8");
     if (approvedDraft) {
@@ -196,8 +188,8 @@ function verifyApprovedArticle(article, entry) {
   assert(article.references?.length >= 2 && article.references.every(ref => /^https:\/\//.test(ref.url) && ref.citation && Number.isFinite(ref.evidenceRank)), `${entry.slug} source references incomplete`);
   assert(JSON.stringify(article.references.map(ref => ref.url)) === JSON.stringify(entry.referenceUrls), `${entry.slug} references differ from reviewed manifest`);
   assert(hasImageDescription(article.imageAlt) && hasImageDescription(article.imageCaption), `${entry.slug} illustration description is missing`);
-  const usedAssets = new Set([article.image, ...[...document.querySelectorAll("img")].map(img => img.getAttribute("src")), ...article.inlineImages.map(img => img.src)].map(asset => asset.replace(/^\//, "")));
-  assert(entry.assets.length === usedAssets.size && entry.assets.every(asset => usedAssets.has(asset.path.replace(/^\//, ""))), `${entry.slug} unapproved or missing illustration`);
+  const usedAssets = new Set([article.image, ...[...document.querySelectorAll("img")].map(img => img.getAttribute("src")), ...article.inlineImages.map(img => img.src)]);
+  assert(entry.assets.length === usedAssets.size && entry.assets.every(asset => usedAssets.has(asset.path)), `${entry.slug} unapproved or missing illustration`);
   for (const asset of entry.assets) {
     verifyAsset(asset.path, entry.slug, true);
     const actual = crypto.createHash("sha256").update(fs.readFileSync(path.join(rootDir, localAsset(asset.path)))).digest("hex");
