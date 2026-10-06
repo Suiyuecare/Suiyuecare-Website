@@ -300,7 +300,7 @@ export function renderPublicArticleLayout(article = {}, options = {}) {
   const contactContext = `data-contact-need="${escapePublicHtml(contactNeed)}" data-contact-message="${escapePublicHtml(`我想了解${contactNeed}，剛閱讀了〈${article.title || "照顧知識"}〉。`)}"`;
 
   const contentKind = article.contentKind || "article";
-  const preserveHeroDetails = contentKind === "article" && (article.imageUsage === "actual_ui_screenshot" || /\.svg(?:[?#]|$)/i.test(image));
+  const preserveHeroDetails = contentKind === "article" && (["actual_ui_screenshot", "original_raster_illustration"].includes(article.imageUsage) || /\.svg(?:[?#]|$)/i.test(image));
   const contentKey = publicContentKey({ ...article, contentKind }) || `content:${contentKind}:${article.publicSlug || article.slug || ""}`;
   const contentRevisionTime = publicContentRevisionTime(article);
   const contentUpdatedAt = contentRevisionTime === null ? "" : new Date(contentRevisionTime).toISOString();

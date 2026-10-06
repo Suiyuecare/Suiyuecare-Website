@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1210" viewBox="0 0 800 1210" role="img" aria-labelledby="title desc"><title id="title">青光眼檢查的不同資訊</title><desc id="desc">視力檢查評估看清楚細節；眼壓提供眼內壓力資訊；視神經和視野檢查評估結構與功能。需要眼科綜合判斷，正常眼壓或看得清楚不能單獨排除青光眼。</desc><rect width="800" height="1210" fill="#fffaf5"/><g font-family="Noto Sans TC, PingFang TC, Microsoft JhengHei, sans-serif">
+<rect x="36" y="32" width="78" height="8" rx="22" fill="#ce6328"/>
+<text x="36" y="100" font-size="46" font-weight="700" fill="#3e3029">青光眼：檢查各看什麼？</text>
+<text x="36" y="152" font-size="30" font-weight="400" fill="#695b54">不是一個眼壓數字，就能回答全部問題</text>
+<rect x="36" y="194" width="728" height="204" rx="22" fill="#ffffff"/>
+<rect x="36" y="194" width="9" height="204" rx="22" fill="#266c67"/>
+<text x="68" y="250" font-size="38" font-weight="700" fill="#266c67">視力：看清細節的能力</text>
+<text x="68" y="305" font-size="34" font-weight="400" fill="#3e3029">看得清楚正前方</text>
+<text x="68" y="353" font-size="34" font-weight="400" fill="#3e3029">不代表周邊視野與視神經正常</text>
+<rect x="36" y="420" width="728" height="204" rx="22" fill="#ffffff"/>
+<rect x="36" y="420" width="9" height="204" rx="22" fill="#266c67"/>
+<text x="68" y="476" font-size="38" font-weight="700" fill="#266c67">眼壓：眼內壓力的資訊</text>
+<text x="68" y="531" font-size="34" font-weight="400" fill="#3e3029">正常眼壓，仍可能有青光眼</text>
+<text x="68" y="579" font-size="34" font-weight="400" fill="#3e3029">眼壓偏高，也不等於已確診</text>
+<rect x="36" y="646" width="728" height="204" rx="22" fill="#ffffff"/>
+<rect x="36" y="646" width="9" height="204" rx="22" fill="#266c67"/>
+<text x="68" y="702" font-size="38" font-weight="700" fill="#266c67">視神經與視野：結構、功能</text>
+<text x="68" y="757" font-size="34" font-weight="400" fill="#3e3029">評估視神經是否受損</text>
+<text x="68" y="805" font-size="34" font-weight="400" fill="#3e3029">以及視野有無缺損</text>
+<path d="M 400 866 L 400 909" fill="none" stroke="#ce6328" stroke-width="5" stroke-linecap="round"/>
+<path d="M 386 895 L 400 909" fill="none" stroke="#ce6328" stroke-width="5" stroke-linecap="round"/>
+<path d="M 414 895 L 400 909" fill="none" stroke="#ce6328" stroke-width="5" stroke-linecap="round"/>
+<rect x="36" y="927" width="728" height="158" rx="22" fill="#fbe4ce"/>
+<text x="68" y="984" font-size="38" font-weight="700" fill="#ce6328">連同病史，由眼科綜合判斷</text>
+<text x="68" y="1041" font-size="34" font-weight="400" fill="#3e3029">實際檢查組合，依個人情況安排。</text>
+<text x="36" y="1159" font-size="28" font-weight="400" fill="#695b54">原創衛教概念圖｜不供自行排除疾病</text>
+</g></svg>
