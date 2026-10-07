@@ -333,9 +333,14 @@ function createPortalApiHandler(dependencies = {}) {
   const financeProfileHandler = createPortalFinanceProfileHandler(dependencies);
   const handoffHandler = createPortalHandoffHandler(dependencies);
   const logoutHandler = require('../server/portal-logout.js').createPortalLogoutHandler(dependencies);
+  const logoutWorkerHandler = require('../server/portal-logout-worker.js').createPortalLogoutWorker(dependencies);
 
   return async function handler(request, response) {
-    if (request.query?.action === 'logout' || new URL(request.url || '/', 'https://login.suiyuecare.com').searchParams.get('action') === 'logout') {
+    const action = request.query?.action || new URL(request.url || '/', 'https://login.suiyuecare.com').searchParams.get('action');
+    if (action === 'logout-worker') {
+      return logoutWorkerHandler(request, response);
+    }
+    if (action === 'logout') {
       return logoutHandler(request, response);
     }
     if (request.method === "GET") {

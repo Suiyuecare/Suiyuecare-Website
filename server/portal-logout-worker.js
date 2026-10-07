@@ -1,6 +1,6 @@
 const {createClient}=require('@supabase/supabase-js');
 const crypto=require('node:crypto');
-const {validConfiguration,createPortalAdmin,checkedRpc,processTarget}=require('../server/portal-logout.js');
+const {validConfiguration,createPortalAdmin,checkedRpc,processTarget}=require('./portal-logout.js');
 
 function createPortalLogoutWorker({environment=process.env,clientFactory=createClient,fetchImplementation=globalThis.fetch,now=Date.now,randomUUID=crypto.randomUUID}={}){
  return async(request,response)=>{
@@ -17,7 +17,7 @@ function createPortalLogoutWorker({environment=process.env,clientFactory=createC
    const batch=await checkedRpc(admin,'portal_logout_claim',{batch_size:8});
    if(!Array.isArray(batch))throw Error('Invalid outbox batch');
    const dependencies={configs,environment,clientFactory,fetchImplementation,now,randomUUID};
-   const settled=await Promise.allSettled(batch.map(job=>processTarget(admin,job.receiptId,job.moduleId,{subject:job.googleSubject,email:job.verifiedEmail},dependencies,job.moduleId===job.source)));
+   const settled=await Promise.allSettled(batch.map(job=>processTarget(admin,job.receiptId,job.moduleId,{subject:job.googleSubject,email:job.verifiedEmail,createdBefore:job.createdBefore},dependencies,job.moduleId===job.source)));
    const completed=settled.filter(result=>result.status==='fulfilled'&&result.value===true).length;
    return reply(200,{ok:true,claimed:batch.length,completed,pending:batch.length-completed});
   }catch{return reply(503,{ok:false});}

@@ -38,9 +38,9 @@ async function callApm(action,values,env,fetchImplementation,now,randomUUID){
  return result;
 }
 async function revokeModule(id,identity,{configs,environment,clientFactory,fetchImplementation,now,randomUUID},mustMatch=false){
- if(id==='apm'){const result=await callApm('revoke',{googleSubject:identity.subject,verifiedEmail:identity.email},environment,fetchImplementation,now,randomUUID);return result.revoked===true&&(!mustMatch||result.matched===true);}
+ if(id==='apm'){const result=await callApm('revoke',{googleSubject:identity.subject,verifiedEmail:identity.email,createdBefore:identity.createdBefore},environment,fetchImplementation,now,randomUUID);return result.revoked===true&&(!mustMatch||result.matched===true);}
  const admin=clientFactory(configs[id].url,configs[id].service,clientOptions());
- const result=await admin.rpc('portal_revoke_google_sessions',{google_subject:identity.subject,verified_email:identity.email});
+ const result=await admin.rpc('portal_revoke_google_sessions',{google_subject:identity.subject,verified_email:identity.email,created_before:identity.createdBefore});
  return !result.error&&result.data?.revoked===true&&(!mustMatch||result.data?.matched===true);
 }
 async function processTarget(admin,receiptId,id,identity,dependencies,mustMatch=false){
@@ -61,7 +61,7 @@ function createPortalLogoutHandler({environment=process.env,clientFactory=create
   if(origins[source]!==origin)return reply(403,{ok:false,reason:'source'});
   const token=String(request.headers.authorization||'').match(/^Bearer ([^\s]+)$/)?.[1];if(!token)return reply(401,{ok:false,reason:'auth'});
   const configs=validConfiguration(environment);if(!configs)return reply(503,{ok:false,reason:'configuration'});
-  const dependencies={configs,environment,clientFactory,fetchImplementation,now,randomUUID};let receiptId,sourceRevoked=false;
+  const dependencies={configs,environment,clientFactory,fetchImplementation,now,randomUUID};let receiptId,createdBefore,sourceRevoked=false;
   try{
    const options=clientOptions();options.global.headers={Authorization:'Bearer '+token};
    const userClient=clientFactory(configs[source].url,configs[source].publicKey,options);
@@ -76,13 +76,15 @@ function createPortalLogoutHandler({environment=process.env,clientFactory=create
    }else{identity=confirmedGoogleIdentity(verified.data.user);if(!identity)return reply(401,{ok:false,reason:'auth'});}
    const admin=createPortalAdmin(configs,clientFactory);
    const queued=await checkedRpc(admin,'portal_logout_enqueue',{google_subject:identity.subject,verified_email:identity.email,source});
-   receiptId=queued.receiptId;if(typeof receiptId!=='string')throw Error('Outbox receipt missing');
+   receiptId=queued.receiptId;
+   if(typeof receiptId!=='string'||typeof queued.createdBefore!=='string'||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{6}Z$/.test(queued.createdBefore))throw Error('Outbox receipt missing');
+   createdBefore=queued.createdBefore;identity.createdBefore=createdBefore;
    sourceRevoked=await processTarget(admin,receiptId,source,identity,dependencies,true);
    if(sourceRevoked)await Promise.allSettled(moduleIds.filter(id=>id!==source).map(id=>processTarget(admin,receiptId,id,identity,dependencies)));
    const receipt=await checkedRpc(admin,'portal_logout_receipt',{receipt_id:receiptId});
-   if(receipt.ok===true&&moduleIds.every(id=>receipt.revokedModules?.includes(id)))return reply(200,{ok:true,receiptId,revokedModules:moduleIds});
-   return reply(202,{ok:false,pending:true,receiptId,sourceRevoked:receipt.sourceRevoked===true||sourceRevoked,revokedModules:receipt.revokedModules||[],pendingModules:receipt.pendingModules||moduleIds});
-  }catch{return reply(503,{ok:false,reason:'unavailable',...(receiptId?{receiptId,sourceRevoked}:{})});}
+   if(receipt.ok===true&&moduleIds.every(id=>receipt.revokedModules?.includes(id)))return reply(200,{ok:true,receiptId,createdBefore,revokedModules:moduleIds});
+   return reply(202,{ok:false,pending:true,receiptId,createdBefore,sourceRevoked:receipt.sourceRevoked===true||sourceRevoked,revokedModules:receipt.revokedModules||[],pendingModules:receipt.pendingModules||moduleIds});
+  }catch{return reply(503,{ok:false,reason:'unavailable',...(receiptId?{receiptId,createdBefore,sourceRevoked}:{})});}
  };
 }
 module.exports={createPortalLogoutHandler,confirmedGoogleIdentity,projectConfiguration,validConfiguration,createPortalAdmin,checkedRpc,revokeModule,processTarget,apmHeaders,callApm,moduleIds};
