@@ -252,9 +252,12 @@ function normalizePayload(rawPayload, user, moduleId, issuedAt, randomUUID) {
     return {...commonIdentity,exp:issuedAt+60,aud:'hr',source:'logging-portal',googleSubject:google[0].identity_data.sub};
   }
   if (moduleId === "apm") {
+    const google=(user.identities||[]).filter(identity=>identity.provider==='google'&&identity.identity_data?.email_verified===true&&normalizeEmail(identity.identity_data?.email)===user.email&&typeof identity.identity_data?.sub==='string');
+    if(google.length!==1||!google[0].identity_data.sub||google[0].identity_data.sub.length>256)throw new SafeHttpError(403,'A unique confirmed Google identity is required.');
     return {
       ...commonIdentity,
       aud: "apm",
+      googleSubject: google[0].identity_data.sub,
       returnTo: normalizeApmReturnTo(payload.returnTo)
     };
   }
@@ -330,9 +333,14 @@ function createPortalApiHandler(dependencies = {}) {
   const financeProfileHandler = createPortalFinanceProfileHandler(dependencies);
   const handoffHandler = createPortalHandoffHandler(dependencies);
   const logoutHandler = require('../server/portal-logout.js').createPortalLogoutHandler(dependencies);
+  const logoutWorkerHandler = require('../server/portal-logout-worker.js').createPortalLogoutWorker(dependencies);
 
   return async function handler(request, response) {
-    if (request.query?.action === 'logout' || new URL(request.url || '/', 'https://login.suiyuecare.com').searchParams.get('action') === 'logout') {
+    const action = request.query?.action || new URL(request.url || '/', 'https://login.suiyuecare.com').searchParams.get('action');
+    if (action === 'logout-worker') {
+      return logoutWorkerHandler(request, response);
+    }
+    if (action === 'logout') {
       return logoutHandler(request, response);
     }
     if (request.method === "GET") {
