@@ -20,3 +20,4 @@ order by j.created_at;
 ```
 
 發生異常時先執行 [deactivate_portal_logout_worker.sql](deactivate_portal_logout_worker.sql)，保留 outbox 及尚未完成任務供修復。僅回退 Vercel 程式碼會留下無 worker 的待補償任務；回退前須先確認佇列清空或部署相容 worker。資料庫 migration 不應在存在未完成任務時直接刪除。APM HMAC 值需由 Portal 的 `APM_PORTAL_LOGOUT_SECRET` 與 APM 的 `PORTAL_LOGOUT_SECRET` 共用，且與 handoff secret 分開。
+撤銷器拒絕超過 31 天的 `createdBefore` 與超過 30 秒未來的截止時間。若 outbox 超過 31 天仍有未完成目標，任務會保留供人工調查與處理，不能默默丟棄或改用新的截止時間重試。

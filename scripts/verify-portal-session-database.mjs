@@ -25,6 +25,11 @@ await db.exec('commit');
 assert.equal(cutoffRevoke.matched,true);assert.equal(cutoffRevoke.sessionCount,1);
 assert.deepEqual((await db.query('select id from auth.sessions where user_id=$1',[user])).rows.map(row=>row.id).sort(),[newSession,sameInstantSession].sort());
 async function callService(sql,params=[]){await db.exec('begin;set local role service_role');try{const result=await db.query(sql,params);await db.exec('commit');return result.rows[0].v;}catch(error){await db.exec('rollback');throw error;}}
+const sessionCountBeforeInvalid=(await db.query('select count(*)::int n from auth.sessions')).rows[0].n;
+for(const invalidCutoff of[null,new Date(Date.now()-32*86400000).toISOString(),new Date(Date.now()+60000).toISOString()]){
+ await assert.rejects(()=>callService("select public.portal_revoke_google_sessions('synthetic-sub','qa@suiyuecare.com',$1::timestamptz) v",[invalidCutoff]),/PORTAL_LOGOUT_INVALID/);
+}
+assert.equal((await db.query('select count(*)::int n from auth.sessions')).rows[0].n,sessionCountBeforeInvalid);
 let receipt=await callService('select public.portal_logout_receipt($1) v',[receiptId]);
 assert.deepEqual(receipt.pendingModules,['portal','hr','finance','apm']);assert.equal(receipt.sourceRevoked,false);
 assert.equal(receipt.createdBefore,queued.createdBefore);

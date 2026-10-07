@@ -5660,11 +5660,21 @@ async function bootPortalLogin() {
 function portalLogoutIsPending(){return window.sessionStorage.getItem(portalLogoutPendingKey)==='1';}
 function showPortalLogoutProgress(message,mode){
   let panel=document.querySelector('#portal-module-logout');
-  if(!panel){panel=document.createElement('section');panel.id='portal-module-logout';panel.setAttribute('role','status');panel.setAttribute('aria-live','polite');panel.style.cssText='position:fixed;inset:0;z-index:99999;background:#fff8ef;display:grid;place-content:center;gap:20px;padding:24px;text-align:center;color:#4a3f35;';document.body.appendChild(panel);}
+  if(!panel){
+    panel=document.createElement('section');panel.id='portal-module-logout';panel.className='portal-logout-panel';
+    panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');
+    panel.setAttribute('aria-labelledby','portal-logout-title');panel.setAttribute('aria-describedby','portal-logout-message');
+    panel.tabIndex=-1;
+    panel.addEventListener('keydown',event=>{if(event.key==='Tab'){event.preventDefault();(panel.querySelector('button')||panel).focus();}});
+    document.body.appendChild(panel);
+  }
+  portalShell?.setAttribute('inert','');portalShell?.setAttribute('aria-hidden','true');
+  moduleLaunchLoading?.setAttribute('inert','');document.body.classList.add('is-portal-logging-out');
   panel.replaceChildren();
-  const title=document.createElement('h1');title.textContent=mode==='complete'?'已登出':mode==='busy'?'正在登出':'登出處理中';title.style.cssText='font-size:24px;margin:0';panel.appendChild(title);
-  const text=document.createElement('p');text.textContent=message;panel.appendChild(text);
-  if(mode!=='busy'){const button=document.createElement('button');button.type='button';button.textContent=mode==='retry'?'重試登出':'返回登入頁';button.className='primary-button';button.style.minHeight='44px';button.addEventListener('click',mode==='retry'?performPortalLogout:()=>window.location.replace(portalHomePath));panel.appendChild(button);button.focus();}
+  const title=document.createElement('h1');title.id='portal-logout-title';title.textContent=mode==='complete'?'已登出':mode==='busy'?'正在登出':'登出處理中';panel.appendChild(title);
+  const text=document.createElement('p');text.id='portal-logout-message';text.setAttribute('aria-live','polite');text.textContent=message;panel.appendChild(text);
+  if(mode!=='busy'){const button=document.createElement('button');button.type='button';button.textContent=mode==='retry'?'重試登出':'返回登入頁';button.className='portal-logout-action';button.addEventListener('click',mode==='retry'?performPortalLogout:()=>window.location.replace(portalHomePath));panel.appendChild(button);button.focus();}
+  else panel.focus();
 }
 async function performPortalLogout(){
   if(portalLogoutRunning)return;

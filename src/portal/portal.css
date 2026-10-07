@@ -46,6 +46,56 @@ body.is-module-launching {
   overflow: hidden;
 }
 
+body.is-portal-logging-out {
+  overflow: hidden;
+}
+
+.portal-logout-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  overflow: auto;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  background: var(--soft);
+  color: var(--brown);
+  text-align: center;
+}
+
+.portal-logout-panel h1 {
+  margin: 0;
+  font-size: clamp(22px, 5vw, 28px);
+}
+
+.portal-logout-panel p {
+  max-width: 42ch;
+  margin: 0;
+  line-height: 1.65;
+}
+
+.portal-logout-action {
+  min-height: 44px;
+  padding: 10px 24px;
+  border: 1px solid var(--orange-dark);
+  border-radius: 999px;
+  background: var(--orange-dark);
+  color: var(--surface);
+  font-weight: 800;
+}
+
+.portal-logout-action:hover {
+  background: var(--brown);
+}
+
+.portal-logout-action:focus-visible {
+  outline: 3px solid var(--brown);
+  outline-offset: 3px;
+}
+
 button,
 input,
 a {

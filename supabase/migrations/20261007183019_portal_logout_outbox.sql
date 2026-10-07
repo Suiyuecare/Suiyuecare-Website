@@ -53,7 +53,9 @@ returns jsonb language plpgsql security definer set search_path = '' as $$
 declare target uuid; candidates bigint; revoked bigint;
 begin
   if length(google_subject) not between 1 and 256 or verified_email <> lower(btrim(verified_email))
-    or verified_email !~ '^[^[:space:]@]+@suiyuecare[.]com$' or created_before is null then
+    or verified_email !~ '^[^[:space:]@]+@suiyuecare[.]com$' or created_before is null
+    or created_before < statement_timestamp() - interval '31 days'
+    or created_before > statement_timestamp() + interval '30 seconds' then
     raise exception 'PORTAL_LOGOUT_INVALID' using errcode = '42501';
   end if;
   execute 'select count(distinct u.id),min(u.id::text)::uuid from auth.users u join auth.identities i on i.user_id=u.id where i.provider=''google'' and coalesce(i.identity_data->>''sub'',i.provider_id)=$1 and u.email_confirmed_at is not null and coalesce((i.identity_data->>''email_verified'')::boolean,false) and lower(i.identity_data->>''email'')=$2'

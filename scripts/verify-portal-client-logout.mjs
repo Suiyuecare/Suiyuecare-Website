@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
+import {parseHTML} from 'linkedom';
 
 const source=await readFile(new URL('../src/portal/login.js',import.meta.url),'utf8');
 const start=source.indexOf('async function performPortalLogout(){');
@@ -51,4 +52,16 @@ vm.createContext(externalContext);vm.runInContext(source.slice(bootStart,bootEnd
 await externalContext.bootPortalLogin();
 assert.deepEqual(externalCalls,['clear','render','signOut']);assert.equal(externalContext.userSummary.textContent,'');
 assert.equal(externalMessages.at(-1).mode,'pending');assert.match(externalMessages.at(-1).message,/其他系統登出處理中/);
+const progressStart=source.indexOf('function showPortalLogoutProgress(message,mode){');
+const progressEnd=source.indexOf('\nasync function performPortalLogout(){',progressStart);
+assert.ok(progressStart>=0&&progressEnd>progressStart);
+const view=parseHTML('<html><body><main class="portal-shell"></main><div id="moduleLaunchLoading"></div></body></html>');
+const progressContext={document:view.document,window:view.window,portalShell:view.document.querySelector('.portal-shell'),moduleLaunchLoading:view.document.querySelector('#moduleLaunchLoading'),performPortalLogout:()=>{},portalHomePath:'/portal/'};
+vm.createContext(progressContext);vm.runInContext(source.slice(progressStart,progressEnd)+'\nthis.showPortalLogoutProgress=showPortalLogoutProgress;',progressContext);
+progressContext.showPortalLogoutProgress('此裝置已登出，其他系統登出處理中','pending');
+const panel=view.document.querySelector('#portal-module-logout');
+assert.equal(panel.getAttribute('role'),'dialog');assert.equal(panel.getAttribute('aria-modal'),'true');
+assert.equal(progressContext.portalShell.hasAttribute('inert'),true);
+assert.equal(panel.querySelector('button').textContent,'返回登入頁');
+assert.equal(panel.querySelector('#portal-logout-message').textContent,'此裝置已登出，其他系統登出處理中');
 console.log('ok - Portal client clears local session after durable pending logout and preserves retry only while source is active');
