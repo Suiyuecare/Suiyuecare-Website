@@ -17,7 +17,7 @@ function createPortalLogoutWorker({environment=process.env,clientFactory=createC
    const batch=await checkedRpc(admin,'portal_logout_claim',{batch_size:8});
    if(!Array.isArray(batch))throw Error('Invalid outbox batch');
    const dependencies={configs,environment,clientFactory,fetchImplementation,now,randomUUID};
-   const settled=await Promise.allSettled(batch.map(job=>processTarget(admin,job.receiptId,job.moduleId,{subject:job.googleSubject,email:job.verifiedEmail},dependencies)));
+   const settled=await Promise.allSettled(batch.map(job=>processTarget(admin,job.receiptId,job.moduleId,{subject:job.googleSubject,email:job.verifiedEmail},dependencies,job.moduleId===job.source)));
    const completed=settled.filter(result=>result.status==='fulfilled'&&result.value===true).length;
    return reply(200,{ok:true,claimed:batch.length,completed,pending:batch.length-completed});
   }catch{return reply(503,{ok:false});}

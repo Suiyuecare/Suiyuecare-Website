@@ -123,7 +123,7 @@ begin
     from due d where t.job_id = d.job_id and t.module_id = d.module_id
     returning t.job_id, t.module_id
   )
-  select coalesce(jsonb_agg(jsonb_build_object('receiptId', c.job_id, 'moduleId', c.module_id,
+  select coalesce(jsonb_agg(jsonb_build_object('receiptId', c.job_id, 'moduleId', c.module_id, 'source', j.source,
     'googleSubject', j.google_subject, 'verifiedEmail', j.verified_email)), '[]'::jsonb)
     into batch from claimed c join private.portal_logout_jobs j on j.id = c.job_id;
   return batch;

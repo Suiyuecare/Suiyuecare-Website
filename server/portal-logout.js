@@ -37,14 +37,14 @@ async function callApm(action,values,env,fetchImplementation,now,randomUUID){
  const result=await response.json();if(!result||typeof result!=='object')throw Error('APM logout endpoint returned invalid data');
  return result;
 }
-async function revokeModule(id,identity,{configs,environment,clientFactory,fetchImplementation,now,randomUUID}){
- if(id==='apm'){const result=await callApm('revoke',{googleSubject:identity.subject,verifiedEmail:identity.email},environment,fetchImplementation,now,randomUUID);return result.revoked===true;}
+async function revokeModule(id,identity,{configs,environment,clientFactory,fetchImplementation,now,randomUUID},mustMatch=false){
+ if(id==='apm'){const result=await callApm('revoke',{googleSubject:identity.subject,verifiedEmail:identity.email},environment,fetchImplementation,now,randomUUID);return result.revoked===true&&(!mustMatch||result.matched===true);}
  const admin=clientFactory(configs[id].url,configs[id].service,clientOptions());
  const result=await admin.rpc('portal_revoke_google_sessions',{google_subject:identity.subject,verified_email:identity.email});
- return !result.error&&result.data?.revoked===true;
+ return !result.error&&result.data?.revoked===true&&(!mustMatch||result.data?.matched===true);
 }
-async function processTarget(admin,receiptId,id,identity,dependencies){
- let succeeded=false;try{succeeded=await revokeModule(id,identity,dependencies);}catch{/* The outbox retries the target. */}
+async function processTarget(admin,receiptId,id,identity,dependencies,mustMatch=false){
+ let succeeded=false;try{succeeded=await revokeModule(id,identity,dependencies,mustMatch);}catch{/* The outbox retries the target. */}
  await checkedRpc(admin,'portal_logout_record',{receipt_id:receiptId,target_module:id,succeeded});
  return succeeded;
 }
@@ -77,7 +77,7 @@ function createPortalLogoutHandler({environment=process.env,clientFactory=create
    const admin=createPortalAdmin(configs,clientFactory);
    const queued=await checkedRpc(admin,'portal_logout_enqueue',{google_subject:identity.subject,verified_email:identity.email,source});
    receiptId=queued.receiptId;if(typeof receiptId!=='string')throw Error('Outbox receipt missing');
-   sourceRevoked=await processTarget(admin,receiptId,source,identity,dependencies);
+   sourceRevoked=await processTarget(admin,receiptId,source,identity,dependencies,true);
    if(sourceRevoked)await Promise.allSettled(moduleIds.filter(id=>id!==source).map(id=>processTarget(admin,receiptId,id,identity,dependencies)));
    const receipt=await checkedRpc(admin,'portal_logout_receipt',{receipt_id:receiptId});
    if(receipt.ok===true&&moduleIds.every(id=>receipt.revokedModules?.includes(id)))return reply(200,{ok:true,receiptId,revokedModules:moduleIds});

@@ -13,7 +13,7 @@ const environment={APM_SOURCE_SUPABASE_REF:projects.apm,APM_PORTAL_LOGOUT_SECRET
 for(const[id,ref]of Object.entries(projects)){const prefix=id==='portal'?'PORTAL':id.toUpperCase()+'_SOURCE';environment[prefix+'_SUPABASE_URL']='https://'+ref+'.supabase.co';environment[prefix+'_SUPABASE_PUBLISHABLE_KEY']=id+'-public';if(id!=='apm')environment[prefix+'_SUPABASE_SERVICE_ROLE_KEY']=id+'-service';}
 function response(){return{statusCode:0,headers:{},body:'',setHeader(key,value){this.headers[key]=value;},end(value=''){this.body=value;}};}
 function request(source){return{method:'POST',headers:{origin:{portal:'https://login.suiyuecare.com',hr:'https://hr.suiyuecare.com',finance:'https://finance.suiyuecare.com',apm:'https://apm.suiyuecare.com'}[source],authorization:'Bearer synthetic-jwt'},body:{source}};}
-function fixture({failure=null,revoked=false,user=identity,apmBound=true,env=environment}={}){
+function fixture({failure=null,unmatched=null,revoked=false,user=identity,apmBound=true,env=environment}={}){
  const calls=[],events=[],jobs=new Map(),tickets=new Set();
  let targetFailure=failure;
  const receipt=id=>{const job=jobs.get(id),revokedModules=modules.filter(module=>job.done.has(module)),pendingModules=modules.filter(module=>!job.done.has(module));return{receiptId:id,source:job.source,ok:pendingModules.length===0,sourceRevoked:job.done.has(job.source),revokedModules,pendingModules};};
@@ -26,8 +26,8 @@ function fixture({failure=null,revoked=false,user=identity,apmBound=true,env=env
    if(name==='portal_logout_record'){if(args.succeeded)jobs.get(args.receipt_id).done.add(args.target_module);events.push('record:'+args.target_module+':'+args.succeeded);return{data:receipt(args.receipt_id)};}
    if(name==='portal_logout_receipt')return{data:receipt(args.receipt_id)};
    if(name==='portal_logout_consume_worker_ticket'){const valid=tickets.delete(args.request_ticket);return{data:valid};}
-   if(name==='portal_logout_claim'){const batch=[];for(const[id,job]of jobs){for(const module of modules){if(!job.done.has(module)&&(module===job.source||job.done.has(job.source)))batch.push({receiptId:id,moduleId:module,googleSubject:job.subject,verifiedEmail:job.email});}}return{data:batch.slice(0,args.batch_size)};}
-   if(name==='portal_revoke_google_sessions'){const module=key.replace('-service','');events.push('revoke:'+module);return key===targetFailure+'-service'?{error:{message:'synthetic failure'}}:{data:{revoked:true,matched:true}};}
+   if(name==='portal_logout_claim'){const batch=[];for(const[id,job]of jobs){for(const module of modules){if(!job.done.has(module)&&(module===job.source||job.done.has(job.source)))batch.push({receiptId:id,moduleId:module,source:job.source,googleSubject:job.subject,verifiedEmail:job.email});}}return{data:batch.slice(0,args.batch_size)};}
+   if(name==='portal_revoke_google_sessions'){const module=key.replace('-service','');events.push('revoke:'+module);return key===targetFailure+'-service'?{error:{message:'synthetic failure'}}:{data:{revoked:true,matched:module!==unmatched}};}
    throw Error('unexpected RPC '+name);
   }};
  };
@@ -40,7 +40,7 @@ function fixture({failure=null,revoked=false,user=identity,apmBound=true,env=env
   assert.equal(body.action==='resolve'||body.action==='revoke',true);
   events.push('apm:'+body.action);
   if(body.action==='resolve')return{ok:apmBound,json:async()=>({googleSubject:'synthetic-google-sub',verifiedEmail:'qa@suiyuecare.com'})};
-  return{ok:targetFailure!=='apm',json:async()=>({revoked:true,matched:true})};
+  return{ok:targetFailure!=='apm',json:async()=>({revoked:true,matched:unmatched!=='apm'})};
  };
  return{handler:createPortalLogoutHandler({environment:env,clientFactory,fetchImplementation}),worker:createPortalLogoutWorker({environment:env,clientFactory,fetchImplementation}),calls,events,jobs,tickets,setFailure:value=>{targetFailure=value;}};
 }
@@ -65,6 +65,9 @@ assert.equal(partialResponse.statusCode,202);const pending=JSON.parse(partialRes
 assert.ok(partial.events.indexOf('revoke:hr')<partial.events.indexOf('revoke:finance'));
 const ticket=randomUUID();partial.tickets.add(ticket);partial.setFailure(null);const workerResponse=response();await partial.worker({method:'POST',body:{ticket}},workerResponse);
 assert.equal(workerResponse.statusCode,200);assert.equal(JSON.parse(workerResponse.body).completed,1);assert.equal(partial.jobs.get(pending.receiptId).done.size,4);
+const unmatchedSource=fixture({unmatched:'hr'}),unmatchedResponse=response();await unmatchedSource.handler(request('hr'),unmatchedResponse);
+assert.equal(unmatchedResponse.statusCode,202);assert.equal(JSON.parse(unmatchedResponse.body).sourceRevoked,false);
+assert.ok(!unmatchedSource.events.includes('apm:revoke'));assert.ok(!unmatchedSource.events.includes('revoke:finance'));
 const replay=response();await partial.worker({method:'POST',body:{ticket}},replay);assert.equal(replay.statusCode,401);
 const unbound=fixture({apmBound:false}),unboundResponse=response();await unbound.handler(request('apm'),unboundResponse);assert.ok(unboundResponse.statusCode>=400);assert.equal(unbound.jobs.size,0);
 const misconfigured=fixture({env:{...environment,APM_PORTAL_LOGOUT_SECRET:''}}),misconfiguredResponse=response();await misconfigured.handler(request('hr'),misconfiguredResponse);assert.equal(misconfiguredResponse.statusCode,503);assert.equal(misconfigured.jobs.size,0);

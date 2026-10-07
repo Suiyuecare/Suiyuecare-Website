@@ -27,6 +27,7 @@ assert.deepEqual(receipt.pendingModules,['portal','finance','apm']);
 await db.query("update private.portal_logout_targets set next_attempt_at=now()-interval '1 minute' where job_id=$1",[receiptId]);
 const batch=await callService('select public.portal_logout_claim(8) v');
 assert.deepEqual(batch.map(target=>target.moduleId).sort(),['apm','finance','portal']);
+assert.ok(batch.every(target=>target.source==='hr'));
 for(const target of batch)await callService('select public.portal_logout_record($1,$2,true) v',[receiptId,target.moduleId]);
 receipt=await callService('select public.portal_logout_receipt($1) v',[receiptId]);assert.equal(receipt.ok,true);assert.deepEqual(receipt.pendingModules,[]);
 const ticket=randomUUID();await db.query("insert into private.portal_logout_worker_tickets(ticket,expires_at) values($1,now()+interval '1 minute')",[ticket]);
