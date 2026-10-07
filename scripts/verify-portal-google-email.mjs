@@ -9,7 +9,7 @@ const { createPortalApiHandler } = require("../api/portal-handoff.js");
 const oldEmail = "cms.ntpc.2@suiyuecare.com";
 const email = "cms.ntpc2@suiyuecare.com";
 const identity = (address, verified = true, provider = "google") => ({
-  provider, identity_data: { email: address, email_verified: verified }
+  provider, identity_data: { email: address, email_verified: verified, sub: "verified-rename-subject" }
 });
 const user = (identities = [identity(email)]) => ({
   id: "renamed-workspace-user", email: oldEmail,
@@ -84,6 +84,7 @@ assert.equal(handoff.statusCode, 200);
 const payload = JSON.parse(Buffer.from(handoff.body.payload, "base64url"));
 assert.equal(payload.email, email);
 assert.equal(payload.aud, "apm");
+assert.equal(payload.googleSubject, "verified-rename-subject");
 assert.equal(payload.returnTo, "/tasks");
 assert.equal(Object.hasOwn(payload, "role"), false);
 for (const claimed of [oldEmail, "entrepreneur@suiyuecare.com"]) {
