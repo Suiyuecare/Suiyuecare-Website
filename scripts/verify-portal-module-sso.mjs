@@ -10,7 +10,7 @@ const projects={portal:'ussnmxdpxeoshlrdchov',hr:'eswdhynrbzrjgetnmhit',finance:
 const modules=['portal','hr','finance','apm'];
 const identity={id:'80000000-0000-4000-8000-000000000001',email:'qa@suiyuecare.com',email_confirmed_at:'2026-01-01',identities:[{provider:'google',identity_data:{sub:'synthetic-google-sub',email:'qa@suiyuecare.com',email_verified:true}}]};
 const createdBefore='2026-10-07T18:00:00.123456Z';
-const environment={APM_SOURCE_SUPABASE_REF:projects.apm,APM_PORTAL_LOGOUT_SECRET:'synthetic-apm-logout-secret-with-at-least-32-characters'};
+const environment={VERCEL_ENV:'production',APM_SOURCE_SUPABASE_REF:projects.apm,APM_PORTAL_LOGOUT_SECRET:'synthetic-apm-logout-secret-with-at-least-32-characters'};
 for(const[id,ref]of Object.entries(projects)){const prefix=id==='portal'?'PORTAL':id.toUpperCase()+'_SOURCE';environment[prefix+'_SUPABASE_URL']='https://'+ref+'.supabase.co';environment[prefix+'_SUPABASE_PUBLISHABLE_KEY']=id+'-public';if(id!=='apm')environment[prefix+'_SUPABASE_SERVICE_ROLE_KEY']=id+'-service';}
 function response(){return{statusCode:0,headers:{},body:'',setHeader(key,value){this.headers[key]=value;},end(value=''){this.body=value;}};}
 function request(source){return{method:'POST',headers:{origin:{portal:'https://login.suiyuecare.com',hr:'https://hr.suiyuecare.com',finance:'https://finance.suiyuecare.com',apm:'https://apm.suiyuecare.com'}[source],authorization:'Bearer synthetic-jwt'},body:{source}};}
@@ -75,6 +75,7 @@ assert.ok(!unmatchedSource.events.includes('apm:revoke'));assert.ok(!unmatchedSo
 const replay=response();await partial.worker({method:'POST',body:{ticket}},replay);assert.equal(replay.statusCode,401);
 const unbound=fixture({apmBound:false}),unboundResponse=response();await unbound.handler(request('apm'),unboundResponse);assert.ok(unboundResponse.statusCode>=400);assert.equal(unbound.jobs.size,0);
 const misconfigured=fixture({env:{...environment,APM_PORTAL_LOGOUT_SECRET:''}}),misconfiguredResponse=response();await misconfigured.handler(request('hr'),misconfiguredResponse);assert.equal(misconfiguredResponse.statusCode,503);assert.equal(misconfigured.jobs.size,0);
+const preview=fixture({env:{...environment,VERCEL_ENV:'preview'}}),previewResponse=response();await preview.handler(request('hr'),previewResponse);assert.equal(previewResponse.statusCode,503);assert.equal(preview.jobs.size,0);
 const wrongSource=fixture(),wrongSourceResponse=response();await wrongSource.handler({...request('hr'),body:{source:'portal'}},wrongSourceResponse);assert.equal(wrongSourceResponse.statusCode,403);assert.equal(wrongSource.jobs.size,0);
 const routed=response();await createPortalApiHandler({environment})({...request('hr'),url:'/api/portal-handoff?action=logout',headers:{origin:'https://evil.test'}},routed);assert.equal(routed.statusCode,403);
 const handoff=normalizePayload({roles:['owner'],googleSubject:'forged'},identity,'hr',2000000000,()=> '80000000-0000-4000-8000-000000000001');assert.equal(handoff.exp-handoff.iat,60);assert.equal(handoff.googleSubject,'synthetic-google-sub');assert.equal(handoff.roles,undefined);assert.throws(()=>normalizePayload({email:'other@suiyuecare.com'},identity,'hr',2000000000,()=>''));

@@ -10,6 +10,9 @@ function projectConfiguration(env){
  }));
 }
 function validConfiguration(env){
+ // All configured module refs are production refs. Never route a Preview
+ // deployment's logout request into production Auth projects.
+ if(env.VERCEL_ENV!=='production')return null;
  const configs=projectConfiguration(env);
  if(moduleIds.some(id=>!configs[id].expectedUrl||configs[id].url!==configs[id].expectedUrl||!configs[id].publicKey||(id!=='apm'&&!configs[id].service)))return null;
  if(typeof env.APM_PORTAL_LOGOUT_SECRET!=='string'||env.APM_PORTAL_LOGOUT_SECRET.length<32)return null;

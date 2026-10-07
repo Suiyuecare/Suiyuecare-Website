@@ -4,6 +4,8 @@ Portal API 先將精確 Google subject、已驗證電郵、建立時的 UTC `cre
 
 新 migration **不啟用排程**。正式啟用前須核對目前連線確為 Portal Supabase 專案 `ussnmxdpxeoshlrdchov`，確認四模組撤銷器與 `/api/portal-handoff?action=logout-worker` 已部署，並以測試帳號驗證 200、202 及補償流程。之後才執行 [activate_portal_logout_worker.sql](activate_portal_logout_worker.sql)。此腳本每分鐘用 Supabase Cron 呼叫 `private.portal_logout_dispatch_worker()`，由 pg_net 送出一次性、兩分鐘內有效的 ticket；固定密鑰不進入 pg_net request queue。
 
+由於本協調器固定指向四個正式 Supabase 專案及 APM 正式網域，API 只在 `VERCEL_ENV=production` 執行。Preview 不會用正式身分與金鑰撤銷任何 session；正式跨模組驗收需在受控的正式發布窗口進行。
+
 運作檢查：
 
 ```sql
