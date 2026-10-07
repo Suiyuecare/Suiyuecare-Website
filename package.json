@@ -50,7 +50,7 @@
     "verify:public-editorial": "node scripts/verify-public-editorial.mjs && node scripts/verify-article-editorial-fields.mjs",
     "verify:home-image-loading": "node scripts/verify-home-image-loading.mjs",
     "verify:seo-next": "node scripts/verify-analytics-route.mjs && node scripts/verify-search-console-import.mjs && node scripts/verify-admin-toast-text.mjs && node scripts/verify-topic-guides.mjs && node scripts/verify-seo-consolidation.mjs",
-    "verify:portal-session": "node scripts/verify-portal-module-sso.mjs && node scripts/verify-portal-session-database.mjs",
+    "verify:portal-session": "node scripts/verify-portal-module-sso.mjs && node scripts/verify-portal-session-database.mjs && node scripts/verify-portal-client-logout.mjs",
     "verify:cms-seed": "node scripts/verify-cms-seed.mjs"
   },
   "dependencies": {

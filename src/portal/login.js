@@ -5639,6 +5639,14 @@ function renderSecurityRestrictionTool(profile) {
 }
 
 async function bootPortalLogin() {
+  if(new URLSearchParams(window.location.search).get('logout')==='pending'){
+    window.sessionStorage.removeItem(portalLogoutPendingKey);
+    clearStoredProfile();window.sessionStorage.removeItem(pendingModuleLaunchKey);renderSession(null);
+    if(userSummary)userSummary.textContent='';
+    try{await supabase?.auth.signOut({scope:'local'});}catch{}
+    showPortalLogoutProgress('此裝置已登出，其他系統登出處理中；請稍後再重新登入。','pending');
+    return;
+  }
   if(portalLogoutIsPending()){await performPortalLogout();return;}
   rememberRequestedModuleLaunch();
   const requestedLaunch = consumeRequestedModuleLaunch();
@@ -5650,30 +5658,42 @@ async function bootPortalLogin() {
 }
 
 function portalLogoutIsPending(){return window.sessionStorage.getItem(portalLogoutPendingKey)==='1';}
-function showPortalLogoutProgress(message,busy,complete=false){
+function showPortalLogoutProgress(message,mode){
   let panel=document.querySelector('#portal-module-logout');
   if(!panel){panel=document.createElement('section');panel.id='portal-module-logout';panel.setAttribute('role','status');panel.setAttribute('aria-live','polite');panel.style.cssText='position:fixed;inset:0;z-index:99999;background:#fff8ef;display:grid;place-content:center;gap:20px;padding:24px;text-align:center;color:#4a3f35;';document.body.appendChild(panel);}
   panel.replaceChildren();
-  const title=document.createElement('h1');title.textContent=complete?'已登出':'正在登出';title.style.cssText='font-size:24px;margin:0';panel.appendChild(title);
+  const title=document.createElement('h1');title.textContent=mode==='complete'?'已登出':mode==='busy'?'正在登出':'登出處理中';title.style.cssText='font-size:24px;margin:0';panel.appendChild(title);
   const text=document.createElement('p');text.textContent=message;panel.appendChild(text);
-  if(!busy){const button=document.createElement('button');button.type='button';button.textContent=complete?'回模組頁':'重試登出';button.className='primary-button';button.style.minHeight='44px';button.addEventListener('click',complete?()=>window.location.replace(portalHomePath):performPortalLogout);panel.appendChild(button);button.focus();}
+  if(mode!=='busy'){const button=document.createElement('button');button.type='button';button.textContent=mode==='retry'?'重試登出':'返回登入頁';button.className='primary-button';button.style.minHeight='44px';button.addEventListener('click',mode==='retry'?performPortalLogout:()=>window.location.replace(portalHomePath));panel.appendChild(button);button.focus();}
 }
 async function performPortalLogout(){
   if(portalLogoutRunning)return;
   portalLogoutRunning=true;window.sessionStorage.setItem(portalLogoutPendingKey,'1');
   clearStoredProfile();window.sessionStorage.removeItem(pendingModuleLaunchKey);renderSession(null);
   if(userSummary)userSummary.textContent='';
-  showPortalLogoutProgress('正在登出人資、會計、敏捷專案管理與模組頁…',true);
+  showPortalLogoutProgress('正在登出人資、會計、敏捷專案管理與模組頁…','busy');
   try{
     const current=await supabase?.auth.getSession();
     if(!current?.data.session)throw new Error('session');
     const result=await fetch('/api/portal-handoff?action=logout',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${current.data.session.access_token}`},body:JSON.stringify({source:'portal'}),cache:'no-store',credentials:'omit',redirect:'error',signal:AbortSignal.timeout(30000)});
     const data=await result.json();
-    if(!result.ok||data?.ok!==true||!Array.isArray(data.revokedModules)||!['hr','finance','apm','portal'].every(id=>data.revokedModules.includes(id)))throw new Error('incomplete');
+    const complete=result.ok&&data?.ok===true&&Array.isArray(data.revokedModules)&&['hr','finance','apm','portal'].every(id=>data.revokedModules.includes(id));
+    const queued=result.status===202&&data?.pending===true&&typeof data.receiptId==='string'&&Array.isArray(data.pendingModules);
+    if(!complete&&!queued)throw new Error('incomplete');
+    if(queued&&data.sourceRevoked!==true){showPortalLogoutProgress('登出尚未完成，請重試；其他模組的結果尚未確認。','retry');return;}
     const out=await supabase.auth.signOut({scope:'local'});if(out.error)throw new Error('local');
     window.sessionStorage.removeItem(portalLogoutPendingKey);
-    showPortalLogoutProgress('已登出人資、會計、敏捷專案管理與模組頁。',false,true);
-  }catch{showPortalLogoutProgress('登出未全部完成，請重試；其他模組的結果尚未確認。',false);}
+    showPortalLogoutProgress(complete?'已登出人資、會計、敏捷專案管理與模組頁。':'本機已登出，其他系統正在由背景程序完成登出；目前不能視為全部登出。',complete?'complete':'pending');
+  }catch{
+    let sourceActive=false;
+    try{const status=await supabase?.rpc('portal_session_status');sourceActive=status?.data?.active===true;}catch{}
+    if(sourceActive)showPortalLogoutProgress('登出尚未完成，請重試；其他模組的結果尚未確認。','retry');
+    else{
+      try{await supabase?.auth.signOut({scope:'local'});}catch{}
+      window.sessionStorage.removeItem(portalLogoutPendingKey);
+      showPortalLogoutProgress('本機登入已清除，跨系統登出結果尚未確認；請稍後向管理員確認。','pending');
+    }
+  }
   finally{portalLogoutRunning=false;}
 }
 signOutButton?.addEventListener('click',performPortalLogout);

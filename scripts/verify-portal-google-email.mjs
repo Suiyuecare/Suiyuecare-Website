@@ -9,7 +9,7 @@ const { createPortalApiHandler } = require("../api/portal-handoff.js");
 const oldEmail = "cms.ntpc.2@suiyuecare.com";
 const email = "cms.ntpc2@suiyuecare.com";
 const identity = (address, verified = true, provider = "google") => ({
-  provider, identity_data: { email: address, email_verified: verified }
+  provider, identity_data: { sub: "synthetic-google-subject", email: address, email_verified: verified }
 });
 const user = (identities = [identity(email)]) => ({
   id: "renamed-workspace-user", email: oldEmail,
