@@ -79,7 +79,12 @@ export function verifyAssertion(result, moduleId, email) {
     ? ["email", "iat", "exp", "jti", "source", "aud", "googleSubject"]
     : moduleId === "edoc"
     ? ["email", "iat", "exp", "jti", "source", "aud", "moduleId", "authUserId"]
+    : moduleId === "apm"
+    ? ["email", "iat", "exp", "jti", "aud", "returnTo", "googleSubject"]
     : ["email", "iat", "exp", "jti", "aud", "returnTo"]).sort());
+  if (moduleId === "apm") {
+    assert.equal(claim.googleSubject, "fictional-google-subject");
+  }
   if (moduleId === "hr") {
     assert.equal(claim.googleSubject, "fictional-google-subject");
     assert.equal(claim.source, "logging-portal");

@@ -230,6 +230,7 @@ function handlerFor(user, overrides = {}) {
   const apmPayload = decodeSignedPayload(apmResult);
   assert.deepEqual(apmPayload, {
     email,
+    googleSubject: "google-sub-123",
     iat: Math.floor(issuedAtMs / 1000),
     exp: Math.floor(issuedAtMs / 1000) + 600,
     jti: fixedJti,

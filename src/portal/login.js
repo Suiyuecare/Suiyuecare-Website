@@ -5663,16 +5663,16 @@ async function performPortalLogout(){
   portalLogoutRunning=true;window.sessionStorage.setItem(portalLogoutPendingKey,'1');
   clearStoredProfile();window.sessionStorage.removeItem(pendingModuleLaunchKey);renderSession(null);
   if(userSummary)userSummary.textContent='';
-  showPortalLogoutProgress('正在登出人資、會計與模組頁…',true);
+  showPortalLogoutProgress('正在登出人資、會計、敏捷專案管理與模組頁…',true);
   try{
     const current=await supabase?.auth.getSession();
     if(!current?.data.session)throw new Error('session');
     const result=await fetch('/api/portal-handoff?action=logout',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${current.data.session.access_token}`},body:JSON.stringify({source:'portal'}),cache:'no-store',credentials:'omit',redirect:'error',signal:AbortSignal.timeout(30000)});
     const data=await result.json();
-    if(!result.ok||data?.ok!==true||!Array.isArray(data.revokedModules)||!['hr','finance','portal'].every(id=>data.revokedModules.includes(id)))throw new Error('incomplete');
+    if(!result.ok||data?.ok!==true||!Array.isArray(data.revokedModules)||!['hr','finance','apm','portal'].every(id=>data.revokedModules.includes(id)))throw new Error('incomplete');
     const out=await supabase.auth.signOut({scope:'local'});if(out.error)throw new Error('local');
     window.sessionStorage.removeItem(portalLogoutPendingKey);
-    showPortalLogoutProgress('已登出人資、會計與模組頁。',false,true);
+    showPortalLogoutProgress('已登出人資、會計、敏捷專案管理與模組頁。',false,true);
   }catch{showPortalLogoutProgress('登出未全部完成，請重試；其他模組的結果尚未確認。',false);}
   finally{portalLogoutRunning=false;}
 }
