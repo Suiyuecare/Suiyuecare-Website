@@ -129,7 +129,24 @@ await test("fresh Google OAuth preserves only the Daycare module, not client pat
   requestedRedirectLaunch = { moduleId: "day-care", returnTo: "https://evil.example/app" };
   check(subject.getPortalRedirectUrl(), "https://suiyuecare-website.vercel.app/portal/");
   requestedRedirectLaunch = { moduleId: "apm", returnTo: "https://apm.suiyuecare.com/tasks" };
-  check(subject.getPortalRedirectUrl(), "https://suiyuecare-website.vercel.app/portal/");
+  check(subject.getPortalRedirectUrl(), "https://suiyuecare-website.vercel.app/portal/?module=apm");
+});
+
+await test("fresh OAuth preserves HR entry without leaking private paths or granting module access", () => {
+  requestedRedirectLaunch = { moduleId: "hr", returnTo: "https://hr.suiyuecare.com/#live/my-payroll?employee=private" };
+  check(subject.getPortalRedirectUrl(), "https://suiyuecare-website.vercel.app/portal/?module=hr");
+  for (const request of [
+    { moduleId: "hr", returnTo: "https://evil.example/" },
+    { moduleId: "hr", returnTo: "https://hr.suiyuecare.com.evil.example/" },
+    { moduleId: "hr", returnTo: "https://user:secret@hr.suiyuecare.com/" },
+    { moduleId: "hr", returnTo: "javascript:alert(1)" },
+    { moduleId: "__proto__", returnTo: "https://hr.suiyuecare.com/" },
+    { moduleId: "unconfigured", returnTo: "https://hr.suiyuecare.com/" }
+  ]) {
+    requestedRedirectLaunch = request;
+    check(subject.getPortalRedirectUrl(), "https://suiyuecare-website.vercel.app/portal/");
+  }
+  assertNoIdentityTransfer();
 });
 
 const allowedProfiles = [
