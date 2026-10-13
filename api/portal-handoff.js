@@ -255,6 +255,7 @@ function normalizePayload(rawPayload, user, moduleId, issuedAt, randomUUID) {
     return {
       ...commonIdentity,
       aud: "apm",
+      googleSubject: confirmedGoogleSubject(user),
       returnTo: normalizeApmReturnTo(payload.returnTo)
     };
   }

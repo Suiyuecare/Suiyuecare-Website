@@ -220,6 +220,7 @@ function handlerFor(user, overrides = {}) {
     moduleId: "apm",
     email,
     returnTo: "/tasks?create=delegated",
+    googleSubject: "attacker-selected-subject",
     role: "ceo",
     scope: "group",
     actions: ["manage"]
@@ -234,6 +235,7 @@ function handlerFor(user, overrides = {}) {
     exp: Math.floor(issuedAtMs / 1000) + 600,
     jti: fixedJti,
     aud: "apm",
+    googleSubject: "google-sub-123",
     returnTo: "/tasks?create=delegated"
   });
   assert.equal(Object.hasOwn(apmPayload, "role"), false);
@@ -392,6 +394,27 @@ function handlerFor(user, overrides = {}) {
     requestFor({ moduleId: "apm", email, returnTo: "/dashboard" })
   );
   assert.equal(passwordIdentity.status, 403);
+
+  // APM may bind the signed Google subject to an existing Auth user, so the
+  // subject must be unique and provider-confirmed before any assertion exists.
+  for (const identities of [
+    [],
+    [{ provider: "google", identity_data: { email, email_verified: true } }],
+    [{ provider: "google", provider_id: "other-google-sub", identity_data: {
+      email, email_verified: true, sub: "google-sub-123"
+    } }],
+    [
+      { provider: "google", identity_data: { email, email_verified: true, sub: "google-sub-123" } },
+      { provider: "google", identity_data: { email, email_verified: true, sub: "google-sub-456" } }
+    ]
+  ]) {
+    const rejected = await invoke(
+      handlerFor(verifiedGoogleUser(email, { identities })),
+      requestFor({ moduleId: "apm", email, returnTo: "/dashboard" })
+    );
+    assert.ok([401, 403].includes(rejected.status));
+    assert.equal(rejected.body.signature, undefined);
+  }
 }
 
 {
