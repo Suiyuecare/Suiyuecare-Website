@@ -131,7 +131,7 @@ function financeRow(overrides = {}) {
   assert.equal(financeCalls[0].url.searchParams.get("org_status"), "eq.active");
   assert.equal(
     financeCalls[0].url.searchParams.get("org_source"),
-    "in.(pptx_org_chart_20260728,personnel_management)"
+    "in.(pptx_org_chart_20260728,personnel_management,atomic_member_admin_v1)"
   );
   assert.equal(financeCalls[0].init.cache, "no-store");
   assert.ok(financeCalls[0].init.signal instanceof AbortSignal);
@@ -272,6 +272,97 @@ function financeRow(overrides = {}) {
   ], "homecare.taipei2@suiyuecare.com");
   assert.equal(profile.email, "homecare.taipei2@suiyuecare.com");
   assert.deepEqual(profile.allowedModules, ["accounting", "apm", "edoc"]);
+}
+
+// A member saved by the transactional personnel editor can enter Portal and
+// launch both signed modules through the same real Finance profile lookup.
+// This is a fictional account outside the static roster, including a Workspace
+// primary-address change. Auth's old email must not pick another employee.
+{
+  const email = "atomic-member.fixture@suiyuecare.com";
+  const authId = "fixture-portal-auth-id";
+  const user = {
+    id: authId,
+    email: "old-address.fixture@suiyuecare.com",
+    identities: [{ provider: "google", identity_data: { email, email_verified: true } }]
+  };
+  let currentRows = [financeRow({ email, org_source: "atomic_member_admin_v1" })];
+  let currentSession = { active: true, userId: authId };
+  const financeCalls = [];
+  const handler = createPortalApiHandler({
+    environment: {
+      ...environment,
+      APM_PORTAL_SIGNING_SECRET: "a".repeat(48),
+      EDOC_PORTAL_HANDOFF_SECRET: "e".repeat(48)
+    },
+    createPortalClient: () => ({
+      ...portalClientFor(user)(),
+      rpc: async (name) => {
+        assert.equal(name, "portal_session_status");
+        return { data: currentSession, error: null };
+      }
+    }),
+    fetchImplementation: async (input) => {
+      const url = new URL(input);
+      financeCalls.push(url);
+      assert.equal(url.searchParams.get("email"), `eq.${email}`);
+      assert.equal(url.searchParams.get("active"), "eq.true");
+      assert.equal(url.searchParams.get("org_status"), "eq.active");
+      assert.equal(url.searchParams.get("org_source"),
+        "in.(pptx_org_chart_20260728,personnel_management,atomic_member_admin_v1)");
+      return Response.json(currentRows);
+    }
+  });
+  const getRequest = { method: "GET", headers: { authorization: `Bearer ${portalToken}` } };
+  const getResult = await invoke(handler, getRequest);
+  assert.equal(getResult.status, 200);
+  assert.equal(getResult.body.profile.email, email);
+  assert.deepEqual(getResult.body.profile.allowedModules, ["accounting", "apm", "edoc"]);
+  for (const forbidden of ["u_ppt_profile", "role", "scope", "authUserId"]) {
+    assert.equal(JSON.stringify(getResult.body).includes(forbidden), false);
+  }
+
+  for (const moduleId of ["apm", "edoc"]) {
+    const before = financeCalls.length;
+    const result = await invoke(handler, {
+      method: "POST", headers: getRequest.headers,
+      body: { payload: { moduleId, email, role: "ceo", scope: "group", actions: ["manage"] } }
+    });
+    assert.equal(result.status, 200);
+    assert.equal(financeCalls.length, before + 1, "Each launch must revalidate the member");
+    const signed = JSON.parse(Buffer.from(result.body.payload, "base64url").toString("utf8"));
+    assert.equal(signed.email, email);
+    assert.equal(signed.aud, moduleId);
+    assert.equal(Object.hasOwn(signed, "role"), false);
+    assert.equal(Object.hasOwn(signed, "scope"), false);
+    assert.equal(Object.hasOwn(signed, "actions"), false);
+    if (moduleId === "edoc") assert.equal(signed.authUserId, authId);
+  }
+
+  const validRow = currentRows[0];
+  for (const rows of [[], [validRow, validRow], [{ ...validRow, active: false }],
+    [{ ...validRow, org_status: "inactive" }], [{ ...validRow, email: user.email }],
+    [{ ...validRow, org_source: "untrusted-member-source" }]]) {
+    currentRows = rows;
+    const result = await invoke(handler, getRequest);
+    assert.notEqual(result.status, 200, "Invalid members must remain blocked");
+    assert.equal(result.body.profile, undefined);
+    for (const moduleId of ["apm", "edoc"]) {
+      const denied = await invoke(handler, {
+        method: "POST", headers: getRequest.headers, body: { payload: { moduleId, email } }
+      });
+      assert.notEqual(denied.status, 200, "Invalid members must not obtain module assertions");
+      assert.equal(denied.body.signature, undefined);
+    }
+  }
+  currentRows = [validRow];
+  for (const session of [{ active: false, userId: authId }, { active: true, userId: "another-auth-id" }]) {
+    currentSession = session;
+    const before = financeCalls.length;
+    const result = await invoke(handler, getRequest);
+    assert.equal(result.status, 401);
+    assert.equal(financeCalls.length, before, "Invalid sessions must not query employee profiles");
+  }
 }
 
 {

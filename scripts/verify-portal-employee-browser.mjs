@@ -50,7 +50,8 @@ const evidence = { mode: "local fictional identities and transport; real UI and 
 try {
   for (const width of [1440, 390]) {
     for (const [index, email] of employeeEmails.entries()) {
-      current = employeeHandler(email);
+      const orgSource = ["personnel_management", "atomic_member_admin_v1", "pptx_org_chart_20260728"][index];
+      current = employeeHandler(email, { row: { org_source: orgSource } });
       const context = await browser.newContext({ viewport: { width, height: 900 } });
       await context.addInitScript((value) => { window.__fixtureEmail = value; }, email);
       const received = [];
@@ -98,7 +99,7 @@ try {
           verifyAssertion({ statusCode: 200, headers: { "cache-control": "no-store" }, body: { payload, signature } }, moduleId, email);
         }
       }
-      evidence.cases.push({ width, identity: index, threeFinanceGrantsAndHrCheckVisible: true, deniedAdminClick: true, ownFinanceEntry: true, signedEdocApmAndHr: true, overflow });
+      evidence.cases.push({ width, identity: index, orgSource, threeFinanceGrantsAndHrCheckVisible: true, deniedAdminClick: true, ownFinanceEntry: true, signedEdocApmAndHr: true, overflow });
       await context.close();
     }
     for (const [name, options] of [["inactive", { rows: [] }], ["unverified", { user: { email_confirmed_at: null } }]]) {

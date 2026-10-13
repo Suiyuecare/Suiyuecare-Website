@@ -50,7 +50,7 @@ export function employeeHandler(email, options = {}) {
       assert.equal(url.searchParams.get("email"), `eq.${email}`);
       assert.equal(url.searchParams.get("active"), "eq.true");
       assert.equal(url.searchParams.get("org_status"), "eq.active");
-      assert.equal(url.searchParams.get("org_source"), "in.(pptx_org_chart_20260728,personnel_management)");
+      assert.equal(url.searchParams.get("org_source"), "in.(pptx_org_chart_20260728,personnel_management,atomic_member_admin_v1)");
       assert.equal(init.method, "GET");
       reads.push(url.toString());
       return Response.json(options.rows ?? [row]);
@@ -98,8 +98,9 @@ function realFunctions(names) {
 
 export async function verifyEmployeeModules() {
   let checks = 0;
-  for (const email of employeeEmails) {
-    const { handler, reads } = employeeHandler(email);
+  for (const [index, email] of employeeEmails.entries()) {
+    const orgSource = ["personnel_management", "atomic_member_admin_v1", "pptx_org_chart_20260728"][index];
+    const { handler, reads } = employeeHandler(email, { row: { org_source: orgSource } });
     const result = await invokePortal(handler);
     assert.equal(result.statusCode, 200);
     assert.deepEqual(result.body.profile.allowedModules, allowedModules); checks++;

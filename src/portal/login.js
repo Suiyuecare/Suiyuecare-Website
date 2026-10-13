@@ -2765,14 +2765,18 @@ function getPortalRedirectUrl() {
 
   // Google OAuth returns to the Vercel bridge origin, which has a different
   // sessionStorage from login.suiyuecare.com. Carry only the module ID across
-  // OAuth. A Daycare work path can contain a client identifier and must not be
-  // sent to the identity provider as part of its redirect URL.
+  // OAuth. Work paths can contain personal identifiers and must not be sent to
+  // the identity provider. Authorization is still checked after OAuth returns.
   const requestedLaunch = consumeRequestedModuleLaunch();
-  if (requestedLaunch?.moduleId !== "day-care") return destination;
+  const moduleId = requestedLaunch?.moduleId;
+  if (!Object.prototype.hasOwnProperty.call(moduleLaunchUrls, moduleId)) return destination;
   try {
-    moduleReturnPath("day-care", requestedLaunch.returnTo);
+    const launchUrl = new URL(requestedLaunch.returnTo, moduleLaunchUrls[moduleId]);
+    const configuredUrl = new URL(moduleLaunchUrls[moduleId]);
+    if (launchUrl.origin !== configuredUrl.origin || launchUrl.username || launchUrl.password) return destination;
+    moduleReturnPath(moduleId, requestedLaunch.returnTo);
     const url = new URL(destination);
-    url.searchParams.set("module", "day-care");
+    url.searchParams.set("module", moduleId);
     return url.toString();
   } catch {
     return destination;
