@@ -1,6 +1,8 @@
 const { createClient } = require("@supabase/supabase-js");
 
-const financeRosterSources = ["pptx_org_chart_20260728", "personnel_management"];
+// Include the authoritative transactional personnel editor's source. It writes
+// this marker after a validated member update; it does not change module roles.
+const financeRosterSources = ["pptx_org_chart_20260728", "personnel_management", "atomic_member_admin_v1"];
 const financeProjectRef = "udtlppnrugmtzhigdsxo";
 const financeSupabaseHost = `${financeProjectRef}.supabase.co`;
 const financeRequestTimeoutMs = 10_000;
